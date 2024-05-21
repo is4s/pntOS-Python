@@ -23,6 +23,7 @@ EstimateWithCovarianceType = Enum(
 class EstimateWithCovariance:
     type: EstimateWithCovarianceType
     estimate: NDArray[float64]
+    covariance: NDArray[float64]
 
 
 PluginTypes = Enum(
@@ -142,14 +143,14 @@ class KeyValueStore(Protocol):
     def request_notify(
         self,
         key: Optional[str],
-        callback: Callable[[str, List[str], "KeyValueStore"], int],
+        callback: Callable[[str, List[str], "KeyValueStore"], None],
     ) -> bool:
         pass
 
     def remove_notify(
         self,
         key: Optional[str],
-        callback: Callable[[str, List[str], "KeyValueStore"], int],
+        callback: Callable[[str, List[str], "KeyValueStore"], None],
     ) -> bool:
         pass
 
