@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from enum import Enum
-from typing import Callable, List, Optional, Protocol
+from typing import Callable, List, Optional, Protocol, TypeVar
 
 from aspn23.aspn_base import AspnBase
 from aspn23.type_timestamp import TypeTimestamp
@@ -75,6 +75,7 @@ KeyValueStoreDataFormat = Enum(
     "KeyValueStoreDataFormat", ["PNTOS_KV_STORE_INI", "PNTOS_KV_STORE_UNSPECIFIED"]
 )
 
+ValueType = TypeVar("ValueType", None, str, List[str], int, bool, float, NDArray[float64], Message)
 
 class KeyValueStore(Protocol):
     def get_key_array(self) -> List[str]:
@@ -83,49 +84,13 @@ class KeyValueStore(Protocol):
     def has_key(self, key: str) -> bool:
         pass
 
-    def get_str(self, key: str) -> Optional[str]:
-        pass
-
-    def get_str_array(self, key: str) -> List[str]:
-        pass
-
-    def get_int(self, key: str) -> int:
-        pass
-
-    def get_bool(self, key: str) -> bool:
-        pass
-
-    def get_double(self, key: str) -> float:
-        pass
-
-    def get_double_array(self, key: str) -> NDArray[float64]:
-        pass
-
-    def get_message(self, key: str) -> Optional[Message]:
+    def get_value(self, key: str, type: type[ValueType]) -> ValueType:
         pass
 
     def get_raw(self, key: Optional[str]) -> Optional[bytes]:
         pass
 
-    def set_str(self, key: str, value: str) -> None:
-        pass
-
-    def set_str_array(self, key: str, value: List[str]) -> None:
-        pass
-
-    def set_int(self, key: str, value: int) -> None:
-        pass
-
-    def set_bool(self, key: str, value: bool) -> None:
-        pass
-
-    def set_double(self, key: str, value: float) -> None:
-        pass
-
-    def set_double_array(self, key: str, value: NDArray[float64]) -> None:
-        pass
-
-    def set_message(self, key: str, value: Optional[Message]) -> None:
+    def set_value(self, key: str, value: ValueType) -> None:
         pass
 
     def set_raw(self, key: Optional[str], bytes: bytes) -> None:
