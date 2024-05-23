@@ -35,8 +35,11 @@ from the pntOS project root folder.
 from multiprocessing import Process
 from typing import Optional, Protocol
 
+import aspn23.lcm_translations
+import aspn23.measurement_position_velocity_attitude
 from pntos.api.plugins.common import CommonPlugin, Message
-import aspn23
+from aspn23.measurement_position_velocity_attitude \
+    import MeasurementPositionVelocityAttitude as MeasurementPVA
 
 from lcm import LCM
 
@@ -60,7 +63,7 @@ class TransportPlugin(CommonPlugin, Protocol):
     listener:Process
 
 
-    def __init__(self, url):
+    def __init__(self, url, handler:callable):
         self.identifier = "python-transport-lcm2-plugin"
         self.url = url
 
@@ -180,5 +183,11 @@ class TransportPlugin(CommonPlugin, Protocol):
         Send a message over LCM to a specific channel
         """
         
-        if isinstance(message.wrapped_message, ):
+        if isinstance(message.wrapped_message, MeasurementPVA):
+            translated = \
+                aspn23.lcm_translations.measurement_position_attitude_to_lcm(
+                    message.wrapped_message)
+            self.lcm.publish(channel_name, translated.encode())
+        else:
+            print("Invalid LCM message")
 
