@@ -6,20 +6,13 @@ from multiprocessing import Process
 from typing import Optional, Protocol
 
 from aspn23_lcm import MeasurementPositionVelocityAttitude
-from aspn23.lcm_translations import (
-    lcm_to_measurement_position_velocity_attitude
-)
-from aspn23.lcm_translations import (
-    measurement_position_velocity_attitude_to_lcm
-)
+from aspn23.lcm_translations import lcm_to_measurement_position_velocity_attitude
+from aspn23.lcm_translations import measurement_position_velocity_attitude_to_lcm
 from aspn23.measurement_position_velocity_attitude import (
     MeasurementPositionVelocityAttitude as MeasurementPVA,
 )
 
-from pntos.api.plugins.common import (
-    CommonPlugin, Mediator, Message, LoggingLevel
-)
-
+from pntos.api.plugins.common import CommonPlugin, Mediator, Message, LoggingLevel
 
 
 from lcm import LCM, LCMSubscription
@@ -41,12 +34,13 @@ class TransportPlugin(CommonPlugin, Protocol):
     listener: Process
     mediator: Mediator
     subscription: LCMSubscription
+    channel: str
 
     def __init__(self, url, handler: callable):
         self.identifier = "python-transport-aspn23-plugin"
         self.url = url
 
-    def init_plugin(self, mediator:Mediator):
+    def init_plugin(self, mediator: Mediator):
         """
         pntOS plugin initialization function
 
@@ -65,14 +59,16 @@ class TransportPlugin(CommonPlugin, Protocol):
         if self.subscription is not None and self.lcm is not None:
             self.lcm.unsubscribe(self.subscription)
         self.__init__(self.url, mediator=None)
-        self.mediator.log_message(INFO, "shutdown_plugin for "+self.identifier)
+        self.mediator.log_message(INFO, 
+                                  "shutdown_plugin for " + self.identifier
+                                  )
 
     def general_handler(self):
         """
-        Generic listener for lcm messages to marshal to the mediator for 
+        Generic listener for lcm messages to marshal to the mediator for
         processing.
 
-        NOTE: Current implementation only supports input from the following 
+        NOTE: Current implementation only supports input from the following
         sensors:
             Position-velocity-attitude
         """
@@ -92,10 +88,7 @@ class TransportPlugin(CommonPlugin, Protocol):
         return _general_handler
 
     def listener_thread(self, lcm: LCM):
-        self.subscription = lcm.subscribe(
-            "^((?!pntos).)*$", 
-            self.general_handler()
-        )
+        self.subscription = lcm.subscribe(self.channel, self.general_handler())
 
     def start_listening(self) -> None:
         """
@@ -103,7 +96,7 @@ class TransportPlugin(CommonPlugin, Protocol):
         """
 
         # Get the channel to pass to lcm_subscribe
-        channel = ".*"  # Currently subscribe all, will come from registry
+        self.channel = ".*"  # Currently subscribe all, will come from registry
 
         self.lcm = LCM(self.url)
 
