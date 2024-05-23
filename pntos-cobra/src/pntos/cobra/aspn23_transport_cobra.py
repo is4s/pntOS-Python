@@ -1,14 +1,5 @@
 """
-An example LCM Transport Plugin for ASPN 2.X implemented in Python
-
-The Transport LCM Plugin in this file can be substituted for the Viper
-Transport LCM Plugin in the default plugins list.  However, it is not currently
-a complete substitution.  Only geodetic 3D position, PVA, and IMU data sources
-are supported in this example.
-
-To see it in action, run
-python sdk/python/example_plugin_transport_lcm_aspn_2/run_transport_lcm_plugin.py
-from the pntOS project root folder.
+An example LCM Transport Plugin for ASPN23
 """
 
 from multiprocessing import Process
