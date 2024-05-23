@@ -37,12 +37,19 @@ from typing import Optional, Protocol
 
 import aspn23.lcm_translations
 import aspn23.measurement_position_velocity_attitude
-from pntos.api.plugins.common import CommonPlugin, Message
+from pntos.api.plugins.common import CommonPlugin, Mediator, Message, LoggingLevel
 from aspn23.measurement_position_velocity_attitude \
     import MeasurementPositionVelocityAttitude as MeasurementPVA
+from aspn23_lcm import MeasurementPositionVelocityAttitude as lcm_PVA
+from aspn23.lcm_translations \
+    import lcm_to_measurement_position_velocity_attitude as lcm_to_aspn23_PVA
 
-from lcm import LCM
+from lcm import LCM, LCMSubscription
 
+WARN = LoggingLevel.PNTOS_LOG_LEVEL_WARN
+INFO = LoggingLevel.PNTOS_LOG_LEVEL_INFO
+ERROR = LoggingLevel.PNTOS_LOG_LEVEL_ERROR
+DEBUG = LoggingLevel.PNTOS_LOG_LEVEL_DEBUG
 
 class TransportPlugin(CommonPlugin, Protocol):
     """
@@ -61,13 +68,15 @@ class TransportPlugin(CommonPlugin, Protocol):
     url:str
     lcm:LCM
     listener:Process
+    mediator:Mediator
+    subscription:LCMSubscription
 
 
     def __init__(self, url, handler:callable):
         self.identifier = "python-transport-lcm2-plugin"
         self.url = url
 
-    def init_plugin(self):
+    def init_plugin(self, mediator):
         """
         pntOS plugin initialization function
 
@@ -76,6 +85,7 @@ class TransportPlugin(CommonPlugin, Protocol):
         Implements C API PntosCommonPlugin.init_plugin.  See documentation in
         api/include/pntos/plugins/common.h for more information.
         """
+        self.mediator = mediator
         pass
 
     def shutdown_plugin(self):
@@ -87,6 +97,7 @@ class TransportPlugin(CommonPlugin, Protocol):
         Implements C API PntosCommonPlugin.shutdown_plugin.  See documentation
         in api/include/pntos/plugins/common.h for more information.
         """
+        pass
 
     def general_handler(self):
         """
@@ -103,15 +114,17 @@ class TransportPlugin(CommonPlugin, Protocol):
             if "pntos" in channel:
                 print("pntos channel message, not processing in aspn handler")
                 return
-            self.broadcast_message()
+            decoded = lcm_PVA.decode(data)
+            translated = lcm_to_aspn23_PVA(translated)
+            self.broadcast_message(translated)
 
         return _general_handler
 
-        
-
     
     def listener_thread(self, lcm:LCM):
-        lcm.subscribe("^((?!pntos).)*$", TransportPlugin.general_handler(self))
+        self.subscription = lcm.subscribe("^((?!pntos).)*$", 
+                                          self.general_handler()
+        )
     
     
 
@@ -121,62 +134,38 @@ class TransportPlugin(CommonPlugin, Protocol):
         Begin listening for lcm messages given input configuration
         """
 
-    
-
         # Get the channel to pass to lcm_subscribe
-        channel = ".*"
+        channel = ".*" # Currently subscribe all, will come from registry
 
         self.lcm = LCM(self.url)
 
         if self.lcm is None:
-            print("Failed to create lcm transport")
+            self.mediator.log_message(ERROR, "Failed to create lcm transport")
             return
 
-
+        # Start new listener thread
         self.listener = Process(
-            target=listener_thread, args=[self.lcm]
+            target=self.listener_thread, args=[self.lcm]
         )
+
         self.listener.start()
-        self.lcm_transport.subscription = self.lcm_transport.lcm.subscribe(
-            "^((?!pntos).)*$", general_handler(self.lcm_transport)
-        )
-
-        self.lcm_transport.is_running = True
-
-        self.lcm_transport.logger_process = LcmLogger(
-            url=url, channel=channel, file=file
-        )
-        self.lcm_transport.logger_process.start()
-        self.log_info("LCM transport started")
+        
+        self.mediator.log_message(INFO,"LCM transport started")
 
     def stop_listening(self) -> None:
         """
         Shut down all processes and threads spun up for LCM message passing
         """
-        # Transport is marked as no longer running
-        if self.lcm_transport.is_running:
-            self.lcm_transport.is_running = False
 
-        # Wait for listener thread to join.
-        if self.lcm_transport.listener is not None:
-            self.lcm_transport.listener.join()
+        if self.listener.is_alive():
+            self.listener.join()
 
-        # Wait for logger thread to join.
-        if self.lcm_transport.logger_process is not None:
-            self.lcm_transport.logger_process._is_running = False
-
-        # Unblock send thread with empty message and wait for join.
-        if self.lcm_transport.send_thread is not None:
-            self.lcm_transport.send_queue.put(None)
-            self.lcm_transport.send_thread.join()
-
-        if (
-            self.lcm_transport.subscription is not None
-            and self.lcm_transport.lcm is not None
+        if (self.lcm.subscription is not None
+            and self.lcm is not None
         ):
-            self.lcm_transport.lcm.unsubscribe(self.lcm_transport.subscription)
+            self.lcm.unsubscribe(self.lcm.subscription)
 
-        self.log_info("LCM transport stopped")
+        self.mediator.log_message(INFO, "LCM transport stopped")
 
     def broadcast_message(self, message: Message, channel_name: Optional[str]):
         """
@@ -189,5 +178,5 @@ class TransportPlugin(CommonPlugin, Protocol):
                     message.wrapped_message)
             self.lcm.publish(channel_name, translated.encode())
         else:
-            print("Invalid LCM message")
+            self.mediator.log_message(WARN, "Invalid LCM message")
 
