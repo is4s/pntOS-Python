@@ -36,41 +36,25 @@ from multiprocessing import Process
 from threading import Thread
 from typing import Optional, Protocol
 
-import aspn23.lcm_translations
-import aspn23.measurement_position_velocity_attitude
-from pntos.api.plugins.common import CommonPlugin, Mediator, Message
+from datasources.lcm.messages.aspn.positionvelocityattitude import positionvelocityattitude
+from datasources.lcm.messages.aspn.types.geodeticposition3d_type import geodeticposition3d_type 
+from datasources.lcm.messages.aspn.types.header import header 
+from datasources.lcm.messages.aspn.types.timestamp import timestamp 
+from pntos.api.plugins.common import CommonPlugin, Message
 from aspn23.measurement_position_velocity_attitude \
     import MeasurementPositionVelocityAttitude as MeasurementPVA
-from aspn23_lcm.MeasurementPositionVelocityAttitude \
-    import MeasurementPositionVelocityAttitude as MeasurementPVALCM
+
 from lcm import LCM
 
-
 class TransportPlugin(CommonPlugin, Protocol):
-    """
-    An example LCM Transport Plugin for ASPN 2.X implemented in Python
+    identifier: str
+    url: str
+    lcm: LCM
+    listener: Process
 
-    The Transport LCM Plugin in this file can be substituted for the Viper
-    Transport LCM Plugin in the default plugins list.  However, it is not currently
-    a complete substitution.  Only geodetic 3D position, PVA, and IMU data sources
-    are supported in this example.
-
-    To see it in action, run
-    python sdk/python/example_plugin_transport_lcm_aspn_2/run_transport_lcm_plugin.py
-    from the pntOS project root folder.
-    """
-    identifier:str
-    url:str
-    lcm:LCM
-    listener:Process
-    mediator: Mediator
-
-
-    def __init__(self, url: str, mediator: Mediator):
-        self.identifier = "python-transport-lcm23-plugin"
+    def __init__(self, url: str):
+        self.identifier = "python-transport-lcm2-plugin"
         self.url = url
-        self.mediator = mediator
-
 
     def init_plugin(self):
         """
@@ -92,6 +76,7 @@ class TransportPlugin(CommonPlugin, Protocol):
         Implements C API PntosCommonPlugin.shutdown_plugin.  See documentation
         in api/include/pntos/plugins/common.h for more information.
         """
+        pass
 
     def general_handler(self):
         """
@@ -108,26 +93,34 @@ class TransportPlugin(CommonPlugin, Protocol):
             if "pntos" in channel:
                 print("pntos channel message, not processing in aspn handler")
                 return
-            decoded = MeasurementPVALCM.decode(data)
-            translated = aspn23.lcm_translations.lcm_to_measurement_position_velocity_attitude(decoded)
-            msg = Message(translated, "")
-            self.mediator.broadcast_aspn_message(msg, "python-transport-lcm2-plugin", None)
+            
+            untrans = positionvelocityattitude.decode(data)
+            trans = MeasurementPVA()
+            trans.p1 = untrans.position[0]
+            trans.p2 = untrans.position[1]
+            trans.p3 = untrans.position[2]
+            trans.v1 = untrans.velocity[0]
+            trans.v2 = untrans.velocity[1]
+            trans.v3 = untrans.velocity[2]
+            trans.quaternion = untrans.attitude
+            msg = Message()
+            msg.wrapped_message = trans
+
+            self.broadcast_message(trans)
 
         return _general_handler
-    
-    def listener_thread(self):
-        self.lcm.subscribe("EXAMPLE", self.general_handler())
-        try:
-            while True:
-                self.lcm.handle()
-        except KeyboardInterrupt:
-            pass
 
+    def listener_thread(self):
+        self.lcm.subscribe("^((?!pntos).)*$", self.general_handler())
+    
     def start_listening(self) -> None:
         # old: config_path="config/transport/is4s_transport_lcm"
         """
         Begin listening for lcm messages given input configuration
         """
+        # Get the channel to pass to lcm_subscribe
+        channel = ".*"
+
         self.lcm = LCM()
 
         if self.lcm is None:
@@ -138,46 +131,37 @@ class TransportPlugin(CommonPlugin, Protocol):
             target=self.listener_thread, args=[]
         )
         self.listener.start()
-
         
 
     def stop_listening(self) -> None:
         """
         Shut down all processes and threads spun up for LCM message passing
         """
-        # Transport is marked as no longer running
-        if self.lcm_transport.is_running:
-            self.lcm_transport.is_running = False
-
-        # Wait for listener thread to join.
-        if self.lcm_transport.listener is not None:
-            self.lcm_transport.listener.join()
-
-        # Wait for logger thread to join.
-        if self.lcm_transport.logger_process is not None:
-            self.lcm_transport.logger_process._is_running = False
-
-        # Unblock send thread with empty message and wait for join.
-        if self.lcm_transport.send_thread is not None:
-            self.lcm_transport.send_queue.put(None)
-            self.lcm_transport.send_thread.join()
-
-        if (
-            self.lcm_transport.subscription is not None
-            and self.lcm_transport.lcm is not None
-        ):
-            self.lcm_transport.lcm.unsubscribe(self.lcm_transport.subscription)
-
-        self.log_info("LCM transport stopped")
+        self.lcm.unsubscribe()
+        self.listener.terminate()
 
     def broadcast_message(self, message: Message, channel_name: Optional[str]):
         """
         Send a message over LCM to a specific channel
         """
+        
         if isinstance(message.wrapped_message, MeasurementPVA):
-            translated = \
-                aspn23.lcm_translations.measurement_position_velocity_attitude_to_lcm(
-                    message.wrapped_message)
+            translated = positionvelocityattitude()
+            head = header()
+            ts = timestamp()
+            head.seq_num = 0
+            ts = timestamp()
+            head.timestamp_arrival = ts
+            head.timestamp_valid = ts
+            translated.header = head
+            translated.attitude = message.wrapped_message.quaternion
+            geo = geodeticposition3d_type()
+            geo.latitude = message.wrapped_message.p1
+            geo.longitude = message.wrapped_message.p2
+            geo.altitude = message.wrapped_message.p3
+            translated.position = geo
+            translated.velocity = [message.wrapped_message.v1, message.wrapped_message.v2, message.wrapped_message.v3]
             self.lcm.publish(channel_name, translated.encode())
         else:
             print("Invalid LCM message")
+
