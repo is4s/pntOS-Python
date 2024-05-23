@@ -13,5 +13,6 @@
 -e file:pntos-cobra
 numpy==1.26.4
     # via pntos-cobra
-aspn @ git+ssh://git@git.aspn.us/pntos/firehose-outputs.git@feature/pyproject_wheel#subdirectory=aspn-py
-aspn_lcm @ git+ssh://git@git.aspn.us/pntos/firehose-outputs.git@feature/pyproject_wheel#subdirectory=lcm/python
+aspn23 @ git+ssh://git@git.aspn.us/pntos/firehose-outputs.git@feature/pyproject_wheel#subdirectory=aspn-py
+aspn23_lcm @ git+ssh://git@git.aspn.us/pntos/firehose-outputs.git@feature/pyproject_wheel#subdirectory=lcm/python
+lcm @ git+https://github.com/lcm-proj/lcm.git@master#subdirectory=lcm-python

@@ -8,6 +8,7 @@ authors = [
 dependencies = [
     "numpy>=1.26.4",
     "pntos-api>=0.1.0",
+    "lcm @ git+https://github.com/lcm-proj/lcm.git@master#subdirectory=lcm-python"
 ]
 readme = "README.md"
 requires-python = ">= 3.11"
