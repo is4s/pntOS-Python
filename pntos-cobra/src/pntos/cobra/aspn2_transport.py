@@ -33,18 +33,23 @@ from the pntOS project root folder.
 # from threading import Thread
 
 from multiprocessing import Thread
-from threading import Thread
 from typing import Optional, Protocol
 
-from datasources.lcm.messages.aspn.positionvelocityattitude import positionvelocityattitude
-from datasources.lcm.messages.aspn.types.geodeticposition3d_type import geodeticposition3d_type 
-from datasources.lcm.messages.aspn.types.header import header 
-from datasources.lcm.messages.aspn.types.timestamp import timestamp 
-from pntos.api.plugins.common import CommonPlugin, LoggingLevel, Mediator, Message
-from aspn23.measurement_position_velocity_attitude \
-    import MeasurementPositionVelocityAttitude as MeasurementPVA
-
+from aspn23.measurement_position_velocity_attitude import (
+    MeasurementPositionVelocityAttitude as MeasurementPVA,
+)
+from datasources.lcm.messages.aspn.positionvelocityattitude import (
+    positionvelocityattitude,
+)
+from datasources.lcm.messages.aspn.types.geodeticposition3d_type import (
+    geodeticposition3d_type,
+)
+from datasources.lcm.messages.aspn.types.header import header
+from datasources.lcm.messages.aspn.types.timestamp import timestamp
 from lcm import LCM, LCMSubscription
+
+from pntos.api.plugins.common import CommonPlugin, LoggingLevel, Mediator, Message
+
 
 class TransportPlugin(CommonPlugin, Protocol):
     identifier:str

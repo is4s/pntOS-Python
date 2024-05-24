@@ -1,8 +1,11 @@
 
 from typing import List
+
 from aspn23.type_timestamp import TypeTimestamp
-from pntos.api.plugins.common import CommonPlugin, LoggingLevel, Mediator, Message
+
+from pntos.api.plugins.common import LoggingLevel, Mediator, Message
 from pntos.api.plugins.transport import TransportPlugin
+
 from .registry import PyRegistry
 
 

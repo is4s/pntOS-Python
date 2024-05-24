@@ -24,17 +24,21 @@ An example LCM Transport Plugin for ASPN23
 # from threading import Thread
 
 from multiprocessing import Thread
-from threading import Thread
 from typing import Optional, Protocol
 
-from aspn23.lcm_translations import lcm_to_measurement_position_velocity_attitude, measurement_position_velocity_attitude_to_lcm 
-import aspn23.measurement_position_velocity_attitude
-from pntos.api.plugins.common import CommonPlugin, LoggingLevel, Mediator, Message
-from aspn23.measurement_position_velocity_attitude \
-    import MeasurementPositionVelocityAttitude
-from aspn23_lcm.MeasurementPositionVelocityAttitude \
-    import MeasurementPositionVelocityAttitude as MeasurementPositionVelocityAttitude_LCM
+from aspn23.lcm_translations import (
+    lcm_to_measurement_position_velocity_attitude,
+    measurement_position_velocity_attitude_to_lcm,
+)
+from aspn23.measurement_position_velocity_attitude import (
+    MeasurementPositionVelocityAttitude,
+)
+from aspn23_lcm.MeasurementPositionVelocityAttitude import (
+    MeasurementPositionVelocityAttitude as MeasurementPositionVelocityAttitude_LCM,
+)
 from lcm import LCM, LCMSubscription
+
+from pntos.api.plugins.common import CommonPlugin, LoggingLevel, Mediator, Message
 
 
 class TransportPlugin(CommonPlugin, Protocol):

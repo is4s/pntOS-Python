@@ -1,6 +1,9 @@
 from typing import Callable, List
+
 from pntos.api.plugins.common import KeyValueStore, Registry
+
 from .kv import PyKv
+
 
 class PyRegistry(Registry):
     kv: PyKv
