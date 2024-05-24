@@ -9,7 +9,7 @@ dependencies = [
     "numpy>=1.26.4",
     "pntos-api>=0.1.0",
     "lcm @ git+https://github.com/lcm-proj/lcm.git@master#subdirectory=lcm-python",
-    "aspn23 @ file:/home/is4s/prg/firehose/build/output/aspn-py",
+    "aspn23 @ git+ssh://git@git.aspn.us/pntos/firehose-outputs.git@feature/pyproject_wheel#subdirectory=aspn-py",
     "aspn2_lcm @ git+ssh://git@git.aspn.us/pntos/lcm-generated.git@aspn-2.2#subdirectory=python",
     "aspn23_lcm @ git+ssh://git@git.aspn.us/pntos/firehose-outputs.git@feature/pyproject_wheel#subdirectory=lcm/python"
 ]

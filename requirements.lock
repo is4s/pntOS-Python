@@ -6,7 +6,6 @@
 #   features: []
 #   all-features: false
 #   with-sources: false
-#   generate-hashes: false
 
 -e file:pntos-api
     # via pntos-cobra
@@ -14,13 +13,12 @@
 -e file:pntos-cobra
 aspn2-lcm @ git+ssh://git@git.aspn.us/pntos/lcm-generated.git@8e69d19ebdee5ac3c616023ab2c5884e0d695744#subdirectory=python
     # via pntos-cobra
-aspn23 @ file:/home/is4s/prg/firehose/build/output/aspn-py
+aspn23 @ git+ssh://git@git.aspn.us/pntos/firehose-outputs.git@2236c39d549cffe9ad8e4c09be075b695fd1ad41#subdirectory=aspn-py
     # via pntos-cobra
-aspn23-lcm @ git+ssh://git@git.aspn.us/pntos/firehose-outputs.git@3f7e1be69c366866b7a36876e94e60ff3d62b79b#subdirectory=lcm/python
+aspn23-lcm @ git+ssh://git@git.aspn.us/pntos/firehose-outputs.git@2236c39d549cffe9ad8e4c09be075b695fd1ad41#subdirectory=lcm/python
     # via pntos-cobra
 lcm @ git+https://github.com/lcm-proj/lcm.git@e72f1baccadcd2a367d1612ba102ce004b03f0ca#subdirectory=lcm-python
     # via aspn2-lcm
-    # via aspn23
     # via aspn23-lcm
     # via pntos-cobra
 numpy==1.26.4
