@@ -52,8 +52,8 @@ from pntos.api.plugins.common import CommonPlugin, LoggingLevel, Mediator, Messa
 
 
 class TransportPlugin(CommonPlugin, Protocol):
-    identifier:str
-    lcm:LCM
+    identifier: str
+    lcm: LCM
     listener: Thread
     mediator: Mediator
     subscription: LCMSubscription
@@ -99,7 +99,7 @@ class TransportPlugin(CommonPlugin, Protocol):
             if "pntos" in channel:
                 print("pntos channel message, not processing in aspn handler")
                 return
-            
+
             untrans = positionvelocityattitude.decode(data)
             trans = MeasurementPVA()
             trans.p1 = untrans.position[0]
@@ -118,7 +118,7 @@ class TransportPlugin(CommonPlugin, Protocol):
 
     def listener_thread(self):
         self.lcm.subscribe("^((?!pntos).)*$", self.general_handler())
-    
+
     def start_listening(self) -> None:
         # old: config_path="config/transport/is4s_transport_lcm"
         """
@@ -133,11 +133,8 @@ class TransportPlugin(CommonPlugin, Protocol):
             print("Failed to create lcm transport")
             return
 
-        self.listener = Thread(
-            target=self.listener_thread, args=[]
-        )
+        self.listener = Thread(target=self.listener_thread, args=[])
         self.listener.start()
-        
 
     def stop_listening(self) -> None:
         """
@@ -155,7 +152,7 @@ class TransportPlugin(CommonPlugin, Protocol):
         """
         Send a message over LCM to a specific channel
         """
-        
+
         if isinstance(message.wrapped_message, MeasurementPVA):
             translated = positionvelocityattitude()
             head = header()
@@ -171,8 +168,11 @@ class TransportPlugin(CommonPlugin, Protocol):
             geo.longitude = message.wrapped_message.p2
             geo.altitude = message.wrapped_message.p3
             translated.position = geo
-            translated.velocity = [message.wrapped_message.v1, message.wrapped_message.v2, message.wrapped_message.v3]
+            translated.velocity = [
+                message.wrapped_message.v1,
+                message.wrapped_message.v2,
+                message.wrapped_message.v3,
+            ]
             self.lcm.publish(channel_name, translated.encode())
         else:
             print("Invalid LCM message")
-

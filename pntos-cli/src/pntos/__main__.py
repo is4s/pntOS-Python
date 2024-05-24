@@ -1,2 +1,1 @@
-
 print("pntOS CLI stub")

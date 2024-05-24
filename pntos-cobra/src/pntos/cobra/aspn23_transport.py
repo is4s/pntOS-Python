@@ -45,8 +45,9 @@ class TransportPlugin(CommonPlugin, Protocol):
     """
     An example LCM Transport Plugin for ASPN23 implemented in Python
     """
-    identifier:str
-    lcm:LCM
+
+    identifier: str
+    lcm: LCM
     listener: Thread
     mediator: Mediator
     subscription: LCMSubscription
@@ -54,7 +55,6 @@ class TransportPlugin(CommonPlugin, Protocol):
     def __init__(self, mediator: Mediator):
         self.identifier = "python-transport-lcm23-plugin"
         self.mediator = mediator
-
 
     def init_plugin(self, mediator: Mediator):
         """
@@ -75,9 +75,9 @@ class TransportPlugin(CommonPlugin, Protocol):
         if self.subscription is not None and self.lcm is not None:
             self.lcm.unsubscribe(self.subscription)
         self.__init__(self.url, mediator=None)
-        self.mediator.log_message(LoggingLevel.INFO, 
-                                  "shutdown_plugin for " + self.identifier
-                                  )
+        self.mediator.log_message(
+            LoggingLevel.INFO, "shutdown_plugin for " + self.identifier
+        )
 
     def general_handler(self):
         """
@@ -93,8 +93,8 @@ class TransportPlugin(CommonPlugin, Protocol):
             # Do not process messages sent from pntos.
             if "pntos" in channel:
                 self.mediator.log_message(
-                    LoggingLevel.INFO, 
-                    "pntos channel message, not processing in aspn handler"
+                    LoggingLevel.INFO,
+                    "pntos channel message, not processing in aspn handler",
                 )
                 return
             decoded = MeasurementPositionVelocityAttitude_LCM.decode(data)
@@ -113,15 +113,13 @@ class TransportPlugin(CommonPlugin, Protocol):
         self.lcm = LCM()
 
         if self.lcm is None:
-            self.mediator.log_message(LoggingLevel.ERROR, "Failed to create lcm transport")
+            self.mediator.log_message(
+                LoggingLevel.ERROR, "Failed to create lcm transport"
+            )
             return
 
-        self.listener = Thread(
-            target=self.listener_thread, args=[]
-        )
+        self.listener = Thread(target=self.listener_thread, args=[])
         self.listener.start()
-
-        
 
     def stop_listening(self) -> None:
         """
@@ -141,7 +139,9 @@ class TransportPlugin(CommonPlugin, Protocol):
         Send a message over LCM to a specific channel
         """
         if isinstance(message.wrapped_message, MeasurementPositionVelocityAttitude):
-            translated = measurement_position_velocity_attitude_to_lcm(message.wrapped_message)
+            translated = measurement_position_velocity_attitude_to_lcm(
+                message.wrapped_message
+            )
             self.lcm.publish(channel_name, translated.encode())
         else:
             print("Invalid LCM message")
