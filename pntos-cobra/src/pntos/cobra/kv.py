@@ -4,9 +4,9 @@ from pntos.api.plugins.common import KeyValueStore, Registry, ValueType
 
 class PyKv(KeyValueStore):
     store = {}
-    locked = []
+    locked: str | None = None
     
-    def get_key_array(self) -> List[str]:
+    def get_key_array(self) -> List[str]: 
         return dir(self.store)
     
     def has_key(self, key: str) -> bool:

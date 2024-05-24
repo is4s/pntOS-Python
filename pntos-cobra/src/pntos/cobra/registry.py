@@ -5,7 +5,7 @@ from .kv import PyKv
 class PyRegistry(Registry):
     kv: PyKv
     def batch_start(self, group: str) -> KeyValueStore:
-        self.kv.locked.append(group)
+        self.kv.locked = group
         return self.kv
 
     def get_group_array(self) -> List[str]:
