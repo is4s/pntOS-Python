@@ -37,7 +37,6 @@ from aspn23_lcm.MeasurementPositionVelocityAttitude import (
     MeasurementPositionVelocityAttitude as MeasurementPositionVelocityAttitude_LCM,
 )
 from lcm import LCM, LCMSubscription
-
 from pntos.api.plugins.common import CommonPlugin, LoggingLevel, Mediator, Message
 
 
@@ -99,7 +98,7 @@ class TransportPlugin(CommonPlugin, Protocol):
                 return
             decoded = MeasurementPositionVelocityAttitude_LCM.decode(data)
             translated = lcm_to_measurement_position_velocity_attitude(decoded)
-            self.broadcast_message(translated)
+            self.broadcast_message(translated, None)
 
         return _general_handler
 
