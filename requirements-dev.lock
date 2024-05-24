@@ -6,7 +6,6 @@
 #   features: []
 #   all-features: false
 #   with-sources: false
-#   generate-hashes: false
 
 -e file:pntos-api
     # via pntos-cobra
@@ -16,7 +15,7 @@ alabaster==0.7.16
     # via sphinx
 aspn2-lcm @ git+ssh://git@git.aspn.us/pntos/lcm-generated.git@8e69d19ebdee5ac3c616023ab2c5884e0d695744#subdirectory=python
     # via pntos-cobra
-aspn23 @ file:/home/is4s/prg/firehose/build/output/aspn-py
+aspn23 @ git+ssh://git@git.aspn.us/pntos/firehose-outputs.git@2236c39d549cffe9ad8e4c09be075b695fd1ad41#subdirectory=aspn-py
     # via pntos-cobra
 aspn23-lcm @ git+ssh://git@git.aspn.us/pntos/firehose-outputs.git@2236c39d549cffe9ad8e4c09be075b695fd1ad41#subdirectory=lcm/python
     # via pntos-cobra

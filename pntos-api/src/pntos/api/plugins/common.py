@@ -10,25 +10,25 @@ from numpy.typing import NDArray
 
 @dataclass
 class Message:
-    #TODO: review the below docstring
+    # TODO: review the below docstring
     """
-    A container for an ASPN message. This container may contain either proper 
-    ASPN messages which are part of the ASPN data model, or extension messages 
-    specific to pntOS which augment ASPN. For messages of the former type, the 
-    wrapped message's message_type field should be used directly. For messages 
-    of the latter type, cast the wrapped message's message_type field to 
-    PntosMessageType. 
+    A container for an ASPN message. This container may contain either proper
+    ASPN messages which are part of the ASPN data model, or extension messages
+    specific to pntOS which augment ASPN. For messages of the former type, the
+    wrapped message's message_type field should be used directly. For messages
+    of the latter type, cast the wrapped message's message_type field to
+    PntosMessageType.
     """
+
     wrapped_message: AspnBase
     source_identifier: str
 
 
 EstimateWithCovarianceType = Enum(
-
-    "EstimateWithCovarianceType", [
-
-        #TODO: review the below docstring
-        "PNTOS_EWC_GENERIC", 
+    "EstimateWithCovarianceType",
+    [
+        # TODO: review the below docstring
+        "PNTOS_EWC_GENERIC",
         """
         Contains a mean (estimate) and covariance describing a multivariate
         Gaussian distribution.
@@ -39,8 +39,7 @@ EstimateWithCovarianceType = Enum(
         * PntosEstimateWithCovariance.covariance is size NxN where N is the 
           length field.
         """
-
-        #TODO: review the below docstring
+        # TODO: review the below docstring
         "PNTOS_EWC_ATTITUDE_QUAT"
         """
         Contains a mean (estimate) and covariance describing a rotation modeled
@@ -49,8 +48,8 @@ EstimateWithCovarianceType = Enum(
 	    * PntosEstimateWithCovariance.length is unused.
 	    * PntosEstimateWithCovariance.estimate is size 4x1
 	    * PntosEstimateWithCovariance.covariance is size 3x3, in radians^2.
-        """
-    ]
+        """,
+    ],
 )
 
 
@@ -62,13 +61,13 @@ class EstimateWithCovariance:
     # The estimate vector.  Usage depends on the #type field.
     estimate: NDArray[float64]
 
-    # An array of doubles representing a square covariance matrix. Data is 
+    # An array of doubles representing a square covariance matrix. Data is
     # stored in row major form.  Usage depends on the #type field.
     covariance: NDArray[float64]
 
 
 PluginTypes = Enum(
-    #TODO: review the below docstring
+    # TODO: review the below docstring
     """
     An enumeration of the types of plugins supported by pntOS for this loader 
     API version. Each enum entry maps to a corresponding structure with 
@@ -78,18 +77,16 @@ PluginTypes = Enum(
     there is not a `PntosUtilityPlugin`. Instead, implementers of 
     #PNTOS_UTILITY_PLUGIN should implement and return a PntosCommonPlugin.
     """
-
     "PluginTypes",
     [
-        #TODO: review the below docstring
+        # TODO: review the below docstring
         "PNTOS_UNDEFINED_PLUGIN",
         """ 
         An unused entry, designed to allow code to detect accidentally unset 
         fields. This value must not be used by any plugin implementation, 
         other than to check for an erroneous default value being used.
         """
-
-        #TODO: review the below docstring
+        # TODO: review the below docstring
         "PNTOS_CONTROLLER_PLUGIN",
         """
         The primary plugin that controls the entire operation of pntOS. After 
@@ -116,8 +113,7 @@ PluginTypes = Enum(
         and control of the plugins outside the scope of inter-plugin 
         communications and message routing between plugins.  
         """
-        
-        #TODO: review the below docstring
+        # TODO: review the below docstring
         "PNTOS_FUSION_PLUGIN",
         """
         A plugin that models an information fusion approach. This plugin 
@@ -129,8 +125,7 @@ PluginTypes = Enum(
         by state modeling plugins, raw measurements are provided by transport 
         plugins, and filtering engines are provided by fusion strategy plugins.
         """
-
-        #TODO: review the below docstring
+        # TODO: review the below docstring
         "PNTOS_FUSION_STRATEGY_PLUGIN",
         """
         A low level computational engine that can perform sensor fusion given 
@@ -141,8 +136,7 @@ PluginTypes = Enum(
         descriptions into a fixed-size problem suitable for the computational 
         engine in this plugin to consume.
         """
-        
-        #TODO: review the below docstring
+        # TODO: review the below docstring
         "PNTOS_PLATFORM_INTEGRATION_PLUGIN",
         """
         An output plugin for pntOS to interact with the platform it is running 
@@ -160,8 +154,7 @@ PluginTypes = Enum(
         of the stable pntOS API. Usage of this feature is highly discouraged in
         non-experimental code, and its definition may change at any time.
         """
-
-        #TODO: review the below docstring
+        # TODO: review the below docstring
         "PNTOS_INITIALIZATION_PLUGIN",
         """
         A plugin that provides initialization algorithms. In general, this 
@@ -174,8 +167,7 @@ PluginTypes = Enum(
         of the stable pntOS API. Usage of this feature is highly discouraged in
         non-experimental code, and its definition may change at any time.
         """
-
-        #TODO: review the below docstring
+        # TODO: review the below docstring
         "PNTOS_DATABASE_PLUGIN",
         """
         A plugin for storing generic datasets that might be consumed by many 
@@ -188,8 +180,7 @@ PluginTypes = Enum(
         of the stable pntOS API. Usage of this feature is highly discouraged in
         non-experimental code, and its definition may change at any time.
         """
-
-        #TODO: review the below docstring
+        # TODO: review the below docstring
         "PNTOS_TRANSPORT_PLUGIN",
         """
         A plugin that listens for incoming sensor/other data on a network bus 
@@ -201,8 +192,7 @@ PluginTypes = Enum(
         data, the transport plugin may end up being a trivial plugin, simply 
         marshalling data off of a network connection into the system.
         """
-
-        #TODO: review the below docstring
+        # TODO: review the below docstring
         "PNTOS_UI_PLUGIN",
         """
         A plugin for enabling user interfaces to be hooked up to pntOS. This 
@@ -212,8 +202,7 @@ PluginTypes = Enum(
         developer consoles. For outputs that will be sent to operational live 
         displays on the platform, the platform integration plugin is preferred.
         """
-
-        #TODO: review the below docstring
+        # TODO: review the below docstring
         "PNTOS_ORCHESTRATION_PLUGIN",
         """
         A plugin that implements the orchestration monitoring framework. In 
@@ -227,8 +216,7 @@ PluginTypes = Enum(
         which implement a particular orchestration approach for a particular 
         sensor or situation.
         """
-
-        #TODO: review the below docstring
+        # TODO: review the below docstring
         "PNTOS_ORCHESTRATION_STRATEGY_PLUGIN",
         """
         A fine-grained integrity plugin that itself plugins into the larger 
@@ -244,8 +232,7 @@ PluginTypes = Enum(
         of the stable pntOS API. Usage of this feature is highly discouraged in
         non-experimental code, and its definition may change at any time.
         """
-        
-        #TODO: review the below docstring
+        # TODO: review the below docstring
         "PNTOS_REGISTRY_PLUGIN",
         """
         A registry of configuration and status data for pntOS that is available
@@ -267,8 +254,7 @@ PluginTypes = Enum(
         values are changed, monitoring/logging of when values are changed and 
         by what source, and access control lists to guard certain keys.
         """
-
-        #TODO: review the below docstring
+        # TODO: review the below docstring
         "PNTOS_INERTIAL_PLUGIN",
         """
         A plugin that generates PVA solutions from an inertial.
@@ -277,8 +263,7 @@ PluginTypes = Enum(
         of the stable pntOS API. Usage of this feature is highly discouraged in
         non-experimental code, and its definition may change at any time.
         """
-
-        #TODO: review the below docstring
+        # TODO: review the below docstring
         "PNTOS_STATE_MODELING_PLUGIN",
         """
         A plugin that models the errors of the various sensors and systems that
@@ -292,15 +277,13 @@ PluginTypes = Enum(
         of zero or more state blocks, zero or more measurement processors, and 
         zero or more virtual state blocks.
         """
-
-        #TODO: review the below docstring
+        # TODO: review the below docstring
         "PNTOS_LOGGING_PLUGIN",
         """
         A plugin that logs system events to an arbitrary sink. A sink may be a 
         file, a console, an attached GUI, a network destination, or any other destination of interest.
         """
-
-        #TODO: review the below docstring
+        # TODO: review the below docstring
         "PNTOS_UTILITY_PLUGIN",
         """
         A plugin that performs a generic utility function. A utility plugin 
@@ -308,8 +291,7 @@ PluginTypes = Enum(
         the registry) but is not otherwise relied upon to perform any 
         particular function.
         """
-
-        #TODO: review the below docstring
+        # TODO: review the below docstring
         "PNTOS_PREPROCESSOR_PLUGIN",
         """
         A plugin that processes data received from a transport before it is 
@@ -325,14 +307,14 @@ PluginTypes = Enum(
         **UNSTABLE**: This feature is unstable and is not yet considered part 
         of the stable pntOS API. Usage of this feature is highly discouraged in
         non-experimental code, and its definition may change at any time.
-        """
+        """,
     ],
 )
 
 
 FusionType = Enum(
-#TODO: review the below docstring
-"""
+    # TODO: review the below docstring
+    """
 An enumeration of the types of fusion that can be performed by pntOS. An 
 implementation of a #PntosFusionPlugin plugin will compare a model from this 
 enum in its PntosFusionPlugin.is_fusion_type_supported function. The return of
@@ -347,7 +329,7 @@ PNTOS_FUSION_STANDARD_MODEL)` is true, then that means that
 """
     "FusionType",
     [
-        #TODO: review the below docstring
+        # TODO: review the below docstring
         "PNTOS_FUSION_STANDARD_MODEL",
         """
         The standard model of fusion within pntOS. This model assumes that 
@@ -355,8 +337,7 @@ PNTOS_FUSION_STANDARD_MODEL)` is true, then that means that
         and that updates of the state vector contain only i.i.d. additive white
         Gaussian noise. See PntosStandardFusionEngine for more information.
         """
-
-        #TODO: review the below docstring
+        # TODO: review the below docstring
         "PNTOS_FUSION_SAMPLED_MODEL",
         """
         The sampled model of fusion within pntOS. This model assumes that state
@@ -369,8 +350,7 @@ PNTOS_FUSION_STANDARD_MODEL)` is true, then that means that
         of the stable pntOS API. Usage of this feature is highly discouraged in
         non-experimental code, and its definition may change at any time.
         """
-
-        #TODO: review the below docstring
+        # TODO: review the below docstring
         "PNTOS_FUSION_TIME_DELAYED_MODEL",
         """
         The time delayed model of fusion within pntOS. This model assumes that 
@@ -382,8 +362,7 @@ PNTOS_FUSION_STANDARD_MODEL)` is true, then that means that
         of the stable pntOS API. Usage of this feature is highly discouraged in
         non-experimental code, and its definition may change at any time.
         """
-
-        #TODO: review the below docstring
+        # TODO: review the below docstring
         "PNTOS_FUSION_STANDARD_COMPILED_MODEL",
         """
         The standard model of fusion within pntOS, in compiled format. This 
@@ -396,94 +375,92 @@ PNTOS_FUSION_STANDARD_MODEL)` is true, then that means that
         **UNSTABLE**: This feature is unstable and is not yet considered part 
         of the stable pntOS API. Usage of this feature is highly discouraged in
         non-experimental code, and its definition may change at any time.
-        """
+        """,
     ],
 )
 
 LoggingLevel = Enum(
-#TODO: review the below docstring
-"""
+    # TODO: review the below docstring
+    """
 An enumeration of the types of log outs that are available in pntOS.
 """
     "LoggingLevel",
     [
-        #TODO: review the below docstring
+        # TODO: review the below docstring
         "PNTOS_LOG_LEVEL_ERROR",
         """
         This output indicates the program has entered an error state, and 
         likely needs to be inspected to discover what went wrong.
         """
-
-        #TODO: review the below docstring
+        # TODO: review the below docstring
         "PNTOS_LOG_LEVEL_WARN",
         """
         This output is designed to warn of a possibly unintended state that may
         be harmless or be indicative of a bug.
         """
-
-        #TODO: review the below docstring
+        # TODO: review the below docstring
         "PNTOS_LOG_LEVEL_INFO",
         """
         This output is designed to be informational, and may indicate correct 
         operation.
         """
-
-        #TODO: review the below docstring
+        # TODO: review the below docstring
         "PNTOS_LOG_LEVEL_DEBUG",
         """
         This output is designed to assist in debugging plugins by providing 
         additional information about state and behavior which would be 
         otherwise unnecessary.
-        """
+        """,
     ],
 )
 
 
 KeyValueStoreDataFormat = Enum(
-#TODO: review the below docstring
-"""
+    # TODO: review the below docstring
+    """
 An enum that specifies the format of data returned/expected in the 
 PntosKeyValueStore.get_raw and PntosKeyValueStore.set_raw methods. This value 
 is otherwise unused when querying a key-value store.
 """
-    "KeyValueStoreDataFormat", [
-
-        #TODO: review the below docstring
-        "PNTOS_KV_STORE_INI", 
+    "KeyValueStoreDataFormat",
+    [
+        # TODO: review the below docstring
+        "PNTOS_KV_STORE_INI",
         """
         Keys and their corresponding values are returned according to the INI 
         file format specification.
         """
-
-        #TODO: review the below docstring
+        # TODO: review the below docstring
         "PNTOS_KV_STORE_UNSPECIFIED"
         """
         An opaque type that is undefined by the implementer.
-        """
-    ]
+        """,
+    ],
 )
 
-ValueType = TypeVar("ValueType", None, str, List[str], int, bool, float, NDArray[float64], Message)
-#TODO: make docstring if needed
+ValueType = TypeVar(
+    "ValueType", None, str, List[str], int, bool, float, NDArray[float64], Message
+)
+# TODO: make docstring if needed
 
 
 class KeyValueStore(Protocol):
-    #TODO: review the below docstring
+    # TODO: review the below docstring
     """
-    A key-value store implemented with a string-pair key. Each value can be 
-    looked up by an associated key (string). Values can be a variety of 
+    A key-value store implemented with a string-pair key. Each value can be
+    looked up by an associated key (string). Values can be a variety of
     different types.
 
-    In general, a KeyValueStore is generated by a Registry and not 
-    directly by other code. The Registry will return key/value stores on 
+    In general, a KeyValueStore is generated by a Registry and not
+    directly by other code. The Registry will return key/value stores on
     demand, utilizing the data backing store chosen by the plugin to store data
-    (either ephemerally in memory or permanently in persistent storage). In 
-    general, it is only valid to call the getters/setters on a KeyValueStore 
+    (either ephemerally in memory or permanently in persistent storage). In
+    general, it is only valid to call the getters/setters on a KeyValueStore
     during a batch operation. See Registry for more information.
     """
 
     def get_key_array(self) -> List[str]:
-        #TODO: review the below docstring
+        # TODO: review the below docstring
         """
         Get the array of keys which currently exist in this store. Returns NULL
         if no keys are available.
@@ -491,30 +468,30 @@ class KeyValueStore(Protocol):
         pass
 
     def has_key(self, key: str) -> bool:
-        #TODO: review the below docstring
+        # TODO: review the below docstring
         """
         Returns whether or not a given key exists in the store.
         """
         pass
 
     def get_value(self, key: str, type: type[ValueType]) -> ValueType:
-        #TODO: review the below docstring
+        # TODO: review the below docstring
         """
-        Get the value stored at 'key' with return type 'type'. For example, to 
+        Get the value stored at 'key' with return type 'type'. For example, to
         access altitude in KeyValueStore 'kv_store' as an integer:\n
         altitude = kv_store.get_value("altitude", int) \n
-        Returns NULL if the key is not available. The return is guaranteed to 
-        not be NULL if called with a valid key, which can be checked with 
+        Returns NULL if the key is not available. The return is guaranteed to
+        not be NULL if called with a valid key, which can be checked with
         has_key().
         """
         pass
 
     def get_raw(self, key: Optional[str]) -> Optional[bytes]:
-        #TODO: make a docstring 
+        # TODO: make a docstring
         pass
 
     def set_value(self, key: str, value: ValueType) -> None:
-        #TODO: review the below docstring
+        # TODO: review the below docstring
         pass
 
     def set_raw(self, key: Optional[str], bytes: bytes) -> None:
