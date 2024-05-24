@@ -23,7 +23,7 @@ An example LCM Transport Plugin for ASPN23
 
 # from threading import Thread
 
-from multiprocessing import Thread
+from threading import Thread
 from typing import Optional, Protocol
 
 from aspn23.lcm_translations import (
