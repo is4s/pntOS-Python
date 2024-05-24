@@ -32,7 +32,7 @@ from the pntOS project root folder.
 
 # from threading import Thread
 
-from multiprocessing import Process
+from multiprocessing import Thread
 from threading import Thread
 from typing import Optional, Protocol
 
@@ -60,15 +60,13 @@ class TransportPlugin(CommonPlugin, Protocol):
     from the pntOS project root folder.
     """
     identifier:str
-    url:str
     lcm:LCM
-    listener:Process
+    listener: Thread
     mediator: Mediator
 
 
-    def __init__(self, url: str, mediator: Mediator):
+    def __init__(self, mediator: Mediator):
         self.identifier = "python-transport-lcm23-plugin"
-        self.url = url
         self.mediator = mediator
 
 

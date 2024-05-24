@@ -32,7 +32,7 @@ from the pntOS project root folder.
 
 # from threading import Thread
 
-from multiprocessing import Process
+from multiprocessing import Thread
 from threading import Thread
 from typing import Optional, Protocol
 
@@ -48,13 +48,11 @@ from lcm import LCM
 
 class TransportPlugin(CommonPlugin, Protocol):
     identifier: str
-    url: str
     lcm: LCM
-    listener: Process
+    listener: Thread
 
-    def __init__(self, url: str):
+    def __init__(self):
         self.identifier = "python-transport-lcm2-plugin"
-        self.url = url
 
     def init_plugin(self):
         """
