@@ -1,14 +1,5 @@
 """
-An example LCM Transport Plugin for ASPN 2.X implemented in Python
-
-The Transport LCM Plugin in this file can be substituted for the Viper
-Transport LCM Plugin in the default plugins list.  However, it is not currently
-a complete substitution.  Only geodetic 3D position, PVA, and IMU data sources
-are supported in this example.
-
-To see it in action, run
-python sdk/python/example_plugin_transport_lcm_aspn_2/run_transport_lcm_plugin.py
-from the pntOS project root folder.
+An example LCM Transport Plugin for ASPN23
 """
 
 
@@ -36,100 +27,89 @@ from multiprocessing import Thread
 from threading import Thread
 from typing import Optional, Protocol
 
-import aspn23.lcm_translations
+from aspn23.lcm_translations import lcm_to_measurement_position_velocity_attitude, measurement_position_velocity_attitude_to_lcm 
 import aspn23.measurement_position_velocity_attitude
-from pntos.api.plugins.common import CommonPlugin, Mediator, Message
+from pntos.api.plugins.common import CommonPlugin, LoggingLevel, Mediator, Message
 from aspn23.measurement_position_velocity_attitude \
-    import MeasurementPositionVelocityAttitude as MeasurementPVA
+    import MeasurementPositionVelocityAttitude
 from aspn23_lcm.MeasurementPositionVelocityAttitude \
-    import MeasurementPositionVelocityAttitude as MeasurementPVALCM
-from lcm import LCM
+    import MeasurementPositionVelocityAttitude as MeasurementPositionVelocityAttitude_LCM
+from lcm import LCM, LCMSubscription
 
 
 class TransportPlugin(CommonPlugin, Protocol):
     """
-    An example LCM Transport Plugin for ASPN 2.X implemented in Python
-
-    The Transport LCM Plugin in this file can be substituted for the Viper
-    Transport LCM Plugin in the default plugins list.  However, it is not currently
-    a complete substitution.  Only geodetic 3D position, PVA, and IMU data sources
-    are supported in this example.
-
-    To see it in action, run
-    python sdk/python/example_plugin_transport_lcm_aspn_2/run_transport_lcm_plugin.py
-    from the pntOS project root folder.
+    An example LCM Transport Plugin for ASPN23 implemented in Python
     """
     identifier:str
     lcm:LCM
     listener: Thread
     mediator: Mediator
-
+    subscription: LCMSubscription
 
     def __init__(self, mediator: Mediator):
         self.identifier = "python-transport-lcm23-plugin"
         self.mediator = mediator
 
 
-    def init_plugin(self):
+    def init_plugin(self, mediator: Mediator):
         """
         pntOS plugin initialization function
 
         This is called by the pntOS system before calling any other function.
-
-        Implements C API PntosCommonPlugin.init_plugin.  See documentation in
-        api/include/pntos/plugins/common.h for more information.
         """
-        pass
+        self.mediator = mediator
 
     def shutdown_plugin(self):
         """
         pntOS plugin shutdown function
 
         This is called by the pntOS system when it is done with the plugin.
-
-        Implements C API PntosCommonPlugin.shutdown_plugin.  See documentation
-        in api/include/pntos/plugins/common.h for more information.
         """
+        if self.listener is not None:
+            self.listener.join()
+        if self.subscription is not None and self.lcm is not None:
+            self.lcm.unsubscribe(self.subscription)
+        self.__init__(self.url, mediator=None)
+        self.mediator.log_message(LoggingLevel.INFO, 
+                                  "shutdown_plugin for " + self.identifier
+                                  )
 
     def general_handler(self):
         """
-        Generic listener for lcm messages to marshal to the mediator for processing.
+        Generic listener for lcm messages to marshal to the mediator for
+        processing.
 
-        NOTE: Current implementation only supports input from the following sensors:
-            Inertial measurement unit (IMU)
-            Geodetic position
+        NOTE: Current implementation only supports input from the following
+        sensors:
             Position-velocity-attitude
         """
 
         def _general_handler(channel: str, data: bytes):
             # Do not process messages sent from pntos.
             if "pntos" in channel:
-                print("pntos channel message, not processing in aspn handler")
+                self.mediator.log_message(
+                    LoggingLevel.INFO, 
+                    "pntos channel message, not processing in aspn handler"
+                )
                 return
-            decoded = MeasurementPVALCM.decode(data)
-            translated = aspn23.lcm_translations.lcm_to_measurement_position_velocity_attitude(decoded)
-            msg = Message(translated, "")
-            self.mediator.broadcast_aspn_message(msg, "python-transport-lcm2-plugin", None)
+            decoded = MeasurementPositionVelocityAttitude_LCM.decode(data)
+            translated = lcm_to_measurement_position_velocity_attitude(decoded)
+            self.broadcast_message(translated)
 
         return _general_handler
-    
-    def listener_thread(self):
-        self.lcm.subscribe("EXAMPLE", self.general_handler())
-        try:
-            while True:
-                self.lcm.handle()
-        except KeyboardInterrupt:
-            pass
+
+    def listener_thread(self, lcm: LCM):
+        self.subscription = lcm.subscribe(self.channel, self.general_handler())
 
     def start_listening(self) -> None:
-        # old: config_path="config/transport/is4s_transport_lcm"
         """
         Begin listening for lcm messages given input configuration
         """
         self.lcm = LCM()
 
         if self.lcm is None:
-            print("Failed to create lcm transport")
+            self.mediator.log_message(LoggingLevel.ERROR, "Failed to create lcm transport")
             return
 
         self.listener = Thread(
@@ -143,39 +123,21 @@ class TransportPlugin(CommonPlugin, Protocol):
         """
         Shut down all processes and threads spun up for LCM message passing
         """
-        # Transport is marked as no longer running
-        if self.lcm_transport.is_running:
-            self.lcm_transport.is_running = False
 
-        # Wait for listener thread to join.
-        if self.lcm_transport.listener is not None:
-            self.lcm_transport.listener.join()
+        if self.listener.is_alive():
+            self.listener.join()
 
-        # Wait for logger thread to join.
-        if self.lcm_transport.logger_process is not None:
-            self.lcm_transport.logger_process._is_running = False
+        if self.lcm.subscription is not None and self.lcm is not None:
+            self.lcm.unsubscribe(self.subscription)
 
-        # Unblock send thread with empty message and wait for join.
-        if self.lcm_transport.send_thread is not None:
-            self.lcm_transport.send_queue.put(None)
-            self.lcm_transport.send_thread.join()
-
-        if (
-            self.lcm_transport.subscription is not None
-            and self.lcm_transport.lcm is not None
-        ):
-            self.lcm_transport.lcm.unsubscribe(self.lcm_transport.subscription)
-
-        self.log_info("LCM transport stopped")
+        self.mediator.log_message(LoggingLevel.INFO, "LCM transport stopped")
 
     def broadcast_message(self, message: Message, channel_name: Optional[str]):
         """
         Send a message over LCM to a specific channel
         """
-        if isinstance(message.wrapped_message, MeasurementPVA):
-            translated = \
-                aspn23.lcm_translations.measurement_position_velocity_attitude_to_lcm(
-                    message.wrapped_message)
+        if isinstance(message.wrapped_message, MeasurementPositionVelocityAttitude):
+            translated = measurement_position_velocity_attitude_to_lcm(message.wrapped_message)
             self.lcm.publish(channel_name, translated.encode())
         else:
             print("Invalid LCM message")

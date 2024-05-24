@@ -9,8 +9,8 @@ def main():
     registry = PyRegistry()
     mediator = PyMediator(registry)
 
-    t23 = Aspn23Transport(None, None)
-    t2 = Aspn2Transport(None)
+    t23 = Aspn23Transport(mediator)
+    t2 = Aspn2Transport(mediator)
 
     t23.start_listening()
     t2.start_listening()

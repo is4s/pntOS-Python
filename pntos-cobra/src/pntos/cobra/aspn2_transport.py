@@ -40,19 +40,22 @@ from datasources.lcm.messages.aspn.positionvelocityattitude import positionveloc
 from datasources.lcm.messages.aspn.types.geodeticposition3d_type import geodeticposition3d_type 
 from datasources.lcm.messages.aspn.types.header import header 
 from datasources.lcm.messages.aspn.types.timestamp import timestamp 
-from pntos.api.plugins.common import CommonPlugin, Message
+from pntos.api.plugins.common import CommonPlugin, LoggingLevel, Mediator, Message
 from aspn23.measurement_position_velocity_attitude \
     import MeasurementPositionVelocityAttitude as MeasurementPVA
 
-from lcm import LCM
+from lcm import LCM, LCMSubscription
 
 class TransportPlugin(CommonPlugin, Protocol):
-    identifier: str
-    lcm: LCM
+    identifier:str
+    lcm:LCM
     listener: Thread
+    mediator: Mediator
+    subscription: LCMSubscription
 
-    def __init__(self):
+    def __init__(self, mediator: Mediator):
         self.identifier = "python-transport-lcm2-plugin"
+        self.mediator = mediator
 
     def init_plugin(self):
         """
@@ -135,8 +138,13 @@ class TransportPlugin(CommonPlugin, Protocol):
         """
         Shut down all processes and threads spun up for LCM message passing
         """
-        self.lcm.unsubscribe()
-        self.listener.terminate()
+        if self.listener.is_alive():
+            self.listener.join()
+
+        if self.lcm.subscription is not None and self.lcm is not None:
+            self.lcm.unsubscribe(self.subscription)
+
+        self.mediator.log_message(LoggingLevel.INFO, "LCM transport stopped")
 
     def broadcast_message(self, message: Message, channel_name: Optional[str]):
         """
