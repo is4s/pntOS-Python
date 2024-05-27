@@ -13,26 +13,35 @@
 -e file:pntos-cobra
 alabaster==0.7.16
     # via sphinx
-aspn2-lcm @ git+ssh://git@git.aspn.us/pntos/lcm-generated.git@8e69d19ebdee5ac3c616023ab2c5884e0d695744#subdirectory=python
+aspn2-lcm @ git+ssh://git@git.aspn.us/pntos/lcm-generated.git@6a566b0bcbe39f0393bef939832c90bfe2195f3c#subdirectory=python
     # via pntos-cobra
-aspn23 @ git+ssh://git@git.aspn.us/pntos/firehose-outputs.git@2236c39d549cffe9ad8e4c09be075b695fd1ad41#subdirectory=aspn-py
+aspn23 @ git+ssh://git@git.aspn.us/pntos/firehose-outputs.git@a0083b3a3f823cbfc5f71d5261dd16fb41e832d3#subdirectory=aspn-py
     # via pntos-cobra
-aspn23-lcm @ git+ssh://git@git.aspn.us/pntos/firehose-outputs.git@2236c39d549cffe9ad8e4c09be075b695fd1ad41#subdirectory=lcm/python
+aspn23-lcm @ git+ssh://git@git.aspn.us/pntos/firehose-outputs.git@a0083b3a3f823cbfc5f71d5261dd16fb41e832d3#subdirectory=lcm/python
     # via pntos-cobra
+asttokens==2.4.1
+    # via stack-data
 babel==2.15.0
     # via sphinx
 certifi==2024.2.2
     # via requests
 charset-normalizer==3.3.2
     # via requests
+decorator==5.1.1
+    # via ipython
 docutils==0.21.2
     # via sphinx
+executing==2.0.1
+    # via stack-data
 idna==3.7
     # via requests
 imagesize==1.4.1
     # via sphinx
 iniconfig==2.0.0
     # via pytest
+ipython==8.24.0
+jedi==0.19.1
+    # via ipython
 jinja2==3.1.4
     # via sphinx
 lcm @ git+https://github.com/lcm-proj/lcm.git@e72f1baccadcd2a367d1612ba102ce004b03f0ca#subdirectory=lcm-python
@@ -41,18 +50,39 @@ lcm @ git+https://github.com/lcm-proj/lcm.git@e72f1baccadcd2a367d1612ba102ce004b
     # via pntos-cobra
 markupsafe==2.1.5
     # via jinja2
+matplotlib-inline==0.1.7
+    # via ipython
+mypy==1.10.0
+mypy-extensions==1.0.0
+    # via mypy
 numpy==1.26.4
+    # via aspn23
     # via pntos-cobra
 packaging==24.0
     # via pytest
     # via sphinx
+parso==0.8.4
+    # via jedi
+pexpect==4.9.0
+    # via ipython
+pip==24.0
 pluggy==1.5.0
     # via pytest
+prompt-toolkit==3.0.43
+    # via ipython
+ptyprocess==0.7.0
+    # via pexpect
+pure-eval==0.2.2
+    # via stack-data
 pygments==2.18.0
+    # via ipython
     # via sphinx
 pytest==8.2.0
 requests==2.31.0
     # via sphinx
+ruff==0.4.5
+six==1.16.0
+    # via asttokens
 snowballstemmer==2.2.0
     # via sphinx
 sphinx==7.3.7
@@ -68,5 +98,15 @@ sphinxcontrib-qthelp==1.0.7
     # via sphinx
 sphinxcontrib-serializinghtml==1.1.10
     # via sphinx
+stack-data==0.6.3
+    # via ipython
+traitlets==5.14.3
+    # via ipython
+    # via matplotlib-inline
+typing-extensions==4.12.0
+    # via ipython
+    # via mypy
 urllib3==2.2.1
     # via requests
+wcwidth==0.2.13
+    # via prompt-toolkit
