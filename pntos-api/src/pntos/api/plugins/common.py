@@ -55,16 +55,22 @@ EstimateWithCovarianceType = Enum(
 
 @dataclass
 class EstimateWithCovariance:
-    # Describes how the fields in this struct are used.
+    
     type: EstimateWithCovarianceType
+    """ 
+    Describes how the fields in this struct are used. 
+    """
 
-    # The estimate vector.  Usage depends on the #type field.
     estimate: NDArray[float64]
-
-    # An array of doubles representing a square covariance matrix. Data is
-    # stored in row major form.  Usage depends on the #type field.
+    """ 
+    The estimate vector. Usage depends on the #type field. 
+    """
+    
     covariance: NDArray[float64]
-
+    """
+    An array of doubles representing a square covariance matrix. Data is
+    # stored in row major form.  Usage depends on the #type field.
+    """
 
 PluginTypes = Enum(
     # TODO: review the below docstring
@@ -477,8 +483,8 @@ class KeyValueStore(Protocol):
     def get_value(self, key: str, type: type[ValueType]) -> ValueType:
         # TODO: review the below docstring
         """
-        Get the value stored at 'key' with return type 'type'. For example, to
-        access altitude in KeyValueStore 'kv_store' as an integer:\n
+        Get the value stored at key with return type `type`. For example, to
+        access altitude in KeyValueStore `kv_store` as an integer:\n
         altitude = kv_store.get_value("altitude", int) \n
         Returns NULL if the key is not available. The return is guaranteed to
         not be NULL if called with a valid key, which can be checked with
@@ -487,23 +493,105 @@ class KeyValueStore(Protocol):
         pass
 
     def get_raw(self, key: Optional[str]) -> Optional[bytes]:
-        # TODO: make a docstring
+        # TODO: review the below docstring
+        """
+        Get the value for the given key as an array of bytes. The format of 
+        PntosByteArray.data will conform to the definition of a value in 
+        #data_format. Returns NULL if the given key is not available. The 
+        return is guaranteed to not be NULL if called with a valid key, which 
+        can be checked with #has_key. \n
+        \n
+        If `key` is NULL, then this function will return all of the keys and 
+        values in the group passed to batch_start() and will be formatted to 
+        conform to keys and values as defined in #data_format.
+        """
         pass
 
     def set_value(self, key: str, value: ValueType) -> None:
         # TODO: review the below docstring
+        """
+        Set the given key to the provided value. `value` can be of any type
+        specified by ValueType
+        """
         pass
 
     def set_raw(self, key: Optional[str], bytes: bytes) -> None:
+        # TODO: review the below docstring
+        """
+        Set the given key to the provided value. `bytes` must be formatted to 
+        conform to the definition of a value in #data_format.\n
+        \n
+        If `key` is NULL, then the contents of `bytes` must include both keys 
+        and values and must be formatted to conform to #data_format. `bytes` 
+        will then be used to set the corresponding keys and values in the group
+        passed to batch_start().
+        """
         pass
 
     def remove_key(self, key: str) -> bool:
+        # TODO: review the below docstring
+        """
+        Remove the given key from the registry. Returns true if `key` is 
+        successfully removed, and false otherwise. Keys may fail to be removed 
+        if the key does not currently exist, or the backend is unable to remove
+        the key.
+        """
         pass
 
     def batch_end(self) -> None:
+        # TODO: review the below docstring
+        """
+        Ends a batch operation started with a `batch_start()` call. After 
+        calling this, the user should not use the `KeyValueStore` they 
+        received from `batch_start()` again without calling `batch_restart()` 
+        on the `KeyValueStore`.\n
+        \n
+        If keys in the batch were acted upon with set_permanent turned on, and 
+        the plugin supports permanent storage, this call will save changes to 
+        permanent storage if set_permanent is true during the call to 
+        batch_end(). Enacts equivalent of `set_permanent(self,false)` before 
+        return. If any request_notify observers have been added, they will be 
+        processed prior to this call returning.\n
+        \n
+        * EXAMPLE 1: Flushing to permanent storage on `batch_end` \n
+        ```
+        store = Registry.batch_start("group")
+        ...work...
+        store.set_permanent(true) # if not disabled, flush on batch_end
+        ...work...
+        store.batch_end() # will flush values
+        ```
+        \n
+        * EXAMPLE 2: Not flushing to permanent storage on `batch_end` \n
+	    ```
+        store = batch_start("group")
+        ...work...
+        store.set_permanent(true) # tag some values
+        ...work...
+        store->set_permanent(false) # do not flush on batch_end
+        store->batch_end() # will not flush values
+        ```
+        \n
+        In the second example above, values set with "set" methods after the 
+        initial `set_permanent()` call are still stored for potential saving to
+        permanent storage.
+        """
         pass
 
     def batch_restart(self) -> None:
+        # TODO: review the below docstring
+        """
+        Restarts a batch that was previously started with `batch_start` and 
+        subsequently ended with `batch_end`. This method is likely much more 
+        efficient than 'Registry.batch_start' (depending on the registry 
+        implementation) as the `Registry.batch_start` method must find the 
+        store again given the group name. \n
+        \n
+        NOTE: While a batch is active, access to the store may be denied to 
+        other users. Thus a user should endeavour to call `batch_end` as soon 
+        as possible after they are done getting/setting values in the returned 
+        KeyValueStore.
+        """
         pass
 
     def request_notify(
@@ -511,6 +599,28 @@ class KeyValueStore(Protocol):
         key: Optional[str],
         callback: Callable[[str, List[str], "KeyValueStore"], None],
     ) -> bool:
+        # TODO: review the below docstring
+        """
+        Register a callback which gets called each time a key in the store is 
+        updated. Allows plugins to respond asynchronously to parameter updates.
+        Returns true if the notifier was successfully registered, and false if 
+        the store is unable to notify the requester. If key is null, then the 
+        callback will be invoked when any key in the batch's group is modified.
+        Otherwise, the callback will only be invoked when the given key is 
+        modified. The receiver argument, if non-NULL, will be passed through to
+        the callback's receiver parameter when the callback is invoked. The 
+        receiver argument is designed to allow the caller of `request_notify` 
+        to pass a context object through, such that the same context object is 
+        available when the callback is run.\n
+        \n
+	    NOTE: The callback must not attempt to set any values inside the 
+        KeyValueStore, as the callback is likely being invoked during the 
+        processing of another operation. The callback should endeavour to store
+        off the updated keys/values as quickly as possible and return, leaving 
+        the processing of the updates to another context or thread when 
+        possible. Calling `Mediator` within the callback may be disallowed by 
+        the controller implementation and lead to undefined behavior.\n
+        """
         pass
 
     def remove_notify(
@@ -518,9 +628,47 @@ class KeyValueStore(Protocol):
         key: Optional[str],
         callback: Callable[[str, List[str], "KeyValueStore"], None],
     ) -> bool:
+        # TODO: review the below docstring
+        """
+        Removes a notification as requested by `request_notify`. The group, 
+        receiver, and callback must match the parameters passed to 
+        `request_notify` in order to successfully remove a callback. \n
+        \n
+        NOTE: This will remove all matching callbacks that have a matching 
+        group, receiver, and callback. If a user registers the same callback 
+        twice this will remove both.\n
+        \n
+        Returns `true` if removal was successful and `false` if it was not. 
+        `false` will be returned if a callback did not exist for the 
+        group/receiver combination.
+        """
         pass
 
     def set_permanent(self, permanent: bool) -> bool:
+        # TODO: review the below docstring
+        """
+        Configure the KeyValueStore to tag values modified with "set" methods 
+        as permanently stored (as opposed to ephemerally stored in memory). 
+        Only values acted upon with "set" methods while `set_permanent` is 
+        'true' will be tagged. Values will be flushed according to registry 
+        configuration settings or per `batch_end` API. Returns the value of the
+        permanent storage configuration. Callers should check this to verify if
+        the set was successful.\n
+        \n
+        EXAMPLE: Tagging specific keys to be permanently stored\n
+        \n
+        ```
+        PntosKeyValueStore* store = registry->batch_start("group");
+        store.set_value("key1",1234.56) # does not tag this value as permanently stored
+        store.set_permanent(true)       # start tagging set* calls as permanently stored
+        store.set_value("key1",987.65) 
+        store.set_value("key2",123)     # both key1 and key2 values tagged
+        store.set_permanent(false)      # disable permanent storage
+        store.set_value("key1",456.78)  # key1 = 456.78 is value of key1 in store
+                                        # key1 = 987.65 tagged to be permanently stored
+                                        # key2 = 123    tagged to be permanently stored
+        ```
+        """
         pass
 
     data_format: KeyValueStoreDataFormat
