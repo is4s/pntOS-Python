@@ -19,6 +19,7 @@ New contributions to this repo should pass the following checks:
 
 ```bash
 rye lint --fix
+rye fmt
 mypy pntos-api
 mypy pntos-cli
 mypy pntos-cobra
