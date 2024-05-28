@@ -4,5 +4,31 @@ from .common import CommonPlugin, Registry
 
 
 class RegistryPlugin(CommonPlugin, Protocol):
+    """
+    A plugin for a global key-value registry. See the `pntOS Registry` page in
+    the `Internals` section for more information on the goal of this plugin.
+    """
+
     def new_registry(self, initial_config: Optional[str]) -> Registry:
+        """
+        Create a new registry based on the initial values stored in 
+        `initial_config`.  The format of `initial_config` is implementation
+        specific, and plugins are free to support any or no format.
+        
+        Possible formats may include:
+        - `None`, in which case the plugin is free to choose initial values.
+          Choices may include hard-coded in the plugin or none at all.
+        - a `str`.  Examples of possible values the parameter could hold:
+        1. The entire config.
+        2. A local file path on systems which support them.
+        3. A string adhering to the URI scheme.
+         
+        NOTE: The returned `Registry` should be capable of producing 
+        `KeyValueStore` structs that are able to be used concurrently. Thus if
+        the user uses the return value of this method to start two batches, one
+        on group "foo" and the other on group "bar", then concurrent access to
+        both of the resulting `KeyValueStore` structs for "foo" and "bar"
+        should be supported (i.e. no shared mutable state between them that is
+        not synchronized).
+        """
         pass
