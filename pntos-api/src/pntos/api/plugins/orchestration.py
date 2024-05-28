@@ -7,11 +7,11 @@ from .common import CommonPlugin, Message
 
 class MessageStreamConfig(Protocol):
     """
-    This class configures the buffering, delay, and sorting characteristics of 
+    This class configures the buffering, delay, and sorting characteristics of
     messages that are streamed into the orchestration plugin. The pntOS system
     will deliver messages to the orchestration plugin as it receives them.
     However, there is a fundamental tradeoff between latency and those messages
-    being in-order. In particular, to guarantee that messages are sorted by 
+    being in-order. In particular, to guarantee that messages are sorted by
     timestamp, it is necessary to build a buffer and delay delivery, such that
     a sorting function may be applied. This structure allows the plugin to
     choose which messages are buffered and which are not.
@@ -21,7 +21,7 @@ class MessageStreamConfig(Protocol):
         self, type: type, source_identifier: Optional[str]
     ) -> None:
         """
-        Request messages of the given `MessageType` and optional 
+        Request messages of the given `MessageType` and optional
         `source_identifier` are streamed in sorted timestamp ordering.
         """
         pass
@@ -33,7 +33,7 @@ class MessageStreamConfig(Protocol):
         Request messages of the given `MessageType` and optional
         `source_identifier` are no longer streamed in sorted timestamp
         ordering. This will remove a type that was previously added in a call
-        to `sequenced_stream_add`, or remove individual messages from the 
+        to `sequenced_stream_add`, or remove individual messages from the
         entire list of messages that was added with a previous call to
         `sequenced_stream_all`.
         """
@@ -51,7 +51,7 @@ class MessageStreamConfig(Protocol):
         self, type: type, source_identifier: Optional[str]
     ) -> None:
         """
-        Request messages of the given `MessageType` and optional 
+        Request messages of the given `MessageType` and optional
         `source_identifier` are streamed immediately without delay, buffering,
         or sorting.
         """
@@ -84,9 +84,9 @@ class OrchestrationPlugin(CommonPlugin, Protocol):
     sensor fusion. The orchestration plugin is sent (sorted, buffered) ASPN
     messages from the controller, and is responsible for computing a solution
     for the system, as well as estimating any other quantities of interest.
-    
+
     In order to achieve this task, the orchestration plugin may be passed a set
-    of other plugins during the call to 
+    of other plugins during the call to
     `OrchestrationPlugin.init_orchestration_plugin`. If so, the orchestration
     plugin then, as the name suggests, configures and orchestrates these
     plugins to work together to perform sensor fusion. For example, the
@@ -108,7 +108,7 @@ class OrchestrationPlugin(CommonPlugin, Protocol):
         function will be called by the system after the
         `CommonPlugin.init_plugin` but before any other call to an
         orchestration plugin function.
-        
+
         The `plugins` parameter is a set of plugins which should be used by the
         orchestration plugin. For example, the plugins list may include a
         `StandardFusionEngine`, which the orchestration plugin can use to
@@ -117,7 +117,7 @@ class OrchestrationPlugin(CommonPlugin, Protocol):
         extract the algorithms needed for parsing sensor data into the data
         model a fusion engine needs. If the orchestration plugin does not
         require any plugins, `None` may be passed.
-        
+
         The `stream_config` parameter is a set of configuration options that
         the orchestration plugin can use to indicate to the controller how it
         would prefer delivery of messages. When the orchestration plugin
@@ -142,7 +142,7 @@ class OrchestrationPlugin(CommonPlugin, Protocol):
         Orchestration plugin. One of these description strings may be used when
         calling `request_solutions`. For consistency, these strings should
         adhere to the following conventions:
-        
+
         - Strings should be upper case and have words and acronyms separated by
           underscores (`UPPER_SNAKE_CASE`).
         - Strings should contain the substring `BEST` when they represent the
@@ -163,11 +163,11 @@ class OrchestrationPlugin(CommonPlugin, Protocol):
           This allows the user to perform substring matching without a risk of
           getting a false positive match from a type whose string would be a
           subset of another type.
-          
+
         For example, if the primary solution is an ASPN PVA then the string
         `MY_BEST_ASPN_MEASUREMENT_POSITION_VELOCITY_ATTITUDE_ESTIMATE` would
         fulfill the convention.
-        
+
         These conventions allow the user to identify their desired type of
         solution using substring matching.
         """
@@ -177,9 +177,9 @@ class OrchestrationPlugin(CommonPlugin, Protocol):
         self, solution_times: List[TypeTimestamp], filter_description: Optional[str]
     ) -> List[Message]:
         """
-        Request filtering solutions at the times specified in the array 
+        Request filtering solutions at the times specified in the array
         `solution_times`.
-        
+
         An Orchestration plugin may run multiple filters. To select which
         filter(s) to request solutions from, enter a valid filter description
         string in `filter_description`. Valid filter description strings can be
@@ -187,12 +187,12 @@ class OrchestrationPlugin(CommonPlugin, Protocol):
         will provide a result specific to a particular Orchestration plugin
         implementation. When `filter_description` is `None`, the implementation
         should endeavor to return its best solution.
-        
+
         Returned will be an array of messages containing the filter solutions
         for the requested `solution_times`. The number of solutions should
-        equal the number of times in `solution_times`, although some entries 
+        equal the number of times in `solution_times`, although some entries
         may be None if they are unavailable at the corresponding time in
-        `solution_times`. The returned `Message` list may be `None` if 
+        `solution_times`. The returned `Message` list may be `None` if
         `filter_description` is invalid.
         """
         pass

@@ -8,6 +8,7 @@ class TransportPlugin(CommonPlugin, Protocol):
     A plugin that abstracts a network transport, listening for sensor data off
     the wire and sending data back to the sensors as needed.
     """
+
     def start_listening(self) -> None:
         """
         Start listening to the transport that this plugin implements, calling
