@@ -16,7 +16,7 @@ class PyRegistry(Registry):
         return dir(self.store)
 
     def has_group(self, group: str) -> bool:
-        return self.store.get(group) != None
+        return self.store.get(group) is not None
 
     def request_notify_new_group(self, callback: Callable[[str], None]) -> bool:
         return super().request_notify_new_group(callback)
