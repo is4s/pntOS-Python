@@ -443,10 +443,6 @@ class KeyValueStoreDataFormat(Enum):
 ValueType = TypeVar(
     "ValueType", None, str, List[str], int, bool, float, NDArray[float64], Message
 )
-ValueTypeUnion = (
-    None | str | List[str] | int | bool | float | NDArray[float64] | Message
-)
-# TODO: make docstring if needed
 
 
 class KeyValueStore(Protocol):
@@ -493,7 +489,7 @@ class KeyValueStore(Protocol):
 
     def get_value(self, key: str, type: type[ValueType]) -> ValueType:
         """
-        Get the value stored at key with return type `type`.
+        Get the value stored at `key` with return type `type`.
 
         For example, to access altitude in KeyValueStore `kv_store` as an
         integer:
