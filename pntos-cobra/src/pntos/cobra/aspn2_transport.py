@@ -124,8 +124,6 @@ class TransportPlugin(CommonPlugin, Protocol):
         """
         Begin listening for lcm messages given input configuration
         """
-        # Get the channel to pass to lcm_subscribe
-        channel = ".*"
 
         self.lcm = LCM()
 

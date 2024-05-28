@@ -31,7 +31,7 @@ class PyMediator(Mediator):
         transport: str | None,
         destination_identifier: str | None,
     ) -> None:
-        if transport == None:
+        if transport is None:
             print("No transport passed. Sorry.")
         the_transport = [
             x for x in self.transport_plugins if x.identifier == transport
