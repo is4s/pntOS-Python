@@ -3,7 +3,7 @@ from typing import List, Optional, Protocol
 from .common import CommonPlugin
 
 
-class Controller(CommonPlugin, Protocol):
+class ControllerPlugin(CommonPlugin, Protocol):
     def take_control(
         self,
         plugins: List[CommonPlugin],
