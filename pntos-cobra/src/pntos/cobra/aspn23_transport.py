@@ -37,6 +37,7 @@ from aspn23_lcm.MeasurementPositionVelocityAttitude import (
     MeasurementPositionVelocityAttitude as MeasurementPositionVelocityAttitude_LCM,
 )
 from lcm import LCM, LCMSubscription
+
 from pntos.api.plugins.common import CommonPlugin, LoggingLevel, Mediator, Message
 
 
