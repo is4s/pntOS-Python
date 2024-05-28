@@ -465,7 +465,7 @@ class KeyValueStore(Protocol):
     internal data storage. Later a user could call
 
     ```
-    store->get_value("k1", str);
+    store.get_value("k1", str);
     ```
 
     To retrieve the value from the store as a string.
@@ -504,7 +504,7 @@ class KeyValueStore(Protocol):
 
         Returns None if the key is not available. The return is guaranteed to
         not be None if called with a valid key, which can be checked with
-        has_key().
+        `has_key()`.
         """
         pass
 
