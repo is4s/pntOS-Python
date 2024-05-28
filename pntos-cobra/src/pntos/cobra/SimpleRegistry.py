@@ -5,7 +5,7 @@ from pntos.api.plugins.common import KeyValueStore, Registry
 from .kv import PyKv
 
 
-class PyRegistry(Registry):
+class SimpleRegistry(Registry):
     kv: PyKv
 
     def batch_start(self, group: str) -> KeyValueStore:
