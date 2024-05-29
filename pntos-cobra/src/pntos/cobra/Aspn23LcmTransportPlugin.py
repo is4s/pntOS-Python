@@ -1,28 +1,3 @@
-"""
-An example LCM Transport Plugin for ASPN23
-"""
-
-
-# from pntos import (
-#     class_PntosTransportPlugin,
-#     PntosLoggingLevel,
-#     PntosMediator,\
-#     PntosMessage,
-# )
-
-# from example_plugin_transport_lcm_aspn_2.LcmTransport import (
-#     LcmTransport,
-#     LcmLogger,
-# )
-# from example_plugin_transport_lcm_aspn_2.lcm_aspn2_handler import (
-#     lcm_transport_send_message,
-#     general_handler,
-#     listener_thread,
-#     send_thread,
-# )
-
-# from threading import Thread
-
 from threading import Thread
 from typing import Optional, Protocol
 
@@ -38,10 +13,10 @@ from aspn23_lcm.MeasurementPositionVelocityAttitude import (
 )
 from lcm import LCM, LCMSubscription
 
-from pntos.api.plugins.common import CommonPlugin, LoggingLevel, Mediator, Message
+from pntos.api import CommonPlugin, LoggingLevel, Mediator, Message
 
 
-class TransportPlugin(CommonPlugin, Protocol):
+class Aspn23LcmTransportPlugin(CommonPlugin, Protocol):
     """
     An example LCM Transport Plugin for ASPN23 implemented in Python
     """

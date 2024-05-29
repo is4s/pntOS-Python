@@ -1,0 +1,67 @@
+from typing import List, Optional
+
+from aspn23 import TypeTimestamp
+
+from pntos.api import (
+    CommonPlugin,
+    ControllerPlugin,
+    LoggingLevel,
+    Mediator,
+    Message,
+    Registry,
+    TransportPlugin,
+)
+
+
+class SimpleControllerPlugin(ControllerPlugin):
+    def __init__(self, identifier: str):
+        self.identifier = identifier
+
+    def init_plugin(
+        self, plugin_resources_location: Optional[str], mediator: Optional[Mediator]
+    ) -> None:
+        pass
+
+    def shutdown_plugin(self) -> None:
+        pass
+
+    identifier: str
+
+    def take_control(
+        self,
+        plugins: List[CommonPlugin],
+        plugin_resources_locations: List[Optional[str]],
+        initial_config: Optional[str],
+    ) -> None:
+        pass
+
+
+class SimpleMediator(Mediator):
+    transport_plugins: list[TransportPlugin]
+    registry: Registry
+
+    def __init__(self, registry: Registry, transport_plugins):
+        self.registry = registry
+        self.transport_plugins = transport_plugins
+
+    def get_filter_description_list(self) -> List[str]:
+        return []
+
+    def request_solutions(
+        self, solution_times: List[TypeTimestamp], filter_description: str | None
+    ) -> List[Message]:
+        return []
+
+    def process_pntos_message(self, message: Message) -> None:
+        pass
+
+    def broadcast_aspn_message(
+        self,
+        message: Message,
+        transport: str | None,
+        destination_identifier: str | None,
+    ) -> None:
+        pass
+
+    def log_message(self, level: LoggingLevel, message: str) -> None:
+        pass

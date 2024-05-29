@@ -1,7 +1,7 @@
 from time import sleep
 
-from pntos.cobra.aspn2_transport import TransportPlugin as Aspn2Transport
-from pntos.cobra.aspn23_transport import TransportPlugin as Aspn23Transport
+from pntos.cobra.Aspn2LCMTransportPlugin import TransportPlugin as Aspn2Transport
+from pntos.cobra.Aspn23LCMTransportPlugin import TransportPlugin as Aspn23Transport
 from pntos.cobra.mediator import PyMediator
 from pntos.cobra.registry import PyRegistry
 

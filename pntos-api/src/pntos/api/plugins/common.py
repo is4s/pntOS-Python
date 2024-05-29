@@ -40,7 +40,7 @@ class EstimateWithCovarianceType(Enum):
     Describes how the fields in `EstimateWithCovariance` are used.
     """
 
-    PNTOS_EWC_GENERIC = 0
+    EWC_GENERIC = 0
     """
     Contains a mean (estimate) and covariance describing a multivariate
     Gaussian distribution.
@@ -50,7 +50,7 @@ class EstimateWithCovarianceType(Enum):
       field.
     """
 
-    PNTOS_EWC_ATTITUDE_QUAT = 1
+    EWC_ATTITUDE_QUAT = 1
     """
     Contains a mean (estimate) and covariance describing a rotation modeled
     by a multivariate Gaussian distribution, but the estimate is in quaternion 
@@ -88,22 +88,22 @@ class PluginTypes(Enum):
     """
     An enumeration of the types of plugins supported by pntOS for this loader
     API version. Each enum entry maps to a corresponding structure with
-    PascalCase naming. For example, the `PNTOS_CONTROLLER_PLUGIN` value in this
+    PascalCase naming. For example, the `CONTROLLER_PLUGIN` value in this
     enum is indicating a plugin represented by the struct
     `ControllerPlugin`. Note that because the utility plugin has no
     additional API requirements beyond the `CommonPlugin`, there is not a
-    `UtilityPlugin`. Instead, implementers of `PNTOS_UTILITY_PLUGIN` should implement
+    `UtilityPlugin`. Instead, implementers of `UTILITY_PLUGIN` should implement
     and return a `CommonPlugin`.
     """
 
-    PNTOS_UNDEFINED_PLUGIN = 0
+    UNDEFINED_PLUGIN = 0
     """ 
     An unused entry, designed to allow code to detect accidentally unset 
     fields. This value must not be used by any plugin implementation, 
     other than to check for an erroneous default value being used.
     """
 
-    PNTOS_CONTROLLER_PLUGIN = 1
+    CONTROLLER_PLUGIN = 1
     """
     The primary plugin that controls the entire operation of pntOS. After 
     the pntOS loader collects the set of plugins available, execution 
@@ -130,7 +130,7 @@ class PluginTypes(Enum):
     communications and message routing between plugins.  
     """
 
-    PNTOS_FUSION_PLUGIN = 2
+    PLUGIN = 2
     """
     A plugin that models an information fusion approach. This plugin 
     accepts modular representations of state space models, sensor 
@@ -142,7 +142,7 @@ class PluginTypes(Enum):
     plugins, and filtering engines are provided by fusion strategy plugins.
     """
 
-    PNTOS_FUSION_STRATEGY_PLUGIN = 3
+    STRATEGY_PLUGIN = 3
     """
     A low level computational engine that can perform sensor fusion given 
     pre-determined fixed models of errors and raw measurements. Because 
@@ -153,7 +153,7 @@ class PluginTypes(Enum):
     engine in this plugin to consume.
     """
 
-    PNTOS_PLATFORM_INTEGRATION_PLUGIN = 4
+    PLATFORM_INTEGRATION_PLUGIN = 4
     """
     An output plugin for pntOS to interact with the platform it is running 
     on. While pntOS uses a uniform set of conventions internally (e.g. ASPN
@@ -171,7 +171,7 @@ class PluginTypes(Enum):
     non-experimental code, and its definition may change at any time.
     """
 
-    PNTOS_INITIALIZATION_PLUGIN = 5
+    INITIALIZATION_PLUGIN = 5
     """
     A plugin that provides initialization algorithms. In general, this 
     plugin must be able to consume some set of measurements and produce an 
@@ -184,7 +184,7 @@ class PluginTypes(Enum):
     non-experimental code, and its definition may change at any time.
     """
 
-    PNTOS_DATABASE_PLUGIN = 6
+    DATABASE_PLUGIN = 6
     """
     A plugin for storing generic datasets that might be consumed by many 
     plugins. For example, DTED elevation data may be used by many different
@@ -197,7 +197,7 @@ class PluginTypes(Enum):
     non-experimental code, and its definition may change at any time.
     """
 
-    PNTOS_TRANSPORT_PLUGIN = 7
+    TRANSPORT_PLUGIN = 7
     """
     A plugin that listens for incoming sensor/other data on a network bus 
     and provides this data to pntOS. pntOS has an internally consistent 
@@ -209,7 +209,7 @@ class PluginTypes(Enum):
     marshalling data off of a network connection into the system.
     """
 
-    PNTOS_UI_PLUGIN = 8
+    UI_PLUGIN = 8
     """
     A plugin for enabling user interfaces to be hooked up to pntOS. This 
     plugin is designed to enable displays to users to both see the current 
@@ -219,7 +219,7 @@ class PluginTypes(Enum):
     displays on the platform, the platform integration plugin is preferred.
     """
 
-    PNTOS_ORCHESTRATION_PLUGIN = 9
+    ORCHESTRATION_PLUGIN = 9
     """
     A plugin that implements the orchestration monitoring framework. In 
     general, complementary navigation techniques incur a large risk of 
@@ -233,7 +233,7 @@ class PluginTypes(Enum):
     sensor or situation.
     """
 
-    PNTOS_ORCHESTRATION_STRATEGY_PLUGIN = 10
+    ORCHESTRATION_STRATEGY_PLUGIN = 10
     """
     A fine-grained integrity plugin that itself plugins into the larger 
     orchestration plugin. This plugin is designed to be implementable by a 
@@ -249,7 +249,7 @@ class PluginTypes(Enum):
     non-experimental code, and its definition may change at any time.
     """
 
-    PNTOS_REGISTRY_PLUGIN = 11
+    REGISTRY_PLUGIN = 11
     """
     A registry of configuration and status data for pntOS that is available
     to all plugins. Registries allow for plugins to have side-channel 
@@ -271,7 +271,7 @@ class PluginTypes(Enum):
     by what source, and access control lists to guard certain keys.
     """
 
-    PNTOS_INERTIAL_PLUGIN = 12
+    INERTIAL_PLUGIN = 12
     """
     A plugin that generates PVA solutions from an inertial.
 
@@ -280,7 +280,7 @@ class PluginTypes(Enum):
     non-experimental code, and its definition may change at any time.
     """
 
-    PNTOS_STATE_MODELING_PLUGIN = 13
+    STATE_MODELING_PLUGIN = 13
     """
     A plugin that models the errors of the various sensors and systems that
     measuring the world. Abstractly, a state modeling plugin includes 
@@ -294,14 +294,14 @@ class PluginTypes(Enum):
     zero or more virtual state blocks.
     """
 
-    PNTOS_LOGGING_PLUGIN = 14
+    LOGGING_PLUGIN = 14
     """
     A plugin that logs system events to an arbitrary sink. A sink may be a 
     file, a console, an attached GUI, a network destination, or any other 
     destination of interest.
     """
 
-    PNTOS_UTILITY_PLUGIN = 15
+    UTILITY_PLUGIN = 15
     """
     A plugin that performs a generic utility function. A utility plugin 
     performs functions that may require access to pntOS resources (such as 
@@ -309,7 +309,7 @@ class PluginTypes(Enum):
     particular function.
     """
 
-    PNTOS_PREPROCESSOR_PLUGIN = 16
+    PREPROCESSOR_PLUGIN = 16
     """
     A plugin that processes data received from a transport before it is 
     sent onward into other pntOS plugins. Intended use cases include:
@@ -338,11 +338,11 @@ class FusionType(Enum):
 
     For example, suppose we have a variable `FusionPlugin* plugin`. Then if the
     return value of `plugin->is_fusion_type_supported(plugin,
-    FUSION_STANDARD_MODEL)` is true, then that means that
+    STANDARD_MODEL)` is true, then that means that
     `plugin->new_fusion_engine(plugin)` will return a `StandardFusionEngine*`.
     """
 
-    PNTOS_FUSION_STANDARD_MODEL = 0
+    STANDARD_MODEL = 0
     """
     The standard model of fusion within pntOS. This model assumes that 
     state estimates are representable in a jointly Gaussian state vector 
@@ -350,7 +350,7 @@ class FusionType(Enum):
     Gaussian noise. See `StandardFusionEngine` for more information.
     """
 
-    PNTOS_FUSION_SAMPLED_MODEL = 1
+    SAMPLED_MODEL = 1
     """
     The sampled model of fusion within pntOS. This model assumes that state
     estimates are represented by discrete stochastic sample points of a 
@@ -363,7 +363,7 @@ class FusionType(Enum):
     non-experimental code, and its definition may change at any time.
     """
 
-    PNTOS_FUSION_TIME_DELAYED_MODEL = 2
+    TIME_DELAYED_MODEL = 2
     """
     The time delayed model of fusion within pntOS. This model assumes that 
     information about a state is retained across different time epochs and 
@@ -375,7 +375,7 @@ class FusionType(Enum):
     non-experimental code, and its definition may change at any time.
     """
 
-    PNTOS_FUSION_STANDARD_COMPILED_MODEL = 3
+    STANDARD_COMPILED_MODEL = 3
     """
     The standard model of fusion within pntOS, in compiled format. This 
     model is identical to the standard model, with the exception that model
@@ -395,25 +395,25 @@ class LoggingLevel(Enum):
     An enumeration of the types of log outs that are available in pntOS.
     """
 
-    PNTOS_LOG_LEVEL_ERROR = 0
+    ERROR = 0
     """
     This output indicates the program has entered an error state, and 
     likely needs to be inspected to discover what went wrong.
     """
 
-    PNTOS_LOG_LEVEL_WARN = 1
+    WARN = 1
     """
     This output is designed to warn of a possibly unintended state that may
     be harmless or be indicative of a bug.
     """
 
-    PNTOS_LOG_LEVEL_INFO = 2
+    INFO = 2
     """
     This output is designed to be informational, and may indicate correct 
     operation.
     """
 
-    PNTOS_LOG_LEVEL_DEBUG = 3
+    DEBUG = 3
     """
     This output is designed to assist in debugging plugins by providing 
     additional information about state and behavior which would be 
@@ -428,20 +428,20 @@ class KeyValueStoreDataFormat(Enum):
     This value is otherwise unused when querying a key-value store.
     """
 
-    PNTOS_KV_STORE_INI = 0
+    INI = 0
     """
     Keys and their corresponding values are returned according to the INI 
     file format specification.
     """
 
-    PNTOS_KV_STORE_UNSPECIFIED = 1
+    UNSPECIFIED = 1
     """
     An opaque type that is undefined by the implementer.
     """
 
 
-ValueType = TypeVar(
-    "ValueType", None, str, List[str], int, bool, float, NDArray[float64], Message
+RegistryValueTypes = TypeVar(
+    "RegistryValueTypes", str, List[str], int, bool, float, NDArray[float64], Message
 )
 
 
@@ -487,7 +487,9 @@ class KeyValueStore(Protocol):
         """
         pass
 
-    def get_value(self, key: str, type: type[ValueType]) -> ValueType:
+    def get_value(
+        self, key: str, type: type[RegistryValueTypes]
+    ) -> RegistryValueTypes | None:
         """
         Get the value stored at `key` with return type `type`.
 
@@ -517,7 +519,7 @@ class KeyValueStore(Protocol):
         """
         pass
 
-    def set_value(self, key: str, value: ValueType) -> None:
+    def set_value(self, key: str, value: RegistryValueTypes) -> None:
         """
         Set the given key to the provided value. `value` can be of any type
         specified by `ValueType`
