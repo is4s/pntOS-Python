@@ -1,5 +1,5 @@
-from pntos.api.plugins.orchestration import OrchestrationPlugin
+from pntos.api import OrchestrationPlugin
 
 
-class SimpleController(OrchestrationPlugin):
+class SimpleOrchestration(OrchestrationPlugin):
     pass

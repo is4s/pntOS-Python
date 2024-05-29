@@ -1,5 +1,5 @@
-from pntos.api.plugins.controller import Controller
+from pntos.api import ControllerPlugin
 
 
-class SimpleController(Controller):
+class SimpleController(ControllerPlugin):
     pass

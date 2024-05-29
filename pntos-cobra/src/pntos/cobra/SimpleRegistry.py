@@ -1,11 +1,11 @@
 from typing import Callable, List
 
-from pntos.api.plugins.common import KeyValueStore, Registry
+from pntos.api import KeyValueStore, RegistryPlugin
 
 from .kv import PyKv
 
 
-class SimpleRegistry(Registry):
+class SimpleRegistry(RegistryPlugin):
     kv: PyKv
 
     def batch_start(self, group: str) -> KeyValueStore:
