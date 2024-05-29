@@ -4,7 +4,7 @@ from pntos.cobra import (
     SimpleRegistryPlugin,
 )
 from pntos.cobra.config import AlignmentConfig, ImuConfig, SensorConfig
-from pntos.cppsdk import LoadCppPlugin  # type: ignore
+from pntos.csdk import LoadCPlugin  # type: ignore
 
 my_config = [
     ImuConfig(
@@ -37,7 +37,7 @@ my_config = [
 controller = SimpleControllerPlugin(identifier="my_controller")
 orchestration = SimpleOrchestrationPlugin(identifier="my_orchestration")
 registry = SimpleRegistryPlugin(identifier="my_registry", config=my_config)
-sensor_baronav = LoadCppPlugin("libviper.so.1", "viper_baronav_plugin")
+sensor_baronav = LoadCPlugin("libviper.so.1", "viper_baronav_plugin")
 
 # Start the controller, and pass it all of the other plugins to use
 

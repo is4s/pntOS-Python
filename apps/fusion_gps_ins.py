@@ -4,6 +4,7 @@ from pntos.cobra import (
     SimpleControllerPlugin,
     SimpleOrchestrationPlugin,
     SimpleRegistryPlugin,
+    SimpleTransportPlugin,
 )
 from pntos.cobra.config import AlignmentConfig, ImuConfig, SensorConfig
 
@@ -40,8 +41,9 @@ my_config = [
 controller = SimpleControllerPlugin(identifier="my_controller")
 orchestration = SimpleOrchestrationPlugin(identifier="my_orchestration")
 registry = SimpleRegistryPlugin(identifier="my_registry", config=my_config)
+transport = SimpleTransportPlugin(identifier="my_transport")
 
 # Start the controller, and pass it all of the other plugins to use
 
 controller.init_plugin(None, None)
-controller.take_control([orchestration, registry], [], None)
+controller.take_control([orchestration, registry, transport], [], None)

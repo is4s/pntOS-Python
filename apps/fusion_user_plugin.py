@@ -65,7 +65,6 @@ class MyTransportPlugin(TransportPlugin):
     def broadcast_message(self, message: Message, channel_name: str | None) -> None:
         pass
 
-    thread: Thread
     mediator: Mediator
     listening: bool
     identifier: str = "my_transport_plugin"
@@ -89,6 +88,7 @@ controller = SimpleControllerPlugin(identifier="my_controller")
 orchestration = SimpleOrchestrationPlugin(identifier="my_orchestration")
 registry = SimpleRegistryPlugin(identifier="my_registry", config=my_config)
 custom_transport = MyTransportPlugin()
+
 # Start the controller, and pass it all of the other plugins to use
 
 controller.init_plugin(None, None)
