@@ -3,18 +3,17 @@ from pntos.cobra import (
     SimpleOrchestrationPlugin,
     SimpleRegistryPlugin,
 )
-from pntos.cobra.config import (
-    AlignmentConfig,
-    ImuConfig,
-)
+from pntos.cobra.config import AlignmentConfig, ImuConfig, SensorConfig
 from pntos.cppsdk import LoadCppPlugin  # type: ignore
 
 my_config = [
     ImuConfig(
         accel_bias_sigma=(0.0098, 0.0098, 0.0098),
         accel_bias_tau=(3600.0, 3600.0, 3600.0),
+        accel_rw_sigma=(0.001, 0.001, 0.001),
         gyro_bias_sigma=(1.234e-6, 1.234e-6, 1.234e-6),
         gyro_bias_tau=(3600.0, 3600.0, 3600.0),
+        gyro_rw_sigma=(0.001, 0.001, 0.001),
     ),
     AlignmentConfig(
         initialPosCov=(9.0, 9.0, 9.0),
@@ -22,6 +21,14 @@ my_config = [
         initialTiltCov=(0.01, 0.01, 0.01),
         initialAccelBiasCov=(9.604e-5, 9.604e-5, 9.604e-5),
         initialGyroBiasCov=(2.3504074e-11, 2.3504074e-11, 2.3504074e-11),
+    ),
+    SensorConfig(
+        lever_arm=(0.0, 0.0, 0.0),
+        orientation=(0.0, 0.0, 0.0, 0.0),
+        source_identifier="lcm://cobranav/novatel",
+        destination_identifier="gps_measurement_processor",
+        use_for_alignment=True,
+        sensor_name="novatel",
     ),
 ]
 
