@@ -17,7 +17,7 @@ class SimpleRegistryPlugin(RegistryPlugin):
     def __init__(
         self,
         identifier: str,
-        config: Dict[str, Any] | None,
+        config: Dict[str, Dict[str, Any]] | None,
     ):
         self.identifier = identifier
 

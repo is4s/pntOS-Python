@@ -5,7 +5,9 @@ from pntos.cobra import (
 )
 from pntos.cppsdk import LoadCppPlugin
 
-my_config = {"a": 5, "b": "3"}
+my_config = {}
+my_config["imu_params"] = {"a": 5, "b": "c"}
+my_config["lever_arms"] = {"aa": 123}
 
 # List of all the plugins we've loaded, except the controller
 plugin_list = [
