@@ -5,13 +5,15 @@ description = "A Python implementation of a set of pntOS example plugins."
 authors = [
     { name = "IS4S", email = "pntos@is4s.com" }
 ]
+# Git dependencies need exact commit hash for pip compatibility,
+# see https://github.com/astral-sh/rye/issues/957
 dependencies = [
     "numpy>=1.26.4",
     "pntos-api>=0.1.0",
-    "lcm @ git+https://github.com/lcm-proj/lcm.git@master#subdirectory=lcm-python",
-    "aspn23 @ git+ssh://git@git.aspn.us/pntos/firehose-outputs.git@feature/pyproject_wheel#subdirectory=aspn-py",
-    "aspn2_lcm @ git+ssh://git@git.aspn.us/pntos/lcm-generated.git@aspn-2.2#subdirectory=python",
-    "aspn23_lcm @ git+ssh://git@git.aspn.us/pntos/firehose-outputs.git@feature/pyproject_wheel#subdirectory=lcm/python"
+    "lcm @ git+https://github.com/lcm-proj/lcm.git@e72f1baccadcd2a367d1612ba102ce004b03f0ca#subdirectory=lcm-python",
+    "aspn23 @ git+ssh://git@git.aspn.us/pntos/firehose-outputs.git@be11c4279e8f8b1f72833beaf49ca9f995654f2c#subdirectory=aspn-py",
+    "aspn2_lcm @ git+ssh://git@git.aspn.us/pntos/lcm-generated.git@40f3930653286e2a4f1d4557ccd3b4279ac4f522#subdirectory=python",
+    "aspn23_lcm @ git+ssh://git@git.aspn.us/pntos/firehose-outputs.git@be11c4279e8f8b1f72833beaf49ca9f995654f2c#subdirectory=lcm/python"
 ]
 readme = "README.md"
 requires-python = ">= 3.11"
