@@ -441,15 +441,7 @@ class KeyValueStoreDataFormat(Enum):
 
 
 RegistryValueTypes = TypeVar(
-    "RegistryValueTypes",
-    str,
-    List[str],
-    int,
-    bool,
-    float,
-    NDArray[float64],
-    Message,
-    None,
+    "RegistryValueTypes", str, List[str], int, bool, float, NDArray[float64], Message
 )
 
 
@@ -495,7 +487,9 @@ class KeyValueStore(Protocol):
         """
         pass
 
-    def get_value(self, key: str, type: type[RegistryValueTypes]) -> RegistryValueTypes:
+    def get_value(
+        self, key: str, type: type[RegistryValueTypes]
+    ) -> RegistryValueTypes | None:
         """
         Get the value stored at `key` with return type `type`.
 
