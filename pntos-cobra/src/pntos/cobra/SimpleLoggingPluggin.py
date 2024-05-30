@@ -4,7 +4,8 @@ import time
 from pntos.api.plugins.common import LoggingLevel, Mediator
 from pntos.api.plugins.logging import LoggingPlugin
 
-global_log_level = LoggingLevel.INFO
+global_global_log_level = LoggingLevel.INFO
+
 
 class fmts:
     """
@@ -25,8 +26,8 @@ class fmts:
 class SimpleLoggingPlugin(LoggingPlugin):
     config_group = "config/logging/all"
     colorize_key = "force_colorize"
-    log_level_key = "default_log_level"
-    log_level: str
+    global_log_level_key = "default_log_level"
+    global_log_level = LoggingLevel.INFO
     colorize = False  # Wether to print fancy outputs
     dt_fmt = "%d/%m/%Y %H:%M:%S"  # date-time format
 
@@ -37,10 +38,36 @@ class SimpleLoggingPlugin(LoggingPlugin):
             config = mediator.registry.batch_start(self.config_group)
             if config.has_key(self.colorize_key):
                 self.colorize = config.get_value(self.colorize_key, bool)
-            if config.has_key(self.log_level_key):
-                self.log_level = config.get_value(self.log_level_key, str)
+            if config.has_key(self.global_log_level_key):
+                global_log_level_temp = config.get_value(self.global_log_level_key, str)
+                if global_log_level_temp is not None:
+                    match global_log_level_temp:
+                        case "error":
+                            self.global_log_level = LoggingLevel.ERROR
+                        case "debug":
+                            self.global_log_level = LoggingLevel.DEBUG
+                        case "warn":
+                            self.global_log_level = LoggingLevel.WARN
+                        case "info":
+                            self.global_log_level = LoggingLevel.INFO
+                        case _:
+                            self.WARNF(
+                                "logging level "
+                                + global_log_level_temp
+                                + " is unknown, remaining at "
+                                + self.level_to_str(self.global_log_level)
+                            )
+
+                else:
+                    self.INFOF(
+                        "using hard-coded global logging level "
+                        + self.level_to_str(self.global_log_level)
+                    )
             else:
-                self.log_level = 
+                self.INFOF(
+                    "using hard-coded global logging level "
+                    + self.level_to_str(self.global_log_level)
+                )
             config.batch_end()
 
     def shutdown_plugin(self):
@@ -72,7 +99,7 @@ class SimpleLoggingPlugin(LoggingPlugin):
         """
         pass
 
-    def level_to_str(level):
+    def level_to_str(self, level):
         match level:
             case LoggingLevel.DEBUG:
                 return "debug"
@@ -85,15 +112,10 @@ class SimpleLoggingPlugin(LoggingPlugin):
             case _:
                 return "unknown"
 
-    def output_time(self):
-        if self.colorize:
+    def output_time(self, fmt: Optional[str]):
+        if self.colorize and fmt is not None:
             print(
-                fmts.BOLD
-                + fmts.HEADER
-                + "["
-                + time.strftime(self.dt_fmt)
-                + "]"
-                + fmts.ENDC,
+                fmts.BOLD + fmt + "[" + time.strftime(self.dt_fmt) + "]" + fmts.ENDC,
                 None,
             )
         else:
@@ -108,6 +130,45 @@ class SimpleLoggingPlugin(LoggingPlugin):
     def terminal_print(self):
         pass
 
+    def INFOF(self, message: str):
+        if (
+            self.global_log_level is LoggingLevel.INFO
+            or self.global_log_level is LoggingLevel.DEBUG
+        ):
+            if self.colorize:
+                info_color = fmts.OKGREEN
+                self.output_time(info_color)
+                print(info_color + message + fmts.ENDC)
+            else:
+                self.output_time()
+                print(message)
 
-a = SimpleLoggingPlugin()
-a.output_time()
+    def DEBUGF(self, message: str):
+        if self.global_log_level is LoggingLevel.DEBUG:
+            if self.colorize:
+                dbg_color = fmts.OKCYAN
+                self.output_time(dbg_color)
+                print(dbg_color + message + fmts.ENDC)
+            else:
+                self.output_time()
+                print(message)
+
+    def WARNF(self, message: str):
+        if self.global_log_level is not LoggingLevel.ERROR:
+            if self.colorize:
+                warn_color = fmts.WARNING
+                self.output_time(warn_color)
+                print(warn_color + message + fmts.ENDC)
+            else:
+                self.output_time()
+                print("Warning: " + message)
+
+    def ERRORF(self, message: str):
+        if self.colorize:
+            err_color = fmts.ERROR
+            self.output_time(err_color)
+            print(err_color + message + fmts.ENDC)
+        else:
+            self.output_time()
+            print("Error: " + message)
+        pass
