@@ -119,7 +119,7 @@ class SimpleLoggingPlugin(LoggingPlugin):
 
     def log(
         self,
-        source_plugin_type: type,
+        source_plugin_type: PluginTypes,
         source_plugin_identifier: str,
         level: LoggingLevel,
         message: str,

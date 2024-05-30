@@ -1,6 +1,6 @@
 from typing import Protocol
 
-from .common import CommonPlugin, LoggingLevel
+from .common import CommonPlugin, LoggingLevel, PluginTypes
 
 
 class LoggingPlugin(CommonPlugin, Protocol):
@@ -11,7 +11,7 @@ class LoggingPlugin(CommonPlugin, Protocol):
 
     def log(
         self,
-        source_plugin_type: type,
+        source_plugin_type: PluginTypes,
         source_plugin_identifier: str,
         level: LoggingLevel,
         message: str,
