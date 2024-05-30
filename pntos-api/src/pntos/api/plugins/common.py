@@ -130,7 +130,7 @@ class PluginTypes(Enum):
     communications and message routing between plugins.  
     """
 
-    PLUGIN = 2
+    FUSION_PLUGIN = 2
     """
     A plugin that models an information fusion approach. This plugin 
     accepts modular representations of state space models, sensor 
@@ -142,7 +142,7 @@ class PluginTypes(Enum):
     plugins, and filtering engines are provided by fusion strategy plugins.
     """
 
-    STRATEGY_PLUGIN = 3
+    FUSION_STRATEGY_PLUGIN = 3
     """
     A low level computational engine that can perform sensor fusion given 
     pre-determined fixed models of errors and raw measurements. Because 
