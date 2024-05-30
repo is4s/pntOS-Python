@@ -27,7 +27,7 @@ class fmts:
     TAN = "\033[100m"
 
 
-def plugin_type_to_string(plugin_type: Enum):
+def plugin_type_to_string(plugin_type: type):
     match plugin_type:
         case PluginTypes.UNDEFINED_PLUGIN:
             return "undefined"
@@ -141,7 +141,50 @@ class SimpleLoggingPlugin(LoggingPlugin):
         -global level: INFO  - shows ERROR, WARN, or INFO
         -global level: DEBUG - shows ERROR, WARN, INFO, or DEBUG
         """
-        pass
+        plugin_id = plugin_type_to_string(source_plugin_type)
+        self.output_time()
+        self.output_plugin_id(plugin_id)
+
+        if level is LoggingLevel.INFO and (
+            self.global_log_level is LoggingLevel.INFO
+            or self.global_log_level is LoggingLevel.DEBUG
+        ):
+            if self.colorize:
+                print(fmts.OKGREEN + " [INFO] " + fmts.ENDC)
+            else:
+                print(" [INFO] ")
+
+        elif level is LoggingLevel.WARN and (
+            self.global_log_level is LoggingLevel.INFO
+            or self.global_log_level is LoggingLevel.DEBUG
+            or self.global_log_level is LoggingLevel.WARN
+        ):
+            if self.colorize:
+                print(fmts.WARNING + " [WARN] " + fmts.ENDC)
+            else:
+                print(" [WARN] ")
+
+        elif (
+            level is LoggingLevel.DEBUG and self.global_log_level is LoggingLevel.DEBUG
+        ):
+            if self.colorize:
+                print(fmts.OKBLUE + " [DEBUG] " + fmts.ENDC)
+            else:
+                print(" [DEBUG] ")
+
+        elif level is LoggingLevel.ERROR:
+            if self.colorize:
+                print(fmts.FAIL + " [ERROR] " + fmts.ENDC)
+            else:
+                print(" [ERROR] ")
+
+        else:
+            if self.colorize:
+                print(fmts.TAN + " [UNKNOWN] " + fmts.ENDC)
+            else:
+                print(" [UNKNOWN] ")
+
+        print(message)
 
     def level_to_str(self, level: Enum):
         match level:
@@ -179,45 +222,3 @@ class SimpleLoggingPlugin(LoggingPlugin):
             )
         else:
             print(" [" + plugin_id + "]", end="")
-
-    def INFOF(self, message: str):
-        if (
-            self.global_log_level is LoggingLevel.INFO
-            or self.global_log_level is LoggingLevel.DEBUG
-        ):
-            if self.colorize:
-                info_color = fmts.OKGREEN
-                self.output_time()
-                print(info_color + message + fmts.ENDC)
-            else:
-                self.output_time()
-                print(message)
-
-    def DEBUGF(self, message: str):
-        if self.global_log_level is LoggingLevel.DEBUG:
-            if self.colorize:
-                dbg_color = fmts.OKCYAN
-                self.output_time()
-                print(dbg_color + message + fmts.ENDC)
-            else:
-                self.output_time()
-                print(message)
-
-    def WARNF(self, message: str):
-        if self.global_log_level is not LoggingLevel.ERROR:
-            if self.colorize:
-                warn_color = fmts.WARNING
-                self.output_time()
-                print(warn_color + message + fmts.ENDC)
-            else:
-                self.output_time()
-                print("Warning: " + message)
-
-    def ERRORF(self, message: str):
-        if self.colorize:
-            err_color = fmts.FAIL
-            self.output_time()
-            print(err_color + message + fmts.ENDC)
-        else:
-            self.output_time()
-            print("Error: " + message)
