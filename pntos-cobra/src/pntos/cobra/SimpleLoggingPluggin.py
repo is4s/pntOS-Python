@@ -1,7 +1,7 @@
 from typing import Protocol, Optional
 import time
 
-from pntos.api.plugins.common import LoggingLevel, Mediator
+from pntos.api.plugins.common import LoggingLevel, Mediator, PluginTypes
 from pntos.api.plugins.logging import LoggingPlugin
 
 global_global_log_level = LoggingLevel.INFO
@@ -21,6 +21,46 @@ class fmts:
     ENDC = "\033[0m"
     BOLD = "\033[1m"
     UNDERLINE = "\033[4m"
+
+
+def plugin_type_to_string(plugin_type):
+    match plugin_type:
+        case PluginTypes.UNDEFINED_PLUGIN:
+            return "undefined"
+        case PluginTypes.CONTROLLER_PLUGIN:
+            return "controller"
+        case PluginTypes.FUSION_PLUGIN:
+            return "fusion"
+        case PluginTypes.FUSION_STRATEGY_PLUGIN:
+            return "fusion_strategy"
+        case PluginTypes.PLATFORM_INTEGRATION_PLUGIN:
+            return "platform_integration"
+        case PluginTypes.PREPROCESSOR_PLUGIN:
+            return "preprocessor"
+        case PluginTypes.INITIALIZATION_PLUGIN:
+            return "initialization"
+        case PluginTypes.DATABASE_PLUGIN:
+            return "database"
+        case PluginTypes.TRANSPORT_PLUGIN:
+            return "transport"
+        case PluginTypes.UI_PLUGIN:
+            return "ui"
+        case PluginTypes.ORCHESTRATION_PLUGIN:
+            return "orchestration"
+        case PluginTypes.ORCHESTRATION_STRATEGY_PLUGIN:
+            return "orchestration_strategy"
+        case PluginTypes.REGISTRY_PLUGIN:
+            return "registry"
+        case PluginTypes.INERTIAL_PLUGIN:
+            return "inertial"
+        case PluginTypes.STATE_MODELING_PLUGIN:
+            return "state_modeling"
+        case PluginTypes.LOGGING_PLUGIN:
+            return "logging"
+        case PluginTypes.UTILITY_PLUGIN:
+            return "utility"
+        case _:
+            return "unknown"
 
 
 class SimpleLoggingPlugin(LoggingPlugin):
