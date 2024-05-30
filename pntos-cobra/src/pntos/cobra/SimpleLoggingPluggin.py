@@ -154,10 +154,15 @@ class SimpleLoggingPlugin(LoggingPlugin):
             case _:
                 return "unknown"
 
-    def output_time(self, fmt: Optional[str] = None):
-        if self.colorize and fmt is not None:
+    def output_time(self):
+        if self.colorize:
             print(
-                fmts.BOLD + fmt + "[" + time.strftime(self.dt_fmt) + "]" + fmts.ENDC,
+                fmts.BOLD
+                + fmts.LTGRAY
+                + "["
+                + time.strftime(self.dt_fmt)
+                + "]"
+                + fmts.ENDC,
                 None,
             )
         else:
@@ -183,7 +188,7 @@ class SimpleLoggingPlugin(LoggingPlugin):
         ):
             if self.colorize:
                 info_color = fmts.OKGREEN
-                self.output_time(info_color)
+                self.output_time()
                 print(info_color + message + fmts.ENDC)
             else:
                 self.output_time()
@@ -193,7 +198,7 @@ class SimpleLoggingPlugin(LoggingPlugin):
         if self.global_log_level is LoggingLevel.DEBUG:
             if self.colorize:
                 dbg_color = fmts.OKCYAN
-                self.output_time(dbg_color)
+                self.output_time()
                 print(dbg_color + message + fmts.ENDC)
             else:
                 self.output_time()
@@ -203,7 +208,7 @@ class SimpleLoggingPlugin(LoggingPlugin):
         if self.global_log_level is not LoggingLevel.ERROR:
             if self.colorize:
                 warn_color = fmts.WARNING
-                self.output_time(warn_color)
+                self.output_time()
                 print(warn_color + message + fmts.ENDC)
             else:
                 self.output_time()
@@ -212,9 +217,8 @@ class SimpleLoggingPlugin(LoggingPlugin):
     def ERRORF(self, message: str):
         if self.colorize:
             err_color = fmts.FAIL
-            self.output_time(err_color)
+            self.output_time()
             print(err_color + message + fmts.ENDC)
         else:
             self.output_time()
             print("Error: " + message)
-        pass
