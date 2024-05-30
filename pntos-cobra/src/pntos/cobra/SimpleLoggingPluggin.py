@@ -22,6 +22,7 @@ class fmts:
     ENDC = "\033[0m"
     BOLD = "\033[1m"
     UNDERLINE = "\033[4m"
+    TAN = "\033[100m"
 
 
 def plugin_type_to_string(plugin_type: Enum):
