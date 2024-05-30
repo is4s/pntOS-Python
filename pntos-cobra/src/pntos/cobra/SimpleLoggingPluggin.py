@@ -180,9 +180,6 @@ class SimpleLoggingPlugin(LoggingPlugin):
         else:
             print(" [" + plugin_id + "]", end="")
 
-    def terminal_print(self):
-        pass
-
     def INFOF(self, message: str):
         if (
             self.global_log_level is LoggingLevel.INFO
