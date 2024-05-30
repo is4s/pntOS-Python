@@ -161,13 +161,17 @@ class SimpleLoggingPlugin(LoggingPlugin):
                 None,
             )
         else:
-            print(
-                fmts.BOLD + "[" + time.strftime(self.dt_fmt) + "] " + fmts.ENDC, end=""
-            )
+            print("[" + time.strftime(self.dt_fmt) + "]", end="")
         pass
 
-    def output_plugin_id(self):
-        pass
+    def output_plugin_id(self, plugin_id: str):
+        if self.colorize:
+            print(
+                fmts.DRKGRAY + " [" + plugin_id + "]" + fmts.ENDC,
+                None,
+            )
+        else:
+            print(" [" + plugin_id + "]", end="")
 
     def terminal_print(self):
         pass
