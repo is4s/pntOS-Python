@@ -27,46 +27,6 @@ class fmts:
     TAN = "\033[100m"
 
 
-def plugin_type_to_string(plugin_type: type):
-    match plugin_type:
-        case PluginTypes.UNDEFINED_PLUGIN:
-            return "undefined"
-        case PluginTypes.CONTROLLER_PLUGIN:
-            return "controller"
-        case PluginTypes.FUSION_PLUGIN:
-            return "fusion"
-        case PluginTypes.FUSION_STRATEGY_PLUGIN:
-            return "fusion_strategy"
-        case PluginTypes.PLATFORM_INTEGRATION_PLUGIN:
-            return "platform_integration"
-        case PluginTypes.PREPROCESSOR_PLUGIN:
-            return "preprocessor"
-        case PluginTypes.INITIALIZATION_PLUGIN:
-            return "initialization"
-        case PluginTypes.DATABASE_PLUGIN:
-            return "database"
-        case PluginTypes.TRANSPORT_PLUGIN:
-            return "transport"
-        case PluginTypes.UI_PLUGIN:
-            return "ui"
-        case PluginTypes.ORCHESTRATION_PLUGIN:
-            return "orchestration"
-        case PluginTypes.ORCHESTRATION_STRATEGY_PLUGIN:
-            return "orchestration_strategy"
-        case PluginTypes.REGISTRY_PLUGIN:
-            return "registry"
-        case PluginTypes.INERTIAL_PLUGIN:
-            return "inertial"
-        case PluginTypes.STATE_MODELING_PLUGIN:
-            return "state_modeling"
-        case PluginTypes.LOGGING_PLUGIN:
-            return "logging"
-        case PluginTypes.UTILITY_PLUGIN:
-            return "utility"
-        case _:
-            return "unknown"
-
-
 class SimpleLoggingPlugin(LoggingPlugin):
     config_group = "config/logging/all"
     colorize_key = "force_colorize"
@@ -119,7 +79,7 @@ class SimpleLoggingPlugin(LoggingPlugin):
 
     def log(
         self,
-        source_plugin_type: PluginTypes,
+        source_plugin_type: type,
         source_plugin_identifier: str,
         level: LoggingLevel,
         message: str,
@@ -141,7 +101,7 @@ class SimpleLoggingPlugin(LoggingPlugin):
         -global level: INFO  - shows ERROR, WARN, or INFO
         -global level: DEBUG - shows ERROR, WARN, INFO, or DEBUG
         """
-        plugin_id = plugin_type_to_string(source_plugin_type)
+        plugin_id = source_plugin_type.__class__.__name__
         self.output_time()
         self.output_plugin_id(plugin_id)
 
