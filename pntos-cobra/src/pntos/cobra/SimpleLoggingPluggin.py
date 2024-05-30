@@ -55,22 +55,31 @@ class SimpleLoggingPlugin(LoggingPlugin):
                         case "info":
                             self.global_log_level = LoggingLevel.INFO
                         case _:
-                            self.WARNF(
+                            self.log(
+                                self.__class__,
+                                "",
+                                LoggingLevel.INFO,
                                 "logging level "
                                 + global_log_level_temp
                                 + " is unknown, remaining at "
-                                + self.level_to_str(self.global_log_level)
+                                + self.level_to_str(self.global_log_level),
                             )
 
                 else:
-                    self.INFOF(
+                    self.log(
+                        self.__class__,
+                        "",
+                        LoggingLevel.INFO,
                         "using hard-coded global logging level "
-                        + self.level_to_str(self.global_log_level)
+                        + self.level_to_str(self.global_log_level),
                     )
             else:
-                self.INFOF(
+                self.log(
+                    self.__class__,
+                    "",
+                    LoggingLevel.INFO,
                     "using hard-coded global logging level "
-                    + self.level_to_str(self.global_log_level)
+                    + self.level_to_str(self.global_log_level),
                 )
             config.batch_end()
 
@@ -101,7 +110,7 @@ class SimpleLoggingPlugin(LoggingPlugin):
         -global level: INFO  - shows ERROR, WARN, or INFO
         -global level: DEBUG - shows ERROR, WARN, INFO, or DEBUG
         """
-        plugin_id = source_plugin_type.__class__.__name__
+        plugin_id = source_plugin_type.__name__
         self.output_time()
         self.output_plugin_id(plugin_id)
 
@@ -146,7 +155,7 @@ class SimpleLoggingPlugin(LoggingPlugin):
 
         print(message)
 
-    def level_to_str(self, level: Enum):
+    def level_to_str(self, level: LoggingLevel):
         match level:
             case LoggingLevel.DEBUG:
                 return "debug"
