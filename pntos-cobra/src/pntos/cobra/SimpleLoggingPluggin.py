@@ -1,8 +1,7 @@
 import time
 from typing import Optional
-from enum import Enum
 
-from pntos.api.plugins.common import LoggingLevel, Mediator, PluginTypes
+from pntos.api.plugins.common import LoggingLevel, Mediator
 from pntos.api.plugins.logging import LoggingPlugin
 
 global_global_log_level = LoggingLevel.INFO
@@ -28,12 +27,13 @@ class fmts:
 
 
 class SimpleLoggingPlugin(LoggingPlugin):
-    config_group = "config/logging/all"
-    colorize_key = "force_colorize"
-    global_log_level_key = "default_log_level"
-    global_log_level = LoggingLevel.INFO
-    colorize = False  # Wether to print fancy outputs
-    dt_fmt = "%d/%m/%Y %H:%M:%S"  # date-time format
+    def __init__(self):
+        self.config_group = "config/logging/all"
+        self.colorize_key = "force_colorize"
+        self.global_log_level_key = "default_log_level"
+        self.global_log_level = LoggingLevel.INFO
+        self.colorize = False
+        self.dt_fmt = "%d/%m/%Y %H:%M:%S"  # date-time format
 
     def init_plugin(
         self, plugin_resources_location: Optional[str], mediator: Optional[Mediator]
@@ -41,7 +41,10 @@ class SimpleLoggingPlugin(LoggingPlugin):
         if mediator:
             config = mediator.registry.batch_start(self.config_group)
             if config.has_key(self.colorize_key):
-                self.colorize = config.get_value(self.colorize_key, bool)
+                self.colorize
+                config_colorize = config.get_value(self.colorize_key, bool)
+                if config_colorize is not None:
+                    self.colorize = config_colorize
             if config.has_key(self.global_log_level_key):
                 global_log_level_temp = config.get_value(self.global_log_level_key, str)
                 if global_log_level_temp is not None:
