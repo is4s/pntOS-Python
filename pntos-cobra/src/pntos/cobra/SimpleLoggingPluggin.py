@@ -1,5 +1,5 @@
-from typing import Protocol, Optional
 import time
+from typing import Optional
 
 from pntos.api.plugins.common import LoggingLevel, Mediator, PluginTypes
 from pntos.api.plugins.logging import LoggingPlugin
@@ -152,7 +152,7 @@ class SimpleLoggingPlugin(LoggingPlugin):
             case _:
                 return "unknown"
 
-    def output_time(self, fmt: Optional[str]):
+    def output_time(self, fmt: Optional[str] = None):
         if self.colorize and fmt is not None:
             print(
                 fmts.BOLD + fmt + "[" + time.strftime(self.dt_fmt) + "]" + fmts.ENDC,
@@ -205,7 +205,7 @@ class SimpleLoggingPlugin(LoggingPlugin):
 
     def ERRORF(self, message: str):
         if self.colorize:
-            err_color = fmts.ERROR
+            err_color = fmts.FAIL
             self.output_time(err_color)
             print(err_color + message + fmts.ENDC)
         else:
