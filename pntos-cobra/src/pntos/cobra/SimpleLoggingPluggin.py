@@ -1,5 +1,6 @@
 import time
 from typing import Optional
+from enum import Enum
 
 from pntos.api.plugins.common import LoggingLevel, Mediator, PluginTypes
 from pntos.api.plugins.logging import LoggingPlugin
@@ -23,7 +24,7 @@ class fmts:
     UNDERLINE = "\033[4m"
 
 
-def plugin_type_to_string(plugin_type):
+def plugin_type_to_string(plugin_type: Enum):
     match plugin_type:
         case PluginTypes.UNDEFINED_PLUGIN:
             return "undefined"
@@ -139,7 +140,7 @@ class SimpleLoggingPlugin(LoggingPlugin):
         """
         pass
 
-    def level_to_str(self, level):
+    def level_to_str(self, level: Enum):
         match level:
             case LoggingLevel.DEBUG:
                 return "debug"
