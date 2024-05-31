@@ -182,23 +182,13 @@ class SimpleLoggingPlugin(LoggingPlugin):
     def output_time(self):
         if self.colorize:
             print(
-                fmts.BOLD
-                + fmts.LTGRAY
-                + "["
-                + time.strftime(self.dt_fmt)
-                + "]"
-                + fmts.ENDC,
-                None,
+                fmts.LTGRAY + "[" + time.strftime(self.dt_fmt) + "]" + fmts.ENDC, end=""
             )
         else:
             print("[" + time.strftime(self.dt_fmt) + "]", end="")
-        pass
 
     def output_plugin_id(self, plugin_id: str):
         if self.colorize:
-            print(
-                fmts.DRKGRAY + " [" + plugin_id + "]" + fmts.ENDC,
-                None,
-            )
+            print(fmts.DRKGRAY + " [" + plugin_id + "]" + fmts.ENDC, end="")
         else:
             print(" [" + plugin_id + "]", end="")
