@@ -116,49 +116,55 @@ class SimpleLoggingPlugin(LoggingPlugin):
         -global level: DEBUG - shows ERROR, WARN, INFO, or DEBUG
         """
         plugin_id = source_plugin_type.__name__
-        self.output_time()
-        self.output_plugin_id(plugin_id)
+        GLL = self.global_log_level
+        INFO = LoggingLevel.INFO
+        DEBUG = LoggingLevel.DEBUG
+        WARN = LoggingLevel.WARN
 
-        if level is LoggingLevel.INFO and (
-            self.global_log_level is LoggingLevel.INFO
-            or self.global_log_level is LoggingLevel.DEBUG
-        ):
-            if self.colorize:
-                print(fmts.OKGREEN + " [INFO] " + fmts.ENDC)
-            else:
-                print(" [INFO] ")
-
-        elif level is LoggingLevel.WARN and (
-            self.global_log_level is LoggingLevel.INFO
-            or self.global_log_level is LoggingLevel.DEBUG
-            or self.global_log_level is LoggingLevel.WARN
-        ):
-            if self.colorize:
-                print(fmts.WARNING + " [WARN] " + fmts.ENDC)
-            else:
-                print(" [WARN] ")
-
-        elif (
-            level is LoggingLevel.DEBUG and self.global_log_level is LoggingLevel.DEBUG
-        ):
-            if self.colorize:
-                print(fmts.OKBLUE + " [DEBUG] " + fmts.ENDC)
-            else:
-                print(" [DEBUG] ")
-
-        elif level is LoggingLevel.ERROR:
-            if self.colorize:
-                print(fmts.FAIL + " [ERROR] " + fmts.ENDC)
-            else:
-                print(" [ERROR] ")
-
-        else:
-            if self.colorize:
-                print(fmts.TAN + " [UNKNOWN] " + fmts.ENDC)
-            else:
-                print(" [UNKNOWN] ")
-
-        print(message)
+        match level:
+            case LoggingLevel.INFO:
+                if GLL is INFO or GLL is DEBUG:
+                    self.output_time()
+                    self.output_plugin_id(plugin_id)
+                    if self.colorize:
+                        print(fmts.OKGREEN + " [INFO] " + fmts.ENDC, end="")
+                    else:
+                        print(" [INFO] ", end="")
+                    print(message)
+            case LoggingLevel.WARN:
+                if GLL is INFO or GLL is DEBUG or GLL is WARN:
+                    self.output_time()
+                    self.output_plugin_id(plugin_id)
+                    if self.colorize:
+                        print(fmts.WARNING + " [WARN] " + fmts.ENDC, end="")
+                    else:
+                        print(" [WARN] ", end="")
+                    print(message)
+            case LoggingLevel.DEBUG:
+                if GLL is DEBUG:
+                    self.output_time()
+                    self.output_plugin_id(plugin_id)
+                    if self.colorize:
+                        print(fmts.OKBLUE + " [DEBUG] " + fmts.ENDC, end="")
+                    else:
+                        print(" [DEBUG] ", end="")
+                    print(message)
+            case LoggingLevel.ERROR:
+                self.output_time()
+                self.output_plugin_id(plugin_id)
+                if self.colorize:
+                    print(fmts.FAIL + " [ERROR] " + fmts.ENDC, end="")
+                else:
+                    print(" [ERROR] ", end="")
+                print(message)
+            case _:
+                self.output_time()
+                self.output_plugin_id(plugin_id)
+                if self.colorize:
+                    print(fmts.TAN + " [UNKOWN LOG LEVEL] " + fmts.ENDC, end="")
+                else:
+                    print(" [UNKNOWN LOG LEVEL] ", end="")
+                print(message)
 
     def level_to_str(self, level: LoggingLevel):
         match level:
