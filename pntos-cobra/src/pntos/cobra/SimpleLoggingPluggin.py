@@ -23,7 +23,8 @@ class fmts:
     ENDC = "\033[0m"
     BOLD = "\033[1m"
     UNDERLINE = "\033[4m"
-    TAN = "\033[100m"
+    TAN = "\033[2m"
+    WHITE = "\033[97m"
 
 
 class SimpleLoggingPlugin(LoggingPlugin):
