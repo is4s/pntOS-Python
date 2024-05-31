@@ -158,14 +158,6 @@ class SimpleLoggingPlugin(LoggingPlugin):
                 else:
                     print(" [ERROR] ", end="")
                 print(message)
-            case _:
-                self.output_time()
-                self.output_plugin_id(plugin_id)
-                if self.colorize:
-                    print(fmts.TAN + " [UNKOWN LOG LEVEL] " + fmts.ENDC, end="")
-                else:
-                    print(" [UNKNOWN LOG LEVEL] ", end="")
-                print(message)
 
     def level_to_str(self, level: LoggingLevel):
         match level:
