@@ -27,13 +27,15 @@ class fmts:
 
 
 class SimpleLoggingPlugin(LoggingPlugin):
-    def __init__(self):
-        self.config_group = "config/logging/all"
-        self.colorize_key = "force_colorize"
-        self.global_log_level_key = "default_log_level"
-        self.global_log_level = LoggingLevel.INFO
-        self.colorize = False
-        self.dt_fmt = "%d/%m/%Y %H:%M:%S"  # date-time format
+    config_group: str = "config/logging/all"
+    colorize_key: str = "force_colorize"
+    global_log_level_key: str = "default_log_level"
+    global_log_level: LoggingLevel = LoggingLevel.INFO
+    colorize: bool = False
+    dt_fmt: str = "%d/%m/%Y %H:%M:%S"  # date-time format
+
+    def __init__(self, identifier: str):
+        self.identifier = identifier
 
     def init_plugin(
         self, plugin_resources_location: Optional[str], mediator: Optional[Mediator]
