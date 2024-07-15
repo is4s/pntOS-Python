@@ -1,6 +1,8 @@
 from threading import Thread
 from time import sleep
 
+from aspn23.measurement_position import MeasurementPosition
+
 from pntos.api import Mediator, TransportPlugin
 from pntos.api.plugins.common import Message
 
@@ -38,7 +40,7 @@ def listen_for_messages(my_plugin: SimpleTransportPlugin):
         sleep(0.1)
         if my_plugin.listening:
             # Create a new ASPN measurement
-            aspn_msg = MeasurementPosition(...)  # noqa: F841
+            aspn_msg = MeasurementPosition()
 
             # Send a new ASPN message we've received to the system
             my_plugin.mediator.process_pntos_message(

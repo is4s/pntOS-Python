@@ -27,3 +27,6 @@ members = ["pntos-*"]
 
 [tool.ruff.lint]
 extend-select = ["I"]
+
+[tool.ruff.lint.isort]
+combine-as-imports = true

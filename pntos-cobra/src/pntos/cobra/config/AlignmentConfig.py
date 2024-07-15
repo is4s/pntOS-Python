@@ -10,4 +10,4 @@ class AlignmentConfig:
     initialAccelBiasCov: Tuple[float, float, float]
     initialGyroBiasCov: Tuple[float, float, float]
 
-    group: str = "/config/cobra/alignment_config"
+    group: str = "/config/cobra/alignment_config/default"
