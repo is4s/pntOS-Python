@@ -1,10 +1,11 @@
-from typing import Optional, Protocol
+from typing import Optional, Protocol, runtime_checkable
 
 from numpy.typing import NDArray
 
 from .common import CommonPlugin, FusionType
 
 
+@runtime_checkable
 class FusionStrategy(Protocol):
     """A computation engine for doing raw estimation."""
 
@@ -19,7 +20,7 @@ class StandardDynamicsModel(Protocol):
         pass
 
 
-class StandardMeasurementModel:
+class StandardMeasurementModel(Protocol):
     z: NDArray
     H: NDArray
     R: NDArray
@@ -28,6 +29,7 @@ class StandardMeasurementModel:
         pass
 
 
+@runtime_checkable
 class StandardFusionStrategy(FusionStrategy, Protocol):
     """A Fusion strategy making linearized Bayesian assumptions.
 
