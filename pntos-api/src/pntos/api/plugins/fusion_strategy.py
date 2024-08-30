@@ -1,4 +1,5 @@
-from typing import Optional, Protocol, runtime_checkable
+from dataclasses import dataclass
+from typing import Callable, Optional, Protocol, runtime_checkable
 
 from numpy.typing import NDArray
 
@@ -12,21 +13,18 @@ class FusionStrategy(Protocol):
     pass
 
 
-class StandardDynamicsModel(Protocol):
+@dataclass
+class StandardDynamicsModel:
+    g: Callable[[NDArray], NDArray]
     Phi: NDArray
     Qd: NDArray
-
-    def g(self, x: NDArray):
-        pass
 
 
 class StandardMeasurementModel(Protocol):
     z: NDArray
+    h: Callable[[NDArray], NDArray]
     H: NDArray
     R: NDArray
-
-    def h(self, x: NDArray):
-        pass
 
 
 @runtime_checkable
@@ -44,7 +42,7 @@ class StandardFusionStrategy(FusionStrategy, Protocol):
         Returns:
             int: Number of stats being estimated in this filter.
         """
-        pass
+        ...
 
     def add_states(
         self,
@@ -65,7 +63,7 @@ class StandardFusionStrategy(FusionStrategy, Protocol):
         Returns:
             int: Number of stats being added to this filter.
         """
-        pass
+        ...
 
     def remove_states(self, first_index: int, count: int) -> None:
         """Removes a set of states from the filter
@@ -74,33 +72,26 @@ class StandardFusionStrategy(FusionStrategy, Protocol):
             first_index (int): Index of the first state to be removed
             count (int): The number of states to be removed.
         """
-        pass
+        ...
 
-    def get_estimate(self) -> Optional[NDArray]:
-        pass
+    def get_estimate(self) -> Optional[NDArray]: ...
 
-    def set_estimate_slice(self, new_estimate: NDArray, first_index: int) -> None:
-        pass
+    def set_estimate_slice(self, new_estimate: NDArray, first_index: int) -> None: ...
 
-    def get_covariance(self) -> Optional[NDArray]:
-        pass
+    def get_covariance(self) -> Optional[NDArray]: ...
 
     def set_covariance_block(
         self, new_covariance: NDArray, first_row: int, first_col: int
-    ) -> None:
-        pass
+    ) -> None: ...
 
     def set_covariance_slice(self, new_covariance: NDArray, first_state: int) -> None:
         pass
 
-    def propagate(self, dynamics_model: StandardDynamicsModel) -> None:
-        pass
+    def propagate(self, dynamics_model: StandardDynamicsModel) -> None: ...
 
-    def update(self, measurement_model: StandardMeasurementModel) -> None:
-        pass
+    def update(self, measurement_model: StandardMeasurementModel) -> None: ...
 
-    def clone(self) -> "StandardFusionStrategy":
-        pass
+    def clone(self) -> "StandardFusionStrategy": ...
 
 
 class FusionStrategyPlugin(CommonPlugin, Protocol):
@@ -122,8 +113,6 @@ class FusionStrategyPlugin(CommonPlugin, Protocol):
     interfaces to an EKF (such as a UKF).
     """
 
-    def is_fusion_type_supported(self, fusion_type: FusionType) -> bool:
-        pass
+    def is_fusion_type_supported(self, fusion_type: FusionType) -> bool: ...
 
-    def new_fusion_strategy(self, fusion_type: FusionType) -> FusionStrategy:
-        pass
+    def new_fusion_strategy(self, fusion_type: FusionType) -> FusionStrategy: ...
