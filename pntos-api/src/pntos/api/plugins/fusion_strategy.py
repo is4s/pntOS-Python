@@ -8,19 +8,61 @@ from .common import CommonPlugin, FusionType
 
 @runtime_checkable
 class FusionStrategy(Protocol):
-    """A computation engine for doing raw estimation."""
+    """A computation engine for doing raw estimation.
+
+    This class is itself empty and only serves as a base class for different
+    types of fusion strategies. At this time, the only implementation of this
+    protocol is StandardFusionStrategy. However, other fusion strategies will be
+    added in the future, so code that receives a FusionStrategy should use
+    `isinstance` to check that it is really a StandardFusionStrategy before
+    using it.
+    """
 
     pass
 
 
 @dataclass
 class StandardDynamicsModel:
+    """A description of the propagation dynamics for a set of states.
+
+    This model assumes that the state space `x` can be propagated forward in time by the equation:
+
+        x_k = g(x_{k-1}) + w_k
+
+    where `x_k` is the set of states at time k, `g` is an arbitrary function,
+    and `w_k` is additive white Gaussian noise.
+
+    Attributes:
+      g (Callable[[NDArray], NDArray]): A function that propagates forward in time a set of states.
+      Phi (NDArray): The first-order Taylor series expansion (Jacobian) of the function `g`.
+      Qd: The covariance matrix of `w_k`.
+
+    """
+
     g: Callable[[NDArray], NDArray]
     Phi: NDArray
     Qd: NDArray
 
 
-class StandardMeasurementModel(Protocol):
+@dataclass
+class StandardMeasurementModel:
+    """A description of how a measurement relates to a state space.
+
+    This model assumes that the relationship between the measurement and state vector is
+    well modeled by the equation:
+        z=h(x) + v
+    where `z` is the measurement itself, `x` is the set of states being
+    estimated, `h` is an arbitrary function, and `v` is additive white Gaussian
+    noise.
+
+    Attributes:
+      z (NDArray): A column vector containing the measurement itself.
+      h (Callable[[NDArray], NDArray]): A function that maps the state space to
+        measurement space.
+      H: The first-order Taylor series expansion (i.e. Jacobian) of the function `h`.
+      R: The covariance matrix of `v`.
+    """
+
     z: NDArray
     h: Callable[[NDArray], NDArray]
     H: NDArray
@@ -31,13 +73,42 @@ class StandardMeasurementModel(Protocol):
 class StandardFusionStrategy(FusionStrategy, Protocol):
     """A Fusion strategy making linearized Bayesian assumptions.
 
-        An implementation of the standard fusion strategy is capable of Bayesian
-    inference on a linearized discrete-time system with Gaussian noise inputs
-    (e.g. an EKF).
+    An implementation of the standard fusion strategy that is capable of
+    Bayesian inference on a linearized discrete-time system with Gaussian noise
+    inputs (e.g. an EKF).
+
+    At a fundamental level, this class manages an estimate of a state space as
+    it propagates (changes over time) and updates (incorporates new measurements
+    and observations). An estimate of a set of values (states) is stored and
+    maintained within this object. The estimate is then mutated and updated over
+    time by the various method calls.
+
+    A typical usage pattern of this class is as follows:
+
+    1. The user adds a set of states by calling the `add_states` method. As part
+       of this step, the user all passes in initial conditions for the estimate.
+       The fusion strategy is now storing an estimate of the states, set to the
+       initial conditions.
+    2. The user propagates this estimate forward in time by calling the
+       `propagate` method. For example, if the initial conditions were the
+       estimates of the states at time 0.0s, but we now want to know the
+       estimate of the values at time 5.0s, the user would call `propagate` with
+       a dynamics model parameter that specifies how to take an estimate at time
+       0.0 and use it to compute the estimate at time 5.0.
+    3. The user updates this estimate by using observations of the states at the
+       current time. For example, if the filter is currently propagated to time
+       5.0s and a measurement is received that observes the states' values at
+       time 5.0s, the user would call `update` with a measurement model
+       parameter that describes how to take the current estimate at 5.0s and
+       incorporate the new information from the measurement.
+    4. At any point, when the user wants to know the latest estimate given all
+       the propagate/updates that have occurred, they may call `get_estimate`.
     """
 
     def get_num_states(self) -> int:
-        """Return the total number of states added to this filter.
+        """Get the total number of states this filter is estimating.
+
+        The count will initially be zero, until [add_states] is called.
 
         Returns:
             int: Number of stats being estimated in this filter.
@@ -50,15 +121,21 @@ class StandardFusionStrategy(FusionStrategy, Protocol):
         initial_covariance: NDArray,
         cross_covariance: Optional[NDArray],
     ) -> int:
-        """Add new states to this filter.
+        r"""Add new states to this filter.
 
-        Increases number of filter states and set the initial conditions of the new states.  Returns index of the first added state. If \p cross_covariance is NULL, cross
-            covariance between the existing states and the added states will be set to zeroes.
+        Increases number of filter states and set the initial conditions of the
+        new states.  Returns index of the first added state. If \p
+        cross_covariance is NULL, cross covariance between the existing states
+        and the added states will be set to zeroes.
 
         Args:
-            initial_estimate (NDArray): The initial estimate to populate the new states with.
-            initial_covariance (NDArray): The initial covariance matrix used to initialize the uncertainty of the new states.
-            cross_covariance (Optional[NDArray]): A covariance matrix that describes the cross terms between the new states and all previous states. If `None`, the cross-terms will be set to zero.
+            initial_estimate (NDArray): The initial estimate to populate the new
+              states with.
+            initial_covariance (NDArray): The initial covariance matrix used to
+              initialize the uncertainty of the new states.
+            cross_covariance (Optional[NDArray]): A covariance matrix that
+              describes the cross terms between the new states and all previous
+              states. If `None`, the cross-terms will be set to zero.
 
         Returns:
             int: Number of stats being added to this filter.
@@ -66,43 +143,146 @@ class StandardFusionStrategy(FusionStrategy, Protocol):
         ...
 
     def remove_states(self, first_index: int, count: int) -> None:
-        """Removes a set of states from the filter
+        """Removes a set of states from the filter.
 
         Args:
-            first_index (int): Index of the first state to be removed
+            first_index (int): Index of the first state to be removed.
             count (int): The number of states to be removed.
         """
         ...
 
-    def get_estimate(self) -> Optional[NDArray]: ...
+    def get_estimate(self) -> Optional[NDArray]:
+        """Get the current internal estimate managed by this strategy.
 
-    def set_estimate_slice(self, new_estimate: NDArray, first_index: int) -> None: ...
+        This class manages a current estimate that is initially populated by
+        `add_states` and then is modified iteratively by `propagate`, `update`,
+        and other method calls. This method returns the current estimate,
+        incorporating all changes made by previous method calls to this
+        strategy.
 
-    def get_covariance(self) -> Optional[NDArray]: ...
+        Returns:
+            Optional[NDArray]: An estimate if available. Returns None if no
+              states have been added yet.
+        """
 
-    def set_covariance_block(
+    def set_estimate_slice(self, new_estimate: NDArray, first_index: int) -> None:
+        """Set a slice of the state estimates to a given set of values.
+
+        This class manages a current estimate that is initially populated by
+        `add_states` and then is modified iteratively by `propagate`, `update`,
+        and other method calls. This method allows for manually overriding the
+        current estimate. Sets a block of states to new values, starting with
+        `first_index` and overwriting a number of states equal to the length of
+        `new_estimate`.
+
+        Args:
+            new_estimate (NDArray): The new estimate values that will overwrite
+              the previous values.
+            first_index (int): The index of the first state to overwrite.
+        """
+        ...
+
+    def get_covariance(self) -> Optional[NDArray]:
+        """Get the covariance of the current estimate.
+
+        This class manages a current estimate that is initially populated by
+        `add_states` and then is modified iteratively by `propagate`, `update`,
+        and other method calls. In addition to the estimate itself, a covariance
+        of the current estimate is computed. This method returns this
+        covariance, incorporating all changes made by previous method calls to
+        this strategy.
+
+        Returns:
+            Optional[NDArray]: The covariance of the current estimate. Returns None if no states have been added yet.
+        """
+
+    def set_covariance_slice(
         self, new_covariance: NDArray, first_row: int, first_col: int
-    ) -> None: ...
+    ) -> None:
+        """Set a slice of the covariance matrix to a given set of values.
 
-    def set_covariance_slice(self, new_covariance: NDArray, first_state: int) -> None:
-        pass
+        This class manages a current estimate that is initially populated by
+        `add_states` and then is modified iteratively by `propagate`, `update`,
+        and other method calls. In addition to the estimate itself, a covariance
+        of the current estimate is computed.
 
-    def propagate(self, dynamics_model: StandardDynamicsModel) -> None: ...
+        Allows for manually overriding the current covariance matrix. Sets a
+        block of the covariance matrix to new values. The overwritten values are
+        those in a rectangular area defined by the upper left corner at
+        `first_row`, `first_col` and extending down and right to cover an area
+        equal to the size of `new_covariance`.
 
-    def update(self, measurement_model: StandardMeasurementModel) -> None: ...
+        Args:
+            new_covariance (NDArray): The new covariance values that will
+              overwrite a slice of the previous covariance matrix.
+            first_row (int): The row of the first value to overwrite
+            first_col (int): The column of the first value to overwrite
+        """
+        ...
 
-    def clone(self) -> "StandardFusionStrategy": ...
+    def propagate(self, dynamics_model: StandardDynamicsModel) -> None:
+        """Propagates the estimate of the state space forward in time.
+
+        This method assumes that a state space is already initialized with a set
+        of states via the `add_states` method. The `dynamics_model` parameter
+        includes a description of how the current state estimate can be
+        propagated from the current time to a new time. Note that the actual
+        numerical values of the current/new times are not specified anywhere, as
+        that information is not needed to perform the computation. This method
+        then takes the current state space estimate and the `dynamics_model` and
+        uses both to compute an estimate at the new time. The new estimate
+        clobbers the old estimate managed by this class, and be acquired by
+        calling `get_estimate`.
+
+
+        Args:
+            dynamics_model (StandardDynamicsModel): _description_
+        """
+        ...
+
+    def update(self, measurement_model: StandardMeasurementModel) -> None:
+        """Updates the estimate of the state space, incorporating a new measurement.
+
+        This method assumes that a state space is already initialized with a set
+        of states via the `add_states` method. The `measurement_model` parameter
+        includes both the measurement itself and a description of how the
+        measurement relates to the state space. This method then takes the
+        current state space estimate and updates it using information from the
+        `measurement_model`. The updated estimate can be acquired by calling
+        `get_estimate`.
+
+        Args:
+            measurement_model (StandardMeasurementModel): The measurement to
+              update the filter with, as well as a model that describes how the
+              measurement relates to the states this strategy is estimating.
+        """
+
+    def clone(self) -> "StandardFusionStrategy":
+        """Create a deep copy of this object.
+
+        The returned object will have all state copied, such that the original
+        and newly returned objects are entirely separate from each other. A
+        typical use case for this method is when a fault is detected in a
+        running filter, and the user wants to experiment on the filter while
+        still preserving the original state. In this case, the user may `clone`
+        a new filter to experiment with, but continue to have the original
+        available to go back to.
+
+        Returns:
+            StandardFusionStrategy: A deep copy of the object.
+        """
+        ...
 
 
 class FusionStrategyPlugin(CommonPlugin, Protocol):
     """A plugin that provides computational engines for estimation.
 
-    At the high level, a fusion strategy is an algorithm that knows how to
-    perform sensor fusion by estimating one or more states, given a set of
-    observations/measurements. For example, the EKF equations are an
-    implementation of a fusion strategy. This plugin is a factory that produces
-    fusion strategies on demand, which is useful for multi-filter approaches
-    where the system may need several fusion strategies running simultaneously.
+    At the high level, a fusion strategy is a computation engine that knows how
+    to estimating one or more states, given a set of observations/measurements.
+    For example, the EKF equations are an implementation of a fusion strategy.
+    This plugin is a factory that produces fusion strategies on demand, which is
+    useful for multi-filter approaches where the system may need several fusion
+    strategies running simultaneously.
 
     There are many ways to model sensor fusion, including very simple (linear
     Kalman filter) and complex (neural networks, factor graphs, etc.). This
@@ -110,9 +290,55 @@ class FusionStrategyPlugin(CommonPlugin, Protocol):
     achieves this by having multiple FusionTypes, so that the user may select
     what kind of fusion they want. Currently, only the StandardFusionStrategy is
     implemented, which is suitable for EKFs and filters that have similar
-    interfaces to an EKF (such as a UKF).
+    interfaces to an EKF (such as a UKF). However, more strategy types are
+    planned to be added in the future.
     """
 
-    def is_fusion_type_supported(self, fusion_type: FusionType) -> bool: ...
+    def is_fusion_type_supported(self, fusion_type: FusionType) -> bool:
+        """Check if a particular fusion type is supported by `new_fusion_strategy`.
 
-    def new_fusion_strategy(self, fusion_type: FusionType) -> FusionStrategy: ...
+        The `new_fusion_strategy` factory method on this class can create
+        `FusionStrategy`s of different types. However, `FusionStrategyPlugin`s
+        may not support all types (they must support at least one). Therefore,
+        when a user receives a FusionStrategyPlugin, they should:
+
+        1. Initialize the plugin by calling `init_plugin` (see `CommonPlugin`
+           for more information).
+        2. Call `is_fusion_type_supported` to check that the plugin supports the
+           `FusionType` that the user wants to use.
+        3. If `is_fusion_type_supported` returned True, call the
+           `new_fusion_strategy` factory method to get a new `FusionStrategy` of
+           the desired `FusionType`.
+        4. Downcast the returned `FusionStrategy` to the selected `FusionType`.
+           For example, if the user calls `new_fusion_strategy` with a
+           `fusion_type` of `STANDARD_MODEL`, then the returned object should be
+           downcast to a `StandardFusionStrategy`.
+        5. Proceed to use the fusion strategy to do estimation.
+
+        Args:
+            fusion_type (FusionType): The fusion type we are checking.
+
+        Returns:
+            bool: Whether or not we support the requested `fusion_type`.
+        """
+        ...
+
+    def new_fusion_strategy(self, fusion_type: FusionType) -> FusionStrategy:
+        """Create a new fusion strategy of the requested type.
+
+        Users must first ensure that the FusionType is supported by calling
+        `is_fusion_type_supported`.
+
+        Args:
+            fusion_type (FusionType): The type of fusion plugin that we want
+              returned.
+
+        Returns:
+            FusionStrategy: The newly created FusionStrategy, which has a type
+              that corresponds to the `fusion_type`. For example, if the user
+              calls `new_fusion_strategy` with a `fusion_type` of
+              `STANDARD_MODEL`, then the returned object will be a
+              `StandardFusionStrategy`.
+
+        """
+        ...
