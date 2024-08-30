@@ -6,31 +6,89 @@ If you are looking for Python support of pntOS, please use the Python SDK in the
 
 A meta package for pntOS that contains the components of pntOS.
 
-## Installation
+## Environment Setup
 
 Make sure that you have **at least `python3.11`** installed.
 
+We currently support two toolchains: A standard `pip`-based workflow, and a more experimental `Rye`-based workflow:
+
 **Pip**: If you already have your own workflows or prefer to just use vanilla `pip`, you might prefer this route.
 
-**Rye**: If you're looking for an all in one experience that runs things for you, you might prefer this route. Install it from [here](https://setuptools.pypa.io/en/latest/userguide/development_mode.html). Note that it also manages your python versions for you, so whenever you run `rye sync` it will install the correct python version as defined in your `pyproject.toml`.
+**Rye**: If you're looking for an all in one experience that runs things for you, you might prefer this route. 
+
+How you wish to set up your environment will determine which of the next sections you follow.
+
+### Pip Environment Setup
+
+Begin by creating and entering a clean venv. We can create the venv in the
+`.venv` folder by running the following command in the project root directory:
+
+    python3 -m venv .venv
+
+Next, enter the venv. The steps to do this vary depending on your shell:
+
+**bash/zsh**: `source .venv/bin/activate`
+
+**fish**: `source .venv/bin/activate.fish`
+
+**powershell** `.venv/bin/activate.ps1`
+
+Your shell should now be inside the venv. It is recommended that you upgrade your pip to the latest:
+
+    pip install --upgrade pip
+
+Now we're ready to install pntos. In the project root directory, run:
+
+    pip install -r requirements-dev.lock
+
+If successful, you should now have all of pntos-python registered in your venv. You can test to see if this is the case by opening a python interpreter and checking that importing the various components of pntOS and cobra works:
+
+    $ python3
+    >>> import pntos.api as a
+    >>> import pntos.cobra as c
+    >>> c.SimpleControllerPlugin
+    <class 'pntos.cobra.SimpleControllerPlugin.SimpleControllerPlugin'>
+    >>> a.ControllerPlugin
+    <class 'pntos.api.plugins.controller.ControllerPlugin'>
+
+If that works, you are ready to move on to [running the examples](#running-examples)
+
+
+### Rye Environment Setup
+
+First, install Rye. Rye is available directly in homebrew on macOS and a variety of package managers on Linux distributions. Alternatively, you may use the [upstream install instructions](https://rye.astral.sh/guide/installation/).
+
+Once Rye is installed, we will sync the project in the project root directory:
+
+    rye sync
+
+The above command does a lot of work for you: it creates a new venv in the local `.venv` folder, installs all of the pntos-python packages into it, and installs a compatible version of the Python interpreter/pip for you. If all went well, you should now be able to enter the venv. The steps to do this vary depending on your shell:
+
+**bash/zsh**: `source .venv/bin/activate`
+
+**fish**: `source .venv/bin/activate.fish`
+
+**powershell** `.venv/bin/activate.ps1`
+
+Your shell should now be inside a venv that is ready to use pntos-python. You can confirm that this is the case by opening a python interpreter and checking that importing the various components of pntOS and Cobra works:
+
+    $ python3
+    >>> import pntos.api as a
+    >>> import pntos.cobra as c
+    >>> c.SimpleControllerPlugin
+    <class 'pntos.cobra.SimpleControllerPlugin.SimpleControllerPlugin'>
+    >>> a.ControllerPlugin
+    <class 'pntos.api.plugins.controller.ControllerPlugin'>
+
+If that works, you are ready to move on to [running the examples](#running-examples)
+
+## Running Examples
+
+No examples work yet (WIP!).
 
 ## Contributing
 
-To begin development, refer to [Installation](#installation) for how to setup development tooling.
-
-Next, you will run:
-
-`rye sync` or `pip3 install requirements-dev.lock`
-
-This will sync all of your dependencies. Note that this forms a `.venv` for you and you do not have to create it yourself. You do, however, still have to source into it by running:
-
-**bash/zsh**: `source .venv/bin/activate`
-**fish**: `source .venv/bin/activate.fish`
-**powershell** `.venv/bin/activate.ps1`
-
-If you are using Visual Studio Code, hit `ctrl+shift+p` and type in `Python: select interpreter`. Set your interpreter to be `.venv/bin/python`.
-
-If you are not using VSCode, make sure to start your editor with the correct interpreter selected.
+To begin development, refer to [Environment Setup](#environment-setup) for how to setup development tooling and enter the configured venv. Once that is done, you can proceed to develop your new functionality in a feature branch. When your feature is complete and ready for us to review, there are a few code quality checks you should perform before opening a merge request. These steps vary depending on if you are using `pip` or `rye`, as described below.
 
 ### Checking Contributions using Pip
 
