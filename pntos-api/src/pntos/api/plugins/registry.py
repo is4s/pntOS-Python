@@ -4,14 +4,12 @@ from .common import CommonPlugin, Registry
 
 
 class RegistryPlugin(CommonPlugin, Protocol):
-    """
-    A plugin for a global key-value registry. See the `pntOS Registry` page in
+    """A plugin for a global key-value registry. See the `pntOS Registry` page in
     the `Internals` section for more information on the goal of this plugin.
     """
 
     def new_registry(self, initial_config: Optional[str]) -> Registry:
-        """
-        Create a new registry based on the initial values stored in
+        """Create a new registry based on the initial values stored in
         `initial_config`.  The format of `initial_config` is implementation
         specific, and plugins are free to support any or no format.
 

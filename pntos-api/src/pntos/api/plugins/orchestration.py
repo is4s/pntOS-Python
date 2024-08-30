@@ -6,8 +6,7 @@ from .common import CommonPlugin, Message
 
 
 class MessageStreamConfig(Protocol):
-    """
-    This class configures the buffering, delay, and sorting characteristics of
+    """This class configures the buffering, delay, and sorting characteristics of
     messages that are streamed into the orchestration plugin. The pntOS system
     will deliver messages to the orchestration plugin as it receives them.
     However, there is a fundamental tradeoff between latency and those messages
@@ -20,8 +19,7 @@ class MessageStreamConfig(Protocol):
     def sequenced_stream_add(
         self, type: type, source_identifier: Optional[str]
     ) -> None:
-        """
-        Request messages of the given `MessageType` and optional
+        """Request messages of the given `MessageType` and optional
         `source_identifier` are streamed in sorted timestamp ordering.
         """
         pass
@@ -29,8 +27,7 @@ class MessageStreamConfig(Protocol):
     def sequenced_stream_remove(
         self, type: type, source_identifier: Optional[str]
     ) -> None:
-        """
-        Request messages of the given `MessageType` and optional
+        """Request messages of the given `MessageType` and optional
         `source_identifier` are no longer streamed in sorted timestamp
         ordering. This will remove a type that was previously added in a call
         to `sequenced_stream_add`, or remove individual messages from the
@@ -40,8 +37,7 @@ class MessageStreamConfig(Protocol):
         pass
 
     def sequenced_stream_all(self, enable: bool) -> None:
-        """
-        Request all messages are streamed in sorted timestamp ordering. Note
+        """Request all messages are streamed in sorted timestamp ordering. Note
         that the ability to do this reliably will depend on the length of the
         buffer used by the mediator.
         """
@@ -50,8 +46,7 @@ class MessageStreamConfig(Protocol):
     def immediate_stream_add(
         self, type: type, source_identifier: Optional[str]
     ) -> None:
-        """
-        Request messages of the given `MessageType` and optional
+        """Request messages of the given `MessageType` and optional
         `source_identifier` are streamed immediately without delay, buffering,
         or sorting.
         """
@@ -60,8 +55,7 @@ class MessageStreamConfig(Protocol):
     def immediate_stream_remove(
         self, type: type, source_identifier: Optional[str]
     ) -> None:
-        """
-        Request messages of the given `MessageType` and optional
+        """Request messages of the given `MessageType` and optional
         `source_identifier are no longer streamed immediately. This will remove
         a type that was previously added in a call to `immediate_stream_add`,
         or remove individual messages from the entire list of messages that was
@@ -70,16 +64,14 @@ class MessageStreamConfig(Protocol):
         pass
 
     def immediate_stream_all(self, enable: bool) -> None:
-        """
-        Request all messages are streamed immediately without delay, buffering,
+        """Request all messages are streamed immediately without delay, buffering,
         or sorting.
         """
         pass
 
 
 class OrchestrationPlugin(CommonPlugin, Protocol):
-    """
-    The pntOS orchestration plugin is responsible for orchestrating one or more
+    """The pntOS orchestration plugin is responsible for orchestrating one or more
     fusion engines, state model providers and other plugins in order to perform
     sensor fusion. The orchestration plugin is sent (sorted, buffered) ASPN
     messages from the controller, and is responsible for computing a solution
@@ -103,8 +95,7 @@ class OrchestrationPlugin(CommonPlugin, Protocol):
     def init_orchestration_plugin(
         self, plugins: List[CommonPlugin], stream_config: MessageStreamConfig
     ) -> None:
-        """
-        Initial data structures needed by the orchestration plugin. This
+        """Initial data structures needed by the orchestration plugin. This
         function will be called by the system after the
         `CommonPlugin.init_plugin` but before any other call to an
         orchestration plugin function.
@@ -129,16 +120,14 @@ class OrchestrationPlugin(CommonPlugin, Protocol):
         pass
 
     def process_pntos_message(self, message: Message, sequenced: bool) -> None:
-        """
-        Deliver a new message from an external to pntOS source into the
+        """Deliver a new message from an external to pntOS source into the
         orchestration plugin. The plugin should utilize this sensor data
         contained in message by passing it into a fusion engine.
         """
         pass
 
     def get_filter_description_list(self) -> List[str]:
-        """
-        Request a list of strings describing the filters available in this
+        """Request a list of strings describing the filters available in this
         Orchestration plugin. One of these description strings may be used when
         calling `request_solutions`. For consistency, these strings should
         adhere to the following conventions:
@@ -176,8 +165,7 @@ class OrchestrationPlugin(CommonPlugin, Protocol):
     def request_solutions(
         self, solution_times: List[TypeTimestamp], filter_description: Optional[str]
     ) -> List[Message]:
-        """
-        Request filtering solutions at the times specified in the array
+        """Request filtering solutions at the times specified in the array
         `solution_times`.
 
         An Orchestration plugin may run multiple filters. To select which

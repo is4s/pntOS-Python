@@ -4,8 +4,7 @@ from .common import CommonPlugin, Message
 
 
 class Preprocessor(Protocol):
-    """
-    A preprocessor.
+    """A preprocessor.
 
     **UNSTABLE**: This feature is unstable and is not yet considered part of
     the stable pntOS API. Usage of this feature is highly discouraged in
@@ -13,8 +12,7 @@ class Preprocessor(Protocol):
     """
 
     def process_pntos_message(self, message: Message) -> List[Message]:
-        """
-        `message` - A message to be processed.
+        """`message` - A message to be processed.
         return - A list of `Message`s. Usually this will be a single message, a
         modified version of `message`. It could be `None` if `message` is
         rejected or dropped. The preprocessor could also accumulate several
@@ -25,8 +23,7 @@ class Preprocessor(Protocol):
 
 
 class PreprocessorPlugin(CommonPlugin, Protocol):
-    """
-    An implementation of a preprocessor plugin. This plugin generates
+    """An implementation of a preprocessor plugin. This plugin generates
     `Preprocessor` instances which may be used to process incoming messages
     before being distributed to other plugins.
 
@@ -47,8 +44,7 @@ class PreprocessorPlugin(CommonPlugin, Protocol):
     def new_preprocessor(
         self, preprocessor_index: int, config_group: Optional[str]
     ) -> Preprocessor:
-        """
-        Returns a newly created `Preprocessor`. Returns `None` if
+        """Returns a newly created `Preprocessor`. Returns `None` if
         `preprocessor_index` is greater than or equal to the length of
         `preprocessor_identifiers` or if `config_group` is invalid.
 

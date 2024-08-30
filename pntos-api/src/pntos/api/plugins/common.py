@@ -10,8 +10,7 @@ from numpy.typing import NDArray
 
 @dataclass
 class Message:
-    """
-    A container for an ASPN message. This container may contain either proper
+    """A container for an ASPN message. This container may contain either proper
     ASPN messages which are part of the ASPN data model, or extension messages
     specific to pntOS which augment ASPN. For messages of the former type, the
     wrapped message's `message_type` field should be used directly. For
@@ -36,9 +35,7 @@ class Message:
 
 
 class EstimateWithCovarianceType(Enum):
-    """
-    Describes how the fields in `EstimateWithCovariance` are used.
-    """
+    """Describes how the fields in `EstimateWithCovariance` are used."""
 
     EWC_GENERIC = 0
     """
@@ -62,9 +59,7 @@ class EstimateWithCovarianceType(Enum):
 
 @dataclass
 class EstimateWithCovariance:
-    """
-    A container for holding an estimate and covariance.
-    """
+    """A container for holding an estimate and covariance."""
 
     type: EstimateWithCovarianceType
     """ 
@@ -85,8 +80,7 @@ class EstimateWithCovariance:
 
 
 class PluginTypes(Enum):
-    """
-    An enumeration of the types of plugins supported by pntOS for this loader
+    """An enumeration of the types of plugins supported by pntOS for this loader
     API version. Each enum entry maps to a corresponding structure with
     PascalCase naming. For example, the `CONTROLLER_PLUGIN` value in this
     enum is indicating a plugin represented by the struct
@@ -328,8 +322,7 @@ class PluginTypes(Enum):
 
 
 class FusionType(Enum):
-    """
-    An enumeration of the types of fusion that can be performed by pntOS. An
+    """An enumeration of the types of fusion that can be performed by pntOS. An
     implementation of a `FusionPlugin` plugin will compare a model from this
     enum in its `FusionPlugin.is_fusion_type_supported` function. The return of
     `FusionPlugin.is_fusion_type_supported` indicates whether the input type of
@@ -391,9 +384,7 @@ class FusionType(Enum):
 
 
 class LoggingLevel(Enum):
-    """
-    An enumeration of the types of log outs that are available in pntOS.
-    """
+    """An enumeration of the types of log outs that are available in pntOS."""
 
     ERROR = 0
     """
@@ -422,8 +413,7 @@ class LoggingLevel(Enum):
 
 
 class KeyValueStoreDataFormat(Enum):
-    """
-    An enum that specifies the format of data returned/expected in the
+    """An enum that specifies the format of data returned/expected in the
     `KeyValueStore.get_raw` and `KeyValueStore.set_raw` methods.
     This value is otherwise unused when querying a key-value store.
     """
@@ -446,8 +436,7 @@ RegistryValueTypes = TypeVar(
 
 
 class KeyValueStore(Protocol):
-    """
-    A key-value store implemented with a string-pair key. Each value can be
+    """A key-value store implemented with a string-pair key. Each value can be
     looked up by an associated key (string). Values can be a variety of
     different types, depending on which type identifier is specified. For
     example, to store a string value "foo" in the key-value store under the key
@@ -475,23 +464,19 @@ class KeyValueStore(Protocol):
     """
 
     def get_key_array(self) -> List[str]:
-        """
-        Get the array of keys which currently exist in this store. Returns None
+        """Get the array of keys which currently exist in this store. Returns None
         if no keys are available.
         """
         pass
 
     def has_key(self, key: str) -> bool:
-        """
-        Returns whether or not a given key exists in the store.
-        """
+        """Returns whether or not a given key exists in the store."""
         pass
 
     def get_value(
         self, key: str, type: type[RegistryValueTypes]
     ) -> RegistryValueTypes | None:
-        """
-        Get the value stored at `key` with return type `type`.
+        """Get the value stored at `key` with return type `type`.
 
         For example, to access altitude in KeyValueStore `kv_store` as an
         integer:
@@ -507,8 +492,7 @@ class KeyValueStore(Protocol):
         pass
 
     def get_raw(self, key: Optional[str]) -> Optional[bytes]:
-        """
-        Get the value for the given key as an array of bytes. The return format
+        """Get the value for the given key as an array of bytes. The return format
         will conform to the definition in `data_format`. Returns None if the
         given key is not available. The return is guaranteed to not be None if
         called with a valid key, which can be checked with `has_key`.
@@ -520,15 +504,13 @@ class KeyValueStore(Protocol):
         pass
 
     def set_value(self, key: str, value: RegistryValueTypes) -> None:
-        """
-        Set the given key to the provided value. `value` can be of any type
+        """Set the given key to the provided value. `value` can be of any type
         specified by `ValueType`
         """
         pass
 
     def set_raw(self, key: Optional[str], bytes: bytes) -> None:
-        """
-        Set the given key to the provided value. `bytes` must be formatted to
+        """Set the given key to the provided value. `bytes` must be formatted to
         conform to the definition of a value in `data_format`.
 
         If `key` is None, then the contents of `bytes` must include both keys
@@ -539,8 +521,7 @@ class KeyValueStore(Protocol):
         pass
 
     def remove_key(self, key: str) -> bool:
-        """
-        Remove the given key from the registry. Returns true if `key` is
+        """Remove the given key from the registry. Returns true if `key` is
         successfully removed, and false otherwise. Keys may fail to be removed
         if the key does not currently exist, or the backend is unable to remove
         the key.
@@ -548,8 +529,7 @@ class KeyValueStore(Protocol):
         pass
 
     def batch_end(self) -> None:
-        """
-        Ends a batch operation started with a `Registry.batch_start` call.
+        """Ends a batch operation started with a `Registry.batch_start` call.
         After calling this, the user should not use the `KeyValueStore` they
         received from `Registry.batch_start()` again without calling
         `batch_restart` on the `KeyValueStore`.
@@ -589,8 +569,7 @@ class KeyValueStore(Protocol):
         pass
 
     def batch_restart(self) -> None:
-        """
-        Restarts a batch that was previously started with
+        """Restarts a batch that was previously started with
         `Registry.batch_start` and subsequently ended with `batch_end`. This
         method is likely much more efficient than 'Registry.batch_start'
         (depending on the registry implementation) as the
@@ -609,8 +588,7 @@ class KeyValueStore(Protocol):
         key: Optional[str],
         callback: Callable[[str, List[str], "KeyValueStore"], None],
     ) -> bool:
-        """
-        Register a callback which gets called each time a key in the store is
+        """Register a callback which gets called each time a key in the store is
         updated. Allows plugins to respond asynchronously to parameter updates.
         Returns true if the notifier was successfully registered, and false if
         the store is unable to notify the requester. If key is None, then the
@@ -644,8 +622,7 @@ class KeyValueStore(Protocol):
         key: Optional[str],
         callback: Callable[[str, List[str], "KeyValueStore"], None],
     ) -> bool:
-        """
-        Removes a notification as requested by `request_notify`. The group,
+        """Removes a notification as requested by `request_notify`. The group,
         receiver, and callback must match the parameters passed to
         `request_notify` in order to successfully remove a callback.
 
@@ -660,8 +637,7 @@ class KeyValueStore(Protocol):
         pass
 
     def set_permanent(self, permanent: bool) -> bool:
-        """
-        Configure the KeyValueStore to tag values modified with "set" methods
+        """Configure the KeyValueStore to tag values modified with "set" methods
         as permanently stored (as opposed to ephemerally stored in memory).
         Only values acted upon with "set" methods while `set_permanent` is
         `true` will be tagged. Values will be flushed according to registry
@@ -692,8 +668,7 @@ class KeyValueStore(Protocol):
 
 
 class Registry(Protocol):
-    """
-    A registry of key/value data which is organized by (string) groups. In
+    """A registry of key/value data which is organized by (string) groups. In
     order to get/set a key in the registry, one must call
     `Registry.batch_start` with the group the key is stored under and then use
     the resulting `KeyValueStore` to get/set the key/value pair. When one is
@@ -705,8 +680,7 @@ class Registry(Protocol):
     """
 
     def batch_start(self, group: str) -> KeyValueStore:
-        """
-        Begin a batch get/set operation wherein the user may make any number of
+        """Begin a batch get/set operation wherein the user may make any number of
         modifications to the keys/values in the `group`. The registry
         implementation may wait to batch these requests until `
         KeyValueStore.batch_end` is called for better performance. For example,
@@ -730,22 +704,19 @@ class Registry(Protocol):
         pass
 
     def get_group_array(self) -> List[str]:
-        """
-        Get the array of groups which currently exist. Returns None if no
+        """Get the array of groups which currently exist. Returns None if no
         groups exist.
         """
         pass
 
     def has_group(self, group: str) -> bool:
-        """
-        Returns whether or not a given group has had any values added to it
+        """Returns whether or not a given group has had any values added to it
         (for any key).
         """
         pass
 
     def request_notify_new_group(self, callback: Callable[[str], None]) -> bool:
-        """
-        Register a callback which gets called each time a new group is made in
+        """Register a callback which gets called each time a new group is made in
         the registry. Returns true if the notifier was successfully registered,
         and false if the registry is unable to notify the requester. The
         callback will receive the same receiver as was passed into this method,
@@ -762,8 +733,7 @@ class Registry(Protocol):
 
 
 class Mediator(Protocol):
-    """
-    A set of callbacks which are handed to a pntOS plugin upon initialization.
+    """A set of callbacks which are handed to a pntOS plugin upon initialization.
 
     When a plugin is first initialized into pntOS, it is guaranteed that the
     plugin will be passed an instance of this struct via an invocation of
@@ -786,8 +756,7 @@ class Mediator(Protocol):
     """
 
     def get_filter_description_list(self) -> List[str]:
-        """
-        Request a list of strings describing the solutions available. One of
+        """Request a list of strings describing the solutions available. One of
         these description strings may be used when calling `request_solutions`.
         For consistency, these strings should adhere to the following
         conventions:
@@ -826,8 +795,7 @@ class Mediator(Protocol):
     def request_solutions(
         self, solution_times: List[TypeTimestamp], filter_description: Optional[str]
     ) -> List[Message]:
-        """
-        Request filtering solutions at the times specified in the array
+        """Request filtering solutions at the times specified in the array
         `solution_times`. The number of time entries in `solution_times` is
         specified by `num_solution_times`.
 
@@ -848,8 +816,7 @@ class Mediator(Protocol):
         pass
 
     def process_pntos_message(self, message: Message) -> None:
-        """
-        Send a new message to the system for arbitrary processing. For example,
+        """Send a new message to the system for arbitrary processing. For example,
         this function is useful for plugins who have just received new sensor
         data that they wish to relay to the system to be used in a sensor
         fusion solution.
@@ -862,8 +829,7 @@ class Mediator(Protocol):
         transport: Optional[str],
         destination_identifier: Optional[str],
     ) -> None:
-        """
-        Request that pntOS broadcast the provided message out to the network.
+        """Request that pntOS broadcast the provided message out to the network.
         The `destination_identifier` parameter is a transport-specific
         identifier that allows transports to determine how to route the
         message. If the destination transport has the concept of a channel or
@@ -883,8 +849,7 @@ class Mediator(Protocol):
         pass
 
     def log_message(self, level: LoggingLevel, message: str) -> None:
-        """
-        Send a loggable message to the system, to be logged through the current
+        """Send a loggable message to the system, to be logged through the current
         logging infrastructure enabled (e.g. the console, a logfile, etc.).
         """
         pass
@@ -897,8 +862,7 @@ class Mediator(Protocol):
 
 
 class CommonPlugin(Protocol):
-    """
-    Common definitions that all plugins must provide. This structure should not
+    """Common definitions that all plugins must provide. This structure should not
     be used directly (except in the case of a utility plugin), but instead is
     composed as the first field on all of the concrete pntOS plugin structures.
     For example, the transport plugin is specified as:
@@ -925,8 +889,7 @@ class CommonPlugin(Protocol):
     def init_plugin(
         self, plugin_resources_location: Optional[str], mediator: Optional[Mediator]
     ) -> None:
-        """
-        A function that will be called by pntOS once and only once when it
+        """A function that will be called by pntOS once and only once when it
         first initializes the plugin before any other functions on the plugin
         are called. Here the plugin may do dynamic runtime initialization of
         its members, and is given the full path to the location of a data
@@ -963,8 +926,7 @@ class CommonPlugin(Protocol):
         pass
 
     def shutdown_plugin(self) -> None:
-        """
-        A function that will be called by pntOS when it is done using the
+        """A function that will be called by pntOS when it is done using the
         plugin. Here the plugin should release any resources it has acquired
         (including the `Mediator` if it kept a reference to that when
         `init_plugin` was called). When this function call returns pntOS may

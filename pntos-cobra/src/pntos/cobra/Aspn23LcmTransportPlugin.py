@@ -17,9 +17,7 @@ from pntos.api import CommonPlugin, LoggingLevel, Mediator, Message
 
 
 class Aspn23LcmTransportPlugin(CommonPlugin, Protocol):
-    """
-    An example LCM Transport Plugin for ASPN23 implemented in Python
-    """
+    """An example LCM Transport Plugin for ASPN23 implemented in Python"""
 
     identifier: str
     lcm: LCM
@@ -32,16 +30,14 @@ class Aspn23LcmTransportPlugin(CommonPlugin, Protocol):
         self.mediator = mediator
 
     def init_plugin(self, mediator: Mediator):
-        """
-        pntOS plugin initialization function
+        """PntOS plugin initialization function
 
         This is called by the pntOS system before calling any other function.
         """
         self.mediator = mediator
 
     def shutdown_plugin(self):
-        """
-        pntOS plugin shutdown function
+        """PntOS plugin shutdown function
 
         This is called by the pntOS system when it is done with the plugin.
         """
@@ -55,8 +51,7 @@ class Aspn23LcmTransportPlugin(CommonPlugin, Protocol):
         )
 
     def general_handler(self):
-        """
-        Generic listener for lcm messages to marshal to the mediator for
+        """Generic listener for lcm messages to marshal to the mediator for
         processing.
 
         NOTE: Current implementation only supports input from the following
@@ -82,9 +77,7 @@ class Aspn23LcmTransportPlugin(CommonPlugin, Protocol):
         self.subscription = lcm.subscribe(self.channel, self.general_handler())
 
     def start_listening(self) -> None:
-        """
-        Begin listening for lcm messages given input configuration
-        """
+        """Begin listening for lcm messages given input configuration"""
         self.lcm = LCM()
 
         if self.lcm is None:
@@ -97,10 +90,7 @@ class Aspn23LcmTransportPlugin(CommonPlugin, Protocol):
         self.listener.start()
 
     def stop_listening(self) -> None:
-        """
-        Shut down all processes and threads spun up for LCM message passing
-        """
-
+        """Shut down all processes and threads spun up for LCM message passing"""
         if self.listener.is_alive():
             self.listener.join()
 
@@ -110,9 +100,7 @@ class Aspn23LcmTransportPlugin(CommonPlugin, Protocol):
         self.mediator.log_message(LoggingLevel.INFO, "LCM transport stopped")
 
     def broadcast_message(self, message: Message, channel_name: Optional[str]):
-        """
-        Send a message over LCM to a specific channel
-        """
+        """Send a message over LCM to a specific channel"""
         if isinstance(message.wrapped_message, MeasurementPositionVelocityAttitude):
             translated = measurement_position_velocity_attitude_to_lcm(
                 message.wrapped_message
