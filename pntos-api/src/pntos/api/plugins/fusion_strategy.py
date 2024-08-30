@@ -119,7 +119,7 @@ class StandardFusionStrategy(FusionStrategy, Protocol):
         self,
         initial_estimate: NDArray,
         initial_covariance: NDArray,
-        cross_covariance: Optional[NDArray],
+        cross_covariance: Optional[NDArray] = None,
     ) -> int:
         r"""Add new states to this filter.
 
