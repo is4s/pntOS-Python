@@ -27,6 +27,10 @@ members = ["pntos-*"]
 
 [tool.ruff.lint]
 extend-select = ["I"]
+select = ["D", "D213"]
 
 [tool.ruff.lint.isort]
 combine-as-imports = true
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
