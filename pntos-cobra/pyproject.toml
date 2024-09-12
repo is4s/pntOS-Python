@@ -10,10 +10,10 @@ authors = [
 dependencies = [
     "numpy>=1.26.4",
     "pntos-api>=0.1.0",
-    "lcm",
-    "aspn23 @ git+ssh://git@git.aspn.us/pntos/firehose-outputs.git@be11c4279e8f8b1f72833beaf49ca9f995654f2c#subdirectory=aspn-py",
-    "aspn2_lcm @ git+ssh://git@git.aspn.us/pntos/lcm-generated.git@40f3930653286e2a4f1d4557ccd3b4279ac4f522#subdirectory=python",
-    "aspn23_lcm @ git+ssh://git@git.aspn.us/pntos/firehose-outputs.git@be11c4279e8f8b1f72833beaf49ca9f995654f2c#subdirectory=lcm/python"
+    "lcm>=1.5.0",
+    "aspn23 @ git+ssh://git@git.aspn.us/pntos/firehose-outputs.git@e720a212cf5a3b18ab61cc084dcd62f2a48f2f51#subdirectory=aspn-py",
+    "aspn_lcm @ git+ssh://git@git.aspn.us/pntos/lcm-generated.git@21e03f8765605dcd3c8d8d6bb7091ebeef24ee23#subdirectory=python",
+    "aspn23_lcm @ git+ssh://git@git.aspn.us/pntos/firehose-outputs.git@e720a212cf5a3b18ab61cc084dcd62f2a48f2f51#subdirectory=lcm/python"
 ]
 readme = "README.md"
 requires-python = ">= 3.11"

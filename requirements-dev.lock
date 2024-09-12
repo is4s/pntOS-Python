@@ -13,11 +13,11 @@
 -e file:pntos-cobra
 alabaster==0.7.16
     # via sphinx
-aspn2-lcm @ git+ssh://git@git.aspn.us/pntos/lcm-generated.git@40f3930653286e2a4f1d4557ccd3b4279ac4f522#subdirectory=python
+aspn-lcm @ git+ssh://git@git.aspn.us/pntos/lcm-generated.git@21e03f8765605dcd3c8d8d6bb7091ebeef24ee23#subdirectory=python
     # via pntos-cobra
-aspn23 @ git+ssh://git@git.aspn.us/pntos/firehose-outputs.git@be11c4279e8f8b1f72833beaf49ca9f995654f2c#subdirectory=aspn-py
+aspn23 @ git+ssh://git@git.aspn.us/pntos/firehose-outputs.git@e720a212cf5a3b18ab61cc084dcd62f2a48f2f51#subdirectory=aspn-py
     # via pntos-cobra
-aspn23-lcm @ git+ssh://git@git.aspn.us/pntos/firehose-outputs.git@be11c4279e8f8b1f72833beaf49ca9f995654f2c#subdirectory=lcm/python
+aspn23-lcm @ git+ssh://git@git.aspn.us/pntos/firehose-outputs.git@e720a212cf5a3b18ab61cc084dcd62f2a48f2f51#subdirectory=lcm/python
     # via pntos-cobra
 asttokens==2.4.1
     # via stack-data
@@ -44,8 +44,8 @@ jedi==0.19.1
     # via ipython
 jinja2==3.1.4
     # via sphinx
-lcm @ git+https://github.com/lcm-proj/lcm.git@e72f1baccadcd2a367d1612ba102ce004b03f0ca#subdirectory=lcm-python
-    # via aspn2-lcm
+lcm==1.5.0
+    # via aspn-lcm
     # via aspn23-lcm
     # via pntos-cobra
 markupsafe==2.1.5
