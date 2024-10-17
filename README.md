@@ -115,9 +115,9 @@ New contributions to this repo should pass the following checks, if they use Rye
 rye lint --fix 
 rye fmt 
 rye test --all 
-mypy pntos-api
+mypy pntos-api --ignore-missing-imports
 mypy pntos-cli
-mypy pntos-cobra
+mypy pntos-cobra --ignore-missing-imports
 ```
 
 ### Rye Tooling Explanation

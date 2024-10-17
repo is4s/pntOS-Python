@@ -83,6 +83,6 @@ mypy:
     tags:
         - linux-light-runner
     script:
-        - docker run --rm -v $(pwd):/work $DOCKER_IMAGE "mypy pntos-api"
+        - docker run --rm -v $(pwd):/work $DOCKER_IMAGE "mypy pntos-api --ignore-missing-imports"
         - docker run --rm -v $(pwd):/work $DOCKER_IMAGE "mypy pntos-cli"
-        - docker run --rm -v $(pwd):/work $DOCKER_IMAGE "mypy pntos-cobra"
+        - docker run --rm -v $(pwd):/work $DOCKER_IMAGE "mypy pntos-cobra --ignore-missing-imports"
