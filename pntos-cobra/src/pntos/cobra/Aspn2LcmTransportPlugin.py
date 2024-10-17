@@ -104,7 +104,7 @@ class Aspn2LcmTransportPlugin(CommonPlugin, Protocol):
 
         self.mediator.log_message(LoggingLevel.INFO, "LCM transport stopped")
 
-    def broadcast_message(self, message: Message, channel_name: Optional[str]):
+    def broadcast_message(self, message: Message, channel_name: Optional[str] = None):
         """Send a message over LCM to a specific channel"""
         if isinstance(message.wrapped_message, MeasurementPVA):
             translated = positionvelocityattitude()
