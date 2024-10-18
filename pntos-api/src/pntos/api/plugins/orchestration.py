@@ -81,9 +81,7 @@ class MessageStreamConfig(Protocol):
         pass
 
     def immediate_stream_all(self, enable: bool) -> None:
-        """
-        Request all messages are streamed immediately without delay, buffering, or sorting.
-        """
+        """Request all messages are streamed immediately without delay, buffering, or sorting."""
         pass
 
 

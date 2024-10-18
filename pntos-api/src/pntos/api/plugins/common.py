@@ -742,15 +742,11 @@ class Registry(Protocol):
         pass
 
     def get_group_array(self) -> List[str]:
-        """
-        Get the array of groups which currently exist. Returns None if no groups exist.
-        """
+        """Get the array of groups which currently exist. Returns None if no groups exist."""
         pass
 
     def has_group(self, group: str) -> bool:
-        """
-        Returns whether or not a given group has had any values added to it (for any key).
-        """
+        """Returns whether or not a given group has had any values added to it (for any key)."""
         pass
 
     def request_notify_new_group(self, callback: Callable[[str], None]) -> bool:
