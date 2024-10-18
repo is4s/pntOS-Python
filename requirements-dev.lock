@@ -18,6 +18,7 @@ alabaster==0.7.16
 aspn-lcm @ git+ssh://git@git.aspn.us/pntos/lcm-generated.git@21e03f8765605dcd3c8d8d6bb7091ebeef24ee23#subdirectory=python
     # via pntos-cobra
 aspn23 @ git+ssh://git@git.aspn.us/pntos/firehose-outputs.git@e73a0d429d54bc92cde1f4896da46d3885f4b05c#subdirectory=aspn-py
+    # via pntos-api
     # via pntos-cobra
 aspn23-lcm @ git+ssh://git@git.aspn.us/pntos/firehose-outputs.git@e73a0d429d54bc92cde1f4896da46d3885f4b05c#subdirectory=lcm/python
     # via pntos-cobra
