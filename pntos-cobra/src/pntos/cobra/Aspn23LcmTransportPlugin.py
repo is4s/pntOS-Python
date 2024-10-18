@@ -1,15 +1,13 @@
 from threading import Thread
 from typing import Optional, Protocol
 
-from aspn23.lcm_translations import (
+from aspn23 import (
+    MeasurementPositionVelocityAttitude,
     lcm_to_measurement_position_velocity_attitude,
     measurement_position_velocity_attitude_to_lcm,
 )
-from aspn23.measurement_position_velocity_attitude import (
-    MeasurementPositionVelocityAttitude,
-)
-from aspn23_lcm.MeasurementPositionVelocityAttitude import (
-    MeasurementPositionVelocityAttitude as MeasurementPositionVelocityAttitude_LCM,
+from aspn23_lcm import (
+    measurement_position_velocity_attitude as MeasurementPositionVelocityAttitude_LCM,
 )
 from lcm import LCM, LCMSubscription
 

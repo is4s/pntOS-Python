@@ -1,7 +1,7 @@
 from threading import Thread
 from time import sleep
 
-from aspn23.measurement_position import MeasurementPosition
+from aspn23 import MeasurementPosition
 
 from pntos.api import Mediator, TransportPlugin
 from pntos.api.plugins.common import Message

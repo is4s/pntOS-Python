@@ -2,7 +2,7 @@
 
 from typing import List, Optional, Protocol
 
-from aspn23.type_timestamp import TypeTimestamp
+from aspn23 import TypeTimestamp
 
 from .common import CommonPlugin, Message
 
