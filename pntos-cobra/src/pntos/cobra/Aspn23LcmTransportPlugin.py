@@ -30,14 +30,16 @@ class Aspn23LcmTransportPlugin(CommonPlugin, Protocol):
         self.mediator = mediator
 
     def init_plugin(self, mediator: Mediator):
-        """PntOS plugin initialization function
+        """
+        PntOS plugin initialization function
 
         This is called by the pntOS system before calling any other function.
         """
         self.mediator = mediator
 
     def shutdown_plugin(self):
-        """PntOS plugin shutdown function
+        """
+        PntOS plugin shutdown function
 
         This is called by the pntOS system when it is done with the plugin.
         """
@@ -51,7 +53,8 @@ class Aspn23LcmTransportPlugin(CommonPlugin, Protocol):
         )
 
     def general_handler(self):
-        """Generic listener for lcm messages to marshal to the mediator for
+        """
+        Generic listener for lcm messages to marshal to the mediator for
         processing.
 
         NOTE: Current implementation only supports input from the following

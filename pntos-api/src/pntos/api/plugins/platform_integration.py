@@ -4,7 +4,8 @@ from .common import CommonPlugin
 
 
 class PlatformIntegrationPlugin(CommonPlugin, Protocol):
-    """A plugin for command, control, solution output, and other behavior of the
+    """
+    A plugin for command, control, solution output, and other behavior of the
     system which is specific to a particular platform. Works closely with the
     controller plugin to fully define the overall behavior of the system.
 
@@ -19,7 +20,8 @@ class PlatformIntegrationPlugin(CommonPlugin, Protocol):
         plugin_resources_locations: List[Optional[str]],
         initial_config: Optional[str],
     ) -> None:
-        """Takes over secondary control of the daemon from the controller.
+        """
+        Takes over secondary control of the daemon from the controller.
 
         When pntOS first boots, it passes control over to the controller. After
         the controller has initialized the plugins it wants to run, it calls

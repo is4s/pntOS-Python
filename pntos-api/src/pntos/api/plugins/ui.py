@@ -4,7 +4,8 @@ from .common import CommonPlugin
 
 
 class UiPlugin(CommonPlugin, Protocol):
-    """A plugin for a UI that is integrated directly into pntOS. While it is
+    """
+    A plugin for a UI that is integrated directly into pntOS. While it is
     always possible to write a GUI that listens to pntOS outputs and interacts
     with it externally, this plugin allows users to write a GUI that has direct
     access to pntOS via the plugin API. This allows for low latency and high
