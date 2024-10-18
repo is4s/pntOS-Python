@@ -5,6 +5,8 @@ from .common import CommonPlugin
 
 class PlatformIntegrationPlugin(CommonPlugin, Protocol):
     """
+    Platform integration plugin.
+
     A plugin for command, control, solution output, and other behavior of the
     system which is specific to a particular platform. Works closely with the
     controller plugin to fully define the overall behavior of the system.

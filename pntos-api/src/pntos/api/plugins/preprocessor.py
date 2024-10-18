@@ -14,6 +14,8 @@ class Preprocessor(Protocol):
 
     def process_pntos_message(self, message: Message) -> List[Message]:
         """
+        Process a message.
+
         `message` - A message to be processed.
         return - A list of `Message`s. Usually this will be a single message, a
         modified version of `message`. It could be `None` if `message` is
@@ -26,8 +28,9 @@ class Preprocessor(Protocol):
 
 class PreprocessorPlugin(CommonPlugin, Protocol):
     """
-    An implementation of a preprocessor plugin. This plugin generates
-    `Preprocessor` instances which may be used to process incoming messages
+    An implementation of a preprocessor plugin.
+
+    This plugin generates `Preprocessor` instances which may be used to process incoming messages
     before being distributed to other plugins.
 
     **UNSTABLE**: This feature is unstable and is not yet considered part of
@@ -48,8 +51,9 @@ class PreprocessorPlugin(CommonPlugin, Protocol):
         self, preprocessor_index: int, config_group: Optional[str]
     ) -> Preprocessor:
         """
-        Returns a newly created `Preprocessor`. Returns `None` if
-        `preprocessor_index` is greater than or equal to the length of
+        Returns a newly created `Preprocessor`.
+
+        Returns `None` if `preprocessor_index` is greater than or equal to the length of
         `preprocessor_identifiers` or if `config_group` is invalid.
 
         `preprocessor_index` -  Since the `PreprocessorPlugin` can create

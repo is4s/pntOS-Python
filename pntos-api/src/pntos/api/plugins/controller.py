@@ -5,6 +5,8 @@ from .common import CommonPlugin
 
 class ControllerPlugin(CommonPlugin, Protocol):
     """
+    Controller plugin.
+
     An implementation of a primary controller in charge of defining the
     behavior of pntosd and the usage of all other pntOS plugins.
 
@@ -74,6 +76,8 @@ class ControllerPlugin(CommonPlugin, Protocol):
         initial_config: Optional[str],
     ) -> None:
         """
+        Takes over primary control of the daemon from the loader.
+
         Takes over primary control of the daemon from the loader, using the
         `plugins` to process data, generate fused estimates, and ultimately
         produce and output PNT solutions. `ControllerPlugin.take_control` must

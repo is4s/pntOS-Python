@@ -54,8 +54,7 @@ class Aspn23LcmTransportPlugin(CommonPlugin, Protocol):
 
     def general_handler(self):
         """
-        Generic listener for lcm messages to marshal to the mediator for
-        processing.
+        Generic listener for lcm messages to marshal to the mediator for processing.
 
         NOTE: Current implementation only supports input from the following
         sensors:

@@ -98,6 +98,8 @@ class SimpleLoggingPlugin(LoggingPlugin):
         message: str,
     ) -> None:
         """
+        Log a message.
+
         This implementation defines the following behavior:
             1. A config defines a global LoggingLevel for the plugin
             2. A logging request has a LoggingLevel and interacts with the global log level to determine if it will be output.
