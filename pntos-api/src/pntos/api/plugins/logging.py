@@ -1,3 +1,5 @@
+"""Python API of pntOS."""
+
 from typing import Protocol
 
 from .common import CommonPlugin, LoggingLevel

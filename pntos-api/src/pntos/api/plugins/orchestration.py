@@ -1,3 +1,5 @@
+"""Python API of pntOS."""
+
 from typing import List, Optional, Protocol
 
 from aspn23.type_timestamp import TypeTimestamp

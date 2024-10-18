@@ -1,3 +1,5 @@
+"""Python API of pntOS."""
+
 from dataclasses import dataclass
 from enum import Enum
 from typing import Callable, List, Optional, Protocol, TypeVar

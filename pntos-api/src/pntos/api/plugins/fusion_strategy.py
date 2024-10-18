@@ -1,3 +1,5 @@
+"""Python API of pntOS."""
+
 from dataclasses import dataclass
 from typing import Callable, Optional, Protocol, runtime_checkable
 

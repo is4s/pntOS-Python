@@ -1,3 +1,5 @@
+"""Python API of pntOS."""
+
 from typing import Protocol
 
 from .common import CommonPlugin
@@ -20,7 +22,21 @@ class UiPlugin(CommonPlugin, Protocol):
     """
 
     def requires_main_thread(self) -> bool:
+        """
+        Check if this plugin needs to run on the main thread.
+
+        Some systems require GUI applications to run on the main thread. This method can be used to
+        query whether or not this plugin must be run on the main thread. If this method returns
+        True, then run_main_thread() must be called from the main thread in order to start this
+        plugin.
+        """
         pass
 
     def run_main_thread(self) -> None:
+        """
+        Start plugin on the main thread.
+
+        This method should only be called if requires_main_thread() returns True. This method should
+        only be called from the main thread.
+        """
         pass

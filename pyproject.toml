@@ -30,6 +30,12 @@ extend-select = ["I"]
 select = ["D", "D213"]
 ignore = ["D212"]
 
+[tool.ruff.lint.per-file-ignores]
+"pntos-cobra/*" = ["D"]
+"pntos-cli/*" = ["D"]
+"apps/*" = ["D"]
+"docs/*" = ["D"]
+
 [tool.ruff.lint.isort]
 combine-as-imports = true
 

@@ -1,3 +1,5 @@
+"""Python API of pntOS."""
+
 from typing import Optional, Protocol
 
 from .common import CommonPlugin, Message
