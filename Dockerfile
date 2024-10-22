@@ -7,8 +7,8 @@ RUN apt update && apt install python3-pip curl git -y
 ENV PATH=/root/.rye/shims:$PATH
 RUN curl -sSf https://rye.astral.sh/get | RYE_INSTALL_OPTION="--yes" bash
 
-# Install mypy
-RUN pip install mypy --break-system-packages
-
 WORKDIR /work
 ENTRYPOINT ["/bin/bash", "-c"]
+CMD ["/bin/bash"]
+# Prepend future venv path to PATH so that pip automatically uses it.
+ENV PATH=/work/.venv/bin:$PATH
