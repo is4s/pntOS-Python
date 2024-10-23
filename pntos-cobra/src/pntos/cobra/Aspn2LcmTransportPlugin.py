@@ -29,7 +29,8 @@ class Aspn2LcmTransportPlugin(CommonPlugin, Protocol):
         self.mediator = mediator
 
     def init_plugin(self):
-        """PntOS plugin initialization function
+        """
+        PntOS plugin initialization function
 
         This is called by the pntOS system before calling any other function.
 
@@ -39,7 +40,8 @@ class Aspn2LcmTransportPlugin(CommonPlugin, Protocol):
         pass
 
     def shutdown_plugin(self):
-        """PntOS plugin shutdown function
+        """
+        PntOS plugin shutdown function
 
         This is called by the pntOS system when it is done with the plugin.
 
@@ -49,7 +51,8 @@ class Aspn2LcmTransportPlugin(CommonPlugin, Protocol):
         pass
 
     def general_handler(self):
-        """Generic listener for lcm messages to marshal to the mediator for processing.
+        """
+        Generic listener for lcm messages to marshal to the mediator for processing.
 
         NOTE: Current implementation only supports input from the following sensors:
             Inertial measurement unit (IMU)
@@ -104,7 +107,7 @@ class Aspn2LcmTransportPlugin(CommonPlugin, Protocol):
 
         self.mediator.log_message(LoggingLevel.INFO, "LCM transport stopped")
 
-    def broadcast_message(self, message: Message, channel_name: Optional[str]):
+    def broadcast_message(self, message: Message, channel_name: Optional[str] = None):
         """Send a message over LCM to a specific channel"""
         if isinstance(message.wrapped_message, MeasurementPVA):
             translated = positionvelocityattitude()

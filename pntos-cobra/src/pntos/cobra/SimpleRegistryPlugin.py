@@ -37,7 +37,8 @@ class SimpleRegistryPlugin(RegistryPlugin):
 
 class SimpleRegistry(Registry):
     groups: Dict[str, KeyValueStore] = {}
-    """Maps group names to objects storing all the key/values in that group.
+    """
+    Maps group names to objects storing all the key/values in that group.
     """
 
     def batch_start(self, group: str) -> KeyValueStore:

@@ -1,10 +1,15 @@
+"""Python API of pntOS."""
+
 from typing import List, Optional, Protocol
 
 from .common import CommonPlugin
 
 
 class ControllerPlugin(CommonPlugin, Protocol):
-    """An implementation of a primary controller in charge of defining the
+    """
+    Controller plugin.
+
+    An implementation of a primary controller in charge of defining the
     behavior of pntosd and the usage of all other pntOS plugins.
 
     In ordinary operation, `pntosd`'s entry point will be a main function
@@ -72,7 +77,10 @@ class ControllerPlugin(CommonPlugin, Protocol):
         plugin_resources_locations: List[Optional[str]],
         initial_config: Optional[str],
     ) -> None:
-        """Takes over primary control of the daemon from the loader, using the
+        """
+        Takes over primary control of the daemon from the loader.
+
+        Takes over primary control of the daemon from the loader, using the
         `plugins` to process data, generate fused estimates, and ultimately
         produce and output PNT solutions. `ControllerPlugin.take_control` must
         use the plugins passed to it and construct a full pntOS system. Please

@@ -1,3 +1,5 @@
+"""Python API of pntOS."""
+
 from dataclasses import dataclass
 from typing import Callable, Optional, Protocol, runtime_checkable
 
@@ -8,7 +10,8 @@ from .common import CommonPlugin, FusionType
 
 @runtime_checkable
 class FusionStrategy(Protocol):
-    """A computation engine for doing raw estimation.
+    """
+    A computation engine for doing raw estimation.
 
     This class is itself empty and only serves as a base class for different
     types of fusion strategies. At this time, the only implementation of this
@@ -23,7 +26,8 @@ class FusionStrategy(Protocol):
 
 @dataclass
 class StandardDynamicsModel:
-    """A description of the propagation dynamics for a set of states.
+    """
+    A description of the propagation dynamics for a set of states.
 
     This model assumes that the state space `x` can be propagated forward in time by the equation:
 
@@ -46,7 +50,8 @@ class StandardDynamicsModel:
 
 @dataclass
 class StandardMeasurementModel:
-    """A description of how a measurement relates to a state space.
+    """
+    A description of how a measurement relates to a state space.
 
     This model assumes that the relationship between the measurement and state vector is
     well modeled by the equation:
@@ -71,7 +76,8 @@ class StandardMeasurementModel:
 
 @runtime_checkable
 class StandardFusionStrategy(FusionStrategy, Protocol):
-    """A Fusion strategy making linearized Bayesian assumptions.
+    """
+    A Fusion strategy making linearized Bayesian assumptions.
 
     An implementation of the standard fusion strategy that is capable of
     Bayesian inference on a linearized discrete-time system with Gaussian noise
@@ -106,7 +112,8 @@ class StandardFusionStrategy(FusionStrategy, Protocol):
     """
 
     def get_num_states(self) -> int:
-        """Get the total number of states this filter is estimating.
+        """
+        Get the total number of states this filter is estimating.
 
         The count will initially be zero, until [add_states] is called.
 
@@ -121,7 +128,8 @@ class StandardFusionStrategy(FusionStrategy, Protocol):
         initial_covariance: NDArray,
         cross_covariance: Optional[NDArray] = None,
     ) -> int:
-        r"""Add new states to this filter.
+        r"""
+        Add new states to this filter.
 
         Increases number of filter states and set the initial conditions of the
         new states.  Returns index of the first added state. If \p
@@ -143,7 +151,8 @@ class StandardFusionStrategy(FusionStrategy, Protocol):
         ...
 
     def remove_states(self, first_index: int, count: int) -> None:
-        """Removes a set of states from the filter.
+        """
+        Removes a set of states from the filter.
 
         Args:
             first_index (int): Index of the first state to be removed.
@@ -152,7 +161,8 @@ class StandardFusionStrategy(FusionStrategy, Protocol):
         ...
 
     def get_estimate(self) -> Optional[NDArray]:
-        """Get the current internal estimate managed by this strategy.
+        """
+        Get the current internal estimate managed by this strategy.
 
         This class manages a current estimate that is initially populated by
         `add_states` and then is modified iteratively by `propagate`, `update`,
@@ -166,7 +176,8 @@ class StandardFusionStrategy(FusionStrategy, Protocol):
         """
 
     def set_estimate_slice(self, new_estimate: NDArray, first_index: int) -> None:
-        """Set a slice of the state estimates to a given set of values.
+        """
+        Set a slice of the state estimates to a given set of values.
 
         This class manages a current estimate that is initially populated by
         `add_states` and then is modified iteratively by `propagate`, `update`,
@@ -183,7 +194,8 @@ class StandardFusionStrategy(FusionStrategy, Protocol):
         ...
 
     def get_covariance(self) -> Optional[NDArray]:
-        """Get the covariance of the current estimate.
+        """
+        Get the covariance of the current estimate.
 
         This class manages a current estimate that is initially populated by
         `add_states` and then is modified iteratively by `propagate`, `update`,
@@ -199,7 +211,8 @@ class StandardFusionStrategy(FusionStrategy, Protocol):
     def set_covariance_slice(
         self, new_covariance: NDArray, first_row: int, first_col: int
     ) -> None:
-        """Set a slice of the covariance matrix to a given set of values.
+        """
+        Set a slice of the covariance matrix to a given set of values.
 
         This class manages a current estimate that is initially populated by
         `add_states` and then is modified iteratively by `propagate`, `update`,
@@ -221,7 +234,8 @@ class StandardFusionStrategy(FusionStrategy, Protocol):
         ...
 
     def propagate(self, dynamics_model: StandardDynamicsModel) -> None:
-        """Propagates the estimate of the state space forward in time.
+        """
+        Propagates the estimate of the state space forward in time.
 
         This method assumes that a state space is already initialized with a set
         of states via the `add_states` method. The `dynamics_model` parameter
@@ -241,7 +255,8 @@ class StandardFusionStrategy(FusionStrategy, Protocol):
         ...
 
     def update(self, measurement_model: StandardMeasurementModel) -> None:
-        """Updates the estimate of the state space, incorporating a new measurement.
+        """
+        Updates the estimate of the state space, incorporating a new measurement.
 
         This method assumes that a state space is already initialized with a set
         of states via the `add_states` method. The `measurement_model` parameter
@@ -258,7 +273,8 @@ class StandardFusionStrategy(FusionStrategy, Protocol):
         """
 
     def clone(self) -> "StandardFusionStrategy":
-        """Create a deep copy of this object.
+        """
+        Create a deep copy of this object.
 
         The returned object will have all state copied, such that the original
         and newly returned objects are entirely separate from each other. A
@@ -275,7 +291,8 @@ class StandardFusionStrategy(FusionStrategy, Protocol):
 
 
 class FusionStrategyPlugin(CommonPlugin, Protocol):
-    """A plugin that provides computational engines for estimation.
+    """
+    A plugin that provides computational engines for estimation.
 
     At the high level, a fusion strategy is a computation engine that knows how
     to estimating one or more states, given a set of observations/measurements.
@@ -295,7 +312,8 @@ class FusionStrategyPlugin(CommonPlugin, Protocol):
     """
 
     def is_fusion_type_supported(self, fusion_type: FusionType) -> bool:
-        """Check if a particular fusion type is supported by `new_fusion_strategy`.
+        """
+        Check if a particular fusion type is supported by `new_fusion_strategy`.
 
         The `new_fusion_strategy` factory method on this class can create
         `FusionStrategy`s of different types. However, `FusionStrategyPlugin`s
@@ -324,7 +342,8 @@ class FusionStrategyPlugin(CommonPlugin, Protocol):
         ...
 
     def new_fusion_strategy(self, fusion_type: FusionType) -> FusionStrategy:
-        """Create a new fusion strategy of the requested type.
+        """
+        Create a new fusion strategy of the requested type.
 
         Users must first ensure that the FusionType is supported by calling
         `is_fusion_type_supported`.

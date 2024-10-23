@@ -1,3 +1,5 @@
+"""Python API of pntOS."""
+
 from .plugins.common import (
     CommonPlugin as CommonPlugin,
     EstimateWithCovariance as EstimateWithCovariance,

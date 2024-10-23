@@ -1,0 +1,88 @@
+---
+workflow:
+  rules:
+  # Never run merge request pipelines
+  - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    when: never
+  # Only run on git.aspn.us
+  - if: $CI_SERVER_HOST == "git.aspn.us"
+
+variables:
+  GIT_CLEAN_FLAGS: -xdff
+
+default:
+    retry:
+      max: 2 # (2 retry maximum, up to 3 runs in total)
+      when: runner_system_failure
+      exit_codes: 128
+    before_script:
+
+        # Clone only if empty directory
+        - |
+            if ! [ "$(ls -A)" ]; then
+                git clone $CI_REPOSITORY_URL .
+            fi
+        - git remote set-url origin $CI_REPOSITORY_URL
+        - git --no-optional-locks fetch --prune
+        - git reset --hard "$CI_COMMIT_SHA"
+        - git clean "$GIT_CLEAN_FLAGS" || true
+
+        # If this is a branch pipeline, attempt to merge with master/target branch, but keep going
+        # if it fails.
+        - |
+            if [[ ! -z "${CI_COMMIT_BRANCH}" ]]; then
+                git merge origin/"${TARGET_BRANCH:-$CI_DEFAULT_BRANCH}" || true
+                git reset --hard
+                git clean "$GIT_CLEAN_FLAGS"
+            fi
+
+        # Grab URL with CI token, which is of the form:
+        # https://gitlab-ci-token:[MASKED]@git.aspn.us/pntos/pntos.git
+        - export TOKEN_URL="$(echo $CI_REPOSITORY_URL | sed -E 's/(.*git.aspn.us\/).*/\1/g')"
+
+        # Modify the pyproject.toml dependencies to use the CI token URL.
+        - find pntos-* -type f -name "pyproject.toml" -exec sed -i -e "s|git+ssh://git@git.aspn.us/|git+$TOKEN_URL|g" {} \+
+
+        # Build docker container
+        - docker pull ubuntu:24.04
+        - export DOCKER_IMAGE="$LOCAL_REGISTRY_CACHE/pntos-python"
+        - docker build --cache-from $DOCKER_IMAGE --build-arg BUILDKIT_INLINE_CACHE=1 -t $DOCKER_IMAGE -f Dockerfile .
+        - docker push $DOCKER_IMAGE
+
+stages:
+    - check
+
+rye lint:
+    stage: check
+    tags:
+        - linux-light-runner
+    script:
+        - docker run --rm -v $(pwd):/work $DOCKER_IMAGE "rye lint"
+
+rye format:
+    stage: check
+    tags:
+        - linux-light-runner
+    script:
+        # Run the formatter to see if it produces a diff.
+        - docker run --rm -v $(pwd):/work $DOCKER_IMAGE "rye fmt"
+        # Don't let modification to the pyproject.toml files produce a diff.
+        - git checkout -- $(git ls-files | grep pyproject.toml)
+        # If there's a diff, fail the stage.
+        - git diff --exit-code
+
+rye test:
+    stage: check
+    tags:
+        - linux-light-runner
+    script:
+        - docker run --rm -v $(pwd):/work $DOCKER_IMAGE "rye sync && rye test -p pntos-cobra"
+
+mypy:
+    stage: check
+    tags:
+        - linux-light-runner
+    script:
+        - docker run --rm -v $(pwd):/work $DOCKER_IMAGE "mypy pntos-api --ignore-missing-imports"
+        - docker run --rm -v $(pwd):/work $DOCKER_IMAGE "mypy pntos-cli"
+        - docker run --rm -v $(pwd):/work $DOCKER_IMAGE "mypy pntos-cobra --ignore-missing-imports"
