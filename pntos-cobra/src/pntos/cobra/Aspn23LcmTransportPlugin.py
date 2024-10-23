@@ -74,7 +74,7 @@ class Aspn23LcmTransportPlugin(CommonPlugin, Protocol):
         return _general_handler
 
     def listener_thread(self, lcm: LCM):
-        self.subscription = lcm.subscribe(self.channel, self.general_handler())
+        self.subscription = lcm.subscribe("^((?!pntos).)*$", self.general_handler())
 
     def start_listening(self) -> None:
         """Begin listening for lcm messages given input configuration"""
