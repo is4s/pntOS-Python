@@ -99,10 +99,9 @@ class Aspn2LcmTransportPlugin(CommonPlugin, Protocol):
             trans.v2 = untrans.velocity[1]
             trans.v3 = untrans.velocity[2]
             trans.quaternion = untrans.attitude
-            msg = Message()
-            msg.wrapped_message = trans
+            msg = Message(trans, "")
 
-            self.broadcast_message(trans)
+            self.broadcast_message(msg)
 
         return _general_handler
 
