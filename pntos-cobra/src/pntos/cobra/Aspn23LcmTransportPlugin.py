@@ -27,13 +27,16 @@ class Aspn23LcmTransportPlugin(CommonPlugin, Protocol):
         self.identifier = "python-transport-lcm23-plugin"
         self.mediator = mediator
 
-    def init_plugin(self, mediator: Mediator):
+    def init_plugin(
+        self, plugin_resources_location: Optional[str], mediator: Mediator | None
+    ):
         """
         PntOS plugin initialization function
 
         This is called by the pntOS system before calling any other function.
         """
-        self.mediator = mediator
+        if mediator is not None:
+            self.mediator = mediator
 
     def shutdown_plugin(self):
         """
