@@ -1,7 +1,14 @@
 from threading import Thread
 from typing import Optional, Protocol
 
-from aspn23 import MeasurementPositionVelocityAttitude as MeasurementPVA
+import numpy as np
+from aspn23 import (
+    MeasurementPositionVelocityAttitude as MeasurementPVA,
+    MeasurementPositionVelocityAttitudeErrorModel,
+    MeasurementPositionVelocityAttitudeReferenceFrame,
+    TypeHeader,
+    TypeTimestamp,
+)
 from datasources.lcm.messages.aspn.positionvelocityattitude import (
     positionvelocityattitude,
 )
@@ -65,7 +72,26 @@ class Aspn2LcmTransportPlugin(CommonPlugin, Protocol):
                 return
 
             untrans = positionvelocityattitude.decode(data)
-            trans = MeasurementPVA()
+            header = TypeHeader(0, 0, 0, 0)
+            time = TypeTimestamp(0)
+            frame = MeasurementPositionVelocityAttitudeReferenceFrame.GEODETIC
+            error_model = MeasurementPositionVelocityAttitudeErrorModel.NONE
+            trans = MeasurementPVA(
+                header,
+                time,
+                frame,
+                untrans.position[0],
+                untrans.position[1],
+                untrans.position[2],
+                untrans.velocity[0],
+                untrans.velocity[1],
+                untrans.velocity[2],
+                untrans.attitude,
+                untrans.covariance,
+                error_model,
+                np.empty(0),
+                [],
+            )
             trans.p1 = untrans.position[0]
             trans.p2 = untrans.position[1]
             trans.p3 = untrans.position[2]
