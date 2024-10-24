@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from aspn23.type_timestamp import TypeTimestamp
+from aspn23 import TypeTimestamp
 
 from pntos.api import Mediator, OrchestrationPlugin
 from pntos.api.plugins.common import CommonPlugin, Message

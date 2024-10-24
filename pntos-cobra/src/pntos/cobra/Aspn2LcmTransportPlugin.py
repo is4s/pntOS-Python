@@ -1,9 +1,7 @@
 from threading import Thread
 from typing import Optional, Protocol
 
-from aspn23.measurement_position_velocity_attitude import (
-    MeasurementPositionVelocityAttitude as MeasurementPVA,
-)
+from aspn23 import MeasurementPositionVelocityAttitude as MeasurementPVA
 from datasources.lcm.messages.aspn.positionvelocityattitude import (
     positionvelocityattitude,
 )

@@ -4,8 +4,7 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Callable, List, Optional, Protocol, TypeVar
 
-from aspn23.aspn_base import AspnBase
-from aspn23.type_timestamp import TypeTimestamp
+from aspn23 import AspnBase, TypeTimestamp
 from numpy import float64
 from numpy.typing import NDArray
 
