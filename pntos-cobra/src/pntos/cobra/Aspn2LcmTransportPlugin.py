@@ -152,6 +152,9 @@ class Aspn2LcmTransportPlugin(CommonPlugin, Protocol):
                 message.wrapped_message.v2,
                 message.wrapped_message.v3,
             ]
-            self.lcm.publish(channel_name, translated.encode())
+            channel = (
+                channel_name if channel_name is not None else message.source_identifier
+            )
+            self.lcm.publish(channel, translated.encode())
         else:
             print("Invalid LCM message")

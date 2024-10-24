@@ -108,6 +108,9 @@ class Aspn23LcmTransportPlugin(CommonPlugin, Protocol):
             translated = measurement_position_velocity_attitude_to_lcm(
                 message.wrapped_message
             )
-            self.lcm.publish(channel_name, translated.encode())
+            channel = (
+                channel_name if channel_name is not None else message.source_identifier
+            )
+            self.lcm.publish(channel, translated.encode())
         else:
             print("Invalid LCM message")
