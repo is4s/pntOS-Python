@@ -125,7 +125,7 @@ class Aspn2LcmTransportPlugin(CommonPlugin, Protocol):
         if self.listener.is_alive():
             self.listener.join()
 
-        if self.lcm.subscription is not None and self.lcm is not None:
+        if self.subscription is not None and self.lcm is not None:
             self.lcm.unsubscribe(self.subscription)
 
         self.mediator.log_message(LoggingLevel.INFO, "LCM transport stopped")
