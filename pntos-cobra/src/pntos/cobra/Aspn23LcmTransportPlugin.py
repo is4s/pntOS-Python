@@ -72,7 +72,8 @@ class Aspn23LcmTransportPlugin(CommonPlugin, Protocol):
                 return
             decoded = MeasurementPositionVelocityAttitude_LCM.decode(data)
             translated = lcm_to_measurement_position_velocity_attitude(decoded)
-            self.broadcast_message(translated, None)
+            message = Message(translated, channel)
+            self.broadcast_message(message, None)
 
         return _general_handler
 
