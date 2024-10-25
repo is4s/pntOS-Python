@@ -19,7 +19,7 @@ aspn23 @ git+ssh://git@git.aspn.us/pntos/firehose-outputs.git@8f57ea4d2ebbcc906d
     # via pntos-cobra
 aspn23-lcm @ git+ssh://git@git.aspn.us/pntos/firehose-outputs.git@8f57ea4d2ebbcc906d3dc73ec41d62addc121849#subdirectory=lcm/python
     # via pntos-cobra
-lcm==1.5.0
+lcm @ git+https://github.com/lcm-proj/lcm.git@8d638bb3aeae39fda5db59f43b85f3a4b3f9a6ac
     # via aspn-lcm
     # via aspn23-lcm
     # via pntos-cobra

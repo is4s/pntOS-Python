@@ -46,7 +46,7 @@ jedi==0.19.1
     # via ipython
 jinja2==3.1.4
     # via sphinx
-lcm==1.5.0
+lcm @ git+https://github.com/lcm-proj/lcm.git@8d638bb3aeae39fda5db59f43b85f3a4b3f9a6ac
     # via aspn-lcm
     # via aspn23-lcm
     # via pntos-cobra
