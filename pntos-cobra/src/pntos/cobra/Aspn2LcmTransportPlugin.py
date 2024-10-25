@@ -9,14 +9,16 @@ from aspn23 import (
     TypeHeader,
     TypeTimestamp,
 )
-from datasources.lcm.messages.aspn.positionvelocityattitude import (
+from datasources.lcm.messages.aspn.positionvelocityattitude import (  # type: ignore[import]
     positionvelocityattitude,
 )
-from datasources.lcm.messages.aspn.types.geodeticposition3d_type import (
+from datasources.lcm.messages.aspn.types.geodeticposition3d_type import (  # type: ignore[import]
     geodeticposition3d_type,
 )
-from datasources.lcm.messages.aspn.types.header import header
-from datasources.lcm.messages.aspn.types.timestamp import timestamp
+from datasources.lcm.messages.aspn.types.header import header  # type: ignore[import]
+from datasources.lcm.messages.aspn.types.timestamp import (  # type: ignore[import]
+    timestamp,
+)
 from lcm import LCM, LCMSubscription
 
 from pntos.api import CommonPlugin, LoggingLevel, Mediator, Message
