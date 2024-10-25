@@ -1,7 +1,10 @@
 FROM ubuntu:24.04
 
-# Install dependencies needed to install Rye and mypy.
-RUN apt update && apt install python3-pip curl git -y
+# Install dependencies needed to build the LCM wheel.
+RUN apt update && apt install git libglib2.0-dev build-essential -y
+
+# Install dependencies needed to install Rye.
+RUN apt update && apt install curl -y
 
 # Install Rye
 ENV PATH=/root/.rye/shims:$PATH
