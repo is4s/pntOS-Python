@@ -76,13 +76,15 @@ rye test:
     tags:
         - linux-light-runner
     script:
-        - docker run --rm -v $(pwd):/work $DOCKER_IMAGE "rye sync && rye test -p pntos-cobra"
+        - docker run --rm -v $(pwd):/work -e CC=gcc -e CXX=g++ $DOCKER_IMAGE "rye sync && rye test -p pntos-cobra"
 
 mypy:
     stage: check
     tags:
         - linux-light-runner
     script:
-        - docker run --rm -v $(pwd):/work $DOCKER_IMAGE "mypy pntos-api --ignore-missing-imports"
-        - docker run --rm -v $(pwd):/work $DOCKER_IMAGE "mypy pntos-cli"
-        - docker run --rm -v $(pwd):/work $DOCKER_IMAGE "mypy pntos-cobra --ignore-missing-imports"
+        - docker run --rm -dit -v $(pwd):/work --name pntos-python -e CC=gcc -e CXX=g++ $DOCKER_IMAGE bash
+        - docker exec pntos-python rye sync
+        - docker exec pntos-python mypy pntos-api
+        - docker exec pntos-python mypy pntos-cli
+        - docker exec pntos-python mypy pntos-cobra

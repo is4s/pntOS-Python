@@ -1,13 +1,11 @@
 from threading import Thread
 from typing import Optional, Protocol
 
-from aspn23 import (
-    MeasurementPositionVelocityAttitude,
-    lcm_to_measurement_position_velocity_attitude,
-    measurement_position_velocity_attitude_to_lcm,
-)
+from aspn23 import MeasurementPositionVelocityAttitude
 from aspn23_lcm import (
+    lcm_to_measurement_position_velocity_attitude,
     measurement_position_velocity_attitude as MeasurementPositionVelocityAttitude_LCM,
+    measurement_position_velocity_attitude_to_lcm,
 )
 from lcm import LCM, LCMSubscription
 
@@ -27,13 +25,16 @@ class Aspn23LcmTransportPlugin(CommonPlugin, Protocol):
         self.identifier = "python-transport-lcm23-plugin"
         self.mediator = mediator
 
-    def init_plugin(self, mediator: Mediator):
+    def init_plugin(
+        self, plugin_resources_location: Optional[str], mediator: Mediator | None
+    ):
         """
         PntOS plugin initialization function
 
         This is called by the pntOS system before calling any other function.
         """
-        self.mediator = mediator
+        if mediator is not None:
+            self.mediator = mediator
 
     def shutdown_plugin(self):
         """
@@ -69,12 +70,13 @@ class Aspn23LcmTransportPlugin(CommonPlugin, Protocol):
                 return
             decoded = MeasurementPositionVelocityAttitude_LCM.decode(data)
             translated = lcm_to_measurement_position_velocity_attitude(decoded)
-            self.broadcast_message(translated, None)
+            message = Message(translated, channel)
+            self.broadcast_message(message, None)
 
         return _general_handler
 
     def listener_thread(self, lcm: LCM):
-        self.subscription = lcm.subscribe(self.channel, self.general_handler())
+        self.subscription = lcm.subscribe("^((?!pntos).)*$", self.general_handler())
 
     def start_listening(self) -> None:
         """Begin listening for lcm messages given input configuration"""
@@ -94,7 +96,7 @@ class Aspn23LcmTransportPlugin(CommonPlugin, Protocol):
         if self.listener.is_alive():
             self.listener.join()
 
-        if self.lcm.subscription is not None and self.lcm is not None:
+        if self.subscription is not None and self.lcm is not None:
             self.lcm.unsubscribe(self.subscription)
 
         self.mediator.log_message(LoggingLevel.INFO, "LCM transport stopped")
@@ -105,6 +107,9 @@ class Aspn23LcmTransportPlugin(CommonPlugin, Protocol):
             translated = measurement_position_velocity_attitude_to_lcm(
                 message.wrapped_message
             )
-            self.lcm.publish(channel_name, translated.encode())
+            channel = (
+                channel_name if channel_name is not None else message.source_identifier
+            )
+            self.lcm.publish(channel, translated.encode())
         else:
             print("Invalid LCM message")

@@ -1,15 +1,24 @@
 from threading import Thread
 from typing import Optional, Protocol
 
-from aspn23 import MeasurementPositionVelocityAttitude as MeasurementPVA
-from datasources.lcm.messages.aspn.positionvelocityattitude import (
+import numpy as np
+from aspn23 import (
+    MeasurementPositionVelocityAttitude as MeasurementPVA,
+    MeasurementPositionVelocityAttitudeErrorModel,
+    MeasurementPositionVelocityAttitudeReferenceFrame,
+    TypeHeader,
+    TypeTimestamp,
+)
+from datasources.lcm.messages.aspn.positionvelocityattitude import (  # type: ignore[import]
     positionvelocityattitude,
 )
-from datasources.lcm.messages.aspn.types.geodeticposition3d_type import (
+from datasources.lcm.messages.aspn.types.geodeticposition3d_type import (  # type: ignore[import]
     geodeticposition3d_type,
 )
-from datasources.lcm.messages.aspn.types.header import header
-from datasources.lcm.messages.aspn.types.timestamp import timestamp
+from datasources.lcm.messages.aspn.types.header import header  # type: ignore[import]
+from datasources.lcm.messages.aspn.types.timestamp import (  # type: ignore[import]
+    timestamp,
+)
 from lcm import LCM, LCMSubscription
 
 from pntos.api import CommonPlugin, LoggingLevel, Mediator, Message
@@ -65,7 +74,26 @@ class Aspn2LcmTransportPlugin(CommonPlugin, Protocol):
                 return
 
             untrans = positionvelocityattitude.decode(data)
-            trans = MeasurementPVA()
+            header = TypeHeader(0, 0, 0, 0)
+            time = TypeTimestamp(0)
+            frame = MeasurementPositionVelocityAttitudeReferenceFrame.GEODETIC
+            error_model = MeasurementPositionVelocityAttitudeErrorModel.NONE
+            trans = MeasurementPVA(
+                header,
+                time,
+                frame,
+                untrans.position[0],
+                untrans.position[1],
+                untrans.position[2],
+                untrans.velocity[0],
+                untrans.velocity[1],
+                untrans.velocity[2],
+                untrans.attitude,
+                untrans.covariance,
+                error_model,
+                np.empty(0),
+                [],
+            )
             trans.p1 = untrans.position[0]
             trans.p2 = untrans.position[1]
             trans.p3 = untrans.position[2]
@@ -73,10 +101,9 @@ class Aspn2LcmTransportPlugin(CommonPlugin, Protocol):
             trans.v2 = untrans.velocity[1]
             trans.v3 = untrans.velocity[2]
             trans.quaternion = untrans.attitude
-            msg = Message()
-            msg.wrapped_message = trans
+            msg = Message(trans, "")
 
-            self.broadcast_message(trans)
+            self.broadcast_message(msg)
 
         return _general_handler
 
@@ -100,7 +127,7 @@ class Aspn2LcmTransportPlugin(CommonPlugin, Protocol):
         if self.listener.is_alive():
             self.listener.join()
 
-        if self.lcm.subscription is not None and self.lcm is not None:
+        if self.subscription is not None and self.lcm is not None:
             self.lcm.unsubscribe(self.subscription)
 
         self.mediator.log_message(LoggingLevel.INFO, "LCM transport stopped")
@@ -127,6 +154,9 @@ class Aspn2LcmTransportPlugin(CommonPlugin, Protocol):
                 message.wrapped_message.v2,
                 message.wrapped_message.v3,
             ]
-            self.lcm.publish(channel_name, translated.encode())
+            channel = (
+                channel_name if channel_name is not None else message.source_identifier
+            )
+            self.lcm.publish(channel, translated.encode())
         else:
             print("Invalid LCM message")

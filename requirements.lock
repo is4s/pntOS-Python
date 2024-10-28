@@ -15,11 +15,11 @@
 -e file:pntos-cobra
 aspn-lcm @ git+ssh://git@git.aspn.us/pntos/lcm-generated.git@21e03f8765605dcd3c8d8d6bb7091ebeef24ee23#subdirectory=python
     # via pntos-cobra
-aspn23 @ git+ssh://git@git.aspn.us/pntos/firehose-outputs.git@8f57ea4d2ebbcc906d3dc73ec41d62addc121849#subdirectory=aspn-py
+aspn23 @ git+ssh://git@git.aspn.us/pntos/firehose-outputs.git@e73a0d429d54bc92cde1f4896da46d3885f4b05c#subdirectory=aspn-py
     # via pntos-cobra
-aspn23-lcm @ git+ssh://git@git.aspn.us/pntos/firehose-outputs.git@8f57ea4d2ebbcc906d3dc73ec41d62addc121849#subdirectory=lcm/python
+aspn23-lcm @ git+ssh://git@git.aspn.us/pntos/firehose-outputs.git@e73a0d429d54bc92cde1f4896da46d3885f4b05c#subdirectory=lcm/python
     # via pntos-cobra
-lcm==1.5.0
+lcm @ git+https://github.com/lcm-proj/lcm.git@8d638bb3aeae39fda5db59f43b85f3a4b3f9a6ac
     # via aspn-lcm
     # via aspn23-lcm
     # via pntos-cobra
