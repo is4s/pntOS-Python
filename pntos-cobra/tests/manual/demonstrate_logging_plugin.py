@@ -1,6 +1,6 @@
 from pntos.api.plugins.common import LoggingLevel
 from pntos.cobra.SimpleControllerPlugin import SimpleMediator
-from pntos.cobra.SimpleLoggingPluggin import SimpleLoggingPlugin
+from pntos.cobra.SimpleLoggingPlugin import SimpleLoggingPlugin
 from pntos.cobra.SimpleRegistryPlugin import SimpleRegistry
 
 
