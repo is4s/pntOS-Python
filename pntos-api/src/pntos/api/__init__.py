@@ -17,6 +17,12 @@ from .plugins.common import (
     float64 as float64,
 )
 from .plugins.controller import ControllerPlugin as ControllerPlugin
+from .plugins.fusion import (
+    CommonFusionEngine as CommonFusionEngine,
+    CrossCovariances as CrossCovariances,
+    FusionPlugin as FusionPlugin,
+    StandardFusionEngine as StandardFusionEngine,
+)
 from .plugins.logging import LoggingPlugin as LoggingPlugin
 from .plugins.orchestration import OrchestrationPlugin as OrchestrationPlugin
 from .plugins.platform_integration import (
