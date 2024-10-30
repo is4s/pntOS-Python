@@ -120,6 +120,12 @@ mypy pntos-cli
 mypy pntos-cobra
 ```
 
+Or, to run all the above commands at once, run:
+
+```shell
+./run_all_checks.sh
+```
+
 ### Rye Tooling Explanation
 
 Rye allows us to manage this repository as a monorepo. We have a few base folders which act as our modules, and one folder that defines applications which use those modules.
