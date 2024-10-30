@@ -2,7 +2,7 @@
 
 from typing import Protocol
 
-from .common import CommonPlugin, LoggingLevel
+from pntos.api import CommonPlugin, LoggingLevel
 
 
 class LoggingPlugin(CommonPlugin, Protocol):

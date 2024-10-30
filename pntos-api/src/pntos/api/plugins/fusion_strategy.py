@@ -5,7 +5,7 @@ from typing import Callable, Optional, Protocol, runtime_checkable
 
 from numpy.typing import NDArray
 
-from .common import CommonPlugin, FusionType
+from pntos.api import CommonPlugin, FusionType
 
 
 @runtime_checkable

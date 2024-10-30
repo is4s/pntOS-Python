@@ -2,7 +2,7 @@
 
 from typing import Optional, Protocol
 
-from .common import CommonPlugin, Message
+from pntos.api import CommonPlugin, Message
 
 
 class TransportPlugin(CommonPlugin, Protocol):

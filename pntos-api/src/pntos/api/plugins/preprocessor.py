@@ -2,7 +2,7 @@
 
 from typing import List, Optional, Protocol
 
-from .common import CommonPlugin, Message
+from pntos.api import CommonPlugin, Message
 
 
 class Preprocessor(Protocol):
