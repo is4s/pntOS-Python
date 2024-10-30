@@ -93,5 +93,5 @@ custom_transport = MyTransportPlugin()
 
 # Start the controller, and pass it all of the other plugins to use
 
-controller.init_plugin(None, None)
-controller.take_control([orchestration, registry, custom_transport], [], None)
+controller.init_plugin()
+controller.take_control([orchestration, registry, custom_transport], [])
