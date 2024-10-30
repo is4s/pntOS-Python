@@ -19,7 +19,9 @@ class SimpleTransportPlugin(TransportPlugin):
         self.identifier = identifier
 
     def init_plugin(
-        self, plugin_resources_location: str | None, mediator: Mediator | None
+        self,
+        plugin_resources_location: str | None = None,
+        mediator: Mediator | None = None,
     ) -> None:
         assert mediator is not None
         self.mediator = mediator
@@ -34,7 +36,9 @@ class SimpleTransportPlugin(TransportPlugin):
     def stop_listening(self) -> None:
         self.listening = False
 
-    def broadcast_message(self, message: Message, channel_name: str | None) -> None:
+    def broadcast_message(
+        self, message: Message, channel_name: str | None = None
+    ) -> None:
         pass
 
     mediator: Mediator

@@ -22,7 +22,7 @@ class PlatformIntegrationPlugin(CommonPlugin, Protocol):
         self,
         plugins: List[CommonPlugin],
         plugin_resources_locations: List[Optional[str]],
-        initial_config: Optional[str],
+        initial_config: Optional[str] = None,
     ) -> None:
         """
         Takes over secondary control of the daemon from the controller.

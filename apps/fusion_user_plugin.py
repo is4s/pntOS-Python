@@ -46,7 +46,9 @@ my_config = [
 
 class MyTransportPlugin(TransportPlugin):
     def init_plugin(
-        self, plugin_resources_location: str | None, mediator: Mediator | None
+        self,
+        plugin_resources_location: str | None = None,
+        mediator: Mediator | None = None,
     ) -> None:
         assert mediator is not None
         # Save off the mediator to send messages to the system later

@@ -17,12 +17,14 @@ class SimpleRegistryPlugin(RegistryPlugin):
     def __init__(
         self,
         identifier: str,
-        config: List[Any] | None,
+        config: List[Any] | None = None,
     ):
         self.identifier = identifier
 
     def init_plugin(
-        self, plugin_resources_location: Optional[str], mediator: Optional[Mediator]
+        self,
+        plugin_resources_location: Optional[str] = None,
+        mediator: Optional[Mediator] = None,
     ) -> None:
         pass
 
@@ -31,7 +33,7 @@ class SimpleRegistryPlugin(RegistryPlugin):
 
     identifier: str
 
-    def new_registry(self, initial_config: str | None) -> Registry:
+    def new_registry(self, initial_config: str | None = None) -> Registry:
         return SimpleRegistry()
 
 
@@ -77,7 +79,7 @@ class SimpleKeyValueStore(KeyValueStore):
         else:
             return None
 
-    def get_raw(self, key: str | None) -> bytes | None:
+    def get_raw(self, key: str | None = None) -> bytes | None:
         return None
 
     def set_value(self, key: str, value: RegistryValueTypes) -> None:

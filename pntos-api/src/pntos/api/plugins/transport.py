@@ -31,7 +31,9 @@ class TransportPlugin(CommonPlugin, Protocol):
         """
         pass
 
-    def broadcast_message(self, message: Message, channel_name: Optional[str]) -> None:
+    def broadcast_message(
+        self, message: Message, channel_name: Optional[str] = None
+    ) -> None:
         """
         Send a message back out to the sensor from pntOS.
 

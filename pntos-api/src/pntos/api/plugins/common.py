@@ -503,7 +503,7 @@ class KeyValueStore(Protocol):
         """
         pass
 
-    def get_raw(self, key: Optional[str]) -> Optional[bytes]:
+    def get_raw(self, key: Optional[str] = None) -> Optional[bytes]:
         """
         Get the value for the given key as an array of bytes.
 
@@ -832,7 +832,9 @@ class Mediator(Protocol):
         pass
 
     def request_solutions(
-        self, solution_times: List[TypeTimestamp], filter_description: Optional[str]
+        self,
+        solution_times: List[TypeTimestamp],
+        filter_description: Optional[str] = None,
     ) -> List[Message]:
         """
         Request filtering solutions at the times specified in the array `solution_times`.
@@ -869,8 +871,8 @@ class Mediator(Protocol):
     def broadcast_aspn_message(
         self,
         message: Message,
-        transport: Optional[str],
-        destination_identifier: Optional[str],
+        transport: Optional[str] = None,
+        destination_identifier: Optional[str] = None,
     ) -> None:
         """
         Request that pntOS broadcast the provided message out to the network.
@@ -938,7 +940,9 @@ class CommonPlugin(Protocol):
     """
 
     def init_plugin(
-        self, plugin_resources_location: Optional[str], mediator: Optional[Mediator]
+        self,
+        plugin_resources_location: Optional[str] = None,
+        mediator: Optional[Mediator] = None,
     ) -> None:
         """
         The first plugin method called; initializes the plugin.

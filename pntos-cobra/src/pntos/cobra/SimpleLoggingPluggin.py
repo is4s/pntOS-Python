@@ -37,7 +37,9 @@ class SimpleLoggingPlugin(LoggingPlugin):
         self.identifier = identifier
 
     def init_plugin(
-        self, plugin_resources_location: Optional[str], mediator: Optional[Mediator]
+        self,
+        plugin_resources_location: Optional[str] = None,
+        mediator: Optional[Mediator] = None,
     ):
         if mediator:
             config = mediator.registry.batch_start(self.config_group)

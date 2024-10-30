@@ -18,7 +18,9 @@ class SimpleControllerPlugin(ControllerPlugin):
         self.identifier = identifier
 
     def init_plugin(
-        self, plugin_resources_location: Optional[str], mediator: Optional[Mediator]
+        self,
+        plugin_resources_location: Optional[str] = None,
+        mediator: Optional[Mediator] = None,
     ) -> None:
         pass
 
@@ -31,7 +33,7 @@ class SimpleControllerPlugin(ControllerPlugin):
         self,
         plugins: List[CommonPlugin],
         plugin_resources_locations: List[Optional[str]],
-        initial_config: Optional[str],
+        initial_config: Optional[str] = None,
     ) -> None:
         pass
 
@@ -48,7 +50,7 @@ class SimpleMediator(Mediator):
         return []
 
     def request_solutions(
-        self, solution_times: List[TypeTimestamp], filter_description: str | None
+        self, solution_times: List[TypeTimestamp], filter_description: str | None = None
     ) -> List[Message]:
         return []
 
@@ -58,8 +60,8 @@ class SimpleMediator(Mediator):
     def broadcast_aspn_message(
         self,
         message: Message,
-        transport: str | None,
-        destination_identifier: str | None,
+        transport: str | None = None,
+        destination_identifier: str | None = None,
     ) -> None:
         pass
 
