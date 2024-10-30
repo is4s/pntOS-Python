@@ -21,7 +21,7 @@ class PlatformIntegrationPlugin(CommonPlugin, Protocol):
     def take_control(
         self,
         plugins: List[CommonPlugin],
-        plugin_resources_locations: List[Optional[str]],
+        plugin_resources_locations: Optional[List[Optional[str]]] = None,
         initial_config: Optional[str] = None,
     ) -> None:
         """
