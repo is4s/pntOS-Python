@@ -12,25 +12,6 @@ from .common import CommonPlugin, EstimateWithCovariance, Message
 from .inertial import StandardInertialErrors
 
 
-class InitializationType(Enum):
-    """
-    An enumeration of the different types of initialization strategies.
-
-    **UNSTABLE**: This feature is unstable and is not yet considered part of the stable pntOS API.
-    Usage of this feature is highly discouraged in non-experimental code, and its definition may
-    change at any time.
-    """
-
-    INERTIAL_INITIALIZATION_STRATEGY = 0
-    """
-    Produces an ASPN solution to initialize an inertial. Also produces estimates of the inertial
-	errors and covariances associated with each.
-    """
-
-    EWC_INITIALIZATION_STRATEGY = 1
-    """Produces an arbitrary estimate-with-covariance (EWC) solution."""
-
-
 class InitializationStatus(Enum):
     """
     An enumeration that allows the user to know the initialization status.
@@ -195,6 +176,9 @@ class EwcInitializationStrategy(CommonInitializationStrategy):
         strategy. If the status is INITIALIZING_FINE or INITIALIZED_GOOD, then the result is
         guaranteed to not be None.
         """
+
+
+InitializationType = InertialInitializationStrategy | EwcInitializationStrategy
 
 
 class InitializationPlugin(CommonPlugin, Protocol):
