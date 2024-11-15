@@ -113,10 +113,6 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
         """
         pass
 
-    def has_block(self, block_label: str) -> bool:
-        """Returns true if the fusion engine has a `StandardStateBlock` with a matching label."""
-        pass
-
     def add_state_block(
         self,
         block: StandardStateBlock,
@@ -146,8 +142,8 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
         `block_label`, and return a copy of its current estimate vector. If `block_label` references
         a virtual state block (VSB) this will return a converted estimate, converted into the VSBs
         coordinate frame. Returns None if `block_label` does not correspond to a block that has been
-        added to the fusion engine. Guaranteed to not return None when #has_block returns true for
-        `block_label` and #get_strategy does not return None.
+        added to the fusion engine. Guaranteed to not return None when `block_label` is in the list
+        returned by get_state_block_labels() and #get_strategy does not return None.
         """
         pass
 
@@ -159,8 +155,8 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
         `block_label`, and return a copy of its current covariance matrix. If `block_label`
         references a virtual state block (VSB) this will return a converted covariance, converted
         into the VSBs coordinate frame. Returns None if `block_label` does not correspond to a block
-        that has been added to the fusion engine. Guaranteed to not return None when #has_block
-        returns true for `block_label` and #get_strategy does not return None.
+        that has been added to the fusion engine. Guaranteed to not return None when `block_label`
+        is in the list returned by get_state_block_labels() and #get_strategy does not return None.
         """
         pass
 
@@ -173,8 +169,8 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
         Find the `StandardStateBlocks` within the fusion engine matching `block_label1` and
         `block_label2`, and return the cross-covariance matrix between them. Returns None if
         `block_label1` or `block_label2` do not correspond to blocks that gave been added to the
-        fusion engine. Guaranteed to not return None when #has_block returns true for both
-        `block_label` and `block_label2` and #get_strategy does not return None.
+        fusion engine. Guaranteed to not return None when both `block_label` and `block_label2` are
+        in the list returned by get_state_block_labels() and #get_strategy does not return None.
         """
         pass
 
@@ -263,10 +259,6 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
         """
         pass
 
-    def has_processor(self, processor_label: str) -> bool:
-        """Returns true if the fusion engine has a measurement processor with a matching label."""
-        pass
-
     def add_measurement_processor(
         self, processor: StandardMeasurementProcessor
     ) -> None:
@@ -318,7 +310,7 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
 
         - `time` is equal to or after the filter time (which can be checked with #get_time)
         - all labels in `block_labels` correspond to a block that has been added to the fusion
-            engine (which can be checked with #has_block)
+            engine (which can be checked with get_state_block_labels())
         - `block_labels` has at least one element
 
         Then the result returned is guaranteed to not be None. Otherwise, if any of the above are
@@ -340,7 +332,7 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
         If all of the following are true:
 
         - all labels in `block_labels` correspond to a block that has been added to the fusion
-            engine (which can be checked with #has_block)
+            engine (which can be checked with get_state_block_labels())
         - `block_labels` has at least one element
 
         Then the result returned is guaranteed to not be None. Otherwise, if any of the above are
