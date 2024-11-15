@@ -2,7 +2,7 @@
 
 from typing import Protocol
 
-from .common import CommonPlugin
+from pntos.api import CommonPlugin
 
 
 class UiPlugin(CommonPlugin, Protocol):

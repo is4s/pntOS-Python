@@ -2,7 +2,7 @@
 
 from typing import Optional, Protocol
 
-from .common import CommonPlugin, Registry
+from pntos.api import CommonPlugin, Registry
 
 
 class RegistryPlugin(CommonPlugin, Protocol):

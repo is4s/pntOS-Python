@@ -4,7 +4,7 @@ from typing import List, Optional, Protocol
 
 from aspn23 import TypeTimestamp
 
-from .common import CommonPlugin, Message
+from pntos.api import CommonPlugin, Message
 
 
 class MessageStreamConfig(Protocol):
