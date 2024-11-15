@@ -34,6 +34,17 @@ from .plugins.inertial import (
     StandardInertialErrors as StandardInertialErrors,
     StandardInertialMechanization as StandardInertialMechanization,
 )
+from .plugins.initialization import (
+    CommonInitializationStrategy as CommonInitializationStrategy,
+    EwcInitializationStrategy as EwcInitializationStrategy,
+    InertialInitializationStrategy as InertialInitializationStrategy,
+    InitialEstimateWithCovariance as InitialEstimateWithCovariance,
+    InitialInertialSolution as InitialInertialSolution,
+    InitializationMotionNeeded as InitializationMotionNeeded,
+    InitializationPlugin as InitializationPlugin,
+    InitializationStatus as InitializationStatus,
+    InitializationType as InitializationType,
+)
 from .plugins.logging import LoggingPlugin as LoggingPlugin
 from .plugins.orchestration import OrchestrationPlugin as OrchestrationPlugin
 from .plugins.platform_integration import (
