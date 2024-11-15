@@ -23,6 +23,17 @@ from .plugins.fusion import (
     FusionPlugin as FusionPlugin,
     StandardFusionEngine as StandardFusionEngine,
 )
+from .plugins.inertial import (
+    CommonInertial as CommonInertial,
+    ExternalInertial as ExternalInertial,
+    InertialForcesRates as InertialForcesRates,
+    InertialFrame as InertialFrame,
+    InertialPlugin as InertialPlugin,
+    InertialSolutionRangeType as InertialSolutionRangeType,
+    InertialType as InertialType,
+    StandardInertialErrors as StandardInertialErrors,
+    StandardInertialMechanization as StandardInertialMechanization,
+)
 from .plugins.logging import LoggingPlugin as LoggingPlugin
 from .plugins.orchestration import OrchestrationPlugin as OrchestrationPlugin
 from .plugins.platform_integration import (

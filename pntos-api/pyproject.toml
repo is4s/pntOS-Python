@@ -5,7 +5,10 @@ description = "The API specification for pntOS, ported into pure Python."
 authors = [
     { name = "IS4S", email = "pntos@is4s.com" }
 ]
-dependencies = []
+dependencies = [
+    # firehose-outputs main branch - committed 27 October 2024
+    "aspn23 @ git+ssh://git@git.aspn.us/pntos/firehose-outputs.git@e73a0d429d54bc92cde1f4896da46d3885f4b05c#subdirectory=aspn-py",
+]
 readme = "README.md"
 requires-python = ">= 3.11"
 
