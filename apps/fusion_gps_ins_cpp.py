@@ -41,5 +41,5 @@ sensor_baronav = LoadCPlugin("libviper.so.1", "viper_baronav_plugin")
 
 # Start the controller, and pass it all of the other plugins to use
 
-controller.init_plugin(None, None)
-controller.take_control([orchestration, registry, sensor_baronav], [], None)
+controller.init_plugin()
+controller.take_control([orchestration, registry, sensor_baronav], [])

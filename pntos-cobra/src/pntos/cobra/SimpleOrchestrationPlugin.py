@@ -12,7 +12,9 @@ class SimpleOrchestrationPlugin(OrchestrationPlugin):
         self.identifier = identifier
 
     def init_plugin(
-        self, plugin_resources_location: Optional[str], mediator: Optional[Mediator]
+        self,
+        plugin_resources_location: Optional[str] = None,
+        mediator: Optional[Mediator] = None,
     ) -> None:
         pass
 
@@ -33,6 +35,6 @@ class SimpleOrchestrationPlugin(OrchestrationPlugin):
         return []
 
     def request_solutions(
-        self, solution_times: List[TypeTimestamp], filter_description: str | None
+        self, solution_times: List[TypeTimestamp], filter_description: str | None = None
     ) -> List[Message]:
         return []

@@ -26,7 +26,9 @@ class Aspn23LcmTransportPlugin(CommonPlugin, Protocol):
         self.mediator = mediator
 
     def init_plugin(
-        self, plugin_resources_location: Optional[str], mediator: Mediator | None
+        self,
+        plugin_resources_location: Optional[str] = None,
+        mediator: Mediator | None = None,
     ):
         """
         PntOS plugin initialization function
@@ -101,7 +103,7 @@ class Aspn23LcmTransportPlugin(CommonPlugin, Protocol):
 
         self.mediator.log_message(LoggingLevel.INFO, "LCM transport stopped")
 
-    def broadcast_message(self, message: Message, channel_name: Optional[str]):
+    def broadcast_message(self, message: Message, channel_name: Optional[str] = None):
         """Send a message over LCM to a specific channel"""
         if isinstance(message.wrapped_message, MeasurementPositionVelocityAttitude):
             translated = measurement_position_velocity_attitude_to_lcm(

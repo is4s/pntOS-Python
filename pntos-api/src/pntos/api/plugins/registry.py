@@ -13,7 +13,7 @@ class RegistryPlugin(CommonPlugin, Protocol):
     the `Internals` section for more information on the goal of this plugin.
     """
 
-    def new_registry(self, initial_config: Optional[str]) -> Registry:
+    def new_registry(self, initial_config: Optional[str] = None) -> Registry:
         """
         Create a new registry.
 

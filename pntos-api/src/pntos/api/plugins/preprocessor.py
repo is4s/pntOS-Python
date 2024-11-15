@@ -50,7 +50,7 @@ class PreprocessorPlugin(CommonPlugin, Protocol):
     """
 
     def new_preprocessor(
-        self, preprocessor_index: int, config_group: Optional[str]
+        self, preprocessor_index: int, config_group: Optional[str] = None
     ) -> Preprocessor:
         """
         Returns a newly created `Preprocessor`.

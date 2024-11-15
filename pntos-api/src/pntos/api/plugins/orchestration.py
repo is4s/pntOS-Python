@@ -22,7 +22,7 @@ class MessageStreamConfig(Protocol):
     """
 
     def sequenced_stream_add(
-        self, type: type, source_identifier: Optional[str]
+        self, type: type, source_identifier: Optional[str] = None
     ) -> None:
         """
         Request messages are streamed in sorted timestamp ordering.
@@ -33,7 +33,7 @@ class MessageStreamConfig(Protocol):
         pass
 
     def sequenced_stream_remove(
-        self, type: type, source_identifier: Optional[str]
+        self, type: type, source_identifier: Optional[str] = None
     ) -> None:
         """
         Request messages are no longer streamed in sorted timestamp ordering.
@@ -57,7 +57,7 @@ class MessageStreamConfig(Protocol):
         pass
 
     def immediate_stream_add(
-        self, type: type, source_identifier: Optional[str]
+        self, type: type, source_identifier: Optional[str] = None
     ) -> None:
         """
         Request messages are streamed immediately.
@@ -69,7 +69,7 @@ class MessageStreamConfig(Protocol):
         pass
 
     def immediate_stream_remove(
-        self, type: type, source_identifier: Optional[str]
+        self, type: type, source_identifier: Optional[str] = None
     ) -> None:
         """
         Request messages are no longer streamed immediately.
@@ -188,7 +188,9 @@ class OrchestrationPlugin(CommonPlugin, Protocol):
         pass
 
     def request_solutions(
-        self, solution_times: List[TypeTimestamp], filter_description: Optional[str]
+        self,
+        solution_times: List[TypeTimestamp],
+        filter_description: Optional[str] = None,
     ) -> List[Message]:
         """
         Request filtering solutions at the times specified in the array `solution_times`.
