@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List
 
 from aspn23 import TypeTimestamp
 
@@ -13,8 +13,8 @@ class SimpleOrchestrationPlugin(OrchestrationPlugin):
 
     def init_plugin(
         self,
-        plugin_resources_location: Optional[str] = None,
-        mediator: Optional[Mediator] = None,
+        plugin_resources_location: str | None = None,
+        mediator: Mediator | None = None,
     ) -> None:
         pass
 

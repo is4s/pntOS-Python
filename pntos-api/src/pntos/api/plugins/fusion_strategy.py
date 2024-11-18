@@ -1,7 +1,7 @@
 """Python API of pntOS."""
 
 from dataclasses import dataclass
-from typing import Callable, Optional, Protocol, runtime_checkable
+from typing import Callable, Protocol, runtime_checkable
 
 from numpy.typing import NDArray
 
@@ -126,7 +126,7 @@ class StandardFusionStrategy(FusionStrategy, Protocol):
         self,
         initial_estimate: NDArray,
         initial_covariance: NDArray,
-        cross_covariance: Optional[NDArray] = None,
+        cross_covariance: NDArray | None = None,
     ) -> int:
         r"""
         Add new states to this filter.
@@ -141,7 +141,7 @@ class StandardFusionStrategy(FusionStrategy, Protocol):
               states with.
             initial_covariance (NDArray): The initial covariance matrix used to
               initialize the uncertainty of the new states.
-            cross_covariance (Optional[NDArray]): A covariance matrix that
+            cross_covariance (NDArray | None): A covariance matrix that
               describes the cross terms between the new states and all previous
               states. If `None`, the cross-terms will be set to zero.
 
@@ -160,7 +160,7 @@ class StandardFusionStrategy(FusionStrategy, Protocol):
         """
         ...
 
-    def get_estimate(self) -> Optional[NDArray]:
+    def get_estimate(self) -> NDArray | None:
         """
         Get the current internal estimate managed by this strategy.
 
@@ -171,7 +171,7 @@ class StandardFusionStrategy(FusionStrategy, Protocol):
         strategy.
 
         Returns:
-            Optional[NDArray]: An estimate if available. Returns None if no
+            NDArray | None: An estimate if available. Returns None if no
               states have been added yet.
         """
 
@@ -193,7 +193,7 @@ class StandardFusionStrategy(FusionStrategy, Protocol):
         """
         ...
 
-    def get_covariance(self) -> Optional[NDArray]:
+    def get_covariance(self) -> NDArray | None:
         """
         Get the covariance of the current estimate.
 
@@ -205,7 +205,7 @@ class StandardFusionStrategy(FusionStrategy, Protocol):
         this strategy.
 
         Returns:
-            Optional[NDArray]: The covariance of the current estimate. Returns None if no states have been added yet.
+            NDArray | None: The covariance of the current estimate. Returns None if no states have been added yet.
         """
 
     def set_covariance_slice(

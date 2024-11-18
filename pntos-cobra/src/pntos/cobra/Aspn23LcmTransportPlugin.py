@@ -1,5 +1,5 @@
 from threading import Thread
-from typing import Optional, Protocol
+from typing import Protocol
 
 from aspn23 import MeasurementPositionVelocityAttitude
 from aspn23_lcm import (
@@ -27,7 +27,7 @@ class Aspn23LcmTransportPlugin(CommonPlugin, Protocol):
 
     def init_plugin(
         self,
-        plugin_resources_location: Optional[str] = None,
+        plugin_resources_location: str | None = None,
         mediator: Mediator | None = None,
     ):
         """
@@ -103,7 +103,7 @@ class Aspn23LcmTransportPlugin(CommonPlugin, Protocol):
 
         self.mediator.log_message(LoggingLevel.INFO, "LCM transport stopped")
 
-    def broadcast_message(self, message: Message, channel_name: Optional[str] = None):
+    def broadcast_message(self, message: Message, channel_name: str | None = None):
         """Send a message over LCM to a specific channel"""
         if isinstance(message.wrapped_message, MeasurementPositionVelocityAttitude):
             translated = measurement_position_velocity_attitude_to_lcm(

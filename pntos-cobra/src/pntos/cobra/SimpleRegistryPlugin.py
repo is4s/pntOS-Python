@@ -1,4 +1,4 @@
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Callable, Dict, List
 
 from pntos.api import (
     KeyValueStore,
@@ -23,8 +23,8 @@ class SimpleRegistryPlugin(RegistryPlugin):
 
     def init_plugin(
         self,
-        plugin_resources_location: Optional[str] = None,
-        mediator: Optional[Mediator] = None,
+        plugin_resources_location: str | None = None,
+        mediator: Mediator | None = None,
     ) -> None:
         pass
 

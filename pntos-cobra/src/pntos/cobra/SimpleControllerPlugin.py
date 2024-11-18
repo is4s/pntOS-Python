@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List
 
 from aspn23 import TypeTimestamp
 
@@ -19,8 +19,8 @@ class SimpleControllerPlugin(ControllerPlugin):
 
     def init_plugin(
         self,
-        plugin_resources_location: Optional[str] = None,
-        mediator: Optional[Mediator] = None,
+        plugin_resources_location: str | None = None,
+        mediator: Mediator | None = None,
     ) -> None:
         pass
 
@@ -32,8 +32,8 @@ class SimpleControllerPlugin(ControllerPlugin):
     def take_control(
         self,
         plugins: List[CommonPlugin],
-        plugin_resources_locations: Optional[List[Optional[str]]] = None,
-        initial_config: Optional[str] = None,
+        plugin_resources_locations: List[str | None] | None = None,
+        initial_config: str | None = None,
     ) -> None:
         pass
 

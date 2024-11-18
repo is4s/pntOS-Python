@@ -1,6 +1,6 @@
 """Python API of pntOS."""
 
-from typing import Optional, Protocol
+from typing import Protocol
 
 from pntos.api import CommonPlugin, Message
 
@@ -32,7 +32,7 @@ class TransportPlugin(CommonPlugin, Protocol):
         pass
 
     def broadcast_message(
-        self, message: Message, channel_name: Optional[str] = None
+        self, message: Message, channel_name: str | None = None
     ) -> None:
         """
         Send a message back out to the sensor from pntOS.

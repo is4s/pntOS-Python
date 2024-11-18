@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import Callable, List, Optional, Protocol, TypeVar
+from typing import Callable, List, Protocol, TypeVar
 
 from aspn23 import AspnBase, TypeTimestamp
 from numpy import float64
@@ -503,7 +503,7 @@ class KeyValueStore(Protocol):
         """
         pass
 
-    def get_raw(self, key: Optional[str] = None) -> Optional[bytes]:
+    def get_raw(self, key: str | None = None) -> bytes | None:
         """
         Get the value for the given key as an array of bytes.
 
@@ -525,7 +525,7 @@ class KeyValueStore(Protocol):
         """
         pass
 
-    def set_raw(self, key: Optional[str], bytes: bytes) -> None:
+    def set_raw(self, key: str | None, bytes: bytes) -> None:
         """
         Set the given key to the provided value.
 
@@ -612,7 +612,7 @@ class KeyValueStore(Protocol):
 
     def request_notify(
         self,
-        key: Optional[str],
+        key: str | None,
         callback: Callable[[str, List[str], "KeyValueStore"], None],
     ) -> bool:
         """
@@ -648,7 +648,7 @@ class KeyValueStore(Protocol):
 
     def remove_notify(
         self,
-        key: Optional[str],
+        key: str | None,
         callback: Callable[[str, List[str], "KeyValueStore"], None],
     ) -> bool:
         """
@@ -834,7 +834,7 @@ class Mediator(Protocol):
     def request_solutions(
         self,
         solution_times: List[TypeTimestamp],
-        filter_description: Optional[str] = None,
+        filter_description: str | None = None,
     ) -> List[Message]:
         """
         Request filtering solutions at the times specified in the array `solution_times`.
@@ -871,8 +871,8 @@ class Mediator(Protocol):
     def broadcast_aspn_message(
         self,
         message: Message,
-        transport: Optional[str] = None,
-        destination_identifier: Optional[str] = None,
+        transport: str | None = None,
+        destination_identifier: str | None = None,
     ) -> None:
         """
         Request that pntOS broadcast the provided message out to the network.
@@ -941,8 +941,8 @@ class CommonPlugin(Protocol):
 
     def init_plugin(
         self,
-        plugin_resources_location: Optional[str] = None,
-        mediator: Optional[Mediator] = None,
+        plugin_resources_location: str | None = None,
+        mediator: Mediator | None = None,
     ) -> None:
         """
         The first plugin method called; initializes the plugin.
