@@ -10,7 +10,6 @@ from .plugins.common import (
     LoggingLevel as LoggingLevel,
     Mediator as Mediator,
     Message as Message,
-    PluginTypes as PluginTypes,
     Registry as Registry,
     RegistryValueTypes as RegistryValueTypes,
 )
