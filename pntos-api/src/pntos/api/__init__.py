@@ -14,7 +14,6 @@ from .plugins.common import (
     PluginTypes as PluginTypes,
     Registry as Registry,
     RegistryValueTypes as RegistryValueTypes,
-    float64 as float64,
 )
 from .plugins.controller import ControllerPlugin as ControllerPlugin
 from .plugins.fusion import (

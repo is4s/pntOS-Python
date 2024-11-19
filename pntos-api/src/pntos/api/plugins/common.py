@@ -5,7 +5,6 @@ from enum import Enum
 from typing import Callable, List, Optional, Protocol, TypeVar
 
 from aspn23 import AspnBase, TypeTimestamp
-from numpy import float64
 from numpy.typing import NDArray
 
 
@@ -69,13 +68,13 @@ class EstimateWithCovariance:
     Describes how the fields in this struct are used. 
     """
 
-    estimate: NDArray[float64]
+    estimate: NDArray
     """ 
     An array of doubles representing an estimate vector. Usage depends on the 
     `type` field.
     """
 
-    covariance: NDArray[float64]
+    covariance: NDArray
     """
     An array of doubles representing a square covariance matrix. Data is 
     stored in row major form. Usage depends on the `type` field.
@@ -438,7 +437,7 @@ class KeyValueStoreDataFormat(Enum):
 
 
 RegistryValueTypes = TypeVar(
-    "RegistryValueTypes", str, List[str], int, bool, float, NDArray[float64], Message
+    "RegistryValueTypes", str, List[str], int, bool, float, NDArray, Message
 )
 
 
