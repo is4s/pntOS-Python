@@ -1,0 +1,3 @@
+[submodule "docs/branding_assets"]
+	path = docs/branding_assets
+	url = git@git.aspn.us:pntos/navigation-data.git
