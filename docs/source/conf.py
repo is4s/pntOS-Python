@@ -6,7 +6,7 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = "Cobra"
+project = "pntOS Python"
 copyright = "2024, IS4S"
 author = "IS4S"
 release = "0.1.0"
