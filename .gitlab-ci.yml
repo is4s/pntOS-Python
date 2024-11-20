@@ -51,6 +51,7 @@ default:
 
 stages:
     - check
+    - deploy
 
 rye lint:
     stage: check
@@ -88,3 +89,34 @@ mypy:
         - docker exec pntos-python mypy pntos-api
         - docker exec pntos-python mypy pntos-cli
         - docker exec pntos-python mypy pntos-cobra
+
+documentation check:
+    stage: check
+    tags:
+        - linux-light-runner
+    script:
+        - docker run --workdir /work/docs --rm -dit -v $(pwd):/work --name pntos-python -e CC=gcc -e CXX=g++ $DOCKER_IMAGE bash
+        - docker exec pntos-python rye sync
+        # Build the documentation
+        - docker exec -e TZ=UTC pntos-python make html
+    artifacts:
+        expose_as: "documentation"
+        paths:
+        - docs/build/html/index.html  # must be first, expose_as links to the first entry
+        - docs/build/html # ..but all the other files *also* need to be in the archive
+
+pages:
+    stage: deploy
+    tags: [linux-light-runner]
+    before_script: []
+    script:
+        - rm -rf public
+        - mkdir -p public
+        - cp -r docs/build/html/* public
+    needs:
+        - documentation check
+    only:
+        - main
+    artifacts:
+        paths:
+            - public
