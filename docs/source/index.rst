@@ -12,7 +12,13 @@ Welcome to pntOS Python's documentation!
 
    installation.md
 
+.. toctree::
+   :maxdepth: 2
+   :hidden:
 
+   api.rst
+
+* :ref:`pntos_python_api`
 
 Indices and tables
 ==================
