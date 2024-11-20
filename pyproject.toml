@@ -21,6 +21,7 @@ dev-dependencies = [
     "mypy>=1.10.0",
     "pip>=24.0",
     "myst_parser>=4.0.0",
+    "sphinx_rtd_theme>=3.0.2"
 ]
 
 [tool.rye.workspace]
