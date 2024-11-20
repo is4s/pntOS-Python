@@ -23,6 +23,13 @@ from .plugins.fusion import (
     FusionPlugin as FusionPlugin,
     StandardFusionEngine as StandardFusionEngine,
 )
+from .plugins.fusion_strategy import (
+    FusionStrategy as FusionStrategy,
+    FusionStrategyPlugin as FusionStrategyPlugin,
+    StandardDynamicsModel as StandardDynamicsModel,
+    StandardFusionStrategy as StandardFusionStrategy,
+    StandardMeasurementModel as StandardMeasurementModel,
+)
 from .plugins.inertial import (
     CommonInertial as CommonInertial,
     ExternalInertial as ExternalInertial,
