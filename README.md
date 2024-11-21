@@ -134,3 +134,23 @@ Whenever you type `rye sync` it recurses into every `pntos-*` folder and finds t
 
 Note that files that are installed via a local path are installed as [editable installs](https://setuptools.pypa.io/en/latest/userguide/development_mode.html) and are automatically updated whenever a file in that package is updated.
 
+## Generating Documentation
+
+This section assumes you have a Python environment with the necessary dependencies installed. Please
+see [Rye Environment Setup](#rye-environment-setup) or [Pip Environment Setup](#pip-environment-setup)
+for more information on how to do so.
+
+To build the documentation, you'll first need to initialize the git submodule:
+
+```shell
+git submodule update --init --recursive
+```
+
+Then, from the `docs/` directory, you can build the docs with:
+
+```shell
+make html
+```
+
+Then, in a web browser, open the outputted `docs/build/index.html` file to view the documentation
+you just generated.

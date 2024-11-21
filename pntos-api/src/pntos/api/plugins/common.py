@@ -918,16 +918,15 @@ class CommonPlugin(Protocol):
     This structure should not
     be used directly (except in the case of a utility plugin), but instead is
     composed as the first field on all of the concrete pntOS plugin structures.
-    For example, the transport plugin is specified as:
+    For example, the transport plugin is specified as::
 
-    ```
-    class TransportPlugin(CommonPlugin, Protocol):
+        class TransportPlugin(CommonPlugin, Protocol):
 
-        def init_plugin(...):
-            ...init_plugin implementation...
+            def init_plugin(...):
+                ...init_plugin implementation...
 
-        def ...other function implementations...
-    ```
+            def ...other function implementations...
+
 
     Thus this class defines a set of functions and variables that all plugins
     have. The `CommonPlugin.init_plugin` function is guaranteed to be called by

@@ -6,3 +6,4 @@ wheels/
 *.egg-info
 .venv
 .*_cache
+.DS_Store

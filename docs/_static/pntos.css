@@ -1,0 +1,18 @@
+.wy-nav-content {
+    max-width: none;
+}
+
+body, h1, h2, h3, h4, h5, h6{
+    font-family:"HK Grotesk";
+}
+
+.wy-side-nav-search, .wy-nav-side {
+    background: #040747;
+}
+
+footer {
+    background-image: url("pntOS_Branding_Elements_HexagonGroup_Blue_1.png");
+    background-position: right bottom;
+    background-size: 10%;
+    background-repeat: no-repeat;
+}
