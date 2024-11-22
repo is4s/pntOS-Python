@@ -173,13 +173,28 @@ def test(capsys):
         LoggingLevel.ERROR,
         "This is an ERROR message",
     )
-
     captured = capsys.readouterr().out
     captured_datetime = captured.split("] [")[0]
     expected_datetime = "[" + time.strftime(LoggingConfig.dt_fmt)
+    # Check for case where second rolls over between log call and expected_datetime generation. Thus, check everything but the last second:
     assert (
-        captured_datetime == expected_datetime
-    ), f"Logger datetime log failed.\nExpected: {expected_datetime}, Received: {captured_datetime}"
+        captured_datetime[0:-1] == expected_datetime[0:-1]
+    ), f"Logger datetime log failed.\nExpected: {expected_datetime}, Received: {captured_datetime}."
+    # Now check the last second to see if the roll-over case happened
+    if captured_datetime[-1] != expected_datetime[-1]:
+        # if rollover, retrying is VERY likely to fix the issue. Otherwise, we probably have a bigger issue.
+        a.log(
+            a.__class__,
+            a.identifier,
+            LoggingLevel.ERROR,
+            "This is an ERROR message",
+        )
+        captured = capsys.readouterr().out
+        captured_datetime = captured.split("] [")[0]
+        expected_datetime = "[" + time.strftime(LoggingConfig.dt_fmt)
+        assert (
+            captured_datetime == expected_datetime
+        ), f"Logger datetime log failed.\nExpected: {expected_datetime}, Received: {captured_datetime}."
 
 
 if __name__ == "__main__":
