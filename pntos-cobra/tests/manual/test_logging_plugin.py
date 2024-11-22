@@ -1,6 +1,8 @@
 import re
+import time
 
 from pntos.api.plugins.common import LoggingLevel
+from pntos.cobra.config.LoggingConfig import LoggingConfig
 from pntos.cobra.SimpleControllerPlugin import SimpleMediator
 from pntos.cobra.SimpleLoggingPlugin import SimpleLoggingPlugin
 from pntos.cobra.SimpleRegistryPlugin import SimpleRegistry
@@ -162,6 +164,22 @@ def test(capsys):
         "Logger failed to log global_logging_level=ERROR correctly. "
         + f"Expected:\n{expected}\nReceived:\n{captured}"
     )
+
+    # Test date/time output of logger
+    a.colorize = False
+    a.log(
+        a.__class__,
+        a.identifier,
+        LoggingLevel.ERROR,
+        "This is an ERROR message",
+    )
+
+    captured = capsys.readouterr().out
+    captured_datetime = captured.split("] [")[0]
+    expected_datetime = "[" + time.strftime(LoggingConfig.dt_fmt)
+    assert (
+        captured_datetime == expected_datetime
+    ), f"Logger datetime log failed.\nExpected: {expected_datetime}, Received: {captured_datetime}"
 
 
 if __name__ == "__main__":
