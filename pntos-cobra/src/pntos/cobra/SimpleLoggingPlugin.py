@@ -42,9 +42,7 @@ class SimpleLoggingPlugin(LoggingPlugin):
             config = mediator.registry.batch_start(LoggingConfig.config_group)
             if config.has_key(LoggingConfig.colorize_key):
                 self.colorize
-                config_colorize = config.get_value(
-                    LoggingConfig.colorize_key, bool
-                )
+                config_colorize = config.get_value(LoggingConfig.colorize_key, bool)
                 if config_colorize is not None:
                     self.colorize = config_colorize
             if config.has_key(LoggingConfig.global_log_level_key):

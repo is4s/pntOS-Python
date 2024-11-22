@@ -16,12 +16,8 @@ expected_results: dict[LoggingLevel, str] = {
 
 
 def call(a: SimpleLoggingPlugin):
-    a.log(
-        a.__class__, a.identifier, LoggingLevel.INFO, "This is an INFO message"
-    )
-    a.log(
-        a.__class__, a.identifier, LoggingLevel.DEBUG, "This is a DEBUG message"
-    )
+    a.log(a.__class__, a.identifier, LoggingLevel.INFO, "This is an INFO message")
+    a.log(a.__class__, a.identifier, LoggingLevel.DEBUG, "This is a DEBUG message")
     a.log(
         a.__class__,
         a.identifier,
@@ -115,9 +111,7 @@ def test(capsys):
     # Removes all integer values from strings so that mismatched timestamps aren't an issue.
     str_1 = re.sub(r"\d", "", captured.out)
     str_2 = re.sub(r"\d", "", test_str_1)
-    assert (
-        str_1 == str_2
-    ), f"Config read failed. \nExpected:\n{str_2}Received:\n{str_1}"
+    assert str_1 == str_2, f"Config read failed. \nExpected:\n{str_2}Received:\n{str_1}"
 
     # Now test all colorized and non-colorized logging levels
 
