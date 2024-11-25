@@ -3,6 +3,7 @@ from typing import Optional
 
 from pntos.api.plugins.common import LoggingLevel, Mediator
 from pntos.api.plugins.logging import LoggingPlugin
+from pntos.cobra.config.LoggingConfig import LoggingConfig
 
 global_global_log_level = LoggingLevel.INFO
 
@@ -26,12 +27,8 @@ class fmts:
 
 
 class SimpleLoggingPlugin(LoggingPlugin):
-    config_group: str = "config/logging/all"
-    colorize_key: str = "force_colorize"
-    global_log_level_key: str = "default_log_level"
-    global_log_level: LoggingLevel = LoggingLevel.INFO
+    global_log_level: LoggingLevel = LoggingConfig.global_log_level
     colorize: bool = False
-    dt_fmt: str = "%d/%m/%Y %H:%M:%S"  # date-time format
 
     def __init__(self, identifier: str):
         self.identifier = identifier
@@ -42,14 +39,16 @@ class SimpleLoggingPlugin(LoggingPlugin):
         mediator: Optional[Mediator] = None,
     ):
         if mediator:
-            config = mediator.registry.batch_start(self.config_group)
-            if config.has_key(self.colorize_key):
+            config = mediator.registry.batch_start(LoggingConfig.config_group)
+            if config.has_key(LoggingConfig.colorize_key):
                 self.colorize
-                config_colorize = config.get_value(self.colorize_key, bool)
+                config_colorize = config.get_value(LoggingConfig.colorize_key, bool)
                 if config_colorize is not None:
                     self.colorize = config_colorize
-            if config.has_key(self.global_log_level_key):
-                global_log_level_temp = config.get_value(self.global_log_level_key, str)
+            if config.has_key(LoggingConfig.global_log_level_key):
+                global_log_level_temp = config.get_value(
+                    LoggingConfig.global_log_level_key, str
+                )
                 if global_log_level_temp is not None:
                     match global_log_level_temp:
                         case "error":
@@ -177,10 +176,15 @@ class SimpleLoggingPlugin(LoggingPlugin):
     def output_time(self):
         if self.colorize:
             print(
-                fmts.LTGRAY + "[" + time.strftime(self.dt_fmt) + "]" + fmts.ENDC, end=""
+                fmts.LTGRAY
+                + "["
+                + time.strftime(LoggingConfig.dt_fmt)
+                + "]"
+                + fmts.ENDC,
+                end="",
             )
         else:
-            print("[" + time.strftime(self.dt_fmt) + "]", end="")
+            print("[" + time.strftime(LoggingConfig.dt_fmt) + "]", end="")
 
     def output_plugin_id(self, plugin_id: str):
         if self.colorize:
