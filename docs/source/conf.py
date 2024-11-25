@@ -38,6 +38,8 @@ autodoc_default_options = {
     "show-inheritance": True,
 }
 autodoc_preserve_defaults = True
+autodoc_typehints = "none"
+autodoc_typehints_description_target = "documented"
 
 templates_path = ["_templates"]
 exclude_patterns = []
