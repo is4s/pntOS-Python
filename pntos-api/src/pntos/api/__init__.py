@@ -10,11 +10,9 @@ from .plugins.common import (
     LoggingLevel as LoggingLevel,
     Mediator as Mediator,
     Message as Message,
-    NDArray as NDArray,
     PluginTypes as PluginTypes,
     Registry as Registry,
     RegistryValueTypes as RegistryValueTypes,
-    float64 as float64,
 )
 from .plugins.controller import ControllerPlugin as ControllerPlugin
 from .plugins.fusion import (
@@ -53,11 +51,22 @@ from .plugins.initialization import (
     InitializationType as InitializationType,
 )
 from .plugins.logging import LoggingPlugin as LoggingPlugin
-from .plugins.orchestration import OrchestrationPlugin as OrchestrationPlugin
+from .plugins.orchestration import (
+    MessageStreamConfig as MessageStreamConfig,
+    OrchestrationPlugin as OrchestrationPlugin,
+)
 from .plugins.platform_integration import (
     PlatformIntegrationPlugin as PlatformIntegrationPlugin,
 )
-from .plugins.preprocessor import PreprocessorPlugin as PreprocessorPlugin
+from .plugins.preprocessor import (
+    Preprocessor as Preprocessor,
+    PreprocessorPlugin as PreprocessorPlugin,
+)
 from .plugins.registry import RegistryPlugin as RegistryPlugin
+from .plugins.state_modeling import (
+    StandardMeasurementProcessor as StandardMeasurementProcessor,
+    StandardStateBlock as StandardStateBlock,
+    VirtualStateBlock as VirtualStateBlock,
+)
 from .plugins.transport import TransportPlugin as TransportPlugin
 from .plugins.ui import UiPlugin as UiPlugin

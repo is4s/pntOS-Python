@@ -1,15 +1,16 @@
 from typing import Any, Callable, Dict, List, Optional
 
+from numpy import float64
+from numpy.typing import NDArray
+
 from pntos.api import (
     KeyValueStore,
     KeyValueStoreDataFormat,
     Mediator,
     Message,
-    NDArray,
     Registry,
     RegistryPlugin,
     RegistryValueTypes,
-    float64,
 )
 
 
