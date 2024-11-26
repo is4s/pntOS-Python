@@ -70,29 +70,17 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
     change at any time.
     """
 
-    def set_time(self, time: TypeTimestamp) -> None:
-        """Set the current time of the filter to the parameter."""
+    @property
+    def time(self) -> TypeTimestamp:
+        """The current time of the filter."""
         pass
 
-    def get_time(self) -> TypeTimestamp:
-        """Get the current time of the filter."""
-        pass
-
-    def set_strategy(self, strategy: StandardFusionStrategy) -> None:
+    @property
+    def strategy(self) -> StandardFusionStrategy | None:
         """
-        Set the underlying algorithm used for Bayesian inference.
+        The underlying algorithm used for Bayesian inference.
 
         The fusion strategy is the type of filter (EKF, UKF, etc.).
-        """
-        pass
-
-    def get_strategy(self) -> StandardFusionStrategy | None:
-        """
-        @return The underlying algorithm used for Bayesian inference.
-
-        The fusion strategy is the type of filter (EKF, UKF, etc.). Returns None if this fusion
-        engine does not have a strategy. If that is the case, the fusion engine must be provided
-        with a strategy via #set_strategy.
         """
         pass
 
