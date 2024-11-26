@@ -1,5 +1,5 @@
 from threading import Thread
-from typing import Optional, Protocol
+from typing import Protocol
 
 import numpy as np
 from aspn23 import (
@@ -132,7 +132,7 @@ class Aspn2LcmTransportPlugin(CommonPlugin, Protocol):
 
         self.mediator.log_message(LoggingLevel.INFO, "LCM transport stopped")
 
-    def broadcast_message(self, message: Message, channel_name: Optional[str] = None):
+    def broadcast_message(self, message: Message, channel_name: str | None = None):
         """Send a message over LCM to a specific channel"""
         if isinstance(message.wrapped_message, MeasurementPVA):
             translated = positionvelocityattitude()

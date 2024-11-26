@@ -1,6 +1,6 @@
 """Python API of pntOS."""
 
-from typing import List, Optional, Protocol
+from typing import List, Protocol
 
 from aspn23 import TypeTimestamp
 
@@ -22,7 +22,7 @@ class MessageStreamConfig(Protocol):
     """
 
     def sequenced_stream_add(
-        self, type: type, source_identifier: Optional[str] = None
+        self, type: type, source_identifier: str | None = None
     ) -> None:
         """
         Request messages are streamed in sorted timestamp ordering.
@@ -33,7 +33,7 @@ class MessageStreamConfig(Protocol):
         pass
 
     def sequenced_stream_remove(
-        self, type: type, source_identifier: Optional[str] = None
+        self, type: type, source_identifier: str | None = None
     ) -> None:
         """
         Request messages are no longer streamed in sorted timestamp ordering.
@@ -57,7 +57,7 @@ class MessageStreamConfig(Protocol):
         pass
 
     def immediate_stream_add(
-        self, type: type, source_identifier: Optional[str] = None
+        self, type: type, source_identifier: str | None = None
     ) -> None:
         """
         Request messages are streamed immediately.
@@ -69,7 +69,7 @@ class MessageStreamConfig(Protocol):
         pass
 
     def immediate_stream_remove(
-        self, type: type, source_identifier: Optional[str] = None
+        self, type: type, source_identifier: str | None = None
     ) -> None:
         """
         Request messages are no longer streamed immediately.
@@ -190,7 +190,7 @@ class OrchestrationPlugin(CommonPlugin, Protocol):
     def request_solutions(
         self,
         solution_times: List[TypeTimestamp],
-        filter_description: Optional[str] = None,
+        filter_description: str | None = None,
     ) -> List[Message]:
         """
         Request filtering solutions at the times specified in the array `solution_times`.

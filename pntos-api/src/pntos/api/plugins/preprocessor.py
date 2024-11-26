@@ -1,6 +1,6 @@
 """Python API of pntOS."""
 
-from typing import List, Optional, Protocol
+from typing import List, Protocol
 
 from pntos.api import CommonPlugin, Message
 
@@ -50,7 +50,7 @@ class PreprocessorPlugin(CommonPlugin, Protocol):
     """
 
     def new_preprocessor(
-        self, preprocessor_index: int, config_group: Optional[str] = None
+        self, preprocessor_index: int, config_group: str | None = None
     ) -> Preprocessor:
         """
         Returns a newly created `Preprocessor`.

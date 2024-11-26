@@ -1,6 +1,6 @@
 """Python API of pntOS."""
 
-from typing import List, Optional, Protocol
+from typing import List, Protocol
 
 from pntos.api import CommonPlugin
 
@@ -21,8 +21,8 @@ class PlatformIntegrationPlugin(CommonPlugin, Protocol):
     def take_control(
         self,
         plugins: List[CommonPlugin],
-        plugin_resources_locations: Optional[List[Optional[str]]] = None,
-        initial_config: Optional[str] = None,
+        plugin_resources_locations: List[str | None] | None = None,
+        initial_config: str | None = None,
     ) -> None:
         """
         Takes over secondary control of the daemon from the controller.

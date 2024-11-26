@@ -1,6 +1,6 @@
 """Python API of pntOS."""
 
-from typing import Optional, Protocol
+from typing import Protocol
 
 from pntos.api import CommonPlugin, Registry
 
@@ -13,7 +13,7 @@ class RegistryPlugin(CommonPlugin, Protocol):
     the `Internals` section for more information on the goal of this plugin.
     """
 
-    def new_registry(self, initial_config: Optional[str] = None) -> Registry:
+    def new_registry(self, initial_config: str | None = None) -> Registry:
         """
         Create a new registry.
 

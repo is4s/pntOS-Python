@@ -1,5 +1,4 @@
 import time
-from typing import Optional
 
 from pntos.api.plugins.common import LoggingLevel, Mediator
 from pntos.api.plugins.logging import LoggingPlugin
@@ -35,8 +34,8 @@ class SimpleLoggingPlugin(LoggingPlugin):
 
     def init_plugin(
         self,
-        plugin_resources_location: Optional[str] = None,
-        mediator: Optional[Mediator] = None,
+        plugin_resources_location: str | None = None,
+        mediator: Mediator | None = None,
     ):
         if mediator:
             config = mediator.registry.batch_start(LoggingConfig.config_group)
