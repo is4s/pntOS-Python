@@ -9,6 +9,7 @@ from .conversions import (
     convert_imu_to_cpp as convert_imu_to_cpp,
     convert_imu_type_from_cpp as convert_imu_type_from_cpp,
     convert_imu_type_to_cpp as convert_imu_type_to_cpp,
+    convert_message as convert_message,
     convert_pva_from_cpp as convert_pva_from_cpp,
     convert_pva_to_cpp as convert_pva_to_cpp,
     convert_timestamp_from_cpp as convert_timestamp_from_cpp,

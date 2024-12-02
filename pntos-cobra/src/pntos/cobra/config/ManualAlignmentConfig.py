@@ -4,7 +4,7 @@ from .BaseConfig import BaseConfig
 
 
 @dataclass
-class AlignmentConfig(BaseConfig):
+class ManualAlignmentConfig(BaseConfig):
     group: str
 
     initial_pos: tuple[float, float, float]

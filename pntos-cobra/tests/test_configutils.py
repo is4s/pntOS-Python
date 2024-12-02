@@ -6,10 +6,10 @@ from aspn23 import TypeTimestamp
 from pntos.api import LoggingLevel, Mediator, Message
 from pntos.cobra import SimpleRegistryPlugin
 from pntos.cobra.config import (
-    AlignmentConfig,
     BaseConfig,
     DownsamplerConfig,
     ImuConfig,
+    ManualAlignmentConfig,
     SensorConfig,
     config_from_registry,
     config_to_registry,
@@ -55,8 +55,8 @@ class TestConfigUtils(unittest.TestCase):
 
         super().__init__(name)
 
-    def test_AlignmentConfig_to_and_from_registry(self) -> None:
-        test_conf = AlignmentConfig(
+    def test_ManualAlignmentConfig_to_and_from_registry(self) -> None:
+        test_conf = ManualAlignmentConfig(
             CONFIG_TEST_GROUP,
             (1, 2, 3),
             (4, 5, 6),
@@ -81,7 +81,7 @@ class TestConfigUtils(unittest.TestCase):
 
         # Test config_from_registry()
         result_conf = config_from_registry(
-            AlignmentConfig, self.mediator, CONFIG_TEST_GROUP
+            ManualAlignmentConfig, self.mediator, CONFIG_TEST_GROUP
         )
         assert result_conf is not None
 

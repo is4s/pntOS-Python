@@ -24,7 +24,7 @@ from pntos.api import (
 from pntos.cobra.config import (
     config_from_registry,
 )
-from pntos.cobra.config.AlignmentConfig import AlignmentConfig
+from pntos.cobra.config.ManualAlignmentConfig import ManualAlignmentConfig
 
 
 class SimpleInitialization(InertialInitializationStrategy):
@@ -38,7 +38,7 @@ class SimpleInitialization(InertialInitializationStrategy):
     def __init__(self, config_group: str, mediator: Mediator):
         self.config_group = config_group
         self.mediator = mediator
-        config = config_from_registry(AlignmentConfig, mediator, config_group)
+        config = config_from_registry(ManualAlignmentConfig, mediator, config_group)
         if config is None:
             self.mediator.log_message(
                 LoggingLevel.ERROR,
@@ -80,7 +80,7 @@ class SimpleInitialization(InertialInitializationStrategy):
         )
 
     def _create_pva(
-        self, config: AlignmentConfig
+        self, config: ManualAlignmentConfig
     ) -> MeasurementPositionVelocityAttitude:
         header = TypeHeader(
             0,
@@ -117,7 +117,9 @@ class SimpleInitialization(InertialInitializationStrategy):
             integrity=[],
         )
 
-    def _create_imu_errors(self, config: AlignmentConfig) -> StandardInertialErrors:
+    def _create_imu_errors(
+        self, config: ManualAlignmentConfig
+    ) -> StandardInertialErrors:
         return StandardInertialErrors(
             accel_biases=np.array(config.initial_accel_bias),
             gyro_biases=np.array(config.initial_gyro_bias),
