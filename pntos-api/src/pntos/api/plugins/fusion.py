@@ -36,18 +36,16 @@ class CrossCovariances:
     `block_labels` would be an array of 2 strings `B` and `C`, and `cross_covariances` would be a an
     array of two matrices: The cross-covariance matrix of `A` and `B` and the cross-covariance
     matrix of `A` and `C`.
+
+    Attributes:
+        block_labels (List[str]): A list of labels of the `StandardStateBlock`s this structure 
+            contains the cross-covariances for.
+        cross_covariances (List[NDArray]): A list of cross-covariance matrices between a single
+            StateBlock and the set of StateBlocks listed in #block_labels.
     """
 
     block_labels: List[str]
-    """
-    A list of labels of the `StandardStateBlock`s this structure contains the cross-covariances for.
-    """
-
     cross_covariances: List[NDArray]
-    """
-    A list of cross-covariance matrices between a single StateBlock and the set of StateBlocks
-    listed in #block_labels.
-    """
 
 
 class StandardFusionEngine(CommonFusionEngine, Protocol):

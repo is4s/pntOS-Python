@@ -40,16 +40,15 @@ class PreprocessorPlugin(CommonPlugin, Protocol):
          **Unstable**: This feature is unstable and is not yet considered part of the stable pntOS
          API. Usage of this feature is highly discouraged in non-experimental code, and its
          definition may change at any time.
+
+    Attributes:
+        preprocessor_identifiers (List[str]): A list of identifying strings for each kind of
+            `Preprocessor` that this `PreprocessorPlugin` can create instances of. The 
+            `preprocessor_index` parameter of `new_preprocessor` is an index into this
+            array.
     """
 
     preprocessor_identifiers: List[str]
-    """
-    A list of identifying strings for each kind of `Preprocessor` that this
-    `PreprocessorPlugin` can create instances of.
-    
-    The `preprocessor_index` parameter of `new_preprocessor` is an index into
-    this array.
-    """
 
     def new_preprocessor(
         self, preprocessor_index: int, config_group: str | None = None

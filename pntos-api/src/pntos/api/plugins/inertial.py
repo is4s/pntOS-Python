@@ -39,16 +39,16 @@ class InertialForcesRates:
         **Unstable**: This feature is unstable and is not yet considered part of the stable pntOS
         API. Usage of this feature is highly discouraged in non-experimental code, and its
         definition may change at any time.
+
+    Attributes:
+        forces_and_rates (MeasurementImu): An ASPN IMU message which has been repurposed to hold 
+            specific forces (the meas_accel field) and rotation rates (the meas_gyro field) in a 
+            different frame (see #frame).
+        frame (InertialFrame): Specifies the frame of the above forces and rates.
     """
 
     forces_and_rates: MeasurementImu
-    """
-    An ASPN IMU message which has been repurposed to hold specific forces (the meas_accel field)
-	and rotation rates (the meas_gyro field) in a different frame (see #frame).
-    """
-
     frame: InertialFrame
-    """Specifies the frame of the above forces and rates."""
 
 
 @dataclass
@@ -60,31 +60,22 @@ class StandardInertialErrors:
         **Unstable**: This feature is unstable and is not yet considered part of the stable pntOS
         API. Usage of this feature is highly discouraged in non-experimental code, and its
         definition may change at any time.
+
+    Attributes:
+        accel_biases (NDArray): A 1D vector of length 3 containing biases for a 3-axis accelerometer
+            in the sensor's (X-Y-Z) frame, expressed in m/s^2.
+        gyro_biases (NDArray): A 1D vector of length 3 containing biases for a 3-axis gyro in the
+            sensor's (X-Y-Z) frame, expressed in rad/s.
+        accel_scale_factors (NDArray): A 1D vector of length 3 containing scale factor errors for a
+            3-axis accelerometer in the sensor's (X-Y-Z) frame, unitless.
+        gyro_scale_factors (NDArray): A 1D vector of length 3 containing scale factor errors for a
+            3-axis gyroscope in the sensor's (X-Y-Z) frame, unitless.
     """
 
     accel_biases: NDArray
-    """
-    A 1D vector of length 3 containing biases for a 3-axis accelerometer in the sensor's (X-Y-Z)
-    frame, expressed in m/s^2.
-    """
-
     gyro_biases: NDArray
-    """"
-    A 1D vector of length 3 containing biases for a 3-axis gyro in the sensor's (X-Y-Z) frame,
-    expressed in rad/s.
-    """
-
     accel_scale_factors: NDArray
-    """"
-    A 1D vector of length 3 containing scale factor errors for a 3-axis accelerometer in the
-    sensor's (X-Y-Z) frame, unitless.
-    """
-
     gyro_scale_factors: NDArray
-    """"
-    A 1D vector of length 3 containing scale factor errors for a 3-axis gyroscope in the
-    sensor's (X-Y-Z) frame, unitless.
-    """
 
 
 class InertialSolutionRangeType(Enum):

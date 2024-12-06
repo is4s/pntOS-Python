@@ -94,6 +94,14 @@ class InitialInertialSolution:
 
     Coupling these avoids time-of-check to time-of-use (TOCTOU) issues.
 
+    Attributes:
+        solution (Message | None): The initial solution.
+        inertial_errors (StandardInertialErrors | None): The inertial errors.
+        inertial_error_covariance (NDArray | None): The covariance matrix associated with the terms
+            in #inertial_errors.
+        status (InitializationStatus): Indicates the current initialization status. Should be
+            checked before using any of the other fields.
+
     Caution:
         **Unstable**: This feature is unstable and is not yet considered part of the stable pntOS
         API. Usage of this feature is highly discouraged in non-experimental code, and its
@@ -101,20 +109,9 @@ class InitialInertialSolution:
     """
 
     solution: Message | None
-    """The initial solution"""
-
     inertial_errors: StandardInertialErrors | None
-    """The inertial errors"""
-
     inertial_error_covariance: NDArray | None
-    """The covariance matrix associated with the terms in #inertial_errors."""
-
     status: InitializationStatus
-    """
-    Indicates the current initialization status. 
-    
-    Should be checked before using any of the other fields.
-    """
 
 
 class InertialInitializationStrategy(CommonInitializationStrategy, Protocol):
@@ -139,6 +136,14 @@ class InitialEstimateWithCovariance:
 
     Coupling these avoids time-of-check to time-of-use (TOCTOU) issues.
 
+    Attributes:
+        time (TypeTimestamp): The time at which #estimate_with_covariance is valid.
+        estimate_with_covariance (EstimateWithCovariance | None): The current estimate of the
+            initial solution. Check #status for its validity (can be None if #status is anything 
+            other than INITIALIZED_GOOD).
+        status (InitializationStatus): Indicates the current initialization status. Should be
+            checked before using estimate_with_covariance().
+
     Caution:
         **Unstable**: This feature is unstable and is not yet considered part of the stable pntOS
         API. Usage of this feature is highly discouraged in non-experimental code, and its
@@ -146,21 +151,8 @@ class InitialEstimateWithCovariance:
     """
 
     time: TypeTimestamp
-    """The time at which #estimate_with_covariance is valid."""
-
     estimate_with_covariance: EstimateWithCovariance | None
-    """
-    The current estimate of the initial solution. 
-    
-    Check #status for its validity (can be None if #status is anything other than INITIALIZED_GOOD).
-    """
-
     status: InitializationStatus
-    """
-    Indicates the current initialization status.
-    
-    Should be checked before using estimate_with_covariance().
-    """
 
 
 class EwcInitializationStrategy(CommonInitializationStrategy):

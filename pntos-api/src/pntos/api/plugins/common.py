@@ -18,22 +18,19 @@ class Message:
     of the former type, the wrapped message's `message_type` field should be used
     directly. For message of the latter type, cast the wrapped message's message_type
     field to `MessageType`.
+
+    Attributes:
+        wrapped_message (AspnBase): Either an ASPN message or a pntOS ASPN Extension message, 
+        depending on the value of `wrapped_message.message_type`..
+        source_identifier (str): Indicates where this message came from. If the message originated
+            from a transport plugin and the underlying transport has the concept of a
+            channel or topic, this field should be populated by the channel or topic. Otherwise, the
+            identifier is populated in a plugin-specific manner by the originating plugin that
+            created the message.
     """
 
     wrapped_message: AspnBase
-    """
-    Either an ASPN message or a pntOS ASPN Extension message, depending on the 
-    value of `wrapped_message.message_type`.
-    """
-
     source_identifier: str
-    """
-    Indicates where this message came from. If the message originated from a 
-    transport plugin and the underlying transport has the concept of a channel 
-    or topic, this field should be populated by the channel or topic. 
-    Otherwise, the identifier is populated in a plugin-specific manner by the
-    originating plugin that created the message.
-    """
 
 
 class EstimateWithCovarianceType(Enum):
@@ -61,24 +58,20 @@ class EstimateWithCovarianceType(Enum):
 
 @dataclass
 class EstimateWithCovariance:
-    """A container for holding an estimate and covariance."""
+    """
+    A container for holding an estimate and covariance.
+
+    Attributes:
+        type (EstimateWithCovarianceType): Describes how the fields in this struct are used.
+        estimate (NDArray): An array of doubles representing an estimate vector. Usage depends on
+            the `type` field.
+        covariance (NDArray): An array of doubles representing a square covariance matrix. Data is
+            stored in row major form. Usage depends on the `type` field.
+    """
 
     type: EstimateWithCovarianceType
-    """ 
-    Describes how the fields in this struct are used. 
-    """
-
     estimate: NDArray
-    """ 
-    An array of doubles representing an estimate vector. Usage depends on the 
-    `type` field.
-    """
-
     covariance: NDArray
-    """
-    An array of doubles representing a square covariance matrix. Data is 
-    stored in row major form. Usage depends on the `type` field.
-    """
 
 
 class FusionType(Enum):
@@ -230,6 +223,10 @@ class KeyValueStore(Protocol):
     ephemerally in memory or permanently in persistent storage). In general, it
     is only valid to call the getters/setters on a `KeyValueStore` during a
     batch operation. See `Registry` for more information.
+
+    Attributes:
+        data_format (KeyValueStoreDataFormat): The data format that is used by the #set_raw and 
+        #get_raw methods.
     """
 
     def get_key_array(self) -> List[str]:
@@ -456,9 +453,6 @@ class KeyValueStore(Protocol):
         pass
 
     data_format: KeyValueStoreDataFormat
-    """
-    The data format that is used by the #set_raw and #get_raw methods.
-    """
 
 
 class Registry(Protocol):
@@ -696,6 +690,10 @@ class CommonPlugin(Protocol):
     for implementing all fields on the `TransportPlugin` class. Thus, the
     fields of the `CommonPlugin` nested on the `TransportPlugin` are
     implemented by the plugin writer.
+
+    Attributes:
+        identifier (str): A string identifier uniquely identifying this plugin. This string will be
+            used to determine the unique space this plugin receives in the system config.
     """
 
     def init_plugin(
@@ -757,8 +755,3 @@ class CommonPlugin(Protocol):
         pass
 
     identifier: str
-    """
-    A string identifier uniquely identifying this plugin. This string will be 
-    used to determine the unique space this plugin receives in the system 
-    config.
-    """
