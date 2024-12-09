@@ -9,15 +9,14 @@ class ControllerPlugin(CommonPlugin, Protocol):
     """
     Controller plugin.
 
-    An implementation of a primary controller in charge of defining the
-    behavior of pntosd and the usage of all other pntOS plugins.
+    An implementation of a primary controller in charge of defining the usage of all other pntOS
+    plugins.
 
-    In ordinary operation, `pntosd`'s entry point will be a main function inside the loader. The
-    loader is responsible for constructing a list of available plugins, initializing a controller
-    plugin, and then calling :meth:`ControllerPlugin.take_control` on the controller plugin, passing
-    in a list of ``plugins`` that it found on the system.
+    In ordinary operation, an app will import plugins, initializing a controller plugin, and then
+    calling :meth:`ControllerPlugin.take_control` on the controller plugin, passing in a list of
+    ``plugins`` that it imported.
 
-    From that point forward, the controller is responsible for all activity in the daemon. It may
+    From that point forward, the controller is responsible for all activity. It may 
     use any or none of the plugins in the ``plugins`` list as desired. In general, it may do
     anything it wants, within the following guidelines:
 
@@ -28,15 +27,14 @@ class ControllerPlugin(CommonPlugin, Protocol):
       to using any other functionality on that plugin. The controller must pass a :class:`Mediator`
       that the plugin may use to communicate back to the controller. This callback design allows the
       controller to abstract away the concurrency model - in particular, a callback function may be
-      anything from a direct invocation of a C function to a shim that utilizes IPC channels to
+      anything from a direct invocation of a Python function to a shim that utilizes IPC channels to
       communicate to process-separated or machine-separated plugins.
 
-    Outside of these requirements, the controller defines any and all I/O it
-    supports, which pntOS plugins are loaded / used, and the type of fusion
-    being done. The controller can be hard-coded to support only a specific
-    sensor configuration or written generically to support arbitrary run-time
-    environment sensing. Outside of some initialization in the loader, the
-    controller is the conceptual "main" function of pntosd.
+    Outside of these requirements, the controller defines any and all I/O it supports, which pntOS
+    plugins are loaded / used, and the type of fusion being done. The controller can be hard-coded
+    to support only a specific sensor configuration or written generically to support arbitrary
+    run-time environment sensing. Outside of some initialization in the app, the controller is the
+    conceptual "main" function.
 
     When the controller is provided a :class:`PlatformIntegrationPlugin` as one of the plugins in
     the ``plugins`` list passed to :meth:`take_control`, that indicates to the controller that
@@ -71,9 +69,9 @@ class ControllerPlugin(CommonPlugin, Protocol):
         initial_config: str | None = None,
     ) -> None:
         """
-        Takes over primary control of the daemon from the loader.
+        Takes over primary control of the program from the app.
 
-        Takes over primary control of the daemon from the loader, using the ``plugins`` to process
+        Takes over primary control of the program from the app, using the ``plugins`` to process
         data, generate fused estimates, and ultimately produce and output PNT solutions.
         :meth:`take_control` must use the plugins passed to it and construct a full pntOS system.
         Please see the description of the :class:`PlatformIntegrationPlugin` (PIP) for a description
@@ -81,11 +79,10 @@ class ControllerPlugin(CommonPlugin, Protocol):
         :meth:`PlatformIntegrationPlugin.take_control` method (if a PIP is in the ``plugins`` list).
 
         Args:
-            plugins (List[CommonPlugin]): A pointer to an array of pointers to plugins available to
-                the controller`.
+            plugins (List[CommonPlugin]): An array of plugins available to the controller`.
             plugin_resources_locations (List[str  |  None] | None, optional): A list of strings
                 which represent a list of locations, one for each plugin in ``plugins``, where those
-                plugins may find auxiliary data if needed. The array pointer can be ``None``,
+                plugins may find auxiliary data if needed. The array can be ``None``, 
                 otherwise the array is of the same length as ``plugins``. Each string may be
                 ``None``, filesystem paths, or adhere to some scheme, such as the URI scheme, for
                 defining the resource's location.

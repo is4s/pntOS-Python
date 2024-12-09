@@ -13,15 +13,11 @@ class Message:
     """
     A container for an ASPN message.
 
-    This container may contain either proper ASPN messages which are part of the ASPN
-    data model, or extension messages specific to pntOS which augment ASPN. For messages
-    of the former type, the wrapped message's `message_type` field should be used
-    directly. For message of the latter type, cast the wrapped message's message_type
-    field to `MessageType`.
+    This container may contain either proper ASPN messages which are part of the ASPN data model, or
+    extension messages specific to pntOS which augment ASPN.
 
     Attributes:
-        wrapped_message (AspnBase): Either an ASPN message or a pntOS ASPN Extension message, 
-        depending on the value of `wrapped_message.message_type`..
+        wrapped_message (AspnBase): Either an ASPN message or a pntOS ASPN Extension message.
         source_identifier (str): Indicates where this message came from. If the message originated
             from a :class:`TransportPlugin` and the underlying transport has the concept of a
             channel or topic, this field should be populated by the channel or topic. Otherwise, the
@@ -402,13 +398,6 @@ class KeyValueStore(Protocol):
             and return, leaving the processing of the updates to another context or thread when
             possible. Calling :class:`Mediator` within the callback may be disallowed by the
             controller implementation and lead to undefined behavior.
-            
-        NOTE: This method will retain the receiver beyond the lifetime of the
-        function call, as the purpose of that parameter is to pass it back
-        later in the callback. However, the `KeyValueStore` will never
-        dereference the pointer, and thus it is safe to pass in a receiver that
-        does not survive longer than the lifetime of the function call, as long
-        as the callback checks for validity of the receiver before using it.
 
         Args:
             key (str | None)
@@ -557,12 +546,6 @@ class Registry(Protocol):
             bool: ``True`` if the notifier was successfully registered, and ``False`` if the 
             registry is unable to notify the requester. The callback will receive the same receiver
             as was passed into this method, which may be used as a context object.
-        NOTE: This method will retain the receiver beyond the lifetime of the
-        function call, as the purpose of that parameter is to pass it back
-        later in the callback. However, the method will never dereference the
-        receiver pointer, and thus it is safe to pass in a receiver that does
-        not survive longer than the lifetime of the function call, as long as
-        the callback checks for validity of the receiver before using it.
         """
         pass
 
@@ -626,6 +609,7 @@ class Mediator(Protocol):
         Returns:
             List[str]: A list of strings describing the solutions available. 
         """
+        # TODO AspnMessageType doesn't exist.
         pass
 
     def request_solutions(
@@ -751,7 +735,7 @@ class CommonPlugin(Protocol):
         A function that will be called by pntOS once and only once when it first initializes the
         plugin before any other functions on the plugin are called. Here the plugin may do dynamic
         runtime initialization of its members, and is given the full path to the location of a data
-        folder specific to the plugin, in case it needs to acquire additional files. A pointer to an
+        folder specific to the plugin, in case it needs to acquire additional files. An
         instance of :class:`Mediator` will be passed which the plugin should save off for later use.
         Whenever the plugin needs to make a request of pntOS, it should use one of the fields in the
         :class:`Mediator` instance received by the plugin in this function call.

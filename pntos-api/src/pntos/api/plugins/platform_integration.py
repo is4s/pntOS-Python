@@ -26,7 +26,7 @@ class PlatformIntegrationPlugin(CommonPlugin, Protocol):
         initial_config: str | None = None,
     ) -> None:
         """
-        Takes over secondary control of the daemon from the :class:`ControllerPlugin`.
+        Takes over secondary control from the :class:`ControllerPlugin`.
 
         When pntOS first boots, it passes control over to the :class:`ControllerPlugin`. After the
         :class:`ControllerPlugin` has initialized the plugins it wants to run, it calls this

@@ -34,6 +34,7 @@ class MessageStreamConfig(Protocol):
             type (type)
             source_identifier (str | None, optional)
         """
+        # TODO MessageType does not exist yet.
         pass
 
     def sequenced_stream_remove(
@@ -51,6 +52,7 @@ class MessageStreamConfig(Protocol):
             type (type)
             source_identifier (str | None, optional)
         """
+        # TODO MessageType does not exist yet.
         pass
 
     def sequenced_stream_all(self, enable: bool) -> None:
@@ -78,6 +80,7 @@ class MessageStreamConfig(Protocol):
             type (type)
             source_identifier (str | None, optional)
         """
+        # TODO MessageType does not exist yet.
         pass
 
     def immediate_stream_remove(
@@ -95,6 +98,7 @@ class MessageStreamConfig(Protocol):
             type (type)
             source_identifier (str | None, optional)
         """
+        # TODO MessageType does not exist yet.
         pass
 
     def immediate_stream_all(self, enable: bool) -> None:
@@ -208,6 +212,7 @@ class OrchestrationPlugin(CommonPlugin, Protocol):
             List[str]: A list of strings describing the filters available in this
             :class:`OrchestrationPlugin`.
         """
+        # TODO AspnMessageType doesn't exist.
         pass
 
     def request_solutions(
