@@ -137,13 +137,12 @@ class StandardFusionStrategy(FusionStrategy, Protocol):
         and the added states will be set to zeroes.
 
         Args:
-            initial_estimate (NDArray): The initial estimate to populate the new
-              states with.
-            initial_covariance (NDArray): The initial covariance matrix used to
-              initialize the uncertainty of the new states.
-            cross_covariance (NDArray | None): A covariance matrix that
-              describes the cross terms between the new states and all previous
-              states. If `None`, the cross-terms will be set to zero.
+            initial_estimate (NDArray): The initial estimate to populate the new states with.
+            initial_covariance (NDArray): The initial covariance matrix used to initialize the 
+                uncertainty of the new states.
+            cross_covariance (NDArray | None): A covariance matrix that describes the cross terms 
+                between the new states and all previous states. If `None`, the cross-terms will be
+                set to zero.
 
         Returns:
             int: Number of stats being added to this filter.
@@ -187,8 +186,7 @@ class StandardFusionStrategy(FusionStrategy, Protocol):
         `new_estimate`.
 
         Args:
-            new_estimate (NDArray): The new estimate values that will overwrite
-              the previous values.
+            new_estimate (NDArray): The new estimate values that will overwrite the previous values.
             first_index (int): The index of the first state to overwrite.
         """
         ...
@@ -226,8 +224,8 @@ class StandardFusionStrategy(FusionStrategy, Protocol):
         equal to the size of `new_covariance`.
 
         Args:
-            new_covariance (NDArray): The new covariance values that will
-              overwrite a slice of the previous covariance matrix.
+            new_covariance (NDArray): The new covariance values that will overwrite a slice of the
+                previous covariance matrix.
             first_row (int): The row of the first value to overwrite
             first_col (int): The column of the first value to overwrite
         """
@@ -250,7 +248,7 @@ class StandardFusionStrategy(FusionStrategy, Protocol):
 
 
         Args:
-            dynamics_model (StandardDynamicsModel): _description_
+            dynamics_model (StandardDynamicsModel)
         """
         ...
 
@@ -267,9 +265,9 @@ class StandardFusionStrategy(FusionStrategy, Protocol):
         `get_estimate`.
 
         Args:
-            measurement_model (StandardMeasurementModel): The measurement to
-              update the filter with, as well as a model that describes how the
-              measurement relates to the states this strategy is estimating.
+            measurement_model (StandardMeasurementModel): The measurement to update the filter with,
+                as well as a model that describes how the measurement relates to the states this
+                strategy is estimating.
         """
 
     def clone(self) -> "StandardFusionStrategy":
@@ -349,8 +347,7 @@ class FusionStrategyPlugin(CommonPlugin, Protocol):
         `is_fusion_type_supported`.
 
         Args:
-            fusion_type (FusionType): The type of fusion plugin that we want
-              returned.
+            fusion_type (FusionType): The type of fusion plugin that we want returned.
 
         Returns:
             FusionStrategy: The newly created FusionStrategy, which has a type

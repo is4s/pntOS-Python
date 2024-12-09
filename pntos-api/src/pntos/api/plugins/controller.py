@@ -89,22 +89,21 @@ class ControllerPlugin(CommonPlugin, Protocol):
         `PlatformIntegrationPlugin.take_control` method (if a PIP is in the
         `plugins` list).
 
-        `plugins` - A pointer to an array of pointers to plugins available to
-        the controller.
+        Args:
+            plugins (List[CommonPlugin]): A pointer to an array of pointers to plugins available to
+                the controller.
+            plugin_resources_locations (List[str  |  None] | None, optional): A list of strings 
+                which represent a list of locations, one for each plugin in `plugins`, where those
+                plugins may find auxiliary data if needed. The array pointer can be `None`,
+                otherwise the array is of the same length as `plugins`. Each string may be `None`,
+                filesystem paths, or adhere to some scheme, such as the URI scheme, for defining the
+                resource's location.
+            initial_config (str | None, optional): Represents a source of values to initialize the
+                primary pntOS configuration. This could be `None` or a `str`.  Examples
+                of possible values for the latter are:
 
-        `plugin_resources_locations` - a list of strings which represent a list
-        of locations, one for each plugin in `plugins`, where those plugins may
-        find auxiliary data if needed. The array pointer can be `None`,
-        otherwise the array is of the same length as `plugins`. Each string may
-        be `None`, filesystem paths, or adhere to some scheme, such as the URI
-        scheme, for defining the resource's location.
-
-        `initial_config` - represents a source of values to initialize the
-        primary pntOS configuration. This could be `None` or a `str`.  Examples
-        of possible values for the latter are:
-
-        1. The entire config.
-        2. A local file path on systems which support them.
-        3. A string adhering to the URI scheme.
+                1. The entire config.
+                2. A local file path on systems which support them.
+                3. A string adhering to the URI scheme.
         """
         pass

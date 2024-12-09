@@ -29,6 +29,10 @@ class MessageStreamConfig(Protocol):
 
         Request messages of the given `MessageType` and optional
         `source_identifier` are streamed in sorted timestamp ordering.
+
+        Args:
+            type (type)
+            source_identifier (str | None, optional)
         """
         pass
 
@@ -44,6 +48,10 @@ class MessageStreamConfig(Protocol):
         to `sequenced_stream_add`, or remove individual messages from the
         entire list of messages that was added with a previous call to
         `sequenced_stream_all`.
+
+        Args:
+            type (type)
+            source_identifier (str | None, optional)
         """
         pass
 
@@ -53,6 +61,9 @@ class MessageStreamConfig(Protocol):
 
         Note that the ability to do this reliably will depend on the length of the buffer used by
         the mediator.
+
+        Args:
+            enable (bool)
         """
         pass
 
@@ -65,6 +76,10 @@ class MessageStreamConfig(Protocol):
         Request messages of the given `MessageType` and optional
         `source_identifier` are streamed immediately without delay, buffering,
         or sorting.
+
+        Args:
+            type (type)
+            source_identifier (str | None, optional)
         """
         pass
 
@@ -79,11 +94,20 @@ class MessageStreamConfig(Protocol):
         a type that was previously added in a call to `immediate_stream_add`,
         or remove individual messages from the entire list of messages that was
         added with a previous call to `immediate_stream_all`.
+
+        Args:
+            type (type)
+            source_identifier (str | None, optional)
         """
         pass
 
     def immediate_stream_all(self, enable: bool) -> None:
-        """Request all messages are streamed immediately without delay, buffering, or sorting."""
+        """
+        Request all messages are streamed immediately without delay, buffering, or sorting.
+
+        Args:
+            enable (bool)
+        """
         pass
 
 
@@ -121,22 +145,22 @@ class OrchestrationPlugin(CommonPlugin, Protocol):
         This function will be called by the system after the `CommonPlugin.init_plugin` but before
         any other call to an orchestration plugin function.
 
-        The `plugins` parameter is a set of plugins which should be used by the
-        orchestration plugin. For example, the plugins list may include a
-        `StandardFusionEngine`, which the orchestration plugin can use to
-        perform fusion of sensor data received. The list may also include a
-        state modeling plugin, which the orchestration plugin can use to
-        extract the algorithms needed for parsing sensor data into the data
-        model a fusion engine needs. If the orchestration plugin does not
-        require any plugins, `None` may be passed.
-
-        The `stream_config` parameter is a set of configuration options that
-        the orchestration plugin can use to indicate to the controller how it
-        would prefer delivery of messages. When the orchestration plugin
-        receives the `stream_config` struct, it should call the functions on it
-        to set up how messages will be delivered to it. If it does not, the
-        order of messages' arrival will be unspecified and at the discretion of
-        the controller.
+        Args:
+            plugins (List[CommonPlugin]): A set of plugins which should be used by the
+                orchestration plugin. For example, the plugins list may include a
+                `StandardFusionEngine`, which the orchestration plugin can use to
+                perform fusion of sensor data received. The list may also include a
+                state modeling plugin, which the orchestration plugin can use to
+                extract the algorithms needed for parsing sensor data into the data
+                model a fusion engine needs. If the orchestration plugin does not
+                require any plugins, `None` may be passed.
+            stream_config (MessageStreamConfig): A set of configuration options that
+                the orchestration plugin can use to indicate to the controller how it
+                would prefer delivery of messages. When the orchestration plugin
+                receives the `stream_config` struct, it should call the functions on it
+                to set up how messages will be delivered to it. If it does not, the
+                order of messages' arrival will be unspecified and at the discretion of
+                the controller.
         """
         pass
 
@@ -146,6 +170,10 @@ class OrchestrationPlugin(CommonPlugin, Protocol):
 
         The plugin should utilize this sensor data contained in message by passing it into a fusion
         engine.
+
+        Args:
+            message (Message)
+            sequenced (bool)
         """
         pass
 
@@ -184,6 +212,10 @@ class OrchestrationPlugin(CommonPlugin, Protocol):
 
         These conventions allow the user to identify their desired type of
         solution using substring matching.
+
+        Returns:
+            List[str]: A list of strings describing the filters available in this
+            :class:`OrchestrationPlugin`.
         """
         pass
 
@@ -195,19 +227,21 @@ class OrchestrationPlugin(CommonPlugin, Protocol):
         """
         Request filtering solutions at the times specified in the array `solution_times`.
 
-        An Orchestration plugin may run multiple filters. To select which
-        filter(s) to request solutions from, enter a valid filter description
-        string in `filter_description`. Valid filter description strings can be
-        obtained by calling `get_filter_description_list()`. Passing in None
-        will provide a result specific to a particular Orchestration plugin
-        implementation. When `filter_description` is `None`, the implementation
-        should endeavor to return its best solution.
+        Args:
+            solution_times (List[TypeTimestamp]): The solution times.
+            filter_description (str | None, optional): An Orchestration plugin may run multiple 
+                filters. To select which filter(s) to request solutions from, enter a valid filter
+                description string in `filter_description`. Valid filter description strings can be
+                obtained by calling `get_filter_description_list()`. Passing in None will provide a
+                result specific to a particular Orchestration plugin implementation. When
+                `filter_description` is `None`, the implementation should endeavor to return its
+                best solution.
 
-        Returned will be an array of messages containing the filter solutions
-        for the requested `solution_times`. The number of solutions should
-        equal the number of times in `solution_times`, although some entries
-        may be None if they are unavailable at the corresponding time in
-        `solution_times`. The returned `Message` list may be `None` if
-        `filter_description` is invalid.
+        Returns:
+            List[Message]: An array of messages containing the filter solutions for the requested
+            `solution_times`. The number of solutions should equal the number of times in
+            `solution_times`, although some entries may be None if they are unavailable at the
+            corresponding time in `solution_times`. The returned `Message` list may be `None` if
+            `filter_description` is invalid.
         """
         pass

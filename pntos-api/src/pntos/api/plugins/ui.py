@@ -29,6 +29,9 @@ class UiPlugin(CommonPlugin, Protocol):
         query whether or not this plugin must be run on the main thread. If this method returns
         True, then run_main_thread() must be called from the main thread in order to start this
         plugin.
+
+        Returns:
+            bool: ``True`` if plugin needs to run on the main thread, ``False`` otherwise.
         """
         pass
 

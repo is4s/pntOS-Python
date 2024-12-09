@@ -75,15 +75,30 @@ class CommonInitializationStrategy(Protocol):
     """
 
     def request_motion_needed(self) -> InitializationMotionNeeded:
-        """Return the type of motion (if any) needed."""
+        """
+        Check the type of motion (if any) needed.
+
+        Returns:
+            InitializationMotionNeeded
+        """
         pass
 
     def request_current_status(self) -> InitializationStatus:
-        """Return the current initialization status."""
+        """
+        Check the current initialization status.
+
+        Returns:
+            InitializationStatus
+        """
         pass
 
     def process_pntos_message(self, message: Message) -> None:
-        """Incorporate a new message into the initialization algorithm."""
+        """
+        Incorporate a new message into the initialization algorithm.
+
+        Args:
+            message (Message)
+        """
         pass
 
 
@@ -125,7 +140,12 @@ class InertialInitializationStrategy(CommonInitializationStrategy, Protocol):
     """
 
     def request_solution(self) -> InitialInertialSolution:
-        """Return the current initial solution."""
+        """
+        Get the current initial solution.
+
+        Returns:
+            InitialInertialSolution
+        """
         pass
 
 
@@ -167,12 +187,14 @@ class EwcInitializationStrategy(CommonInitializationStrategy):
 
     def request_solution(self) -> InitialEstimateWithCovariance | None:
         """
-        Return the current initial solution.
+        Get the current initial solution.
 
-        Will be None if the initialization strategy has not yet finished. Use
-        #CommonInitializationStrategy.request_current_status to check current status of the
-        strategy. If the status is INITIALIZING_FINE or INITIALIZED_GOOD, then the result is
-        guaranteed to not be None.
+        Returns:
+            InitialEstimateWithCovariance | None: The current initial solution. Will be None if the
+            initialization strategy has not yet finished. Use
+            #CommonInitializationStrategy.request_current_status to check current status of the
+            strategy. If the status is INITIALIZING_FINE or INITIALIZED_GOOD, then the result is
+            guaranteed to not be None.
         """
 
 
@@ -193,7 +215,15 @@ class InitializationPlugin(CommonPlugin, Protocol):
     """
 
     def is_initialization_type_supported(self, type: InitializationType) -> bool:
-        """Return true if the plugin supports a given type of mechanization, false otherwise."""
+        """
+        Check if given ``InitializationType`` is supported.
+
+        Args:
+            type (InitializationType)
+
+        Returns:
+            bool: True if the plugin supports a given type of mechanization, False otherwise.
+        """
         pass
 
     def new_initialization_strategy(
@@ -202,17 +232,19 @@ class InitializationPlugin(CommonPlugin, Protocol):
         """
         Create an instance of CommonInitializationStrategy.
 
-        @param type Specifies the type of initializer that the returned value will support. For
-        example, if the user passes in #INERTIAL_INITIALIZATION_STRATEGY, then the returned value
-        will be an instance of InertialInitializationStrategy. If `type` is unsupported by the
-        plugin, then None will be returned. Please use #is_initialization_type_supported to check if
-        the type is supported by the plugin.
+        Args:
+            type (InitializationType): Specifies the type of initializer that the returned value will support. For
+                example, if the user passes in #INERTIAL_INITIALIZATION_STRATEGY, then the returned value
+                will be an instance of InertialInitializationStrategy. If `type` is unsupported by the
+                plugin, then None will be returned. Please use #is_initialization_type_supported to check if
+                the type is supported by the plugin.
+            config_group (str | None, optional): An optional parameter which can be used to specify
+                which group in the config should be used to set up the new initialization strategy.
+                This allows for multiple initialization strategy instances to exist with unique
+                settings.
 
-        @param config_group An optional parameter which can be used to specify which group in the
-        config should be used to set up the new initialization strategy. This allows for multiple
-        initialization strategy instances to exist with unique settings.
-
-        @return The new initialization strategy instance. Returns None if `type` is unsupported by
-        this plugin (this can be checked using #is_initialization_type_supported) or if
-        `config_group` is invalid.
+        Returns:
+            CommonInitializationStrategy | None: The new initialization strategy instance. Returns
+            None if `type` is unsupported by this plugin (this can be checked using
+            #is_initialization_type_supported) or if `config_group` is invalid.
         """

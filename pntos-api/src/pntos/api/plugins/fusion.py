@@ -71,7 +71,12 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
 
     @property
     def time(self) -> TypeTimestamp:
-        """The current time of the filter."""
+        """
+        Get the current time of the filter.
+
+        Returns:
+            TypeTimestamp
+        """
         pass
 
     @property
@@ -79,7 +84,9 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
         """
         The underlying algorithm used for Bayesian inference.
 
-        The fusion strategy is the type of filter (EKF, UKF, etc.).
+        Returns:
+            StandardFusionStrategy | None: The fusion strategy is the type of filter (EKF, UKF,
+            etc.).
         """
         pass
 
@@ -87,7 +94,10 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
         """
         Get the total number of states currently in the fusion engine.
 
-        Virtual state blocks do no affect this result.
+        Virtual state blocks do not affect this result.
+
+        Returns:
+            int: The total number of states currently in the fusion engine
         """
         pass
 
@@ -95,8 +105,10 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
         """
         Gets a list of the `StandardStateBlock`s labels that have been added to this fusion engine.
 
-        Returns None if no state blocks have been added. Guaranteed to not return None if
-        #get_num_states returns a value other than 0.
+        Returns:
+            List[str] | None: A list of the `StandardStateBlock`s labels that have been added to
+            this fusion engine. Returns None if no state blocks have been added. Guaranteed to not
+            return None if #get_num_states returns a value other than 0.
         """
         pass
 
@@ -110,14 +122,19 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
         Add the given StandardStateBlock to the fusion engine.
 
         This will expand the state vector being estimated by the value of `block.get_num_states()`.
-        The `initial_estimate_covariance` parameter contains the initial conditions of the states,
-        with `initial_estimate_covariance.estimate` being an Nx1 matrix and
-        `initial_estimate_covariance.covariance` being an NxN matrix, where N is
-        `block.get_num_states()`. The `cross_covariances` are an optional parameter which, if
-        non-None, contains a description of the newly added StateBlock's cross covariances with
-        respect to a set of StateBlocks which already exist inside the filter (specified by
-        `cross_covariances.block_labels`). If the `cross_covariance` parameter is None, cross
-        covariance between the existing states and the added states will be set to zeroes.
+
+        Args:
+            block (StandardStateBlock): The :class:`StandardStateBlock` to be added to the fusion
+                engine.
+            initial_estimate_covariance (EstimateWithCovariance): contains the initial conditions of 
+                the states, with `initial_estimate_covariance.estimate` being an Nx1 matrix and
+                `initial_estimate_covariance.covariance` being an NxN matrix, where N is
+                `block.get_num_states()`.
+            cross_covariances (CrossCovariances | None, optional): An optional parameter which, if
+                non-None, contains a description of the newly added StateBlock's cross covariances with
+                respect to a set of StateBlocks which already exist inside the filter (specified by
+                `cross_covariances.block_labels`). If the `cross_covariance` parameter is None, cross
+                covariance between the existing states and the added states will be set to zeroes.
         """
         pass
 
@@ -126,11 +143,17 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
         Get the estimate associated with a state block.
 
         Find a `StandardStateBlock` or `VirtualStateBlock` within the fusion engine matching
-        `block_label`, and return a copy of its current estimate vector. If `block_label` references
-        a virtual state block (VSB) this will return a converted estimate, converted into the VSBs
-        coordinate frame. Returns None if `block_label` does not correspond to a block that has been
-        added to the fusion engine. Guaranteed to not return None when `block_label` is in the list
-        returned by get_state_block_labels() and #get_strategy does not return None.
+        `block_label`, and return a copy of its current estimate vector. 
+
+        Args:
+            block_label (str)
+
+        Returns:
+            NDArray | None: A copy of its current estimate vector. If `block_label` references a
+            virtual state block (VSB) this will return a converted estimate, converted into the VSBs
+            coordinate frame. Returns None if `block_label` does not correspond to a block that has
+            been added to the fusion engine. Guaranteed to not return None when `block_label` is in
+            the list returned by get_state_block_labels() and #get_strategy does not return None.
         """
         pass
 
@@ -139,12 +162,18 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
         Get the covariance associated with a state block.
 
         Find a `StandardStateBlock` or `VirtualStateBlock` within the fusion engine matching
-        `block_label`, and return a copy of its current covariance matrix. If `block_label`
-        references a virtual state block (VSB) this will return a converted covariance, converted
-        into the VSBs coordinate frame. Returns None if `block_label` does not correspond to a block
-        that has been added to the fusion engine. Guaranteed to not return None when `block_label`
-        is in the list returned by get_state_block_labels() and #get_strategy does not return None.
-        """
+        `block_label`, and return a copy of its current covariance matrix.
+
+        Args:
+            block_label (str)
+
+        Returns:
+            NDArray | None: A copy of its current covariance matrix. If `block_label` references a
+            virtual state block (VSB) this will return a converted covariance, converted into the
+            VSBs coordinate frame. Returns None if `block_label` does not correspond to a block that
+            has been added to the fusion engine. Guaranteed to not return None when `block_label` is
+            in the list returned by get_state_block_labels() and #get_strategy does not return None.
+            """
         pass
 
     def get_state_block_cross_covariance(
@@ -154,10 +183,17 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
         Get the cross covariance between the states associated with two state blocks.
 
         Find the `StandardStateBlocks` within the fusion engine matching `block_label1` and
-        `block_label2`, and return the cross-covariance matrix between them. Returns None if
-        `block_label1` or `block_label2` do not correspond to blocks that gave been added to the
-        fusion engine. Guaranteed to not return None when both `block_label` and `block_label2` are
-        in the list returned by get_state_block_labels() and #get_strategy does not return None.
+        `block_label2`, and return the cross-covariance matrix between them.
+
+        Args:
+            block_label1 (str)
+            block_label2 (str)
+
+        Returns:
+            NDArray | None: The cross-covariance matrix between them. Returns None if `block_label1`
+            or `block_label2` do not correspond to blocks that gave been added to the fusion engine.
+            Guaranteed to not return None when both `block_label` and `block_label2` are in the list
+            returned by get_state_block_labels() and #get_strategy does not return None.
         """
         pass
 
@@ -168,6 +204,10 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
         Find a `StandardStateBlock` within the fusion engine matching `block_label`, and change its
         current estimate vector. Note that this function may lead to performance degradation with
         some implementations and thus its use is discouraged if other options are available.
+
+        Args:
+            block_label (str)
+            estimate (NDArray)
         """
         pass
 
@@ -178,6 +218,10 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
         Find a `StandardStateBlock` within the fusion engine matching `block_label`, and change its
         current covariance matrix. Note that this function may lead to performance degradation with
         some implementations and thus its use is discouraged if other options are available.
+
+        Args:
+            block_label (str)
+            covariance (NDArray)
         """
         pass
 
@@ -191,6 +235,11 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
         `block_label2`, and change the current covariance matrix between them. Note that this
         function may lead to performance degradation with some implementations and thus its use is
         discouraged if other options are available.
+
+        Args:
+            block_label1 (str)
+            block_label2 (str)
+            covariance (NDArray)
         """
         pass
 
@@ -200,6 +249,9 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
 
         This will reduce the state vector being estimated by the number of states that the block
         represents.
+
+        Args:
+            block_label (str)
         """
         pass
 
@@ -210,18 +262,25 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
         A label being returned by this list is not a guarantee that the virtual state block has a
         valid source. For that, call has_virtual_state_block().
 
-        Returns None if no virtual state blocks have been added to this fusion engine.
+        Returns:
+            List[str] | None: A list of the target labels of virtual state blocks that have been
+            added. Returns None if no virtual state blocks have been added to this fusion engine.
         """
         pass
 
     def has_virtual_state_block(self, vsb_target_label: str) -> bool:
         """
-        Returns true if the fusion engine has a `VirtualStateBlock` with a matching target label.
+        Checks if the fusion engine has a `VirtualStateBlock` with a matching target label.
 
-        Will return false if no virtual state block with matching target label exists or if one
-        exists but is not capable of generating an estimate. That is, the VSB's source must exist
-        and be in a continuous chain to a concrete state block which also exists in the fusion
-        engine in order to return true.
+        Args:
+            vsb_target_label (str)
+
+        Returns:
+            bool: True if the fusion engine has a `VirtualStateBlock` with a matching target label,
+            Will return false if no virtual state block with matching target label exists or if one
+            exists but is not capable of generating an estimate. That is, the VSB's source must
+            exist and be in a continuous chain to a concrete state block which also exists in the
+            fusion engine in order to return true.
         """
         pass
 
@@ -231,18 +290,28 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
 
         A virtual state block (VSB) convert from an underlying block coordinate frame into the VSB
         coordinate frame.
+
+        Args:
+            virtual_state_block (VirtualStateBlock)
         """
         pass
 
     def remove_virtual_state_block(self, vsb_target_label: str) -> None:
-        """Remove the `VirtualStateBlock` matching `vsb_target_label`."""
+        """
+        Remove the `VirtualStateBlock` matching `vsb_target_label`.
+
+        Args:
+            vsb_target_label (str)
+        """
         pass
 
     def get_measurement_processor_labels(self) -> List[str] | None:
         """
-        Gets a list of the labels of measurement processors that have been added.
+        Get a list of the labels of measurement processors that have been added.
 
-        Returns None if no measurement processors have been added to this fusion engine.
+        Returns:
+            List[str] | None: List of labels of measurement processors that have been added. Returns
+            None if no measurement processors have been added to this fusion engine.
         """
         pass
 
@@ -253,6 +322,9 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
         Add a StandardMeasurementProcessor.
 
         This can be used to process future measurements that correspond to `processor.get_label()`;
+
+        Args:
+            processor (StandardMeasurementProcessor)
         """
         pass
 
@@ -262,6 +334,9 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
 
         Assumes a measurement processor was previously added via #add_measurement_processor with the
         label `processor_label`.
+
+        Args:
+            processor_label (str)
         """
         pass
 
@@ -270,6 +345,9 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
         Propagate the filter estimate forward in time.
 
         May be evaluated lazily (when results are requested).
+
+        Args:
+            time (TypeTimestamp)
         """
         pass
 
@@ -278,6 +356,10 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
         Update the filter with the given measurement.
 
         Will propagate first if needed to reach the time encoded inside the measurement.
+
+        Args:
+            processor_label (str)
+            message (Message)
         """
         pass
 
@@ -291,8 +373,6 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
         engine or its underlying filter. Blocks are assembled in the order that the labels are
         passed in.
 
-        `block_labels` is an array of strings.
-
         If all of the following are true:
 
         - `time` is equal to or after the filter time (which can be checked with #get_time)
@@ -302,6 +382,13 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
 
         Then the result returned is guaranteed to not be None. Otherwise, if any of the above are
         false then the result will be None.
+
+        Args:
+            time (TypeTimestamp)
+            block_labels (List[str]): An array of strings. 
+
+        Returns:
+            EstimateWithCovariance | None
         """
         pass
 
@@ -314,8 +401,6 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
         Estimate and covariance are built corresponding to a list of State Block labels. Blocks are
         assembled in the order that the labels are passed in.
 
-        `block_labels` is an array of strings.
-
         If all of the following are true:
 
         - all labels in `block_labels` correspond to a block that has been added to the fusion
@@ -324,22 +409,46 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
 
         Then the result returned is guaranteed to not be None. Otherwise, if any of the above are
         false then the result will be None.
+
+        Args:
+            block_labels (List[str]): An array of strings.
+
+        Returns:
+            EstimateWithCovariance | None
         """
 
     def give_state_block_aux_data(self, block_label: str, aux: List[Message]) -> None:
-        """Route a list of messages of aux data to a `StandardStateBlock`."""
+        """
+        Route a list of messages of aux data to a `StandardStateBlock`.
+
+        Args:
+            block_label (str)
+            aux (List[Message])
+        """
         pass
 
     def give_measurement_processor_aux_data(
         self, processor_label: str, aux: List[Message]
     ) -> None:
-        """Route a list of messages of aux data to a `StandardMeasurementProcessor`."""
+        """
+        Route a list of messages of aux data to a `StandardMeasurementProcessor`.
+
+        Args:
+            processor_label (str)
+            aux (List[Message])
+        """
         pass
 
     def give_virtual_state_block_aux_data(
         self, target_label: str, aux: List[Message]
     ) -> None:
-        """Route a list of messages of aux data to a `VirtualStateBlock`."""
+        """
+        Route a list of messages of aux data to a `VirtualStateBlock`.
+
+        Args:
+            target_label (str)
+            aux (List[Message])
+        """
         pass
 
     def clone(self) -> "StandardFusionEngine":
@@ -361,16 +470,31 @@ class FusionPlugin(CommonPlugin, Protocol):
     """
 
     def is_fusion_type_supported(self, type: FusionType) -> bool:
-        """Return if the plugin supports a given type of fusion."""
+        """
+        Check if the plugin supports a given type of fusion.
+
+        Args:
+            type (FusionType)
+
+        Returns:
+            bool
+        """
+        pass
 
     def new_fusion_engine(self, type: FusionType) -> CommonFusionEngine | None:
         """
         Create an instance of #CommonFusionEngine.
 
-        The #FusionType parameter specifies the type of fusion that the returned value will support.
-        For example, if the user passes in FUSION_STANDARD_MODEL, then the returned value will be a
-        #StandardFusionEngine. Returns None if `type` is not supported by this fusion plugin
-        (#is_fusion_type_supported can be used to check the type before calling this method).
-        Otherwise the return is guaranteed to not be None.
+        Args:
+            type (FusionType): The :class:`FusionType` parameter specifies the type of
+                fusion that the returned value will support.
+
+        Returns:
+            CommonFusionEngine | None: The #FusionType parameter specifies the type of fusion that
+            the returned value will support. For example, if the user passes in
+            FUSION_STANDARD_MODEL, then the returned value will be a #StandardFusionEngine. Returns
+            None if `type` is not supported by this fusion plugin (#is_fusion_type_supported can be
+            used to check the type before calling this method). Otherwise the return is guaranteed
+            to not be None.
         """
         pass

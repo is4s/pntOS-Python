@@ -15,19 +15,22 @@ class RegistryPlugin(CommonPlugin, Protocol):
 
     def new_registry(self, initial_config: str | None = None) -> Registry:
         """
-        Create a new registry.
+        Create a new registry based on the initial values stored in ``initial_config``.
 
-        Create a new registry based on the initial values stored in
-        `initial_config`.  The format of `initial_config` is implementation
-        specific, and plugins are free to support any or no format.
+        Args:
+            initial_config (str | None, optional): The format of `initial_config` is implementation
+                specific, and plugins are free to support any or no format. Possible formats may include:
 
-        Possible formats may include:
-        - `None`, in which case the plugin is free to choose initial values.
-          Choices may include hard-coded in the plugin or none at all.
-        - a `str`.  Examples of possible values the parameter could hold:
-        1. The entire config.
-        2. A local file path on systems which support them.
-        3. A string adhering to the URI scheme.
+                - `None`, in which case the plugin is free to choose initial values. Choices may
+                  include hard-coded in the plugin or none at all.
+                - A `str`.  Examples of possible values the parameter could hold:
+
+                    1. The entire config.
+                    2. A local file path on systems which support them.
+                    3. A string adhering to the URI scheme.
+
+        Returns:
+            Registry: The newly created registry.
 
         NOTE: The returned `Registry` should be capable of producing
         `KeyValueStore` structs that are able to be used concurrently. Thus if

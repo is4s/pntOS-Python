@@ -233,12 +233,21 @@ class KeyValueStore(Protocol):
         """
         Get the array of keys which currently exist in this store.
 
-        Returns None if no keys are available.
+        Returns:
+            List[str]: Returns None if no keys are available.
         """
         pass
 
     def has_key(self, key: str) -> bool:
-        """Returns whether or not a given key exists in the store."""
+        """
+        Check whether or not a given key exists in the store.
+
+        Args:
+            key (str)
+
+        Returns:
+            bool
+        """
         pass
 
     def get_value(
@@ -252,11 +261,15 @@ class KeyValueStore(Protocol):
 
         ```
         altitude = kv_store.get_value("altitude", int)
-        ```
 
-        Returns None if the key is not available. The return is guaranteed to
-        not be None if called with a valid key, which can be checked with
-        `has_key()`.
+        Args:
+            key (str)
+            type (type[RegistryValueTypes] 
+
+        Returns:
+            RegistryValueTypes | None: None if the key is not available. The return is guaranteed to
+            not be None if called with a valid key, which can be checked with
+            `has_key()`.
         """
         pass
 
@@ -264,13 +277,16 @@ class KeyValueStore(Protocol):
         """
         Get the value for the given key as an array of bytes.
 
-        The return format will conform to the definition in `data_format`. Returns None
-        if the given key is not available. The return is guaranteed to not be None if
-        called with a valid key, which can be checked with `has_key`.
+        Args:
+            key (str | None, optional)
 
-        If `key` is None, then this function will return all of the keys and
-        values in the group passed to `Registry.batch_start()` and will be
-        formatted to conform to keys and values as defined in `data_format`.
+        Returns:
+            bytes | None: The return format will conform to the definition in `data_format`. Returns 
+            None if the given key is not available. The return is guaranteed to not be None if
+            called with a valid key, which can be checked with `has_key`. If `key` is None, then
+            this function will return all of the keys and values in the group passed to
+            `Registry.batch_start()` and will be formatted to conform to keys and values as defined
+            in `data_format`.
         """
         pass
 
@@ -278,7 +294,9 @@ class KeyValueStore(Protocol):
         """
         Set the given key to the provided value.
 
-        `value` can be of any type specified by `ValueType`
+        Args:
+            key (str)
+            value (RegistryValueTypes): Can be of any type specified by `ValueType`.
         """
         pass
 
@@ -286,13 +304,13 @@ class KeyValueStore(Protocol):
         """
         Set the given key to the provided value.
 
-        `bytes` must be formatted to conform to the definition of a value in
-        `data_format`.
-
-        If `key` is None, then the contents of `bytes` must include both keys
-        and values and must be formatted to conform to `data_format`. `bytes`
-        will then be used to set the corresponding keys and values in the group
-        passed to `Registry.batch_start`.
+        Args:
+            key (str | None): If `key` is None, then the contents of `bytes` must include both keys
+            and values and must be formatted to conform to `data_format`. `bytes`
+            will then be used to set the corresponding keys and values in the group
+            passed to `Registry.batch_start`.
+            bytes (bytes): Must be formatted to conform to the definition of a value in
+                `data_format`.
         """
         pass
 
@@ -300,9 +318,13 @@ class KeyValueStore(Protocol):
         """
         Remove the given key from the registry.
 
-        Returns true if `key` is successfully removed, and false otherwise. Keys may
-        fail to be removed if the key does not currently exist, or the backend is unable
-        to remove the key.
+        Args:
+            key (str)
+
+        Returns:
+            bool: True if `key` is successfully removed, and false otherwise. Keys may
+            fail to be removed if the key does not currently exist, or the backend is unable
+            to remove the key.
         """
         pass
 
@@ -400,6 +422,14 @@ class KeyValueStore(Protocol):
         dereference the pointer, and thus it is safe to pass in a receiver that
         does not survive longer than the lifetime of the function call, as long
         as the callback checks for validity of the receiver before using it.
+
+        Args:
+            key (str | None)
+            callback (Callable[[str, List[str], "KeyValueStore"], None])
+
+        Returns:
+            bool: ``True`` if the notifier was successfully registered, and ``False`` if the store 
+            is unable to notify the requester.
         """
         pass
 
@@ -418,9 +448,14 @@ class KeyValueStore(Protocol):
         group, receiver, and callback. If a user registers the same callback
         twice this will remove both.
 
-        Returns `true` if removal was successful and `false` if it was not.
-        `false` will be returned if a callback did not exist for the
-        group/receiver combination.
+        Args:
+            key (str | None)
+            callback (Callable[[str, List[str], "KeyValueStore"], None])
+
+        Returns:
+            bool: `true` if removal was successful and `false` if it was not.
+            `false` will be returned if a callback did not exist for the
+            group/receiver combination.
         """
         pass
 
@@ -448,6 +483,13 @@ class KeyValueStore(Protocol):
         store.set_value("key1",456.78)  # key1 = 456.78 is value of key1 in store
                                         # key1 = 987.65 tagged to be permanently stored
                                         # key2 = 123    tagged to be permanently stored
+
+        Args:
+            permanent (bool)
+
+        Returns:
+            bool: The value of the permanent storage configuration. Callers should check this to
+            verify if the set was successful.
         ```
         """
         pass
@@ -493,26 +535,50 @@ class Registry(Protocol):
         other users. Thus a user should endeavour to call
         `KeyValueStore.batch_end` as soon as possible after they are done
         getting/setting values in the returned `KeyValueStore`.
+
+        Args:
+            group (str)
+
+        Returns:
+            KeyValueStore
         """
         pass
 
     def get_group_array(self) -> List[str]:
-        """Get the array of groups which currently exist. Returns None if no groups exist."""
+        """
+        Get the array of groups which currently exist. 
+
+        Returns:
+            List[str]: The array of groups which currently exists. Returns None if no groups 
+            exist.
+        """
         pass
 
     def has_group(self, group: str) -> bool:
-        """Returns whether or not a given group has had any values added to it (for any key)."""
+        """
+        Checks whether or not a given group has had any values added to it (for any key).
+
+        Args:
+            group (str)
+
+        Returns:
+            bool
+        """
         pass
 
     def request_notify_new_group(self, callback: Callable[[str], None]) -> bool:
         """
         Register a callback which gets called each time a new group is made in the registry.
 
-        Returns true if the notifier was successfully registered,
-        and false if the registry is unable to notify the requester. The
-        callback will receive the same receiver as was passed into this method,
-        which may be used as a context object.
+        Args:
+            callback (Callable[[str], None])
 
+        Returns:
+            bool: true if the notifier was successfully registered,
+            and false if the registry is unable to notify the requester. The
+            callback will receive the same receiver as was passed into this method,
+            which may be used as a context object.
+            
         NOTE: This method will retain the receiver beyond the lifetime of the
         function call, as the purpose of that parameter is to pass it back
         later in the callback. However, the method will never dereference the
@@ -582,6 +648,9 @@ class Mediator(Protocol):
 
         These conventions allow the user to identify their desired type of
         solution using substring matching.
+
+        Returns:
+            List[str]: A list of strings describing the solutions available. 
         """
         pass
 
@@ -593,22 +662,23 @@ class Mediator(Protocol):
         """
         Request filtering solutions at the times specified in the array `solution_times`.
 
-        The number of time entries in `solution_times` is
-        specified by `num_solution_times`.
+        Args:
+            solution_times (List[TypeTimestamp]): The number of time entries in `solution_times` is
+                specified by `num_solution_times`.
+            filter_description (str | None, optional): To select which filter(s) to request solutions 
+                from, enter a valid filter description string in `filter_description`. Valid filter
+                description strings can be obtained by calling `get_filter_description_list`.
+                Passing in None will provide a result specific to a particular implementation. When
+                `filter_description` is None, the implementation should endeavor to return its best
+                solution.
 
-        To select which filter(s) to request solutions from, enter a valid
-        filter description string in `filter_description`. Valid filter
-        description strings can be obtained by calling
-        `get_filter_description_list`. Passing in None will provide a result
-        specific to a particular implementation. When `filter_description` is
-        None, the implementation should endeavor to return its best solution.
-
-        Returned will be an array of messages containing the filter solutions
-        for the requested `solution_times`. The number of solutions should
-        equal `num_solution_times`, although some entries may be None if they
-        are unavailable at the corresponding time in `solution_times`. The
-        returned `Message` array may be None if `filter_description` is
-        invalid.
+        Returns:
+            List[Message]: An array of messages containing the filter solutions
+            for the requested `solution_times`. The number of solutions should
+            equal `num_solution_times`, although some entries may be None if they
+            are unavailable at the corresponding time in `solution_times`. The
+            returned `Message` array may be None if `filter_description` is
+            invalid.
         """
         pass
 
@@ -619,6 +689,9 @@ class Mediator(Protocol):
         For example, this function is useful for plugins who have just received new
         sensor data that they wish to relay to the system to be used in a sensor fusion
         solution.
+
+        Args:
+            message (Message)
         """
         pass
 
@@ -631,21 +704,22 @@ class Mediator(Protocol):
         """
         Request that pntOS broadcast the provided message out to the network.
 
-        The `destination_identifier` parameter is a transport-specific
-        identifier that allows transports to determine how to route the
-        message. If the destination transport has the concept of a channel or
-        topic, `destination_identifier` should be populated by the channel or
-        topic. Otherwise, the identifier is populated in a plugin-specific
-        manner defined by the destination transport. If
-        `destination_identifier` is None, then the transport should output the
-        message in the "default" output channel/topic and route being used by
-        pntOS.
-
-        The `transport` parameter is the identifier of a transport plugin that
-        the message should be routed to. The transport parameter should match
-        the `CommonPlugin.identifier` string of a `TransportPlugin` active in
-        the system. If the transport parameter is None, this indicates that the
-        message should be broadcast to all available transports.
+        Args:
+            message (Message)
+            transport (str | None, optional): The identifier of a transport plugin that
+                the message should be routed to. The transport parameter should match
+                the `CommonPlugin.identifier` string of a `TransportPlugin` active in
+                the system. If the transport parameter is None, this indicates that the
+                message should be broadcast to all available transports.
+            destination_identifier (str | None, optional): a transport-specific
+                identifier that allows transports to determine how to route the
+                message. If the destination transport has the concept of a channel or
+                topic, `destination_identifier` should be populated by the channel or
+                topic. Otherwise, the identifier is populated in a plugin-specific
+                manner defined by the destination transport. If
+                `destination_identifier` is None, then the transport should output the
+                message in the "default" output channel/topic and route being used by
+                pntOS.
         """
         pass
 
@@ -655,6 +729,10 @@ class Mediator(Protocol):
 
         Send a loggable message to the system, to be logged through the current
         logging infrastructure enabled (e.g. the console, a logfile, etc.).
+
+        Args:
+            level (LoggingLevel)
+            message (str)
         """
         pass
 
@@ -727,16 +805,15 @@ class CommonPlugin(Protocol):
         concurrency models, including single-threaded, multi-threaded,
         multi-process, and distributed computing.
 
-        `plugin_resources_location` specifies the location of the plugin's
-        resources.  The location is determined by the controller plugin, and
-        therefore is controller implementation specific. Plugin implementers
-        wishing to provide a resource to their plugin should consult the
-        documentation of the controller to determine which location scheme will
-        be passed into this function.
-
-        `mediator` is None-able if the plugin type being initialized is a
-        `ControllerPlugin`. Non-controller plugins may assume that the mediator
-        parameter is not None.
+        Args:
+            plugin_resources_location (str | None, optional): Specifies the location of the plugin's
+                resources.  The location is determined by the controller plugin, and therefore is
+                controller implementation specific. Plugin implementers wishing to provide a
+                resource to their plugin should consult the documentation of the controller to
+                determine which location scheme will be passed into this function.
+            mediator (Mediator | None, optional): None-able if the plugin type being initialized 
+                is a `ControllerPlugin`. Non-controller plugins may assume that the mediator
+                parameter is not None.
         """
         pass
 
