@@ -31,17 +31,17 @@ class CrossCovariances:
     """
     A container for a set of covariances relating a StateBlock to a set of other StateBlocks.
 
-    Suppose that some StateBlock named `A` existed. Then this structure could define the cross
-    covariance of `A` with respect to other StateBlocks named `B` and `C`. In that case,
-    `block_labels` would be an array of 2 strings `B` and `C`, and `cross_covariances` would be a an
-    array of two matrices: The cross-covariance matrix of `A` and `B` and the cross-covariance
-    matrix of `A` and `C`.
+    Suppose that some StateBlock named ``A`` existed. Then this structure could define the cross
+    covariance of ``A`` with respect to other StateBlocks named ``B`` and ``C``. In that case,
+    :attr:`block_labels` would be an array of 2 strings ``B`` and ``C``, and
+    :attr:`cross_covariances` would be a an array of two matrices: The cross-covariance matrix of
+    ``A`` and ``B`` and the cross-covariance matrix of ``A`` and ``C``.
 
     Attributes:
-        block_labels (List[str]): A list of labels of the `StandardStateBlock`s this structure 
+        block_labels (List[str]): A list of labels of the :class:`StandardStateBlock` this structure
             contains the cross-covariances for.
         cross_covariances (List[NDArray]): A list of cross-covariance matrices between a single
-            StateBlock and the set of StateBlocks listed in #block_labels.
+            StateBlock and the set of StateBlocks listed in :attr:`block_labels`.
     """
 
     block_labels: List[str]
@@ -56,12 +56,13 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
     Gaussian. In addition, all covariance matrices / mean vectors are descriptions of
     jointly-Gaussian multivariate distributions. All noise sources are jointly-Gaussian distributed.
 
-    This object requires a StandardFusionStrategy to work. Some implementations may be able to
-    provide their own. Others will require a strategy to be provided via the
-    StandardFusionEngine.set_strategy method. It is possible to check whether a fusion engine needs
-    to be provided a fusion strategy by calling the StandardFusionEngine.get_strategy method (if the
-    return is None then this fusion engine needs to be provided a strategy). While
-    StandardFusionEngine.get_strategy returns None, all other methods are unsafe to be called.
+    This object requires a :class:`StandardFusionStrategy` to work. Some implementations may be able
+    to provide their own. Others will require a strategy to be provided by setting the
+    :attr:`StandardFusionEngine.strategy` field. It is possible to check whether a fusion
+    engine needs to be provided a fusion strategy by checking the
+    :attr:`StandardFusionEngine.strategy` field (if it is ``None`` then this fusion engine
+    needs to be provided a strategy). While :attr:`StandardFusionEngine.strategy` is ``None``,
+    all other methods are unsafe to be called.
 
     Caution:
         **Unstable**: This feature is unstable and is not yet considered part of the stable pntOS
@@ -103,12 +104,12 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
 
     def get_state_block_labels(self) -> List[str] | None:
         """
-        Gets a list of the `StandardStateBlock`s labels that have been added to this fusion engine.
+        Get a list of :class:`StandardStateBlock` labels that have been added to this fusion engine.
 
         Returns:
-            List[str] | None: A list of the `StandardStateBlock`s labels that have been added to
-            this fusion engine. Returns None if no state blocks have been added. Guaranteed to not
-            return None if #get_num_states returns a value other than 0.
+            List[str] | None: A list of the :class:`StandardStateBlock` labels that have been added
+            to this fusion engine. Returns ``None`` if no state blocks have been added. Guaranteed
+            to not return ``None`` if :meth:`get_num_states` returns a value other than 0.
         """
         pass
 
@@ -119,22 +120,23 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
         cross_covariances: CrossCovariances | None = None,
     ) -> None:
         """
-        Add the given StandardStateBlock to the fusion engine.
+        Add the given :class:`StandardStateBlock` to the fusion engine.
 
-        This will expand the state vector being estimated by the value of `block.get_num_states()`.
+        This will expand the state vector being estimated by the value of :meth:`get_num_states`.
 
         Args:
             block (StandardStateBlock): The :class:`StandardStateBlock` to be added to the fusion
                 engine.
-            initial_estimate_covariance (EstimateWithCovariance): contains the initial conditions of 
-                the states, with `initial_estimate_covariance.estimate` being an Nx1 matrix and
-                `initial_estimate_covariance.covariance` being an NxN matrix, where N is
-                `block.get_num_states()`.
+            initial_estimate_covariance (EstimateWithCovariance): Contains the initial conditions of
+                the states, with ``initial_estimate_covariance.estimate`` being an Nx1 matrix and
+                ``initial_estimate_covariance.covariance`` being an NxN matrix, where N is
+                ``block.num_states``.
             cross_covariances (CrossCovariances | None, optional): An optional parameter which, if
-                non-None, contains a description of the newly added StateBlock's cross covariances with
-                respect to a set of StateBlocks which already exist inside the filter (specified by
-                `cross_covariances.block_labels`). If the `cross_covariance` parameter is None, cross
-                covariance between the existing states and the added states will be set to zeroes.
+                non-``None``, contains a description of the newly added StateBlock's cross
+                covariances with respect to a set of StateBlocks which already exist inside the
+                filter (specified by ``cross_covariances.block_labels``). If the
+                ``cross_covariance`` parameter is ``None``, cross covariance between the existing
+                states and the added states will be set to zeroes.
         """
         pass
 
@@ -142,18 +144,19 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
         """
         Get the estimate associated with a state block.
 
-        Find a `StandardStateBlock` or `VirtualStateBlock` within the fusion engine matching
-        `block_label`, and return a copy of its current estimate vector. 
+        Find a :class:`StandardStateBlock` or :class:`VirtualStateBlock` within the fusion engine
+        matching ``block_label``, and return a copy of its current estimate vector. 
 
         Args:
             block_label (str)
 
         Returns:
-            NDArray | None: A copy of its current estimate vector. If `block_label` references a
+            NDArray | None: A copy of its current estimate vector. If ``block_label`` references a
             virtual state block (VSB) this will return a converted estimate, converted into the VSBs
-            coordinate frame. Returns None if `block_label` does not correspond to a block that has
-            been added to the fusion engine. Guaranteed to not return None when `block_label` is in
-            the list returned by get_state_block_labels() and #get_strategy does not return None.
+            coordinate frame. Returns ``None`` if ``block_label`` does not correspond to a block
+            that has been added to the fusion engine. Guaranteed to not return ``None`` when
+            ``block_label`` is in the list returned by :meth:`get_state_block_labels` and
+            :attr:`strategy` is not ``None``.
         """
         pass
 
@@ -161,18 +164,19 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
         """
         Get the covariance associated with a state block.
 
-        Find a `StandardStateBlock` or `VirtualStateBlock` within the fusion engine matching
-        `block_label`, and return a copy of its current covariance matrix.
+        Find a :class:`StandardStateBlock` or :class:`VirtualStateBlock` within the fusion engine
+        matching ``block_label``, and return a copy of its current covariance matrix. 
 
         Args:
             block_label (str)
 
         Returns:
-            NDArray | None: A copy of its current covariance matrix. If `block_label` references a
+            NDArray | None: A copy of its current covariance matrix. If ``block_label`` references a
             virtual state block (VSB) this will return a converted covariance, converted into the
-            VSBs coordinate frame. Returns None if `block_label` does not correspond to a block that
-            has been added to the fusion engine. Guaranteed to not return None when `block_label` is
-            in the list returned by get_state_block_labels() and #get_strategy does not return None.
+            VSBs coordinate frame. Returns ``None`` if ``block_label`` does not correspond to a
+            block that has been added to the fusion engine. Guaranteed to not return ``None`` when
+            ``block_label`` is in the list returned by :meth:`get_state_block_labels` and
+            :attr:`strategy` is not ``None``.
             """
         pass
 
@@ -182,18 +186,19 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
         """
         Get the cross covariance between the states associated with two state blocks.
 
-        Find the `StandardStateBlocks` within the fusion engine matching `block_label1` and
-        `block_label2`, and return the cross-covariance matrix between them.
+        Find the :class:`StandardStateBlock` s within the fusion engine matching ``block_label1``
+        and ``block_label2``, and return the cross-covariance matrix between them.
 
         Args:
             block_label1 (str)
             block_label2 (str)
 
         Returns:
-            NDArray | None: The cross-covariance matrix between them. Returns None if `block_label1`
-            or `block_label2` do not correspond to blocks that gave been added to the fusion engine.
-            Guaranteed to not return None when both `block_label` and `block_label2` are in the list
-            returned by get_state_block_labels() and #get_strategy does not return None.
+            NDArray | None: The cross-covariance matrix between them. Returns ``None`` if
+            ``block_label1`` or ``block_label2`` do not correspond to blocks that have been added to
+            the fusion engine. Guaranteed to not return ``None`` when both ``block_label1`` and
+            ``block_label2`` are in the list returned by :meth:`get_state_block_labels` and
+            :attr:`strategy` is not ``None``.
         """
         pass
 
@@ -201,8 +206,8 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
         """
         Update the estimate associated with a given state block.
 
-        Find a `StandardStateBlock` within the fusion engine matching `block_label`, and change its
-        current estimate vector.
+        Find a :class:`StandardStateBlock` within the fusion engine matching ``block_label``, and
+        change its current estimate vector.
 
         Note: 
             This function may lead to performance degradation with some implementations and thus its
@@ -218,8 +223,8 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
         """
         Update the covariance associated with a given state block.
 
-        Find a `StandardStateBlock` within the fusion engine matching `block_label`, and change its
-        current covariance matrix.
+        Find a :class:`StandardStateBlock` within the fusion engine matching ``block_label``, and
+        change its current covariance matrix. 
 
         Note:
             This function may lead to performance degradation with some implementations and thus its
@@ -237,8 +242,8 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
         """
         Update the covariance between two state blocks.
 
-        Find the `StandardStateBlock`s within the fusion engine matching `block_label1` and
-        `block_label2`, and change the current covariance matrix between them. 
+        Find the :class:`StandardStateBlock` s within the fusion engine matching ``block_label1``
+        and ``block_label2``, and change the current covariance matrix between them. 
         
         Note:
             This function may lead to performance degradation with some implementations and thus its
@@ -253,7 +258,7 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
 
     def remove_state_block(self, block_label: str) -> None:
         """
-        Remove the `StandardStateBlock` matching `block_label`.
+        Remove the :class:`StandardStateBlock` matching ``block_label``.
 
         This will reduce the state vector being estimated by the number of states that the block
         represents.
@@ -268,33 +273,34 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
         Gets a list of the target labels of virtual state blocks that have been added.
 
         A label being returned by this list is not a guarantee that the virtual state block has a
-        valid source. For that, call has_virtual_state_block().
+        valid source. For that, call :meth:`has_virtual_state_block`.
 
         Returns:
             List[str] | None: A list of the target labels of virtual state blocks that have been
-            added. Returns None if no virtual state blocks have been added to this fusion engine.
+            added. Returns ``None`` if no virtual state blocks have been added to this fusion
+            engine.
         """
         pass
 
     def has_virtual_state_block(self, vsb_target_label: str) -> bool:
         """
-        Checks if the fusion engine has a `VirtualStateBlock` with a matching target label.
+        Checks if the fusion engine has a :class:`VirtualStateBlock` with a matching target label.
 
         Args:
             vsb_target_label (str)
 
         Returns:
-            bool: True if the fusion engine has a `VirtualStateBlock` with a matching target label,
-            Will return false if no virtual state block with matching target label exists or if one
-            exists but is not capable of generating an estimate. That is, the VSB's source must
-            exist and be in a continuous chain to a concrete state block which also exists in the
-            fusion engine in order to return true.
+            bool: ``True`` if the fusion engine has a :class:`VirtualStateBlock` with a matching
+            target label, ``False`` if no virtual state block with matching target label exists or
+            if one exists but is not capable of generating an estimate. That is, the VSB's source
+            must exist and be in a continuous chain to a concrete state block which also exists in
+            the fusion engine in order to return ``True``.
         """
         pass
 
     def add_virtual_state_block(self, virtual_state_block: VirtualStateBlock) -> None:
         """
-        Add the given `VirtualStateBlock` to the fusion engine.
+        Add the given :class:`VirtualStateBlock` to the fusion engine.
 
         A virtual state block (VSB) convert from an underlying block coordinate frame into the VSB
         coordinate frame.
@@ -306,7 +312,7 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
 
     def remove_virtual_state_block(self, vsb_target_label: str) -> None:
         """
-        Remove the `VirtualStateBlock` matching `vsb_target_label`.
+        Remove the :class:`VirtualStateBlock` matching ``vsb_target_label``.
 
         Args:
             vsb_target_label (str)
@@ -319,7 +325,7 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
 
         Returns:
             List[str] | None: List of labels of measurement processors that have been added. Returns
-            None if no measurement processors have been added to this fusion engine.
+            ``None`` if no measurement processors have been added to this fusion engine.
         """
         pass
 
@@ -327,9 +333,9 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
         self, processor: StandardMeasurementProcessor
     ) -> None:
         """
-        Add a StandardMeasurementProcessor.
+        Add a class:`StandardMeasurementProcessor`.
 
-        This can be used to process future measurements that correspond to `processor.get_label()`;
+        This can be used to process future measurements that correspond to ``processor.label``.
 
         Args:
             processor (StandardMeasurementProcessor)
@@ -338,10 +344,10 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
 
     def remove_measurement_processor(self, processor_label: str) -> None:
         """
-        Remove a StandardMeasurementProcessor previously added to the fusion engine.
+        Remove a :class:`StandardMeasurementProcessor` previously added to the fusion engine.
 
-        Assumes a measurement processor was previously added via #add_measurement_processor with the
-        label `processor_label`.
+        Assumes a measurement processor was previously added via :meth:`add_measurement_processor`
+        with the label ``processor_label``.
 
         Args:
             processor_label (str)
@@ -377,19 +383,19 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
         """
         Calculates the estimate and covariance at a requested time.
 
-        Uses the state blocks listed in `block_labels`, without changing the state of the fusion
+        Uses the state blocks listed in ``block_labels``, without changing the state of the fusion
         engine or its underlying filter. Blocks are assembled in the order that the labels are
         passed in.
 
         If all of the following are true:
 
-        - `time` is equal to or after the filter time (which can be checked with #get_time)
-        - all labels in `block_labels` correspond to a block that has been added to the fusion
-            engine (which can be checked with get_state_block_labels())
-        - `block_labels` has at least one element
+        - ``time`` is equal to or after the filter time (which can be checked with :meth:`get_time`)
+        - all labels in ``block_labels`` correspond to a block that has been added to the fusion
+          engine (which can be checked with :meth:`get_state_block_labels`)
+        - ``block_labels`` has at least one element
 
-        Then the result returned is guaranteed to not be None. Otherwise, if any of the above are
-        false then the result will be None.
+        Then the result returned is guaranteed to not be ``None``. Otherwise, if any of the above
+        are false then the result will be ``None``.
 
         Args:
             time (TypeTimestamp)
@@ -406,17 +412,17 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
         """
         Generates the current estimate and covariance.
 
-        Estimate and covariance are built corresponding to a list of State Block labels. Blocks are
+        Estimate and covariance are built corresponding to a list of StateBlock labels. Blocks are
         assembled in the order that the labels are passed in.
 
         If all of the following are true:
 
-        - all labels in `block_labels` correspond to a block that has been added to the fusion
-            engine (which can be checked with get_state_block_labels())
-        - `block_labels` has at least one element
+            - all labels in ``block_labels`` correspond to a block that has been added to the fusion
+              engine (which can be checked with :meth:`get_state_block_labels`)
+            - ``block_labels`` has at least one element
 
-        Then the result returned is guaranteed to not be None. Otherwise, if any of the above are
-        false then the result will be None.
+        Then the result returned is guaranteed to not be ``None``. Otherwise, if any of the above
+        are false then the result will be ``None``.
 
         Args:
             block_labels (List[str]): An array of strings.
@@ -424,10 +430,11 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
         Returns:
             EstimateWithCovariance | None
         """
+        pass
 
     def give_state_block_aux_data(self, block_label: str, aux: List[Message]) -> None:
         """
-        Route a list of messages of aux data to a `StandardStateBlock`.
+        Route a list of messages of aux data to a :class:`StandardStateBlock`.
 
         Args:
             block_label (str)
@@ -439,7 +446,7 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
         self, processor_label: str, aux: List[Message]
     ) -> None:
         """
-        Route a list of messages of aux data to a `StandardMeasurementProcessor`.
+        Route a list of messages of aux data to a :class:`StandardMeasurementProcessor`.
 
         Args:
             processor_label (str)
@@ -451,7 +458,7 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
         self, target_label: str, aux: List[Message]
     ) -> None:
         """
-        Route a list of messages of aux data to a `VirtualStateBlock`.
+        Route a list of messages of aux data to a :class:`VirtualStateBlock`.
 
         Args:
             target_label (str)
@@ -471,7 +478,7 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
 
 class FusionPlugin(CommonPlugin, Protocol):
     """
-    Plugin that provides a `CommonFusionEngine`.
+    Plugin that provides a :class:`CommonFusionEngine`.
 
     A fusion engine allows data from multiple sensors to be integrated into a unified state
     estimate.
@@ -491,18 +498,18 @@ class FusionPlugin(CommonPlugin, Protocol):
 
     def new_fusion_engine(self, type: FusionType) -> CommonFusionEngine | None:
         """
-        Create an instance of #CommonFusionEngine.
+        Create an instance of :class:`CommonFusionEngine`.
 
         Args:
             type (FusionType): The :class:`FusionType` parameter specifies the type of
                 fusion that the returned value will support.
 
         Returns:
-            CommonFusionEngine | None: The #FusionType parameter specifies the type of fusion that
-            the returned value will support. For example, if the user passes in
-            FUSION_STANDARD_MODEL, then the returned value will be a #StandardFusionEngine. Returns
-            None if `type` is not supported by this fusion plugin (#is_fusion_type_supported can be
-            used to check the type before calling this method). Otherwise the return is guaranteed
-            to not be None.
+            CommonFusionEngine | None: The :class:`FusionType` parameter specifies the type of
+            fusion that the returned value will support. For example, if the user passes in
+            ``FUSION_STANDARD_MODEL``, then the returned value will be a
+            :class:`StandardFusionEngine`. Returns ``None`` if ``type`` is not supported by this
+            fusion plugin (:meth:`is_fusion_type_supported` can be used to check the type before
+            calling this method). Otherwise the return is guaranteed to not be ``None``.
         """
         pass

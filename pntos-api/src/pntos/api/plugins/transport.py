@@ -27,7 +27,7 @@ class TransportPlugin(CommonPlugin, Protocol):
         Disable listening.
 
         Disable listening to the transport that was previously started in a
-        call to `start_listening`.
+        call to :meth:`start_listening`.
         """
         pass
 
@@ -39,8 +39,8 @@ class TransportPlugin(CommonPlugin, Protocol):
 
         Args:
             message (Message): The message to send.
-            channel_name (str | None, optional): The desired channel. If `channel_name` is
-                `None` the implementation may decide where `message` should be routed, if
+            channel_name (str | None, optional): The desired channel. If ``channel_name`` is
+                ``None`` the implementation may decide where ``message`` should be routed, if
                 anywhere. For example, a serial cable might send all messages to a single
                 destination.
         """

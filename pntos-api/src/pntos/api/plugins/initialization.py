@@ -113,7 +113,7 @@ class InitialInertialSolution:
         solution (Message | None): The initial solution.
         inertial_errors (StandardInertialErrors | None): The inertial errors.
         inertial_error_covariance (NDArray | None): The covariance matrix associated with the terms
-            in #inertial_errors.
+            in ``inertial_errors``.
         status (InitializationStatus): Indicates the current initialization status. Should be
             checked before using any of the other fields.
 
@@ -157,12 +157,12 @@ class InitialEstimateWithCovariance:
     Coupling these avoids time-of-check to time-of-use (TOCTOU) issues.
 
     Attributes:
-        time (TypeTimestamp): The time at which #estimate_with_covariance is valid.
+        time (TypeTimestamp): The time at which ``estimate_with_covariance`` is valid.
         estimate_with_covariance (EstimateWithCovariance | None): The current estimate of the
-            initial solution. Check #status for its validity (can be None if #status is anything 
-            other than INITIALIZED_GOOD).
+            initial solution. Check ``status`` for its validity (can be ``None`` if ``status`` is
+            anything other than ``INITIALIZED_GOOD``).
         status (InitializationStatus): Indicates the current initialization status. Should be
-            checked before using estimate_with_covariance().
+            checked before using ``estimate_with_covariance``.
 
     Caution:
         **Unstable**: This feature is unstable and is not yet considered part of the stable pntOS
@@ -190,12 +190,13 @@ class EwcInitializationStrategy(CommonInitializationStrategy):
         Get the current initial solution.
 
         Returns:
-            InitialEstimateWithCovariance | None: The current initial solution. Will be None if the
-            initialization strategy has not yet finished. Use
-            #CommonInitializationStrategy.request_current_status to check current status of the
-            strategy. If the status is INITIALIZING_FINE or INITIALIZED_GOOD, then the result is
-            guaranteed to not be None.
+            InitialEstimateWithCovariance | None: The current initial solution. Will be ``None`` if
+            the initialization strategy has not yet finished. Use
+            :meth:`CommonInitializationStrategy.request_current_status` to check current status of
+            the strategy. If the status is ``INITIALIZING_FINE`` or ``INITIALIZED_GOOD``, then the
+            result is guaranteed to not be ``None``.
         """
+        pass
 
 
 InitializationType = InertialInitializationStrategy | EwcInitializationStrategy
@@ -205,8 +206,8 @@ class InitializationPlugin(CommonPlugin, Protocol):
     """
     An implementation of an initialization plugin.
 
-    This plugin generates CommonInitializationStrategy instances which may be used to generate an
-    initial solution from additional external sensor data, such as IMU data.
+    This plugin generates :class:`CommonInitializationStrategy` instances which may be used to
+    generate an initial solution from additional external sensor data, such as IMU data.
 
     Caution:
         **Unstable**: This feature is unstable and is not yet considered part of the stable pntOS
@@ -222,7 +223,8 @@ class InitializationPlugin(CommonPlugin, Protocol):
             type (InitializationType)
 
         Returns:
-            bool: True if the plugin supports a given type of mechanization, False otherwise.
+            bool: ``True`` if the plugin supports a given type of mechanization, ``False``
+            otherwise.
         """
         pass
 
@@ -230,14 +232,15 @@ class InitializationPlugin(CommonPlugin, Protocol):
         self, type: InitializationType, config_group: str | None = None
     ) -> CommonInitializationStrategy | None:
         """
-        Create an instance of CommonInitializationStrategy.
+        Create an instance of :class:`CommonInitializationStrategy`.
 
         Args:
-            type (InitializationType): Specifies the type of initializer that the returned value will support. For
-                example, if the user passes in #INERTIAL_INITIALIZATION_STRATEGY, then the returned value
-                will be an instance of InertialInitializationStrategy. If `type` is unsupported by the
-                plugin, then None will be returned. Please use #is_initialization_type_supported to check if
-                the type is supported by the plugin.
+            type (InitializationType): Specifies the type of initializer that the returned value
+                will support. For example, if the user passes in
+                ``INERTIAL_INITIALIZATION_STRATEGY``, then the returned value will be an instance of
+                :class:`InertialInitializationStrategy`. If ``type`` is unsupported by the plugin,
+                then ``None`` will be returned. Please use :meth:`is_initialization_type_supported`
+                to check if the type is supported by the plugin.
             config_group (str | None, optional): An optional parameter which can be used to specify
                 which group in the config should be used to set up the new initialization strategy.
                 This allows for multiple initialization strategy instances to exist with unique
@@ -245,6 +248,7 @@ class InitializationPlugin(CommonPlugin, Protocol):
 
         Returns:
             CommonInitializationStrategy | None: The new initialization strategy instance. Returns
-            None if `type` is unsupported by this plugin (this can be checked using
-            #is_initialization_type_supported) or if `config_group` is invalid.
+            ``None`` if ``type`` is unsupported by this plugin (this can be checked using
+            :meth:`is_initialization_type_supported`) or if ``config_group`` is invalid.
         """
+        pass

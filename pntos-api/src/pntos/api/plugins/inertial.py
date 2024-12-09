@@ -41,9 +41,9 @@ class InertialForcesRates:
         definition may change at any time.
 
     Attributes:
-        forces_and_rates (MeasurementImu): An ASPN IMU message which has been repurposed to hold 
-            specific forces (the meas_accel field) and rotation rates (the meas_gyro field) in a 
-            different frame (see #frame).
+        forces_and_rates (MeasurementImu): An ASPN IMU message which has been repurposed to hold
+            specific forces (the ``meas_accel`` field) and rotation rates (the ``meas_gyro`` field)
+            in a different frame (see :attr:`frame`).
         frame (InertialFrame): Specifies the frame of the above forces and rates.
     """
 
@@ -99,10 +99,10 @@ class CommonInertial(Protocol):
     """
     A common base type for an inertial.
 
-    A user may use the CommonInertial.mechanization_type field to discover what type of
+    A user may use the :attr:`CommonInertial.mechanization_type` field to discover what type of
     inertial this type actually is and then downcast to the appropriate inertial class. For example,
-    if CommonInertial.mechanization_type is `STANDARD_INERTIAL_MECHANIZATION`, then this
-    instance is actually a StandardInertialMechanization.
+    if :attr:`CommonInertial.mechanization_type` is ``STANDARD_INERTIAL_MECHANIZATION``, then this
+    instance is actually a :class:`StandardInertialMechanization`.
 
     Caution:
         **Unstable**: This feature is unstable and is not yet considered part of the stable pntOS
@@ -115,8 +115,9 @@ class CommonInertial(Protocol):
         Get the solution type.
 
         Returns:
-            type[AspnBase]: The message type that will be returned by request_current_solution, 
-            request_solution, and request_solutions.
+            type[AspnBase]: The message type that will be returned by
+            :meth:`request_current_solution`, :meth:`request_solution`, and
+            :meth:`request_solutions`.
         """
         pass
 
@@ -137,8 +138,9 @@ class CommonInertial(Protocol):
             time (TypeTimestamp): The time at which the returned solution should be valid.
 
         Returns:
-            Message | None: The solution computed by this inertial at `time` if `time` is in the valid range,
-            None otherwise (#is_time_in_range can be used to check `time` before calling this method).
+            Message | None: The solution computed by this inertial at ``time`` if ``time`` is in the
+            valid range, ``None`` otherwise (:meth:`is_time_in_range` can be used to check ``time``
+            before calling this method).
         """
         pass
 
@@ -153,9 +155,9 @@ class CommonInertial(Protocol):
             type (InertialSolutionRangeType): The type of solution requested.
 
         Returns:
-            List[Message] | None: An array of solutions. Returns None if `type` is unsupported by 
-            this inertial or every instance of `times` is outside the valid range. Otherwise 
-            guaranteed to not be None.
+            List[Message] | None: An array of solutions. Returns ``None`` if ``type`` is unsupported
+            by this inertial or every instance of ``time`` is outside the valid range. Otherwise
+            guaranteed to not be ``None``.
         """
         pass
 
@@ -167,8 +169,8 @@ class CommonInertial(Protocol):
             time (TypeTimestamp): The query time.
 
         Returns:
-            bool: True if a solution exists at `time`, false otherwise. This result is only valid
-            until another method (for example, process_pntos_message) is called.
+            bool: ``True`` if a solution exists at ``time``, ``False`` otherwise. This result is
+            only valid until another method (for example, :meth:`process_pntos_message`) is called.
         """
         pass
 
@@ -176,8 +178,8 @@ class CommonInertial(Protocol):
         """
         Get the earliest available time at which a solution or forces and rates can be requested.
 
-        This result is only valid until another method (for example, process_pntos_message) is
-        called.
+        This result is only valid until another method (for example, :meth:`process_pntos_message`)
+        is called.
 
         Returns:
             TypeTimestamp: The earliest available time at which a solution or forces and rates can
@@ -189,8 +191,8 @@ class CommonInertial(Protocol):
         """
         Get the latest available time at which a solution or forces and rates can be requested.
 
-        This result is only valid until another method (for example, process_pntos_message) is
-        called.
+        This result is only valid until another method (for example, :meth:`process_pntos_message`)
+        is called.
 
         Returns:
             TypeTimestamp: The latest available time at which a solution or forces and rates can
@@ -203,8 +205,8 @@ class CommonInertial(Protocol):
         Returns an array of message types that are supported by this plugin.
 
         Returns:
-            List[type[AspnBase]]: An array of message types that are supported by this plugin as 
-            inputs to #process_pntos_message.
+            List[type[AspnBase]]: An array of message types that are supported by this plugin as
+            inputs to :meth:`process_pntos_message`.
         """
         pass
 
@@ -227,9 +229,9 @@ class CommonInertial(Protocol):
             time (TypeTimestamp): The time at which the forces and rates should be valid.
 
         Returns:
-            InertialForcesRates | None: The instantaneous forces and rates at `time` if `time` is in 
-            the valid range, None otherwise (#is_time_in_range can be used to check `time` before
-            calling this method).
+            InertialForcesRates | None: The instantaneous forces and rates at ``time`` if ``time``
+            is in the valid range, ``None`` otherwise (:meth:`is_time_in_range` can be used to check
+            ``time`` before calling this method).
         """
         pass
 
@@ -246,9 +248,9 @@ class CommonInertial(Protocol):
                 and rates should be valid.
 
         Returns:
-            InertialForcesRates | None: The average forces and rates over the period of time 
-            defined by `time1` and `time2` if at least one of them is in the valid range, None
-            otherwise (#is_time_in_range can be used to check both times before calling this
+            InertialForcesRates | None: The average forces and rates over the period of time defined
+            by ``time1`` and ``time2`` if at least one of them is in the valid range, ``None``
+            otherwise (:meth:`is_time_in_range` can be used to check both times before calling this
             method).
         """
         pass
@@ -261,7 +263,7 @@ ExternalInertial = CommonInertial
 
 class StandardInertialMechanization(CommonInertial, Protocol):
     """
-    A struct produced by a InertialPlugin. It generates solutions from raw IMU data.
+    A struct produced by a :class:`InertialPlugin`. It generates solutions from raw IMU data.
 
     Caution:
         **Unstable**: This feature is unstable and is not yet considered part of the stable pntOS
@@ -275,23 +277,23 @@ class StandardInertialMechanization(CommonInertial, Protocol):
 
         Returns:
             List[type[AspnBase]] | None: An array of message types that are supported by this plugin
-            for resetting the inertial solution, or None if resetting the inertial solution is
+            for resetting the inertial solution, or ``None`` if resetting the inertial solution is
             an unsupported operation by the inertial plugin.
         """
         pass
 
     def reset_solution(self, message: Message) -> None:
         """
-        Sets the solution to the values in `message`.
+        Set the solution to the values in ``message``.
 
-        For example, if `message` is PVA then the
-        inertial solution will be set to that PVA. If `message` is just position, then only the
-        position portion of the inertial solution will be set using `message`.
+        For example, if ``message`` is PVA then the inertial solution will be set to that PVA. If
+        ``message`` is just position, then only the position portion of the inertial solution will
+        be set using ``message``.
 
         Args:
             message (Message): A message containing the information necessary to reset the solution.
                 To see the types supported by the implementation, call
-                #request_reset_message_types().
+                :meth:`request_reset_message_types`.
         """
         pass
 
@@ -308,7 +310,7 @@ class StandardInertialMechanization(CommonInertial, Protocol):
         output (which would lead to a double correction).
 
         Args:
-            time (TypeTimestamp): The time at which `errors` should be valid.
+            time (TypeTimestamp): The time at which ``errors`` should be valid.
             errors (StandardInertialErrors): An estimate of the inertial sensor's errors.
         """
         pass
@@ -323,8 +325,9 @@ class StandardInertialMechanization(CommonInertial, Protocol):
             time (TypeTimestamp): Time at which inertial errors should be valid.
 
         Returns:
-            StandardInertialErrors | None: Inertial errors at `time` if `time` is in the valid range 
-            (is_time_in_range can be used to check `time` before calling this method), None otherwise.
+            StandardInertialErrors | None: Inertial errors at ``time`` if ``time`` is in the valid
+            range (:meth:`~CommonInertial.is_time_in_range` can be used to check ``time`` before
+            calling this method), ``None`` otherwise.
         """
         pass
 
@@ -336,8 +339,8 @@ class InertialPlugin(CommonPlugin, Protocol):
     """
     An implementation of an inertial plugin.
 
-    This plugin generates CommonInertial instances which may be used to generate INS solutions
-    from raw IMU data.
+    This plugin generates :class:`CommonInertial` instances which may be used to generate INS
+    solutions from raw IMU data.
 
     Caution:
         **Unstable**: This feature is unstable and is not yet considered part of the stable pntOS
@@ -361,21 +364,23 @@ class InertialPlugin(CommonPlugin, Protocol):
         self, type: InertialType, solution: Message, config_group: str | None = None
     ) -> CommonInertial | None:
         """
-        Create an instance of CommonInertial.
+        Create an instance of :class:`CommonInertial`.
 
         Args:
-            type (InertialType): Specifies the type of inertial that the returned value will support. For
-                example, if the user passes in STANDARD_INERTIAL_MECHANIZATION, then the returned
-                value will be castable to StandardInertialMechanization. If `type` is unsupported by
-                the plugin, then None will be returned. Please use #is_inertial_type_supported to check if
-                the type is supported by the plugin.
+            type (InertialType): Specifies the type of inertial that the returned value will
+                support. For example, if the user passes in ``STANDARD_INERTIAL_MECHANIZATION``,
+                then the returned value will be castable to :class:`StandardInertialMechanization`.
+                If ``type`` is unsupported by the plugin, then ``None`` will be returned. Please use
+                :meth:`is_inertial_type_supported` to check if the type is supported by the plugin.
             solution (Message): The initial solution (i.e. the alignment) to mechanize from.
             config_group (str | None, optional): An optional parameter which can be used to specify
                 which group in the config should be used to initialize the new inertial. This allows
                 for multiple inertial instances to exist with unique settings.
 
         Returns:
-            CommonInertial | None: A new inertial object. Returns None if `type` is unsupported,
-            `solution` is invalid, or `config_group` is invalid. #is_inertial_type_supported can be
-            called to verify `type` before calling this method.
+            CommonInertial | None: A new inertial object. Returns ``None`` if ``type`` is
+            unsupported, ``solution`` is invalid, or ``config_group`` is invalid.
+            :meth:`is_inertial_type_supported` can be called to verify ``type`` before calling this
+            method.
         """
+        pass
