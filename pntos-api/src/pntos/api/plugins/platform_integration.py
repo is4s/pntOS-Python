@@ -13,9 +13,10 @@ class PlatformIntegrationPlugin(CommonPlugin, Protocol):
     system which is specific to a particular platform. Works closely with the
     controller plugin to fully define the overall behavior of the system.
 
-    **UNSTABLE**: This feature is unstable and is not yet considered part of
-    the stable pntOS API. Usage of this feature is highly discouraged in
-    non-experimental code, and its definition may change at any time.
+    Caution:
+        **Unstable**: This feature is unstable and is not yet considered part of the stable pntOS
+        API. Usage of this feature is highly discouraged in non-experimental code, and its
+        definition may change at any time.
     """
 
     def take_control(

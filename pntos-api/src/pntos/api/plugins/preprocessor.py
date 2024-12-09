@@ -9,9 +9,10 @@ class Preprocessor(Protocol):
     """
     A preprocessor.
 
-    **UNSTABLE**: This feature is unstable and is not yet considered part of
-    the stable pntOS API. Usage of this feature is highly discouraged in
-    non-experimental code, and its definition may change at any time.
+    Caution:
+        **Unstable**: This feature is unstable and is not yet considered part of the stable pntOS
+        API. Usage of this feature is highly discouraged in non-experimental code, and its
+        definition may change at any time.
     """
 
     def process_pntos_message(self, message: Message) -> List[Message]:
@@ -35,9 +36,10 @@ class PreprocessorPlugin(CommonPlugin, Protocol):
     This plugin generates `Preprocessor` instances which may be used to process incoming messages
     before being distributed to other plugins.
 
-    **UNSTABLE**: This feature is unstable and is not yet considered part of
-    the stable pntOS API. Usage of this feature is highly discouraged in
-    non-experimental code, and its definition may change at any time.
+    Caution:
+         **Unstable**: This feature is unstable and is not yet considered part of the stable pntOS
+         API. Usage of this feature is highly discouraged in non-experimental code, and its
+         definition may change at any time.
     """
 
     preprocessor_identifiers: List[str]

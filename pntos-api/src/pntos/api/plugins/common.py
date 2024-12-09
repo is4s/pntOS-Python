@@ -112,9 +112,10 @@ class FusionType(Enum):
     functions will receive these samples and be able to arbitrarily modify 
     each particle's weight, location, and add arbitrary noise to them.
 
-    **UNSTABLE**: This feature is unstable and is not yet considered part 
-    of the stable pntOS API. Usage of this feature is highly discouraged in
-    non-experimental code, and its definition may change at any time.
+    Caution: 
+        **Unstable**: This feature is unstable and is not yet considered part of the stable pntOS
+        API. Usage of this feature is highly discouraged in non-experimental code, and its
+        definition may change at any time.
     """
 
     TIME_DELAYED_MODEL = 2
@@ -124,9 +125,10 @@ class FusionType(Enum):
     that historical estimate data is available for processing current time 
     data.
 
-    **UNSTABLE**: This feature is unstable and is not yet considered part 
-    of the stable pntOS API. Usage of this feature is highly discouraged in
-    non-experimental code, and its definition may change at any time.
+    Caution: 
+        **Unstable**: This feature is unstable and is not yet considered part of the stable pntOS
+        API. Usage of this feature is highly discouraged in non-experimental code, and its
+        definition may change at any time.
     """
 
     STANDARD_COMPILED_MODEL = 3
@@ -138,9 +140,10 @@ class FusionType(Enum):
     intended to facilitate usage in environments such as GPGPU filter 
     implementations.
 
-    **UNSTABLE**: This feature is unstable and is not yet considered part 
-    of the stable pntOS API. Usage of this feature is highly discouraged in
-    non-experimental code, and its definition may change at any time.
+    Caution: 
+        **Unstable**: This feature is unstable and is not yet considered part of the stable pntOS
+        API. Usage of this feature is highly discouraged in non-experimental code, and its
+        definition may change at any time.
     """
 
 

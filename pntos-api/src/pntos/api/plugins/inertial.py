@@ -14,9 +14,10 @@ class InertialFrame(Enum):
     """
     An enumeration that specifies frame.
 
-    **UNSTABLE**: This feature is unstable and is not yet considered part of the stable pntOS API.
-    Usage of this feature is highly discouraged in non-experimental code, and its definition may
-    change at any time.
+    Caution:
+        **Unstable**: This feature is unstable and is not yet considered part of the stable pntOS
+        API. Usage of this feature is highly discouraged in non-experimental code, and its
+        definition may change at any time.
     """
 
     INERTIAL_FRAME_NED = 0
@@ -34,9 +35,10 @@ class InertialForcesRates:
     """
     A struct containing specific forces and rotation rates from the inertial.
 
-    **UNSTABLE**: This feature is unstable and is not yet considered part of the stable pntOS API.
-    Usage of this feature is highly discouraged in non-experimental code, and its definition may
-    change at any time.
+    Caution:
+        **Unstable**: This feature is unstable and is not yet considered part of the stable pntOS
+        API. Usage of this feature is highly discouraged in non-experimental code, and its
+        definition may change at any time.
     """
 
     forces_and_rates: MeasurementImu
@@ -54,9 +56,10 @@ class StandardInertialErrors:
     """
     A structure representing the biases on a set of 3-axis gyros and 3-axis accelerometers.
 
-    **UNSTABLE**: This feature is unstable and is not yet considered part of the stable pntOS API.
-    Usage of this feature is highly discouraged in non-experimental code, and its definition may
-    change at any time.
+    Caution:
+        **Unstable**: This feature is unstable and is not yet considered part of the stable pntOS
+        API. Usage of this feature is highly discouraged in non-experimental code, and its
+        definition may change at any time.
     """
 
     accel_biases: NDArray
@@ -91,9 +94,10 @@ class InertialSolutionRangeType(Enum):
     An enumeration that allows the user to decide if the solution they request is the best available
     solution or one that has no discontinuities in it due to resets.
 
-    **UNSTABLE**: This feature is unstable and is not yet considered part of the stable pntOS API.
-    Usage of this feature is highly discouraged in non-experimental code, and its definition may
-    change at any time.
+    Caution:
+        **Unstable**: This feature is unstable and is not yet considered part of the stable pntOS
+        API. Usage of this feature is highly discouraged in non-experimental code, and its
+        definition may change at any time.
     """
 
     INERTIAL_BEST_KNOWN_SOLUTION = 0
@@ -109,9 +113,10 @@ class CommonInertial(Protocol):
     if CommonInertial.mechanization_type is `STANDARD_INERTIAL_MECHANIZATION`, then this
     instance is actually a StandardInertialMechanization.
 
-    **UNSTABLE**: This feature is unstable and is not yet considered part of the stable pntOS API.
-    Usage of this feature is highly discouraged in non-experimental code, and its definition may
-    change at any time.
+    Caution:
+        **Unstable**: This feature is unstable and is not yet considered part of the stable pntOS
+        API. Usage of this feature is highly discouraged in non-experimental code, and its
+        definition may change at any time.
     """
 
     def request_solution_message_type(self) -> type[AspnBase]:
@@ -228,9 +233,10 @@ class StandardInertialMechanization(CommonInertial, Protocol):
     """
     A struct produced by a InertialPlugin. It generates solutions from raw IMU data.
 
-    **UNSTABLE**: This feature is unstable and is not yet considered part of the stable pntOS API.
-    Usage of this feature is highly discouraged in non-experimental code, and its definition may
-    change at any time.
+    Caution:
+        **Unstable**: This feature is unstable and is not yet considered part of the stable pntOS
+        API. Usage of this feature is highly discouraged in non-experimental code, and its
+        definition may change at any time.
     """
 
     def request_reset_message_types(self) -> List[type[AspnBase]] | None:
@@ -295,9 +301,10 @@ class InertialPlugin(CommonPlugin, Protocol):
     This plugin generates CommonInertial instances which may be used to generate INS solutions
     from raw IMU data.
 
-    **UNSTABLE**: This feature is unstable and is not yet considered part of the stable pntOS API.
-    Usage of this feature is highly discouraged in non-experimental code, and its definition may
-    change at any time.
+    Caution:
+        **Unstable**: This feature is unstable and is not yet considered part of the stable pntOS
+        API. Usage of this feature is highly discouraged in non-experimental code, and its
+        definition may change at any time.
     """
 
     def is_inertial_type_supported(self, type: InertialType) -> bool:

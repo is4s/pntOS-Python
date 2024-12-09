@@ -15,9 +15,10 @@ class InitializationStatus(Enum):
     """
     An enumeration that allows the user to know the initialization status.
 
-    **UNSTABLE**: This feature is unstable and is not yet considered part of the stable pntOS API.
-    Usage of this feature is highly discouraged in non-experimental code, and its definition may
-    change at any time.
+    Caution:
+        **Unstable**: This feature is unstable and is not yet considered part of the stable pntOS
+        API. Usage of this feature is highly discouraged in non-experimental code, and its
+        definition may change at any time.
     """
 
     WAITING = 0
@@ -47,9 +48,10 @@ class InitializationMotionNeeded(Enum):
     """
     An enumeration that specifies what type of motion is required by the initialization strategy.
 
-    **UNSTABLE**: This feature is unstable and is not yet considered part of the stable pntOS API.
-    Usage of this feature is highly discouraged in non-experimental code, and its definition may
-    change at any time.
+    Caution:
+        **Unstable**: This feature is unstable and is not yet considered part of the stable pntOS
+        API. Usage of this feature is highly discouraged in non-experimental code, and its
+        definition may change at any time.
     """
 
     NO_MOTION = 0
@@ -66,9 +68,10 @@ class CommonInitializationStrategy(Protocol):
     """
     A common base type for initialization algorithms.
 
-    **UNSTABLE**: This feature is unstable and is not yet considered part of the stable pntOS API.
-    Usage of this feature is highly discouraged in non-experimental code, and its definition may
-    change at any time.
+    Caution:
+        **Unstable**: This feature is unstable and is not yet considered part of the stable pntOS
+        API. Usage of this feature is highly discouraged in non-experimental code, and its
+        definition may change at any time.
     """
 
     def request_motion_needed(self) -> InitializationMotionNeeded:
@@ -91,9 +94,10 @@ class InitialInertialSolution:
 
     Coupling these avoids time-of-check to time-of-use (TOCTOU) issues.
 
-    **UNSTABLE**: This feature is unstable and is not yet considered part of the stable pntOS API.
-    Usage of this feature is highly discouraged in non-experimental code, and its definition may
-    change at any time.
+    Caution:
+        **Unstable**: This feature is unstable and is not yet considered part of the stable pntOS
+        API. Usage of this feature is highly discouraged in non-experimental code, and its
+        definition may change at any time.
     """
 
     solution: Message | None
@@ -117,9 +121,10 @@ class InertialInitializationStrategy(CommonInitializationStrategy, Protocol):
     """
     Generates an initial ASPN solution from sensor data.
 
-    **UNSTABLE**: This feature is unstable and is not yet considered part of the stable pntOS API.
-    Usage of this feature is highly discouraged in non-experimental code, and its definition may
-    change at any time.
+    Caution:
+        **Unstable**: This feature is unstable and is not yet considered part of the stable pntOS
+        API. Usage of this feature is highly discouraged in non-experimental code, and its
+        definition may change at any time.
     """
 
     def request_solution(self) -> InitialInertialSolution:
@@ -134,9 +139,10 @@ class InitialEstimateWithCovariance:
 
     Coupling these avoids time-of-check to time-of-use (TOCTOU) issues.
 
-    **UNSTABLE**: This feature is unstable and is not yet considered part of the stable pntOS API.
-    Usage of this feature is highly discouraged in non-experimental code, and its definition may
-    change at any time.
+    Caution:
+        **Unstable**: This feature is unstable and is not yet considered part of the stable pntOS
+        API. Usage of this feature is highly discouraged in non-experimental code, and its
+        definition may change at any time.
     """
 
     time: TypeTimestamp
@@ -161,9 +167,10 @@ class EwcInitializationStrategy(CommonInitializationStrategy):
     """
     Generates an initial estimate-with-covariance (EWC) solution from sensor data.
 
-    **UNSTABLE**: This feature is unstable and is not yet considered part of the stable pntOS API.
-    Usage of this feature is highly discouraged in non-experimental code, and its definition may
-    change at any time.
+    Caution:
+        **Unstable**: This feature is unstable and is not yet considered part of the stable pntOS
+        API. Usage of this feature is highly discouraged in non-experimental code, and its
+        definition may change at any time.
     """
 
     def request_solution(self) -> InitialEstimateWithCovariance | None:
@@ -187,9 +194,10 @@ class InitializationPlugin(CommonPlugin, Protocol):
     This plugin generates CommonInitializationStrategy instances which may be used to generate an
     initial solution from additional external sensor data, such as IMU data.
 
-    **UNSTABLE**: This feature is unstable and is not yet considered part of the stable pntOS API.
-    Usage of this feature is highly discouraged in non-experimental code, and its definition may
-    change at any time.
+    Caution:
+        **Unstable**: This feature is unstable and is not yet considered part of the stable pntOS
+        API. Usage of this feature is highly discouraged in non-experimental code, and its
+        definition may change at any time.
     """
 
     def is_initialization_type_supported(self, type: InitializationType) -> bool:

@@ -65,9 +65,10 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
     return is None then this fusion engine needs to be provided a strategy). While
     StandardFusionEngine.get_strategy returns None, all other methods are unsafe to be called.
 
-    **UNSTABLE**: This feature is unstable and is not yet considered part of the stable pntOS API.
-    Usage of this feature is highly discouraged in non-experimental code, and its definition may
-    change at any time.
+    Caution:
+        **Unstable**: This feature is unstable and is not yet considered part of the stable pntOS
+        API. Usage of this feature is highly discouraged in non-experimental code, and its
+        definition may change at any time.
     """
 
     @property
