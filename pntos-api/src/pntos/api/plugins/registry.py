@@ -32,12 +32,11 @@ class RegistryPlugin(CommonPlugin, Protocol):
         Returns:
             Registry: The newly created registry.
 
-        NOTE: The returned `Registry` should be capable of producing
-        `KeyValueStore` structs that are able to be used concurrently. Thus if
-        the user uses the return value of this method to start two batches, one
-        on group "foo" and the other on group "bar", then concurrent access to
-        both of the resulting `KeyValueStore` structs for "foo" and "bar"
-        should be supported (i.e. no shared mutable state between them that is
-        not synchronized).
+        Note:
+            The returned `Registry` should be capable of producing `KeyValueStore` structs that are
+            able to be used concurrently. Thus if the user uses the return value of this method to
+            start two batches, one on group "foo" and the other on group "bar", then concurrent
+            access to both of the resulting `KeyValueStore` structs for "foo" and "bar" should be
+            supported (i.e. no shared mutable state between them that is not synchronized).
         """
         pass

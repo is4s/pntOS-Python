@@ -38,11 +38,13 @@ class PlatformIntegrationPlugin(CommonPlugin, Protocol):
         initialized. The PIP is consequently not responsible for the mediator
         construction or message routing - those responsibilities fall on the
         controller. Instead, the PIP is responsible for doing any additional
-        logic that may be platform specific. For example, the PIP may decide to
-        output solutions at a particular rate, or to have the transport plugin
-        passed in its plugins list start/stop listening in response to moding
-        commands, or inform the orchestration plugin that it should not use a
-        particular sensor at runtime (via a registry convention).
+        logic that may be platform specific.
+
+        Example:
+            For example, the PIP may decide to output solutions at a particular rate, or to have the
+            :class:`TransportPlugin` passed in its plugins list start/stop listening in response to
+            moding commands, or inform the :class:`OrchestrationPlugin` that it should not use a
+            particular sensor at runtime (via a registry convention).
 
         In general, the goal of the PIP is to implement the platform-specific
         needs, whereas the controller plugin is designed to be the generic

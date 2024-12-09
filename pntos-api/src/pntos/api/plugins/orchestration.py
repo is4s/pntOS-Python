@@ -121,19 +121,19 @@ class OrchestrationPlugin(CommonPlugin, Protocol):
     messages from the controller, and is responsible for computing a solution
     for the system, as well as estimating any other quantities of interest.
 
-    In order to achieve this task, the orchestration plugin may be passed a set
-    of other plugins during the call to
-    `OrchestrationPlugin.init_orchestration_plugin`. If so, the orchestration
-    plugin then, as the name suggests, configures and orchestrates these
-    plugins to work together to perform sensor fusion. For example, the
-    orchestration plugin may set up a fusion engine it received in the call to
-    `OrchestrationPlugin.init_orchestration_plugin`, then add state blocks or
-    measurement processors to that fusion engine from a state modeling plugin
-    it also received, and process inertial data from an inertial plugin it
-    received. The `OrchestrationPlugin.request_solutions` function will be
-    called by the system when pntOS needs to know the current filtering
-    solutions. Other quantities which need to be estimated by the orchestration
-    engine can be returned to the system by registry updates.
+    In order to achieve this task, the orchestration plugin may be passed a set of other plugins
+    during the call to `OrchestrationPlugin.init_orchestration_plugin`. If so, the
+    orchestration plugin then, as the name suggests, configures and orchestrates these plugins to
+    work together to perform sensor fusion.
+
+    Example:
+        For example, the orchestration plugin may set up a fusion engine it received in the call to
+        `OrchestrationPlugin.init_orchestration_plugin`, then add state blocks or measurement
+        processors to that fusion engine from a state modeling plugin it also received, and process
+        inertial data from an inertial plugin it received. The
+        `OrchestrationPlugin.request_solutions` function will be called by the system when pntOS
+        needs to know the current filtering solutions. Other quantities which need to be estimated
+        by the orchestration engine can be returned to the system by registry updates.
     """
 
     def init_orchestration_plugin(
@@ -206,9 +206,10 @@ class OrchestrationPlugin(CommonPlugin, Protocol):
           getting a false positive match from a type whose string would be a
           subset of another type.
 
-        For example, if the primary solution is an ASPN PVA then the string
-        `MY_BEST_ASPN_MEASUREMENT_POSITION_VELOCITY_ATTITUDE_ESTIMATE` would
-        fulfill the convention.
+        Example:
+            For example, if the primary solution is an ASPN PVA then the string
+            `MY_BEST_ASPN_MEASUREMENT_POSITION_VELOCITY_ATTITUDE_ESTIMATE` would
+            fulfill the convention.
 
         These conventions allow the user to identify their desired type of
         solution using substring matching.

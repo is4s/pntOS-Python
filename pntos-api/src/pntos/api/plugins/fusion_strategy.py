@@ -29,18 +29,20 @@ class StandardDynamicsModel:
     """
     A description of the propagation dynamics for a set of states.
 
-    This model assumes that the state space `x` can be propagated forward in time by the equation:
+    This model assumes that the state space :math:`x` can be propagated forward in time by the
+    equation:
 
+    .. math::
         x_k = g(x_{k-1}) + w_k
 
-    where `x_k` is the set of states at time k, `g` is an arbitrary function,
-    and `w_k` is additive white Gaussian noise.
+    where :math:`x_k` is the set of states at time :math:`k`, :math:`g` is an arbitrary function,
+    and :math:`w_k` is additive white Gaussian noise.
 
     Attributes:
-      g (Callable[[NDArray], NDArray]): A function that propagates forward in time a set of states.
-      Phi (NDArray): The first-order Taylor series expansion (Jacobian) of the function `g`.
-      Qd: The covariance matrix of `w_k`.
-
+        g (Callable[[NDArray], NDArray]): A function that propagates forward in time a set of
+            states.
+        Phi (NDArray): The first-order Taylor series expansion (Jacobian) of the function :math:`g`.
+        Qd (NDArray): The covariance matrix of :math:`w_k`.
     """
 
     g: Callable[[NDArray], NDArray]
@@ -53,19 +55,20 @@ class StandardMeasurementModel:
     """
     A description of how a measurement relates to a state space.
 
-    This model assumes that the relationship between the measurement and state vector is
-    well modeled by the equation:
+    This model assumes that the relationship between the measurement and state vector is well
+    modeled by the equation:
+
+    .. math::
         z=h(x) + v
-    where `z` is the measurement itself, `x` is the set of states being
-    estimated, `h` is an arbitrary function, and `v` is additive white Gaussian
-    noise.
+
+    where :math:`z` is the measurement itself, :math:`x` is the set of states being estimated,
+    :math:`h` is an arbitrary function, and :math:`v` is additive white Gaussian noise.
 
     Attributes:
-      z (NDArray): A column vector containing the measurement itself.
-      h (Callable[[NDArray], NDArray]): A function that maps the state space to
-        measurement space.
-      H: The first-order Taylor series expansion (i.e. Jacobian) of the function `h`.
-      R: The covariance matrix of `v`.
+        z (NDArray): A column vector containing the measurement itself.
+        h (Callable[[NDArray], NDArray]): A function that maps the state space to measurement space.
+        H (NDArray): The first-order Taylor series expansion (i.e. Jacobian) of the function h.
+        R (NDArray): The covariance matrix of :math:`v`.
     """
 
     z: NDArray

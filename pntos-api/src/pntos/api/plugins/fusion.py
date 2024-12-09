@@ -202,8 +202,11 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
         Update the estimate associated with a given state block.
 
         Find a `StandardStateBlock` within the fusion engine matching `block_label`, and change its
-        current estimate vector. Note that this function may lead to performance degradation with
-        some implementations and thus its use is discouraged if other options are available.
+        current estimate vector.
+
+        Note: 
+            This function may lead to performance degradation with some implementations and thus its
+            use is discouraged if other options are available.
 
         Args:
             block_label (str)
@@ -216,8 +219,11 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
         Update the covariance associated with a given state block.
 
         Find a `StandardStateBlock` within the fusion engine matching `block_label`, and change its
-        current covariance matrix. Note that this function may lead to performance degradation with
-        some implementations and thus its use is discouraged if other options are available.
+        current covariance matrix.
+
+        Note:
+            This function may lead to performance degradation with some implementations and thus its
+            use is discouraged if other options are available.
 
         Args:
             block_label (str)
@@ -232,9 +238,11 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
         Update the covariance between two state blocks.
 
         Find the `StandardStateBlock`s within the fusion engine matching `block_label1` and
-        `block_label2`, and change the current covariance matrix between them. Note that this
-        function may lead to performance degradation with some implementations and thus its use is
-        discouraged if other options are available.
+        `block_label2`, and change the current covariance matrix between them. 
+        
+        Note:
+            This function may lead to performance degradation with some implementations and thus its
+            use is discouraged if other options are available.
 
         Args:
             block_label1 (str)
