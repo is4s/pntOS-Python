@@ -586,6 +586,10 @@ class Mediator(Protocol):
     themselves responsible for implementing. The details of which plugins are used in the
     implementation of any particular function on this struct is decided by the
     :class:`ControllerPlugin`, and thus is implementation specific to the controller used.
+
+    Attributes:
+        registry (Registry): A :class:`Registry` object that can be used to update keys/values in
+            the pntOS global registry.
     """
 
     def get_filter_description_list(self) -> List[str]:
@@ -704,10 +708,6 @@ class Mediator(Protocol):
         pass
 
     registry: Registry
-    """
-    A pointer to a `Registry` object that can be used to update keys/values in 
-    the pntOS global registry.
-    """
 
 
 class CommonPlugin(Protocol):
