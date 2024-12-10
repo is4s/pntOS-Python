@@ -1,3 +1,4 @@
 [submodule "docs/branding_assets"]
 	path = docs/branding_assets
 	url = ../navigation-data.git
+	shallow = true
