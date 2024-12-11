@@ -5,6 +5,7 @@ from enum import Enum
 from typing import List, Protocol
 
 from aspn23 import AspnBase, MeasurementImu, TypeTimestamp
+from numpy import float64
 from numpy.typing import NDArray
 
 from .common import CommonPlugin, Message
@@ -59,25 +60,25 @@ class StandardInertialErrors:
     change at any time.
     """
 
-    accel_biases: NDArray
+    accel_biases: NDArray[float64]
     """
     A 1D vector of length 3 containing biases for a 3-axis accelerometer in the sensor's (X-Y-Z)
     frame, expressed in m/s^2.
     """
 
-    gyro_biases: NDArray
+    gyro_biases: NDArray[float64]
     """"
     A 1D vector of length 3 containing biases for a 3-axis gyro in the sensor's (X-Y-Z) frame,
     expressed in rad/s.
     """
 
-    accel_scale_factors: NDArray
+    accel_scale_factors: NDArray[float64]
     """"
     A 1D vector of length 3 containing scale factor errors for a 3-axis accelerometer in the
     sensor's (X-Y-Z) frame, unitless.
     """
 
-    gyro_scale_factors: NDArray
+    gyro_scale_factors: NDArray[float64]
     """"
     A 1D vector of length 3 containing scale factor errors for a 3-axis gyroscope in the
     sensor's (X-Y-Z) frame, unitless.

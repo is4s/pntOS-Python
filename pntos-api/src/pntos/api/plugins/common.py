@@ -5,6 +5,7 @@ from enum import Enum
 from typing import Callable, List, Protocol, TypeVar
 
 from aspn23 import AspnBase, TypeTimestamp
+from numpy import float64
 from numpy.typing import NDArray
 
 
@@ -22,15 +23,15 @@ class Message:
 
     wrapped_message: AspnBase
     """
-    Either an ASPN message or a pntOS ASPN Extension message, depending on the 
+    Either an ASPN message or a pntOS ASPN Extension message, depending on the
     value of `wrapped_message.message_type`.
     """
 
     source_identifier: str
     """
-    Indicates where this message came from. If the message originated from a 
-    transport plugin and the underlying transport has the concept of a channel 
-    or topic, this field should be populated by the channel or topic. 
+    Indicates where this message came from. If the message originated from a
+    transport plugin and the underlying transport has the concept of a channel
+    or topic, this field should be populated by the channel or topic.
     Otherwise, the identifier is populated in a plugin-specific manner by the
     originating plugin that created the message.
     """
@@ -43,16 +44,16 @@ class EstimateWithCovarianceType(Enum):
     """
     Contains a mean (estimate) and covariance describing a multivariate
     Gaussian distribution.
-    * `EstimateWithCovariance.estimate` is size Nx1 where N is the length 
+    * `EstimateWithCovariance.estimate` is size Nx1 where N is the length
       field.
-    * `EstimateWithCovariance.covariance` is size NxN where N is the length 
+    * `EstimateWithCovariance.covariance` is size NxN where N is the length
       field.
     """
 
     EWC_ATTITUDE_QUAT = 1
     """
     Contains a mean (estimate) and covariance describing a rotation modeled
-    by a multivariate Gaussian distribution, but the estimate is in quaternion 
+    by a multivariate Gaussian distribution, but the estimate is in quaternion
     form and the covariance is in tilt error form.
     * `EstimateWithCovariance.estimate` is size 4x1
     * `EstimateWithCovariance.covariance` is size 3x3, in radians^2.
@@ -64,19 +65,19 @@ class EstimateWithCovariance:
     """A container for holding an estimate and covariance."""
 
     type: EstimateWithCovarianceType
-    """ 
-    Describes how the fields in this struct are used. 
+    """
+    Describes how the fields in this struct are used.
     """
 
-    estimate: NDArray
-    """ 
-    An array of doubles representing an estimate vector. Usage depends on the 
+    estimate: NDArray[float64]
+    """
+    An array of doubles representing an estimate vector. Usage depends on the
     `type` field.
     """
 
-    covariance: NDArray
+    covariance: NDArray[float64]
     """
-    An array of doubles representing a square covariance matrix. Data is 
+    An array of doubles representing a square covariance matrix. Data is
     stored in row major form. Usage depends on the `type` field.
     """
 
@@ -98,8 +99,8 @@ class FusionType(Enum):
 
     STANDARD_MODEL = 0
     """
-    The standard model of fusion within pntOS. This model assumes that 
-    state estimates are representable in a jointly Gaussian state vector 
+    The standard model of fusion within pntOS. This model assumes that
+    state estimates are representable in a jointly Gaussian state vector
     and that updates of the state vector contain only i.i.d. additive white
     Gaussian noise. See `StandardFusionEngine` for more information.
     """
@@ -107,38 +108,38 @@ class FusionType(Enum):
     SAMPLED_MODEL = 1
     """
     The sampled model of fusion within pntOS. This model assumes that state
-    estimates are represented by discrete stochastic sample points of a 
+    estimates are represented by discrete stochastic sample points of a
     probability density function (i.e. particles) and that propagate/update
-    functions will receive these samples and be able to arbitrarily modify 
+    functions will receive these samples and be able to arbitrarily modify
     each particle's weight, location, and add arbitrary noise to them.
 
-    **UNSTABLE**: This feature is unstable and is not yet considered part 
+    **UNSTABLE**: This feature is unstable and is not yet considered part
     of the stable pntOS API. Usage of this feature is highly discouraged in
     non-experimental code, and its definition may change at any time.
     """
 
     TIME_DELAYED_MODEL = 2
     """
-    The time delayed model of fusion within pntOS. This model assumes that 
-    information about a state is retained across different time epochs and 
-    that historical estimate data is available for processing current time 
+    The time delayed model of fusion within pntOS. This model assumes that
+    information about a state is retained across different time epochs and
+    that historical estimate data is available for processing current time
     data.
 
-    **UNSTABLE**: This feature is unstable and is not yet considered part 
+    **UNSTABLE**: This feature is unstable and is not yet considered part
     of the stable pntOS API. Usage of this feature is highly discouraged in
     non-experimental code, and its definition may change at any time.
     """
 
     STANDARD_COMPILED_MODEL = 3
     """
-    The standard model of fusion within pntOS, in compiled format. This 
+    The standard model of fusion within pntOS, in compiled format. This
     model is identical to the standard model, with the exception that model
     information is not available in function pointers on the machine itself
-    but instead binary blobs which have been pre-compiled. This mode is 
-    intended to facilitate usage in environments such as GPGPU filter 
+    but instead binary blobs which have been pre-compiled. This mode is
+    intended to facilitate usage in environments such as GPGPU filter
     implementations.
 
-    **UNSTABLE**: This feature is unstable and is not yet considered part 
+    **UNSTABLE**: This feature is unstable and is not yet considered part
     of the stable pntOS API. Usage of this feature is highly discouraged in
     non-experimental code, and its definition may change at any time.
     """
@@ -149,7 +150,7 @@ class LoggingLevel(Enum):
 
     ERROR = 0
     """
-    This output indicates the program has entered an error state, and 
+    This output indicates the program has entered an error state, and
     likely needs to be inspected to discover what went wrong.
     """
 
@@ -161,14 +162,14 @@ class LoggingLevel(Enum):
 
     INFO = 2
     """
-    This output is designed to be informational, and may indicate correct 
+    This output is designed to be informational, and may indicate correct
     operation.
     """
 
     DEBUG = 3
     """
-    This output is designed to assist in debugging plugins by providing 
-    additional information about state and behavior which would be 
+    This output is designed to assist in debugging plugins by providing
+    additional information about state and behavior which would be
     otherwise unnecessary.
     """
 
@@ -184,7 +185,7 @@ class KeyValueStoreDataFormat(Enum):
 
     INI = 0
     """
-    Keys and their corresponding values are returned according to the INI 
+    Keys and their corresponding values are returned according to the INI
     file format specification.
     """
 
@@ -195,7 +196,7 @@ class KeyValueStoreDataFormat(Enum):
 
 
 RegistryValueTypes = TypeVar(
-    "RegistryValueTypes", str, List[str], int, bool, float, NDArray, Message
+    "RegistryValueTypes", str, List[str], int, bool, float, NDArray[float64], Message
 )
 
 
@@ -663,7 +664,7 @@ class Mediator(Protocol):
 
     registry: Registry
     """
-    A pointer to a `Registry` object that can be used to update keys/values in 
+    A pointer to a `Registry` object that can be used to update keys/values in
     the pntOS global registry.
     """
 
@@ -755,7 +756,7 @@ class CommonPlugin(Protocol):
 
     identifier: str
     """
-    A string identifier uniquely identifying this plugin. This string will be 
-    used to determine the unique space this plugin receives in the system 
+    A string identifier uniquely identifying this plugin. This string will be
+    used to determine the unique space this plugin receives in the system
     config.
     """

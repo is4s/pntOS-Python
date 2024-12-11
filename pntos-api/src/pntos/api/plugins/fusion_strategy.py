@@ -3,6 +3,7 @@
 from dataclasses import dataclass
 from typing import Callable, Protocol, runtime_checkable
 
+from numpy import float64
 from numpy.typing import NDArray
 
 from pntos.api import CommonPlugin, FusionType
@@ -37,15 +38,15 @@ class StandardDynamicsModel:
     and `w_k` is additive white Gaussian noise.
 
     Attributes:
-      g (Callable[[NDArray], NDArray]): A function that propagates forward in time a set of states.
-      Phi (NDArray): The first-order Taylor series expansion (Jacobian) of the function `g`.
+      g (Callable[[NDArray[float64]], NDArray[float64]]): A function that propagates forward in time a set of states.
+      Phi (NDArray[float64]): The first-order Taylor series expansion (Jacobian) of the function `g`.
       Qd: The covariance matrix of `w_k`.
 
     """
 
-    g: Callable[[NDArray], NDArray]
-    Phi: NDArray
-    Qd: NDArray
+    g: Callable[[NDArray[float64]], NDArray[float64]]
+    Phi: NDArray[float64]
+    Qd: NDArray[float64]
 
 
 @dataclass
@@ -61,17 +62,17 @@ class StandardMeasurementModel:
     noise.
 
     Attributes:
-      z (NDArray): A column vector containing the measurement itself.
-      h (Callable[[NDArray], NDArray]): A function that maps the state space to
+      z (NDArray[float64]): A column vector containing the measurement itself.
+      h (Callable[[NDArray[float64]], NDArray[float64]]): A function that maps the state space to
         measurement space.
       H: The first-order Taylor series expansion (i.e. Jacobian) of the function `h`.
       R: The covariance matrix of `v`.
     """
 
-    z: NDArray
-    h: Callable[[NDArray], NDArray]
-    H: NDArray
-    R: NDArray
+    z: NDArray[float64]
+    h: Callable[[NDArray[float64]], NDArray[float64]]
+    H: NDArray[float64]
+    R: NDArray[float64]
 
 
 @runtime_checkable
@@ -124,9 +125,9 @@ class StandardFusionStrategy(FusionStrategy, Protocol):
 
     def add_states(
         self,
-        initial_estimate: NDArray,
-        initial_covariance: NDArray,
-        cross_covariance: NDArray | None = None,
+        initial_estimate: NDArray[float64],
+        initial_covariance: NDArray[float64],
+        cross_covariance: NDArray[float64] | None = None,
     ) -> int:
         r"""
         Add new states to this filter.
@@ -137,11 +138,11 @@ class StandardFusionStrategy(FusionStrategy, Protocol):
         and the added states will be set to zeroes.
 
         Args:
-            initial_estimate (NDArray): The initial estimate to populate the new
+            initial_estimate (NDArray[float64]): The initial estimate to populate the new
               states with.
-            initial_covariance (NDArray): The initial covariance matrix used to
+            initial_covariance (NDArray[float64]): The initial covariance matrix used to
               initialize the uncertainty of the new states.
-            cross_covariance (NDArray | None): A covariance matrix that
+            cross_covariance (NDArray[float64] | None): A covariance matrix that
               describes the cross terms between the new states and all previous
               states. If `None`, the cross-terms will be set to zero.
 
@@ -160,7 +161,7 @@ class StandardFusionStrategy(FusionStrategy, Protocol):
         """
         ...
 
-    def get_estimate(self) -> NDArray | None:
+    def get_estimate(self) -> NDArray[float64] | None:
         """
         Get the current internal estimate managed by this strategy.
 
@@ -171,11 +172,13 @@ class StandardFusionStrategy(FusionStrategy, Protocol):
         strategy.
 
         Returns:
-            NDArray | None: An estimate if available. Returns None if no
+            NDArray[float64] | None: An estimate if available. Returns None if no
               states have been added yet.
         """
 
-    def set_estimate_slice(self, new_estimate: NDArray, first_index: int) -> None:
+    def set_estimate_slice(
+        self, new_estimate: NDArray[float64], first_index: int
+    ) -> None:
         """
         Set a slice of the state estimates to a given set of values.
 
@@ -187,13 +190,13 @@ class StandardFusionStrategy(FusionStrategy, Protocol):
         `new_estimate`.
 
         Args:
-            new_estimate (NDArray): The new estimate values that will overwrite
+            new_estimate (NDArray[float64]): The new estimate values that will overwrite
               the previous values.
             first_index (int): The index of the first state to overwrite.
         """
         ...
 
-    def get_covariance(self) -> NDArray | None:
+    def get_covariance(self) -> NDArray[float64] | None:
         """
         Get the covariance of the current estimate.
 
@@ -205,11 +208,11 @@ class StandardFusionStrategy(FusionStrategy, Protocol):
         this strategy.
 
         Returns:
-            NDArray | None: The covariance of the current estimate. Returns None if no states have been added yet.
+            NDArray[float64] | None: The covariance of the current estimate. Returns None if no states have been added yet.
         """
 
     def set_covariance_slice(
-        self, new_covariance: NDArray, first_row: int, first_col: int
+        self, new_covariance: NDArray[float64], first_row: int, first_col: int
     ) -> None:
         """
         Set a slice of the covariance matrix to a given set of values.
@@ -226,7 +229,7 @@ class StandardFusionStrategy(FusionStrategy, Protocol):
         equal to the size of `new_covariance`.
 
         Args:
-            new_covariance (NDArray): The new covariance values that will
+            new_covariance (NDArray[float64]): The new covariance values that will
               overwrite a slice of the previous covariance matrix.
             first_row (int): The row of the first value to overwrite
             first_col (int): The column of the first value to overwrite

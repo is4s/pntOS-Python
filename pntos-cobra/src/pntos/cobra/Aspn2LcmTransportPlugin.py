@@ -1,5 +1,5 @@
 from threading import Thread
-from typing import Protocol
+from typing import Callable, Protocol
 
 import numpy as np
 from aspn23 import (
@@ -9,14 +9,16 @@ from aspn23 import (
     TypeHeader,
     TypeTimestamp,
 )
-from datasources.lcm.messages.aspn.positionvelocityattitude import (  # type: ignore[import]
+from datasources.lcm.messages.aspn.positionvelocityattitude import (  # type: ignore[import-untyped]
     positionvelocityattitude,
 )
-from datasources.lcm.messages.aspn.types.geodeticposition3d_type import (  # type: ignore[import]
+from datasources.lcm.messages.aspn.types.geodeticposition3d_type import (  # type: ignore[import-untyped]
     geodeticposition3d_type,
 )
-from datasources.lcm.messages.aspn.types.header import header  # type: ignore[import]
-from datasources.lcm.messages.aspn.types.timestamp import (  # type: ignore[import]
+from datasources.lcm.messages.aspn.types.header import (  # type: ignore[import-untyped]
+    header,
+)
+from datasources.lcm.messages.aspn.types.timestamp import (  # type: ignore[import-untyped]
     timestamp,
 )
 from lcm import LCM, LCMSubscription
@@ -35,7 +37,11 @@ class Aspn2LcmTransportPlugin(CommonPlugin, Protocol):
         self.identifier = "python-transport-lcm2-plugin"
         self.mediator = mediator
 
-    def init_plugin(self):
+    def init_plugin(
+        self,
+        plugin_resources_location: str | None = None,
+        mediator: Mediator | None = None,
+    ) -> None:
         """
         PntOS plugin initialization function
 
@@ -46,7 +52,7 @@ class Aspn2LcmTransportPlugin(CommonPlugin, Protocol):
         """
         pass
 
-    def shutdown_plugin(self):
+    def shutdown_plugin(self) -> None:
         """
         PntOS plugin shutdown function
 
@@ -57,7 +63,7 @@ class Aspn2LcmTransportPlugin(CommonPlugin, Protocol):
         """
         pass
 
-    def general_handler(self):
+    def general_handler(self) -> Callable[[str, bytes], None]:
         """
         Generic listener for lcm messages to marshal to the mediator for processing.
 
@@ -67,7 +73,7 @@ class Aspn2LcmTransportPlugin(CommonPlugin, Protocol):
             Position-velocity-attitude
         """
 
-        def _general_handler(channel: str, data: bytes):
+        def _general_handler(channel: str, data: bytes) -> None:
             # Do not process messages sent from pntos.
             if "pntos" in channel:
                 print("pntos channel message, not processing in aspn handler")
@@ -107,7 +113,7 @@ class Aspn2LcmTransportPlugin(CommonPlugin, Protocol):
 
         return _general_handler
 
-    def listener_thread(self):
+    def listener_thread(self) -> None:
         self.lcm.subscribe("^((?!pntos).)*$", self.general_handler())
 
     def start_listening(self) -> None:
@@ -132,7 +138,9 @@ class Aspn2LcmTransportPlugin(CommonPlugin, Protocol):
 
         self.mediator.log_message(LoggingLevel.INFO, "LCM transport stopped")
 
-    def broadcast_message(self, message: Message, channel_name: str | None = None):
+    def broadcast_message(
+        self, message: Message, channel_name: str | None = None
+    ) -> None:
         """Send a message over LCM to a specific channel"""
         if isinstance(message.wrapped_message, MeasurementPVA):
             translated = positionvelocityattitude()

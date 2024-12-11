@@ -1,4 +1,5 @@
 import numpy as np
+from numpy import float64
 from numpy.typing import NDArray
 from pntos.api.plugins.fusion_strategy import (
     FusionStrategyPlugin,
@@ -17,7 +18,7 @@ def use_plugin(plugin: FusionStrategyPlugin):
         initial_estimate=np.zeros((3, 1)), initial_covariance=np.zeros((3, 3))
     )
 
-    def my_g(x: NDArray):
+    def my_g(x: NDArray[float64]):
         return x + 1
 
     filter.propagate(StandardDynamicsModel(g=my_g, Phi=np.eye(3, 3), Qd=np.eye(3, 3)))
@@ -27,7 +28,7 @@ def use_plugin(plugin: FusionStrategyPlugin):
 
     my_H = np.array([1, 0, 0])
 
-    def my_h(x: NDArray):
+    def my_h(x: NDArray[float64]):
         return my_H @ x
 
     filter.update(

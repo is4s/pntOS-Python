@@ -36,7 +36,7 @@ class SimpleLoggingPlugin(LoggingPlugin):
         self,
         plugin_resources_location: str | None = None,
         mediator: Mediator | None = None,
-    ):
+    ) -> None:
         if mediator:
             config = mediator.registry.batch_start(LoggingConfig.config_group)
             if config.has_key(LoggingConfig.colorize_key):
@@ -87,7 +87,7 @@ class SimpleLoggingPlugin(LoggingPlugin):
                 )
             config.batch_end()
 
-    def shutdown_plugin(self):
+    def shutdown_plugin(self) -> None:
         return
 
     def log(
@@ -159,7 +159,7 @@ class SimpleLoggingPlugin(LoggingPlugin):
                     print(" [ERROR] ", end="")
                 print(message)
 
-    def level_to_str(self, level: LoggingLevel):
+    def level_to_str(self, level: LoggingLevel) -> str:
         match level:
             case LoggingLevel.DEBUG:
                 return "debug"
@@ -172,7 +172,7 @@ class SimpleLoggingPlugin(LoggingPlugin):
             case _:
                 return "unknown"
 
-    def output_time(self):
+    def output_time(self) -> None:
         if self.colorize:
             print(
                 fmts.LTGRAY
@@ -185,7 +185,7 @@ class SimpleLoggingPlugin(LoggingPlugin):
         else:
             print("[" + time.strftime(LoggingConfig.dt_fmt) + "]", end="")
 
-    def output_plugin_id(self, plugin_id: str):
+    def output_plugin_id(self, plugin_id: str) -> None:
         if self.colorize:
             print(fmts.DRKGRAY + " [" + plugin_id + "]" + fmts.ENDC, end="")
         else:

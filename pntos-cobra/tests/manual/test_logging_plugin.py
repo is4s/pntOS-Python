@@ -1,5 +1,6 @@
 import re
 import time
+from typing import Any
 
 from pntos.api.plugins.common import LoggingLevel
 from pntos.cobra.config.LoggingConfig import LoggingConfig
@@ -15,7 +16,7 @@ expected_results: dict[LoggingLevel, str] = {
 }
 
 
-def call(a: SimpleLoggingPlugin):
+def call(a: SimpleLoggingPlugin) -> None:
     a.log(a.__class__, a.identifier, LoggingLevel.INFO, "This is an INFO message")
     a.log(a.__class__, a.identifier, LoggingLevel.DEBUG, "This is a DEBUG message")
     a.log(
@@ -32,7 +33,7 @@ def call(a: SimpleLoggingPlugin):
     )
 
 
-def call_color_and_not(a: SimpleLoggingPlugin):
+def call_color_and_not(a: SimpleLoggingPlugin) -> None:
     a.colorize = False
     print("Without color:")
     call(a)
@@ -41,7 +42,7 @@ def call_color_and_not(a: SimpleLoggingPlugin):
     call(a)
 
 
-def manual_test():
+def manual_test() -> None:
     """This is for user tests of the logger plugin, not for the pytest suite."""
     # Initialize registry through mediator to have config values for logger
     registry = SimpleRegistry()
@@ -79,7 +80,7 @@ def manual_test():
     call_color_and_not(a)
 
 
-def test(capsys):
+def test(capsys: Any) -> None:
     # Initialize registry through mediator to have config values for logger
     registry = SimpleRegistry()
     mediator = SimpleMediator(registry, [])

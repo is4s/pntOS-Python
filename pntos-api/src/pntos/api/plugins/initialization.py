@@ -5,6 +5,7 @@ from enum import Enum
 from typing import Protocol
 
 from aspn23 import TypeTimestamp
+from numpy import float64
 from numpy.typing import NDArray
 
 from .common import CommonPlugin, EstimateWithCovariance, Message
@@ -102,13 +103,13 @@ class InitialInertialSolution:
     inertial_errors: StandardInertialErrors | None
     """The inertial errors"""
 
-    inertial_error_covariance: NDArray | None
+    inertial_error_covariance: NDArray[float64] | None
     """The covariance matrix associated with the terms in #inertial_errors."""
 
     status: InitializationStatus
     """
-    Indicates the current initialization status. 
-    
+    Indicates the current initialization status.
+
     Should be checked before using any of the other fields.
     """
 
@@ -144,15 +145,15 @@ class InitialEstimateWithCovariance:
 
     estimate_with_covariance: EstimateWithCovariance | None
     """
-    The current estimate of the initial solution. 
-    
+    The current estimate of the initial solution.
+
     Check #status for its validity (can be None if #status is anything other than INITIALIZED_GOOD).
     """
 
     status: InitializationStatus
     """
     Indicates the current initialization status.
-    
+
     Should be checked before using estimate_with_covariance().
     """
 

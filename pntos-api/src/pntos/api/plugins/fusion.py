@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from typing import List, Protocol
 
 from aspn23 import TypeTimestamp
+from numpy import float64
 from numpy.typing import NDArray
 
 from .common import CommonPlugin, EstimateWithCovariance, FusionType, Message
@@ -42,7 +43,7 @@ class CrossCovariances:
     A list of labels of the `StandardStateBlock`s this structure contains the cross-covariances for.
     """
 
-    cross_covariances: List[NDArray]
+    cross_covariances: List[NDArray[float64]]
     """
     A list of cross-covariance matrices between a single StateBlock and the set of StateBlocks
     listed in #block_labels.
@@ -226,7 +227,9 @@ class VirtualStateBlock(Protocol):
         """
         pass
 
-    def convert_estimate(self, estimate: NDArray, time: TypeTimestamp) -> NDArray:
+    def convert_estimate(
+        self, estimate: NDArray[float64], time: TypeTimestamp
+    ) -> NDArray[float64]:
         r"""
         Convert just an estimate vector.
 
@@ -236,11 +239,13 @@ class VirtualStateBlock(Protocol):
             time: Time that \p estimate is valid at.
 
         Returns:
-            NDArray: The converted vector, Mx1.
+            NDArray[float64]: The converted vector, Mx1.
         """
         pass
 
-    def jacobian(self, estimate: NDArray, time: TypeTimestamp) -> NDArray:
+    def jacobian(
+        self, estimate: NDArray[float64], time: TypeTimestamp
+    ) -> NDArray[float64]:
         r"""
         Obtain the Jacobian of the transform performed by this instance.
 
@@ -254,7 +259,7 @@ class VirtualStateBlock(Protocol):
             time: Time that \p estimate is valid at.
 
         Returns:
-            NDArray: An MxN matrix that may be used to pre-multiply \p estimate
+            NDArray[float64]: An MxN matrix that may be used to pre-multiply \p estimate
               to obtain an M length vector in 'target' representation (to first
               order).
         """
@@ -333,7 +338,7 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
         """
         pass
 
-    def get_state_block_estimate(self, block_label: str) -> NDArray | None:
+    def get_state_block_estimate(self, block_label: str) -> NDArray[float64] | None:
         """
         Get the estimate associated with a state block.
 
@@ -346,7 +351,7 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
         """
         pass
 
-    def get_state_block_covariance(self, block_label: str) -> NDArray | None:
+    def get_state_block_covariance(self, block_label: str) -> NDArray[float64] | None:
         """
         Get the covariance associated with a state block.
 
@@ -361,7 +366,7 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
 
     def get_state_block_cross_covariance(
         self, block_label1: str, block_label2: str
-    ) -> NDArray | None:
+    ) -> NDArray[float64] | None:
         """
         Get the cross covariance between the states associated with two state blocks.
 
@@ -373,7 +378,9 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
         """
         pass
 
-    def set_state_block_estimate(self, block_label: str, estimate: NDArray) -> None:
+    def set_state_block_estimate(
+        self, block_label: str, estimate: NDArray[float64]
+    ) -> None:
         """
         Update the estimate associated with a given state block.
 
@@ -383,7 +390,9 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
         """
         pass
 
-    def set_state_block_covariance(self, block_label: str, covariance: NDArray) -> None:
+    def set_state_block_covariance(
+        self, block_label: str, covariance: NDArray[float64]
+    ) -> None:
         """
         Update the covariance associated with a given state block.
 
@@ -394,7 +403,7 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
         pass
 
     def set_state_block_cross_covariance(
-        self, block_label1: str, block_label2: str, covariance: NDArray
+        self, block_label1: str, block_label2: str, covariance: NDArray[float64]
     ) -> None:
         """
         Update the covariance between two state blocks.

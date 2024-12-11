@@ -60,7 +60,9 @@ class SimpleRegistry(Registry):
 
 
 class SimpleKeyValueStore(KeyValueStore):
-    store: dict[str, str | List[str] | int | bool | float | NDArray | Message] = {}
+    store: dict[
+        str, str | List[str] | int | bool | float | NDArray[float64] | Message
+    ] = {}
     data_format = KeyValueStoreDataFormat.UNSPECIFIED
 
     def get_key_array(self) -> List[str]:

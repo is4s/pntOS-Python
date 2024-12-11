@@ -39,10 +39,10 @@ class SimpleControllerPlugin(ControllerPlugin):
 
 
 class SimpleMediator(Mediator):
-    transport_plugins: list[TransportPlugin]
+    transport_plugins: List[TransportPlugin]
     registry: Registry
 
-    def __init__(self, registry: Registry, transport_plugins):
+    def __init__(self, registry: Registry, transport_plugins: List[TransportPlugin]):
         self.registry = registry
         self.transport_plugins = transport_plugins
 

@@ -1,5 +1,5 @@
 from threading import Thread
-from typing import Protocol
+from typing import Callable, Protocol
 
 from aspn23 import MeasurementPositionVelocityAttitude
 from aspn23_lcm import (
@@ -29,7 +29,7 @@ class Aspn23LcmTransportPlugin(CommonPlugin, Protocol):
         self,
         plugin_resources_location: str | None = None,
         mediator: Mediator | None = None,
-    ):
+    ) -> None:
         """
         PntOS plugin initialization function
 
@@ -38,7 +38,7 @@ class Aspn23LcmTransportPlugin(CommonPlugin, Protocol):
         if mediator is not None:
             self.mediator = mediator
 
-    def shutdown_plugin(self):
+    def shutdown_plugin(self) -> None:
         """
         PntOS plugin shutdown function
 
@@ -48,12 +48,12 @@ class Aspn23LcmTransportPlugin(CommonPlugin, Protocol):
             self.listener.join()
         if self.subscription is not None and self.lcm is not None:
             self.lcm.unsubscribe(self.subscription)
-        self.__init__(self.url, mediator=None)
+        # self.__init__(self.url, mediator=None)
         self.mediator.log_message(
             LoggingLevel.INFO, "shutdown_plugin for " + self.identifier
         )
 
-    def general_handler(self):
+    def general_handler(self) -> Callable[[str, bytes], None]:
         """
         Generic listener for lcm messages to marshal to the mediator for processing.
 
@@ -62,7 +62,7 @@ class Aspn23LcmTransportPlugin(CommonPlugin, Protocol):
             Position-velocity-attitude
         """
 
-        def _general_handler(channel: str, data: bytes):
+        def _general_handler(channel: str, data: bytes) -> None:
             # Do not process messages sent from pntos.
             if "pntos" in channel:
                 self.mediator.log_message(
@@ -70,14 +70,14 @@ class Aspn23LcmTransportPlugin(CommonPlugin, Protocol):
                     "pntos channel message, not processing in aspn handler",
                 )
                 return
-            decoded = MeasurementPositionVelocityAttitude_LCM.decode(data)
+            decoded = MeasurementPositionVelocityAttitude_LCM.decode(data)  # type: ignore[no-untyped-call]
             translated = lcm_to_measurement_position_velocity_attitude(decoded)
             message = Message(translated, channel)
             self.broadcast_message(message, None)
 
         return _general_handler
 
-    def listener_thread(self, lcm: LCM):
+    def listener_thread(self, lcm: LCM) -> None:
         self.subscription = lcm.subscribe("^((?!pntos).)*$", self.general_handler())
 
     def start_listening(self) -> None:
@@ -103,7 +103,9 @@ class Aspn23LcmTransportPlugin(CommonPlugin, Protocol):
 
         self.mediator.log_message(LoggingLevel.INFO, "LCM transport stopped")
 
-    def broadcast_message(self, message: Message, channel_name: str | None = None):
+    def broadcast_message(
+        self, message: Message, channel_name: str | None = None
+    ) -> None:
         """Send a message over LCM to a specific channel"""
         if isinstance(message.wrapped_message, MeasurementPositionVelocityAttitude):
             translated = measurement_position_velocity_attitude_to_lcm(
@@ -112,6 +114,6 @@ class Aspn23LcmTransportPlugin(CommonPlugin, Protocol):
             channel = (
                 channel_name if channel_name is not None else message.source_identifier
             )
-            self.lcm.publish(channel, translated.encode())
+            self.lcm.publish(channel, translated.encode())  # type: ignore[no-untyped-call]
         else:
             print("Invalid LCM message")
