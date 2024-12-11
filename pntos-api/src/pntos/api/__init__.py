@@ -19,6 +19,9 @@ from .plugins.fusion import (
     CrossCovariances as CrossCovariances,
     FusionPlugin as FusionPlugin,
     StandardFusionEngine as StandardFusionEngine,
+    StandardMeasurementProcessor as StandardMeasurementProcessor,
+    StandardStateBlock as StandardStateBlock,
+    VirtualStateBlock as VirtualStateBlock,
 )
 from .plugins.fusion_strategy import (
     FusionStrategy as FusionStrategy,
@@ -63,9 +66,8 @@ from .plugins.preprocessor import (
 )
 from .plugins.registry import RegistryPlugin as RegistryPlugin
 from .plugins.state_modeling import (
-    StandardMeasurementProcessor as StandardMeasurementProcessor,
-    StandardStateBlock as StandardStateBlock,
-    VirtualStateBlock as VirtualStateBlock,
+    StandardStateModelProvider as StandardStateModelProvider,
+    StateModelingPlugin as StateModelingPlugin,
 )
 from .plugins.transport import TransportPlugin as TransportPlugin
 from .plugins.ui import UiPlugin as UiPlugin
