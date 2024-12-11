@@ -256,7 +256,7 @@ class KeyValueStore(Protocol):
 
         Args:
             key (str)
-            type (type[RegistryValueTypes] 
+            type (type[RegistryValueTypes])
 
         Returns:
             RegistryValueTypes | None: Returns ``None`` if the key is not available. The return is
@@ -273,12 +273,12 @@ class KeyValueStore(Protocol):
             key (str | None, optional)
 
         Returns:
-            bytes | None: The return format will conform to the definition in :meth:`data_format`.
-            Returns ``None`` if the given key is not available. The return is guaranteed to not be
-            ``None`` if called with a valid key, which can be checked with :meth:`has_key`. If
-            ``key`` is ``None``, then this function will return all of the keys and values in the
-            group passed to :meth:`Registry.batch_start` and will be formatted to conform to keys
-            and values as defined in :meth:`data_format`.
+            bytes | None: The return format will conform to the definition in
+            :attr:`KeyValueStore.data_format`. Returns ``None`` if the given key is not available.
+            The return is guaranteed to not be ``None`` if called with a valid key, which can be
+            checked with :meth:`has_key`. If ``key`` is ``None``, then this function will return all
+            of the keys and values in the group passed to :meth:`Registry.batch_start` and will be
+            formatted to conform to keys and values as defined in :attr:`KeyValueStore.data_format`.
         """
         pass
 
@@ -297,12 +297,12 @@ class KeyValueStore(Protocol):
         Set the given key to the provided value.
 
         Args:
-            key (str | None): If ``key`` is ``None``, then the contents of ``bytes`` must include 
-                both keys and values and must be formatted to conform to :meth:`data_format`.
-                ``bytes`` will then be used to set the corresponding keys and values in the group
-                passed to :meth:`Registry.batch_start`.
+            key (str | None): If ``key`` is ``None``, then the contents of ``bytes`` must include
+                both keys and values and must be formatted to conform to
+                :attr:`KeyValueStore.data_format`. ``bytes`` will then be used to set the
+                corresponding keys and values in the group passed to :meth:`Registry.batch_start`.
             bytes (bytes): Must be formatted to conform to the definition of a value in
-                :meth:`data_format`.
+                :attr:`KeyValueStore.data_format`.
         """
         pass
 
@@ -314,7 +314,7 @@ class KeyValueStore(Protocol):
             key (str)
 
         Returns:
-            bool: ``True`` if ``key`` is successfully removed, and ``False`` otherwise. Keys may 
+            bool: ``True`` if ``key`` is successfully removed, and ``False`` otherwise. Keys may
             fail to be removed if the key does not currently exist, or the backend is unable to
             remove the key.
         """
@@ -367,7 +367,7 @@ class KeyValueStore(Protocol):
         :meth:`Registry.batch_start` (depending on the registry implementation) as the
         :meth:`Registry.batch_start` method must find the store again given the group name.
 
-        Note: 
+        Note:
             While a batch is active, access to the store may be denied to other users. Thus a user
             should endeavour to call :meth:`batch_end` as soon as possible after they are done
             getting/setting values in the returned :class:`KeyValueStore`.
@@ -404,7 +404,7 @@ class KeyValueStore(Protocol):
             callback (Callable[[str, List[str], "KeyValueStore"], None])
 
         Returns:
-            bool: ``True`` if the notifier was successfully registered, and ``False`` if the store 
+            bool: ``True`` if the notifier was successfully registered, and ``False`` if the store
             is unable to notify the requester.
         """
         pass
@@ -515,10 +515,10 @@ class Registry(Protocol):
 
     def get_group_array(self) -> List[str]:
         """
-        Get the array of groups which currently exist. 
+        Get the array of groups which currently exist.
 
         Returns:
-            List[str]: The array of groups which currently exists. Returns ``None`` if no groups 
+            List[str]: The array of groups which currently exists. Returns ``None`` if no groups
             exist.
         """
         pass
@@ -543,7 +543,7 @@ class Registry(Protocol):
             callback (Callable[[str], None])
 
         Returns:
-            bool: ``True`` if the notifier was successfully registered, and ``False`` if the 
+            bool: ``True`` if the notifier was successfully registered, and ``False`` if the
             registry is unable to notify the requester. The callback will receive the same receiver
             as was passed into this method, which may be used as a context object.
         """
@@ -557,18 +557,19 @@ class Mediator(Protocol):
     When a plugin is first initialized into pntOS, it is guaranteed that the plugin will be passed
     an instance of this struct via an invocation of :meth:`CommonPlugin.init_plugin` (See
     :class:`CommonPlugin` for more information). The plugin may then use the set of function calls
-    in this class to make requests of the controller.
+    in this class to make requests of the :class:`ControllerPlugin`.
 
     All of the functions on this class (and any returned values from those functions) are guaranteed
     to be thread-safe for use by all plugins. Thus, after a pntOS plugin has received a copy of a
     :class:`Mediator` it can freely call the functions contained therein without doing any explicit
-    locking. This thread safety is implemented by the controller when it creates the mediator before
-    passing them to other plugins.
+    locking. This thread safety is implemented by the :class:`ControllerPlugin` when it creates the
+    mediator before passing them to other plugins.
 
     Callers must still take care to only call functions in :class:`Mediator` which they are not
     themselves responsible for implementing. The details of which plugins are used in the
     implementation of any particular function on this struct is decided by the
-    :class:`ControllerPlugin`, and thus is implementation specific to the controller used.
+    :class:`ControllerPlugin`, and thus is implementation specific to the :class:`ControllerPlugin`
+    used.
 
     Attributes:
         registry (Registry): A :class:`Registry` object that can be used to update keys/values in
@@ -607,7 +608,7 @@ class Mediator(Protocol):
         matching.
 
         Returns:
-            List[str]: A list of strings describing the solutions available. 
+            List[str]: A list of strings describing the solutions available.
         """
         # TODO AspnMessageType doesn't exist.
         pass
@@ -621,9 +622,9 @@ class Mediator(Protocol):
         Request filtering solutions at the times specified in the array ``solution_times``.
 
         Args:
-            solution_times (List[TypeTimestamp]): The number of time entries in ``solution_times`` 
+            solution_times (List[TypeTimestamp]): The number of time entries in ``solution_times``
                 is specified by ``num_solution_times``.
-            filter_description (str | None, optional): To select which filter(s) to request 
+            filter_description (str | None, optional): To select which filter(s) to request
                 solutions from, enter a valid filter description string in ``filter_description``.
                 Valid filter description strings can be obtained by calling
                 :meth:`get_filter_description_list`. Passing in ``None`` will provide a result
@@ -634,7 +635,7 @@ class Mediator(Protocol):
             List[Message]: An array of messages containing the filter solutions for the requested
             ``solution_times``. The number of solutions should equal ``num_solution_times``,
             although some entries may be ``None`` if they are unavailable at the corresponding time
-            in ``solution_times``. The returned ``Message`` array may be ``None`` if
+            in ``solution_times``. The returned :class:`Message` array may be ``None`` if
             ``filter_description`` is invalid.
         """
         pass
@@ -757,7 +758,7 @@ class CommonPlugin(Protocol):
                 controller implementation specific. Plugin implementers wishing to provide a
                 resource to their plugin should consult the documentation of the controller to
                 determine which location scheme will be passed into this function.
-            mediator (Mediator | None, optional): ``None``-able if the plugin type being initialized 
+            mediator (Mediator | None, optional): ``None``-able if the plugin type being initialized
                 is a :class:`ControllerPlugin`. Non-controller plugins may assume that the mediator
                 parameter is not ``None``.
         """

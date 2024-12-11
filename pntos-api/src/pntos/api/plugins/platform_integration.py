@@ -11,7 +11,7 @@ class PlatformIntegrationPlugin(CommonPlugin, Protocol):
 
     A plugin for command, control, solution output, and other behavior of the
     system which is specific to a particular platform. Works closely with the
-    controller plugin to fully define the overall behavior of the system.
+    :class:`ControllerPlugin` to fully define the overall behavior of the system.
 
     Caution:
         **Unstable**: This feature is unstable and is not yet considered part of the stable pntOS
@@ -51,16 +51,16 @@ class PlatformIntegrationPlugin(CommonPlugin, Protocol):
         hand-in-hand with the PIP to fully define the control behavior of the system.
 
         :class:`ControllerPlugin` responsibilities:
-          - Defining concurrency model
-          - Initializing plugins (and constructing/passing in :class:`Mediator`)
-          - Routing data from transport plugin to orchestration/initialization/inertial plugins
-          - Routing requests for registry data to registry plugins
+          - Defining concurrency model.
+          - Initializing plugins (and constructing/passing in :class:`Mediator`).
+          - Routing data from transport plugin to orchestration/initialization/inertial plugins.
+          - Routing requests for registry data to registry plugins.
 
         :class:`PlatformIntegrationPplugin` responsibilities:
-          - Platform specific outputs
-          - Responding to moding commands from platform
+          - Platform specific outputs.
+          - Responding to moding commands from platform.
           - Routing situational awareness information to other pntOS plugins (via registry
-            convention)
+            convention).
 
         The parameters to :meth:`PlatformIntegrationPlugin.take_control` should be identical to
         those passed to the :meth:`ControllerPlugin.take_control`, with the exception of the

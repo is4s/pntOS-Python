@@ -121,7 +121,7 @@ class StandardFusionStrategy(FusionStrategy, Protocol):
         The count will initially be zero, until :meth:`add_states` is called.
 
         Returns:
-            int: Number of stats being estimated in this filter.
+            int: Number of states being estimated in this filter.
         """
         ...
 
@@ -135,19 +135,19 @@ class StandardFusionStrategy(FusionStrategy, Protocol):
         Add new states to this filter.
 
         Increases number of filter states and set the initial conditions of the new states. Returns
-        index of the first added state. If ``cross_covariance`` is NULL, cross covariance between
+        index of the first added state. If ``cross_covariance`` is ``None``, cross covariance between
         the existing states and the added states will be set to zeroes.
 
         Args:
             initial_estimate (NDArray): The initial estimate to populate the new states with.
-            initial_covariance (NDArray): The initial covariance matrix used to initialize the 
+            initial_covariance (NDArray): The initial covariance matrix used to initialize the
                 uncertainty of the new states.
-            cross_covariance (NDArray | None): A covariance matrix that describes the cross terms 
+            cross_covariance (NDArray | None): A covariance matrix that describes the cross terms
                 between the new states and all previous states. If ``None``, the cross-terms will be
                 set to zero.
 
         Returns:
-            int: Number of stats being added to this filter.
+            int: Number of states being added to this filter.
         """
         ...
 
@@ -224,8 +224,8 @@ class StandardFusionStrategy(FusionStrategy, Protocol):
         Args:
             new_covariance (NDArray): The new covariance values that will overwrite a slice of the
                 previous covariance matrix.
-            first_row (int): The row of the first value to overwrite
-            first_col (int): The column of the first value to overwrite
+            first_row (int): The row of the first value to overwrite.
+            first_col (int): The column of the first value to overwrite.
         """
         ...
 

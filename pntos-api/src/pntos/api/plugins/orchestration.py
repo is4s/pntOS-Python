@@ -12,7 +12,7 @@ class MessageStreamConfig(Protocol):
     Message stream configuration.
 
     This class configures the buffering, delay, and sorting characteristics of
-    messages that are streamed into the orchestration plugin. The pntOS system
+    messages that are streamed into the :class:`OrchestrationPlugin`. The pntOS system
     will deliver messages to the orchestration plugin as it receives them.
     However, there is a fundamental tradeoff between latency and those messages
     being in-order. In particular, to guarantee that messages are sorted by
@@ -60,7 +60,7 @@ class MessageStreamConfig(Protocol):
         Request all messages are streamed in sorted timestamp ordering.
 
         Note that the ability to do this reliably will depend on the length of the buffer used by
-        the mediator.
+        the :class:`Mediator`.
 
         Args:
             enable (bool)
@@ -130,7 +130,7 @@ class OrchestrationPlugin(CommonPlugin, Protocol):
         For example, the orchestration plugin may set up a fusion engine it received in the call to
         :meth:`~OrchestrationPlugin.init_orchestration_plugin`, then add state blocks or measurement
         processors to that fusion engine from a :class:`StateModelingPlugin` it also received, and
-        process inertial data from an :class:InertialPlugin it received. The
+        process inertial data from an :class:`InertialPlugin` it received. The
         :meth:`~OrchestrationPlugin.request_solutions` function will be called by the system when
         pntOS needs to know the current filtering solutions. Other quantities which need to be
         estimated by the orchestration engine can be returned to the system by registry updates.
@@ -177,8 +177,7 @@ class OrchestrationPlugin(CommonPlugin, Protocol):
 
     def get_filter_description_list(self) -> List[str]:
         """
-        Request a list of strings describing the filters available in this
-        :class:`OrchestrationPlugin`.
+        Get a list of strings describing the filters available in this :class:`OrchestrationPlugin`.
 
         One of these description strings may be used when calling :meth:`request_solutions`. For
         consistency, these strings should adhere to the following conventions:

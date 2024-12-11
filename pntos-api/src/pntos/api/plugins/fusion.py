@@ -34,7 +34,7 @@ class CrossCovariances:
     Suppose that some StateBlock named ``A`` existed. Then this structure could define the cross
     covariance of ``A`` with respect to other StateBlocks named ``B`` and ``C``. In that case,
     :attr:`block_labels` would be an array of 2 strings ``B`` and ``C``, and
-    :attr:`cross_covariances` would be a an array of two matrices: The cross-covariance matrix of
+    :attr:`cross_covariances` would be a an array of two matrices: the cross-covariance matrix of
     ``A`` and ``B`` and the cross-covariance matrix of ``A`` and ``C``.
 
     Attributes:
@@ -98,7 +98,7 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
         Virtual state blocks do not affect this result.
 
         Returns:
-            int: The total number of states currently in the fusion engine
+            int: The total number of states currently in the fusion engine.
         """
         pass
 
@@ -145,7 +145,7 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
         Get the estimate associated with a state block.
 
         Find a :class:`StandardStateBlock` or :class:`VirtualStateBlock` within the fusion engine
-        matching ``block_label``, and return a copy of its current estimate vector. 
+        matching ``block_label``, and return a copy of its current estimate vector.
 
         Args:
             block_label (str)
@@ -165,7 +165,7 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
         Get the covariance associated with a state block.
 
         Find a :class:`StandardStateBlock` or :class:`VirtualStateBlock` within the fusion engine
-        matching ``block_label``, and return a copy of its current covariance matrix. 
+        matching ``block_label``, and return a copy of its current covariance matrix.
 
         Args:
             block_label (str)
@@ -177,7 +177,7 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
             block that has been added to the fusion engine. Guaranteed to not return ``None`` when
             ``block_label`` is in the list returned by :meth:`get_state_block_labels` and
             :attr:`strategy` is not ``None``.
-            """
+        """
         pass
 
     def get_state_block_cross_covariance(
@@ -194,11 +194,11 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
             block_label2 (str)
 
         Returns:
-            NDArray | None: The cross-covariance matrix between them. Returns ``None`` if
-            ``block_label1`` or ``block_label2`` do not correspond to blocks that have been added to
-            the fusion engine. Guaranteed to not return ``None`` when both ``block_label1`` and
-            ``block_label2`` are in the list returned by :meth:`get_state_block_labels` and
-            :attr:`strategy` is not ``None``.
+            NDArray | None: The cross-covariance matrix between ``block_label1`` and
+            ``block_label2``. Returns ``None`` if ``block_label1`` or ``block_label2`` do not
+            correspond to blocks that have been added to the fusion engine. Guaranteed to not return
+            ``None`` when both ``block_label1`` and ``block_label2`` are in the list returned by
+            :meth:`get_state_block_labels` and :attr:`strategy` is not ``None``.
         """
         pass
 
@@ -209,7 +209,7 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
         Find a :class:`StandardStateBlock` within the fusion engine matching ``block_label``, and
         change its current estimate vector.
 
-        Note: 
+        Note:
             This function may lead to performance degradation with some implementations and thus its
             use is discouraged if other options are available.
 
@@ -224,7 +224,7 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
         Update the covariance associated with a given state block.
 
         Find a :class:`StandardStateBlock` within the fusion engine matching ``block_label``, and
-        change its current covariance matrix. 
+        change its current covariance matrix.
 
         Note:
             This function may lead to performance degradation with some implementations and thus its
@@ -243,8 +243,8 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
         Update the covariance between two state blocks.
 
         Find the :class:`StandardStateBlock` s within the fusion engine matching ``block_label1``
-        and ``block_label2``, and change the current covariance matrix between them. 
-        
+        and ``block_label2``, and change the current covariance matrix between them.
+
         Note:
             This function may lead to performance degradation with some implementations and thus its
             use is discouraged if other options are available.
@@ -333,7 +333,7 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
         self, processor: StandardMeasurementProcessor
     ) -> None:
         """
-        Add a class:`StandardMeasurementProcessor`.
+        Add a :class:`StandardMeasurementProcessor`.
 
         This can be used to process future measurements that correspond to ``processor.label``.
 
@@ -389,17 +389,17 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
 
         If all of the following are true:
 
-        - ``time`` is equal to or after the filter time (which can be checked with :meth:`get_time`)
-        - all labels in ``block_labels`` correspond to a block that has been added to the fusion
-          engine (which can be checked with :meth:`get_state_block_labels`)
-        - ``block_labels`` has at least one element
+        - ``time`` is equal to or after the filter time (which can be checked with :attr:`time`).
+        - All labels in ``block_labels`` correspond to a block that has been added to the fusion
+          engine (which can be checked with :meth:`get_state_block_labels`).
+        - ``block_labels`` has at least one element.
 
         Then the result returned is guaranteed to not be ``None``. Otherwise, if any of the above
         are false then the result will be ``None``.
 
         Args:
             time (TypeTimestamp)
-            block_labels (List[str]): An array of strings. 
+            block_labels (List[str]): An array of strings.
 
         Returns:
             EstimateWithCovariance | None
@@ -417,9 +417,9 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
 
         If all of the following are true:
 
-            - all labels in ``block_labels`` correspond to a block that has been added to the fusion
-              engine (which can be checked with :meth:`get_state_block_labels`)
-            - ``block_labels`` has at least one element
+            - All labels in ``block_labels`` correspond to a block that has been added to the fusion
+              engine (which can be checked with :meth:`get_state_block_labels`).
+            - ``block_labels`` has at least one element.
 
         Then the result returned is guaranteed to not be ``None``. Otherwise, if any of the above
         are false then the result will be ``None``.

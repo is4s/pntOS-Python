@@ -12,11 +12,11 @@ class ControllerPlugin(CommonPlugin, Protocol):
     An implementation of a primary controller in charge of defining the usage of all other pntOS
     plugins.
 
-    In ordinary operation, an app will import plugins, initializing a controller plugin, and then
-    calling :meth:`ControllerPlugin.take_control` on the controller plugin, passing in a list of
+    In ordinary operation, an app will import plugins, initialize a controller plugin, and then
+    call :meth:`ControllerPlugin.take_control` on the controller plugin, passing in a list of
     ``plugins`` that it imported.
 
-    From that point forward, the controller is responsible for all activity. It may 
+    From that point forward, the controller is responsible for all activity. It may
     use any or none of the plugins in the ``plugins`` list as desired. In general, it may do
     anything it wants, within the following guidelines:
 
@@ -79,10 +79,10 @@ class ControllerPlugin(CommonPlugin, Protocol):
         :meth:`PlatformIntegrationPlugin.take_control` method (if a PIP is in the ``plugins`` list).
 
         Args:
-            plugins (List[CommonPlugin]): An array of plugins available to the controller`.
+            plugins (List[CommonPlugin]): An array of plugins available to the controller.
             plugin_resources_locations (List[str  |  None] | None, optional): A list of strings
                 which represent a list of locations, one for each plugin in ``plugins``, where those
-                plugins may find auxiliary data if needed. The array can be ``None``, 
+                plugins may find auxiliary data if needed. The array can be ``None``,
                 otherwise the array is of the same length as ``plugins``. Each string may be
                 ``None``, filesystem paths, or adhere to some scheme, such as the URI scheme, for
                 defining the resource's location.
@@ -94,4 +94,5 @@ class ControllerPlugin(CommonPlugin, Protocol):
                 2. A local file path on systems which support them.
                 3. A string adhering to the URI scheme.
         """
+
     pass

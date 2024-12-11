@@ -43,7 +43,7 @@ class InertialForcesRates:
     Attributes:
         forces_and_rates (MeasurementImu): An ASPN IMU message which has been repurposed to hold
             specific forces (the ``meas_accel`` field) and rotation rates (the ``meas_gyro`` field)
-            in a different frame (see :attr:`frame`).
+            in a different frame (see :attr:`frame` below).
         frame (InertialFrame): Specifies the frame of the above forces and rates.
     """
 
@@ -63,9 +63,9 @@ class StandardInertialErrors:
 
     Attributes:
         accel_biases (NDArray): A 1D vector of length 3 containing biases for a 3-axis accelerometer
-            in the sensor's (X-Y-Z) frame, expressed in m/s^2.
+            in the sensor's (X-Y-Z) frame, expressed in :math:`m/s^2`.
         gyro_biases (NDArray): A 1D vector of length 3 containing biases for a 3-axis gyro in the
-            sensor's (X-Y-Z) frame, expressed in rad/s.
+            sensor's (X-Y-Z) frame, expressed in :math:`rad/s`.
         accel_scale_factors (NDArray): A 1D vector of length 3 containing scale factor errors for a
             3-axis accelerometer in the sensor's (X-Y-Z) frame, unitless.
         gyro_scale_factors (NDArray): A 1D vector of length 3 containing scale factor errors for a
