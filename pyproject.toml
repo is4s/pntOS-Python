@@ -46,3 +46,4 @@ convention = "google"
 
 [tool.mypy]
 strict = true
+warn_unreachable = true
