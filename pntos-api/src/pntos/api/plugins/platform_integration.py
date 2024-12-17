@@ -1,6 +1,6 @@
 """Python API of pntOS."""
 
-from typing import List, Protocol
+from typing import Protocol
 
 from pntos.api import CommonPlugin
 
@@ -20,8 +20,8 @@ class PlatformIntegrationPlugin(CommonPlugin, Protocol):
 
     def take_control(
         self,
-        plugins: List[CommonPlugin],
-        plugin_resources_locations: List[str | None] | None = None,
+        plugins: list[CommonPlugin],
+        plugin_resources_locations: list[str | None] | None = None,
         initial_config: str | None = None,
     ) -> None:
         """

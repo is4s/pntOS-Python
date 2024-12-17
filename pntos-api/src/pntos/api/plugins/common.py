@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import Callable, List, Protocol, TypeVar
+from typing import Callable, Protocol, TypeVar
 
 from aspn23 import AspnBase, TypeTimestamp
 from numpy import float64
@@ -196,7 +196,7 @@ class KeyValueStoreDataFormat(Enum):
 
 
 RegistryValueTypes = TypeVar(
-    "RegistryValueTypes", str, List[str], int, bool, float, NDArray[float64], Message
+    "RegistryValueTypes", str, list[str], int, bool, float, NDArray[float64], Message
 )
 
 
@@ -230,7 +230,7 @@ class KeyValueStore(Protocol):
     batch operation. See `Registry` for more information.
     """
 
-    def get_key_array(self) -> List[str]:
+    def get_key_array(self) -> list[str]:
         """
         Get the array of keys which currently exist in this store.
 
@@ -371,7 +371,7 @@ class KeyValueStore(Protocol):
     def request_notify(
         self,
         key: str | None,
-        callback: Callable[[str, List[str], "KeyValueStore"], None],
+        callback: Callable[[str, list[str], "KeyValueStore"], None],
     ) -> bool:
         """
         Register a callback which gets called each time a key in the store is updated.
@@ -407,7 +407,7 @@ class KeyValueStore(Protocol):
     def remove_notify(
         self,
         key: str | None,
-        callback: Callable[[str, List[str], "KeyValueStore"], None],
+        callback: Callable[[str, list[str], "KeyValueStore"], None],
     ) -> bool:
         """
         Removes a notification as requested by `request_notify`.
@@ -500,7 +500,7 @@ class Registry(Protocol):
         """
         pass
 
-    def get_group_array(self) -> List[str]:
+    def get_group_array(self) -> list[str]:
         """Get the array of groups which currently exist. Returns None if no groups exist."""
         pass
 
@@ -551,7 +551,7 @@ class Mediator(Protocol):
     specific to the controller used.
     """
 
-    def get_filter_description_list(self) -> List[str]:
+    def get_filter_description_list(self) -> list[str]:
         """
         Request a list of strings describing the solutions available.
 
@@ -591,9 +591,9 @@ class Mediator(Protocol):
 
     def request_solutions(
         self,
-        solution_times: List[TypeTimestamp],
+        solution_times: list[TypeTimestamp],
         filter_description: str | None = None,
-    ) -> List[Message]:
+    ) -> list[Message]:
         """
         Request filtering solutions at the times specified in the array `solution_times`.
 

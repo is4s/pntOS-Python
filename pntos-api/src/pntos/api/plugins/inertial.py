@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import List, Protocol
+from typing import Protocol
 
 from aspn23 import AspnBase, MeasurementImu, TypeTimestamp
 from numpy import float64
@@ -140,8 +140,8 @@ class CommonInertial(Protocol):
         pass
 
     def request_solutions(
-        self, time: List[TypeTimestamp], type: InertialSolutionRangeType
-    ) -> List[Message] | None:
+        self, time: list[TypeTimestamp], type: InertialSolutionRangeType
+    ) -> list[Message] | None:
         """
         Requests solutions at multiple specific times.
 
@@ -185,7 +185,7 @@ class CommonInertial(Protocol):
         """
         pass
 
-    def request_process_pntos_message_types(self) -> List[type[AspnBase]]:
+    def request_process_pntos_message_types(self) -> list[type[AspnBase]]:
         """Returns an array of message types that are supported by this plugin as inputs to #process_pntos_message."""
         pass
 
@@ -234,7 +234,7 @@ class StandardInertialMechanization(CommonInertial, Protocol):
     change at any time.
     """
 
-    def request_reset_message_types(self) -> List[type[AspnBase]] | None:
+    def request_reset_message_types(self) -> list[type[AspnBase]] | None:
         """
         Get valid types of reset messages.
 

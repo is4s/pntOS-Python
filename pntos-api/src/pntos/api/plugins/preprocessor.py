@@ -1,6 +1,6 @@
 """Python API of pntOS."""
 
-from typing import List, Protocol
+from typing import Protocol
 
 from pntos.api import CommonPlugin, Message
 
@@ -14,7 +14,7 @@ class Preprocessor(Protocol):
     non-experimental code, and its definition may change at any time.
     """
 
-    def process_pntos_message(self, message: Message) -> List[Message]:
+    def process_pntos_message(self, message: Message) -> list[Message]:
         """
         Process a message.
 
@@ -40,11 +40,11 @@ class PreprocessorPlugin(CommonPlugin, Protocol):
     non-experimental code, and its definition may change at any time.
     """
 
-    preprocessor_identifiers: List[str]
+    preprocessor_identifiers: list[str]
     """
     A list of identifying strings for each kind of `Preprocessor` that this
     `PreprocessorPlugin` can create instances of.
-    
+
     The `preprocessor_index` parameter of `new_preprocessor` is an index into
     this array.
     """

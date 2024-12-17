@@ -1,7 +1,7 @@
 """Python API of pntOS."""
 
 from dataclasses import dataclass
-from typing import List, Protocol
+from typing import Protocol
 
 from aspn23 import TypeTimestamp
 from numpy import float64
@@ -38,12 +38,12 @@ class CrossCovariances:
     matrix of `A` and `C`.
     """
 
-    block_labels: List[str]
+    block_labels: list[str]
     """
     A list of labels of the `StandardStateBlock`s this structure contains the cross-covariances for.
     """
 
-    cross_covariances: List[NDArray[float64]]
+    cross_covariances: list[NDArray[float64]]
     """
     A list of cross-covariance matrices between a single StateBlock and the set of StateBlocks
     listed in #block_labels.
@@ -308,7 +308,7 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
         """
         pass
 
-    def get_state_block_labels(self) -> List[str] | None:
+    def get_state_block_labels(self) -> list[str] | None:
         """
         Gets a list of the `StandardStateBlock`s labels that have been added to this fusion engine.
 
@@ -424,7 +424,7 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
         """
         pass
 
-    def get_virtual_state_block_target_labels(self) -> List[str] | None:
+    def get_virtual_state_block_target_labels(self) -> list[str] | None:
         """
         Gets a list of the target labels of virtual state blocks that have been added.
 
@@ -459,7 +459,7 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
         """Remove the `VirtualStateBlock` matching `vsb_target_label`."""
         pass
 
-    def get_measurement_processor_labels(self) -> List[str] | None:
+    def get_measurement_processor_labels(self) -> list[str] | None:
         """
         Gets a list of the labels of measurement processors that have been added.
 
@@ -503,7 +503,7 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
         pass
 
     def peek_ahead(
-        self, time: TypeTimestamp, block_labels: List[str]
+        self, time: TypeTimestamp, block_labels: list[str]
     ) -> EstimateWithCovariance | None:
         """
         Calculates the estimate and covariance at a requested time.
@@ -527,7 +527,7 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
         pass
 
     def generate_x_and_p(
-        self, block_labels: List[str]
+        self, block_labels: list[str]
     ) -> EstimateWithCovariance | None:
         """
         Generates the current estimate and covariance.
@@ -547,18 +547,18 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
         false then the result will be None.
         """
 
-    def give_state_block_aux_data(self, block_label: str, aux: List[Message]) -> None:
+    def give_state_block_aux_data(self, block_label: str, aux: list[Message]) -> None:
         """Route a list of messages of aux data to a `StandardStateBlock`."""
         pass
 
     def give_measurement_processor_aux_data(
-        self, processor_label: str, aux: List[Message]
+        self, processor_label: str, aux: list[Message]
     ) -> None:
         """Route a list of messages of aux data to a `StandardMeasurementProcessor`."""
         pass
 
     def give_virtual_state_block_aux_data(
-        self, target_label: str, aux: List[Message]
+        self, target_label: str, aux: list[Message]
     ) -> None:
         """Route a list of messages of aux data to a `VirtualStateBlock`."""
         pass

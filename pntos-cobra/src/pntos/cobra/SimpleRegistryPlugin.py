@@ -1,4 +1,4 @@
-from typing import Any, Callable, Dict, List
+from typing import Any, Callable
 
 from numpy import float64
 from numpy.typing import NDArray
@@ -18,7 +18,7 @@ class SimpleRegistryPlugin(RegistryPlugin):
     def __init__(
         self,
         identifier: str,
-        config: List[Any] | None = None,
+        config: list[Any] | None = None,
     ):
         self.identifier = identifier
 
@@ -39,7 +39,7 @@ class SimpleRegistryPlugin(RegistryPlugin):
 
 
 class SimpleRegistry(Registry):
-    groups: Dict[str, KeyValueStore] = {}
+    groups: dict[str, KeyValueStore] = {}
     """
     Maps group names to objects storing all the key/values in that group.
     """
@@ -49,7 +49,7 @@ class SimpleRegistry(Registry):
             self.groups[group] = SimpleKeyValueStore()
         return self.groups[group]
 
-    def get_group_array(self) -> List[str]:
+    def get_group_array(self) -> list[str]:
         return list(self.groups.keys())
 
     def has_group(self, group: str) -> bool:
@@ -61,11 +61,11 @@ class SimpleRegistry(Registry):
 
 class SimpleKeyValueStore(KeyValueStore):
     store: dict[
-        str, str | List[str] | int | bool | float | NDArray[float64] | Message
+        str, str | list[str] | int | bool | float | NDArray[float64] | Message
     ] = {}
     data_format = KeyValueStoreDataFormat.UNSPECIFIED
 
-    def get_key_array(self) -> List[str]:
+    def get_key_array(self) -> list[str]:
         return list(self.store.keys())
 
     def has_key(self, key: str) -> bool:
@@ -102,12 +102,12 @@ class SimpleKeyValueStore(KeyValueStore):
         pass
 
     def request_notify(
-        self, key: str | None, callback: Callable[[str, List[str], KeyValueStore], None]
+        self, key: str | None, callback: Callable[[str, list[str], KeyValueStore], None]
     ) -> bool:
         return False
 
     def remove_notify(
-        self, key: str | None, callback: Callable[[str, List[str], KeyValueStore], None]
+        self, key: str | None, callback: Callable[[str, list[str], KeyValueStore], None]
     ) -> bool:
         return False
 

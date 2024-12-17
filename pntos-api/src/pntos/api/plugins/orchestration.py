@@ -1,6 +1,6 @@
 """Python API of pntOS."""
 
-from typing import List, Protocol
+from typing import Protocol
 
 from aspn23 import TypeTimestamp
 
@@ -113,7 +113,7 @@ class OrchestrationPlugin(CommonPlugin, Protocol):
     """
 
     def init_orchestration_plugin(
-        self, plugins: List[CommonPlugin], stream_config: MessageStreamConfig
+        self, plugins: list[CommonPlugin], stream_config: MessageStreamConfig
     ) -> None:
         """
         Initial data structures needed by the orchestration plugin.
@@ -149,7 +149,7 @@ class OrchestrationPlugin(CommonPlugin, Protocol):
         """
         pass
 
-    def get_filter_description_list(self) -> List[str]:
+    def get_filter_description_list(self) -> list[str]:
         """
         Request a list of strings describing the filters available in this Orchestration plugin.
 
@@ -189,9 +189,9 @@ class OrchestrationPlugin(CommonPlugin, Protocol):
 
     def request_solutions(
         self,
-        solution_times: List[TypeTimestamp],
+        solution_times: list[TypeTimestamp],
         filter_description: str | None = None,
-    ) -> List[Message]:
+    ) -> list[Message]:
         """
         Request filtering solutions at the times specified in the array `solution_times`.
 
