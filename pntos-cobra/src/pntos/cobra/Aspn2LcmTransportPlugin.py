@@ -121,10 +121,6 @@ class Aspn2LcmTransportPlugin(CommonPlugin, Protocol):
         """Begin listening for lcm messages given input configuration"""
         self.lcm = LCM()
 
-        if self.lcm is None:
-            print("Failed to create lcm transport")
-            return
-
         self.listener = Thread(target=self.listener_thread, args=[])
         self.listener.start()
 

@@ -169,8 +169,6 @@ class SimpleLoggingPlugin(LoggingPlugin):
                 return "warning"
             case LoggingLevel.ERROR:
                 return "error"
-            case _:
-                return "unknown"
 
     def output_time(self) -> None:
         if self.colorize:

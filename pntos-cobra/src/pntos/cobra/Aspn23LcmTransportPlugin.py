@@ -84,12 +84,6 @@ class Aspn23LcmTransportPlugin(CommonPlugin, Protocol):
         """Begin listening for lcm messages given input configuration"""
         self.lcm = LCM()
 
-        if self.lcm is None:
-            self.mediator.log_message(
-                LoggingLevel.ERROR, "Failed to create lcm transport"
-            )
-            return
-
         self.listener = Thread(target=self.listener_thread, args=[])
         self.listener.start()
 
