@@ -22,7 +22,7 @@ class Aspn23LcmTransportPlugin(CommonPlugin, Protocol):
     subscription: LCMSubscription
 
     def __init__(self, mediator: Mediator):
-        self.identifier = "python-transport-lcm23-plugin"
+        self.identifier = 'python-transport-lcm23-plugin'
         self.mediator = mediator
 
     def init_plugin(
@@ -50,7 +50,7 @@ class Aspn23LcmTransportPlugin(CommonPlugin, Protocol):
             self.lcm.unsubscribe(self.subscription)
         self.__init__(self.url, mediator=None)
         self.mediator.log_message(
-            LoggingLevel.INFO, "shutdown_plugin for " + self.identifier
+            LoggingLevel.INFO, 'shutdown_plugin for ' + self.identifier
         )
 
     def general_handler(self):
@@ -64,10 +64,10 @@ class Aspn23LcmTransportPlugin(CommonPlugin, Protocol):
 
         def _general_handler(channel: str, data: bytes):
             # Do not process messages sent from pntos.
-            if "pntos" in channel:
+            if 'pntos' in channel:
                 self.mediator.log_message(
                     LoggingLevel.INFO,
-                    "pntos channel message, not processing in aspn handler",
+                    'pntos channel message, not processing in aspn handler',
                 )
                 return
             decoded = MeasurementPositionVelocityAttitude_LCM.decode(data)
@@ -78,7 +78,7 @@ class Aspn23LcmTransportPlugin(CommonPlugin, Protocol):
         return _general_handler
 
     def listener_thread(self, lcm: LCM):
-        self.subscription = lcm.subscribe("^((?!pntos).)*$", self.general_handler())
+        self.subscription = lcm.subscribe('^((?!pntos).)*$', self.general_handler())
 
     def start_listening(self) -> None:
         """Begin listening for lcm messages given input configuration"""
@@ -86,7 +86,7 @@ class Aspn23LcmTransportPlugin(CommonPlugin, Protocol):
 
         if self.lcm is None:
             self.mediator.log_message(
-                LoggingLevel.ERROR, "Failed to create lcm transport"
+                LoggingLevel.ERROR, 'Failed to create lcm transport'
             )
             return
 
@@ -101,7 +101,7 @@ class Aspn23LcmTransportPlugin(CommonPlugin, Protocol):
         if self.subscription is not None and self.lcm is not None:
             self.lcm.unsubscribe(self.subscription)
 
-        self.mediator.log_message(LoggingLevel.INFO, "LCM transport stopped")
+        self.mediator.log_message(LoggingLevel.INFO, 'LCM transport stopped')
 
     def broadcast_message(self, message: Message, channel_name: str | None = None):
         """Send a message over LCM to a specific channel"""
@@ -114,4 +114,4 @@ class Aspn23LcmTransportPlugin(CommonPlugin, Protocol):
             )
             self.lcm.publish(channel, translated.encode())
         else:
-            print("Invalid LCM message")
+            print('Invalid LCM message')

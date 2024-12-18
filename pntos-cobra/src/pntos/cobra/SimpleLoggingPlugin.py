@@ -10,19 +10,19 @@ global_global_log_level = LoggingLevel.INFO
 class fmts:
     """Formats for printing to terminal"""
 
-    HEADER = "\033[95m"
-    OKBLUE = "\033[94m"
-    OKCYAN = "\033[96m"
-    OKGREEN = "\033[92m"
-    DRKGRAY = "\033[90m"
-    LTGRAY = "\033[37m"
-    WARNING = "\033[93m"
-    FAIL = "\033[91m"
-    ENDC = "\033[0m"
-    BOLD = "\033[1m"
-    UNDERLINE = "\033[4m"
-    TAN = "\033[2m"
-    WHITE = "\033[97m"
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKCYAN = '\033[96m'
+    OKGREEN = '\033[92m'
+    DRKGRAY = '\033[90m'
+    LTGRAY = '\033[37m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+    TAN = '\033[2m'
+    WHITE = '\033[97m'
 
 
 class SimpleLoggingPlugin(LoggingPlugin):
@@ -50,39 +50,39 @@ class SimpleLoggingPlugin(LoggingPlugin):
                 )
                 if global_log_level_temp is not None:
                     match global_log_level_temp:
-                        case "error":
+                        case 'error':
                             self.global_log_level = LoggingLevel.ERROR
-                        case "debug":
+                        case 'debug':
                             self.global_log_level = LoggingLevel.DEBUG
-                        case "warn":
+                        case 'warn':
                             self.global_log_level = LoggingLevel.WARN
-                        case "info":
+                        case 'info':
                             self.global_log_level = LoggingLevel.INFO
                         case _:
                             self.log(
                                 self.__class__,
-                                "",
+                                '',
                                 LoggingLevel.INFO,
-                                "logging level "
+                                'logging level '
                                 + global_log_level_temp
-                                + " is unknown, remaining at "
+                                + ' is unknown, remaining at '
                                 + self.level_to_str(self.global_log_level),
                             )
 
                 else:
                     self.log(
                         self.__class__,
-                        "",
+                        '',
                         LoggingLevel.INFO,
-                        "using hard-coded global logging level "
+                        'using hard-coded global logging level '
                         + self.level_to_str(self.global_log_level),
                     )
             else:
                 self.log(
                     self.__class__,
-                    "",
+                    '',
                     LoggingLevel.INFO,
-                    "using hard-coded global logging level "
+                    'using hard-coded global logging level '
                     + self.level_to_str(self.global_log_level),
                 )
             config.batch_end()
@@ -128,65 +128,65 @@ class SimpleLoggingPlugin(LoggingPlugin):
                     self.output_time()
                     self.output_plugin_id(plugin_id)
                     if self.colorize:
-                        print(fmts.OKGREEN + " [INFO] " + fmts.ENDC, end="")
+                        print(fmts.OKGREEN + ' [INFO] ' + fmts.ENDC, end='')
                     else:
-                        print(" [INFO] ", end="")
+                        print(' [INFO] ', end='')
                     print(message)
             case LoggingLevel.WARN:
                 if GLL is INFO or GLL is DEBUG or GLL is WARN:
                     self.output_time()
                     self.output_plugin_id(plugin_id)
                     if self.colorize:
-                        print(fmts.WARNING + " [WARN] " + fmts.ENDC, end="")
+                        print(fmts.WARNING + ' [WARN] ' + fmts.ENDC, end='')
                     else:
-                        print(" [WARN] ", end="")
+                        print(' [WARN] ', end='')
                     print(message)
             case LoggingLevel.DEBUG:
                 if GLL is DEBUG:
                     self.output_time()
                     self.output_plugin_id(plugin_id)
                     if self.colorize:
-                        print(fmts.OKBLUE + " [DEBUG] " + fmts.ENDC, end="")
+                        print(fmts.OKBLUE + ' [DEBUG] ' + fmts.ENDC, end='')
                     else:
-                        print(" [DEBUG] ", end="")
+                        print(' [DEBUG] ', end='')
                     print(message)
             case LoggingLevel.ERROR:
                 self.output_time()
                 self.output_plugin_id(plugin_id)
                 if self.colorize:
-                    print(fmts.FAIL + " [ERROR] " + fmts.ENDC, end="")
+                    print(fmts.FAIL + ' [ERROR] ' + fmts.ENDC, end='')
                 else:
-                    print(" [ERROR] ", end="")
+                    print(' [ERROR] ', end='')
                 print(message)
 
     def level_to_str(self, level: LoggingLevel):
         match level:
             case LoggingLevel.DEBUG:
-                return "debug"
+                return 'debug'
             case LoggingLevel.INFO:
-                return "info"
+                return 'info'
             case LoggingLevel.WARN:
-                return "warning"
+                return 'warning'
             case LoggingLevel.ERROR:
-                return "error"
+                return 'error'
             case _:
-                return "unknown"
+                return 'unknown'
 
     def output_time(self):
         if self.colorize:
             print(
                 fmts.LTGRAY
-                + "["
+                + '['
                 + time.strftime(LoggingConfig.dt_fmt)
-                + "]"
+                + ']'
                 + fmts.ENDC,
-                end="",
+                end='',
             )
         else:
-            print("[" + time.strftime(LoggingConfig.dt_fmt) + "]", end="")
+            print('[' + time.strftime(LoggingConfig.dt_fmt) + ']', end='')
 
     def output_plugin_id(self, plugin_id: str):
         if self.colorize:
-            print(fmts.DRKGRAY + " [" + plugin_id + "]" + fmts.ENDC, end="")
+            print(fmts.DRKGRAY + ' [' + plugin_id + ']' + fmts.ENDC, end='')
         else:
-            print(" [" + plugin_id + "]", end="")
+            print(' [' + plugin_id + ']', end='')

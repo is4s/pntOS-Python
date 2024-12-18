@@ -29,19 +29,19 @@ my_config = [
     SensorConfig(
         lever_arm=(0.0, 0.0, 0.0),
         orientation=(0.0, 0.0, 0.0, 0.0),
-        source_identifier="lcm://cobranav/novatel",
-        destination_identifier="gps_measurement_processor",
+        source_identifier='lcm://cobranav/novatel',
+        destination_identifier='gps_measurement_processor',
         use_for_alignment=True,
-        sensor_name="novatel",
+        sensor_name='novatel',
     ),
 ]
 
 # Create all of our plugins
 
-controller = SimpleControllerPlugin(identifier="my_controller")
-orchestration = SimpleOrchestrationPlugin(identifier="my_orchestration")
-registry = SimpleRegistryPlugin(identifier="my_registry", config=my_config)
-transport = SimpleTransportPlugin(identifier="my_transport")
+controller = SimpleControllerPlugin(identifier='my_controller')
+orchestration = SimpleOrchestrationPlugin(identifier='my_orchestration')
+registry = SimpleRegistryPlugin(identifier='my_registry', config=my_config)
+transport = SimpleTransportPlugin(identifier='my_transport')
 
 # Start the controller, and pass it all of the other plugins to use
 
