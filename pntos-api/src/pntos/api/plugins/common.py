@@ -45,7 +45,7 @@ class EstimateWithCovarianceType(Enum):
     Contains a mean (estimate) and covariance describing a rotation modeled by a multivariate
     Gaussian distribution, but the estimate is in quaternion form and the covariance is in tilt
     error form.
-    
+
       - :attr:`.EstimateWithCovariance.estimate` is size 4x1.
       - :attr:`.EstimateWithCovariance.covariance` is size 3x3, in :math:`\\text{radians}^2`.
     """
@@ -140,7 +140,7 @@ class LoggingLevel(Enum):
 
     ERROR = 0
     """
-    This output indicates the program has entered an error state, and 
+    This output indicates the program has entered an error state, and
     likely needs to be inspected to discover what went wrong.
     """
 
@@ -152,14 +152,14 @@ class LoggingLevel(Enum):
 
     INFO = 2
     """
-    This output is designed to be informational, and may indicate correct 
+    This output is designed to be informational, and may indicate correct
     operation.
     """
 
     DEBUG = 3
     """
-    This output is designed to assist in debugging plugins by providing 
-    additional information about state and behavior which would be 
+    This output is designed to assist in debugging plugins by providing
+    additional information about state and behavior which would be
     otherwise unnecessary.
     """
 
@@ -175,7 +175,7 @@ class KeyValueStoreDataFormat(Enum):
 
     INI = 0
     """
-    Keys and their corresponding values are returned according to the INI 
+    Keys and their corresponding values are returned according to the INI
     file format specification.
     """
 
