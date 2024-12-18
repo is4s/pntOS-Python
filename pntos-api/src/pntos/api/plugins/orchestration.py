@@ -166,8 +166,14 @@ class OrchestrationPlugin(CommonPlugin, Protocol):
         engine.
 
         Args:
-            message (Message)
-            sequenced (bool)
+            message (Message): The :class:`Message` to be delivered to the
+                :class:`OrchestrationPlugin` from the :class:`ControllerPlugin`. From here the
+                :class:`OrchestrationPlugin` may use it directly or route it to other plugins (like
+                the :class:`FusionPlugin`, :class:`InertialPlugin`, or
+                :class:`InitializationPlugin`).
+            sequenced (bool): ``False`` if ``message`` was the last received :class:`Message`
+                or ``True`` if it was delayed by buffering. See :class:`MessageStreamConfig` for
+                more details.
         """
         pass
 
