@@ -591,10 +591,10 @@ class Mediator(Protocol):
           mechanization, with resets disabled during the time intervals between ``solution_times``
           (but resets applied before all of the ``solution_times``).
         - Strings should include a substring indicating the type of solution returned. This
-          substring should contain the string-equivalent to the ``AspnMessageType`` enum value,
-          followed by the string ``_ESTIMATE``. This allows the user to perform substring matching
-          without a risk of getting a false positive match from a type whose string would be a
-          subset of another type.
+          substring should contain the string-equivalent to the corresponding ASPN message class
+          name, converted to UPPER_SNAKE_CASE, followed by the string ``_ESTIMATE``. This allows the
+          user to perform substring matching without a risk of getting a false positive match from a
+          type whose string would be a subset of another type.
 
         Example:
             If the primary solution is an ASPN PVA then the string
@@ -607,7 +607,6 @@ class Mediator(Protocol):
         Returns:
             List[str]: A list of strings describing the solutions available.
         """
-        # TODO AspnMessageType doesn't exist.
         pass
 
     def request_solutions(

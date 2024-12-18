@@ -27,14 +27,13 @@ class MessageStreamConfig(Protocol):
         """
         Request messages are streamed in sorted timestamp ordering.
 
-        Request messages of the given ``MessageType`` and optional ``source_identifier`` are
+        Request messages of the given ``type`` and optional ``source_identifier`` are
         streamed in sorted timestamp ordering.
 
         Args:
             type (type)
             source_identifier (str | None, optional)
         """
-        # TODO MessageType does not exist yet.
         pass
 
     def sequenced_stream_remove(
@@ -43,7 +42,7 @@ class MessageStreamConfig(Protocol):
         """
         Request messages are no longer streamed in sorted timestamp ordering.
 
-        Request messages of the given ``MessageType`` and optional ``source_identifier`` are no
+        Request messages of the given ``type`` and optional ``source_identifier`` are no
         longer streamed in sorted timestamp ordering. This will remove a type that was previously
         added in a call to :meth:`sequenced_stream_add`, or remove individual messages from the
         entire list of messages that was added with a previous call to :meth:`sequenced_stream_all`.
@@ -52,7 +51,6 @@ class MessageStreamConfig(Protocol):
             type (type)
             source_identifier (str | None, optional)
         """
-        # TODO MessageType does not exist yet.
         pass
 
     def sequenced_stream_all(self, enable: bool) -> None:
@@ -73,14 +71,13 @@ class MessageStreamConfig(Protocol):
         """
         Request messages are streamed immediately.
 
-        Request messages of the given ``MessageType`` and optional ``source_identifier`` are
+        Request messages of the given ``type`` and optional ``source_identifier`` are
         streamed immediately without delay, buffering, or sorting.
 
         Args:
             type (type)
             source_identifier (str | None, optional)
         """
-        # TODO MessageType does not exist yet.
         pass
 
     def immediate_stream_remove(
@@ -89,7 +86,7 @@ class MessageStreamConfig(Protocol):
         """
         Request messages are no longer streamed immediately.
 
-        Request messages of the given ``MessageType`` and optional ``source_identifier`` are no
+        Request messages of the given ``type`` and optional ``source_identifier`` are no
         longer streamed immediately. This will remove a type that was previously added in a call to
         :meth:`immediate_stream_add`, or remove individual messages from the entire list of messages
         that was added with a previous call to :meth:`immediate_stream_all`.
@@ -98,7 +95,6 @@ class MessageStreamConfig(Protocol):
             type (type)
             source_identifier (str | None, optional)
         """
-        # TODO MessageType does not exist yet.
         pass
 
     def immediate_stream_all(self, enable: bool) -> None:
@@ -193,11 +189,10 @@ class OrchestrationPlugin(CommonPlugin, Protocol):
           ``DEAD_RECKONING`` solution which is the solution from its free-running inertial
           mechanization, with resets disabled during the time intervals between ``solution_times``
           (but resets applied before all of the ``solution_times``).
-        - Strings should include a substring indicating the type of solution returned. This
-          substring should contain the string-equivalent to the ``AspnMessageType`` enum value,
-          followed by the string ``_ESTIMATE``. This allows the user to perform substring matching
-          without a risk of getting a false positive match from a type whose string would be a
-          subset of another type.
+        - This substring should contain the string-equivalent to the corresponding ASPN message
+          class name, converted to UPPER_SNAKE_CASE, followed by the string ``_ESTIMATE``. This
+          allows the user to perform substring matching without a risk of getting a false positive
+          match from a type whose string would be a subset of another type.
 
         Example:
             For example, if the primary solution is an ASPN PVA then the string
@@ -211,7 +206,6 @@ class OrchestrationPlugin(CommonPlugin, Protocol):
             List[str]: A list of strings describing the filters available in this
             :class:`OrchestrationPlugin`.
         """
-        # TODO AspnMessageType doesn't exist.
         pass
 
     def request_solutions(
