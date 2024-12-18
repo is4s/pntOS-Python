@@ -386,10 +386,7 @@ class KeyValueStore(Protocol):
         notifier was successfully registered, and ``False`` if the store is unable to notify the
         requester. If ``key`` is ``None``, then the callback will be invoked when any key in the
         batch's group is modified. Otherwise, the callback will only be invoked when the given key
-        is modified. The receiver argument, if non-``None``, will be passed through to the
-        callback's receiver parameter when the callback is invoked. The receiver argument is
-        designed to allow the caller of :meth:`request_notify` to pass a context object through,
-        such that the same context object is available when the callback is run.
+        is modified.
 
         Note:
             The callback must not attempt to set any values inside the :class:`KeyValueStore`, as
@@ -417,12 +414,12 @@ class KeyValueStore(Protocol):
         """
         Removes a notification as requested by :meth:`request_notify`.
 
-        The group, receiver, and callback must match the parameters passed to :meth:`request_notify`
+        The group and callback must match the parameters passed to :meth:`request_notify`
         in order to successfully remove a callback.
 
         Note:
-            This will remove all matching callbacks that have a matching group, receiver, and
-            callback. If a user registers the same callback twice this will remove both.
+            This will remove all matching callbacks that have a matching group and callback. If a
+            user registers the same callback twice this will remove both.
 
         Args:
             key (str | None)
@@ -430,7 +427,7 @@ class KeyValueStore(Protocol):
 
         Returns:
             bool: ``True`` if removal was successful and ``False`` if it was not. ``False`` will be
-            returned if a callback did not exist for the group/receiver combination.
+            returned if a callback did not exist for the group.
         """
         pass
 
@@ -544,8 +541,7 @@ class Registry(Protocol):
 
         Returns:
             bool: ``True`` if the notifier was successfully registered, and ``False`` if the
-            registry is unable to notify the requester. The callback will receive the same receiver
-            as was passed into this method, which may be used as a context object.
+            registry is unable to notify the requester.
         """
         pass
 
