@@ -63,11 +63,14 @@ class PreprocessorPlugin(CommonPlugin, Protocol):
                 preprocessor for each element in ``preprocessor_identifiers``, the
                 ``preprocessor_index`` parameter is used to select which kind of preprocessor to
                 create a new instance of. The :attr:`PreprocessorPlugin.preprocessor_identifiers`
-                field contains identifying strings for the kinds of preprocessors. For example, if
-                the plugin can create 45 different preprocessors, the identifier of the last
-                preprocessor that can be created is found in ``preprocessor_identifiers[44]``. An
-                instance of this preprocessor can be created by calling ``new_preprocessor(44,
-                ...)``. Note that ``0 <= preprocessor_index < length of preprocessor_identifiers``.
+                field contains identifying strings for the kinds of preprocessors. 
+
+        Example:
+                    For example, if the plugin can create 45 different preprocessors, the identifier
+                    of the last preprocessor that can be created is found in
+                    ``preprocessor_identifiers[44]``. An instance of this preprocessor can be
+                    created by calling ``new_preprocessor(44, ...)``. Note that ``0 <=
+                    preprocessor_index < length of preprocessor_identifiers``.
             config_group (str | None, optional): Indicates which (if any) parameter group in the
                 registry may be used to obtain additional configuration values to generate the new
                 preprocessor. If the preprocessor requires no outside configuration,

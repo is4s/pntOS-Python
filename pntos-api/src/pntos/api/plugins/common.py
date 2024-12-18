@@ -596,9 +596,10 @@ class Mediator(Protocol):
           without a risk of getting a false positive match from a type whose string would be a
           subset of another type.
 
-        For example, if the primary solution is an ASPN PVA then the string
-        ``MY_BEST_ASPN_MEASUREMENT_POSITION_VELOCITY_ATTITUDE_ESTIMATE`` would fulfill the
-        convention.
+        Example:
+            If the primary solution is an ASPN PVA then the string
+            ``MY_BEST_ASPN_MEASUREMENT_POSITION_VELOCITY_ATTITUDE_ESTIMATE`` would fulfill the
+            convention.
 
         These conventions allow the user to identify their desired type of solution using substring
         matching.
