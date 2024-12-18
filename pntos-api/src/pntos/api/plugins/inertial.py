@@ -100,11 +100,6 @@ class CommonInertial(Protocol):
     """
     A common base type for an inertial.
 
-    A user may use the :attr:`CommonInertial.mechanization_type` field to discover what type of
-    inertial this type actually is and then downcast to the appropriate inertial class. For example,
-    if :attr:`CommonInertial.mechanization_type` is ``STANDARD_INERTIAL_MECHANIZATION``, then this
-    instance is actually a :class:`StandardInertialMechanization`.
-
     Caution:
         **Unstable**: This feature is unstable and is not yet considered part of the stable pntOS
         API. Usage of this feature is highly discouraged in non-experimental code, and its
