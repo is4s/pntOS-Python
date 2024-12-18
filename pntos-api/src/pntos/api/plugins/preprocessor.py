@@ -59,11 +59,11 @@ class PreprocessorPlugin(CommonPlugin, Protocol):
         Get a newly created :class:`Preprocessor`.
 
         Args:
-            preprocessor_index (int): Since the :class:`PreprocessorPlugin` can create a different 
+            preprocessor_index (int): Since the :class:`PreprocessorPlugin` can create a different
                 preprocessor for each element in ``preprocessor_identifiers``, the
                 ``preprocessor_index`` parameter is used to select which kind of preprocessor to
                 create a new instance of. The :attr:`PreprocessorPlugin.preprocessor_identifiers`
-                field contains identifying strings for the kinds of preprocessors. 
+                field contains identifying strings for the kinds of preprocessors.
 
         Example:
                     For example, if the plugin can create 45 different preprocessors, the identifier

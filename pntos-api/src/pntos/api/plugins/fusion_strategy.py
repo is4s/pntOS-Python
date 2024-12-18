@@ -260,7 +260,7 @@ class StandardFusionStrategy(FusionStrategy, Protocol):
         ``measurement_model``. The updated estimate can be acquired by calling :meth:`get_estimate`.
 
         Args:
-            measurement_model (StandardMeasurementModel): The measurement with which to update the 
+            measurement_model (StandardMeasurementModel): The measurement with which to update the
                 filter, as well as a model that describes how the measurement relates to the states
                 this strategy is estimating.
         """
