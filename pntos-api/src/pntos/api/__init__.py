@@ -4,7 +4,6 @@ from .plugins.common import (
     CommonPlugin as CommonPlugin,
     EstimateWithCovariance as EstimateWithCovariance,
     EstimateWithCovarianceType as EstimateWithCovarianceType,
-    FusionType as FusionType,
     KeyValueStore as KeyValueStore,
     KeyValueStoreDataFormat as KeyValueStoreDataFormat,
     LoggingLevel as LoggingLevel,
@@ -15,8 +14,8 @@ from .plugins.common import (
 )
 from .plugins.controller import ControllerPlugin as ControllerPlugin
 from .plugins.fusion import (
-    CommonFusionEngine as CommonFusionEngine,
     CrossCovariances as CrossCovariances,
+    FusionEngineType as FusionEngineType,
     FusionPlugin as FusionPlugin,
     StandardFusionEngine as StandardFusionEngine,
     StandardMeasurementProcessor as StandardMeasurementProcessor,
@@ -24,8 +23,8 @@ from .plugins.fusion import (
     VirtualStateBlock as VirtualStateBlock,
 )
 from .plugins.fusion_strategy import (
-    FusionStrategy as FusionStrategy,
     FusionStrategyPlugin as FusionStrategyPlugin,
+    FusionStrategyType as FusionStrategyType,
     StandardDynamicsModel as StandardDynamicsModel,
     StandardFusionStrategy as StandardFusionStrategy,
     StandardMeasurementModel as StandardMeasurementModel,
@@ -68,6 +67,7 @@ from .plugins.registry import RegistryPlugin as RegistryPlugin
 from .plugins.state_modeling import (
     StandardStateModelProvider as StandardStateModelProvider,
     StateModelingPlugin as StateModelingPlugin,
+    StateModelProviderType as StateModelProviderType,
 )
 from .plugins.transport import TransportPlugin as TransportPlugin
 from .plugins.ui import UiPlugin as UiPlugin
