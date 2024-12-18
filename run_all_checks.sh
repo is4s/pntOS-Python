@@ -7,8 +7,10 @@
 # - rye is on the PATH
 # - rye sync has been run, and the virtual environment it set up has been activated
 
-rye lint --fix 
-rye fmt 
+set -xe
+
+rye lint --fix
+rye fmt
 rye test -p pntos-cobra
 mypy pntos-api --no-implicit-reexport
 mypy pntos-cli --no-implicit-reexport
