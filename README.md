@@ -14,7 +14,7 @@ We currently support two toolchains: A standard `pip`-based workflow, and a more
 
 **Pip**: If you already have your own workflows or prefer to just use vanilla `pip`, you might prefer this route.
 
-**Rye**: If you're looking for an all in one experience that runs things for you, you might prefer this route. 
+**Rye**: If you're looking for an all in one experience that runs things for you, you might prefer this route.
 
 How you wish to set up your environment will determine which of the next sections you follow.
 
@@ -100,9 +100,9 @@ New contributions to this repo should pass the following checks, if they use oth
 ruff check --fix
 ruff format
 pytest pntos-*
-mypy pntos-api --no-implicit-reexport
-mypy pntos-cli --no-implicit-reexport
-mypy pntos-cobra --no-implicit-reexport
+mypy pntos-api
+mypy pntos-cli
+mypy pntos-cobra
 ```
 
 Note that Rye will be used as the standard on the CI/CD side.
@@ -112,12 +112,12 @@ Note that Rye will be used as the standard on the CI/CD side.
 New contributions to this repo should pass the following checks, if they use Rye:
 
 ```bash
-rye lint --fix 
-rye fmt 
+rye lint --fix
+rye fmt
 rye test -p pntos-cobra
-mypy pntos-api --no-implicit-reexport
-mypy pntos-cli --no-implicit-reexport
-mypy pntos-cobra --no-implicit-reexport
+mypy pntos-api
+mypy pntos-cli
+mypy pntos-cobra
 ```
 
 Or, to run all the above commands at once, run:
