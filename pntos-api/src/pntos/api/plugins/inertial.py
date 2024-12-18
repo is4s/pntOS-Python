@@ -25,8 +25,9 @@ class InertialFrame(Enum):
     Force vectors in this frame are north-east-down in :math:`m/s^2`.
 
 	Rotation rate vectors in this frame are of an inertial sensor with respect to inertial frame, in
-	the inertial sensor frame (:math:`rad/s`). Sometimes represented as w_s_is (or w_b_ib if the
-	body frame is aligned with the inertial sensor frame.
+	the inertial sensor frame (:math:`rad/s`). Sometimes represented as
+	:math:`w^\\text{s}_\\text{is}` (or :math:`w^\\text{b}_\\text{ib}` if the body frame is aligned
+	with the inertial sensor frame.
     """
 
 
