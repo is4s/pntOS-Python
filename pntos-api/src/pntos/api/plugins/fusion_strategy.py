@@ -13,12 +13,12 @@ class FusionStrategy(Protocol):
     """
     A computation engine for doing raw estimation.
 
-    This class is itself empty and only serves as a base class for different
-    types of fusion strategies. At this time, the only implementation of this
-    protocol is StandardFusionStrategy. However, other fusion strategies will be
-    added in the future, so code that receives a FusionStrategy should use
-    `isinstance` to check that it is really a StandardFusionStrategy before
-    using it.
+    This class is itself empty and only serves as a base class for different types of fusion
+    strategies. At this time, the only implementation of this protocol is
+    :class:`StandardFusionStrategy`. However, other fusion strategies will be added in the future,
+    so code that receives a FusionStrategy should use `isinstance
+    <https://docs.python.org/3/library/functions.html#isinstance>`__ to check that it is really a
+    :class:`StandardFusionStrategy` before using it.
     """
 
     pass
@@ -29,18 +29,20 @@ class StandardDynamicsModel:
     """
     A description of the propagation dynamics for a set of states.
 
-    This model assumes that the state space `x` can be propagated forward in time by the equation:
+    This model assumes that the state space :math:`x` can be propagated forward in time by the
+    equation:
 
+    .. math::
         x_k = g(x_{k-1}) + w_k
 
-    where `x_k` is the set of states at time k, `g` is an arbitrary function,
-    and `w_k` is additive white Gaussian noise.
+    where :math:`x_k` is the set of states at time :math:`k`, :math:`g` is an arbitrary function,
+    and :math:`w_k` is additive white Gaussian noise.
 
     Attributes:
-      g (Callable[[NDArray], NDArray]): A function that propagates forward in time a set of states.
-      Phi (NDArray): The first-order Taylor series expansion (Jacobian) of the function `g`.
-      Qd: The covariance matrix of `w_k`.
-
+        g (Callable[[NDArray], NDArray]): A function that propagates forward in time a set of
+            states.
+        Phi (NDArray): The first-order Taylor series expansion (Jacobian) of the function :math:`g`.
+        Qd (NDArray): The covariance matrix of :math:`w_k`.
     """
 
     g: Callable[[NDArray], NDArray]
@@ -53,19 +55,20 @@ class StandardMeasurementModel:
     """
     A description of how a measurement relates to a state space.
 
-    This model assumes that the relationship between the measurement and state vector is
-    well modeled by the equation:
+    This model assumes that the relationship between the measurement and state vector is well
+    modeled by the equation:
+
+    .. math::
         z=h(x) + v
-    where `z` is the measurement itself, `x` is the set of states being
-    estimated, `h` is an arbitrary function, and `v` is additive white Gaussian
-    noise.
+
+    where :math:`z` is the measurement itself, :math:`x` is the set of states being estimated,
+    :math:`h` is an arbitrary function, and :math:`v` is additive white Gaussian noise.
 
     Attributes:
-      z (NDArray): A column vector containing the measurement itself.
-      h (Callable[[NDArray], NDArray]): A function that maps the state space to
-        measurement space.
-      H: The first-order Taylor series expansion (i.e. Jacobian) of the function `h`.
-      R: The covariance matrix of `v`.
+        z (NDArray): A column vector containing the measurement itself.
+        h (Callable[[NDArray], NDArray]): A function that maps the state space to measurement space.
+        H (NDArray): The first-order Taylor series expansion (i.e. Jacobian) of the function h.
+        R (NDArray): The covariance matrix of :math:`v`.
     """
 
     z: NDArray
@@ -91,34 +94,34 @@ class StandardFusionStrategy(FusionStrategy, Protocol):
 
     A typical usage pattern of this class is as follows:
 
-    1. The user adds a set of states by calling the `add_states` method. As part
+    1. The user adds a set of states by calling the :meth:`add_states` method. As part
        of this step, the user all passes in initial conditions for the estimate.
        The fusion strategy is now storing an estimate of the states, set to the
        initial conditions.
     2. The user propagates this estimate forward in time by calling the
-       `propagate` method. For example, if the initial conditions were the
+       :meth:`propagate` method. For example, if the initial conditions were the
        estimates of the states at time 0.0s, but we now want to know the
-       estimate of the values at time 5.0s, the user would call `propagate` with
+       estimate of the values at time 5.0s, the user would call :meth:`propagate` with
        a dynamics model parameter that specifies how to take an estimate at time
        0.0 and use it to compute the estimate at time 5.0.
     3. The user updates this estimate by using observations of the states at the
        current time. For example, if the filter is currently propagated to time
        5.0s and a measurement is received that observes the states' values at
-       time 5.0s, the user would call `update` with a measurement model
+       time 5.0s, the user would call :meth:`update` with a measurement model
        parameter that describes how to take the current estimate at 5.0s and
        incorporate the new information from the measurement.
     4. At any point, when the user wants to know the latest estimate given all
-       the propagate/updates that have occurred, they may call `get_estimate`.
+       the propagate/updates that have occurred, they may call :meth:`get_estimate`.
     """
 
     def get_num_states(self) -> int:
         """
         Get the total number of states this filter is estimating.
 
-        The count will initially be zero, until [add_states] is called.
+        The count will initially be zero, until :meth:`add_states` is called.
 
         Returns:
-            int: Number of stats being estimated in this filter.
+            int: Number of states being estimated in this filter.
         """
         ...
 
@@ -128,25 +131,23 @@ class StandardFusionStrategy(FusionStrategy, Protocol):
         initial_covariance: NDArray,
         cross_covariance: NDArray | None = None,
     ) -> int:
-        r"""
+        """
         Add new states to this filter.
 
-        Increases number of filter states and set the initial conditions of the
-        new states.  Returns index of the first added state. If \p
-        cross_covariance is NULL, cross covariance between the existing states
-        and the added states will be set to zeroes.
+        Increases number of filter states and set the initial conditions of the new states. Returns
+        index of the first added state. If ``cross_covariance`` is ``None``, cross covariance between
+        the existing states and the added states will be set to zeroes.
 
         Args:
-            initial_estimate (NDArray): The initial estimate to populate the new
-              states with.
-            initial_covariance (NDArray): The initial covariance matrix used to
-              initialize the uncertainty of the new states.
-            cross_covariance (NDArray | None): A covariance matrix that
-              describes the cross terms between the new states and all previous
-              states. If `None`, the cross-terms will be set to zero.
+            initial_estimate (NDArray): The initial estimate to populate the new states with.
+            initial_covariance (NDArray): The initial covariance matrix used to initialize the
+                uncertainty of the new states.
+            cross_covariance (NDArray | None): A covariance matrix that describes the cross terms
+                between the new states and all previous states. If ``None``, the cross-terms will be
+                set to zero.
 
         Returns:
-            int: Number of stats being added to this filter.
+            int: Number of states being added to this filter.
         """
         ...
 
@@ -164,31 +165,28 @@ class StandardFusionStrategy(FusionStrategy, Protocol):
         """
         Get the current internal estimate managed by this strategy.
 
-        This class manages a current estimate that is initially populated by
-        `add_states` and then is modified iteratively by `propagate`, `update`,
-        and other method calls. This method returns the current estimate,
-        incorporating all changes made by previous method calls to this
-        strategy.
+        This class manages a current estimate that is initially populated by :meth:`add_states` and
+        then is modified iteratively by :meth:`propagate`, :meth:`update`, and other method calls.
+        This method returns the current estimate, incorporating all changes made by previous method
+        calls to this strategy.
 
         Returns:
-            NDArray | None: An estimate if available. Returns None if no
-              states have been added yet.
+            NDArray | None: An estimate if available. Returns ``None`` if no states have been added
+            yet.
         """
 
     def set_estimate_slice(self, new_estimate: NDArray, first_index: int) -> None:
         """
         Set a slice of the state estimates to a given set of values.
 
-        This class manages a current estimate that is initially populated by
-        `add_states` and then is modified iteratively by `propagate`, `update`,
-        and other method calls. This method allows for manually overriding the
-        current estimate. Sets a block of states to new values, starting with
-        `first_index` and overwriting a number of states equal to the length of
-        `new_estimate`.
+        This class manages a current estimate that is initially populated by :meth:`add_states` and
+        then is modified iteratively by :meth:`propagate`, :meth:`update`, and other method calls.
+        This method allows for manually overriding the current estimate. Sets a block of states to
+        new values, starting with ``first_index`` and overwriting a number of states equal to the
+        length of ``new_estimate``.
 
         Args:
-            new_estimate (NDArray): The new estimate values that will overwrite
-              the previous values.
+            new_estimate (NDArray): The new estimate values that will overwrite the previous values.
             first_index (int): The index of the first state to overwrite.
         """
         ...
@@ -197,15 +195,15 @@ class StandardFusionStrategy(FusionStrategy, Protocol):
         """
         Get the covariance of the current estimate.
 
-        This class manages a current estimate that is initially populated by
-        `add_states` and then is modified iteratively by `propagate`, `update`,
-        and other method calls. In addition to the estimate itself, a covariance
-        of the current estimate is computed. This method returns this
-        covariance, incorporating all changes made by previous method calls to
+        This class manages a current estimate that is initially populated by :meth:`add_states` and
+        then is modified iteratively by :meth:`propagate`, :meth:`update`, and other method calls.
+        In addition to the estimate itself, a covariance of the current estimate is computed. This
+        method returns this covariance, incorporating all changes made by previous method calls to
         this strategy.
 
         Returns:
-            NDArray | None: The covariance of the current estimate. Returns None if no states have been added yet.
+            NDArray | None: The covariance of the current estimate. Returns ``None`` if no states
+            have been added yet.
         """
 
     def set_covariance_slice(
@@ -214,22 +212,20 @@ class StandardFusionStrategy(FusionStrategy, Protocol):
         """
         Set a slice of the covariance matrix to a given set of values.
 
-        This class manages a current estimate that is initially populated by
-        `add_states` and then is modified iteratively by `propagate`, `update`,
-        and other method calls. In addition to the estimate itself, a covariance
-        of the current estimate is computed.
+        This class manages a current estimate that is initially populated by :meth:`add_states` and
+        then is modified iteratively by :meth:`propagate`, :meth:`update`, and other method calls.
+        In addition to the estimate itself, a covariance of the current estimate is computed.
 
-        Allows for manually overriding the current covariance matrix. Sets a
-        block of the covariance matrix to new values. The overwritten values are
-        those in a rectangular area defined by the upper left corner at
-        `first_row`, `first_col` and extending down and right to cover an area
-        equal to the size of `new_covariance`.
+        Allows for manually overriding the current covariance matrix. Sets a block of the covariance
+        matrix to new values. The overwritten values are those in a rectangular area defined by the
+        upper left corner at ``first_row``, ``first_col`` and extending down and right to cover an
+        area equal to the size of ``new_covariance``.
 
         Args:
-            new_covariance (NDArray): The new covariance values that will
-              overwrite a slice of the previous covariance matrix.
-            first_row (int): The row of the first value to overwrite
-            first_col (int): The column of the first value to overwrite
+            new_covariance (NDArray): The new covariance values that will overwrite a slice of the
+                previous covariance matrix.
+            first_row (int): The row of the first value to overwrite.
+            first_col (int): The column of the first value to overwrite.
         """
         ...
 
@@ -238,19 +234,18 @@ class StandardFusionStrategy(FusionStrategy, Protocol):
         Propagates the estimate of the state space forward in time.
 
         This method assumes that a state space is already initialized with a set
-        of states via the `add_states` method. The `dynamics_model` parameter
+        of states via the :meth:`add_states` method. The ``dynamics_model`` parameter
         includes a description of how the current state estimate can be
         propagated from the current time to a new time. Note that the actual
         numerical values of the current/new times are not specified anywhere, as
         that information is not needed to perform the computation. This method
-        then takes the current state space estimate and the `dynamics_model` and
+        then takes the current state space estimate and the ``dynamics_model`` and
         uses both to compute an estimate at the new time. The new estimate
         clobbers the old estimate managed by this class, and be acquired by
-        calling `get_estimate`.
-
+        calling :meth:`get_estimate`.
 
         Args:
-            dynamics_model (StandardDynamicsModel): _description_
+            dynamics_model (StandardDynamicsModel)
         """
         ...
 
@@ -258,18 +253,16 @@ class StandardFusionStrategy(FusionStrategy, Protocol):
         """
         Updates the estimate of the state space, incorporating a new measurement.
 
-        This method assumes that a state space is already initialized with a set
-        of states via the `add_states` method. The `measurement_model` parameter
-        includes both the measurement itself and a description of how the
-        measurement relates to the state space. This method then takes the
-        current state space estimate and updates it using information from the
-        `measurement_model`. The updated estimate can be acquired by calling
-        `get_estimate`.
+        This method assumes that a state space is already initialized with a set of states via the
+        :meth:`add_states` method. The ``measurement_model`` parameter includes both the measurement
+        itself and a description of how the measurement relates to the state space. This method then
+        takes the current state space estimate and updates it using information from the
+        ``measurement_model``. The updated estimate can be acquired by calling :meth:`get_estimate`.
 
         Args:
-            measurement_model (StandardMeasurementModel): The measurement to
-              update the filter with, as well as a model that describes how the
-              measurement relates to the states this strategy is estimating.
+            measurement_model (StandardMeasurementModel): The measurement with which to update the
+                filter, as well as a model that describes how the measurement relates to the states
+                this strategy is estimating.
         """
 
     def clone(self) -> "StandardFusionStrategy":
@@ -304,8 +297,8 @@ class FusionStrategyPlugin(CommonPlugin, Protocol):
     There are many ways to model sensor fusion, including very simple (linear
     Kalman filter) and complex (neural networks, factor graphs, etc.). This
     plugin aims to allow any and all of those models to be represented. It
-    achieves this by having multiple FusionTypes, so that the user may select
-    what kind of fusion they want. Currently, only the StandardFusionStrategy is
+    achieves this by having multiple :class:`FusionType` s, so that the user may select
+    what kind of fusion they want. Currently, only the :class:`StandardFusionStrategy` is
     implemented, which is suitable for EKFs and filters that have similar
     interfaces to an EKF (such as a UKF). However, more strategy types are
     planned to be added in the future.
@@ -313,31 +306,30 @@ class FusionStrategyPlugin(CommonPlugin, Protocol):
 
     def is_fusion_type_supported(self, fusion_type: FusionType) -> bool:
         """
-        Check if a particular fusion type is supported by `new_fusion_strategy`.
+        Check if a particular fusion type is supported by :meth:`new_fusion_strategy`.
 
-        The `new_fusion_strategy` factory method on this class can create
-        `FusionStrategy`s of different types. However, `FusionStrategyPlugin`s
+        The :meth:`new_fusion_strategy` factory method on this class can create
+        :class:`FusionStrategy` of different types. However, :class:`FusionStrategyPlugin`
         may not support all types (they must support at least one). Therefore,
-        when a user receives a FusionStrategyPlugin, they should:
+        when a user receives a :class:`FusionStrategyPlugin`, they should:
 
-        1. Initialize the plugin by calling `init_plugin` (see `CommonPlugin`
-           for more information).
-        2. Call `is_fusion_type_supported` to check that the plugin supports the
-           `FusionType` that the user wants to use.
-        3. If `is_fusion_type_supported` returned True, call the
-           `new_fusion_strategy` factory method to get a new `FusionStrategy` of
-           the desired `FusionType`.
-        4. Downcast the returned `FusionStrategy` to the selected `FusionType`.
-           For example, if the user calls `new_fusion_strategy` with a
-           `fusion_type` of `STANDARD_MODEL`, then the returned object should be
-           downcast to a `StandardFusionStrategy`.
+        1. Initialize the plugin by calling :meth:`.init_plugin` (see :class:`CommonPlugin` for more
+           information).
+        2. Call :meth:`is_fusion_type_supported` to check that the plugin supports the
+           :class:`FusionType` that the user wants to use.
+        3. If :meth:`is_fusion_type_supported` returned True, call the :meth:`new_fusion_strategy`
+           factory method to get a new :class:`FusionStrategy` of the desired :class:`FusionType`.
+        4. Downcast the returned :class:`FusionStrategy` to the selected :class:`FusionType`. For
+           example, if the user calls :meth:`new_fusion_strategy` with a ``fusion_type`` of
+           ``STANDARD_MODEL``, then the returned object should be downcast to a
+           :class:`StandardFusionStrategy`.
         5. Proceed to use the fusion strategy to do estimation.
 
         Args:
             fusion_type (FusionType): The fusion type we are checking.
 
         Returns:
-            bool: Whether or not we support the requested `fusion_type`.
+            bool: Whether or not we support the requested ``fusion_type``.
         """
         ...
 
@@ -345,19 +337,16 @@ class FusionStrategyPlugin(CommonPlugin, Protocol):
         """
         Create a new fusion strategy of the requested type.
 
-        Users must first ensure that the FusionType is supported by calling
-        `is_fusion_type_supported`.
+        Users must first ensure that the :class:`FusionType` is supported by calling
+        :meth:`is_fusion_type_supported`.
 
         Args:
-            fusion_type (FusionType): The type of fusion plugin that we want
-              returned.
+            fusion_type (FusionType): The type of fusion plugin that we want returned.
 
         Returns:
-            FusionStrategy: The newly created FusionStrategy, which has a type
-              that corresponds to the `fusion_type`. For example, if the user
-              calls `new_fusion_strategy` with a `fusion_type` of
-              `STANDARD_MODEL`, then the returned object will be a
-              `StandardFusionStrategy`.
-
+            FusionStrategy: The newly created :class:`FusionStrategy`, which has a type that
+            corresponds to the ``fusion_type``. For example, if the user calls
+            :meth:`new_fusion_strategy` with a ``fusion_type`` of ``STANDARD_MODEL``, then the
+            returned object will be a :class:`StandardFusionStrategy`.
         """
         ...

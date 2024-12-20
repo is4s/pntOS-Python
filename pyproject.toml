@@ -30,7 +30,7 @@ members = ["pntos-*"]
 [tool.ruff.lint]
 extend-select = ["I"]
 select = ["D", "D213"]
-ignore = ["D212"]
+ignore = ["D212", "D417"]
 
 [tool.ruff.lint.per-file-ignores]
 "pntos-cobra/*" = ["D"]
