@@ -48,13 +48,16 @@ class CrossCovariances:
 
 
 class StandardStateBlock(Protocol):
-    """A description of a set of states and their dynamics."""
+    """
+    A description of a set of states and their dynamics.
+
+    Attributes:
+        label (str): The unique name for this state block.
+        num_states (int): The number of states represented by this state block.
+    """
 
     label: str
-    """The unique name for this state block"""
-
     num_states: int
-    """The number of states represented by this state block."""
 
     def receive_aux_data(self, aux: list[Message]) -> None:
         """
@@ -110,26 +113,21 @@ class StandardMeasurementProcessor(Protocol):
     resulting StandardMeasurementModel will be used by the fusion engine to
     call the underlying StandardFusionStrategy.update method to update the
     filter estimate/error covariance.
+
+    Attributes:
+        label (str): A unique name for this measurement processor. This value will be used to
+            select a measurement processor to handle new measurements that the strategy
+            receives.
+        state_block_labels (list[str]): A list of unique state block labels associated with
+            measurements received by this processor. The estimate and covariance matrices passed
+            into :meth:`generate_model` will be composed of the states associated with these state
+            blocks, and the returned StandardMeasurementModel.h and StandardMeasurementModel.H must
+            respect these states. Note, ``state_block_labels[i]`` is the identifier for the ``i`` th
+            state block this processor relates to.
     """
 
     label: str
-    """
-    A unique name for this measurement processor. This value will be used to
-    select a measurement processor to handle new measurements that the strategy
-    receives.
-    """
-
     state_block_labels: list[str]
-    """
-    A list of unique state block labels associated with measurements received
-    by this processor. The estimate and covariance matrices passed into
-    #generate_model will be composed of the states associated with these state
-    blocks, and the returned StandardMeasurementModel.h and
-    StandardMeasurementModel.H must respect these states.
-
-    Note, `state_block_labels[i]` is the identifier for the `i`th state block
-    this processor relates to.
-    """
 
     def receive_aux_data(self, aux: list[Message]) -> None:
         """
@@ -182,19 +180,15 @@ class VirtualStateBlock(Protocol):
     StandardStateBlock and 'target' referring to some representation that is
     advantageous for some other element, such as a
     StandardMeasurementProcessor, to use.
+
+    Attributes:
+        source (str): The label associated with the representation this instance can transform
+            *from*.
+        target (str): The label associated with the representation this instance can transform *to*.
     """
 
     source: str
-    """
-    The label associated with the representation this instance can transform
-    *from*.
-    """
-
     target: str
-    """
-    The label associated with the representation this instance can transform
-    *to*.
-    """
 
     def receive_aux_data(self, aux: list[Message]) -> None:
         """

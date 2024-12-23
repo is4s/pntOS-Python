@@ -12,10 +12,14 @@ from .fusion import (
 
 
 class CommonStateModelProvider(Protocol):
-    """A collection of tools for modeling states and measurements."""
+    """
+    A collection of tools for modeling states and measurements.
+
+    Attributes:
+        engine_type (FusionType): The type of fusion model used by this state model provider.
+    """
 
     engine_type: FusionType
-    """The type of fusion model used by this state model provider"""
 
 
 class StandardStateModelProvider(CommonStateModelProvider, Protocol):
@@ -53,42 +57,28 @@ class StandardStateModelProvider(CommonStateModelProvider, Protocol):
     returning new measurement processors and `processor_identifiers` is a set
     of identifiers for each available kind of measurement processor that can be
     returned by the factory.
+
+    Attributes:
+        processor_identifiers (list[str]): A list of identifying strings for each kind of
+            measurement processor that this :class:`StandardStateModelProvider` can create instances
+            of. The ``processor_index`` parameter of :meth:`new_processor` is an index into this
+            array. This field will be an empty list when this state model provider does not provide
+            any measurement processors.
+        block_identifiers (list[str]): A list of identifying strings for each kind of state block
+            that this :class:`StandardStateModelProvider` can create instances of.
+            The ``block_index`` parameter of :meth:`new_block` is an index into this array.
+            This field will be an empty list when this state model provider does not
+            provide any state blocks.
+        virtual_block_identifiers (list[str]): A list of identifying strings for each kind of
+            virtual state block that this :class:`StandardStateModelProvider` can create instances
+            of. The ``virtual_block_index`` parameter of :meth:`new_virtual_block` is an index into
+            this array. This field will be an empty list when this state model provider does not
+            provide any virtual state blocks.
     """
 
     processor_identifiers: list[str]
-    """
-    A list of identifying strings for each kind of measurement processor that
-    this StandardStateModelProvider can create instances of.
-
-    The `processor_index` parameter of #new_processor is an index into this
-    array.
-
-    This field will be an empty list when this state model provider does not
-    provide any measurement processors.
-    """
-
     block_identifiers: list[str]
-    """
-    A list of identifying strings for each kind of state block that this
-    StandardStateModelProvider can create instances of.
-
-    The `block_index` parameter of #new_block is an index into this array.
-
-    This field will be an empty list when this state model provider does not
-    provide any state blocks.
-    """
-
     virtual_block_identifiers: list[str]
-    """
-    A list of identifying strings for each kind of virtual state block that
-    this StandardStateModelProvider can create instances of.
-
-    The `virtual_block_index` parameter of #new_virtual_block is an index into
-    this array.
-
-    This field will be an empty list when this state model provider does not
-    provide any virtual state blocks.
-    """
 
     def new_processor(
         self,
