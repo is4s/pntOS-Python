@@ -169,8 +169,8 @@ class VirtualStateBlock(Protocol):
     """
     A class used to convert a set of states from one representation to another.
 
-    States are converted using a mapping function `f()` to convert estimates,
-    and the Jacobian of `f()` to map covariances (note that this implies that
+    States are converted using a mapping function :math:`f` to convert estimates,
+    and the Jacobian of :math:`f()` to map covariances (note that this implies that
     the order/units of terms in the estimate vector and covariance matrix are
     the same). Each instance is associated with two labels, ``source`` and
     ``target``, where ``source`` is the label attached to the quantity to be
