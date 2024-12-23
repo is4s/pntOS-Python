@@ -66,6 +66,9 @@ class StandardStateBlock(Protocol):
         This method will be called by the fusion engine when its
         StandardFusionEngine.give_state_block_aux_data is called with a label
         corresponding to this state blocks' #label.
+
+        Args:
+            aux (list[Message])
         """
         pass
 
@@ -80,22 +83,19 @@ class StandardStateBlock(Protocol):
 
         The generated model contains a complete description of how to propagate
         this state block forward in time. For simple models, this can simply
-        return a set of static matrices that are pre-defined. Will return None
-        if \p time_from is later than \p time_to. Otherwise guaranteed to not
-        return None.
+        return a set of static matrices that are pre-defined.
 
         Args:
-            x_and_p: The current estimate and covariance for this state block.
-            NOTE: This is only valid for the duration of this function, and
-            users are strongly discouraged from saving it off for later use.
-
-            time_from: The time to propagate from.
-
-            time_to: The time to propagate to.
+            x_and_p (EstimateWithCovariance): The current estimate and covariance for this
+                state block. Note that this is only valid for the duration of this function, and
+                users are strongly discouraged from saving it off for later use.
+            time_from (TypeTimestamp): The time to propagate from.
+            time_to (TypeTimestamp): The time to propagate to.
 
         Returns:
-            StandardDynamicsModel: The description of how to propagate this
-            state block over the given time interval.
+            StandardDynamicsModel | None: The description of how to propagate this state block over
+            the given time interval, or None if \p time_from is later than \p time_to. Otherwise
+            guaranteed to not return None.
         """
         pass
 
@@ -136,6 +136,9 @@ class StandardMeasurementProcessor(Protocol):
         This method will be called by the fusion engine when its
         StandardFusionEngine.give_measurement_processor_aux_data is called with
         a label corresponding to this measurement processor's #label.
+
+        Args:
+            aux (list[Message])
         """
         pass
 
@@ -146,17 +149,15 @@ class StandardMeasurementProcessor(Protocol):
         Generate a StandardMeasurementModel.
 
         Args:
-            message: The measurement/observation to process.
-
-            x_and_p: The current estimate and covariance for the state blocks
-            this measurement processor targets. NOTE: This is only valid for
-            the duration of this function, and users are strongly discouraged
-            from saving it off for later use. Similarly, the estimate and
-            covariance are invalidated if this function adds or removes any
-            state blocks from the fusion engine.
+            message (Message): The measurement/observation to process.
+            x_and_p (EstimateWithCovariance): The current estimate and covariance for the state
+                blocks this measurement processor targets. Note that this is only valid for the
+                duration of this function, and users are strongly discouraged from saving it off for
+                later use. Similarly, the estimate and covariance are invalidated if this function
+                adds or removes any state blocks from the fusion engine.
 
         Returns:
-            StandardMeasurementModel: A generated model containing the
+            StandardMeasurementModel | None: A generated model containing the
             parameters required for a filter update. Will be None when a
             measurement cannot be produced from \p message (for example, this
             could happen if the measurement type is unsupported by the
@@ -197,6 +198,9 @@ class VirtualStateBlock(Protocol):
         This method will be called by the fusion engine when its
         StandardFusionEngine.give_virtual_state_block_aux_data is called with a
         label corresponding to this VirtualStateBlock's #target.
+
+        Args:
+            aux (list[Message])
         """
         pass
 
@@ -209,9 +213,8 @@ class VirtualStateBlock(Protocol):
         Convert a full estimate/covariance pair.
 
         Args:
-            estimate_with_covariance: Estimate and covariance to convert.
-
-            time: Time that \p estimate_with_covariance is valid at.
+            estimate_with_covariance (EstimateWithCovariance): Estimate and covariance to convert.
+            time (TypeTimestamp): Time that \p estimate_with_covariance is valid at.
 
         Returns:
             EstimateWithCovariance: The converted value.
@@ -223,9 +226,8 @@ class VirtualStateBlock(Protocol):
         Convert just an estimate vector.
 
         Args:
-            estimate: Estimate vector to convert, Nx1.
-
-            time: Time that \p estimate is valid at.
+            estimate (NDArray): Estimate vector to convert, Nx1.
+            time (TypeTimestamp): Time that \p estimate is valid at.
 
         Returns:
             NDArray: The converted vector, Mx1.
@@ -240,15 +242,13 @@ class VirtualStateBlock(Protocol):
         differentiate with respect to.
 
         Args:
-            estimate: Estimate vector associated with the return value of
-              #source, Nx1.
-
-            time: Time that \p estimate is valid at.
+            estimate (NDArray): Estimate vector associated with the return value of #source, Nx1.
+            time (TypeTimestamp): Time that #source is valid at.
 
         Returns:
             NDArray: An MxN matrix that may be used to pre-multiply \p estimate
-              to obtain an M length vector in 'target' representation (to first
-              order).
+            to obtain an M length vector in 'target' representation (to first
+            order).
         """
         pass
 
