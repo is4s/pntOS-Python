@@ -30,10 +30,9 @@ class StandardStateModelProvider(CommonStateModelProvider, Protocol):
     spaces using pntOS' standard fusion model. Specifically, a
     :class:`StandardStateModelProvider` provides three types of tools:
 
-    1. State Blocks - Define a set of states and a model for propagating those
-       states
-    2. Virtual State Blocks - Relate two statespaces to each other
-    3. Measurement Processors - Relate measurements to a statespace
+    1. State Blocks - Define a set of states and a model for propagating those states.
+    2. Virtual State Blocks - Relate two statespaces to each other.
+    3. Measurement Processors - Relate measurements to a statespace.
 
     A :class:`StandardStateModelProvider` conceptually models a set of zero or more
     :class:`StandardStateBlock` s and a set of zero or more
@@ -88,7 +87,7 @@ class StandardStateModelProvider(CommonStateModelProvider, Protocol):
         state_block_labels: list[str],
         config_group: str,
     ) -> StandardMeasurementProcessor | None:
-        r"""
+        """
         Generate a newly created :class:`StandardMeasurementProcessor`.
 
         This measurement processor describes the relationship between a
@@ -137,7 +136,7 @@ class StandardStateModelProvider(CommonStateModelProvider, Protocol):
         label: str,
         config_group: str,
     ) -> StandardStateBlock | None:
-        r"""
+        """
         Generate a newly created :class:`StandardStateBlock`.
 
         This state block describes a set of states and how they propagate over
@@ -183,7 +182,7 @@ class StandardStateModelProvider(CommonStateModelProvider, Protocol):
         target_label: str,
         config_group: str,
     ) -> VirtualStateBlock | None:
-        r"""
+        """
         Generate a newly created :class:`VirtualStateBlock`.
 
         This virtual state block is used to convert a set of states from one
@@ -236,7 +235,7 @@ class StateModelingPlugin(CommonPlugin, Protocol):
     def new_state_model_provider(
         self, type: FusionType
     ) -> CommonStateModelProvider | None:
-        r"""
+        """
         Generate an instance of :class:`CommonStateModelProvider`.
 
         Args:

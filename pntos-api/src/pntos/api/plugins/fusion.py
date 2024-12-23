@@ -78,7 +78,7 @@ class StandardStateBlock(Protocol):
         time_from: TypeTimestamp,
         time_to: TypeTimestamp,
     ) -> StandardDynamicsModel | None:
-        r"""
+        """
         Generate a :class:`StandardDynamicsModel`.
 
         The generated model contains a complete description of how to propagate
@@ -102,7 +102,7 @@ class StandardStateBlock(Protocol):
 
 class StandardMeasurementProcessor(Protocol):
     """
-    An class that processes raw measurements/observations.
+    A class that processes raw measurements/observations.
 
     The measurements are use to calculate estimated states suitable for a linear or linearized
     filter to use. Each type of measurement should correspond to a
@@ -143,7 +143,7 @@ class StandardMeasurementProcessor(Protocol):
     def generate_model(
         self, message: Message, x_and_p: EstimateWithCovariance
     ) -> StandardMeasurementModel | None:
-        r"""
+        """
         Generate a :class:`StandardMeasurementModel`.
 
         Args:
@@ -206,7 +206,7 @@ class VirtualStateBlock(Protocol):
         estimate_with_covariance: EstimateWithCovariance,
         time: TypeTimestamp,
     ) -> EstimateWithCovariance:
-        r"""
+        """
         Convert a full estimate/covariance pair.
 
         Args:
@@ -219,7 +219,7 @@ class VirtualStateBlock(Protocol):
         pass
 
     def convert_estimate(self, estimate: NDArray, time: TypeTimestamp) -> NDArray:
-        r"""
+        """
         Convert just an estimate vector.
 
         Args:
@@ -232,7 +232,7 @@ class VirtualStateBlock(Protocol):
         pass
 
     def jacobian(self, estimate: NDArray, time: TypeTimestamp) -> NDArray:
-        r"""
+        """
         Obtain the Jacobian of the transform performed by this instance.
 
         The Jacobian is calculated at an instance in time, given an estimate to
