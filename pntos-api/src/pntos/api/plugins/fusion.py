@@ -104,7 +104,7 @@ class StandardMeasurementProcessor(Protocol):
     """
     A class that processes raw measurements/observations.
 
-    The measurements are use to calculate estimated states suitable for a linear or linearized
+    The measurements are used to calculate estimated states suitable for a linear or linearized
     filter to use. Each type of measurement should correspond to a
     :class:`StandardMeasurementProcessor` that is supplied to the fusion engine. Incoming
     measurements received by the fusion engine will be routed to the corresponding measurement
@@ -120,7 +120,7 @@ class StandardMeasurementProcessor(Protocol):
             measurements received by this processor. The estimate and covariance matrices passed
             into :meth:`generate_model` will be composed of the states associated with these state
             blocks, and the returned StandardMeasurementModel.h and StandardMeasurementModel.H must
-            respect these states. Note, ``state_block_labels[i]`` is the identifier for the ``i`` th
+            respect these states. Note: ``state_block_labels[i]`` is the identifier for the ``i`` th
             state block this processor relates to.
     """
 
