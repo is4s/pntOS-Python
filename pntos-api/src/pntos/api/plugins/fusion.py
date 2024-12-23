@@ -64,8 +64,8 @@ class StandardStateBlock(Protocol):
         Receive and use an arbitrary collection of aux data.
 
         This method will be called by the fusion engine when its
-        StandardFusionEngine.give_state_block_aux_data is called with a label
-        corresponding to this state blocks' #label.
+        :meth:`StandardFusionEngine.give_state_block_aux_data` is called with a label
+        corresponding to this state block's ``label``.
 
         Args:
             aux (list[Message])
@@ -79,7 +79,7 @@ class StandardStateBlock(Protocol):
         time_to: TypeTimestamp,
     ) -> StandardDynamicsModel | None:
         r"""
-        Generate a StandardDynamicsModel.
+        Generate a :class:`StandardDynamicsModel`.
 
         The generated model contains a complete description of how to propagate
         this state block forward in time. For simple models, this can simply
@@ -94,8 +94,8 @@ class StandardStateBlock(Protocol):
 
         Returns:
             StandardDynamicsModel | None: The description of how to propagate this state block over
-            the given time interval, or None if \p time_from is later than \p time_to. Otherwise
-            guaranteed to not return None.
+            the given time interval, or ``None`` if ``time_from`` is later than ``time_to``.
+            Otherwise guaranteed to not return ``None``.
         """
         pass
 
@@ -104,15 +104,13 @@ class StandardMeasurementProcessor(Protocol):
     """
     An class that processes raw measurements/observations.
 
-    The measurements are use to calculate estimated states suitable for a
-    linear or linearized filter to use. Each type of measurement should
-    correspond to a StandardMeasurementProcessor that is supplied to the fusion
-    engine. Incoming measurements received by the fusion engine will be routed
-    to the corresponding measurement processor (by label) and call
-    StandardMeasurementProcessor.generate_model to process the measurement. The
-    resulting StandardMeasurementModel will be used by the fusion engine to
-    call the underlying StandardFusionStrategy.update method to update the
-    filter estimate/error covariance.
+    The measurements are use to calculate estimated states suitable for a linear or linearized
+    filter to use. Each type of measurement should correspond to a
+    :class:`StandardMeasurementProcessor` that is supplied to the fusion engine. Incoming
+    measurements received by the fusion engine will be routed to the corresponding measurement
+    processor (by label) and call :meth:`generate_model` to process the measurement. The resulting
+    :class:`StandardMeasurementModel` will be used by the fusion engine to call the underlying
+    :meth:`StandardFusionStrategy.update` method to update the filter estimate/error covariance.
 
     Attributes:
         label (str): A unique name for this measurement processor. This value will be used to
@@ -134,8 +132,8 @@ class StandardMeasurementProcessor(Protocol):
         Receive and use an arbitrary collection of aux data.
 
         This method will be called by the fusion engine when its
-        StandardFusionEngine.give_measurement_processor_aux_data is called with
-        a label corresponding to this measurement processor's #label.
+        :meth:`StandardFusionEngine.give_measurement_processor_aux_data` is called with
+        a label corresponding to this measurement processor's ``label``.
 
         Args:
             aux (list[Message])
@@ -146,7 +144,7 @@ class StandardMeasurementProcessor(Protocol):
         self, message: Message, x_and_p: EstimateWithCovariance
     ) -> StandardMeasurementModel | None:
         r"""
-        Generate a StandardMeasurementModel.
+        Generate a :class:`StandardMeasurementModel`.
 
         Args:
             message (Message): The measurement/observation to process.
@@ -158,8 +156,8 @@ class StandardMeasurementProcessor(Protocol):
 
         Returns:
             StandardMeasurementModel | None: A generated model containing the
-            parameters required for a filter update. Will be None when a
-            measurement cannot be produced from \p message (for example, this
+            parameters required for a filter update. Will be ``None`` when a
+            measurement cannot be produced from ``message`` (for example, this
             could happen if the measurement type is unsupported by the
             measurement processor or if it is rejected due to residual
             monitoring).
@@ -174,13 +172,12 @@ class VirtualStateBlock(Protocol):
     States are converted using a mapping function `f()` to convert estimates,
     and the Jacobian of `f()` to map covariances (note that this implies that
     the order/units of terms in the estimate vector and covariance matrix are
-    the same). Each instance is associated with two labels, 'source' and
-    'target', where source is the label attached to the quantity to be
-    transformed, and target is the label attached to the result. Typically used
-    with a StandardFusionEngine where 'source' refers to a 'real'
-    StandardStateBlock and 'target' referring to some representation that is
-    advantageous for some other element, such as a
-    StandardMeasurementProcessor, to use.
+    the same). Each instance is associated with two labels, ``source`` and
+    ``target``, where ``source`` is the label attached to the quantity to be
+    transformed, and ``target`` is the label attached to the result. Typically used
+    with a :class:`StandardFusionEngine` where ``source`` refers to a *real*
+    :class:`StandardStateBlock` and ``target`` refers to some representation that is
+    advantageous for some other element, such as a :class:`StandardMeasurementProcessor`, to use.
 
     Attributes:
         source (str): The label associated with the representation this instance can transform
@@ -196,8 +193,8 @@ class VirtualStateBlock(Protocol):
         Receive and use an arbitrary collection of aux data.
 
         This method will be called by the fusion engine when its
-        StandardFusionEngine.give_virtual_state_block_aux_data is called with a
-        label corresponding to this VirtualStateBlock's #target.
+        :meth:`StandardFusionEngine.give_virtual_state_block_aux_data` is called with a
+        label corresponding to this :class:`VirtualStateBlock` 's ``target``.
 
         Args:
             aux (list[Message])
@@ -214,7 +211,7 @@ class VirtualStateBlock(Protocol):
 
         Args:
             estimate_with_covariance (EstimateWithCovariance): Estimate and covariance to convert.
-            time (TypeTimestamp): Time that \p estimate_with_covariance is valid at.
+            time (TypeTimestamp): Time that ``estimate_with_covariance`` is valid at.
 
         Returns:
             EstimateWithCovariance: The converted value.
@@ -227,7 +224,7 @@ class VirtualStateBlock(Protocol):
 
         Args:
             estimate (NDArray): Estimate vector to convert, Nx1.
-            time (TypeTimestamp): Time that \p estimate is valid at.
+            time (TypeTimestamp): Time that ``estimate`` is valid at.
 
         Returns:
             NDArray: The converted vector, Mx1.
@@ -242,13 +239,12 @@ class VirtualStateBlock(Protocol):
         differentiate with respect to.
 
         Args:
-            estimate (NDArray): Estimate vector associated with the return value of #source, Nx1.
-            time (TypeTimestamp): Time that #source is valid at.
+            estimate (NDArray): Estimate vector associated with the return value of ``source``, Nx1.
+            time (TypeTimestamp): Time that ``estimate`` is valid at.
 
         Returns:
-            NDArray: An MxN matrix that may be used to pre-multiply \p estimate
-            to obtain an M length vector in 'target' representation (to first
-            order).
+            NDArray: An MxN matrix that may be used to pre-multiply ``estimate`` to obtain an M
+            length vector in ``target`` representation (to first order).
         """
         pass
 
