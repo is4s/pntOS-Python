@@ -186,7 +186,7 @@ class KeyValueStoreDataFormat(Enum):
 
 
 RegistryValueTypes = TypeVar(
-    "RegistryValueTypes", str, List[str], int, bool, float, NDArray, Message
+    'RegistryValueTypes', str, List[str], int, bool, float, NDArray, Message
 )
 
 
@@ -377,7 +377,7 @@ class KeyValueStore(Protocol):
     def request_notify(
         self,
         key: str | None,
-        callback: Callable[[str, List[str], "KeyValueStore"], None],
+        callback: Callable[[str, List[str], 'KeyValueStore'], None],
     ) -> bool:
         """
         Register a callback which gets called each time a key in the store is updated.
@@ -409,7 +409,7 @@ class KeyValueStore(Protocol):
     def remove_notify(
         self,
         key: str | None,
-        callback: Callable[[str, List[str], "KeyValueStore"], None],
+        callback: Callable[[str, List[str], 'KeyValueStore'], None],
     ) -> bool:
         """
         Removes a notification as requested by :meth:`request_notify`.

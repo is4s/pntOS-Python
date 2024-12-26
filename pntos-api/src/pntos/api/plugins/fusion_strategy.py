@@ -265,7 +265,7 @@ class StandardFusionStrategy(FusionStrategy, Protocol):
                 this strategy is estimating.
         """
 
-    def clone(self) -> "StandardFusionStrategy":
+    def clone(self) -> 'StandardFusionStrategy':
         """
         Create a deep copy of this object.
 

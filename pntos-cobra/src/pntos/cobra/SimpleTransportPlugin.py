@@ -70,7 +70,7 @@ def listen_for_messages(my_plugin: SimpleTransportPlugin):
 
             # Send a new ASPN message we've received to the system
             my_plugin.mediator.process_pntos_message(
-                Message(aspn_msg, source_identifier="channel_foo")
+                Message(aspn_msg, source_identifier='channel_foo')
             )
         else:
             break

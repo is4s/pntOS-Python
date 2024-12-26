@@ -667,7 +667,7 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
         """
         pass
 
-    def clone(self) -> "StandardFusionEngine":
+    def clone(self) -> 'StandardFusionEngine':
         """
         Produce a deep-copy this fusion engine instance.
 
