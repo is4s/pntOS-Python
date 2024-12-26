@@ -333,6 +333,6 @@ class FusionStrategyPlugin(CommonPlugin, Protocol):
             FusionStrategyType | None: The newly created fusion strategy, which is an
             implementation of the type specified by ``fusion_type``. For example, if the user calls
             :meth:`new_fusion_strategy` with a ``fusion_type`` of ``StandardFusionStrategy``, then
-            the returned object will be a :class:`StandardFusionStrategy`.
+            the returned object will be an implementation of :class:`StandardFusionStrategy`.
         """
         ...

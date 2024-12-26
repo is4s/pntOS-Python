@@ -365,14 +365,15 @@ class InertialPlugin(CommonPlugin, Protocol):
         config_group: str | None = None,
     ) -> InertialType | None:
         """
-        Create an instance of :class:`CommonInertial`.
+        Create an instance of an implementation of :class:`CommonInertial`.
 
         Args:
             type (type[InertialType]): Specifies the type of inertial that the returned value will
                 support. For example, if the user passes in ``STANDARD_INERTIAL_MECHANIZATION``,
-                then the returned value will be castable to :class:`StandardInertialMechanization`.
-                If ``type`` is unsupported by the plugin, then ``None`` will be returned. Please use
-                :meth:`is_inertial_type_supported` to check if the type is supported by the plugin.
+                then the returned value will be an implementation of
+                :class:`StandardInertialMechanization`. If ``type`` is unsupported by the plugin,
+                then ``None`` will be returned. Please use :meth:`is_inertial_type_supported` to
+                check if the type is supported by the plugin.
             solution (Message): The initial solution (i.e. the alignment) to mechanize from.
             config_group (str | None, optional): An optional parameter which can be used to specify
                 which group in the config should be used to initialize the new inertial. This allows

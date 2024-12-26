@@ -243,10 +243,11 @@ class InitializationPlugin(CommonPlugin, Protocol):
             type (type[InitializationType]): Specifies the type of initializer that the returned
             value
                 will support. For example, if the user passes in
-                ``INERTIAL_INITIALIZATION_STRATEGY``, then the returned value will be an instance of
-                :class:`InertialInitializationStrategy`. If ``type`` is unsupported by the plugin,
-                then ``None`` will be returned. Please use :meth:`is_initialization_type_supported`
-                to check if the type is supported by the plugin.
+                ``INERTIAL_INITIALIZATION_STRATEGY``, then the returned value will be an
+                implementation of :class:`InertialInitializationStrategy`. If ``type`` is
+                unsupported by the plugin, then ``None`` will be returned. Please use
+                :meth:`is_initialization_type_supported` to check if the type is supported by the
+                plugin.
             config_group (str | None, optional): An optional parameter which can be used to specify
                 which group in the config should be used to set up the new initialization strategy.
                 This allows for multiple initialization strategy instances to exist with unique

@@ -235,7 +235,7 @@ class StateModelingPlugin(CommonPlugin, Protocol):
         Args:
             type (FusionType): Specifies the type of fusion that the returned value will
                 support. For example, if the user passes in ``STANDARD_MODEL``, then the returned
-                value will be castable to :class:`StandardStateModelProvider`.
+                value will be an implementation of :class:`StandardStateModelProvider`.
 
         Returns:
             StateModelProviderType | None: A state model provider which implements the specified
