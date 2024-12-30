@@ -56,6 +56,12 @@ class TestConfigUtils(unittest.TestCase):
 
     def test_AlignmentConfig_to_and_from_registry(self) -> None:
         test_conf = AlignmentConfig(
+            (1, 2, 3),
+            (4, 5, 6),
+            (7, 8, 9),
+            (10, 11, 12),
+            (13, 14, 15),
+            1.23,
             (8.1, 8.2, 8.3),
             (9.1, 9.2, 9.3),
             (10.1, 10.2, 10.3),

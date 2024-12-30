@@ -6,6 +6,7 @@ from aspn23 import (
     TypeHeader,
     TypeTimestamp,
 )
+from navtk.navutils import rpy_to_quat
 from numpy.typing import NDArray
 
 from pntos.api import (
@@ -19,6 +20,9 @@ from pntos.api import (
     Mediator,
     Message,
     StandardInertialErrors,
+)
+from pntos.cobra.config import (
+    config_from_registry,
 )
 from pntos.cobra.config.AlignmentConfig import AlignmentConfig
 
@@ -34,12 +38,25 @@ class SimpleInitialization(InertialInitializationStrategy):
     def __init__(self, config_group: str, mediator: Mediator):
         self.config_group = config_group
         self.mediator = mediator
-
-        # TODO Get values from registry. Set status to failed if it cannot retrieve from registry.
-        config = AlignmentConfig.from_registry(mediator, config_group)
-        self.solution = Message(self._create_pva(), 'Cobra simple initialization')
-        self.imu_errors = None
-        self.covariance = None
+        config = config_from_registry(AlignmentConfig, mediator, config_group)
+        if config is None:
+            self.mediator.log_message(
+                LoggingLevel.ERROR,
+                f'Failed to populate config from registry to config type AlignmentConfig and group {config_group}',
+            )
+            return
+        self.solution = Message(self._create_pva(config), 'Cobra simple initialization')
+        self.imu_errors = self._create_imu_errors(config)
+        self.covariance = np.diag(
+            np.concatenate(
+                (
+                    np.array(config.initial_accel_bias_var),
+                    np.array(config.initial_gyro_bias_var),
+                    np.zeros(3),
+                    np.zeros(3),
+                )
+            )
+        )
 
         self.status = InitializationStatus.INITIALIZED_GOOD
 
@@ -62,29 +79,50 @@ class SimpleInitialization(InertialInitializationStrategy):
             status=self.status,
         )
 
-    def _create_pva(self) -> MeasurementPositionVelocityAttitude:
+    def _create_pva(
+        self, config: AlignmentConfig
+    ) -> MeasurementPositionVelocityAttitude:
         header = TypeHeader(
             0,
             0,
             0,
             0,
         )
-        time = TypeTimestamp(0)
+        time = TypeTimestamp(int(config.initial_time * 1000000000))
+        initial_position_variances = np.array(config.initial_pos_var)
+        initial_velocity_variances = np.array(config.initial_vel_var)
+        initial_tilt_variances = np.array(config.initial_tilt_var)
+        initial_variances = np.concatenate(
+            (
+                initial_position_variances,
+                initial_velocity_variances,
+                initial_tilt_variances,
+            )
+        )
+        initial_covariance = np.diag(initial_variances)
         return MeasurementPositionVelocityAttitude(
             header=header,
             time_of_validity=time,
             reference_frame=MeasurementPositionVelocityAttitudeReferenceFrame.GEODETIC,
-            p1=0,
-            p2=0,
-            p3=0,
-            v1=0,
-            v2=0,
-            v3=0,
-            quaternion=np.zeros(4),
-            covariance=np.eye(9),
+            p1=config.initial_pos[0],
+            p2=config.initial_pos[1],
+            p3=config.initial_pos[2],
+            v1=config.initial_vel[0],
+            v2=config.initial_vel[1],
+            v3=config.initial_vel[2],
+            quaternion=rpy_to_quat(np.array(config.initial_rpy)),
+            covariance=initial_covariance,
             error_model=MeasurementPositionVelocityAttitudeErrorModel.NONE,
             error_model_params=np.array([]),
             integrity=[],
+        )
+
+    def _create_imu_errors(self, config: AlignmentConfig) -> StandardInertialErrors:
+        return StandardInertialErrors(
+            accel_biases=np.array(config.initial_accel_bias),
+            gyro_biases=np.array(config.initial_gyro_bias),
+            accel_scale_factors=np.zeros((3)),
+            gyro_scale_factors=np.zeros((3)),
         )
 
 

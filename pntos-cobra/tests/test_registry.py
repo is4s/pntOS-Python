@@ -48,6 +48,12 @@ my_config: list[ConfigTypeUnion] = [
         group='config/default/test',
     ),
     AlignmentConfig(
+        initial_pos=(1, 2, 3),
+        initial_vel=(4, 5, 6),
+        initial_rpy=(7, 8, 9),
+        initial_accel_bias=(10, 11, 12),
+        initial_gyro_bias=(13, 14, 15),
+        initial_time=1.23,
         initial_pos_var=(9.0, 9.0, 9.0),
         initial_vel_var=(0.1, 0.1, 0.1),
         initial_tilt_var=(0.01, 0.01, 0.01),
