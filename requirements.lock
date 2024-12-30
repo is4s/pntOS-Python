@@ -24,7 +24,7 @@ lcm @ git+https://github.com/lcm-proj/lcm.git@8d638bb3aeae39fda5db59f43b85f3a4b3
     # via aspn-lcm
     # via aspn23-lcm
     # via pntos-cobra
-navtk @ git+ssh://git@git.aspn.us/pntos/navtk.git@b8eac01d43f1a50387b2c12c6133d9a4ba34f6f7
+navtk @ git+ssh://git@git.aspn.us/pntos/navtk.git@b6729eda4fe5f8d9013f79d25ddce3e1b940b594
     # via pntos-cobra
 numpy==1.26.4
     # via aspn23

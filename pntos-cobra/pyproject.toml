@@ -17,8 +17,8 @@ dependencies = [
     "aspn23_lcm @ git+ssh://git@git.aspn.us/pntos/firehose-outputs.git@0f42a18e9c3a65462d10686eced7bb3e0f51eae8#subdirectory=lcm/python",
     # lcm-generated master branch - committed 25 July 2024
     "aspn_lcm @ git+ssh://git@git.aspn.us/pntos/lcm-generated.git@21e03f8765605dcd3c8d8d6bb7091ebeef24ee23#subdirectory=python",
-    # NavToolkit master branch - committed 5 December 2024
-    "navtk @ git+ssh://git@git.aspn.us/pntos/navtk.git@b8eac01d43f1a50387b2c12c6133d9a4ba34f6f7",
+    # NavToolkit base/workspace branch - committed 31 December 2024
+    "navtk @ git+ssh://git@git.aspn.us/pntos/navtk.git@b6729eda4fe5f8d9013f79d25ddce3e1b940b594",
 ]
 readme = "README.md"
 requires-python = ">= 3.11"
