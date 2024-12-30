@@ -2,6 +2,11 @@ import pntos.api as api
 
 
 def test() -> None:
+    """
+    Ensure that isinstance and issubclass work on various objects and classes, respectively.
+
+    This essentially tests for the existence of the @runtime_checkable decorator.
+    """
     assert isinstance(MockControllerPlugin(), api.ControllerPlugin)
     assert isinstance(MockFusionPlugin(), api.FusionPlugin)
     assert isinstance(MockFusionStrategyPlugin(), api.FusionStrategyPlugin)
