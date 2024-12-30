@@ -11,7 +11,7 @@ set -xe
 
 rye lint --fix
 rye fmt
-rye test -p pntos-cobra
+pytest
 mypy pntos-api
 mypy pntos-cli
 mypy pntos-cobra

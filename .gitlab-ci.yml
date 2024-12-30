@@ -77,7 +77,7 @@ rye test:
     tags:
         - linux-light-runner
     script:
-        - docker run --rm -v $(pwd):/work -e CC=gcc -e CXX=g++ $DOCKER_IMAGE "rye sync && rye test -p pntos-cobra"
+        - docker run --rm -v $(pwd):/work -e CC=gcc -e CXX=g++ $DOCKER_IMAGE "rye sync && pytest"
 
 mypy:
     stage: check
