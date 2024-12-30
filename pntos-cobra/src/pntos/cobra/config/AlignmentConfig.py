@@ -3,10 +3,10 @@ from dataclasses import dataclass
 
 @dataclass
 class AlignmentConfig:
-    initialPosCov: tuple[float, float, float]
-    initialVelCov: tuple[float, float, float]
-    initialTiltCov: tuple[float, float, float]
-    initialAccelBiasCov: tuple[float, float, float]
-    initialGyroBiasCov: tuple[float, float, float]
+    initial_pos_var: tuple[float, float, float]
+    initial_vel_var: tuple[float, float, float]
+    initial_tilt_var: tuple[float, float, float]
+    initial_accel_bias_var: tuple[float, float, float]
+    initial_gyro_bias_var: tuple[float, float, float]
 
     group: str

@@ -32,11 +32,11 @@ def test() -> None:
     gyro_bias_var = (13, 14, 15)
 
     config = AlignmentConfig(
-        initialPosCov=pos_var,
-        initialVelCov=vel_var,
-        initialTiltCov=tilt_var,
-        initialAccelBiasCov=accel_bias_var,
-        initialGyroBiasCov=gyro_bias_var,
+        initial_pos_var=pos_var,
+        initial_vel_var=vel_var,
+        initial_tilt_var=tilt_var,
+        initial_accel_bias_var=accel_bias_var,
+        initial_gyro_bias_var=gyro_bias_var,
     )
 
     # TODO (#43) Initialize registry from config object directly once it's supported.

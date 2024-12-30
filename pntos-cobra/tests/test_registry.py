@@ -48,11 +48,11 @@ my_config: list[ConfigTypeUnion] = [
         group='config/default/test',
     ),
     AlignmentConfig(
-        initialPosCov=(9.0, 9.0, 9.0),
-        initialVelCov=(0.1, 0.1, 0.1),
-        initialTiltCov=(0.01, 0.01, 0.01),
-        initialAccelBiasCov=(9.604e-5, 9.604e-5, 9.604e-5),
-        initialGyroBiasCov=(2.3504074e-11, 2.3504074e-11, 2.3504074e-11),
+        initial_pos_var=(9.0, 9.0, 9.0),
+        initial_vel_var=(0.1, 0.1, 0.1),
+        initial_tilt_var=(0.01, 0.01, 0.01),
+        initial_accel_bias_var=(9.604e-5, 9.604e-5, 9.604e-5),
+        initial_gyro_bias_var=(2.3504074e-11, 2.3504074e-11, 2.3504074e-11),
         group='config/default/test',
     ),
     SensorConfig(
