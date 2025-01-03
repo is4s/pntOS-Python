@@ -79,8 +79,8 @@ class ControllerPlugin(CommonPlugin, Protocol):
         :meth:`PlatformIntegrationPlugin.take_control` method (if a PIP is in the ``plugins`` list).
 
         Args:
-            plugins (List[CommonPlugin]): An array of plugins available to the controller.
-            plugin_resources_locations (List[str  |  None] | None, optional): A list of strings
+            plugins (list[CommonPlugin]): An array of plugins available to the controller.
+            plugin_resources_locations (list[str  |  None] | None, optional): A list of strings
                 which represent a list of locations, one for each plugin in ``plugins``, where those
                 plugins may find auxiliary data if needed. The array can be ``None``,
                 otherwise the array is of the same length as ``plugins``. Each string may be

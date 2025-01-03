@@ -46,7 +46,7 @@ class EstimateWithCovarianceType(Enum):
     Contains a mean (estimate) and covariance describing a rotation modeled by a multivariate
     Gaussian distribution, but the estimate is in quaternion form and the covariance is in tilt
     error form.
-    
+
       - :attr:`.EstimateWithCovariance.estimate` is size 4x1.
       - :attr:`.EstimateWithCovariance.covariance` is size 3x3, in :math:`\\text{radians}^2`.
     """
@@ -59,15 +59,15 @@ class EstimateWithCovariance:
 
     Attributes:
         type (EstimateWithCovarianceType): Describes how the fields in this struct are used.
-        estimate (NDArray): An array of doubles representing an estimate vector. Usage depends on
+        estimate (NDArray[float64]): An array of doubles representing an estimate vector. Usage depends on
             the ``type`` field.
-        covariance (NDArray): An array of doubles representing a square covariance matrix. Data is
+        covariance (NDArray[float64]): An array of doubles representing a square covariance matrix. Data is
             stored in row major form. Usage depends on the ``type`` field.
     """
 
     type: EstimateWithCovarianceType
-    estimate: NDArray
-    covariance: NDArray
+    estimate: NDArray[float64]
+    covariance: NDArray[float64]
 
 
 class FusionType(Enum):
@@ -101,7 +101,7 @@ class FusionType(Enum):
     functions will receive these samples and be able to arbitrarily modify
     each particle's weight, location, and add arbitrary noise to them.
 
-    Caution: 
+    Caution:
         **Unstable**: This feature is unstable and is not yet considered part of the stable pntOS
         API. Usage of this feature is highly discouraged in non-experimental code, and its
         definition may change at any time.
@@ -114,7 +114,7 @@ class FusionType(Enum):
     that historical estimate data is available for processing current time
     data.
 
-    Caution: 
+    Caution:
         **Unstable**: This feature is unstable and is not yet considered part of the stable pntOS
         API. Usage of this feature is highly discouraged in non-experimental code, and its
         definition may change at any time.
@@ -129,7 +129,7 @@ class FusionType(Enum):
     intended to facilitate usage in environments such as GPGPU filter
     implementations.
 
-    Caution: 
+    Caution:
         **Unstable**: This feature is unstable and is not yet considered part of the stable pntOS
         API. Usage of this feature is highly discouraged in non-experimental code, and its
         definition may change at any time.
@@ -187,7 +187,7 @@ class KeyValueStoreDataFormat(Enum):
 
 
 RegistryValueTypes = TypeVar(
-    'RegistryValueTypes', str, List[str], int, bool, float, NDArray, Message
+    'RegistryValueTypes', str, list[str], int, bool, float, NDArray[float64], Message
 )
 
 
@@ -227,7 +227,7 @@ class KeyValueStore(Protocol):
         Get the array of keys which currently exist in this store.
 
         Returns:
-            List[str]: Returns ``None`` if no keys are available.
+            list[str]: Returns ``None`` if no keys are available.
         """
         pass
 
@@ -378,7 +378,7 @@ class KeyValueStore(Protocol):
     def request_notify(
         self,
         key: str | None,
-        callback: Callable[[str, List[str], 'KeyValueStore'], None],
+        callback: Callable[[str, list[str], 'KeyValueStore'], None],
     ) -> bool:
         """
         Register a callback which gets called each time a key in the store is updated.
@@ -399,7 +399,7 @@ class KeyValueStore(Protocol):
 
         Args:
             key (str | None)
-            callback (Callable[[str, List[str], "KeyValueStore"], None])
+            callback (Callable[[str, list[str], "KeyValueStore"], None])
 
         Returns:
             bool: ``True`` if the notifier was successfully registered, and ``False`` if the store
@@ -410,7 +410,7 @@ class KeyValueStore(Protocol):
     def remove_notify(
         self,
         key: str | None,
-        callback: Callable[[str, List[str], 'KeyValueStore'], None],
+        callback: Callable[[str, list[str], 'KeyValueStore'], None],
     ) -> bool:
         """
         Removes a notification as requested by :meth:`request_notify`.
@@ -424,7 +424,7 @@ class KeyValueStore(Protocol):
 
         Args:
             key (str | None)
-            callback (Callable[[str, List[str], "KeyValueStore"], None])
+            callback (Callable[[str, list[str], "KeyValueStore"], None])
 
         Returns:
             bool: ``True`` if removal was successful and ``False`` if it was not. ``False`` will be
@@ -511,12 +511,12 @@ class Registry(Protocol):
         """
         pass
 
-    def get_group_array(self) -> List[str]:
+    def get_group_array(self) -> list[str]:
         """
         Get the array of groups which currently exist.
 
         Returns:
-            List[str]: The array of groups which currently exists. Returns ``None`` if no groups
+            list[str]: The array of groups which currently exists. Returns ``None`` if no groups
             exist.
         """
         pass
@@ -606,7 +606,7 @@ class Mediator(Protocol):
         matching.
 
         Returns:
-            List[str]: A list of strings describing the solutions available.
+            list[str]: A list of strings describing the solutions available.
         """
         pass
 
@@ -619,7 +619,7 @@ class Mediator(Protocol):
         Request filtering solutions at the times specified in the array ``solution_times``.
 
         Args:
-            solution_times (List[TypeTimestamp]): The number of time entries in ``solution_times``
+            solution_times (list[TypeTimestamp]): The number of time entries in ``solution_times``
                 is specified by ``num_solution_times``.
             filter_description (str | None, optional): To select which filter(s) to request
                 solutions from, enter a valid filter description string in ``filter_description``.
@@ -629,7 +629,7 @@ class Mediator(Protocol):
                 the implementation should endeavor to return its best solution.
 
         Returns:
-            List[Message]: An array of messages containing the filter solutions for the requested
+            list[Message]: An array of messages containing the filter solutions for the requested
             ``solution_times``. The number of solutions should equal ``num_solution_times``,
             although some entries may be ``None`` if they are unavailable at the corresponding time
             in ``solution_times``. The returned :class:`Message` array may be ``None`` if

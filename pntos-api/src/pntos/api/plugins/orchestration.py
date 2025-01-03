@@ -142,7 +142,7 @@ class OrchestrationPlugin(CommonPlugin, Protocol):
         any other call to an :class:`OrchestrationPlugin` function.
 
         Args:
-            plugins (List[CommonPlugin]): A set of plugins which should be used by the orchestration
+            plugins (list[CommonPlugin]): A set of plugins which should be used by the orchestration
                 plugin. For example, the plugins list may include a :class:`StandardFusionEngine`,
                 which the orchestration plugin can use to perform fusion of sensor data received.
                 The list may also include a :class:`StateModelingPlugin`, which the orchestration
@@ -209,7 +209,7 @@ class OrchestrationPlugin(CommonPlugin, Protocol):
         matching.
 
         Returns:
-            List[str]: A list of strings describing the filters available in this
+            list[str]: A list of strings describing the filters available in this
             :class:`OrchestrationPlugin`.
         """
         pass
@@ -223,7 +223,7 @@ class OrchestrationPlugin(CommonPlugin, Protocol):
         Request filtering solutions at the times specified in the array ``solution_times``.
 
         Args:
-            solution_times (List[TypeTimestamp]): The solution times.
+            solution_times (list[TypeTimestamp]): The solution times.
             filter_description (str | None, optional): An :class:`OrchestrationPlugin` may run
                 multiple filters. To select which filter(s) to request solutions from, enter a valid
                 filter description string in ``filter_description``. Valid filter description
@@ -233,7 +233,7 @@ class OrchestrationPlugin(CommonPlugin, Protocol):
                 endeavor to return its best solution.
 
         Returns:
-            List[Message]: An array of messages containing the filter solutions for the requested
+            list[Message]: An array of messages containing the filter solutions for the requested
             ``solution_times``. The number of solutions should equal the number of times in
             ``solution_times``, although some entries may be ``None`` if they are unavailable at the
             corresponding time in ``solution_times``. The returned :class:`Message` list may be

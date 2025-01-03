@@ -16,7 +16,7 @@ expected_results: dict[LoggingLevel, str] = {
 }
 
 
-def call(a: SimpleLoggingPlugin):
+def call(a: SimpleLoggingPlugin) -> None:
     a.log(a.__class__, a.identifier, LoggingLevel.INFO, 'This is an INFO message')
     a.log(a.__class__, a.identifier, LoggingLevel.DEBUG, 'This is a DEBUG message')
     a.log(

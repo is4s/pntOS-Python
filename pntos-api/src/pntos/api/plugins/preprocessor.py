@@ -23,7 +23,7 @@ class Preprocessor(Protocol):
             message (Message): A message to be processed.
 
         Returns:
-            List[Message]: A list of :class:`Message` s. Usually this will be a single message, a
+            list[Message]: A list of :class:`Message` s. Usually this will be a single message, a
             modified version of ``message``. It could be ``None`` if ``message`` is rejected or
             dropped. The preprocessor could also accumulate several messages, returning ``None`` for
             each one then returning an array with multiple processed messages.
@@ -44,13 +44,13 @@ class PreprocessorPlugin(CommonPlugin, Protocol):
          definition may change at any time.
 
     Attributes:
-        preprocessor_identifiers (List[str]): A list of identifying strings for each kind of
+        preprocessor_identifiers (list[str]): A list of identifying strings for each kind of
             :class:`Preprocessor` that this :class:`PreprocessorPlugin` can create instances of. The
             ``preprocessor_index`` parameter of :meth:`new_preprocessor` is an index into this
             array.
     """
 
-    preprocessor_identifiers: List[str]
+    preprocessor_identifiers: list[str]
 
     def new_preprocessor(
         self, preprocessor_index: int, config_group: str | None = None

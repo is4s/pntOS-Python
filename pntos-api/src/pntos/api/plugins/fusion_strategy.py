@@ -40,10 +40,10 @@ class StandardDynamicsModel:
     and :math:`w_k` is additive white Gaussian noise.
 
     Attributes:
-        g (Callable[[NDArray], NDArray]): A function that propagates forward in time a set of
+        g (Callable[[NDArray[float64]], NDArray[float64]]): A function that propagates forward in time a set of
             states.
-        Phi (NDArray): The first-order Taylor series expansion (Jacobian) of the function :math:`g`.
-        Qd (NDArray): The covariance matrix of :math:`w_k`.
+        Phi (NDArray[float64]): The first-order Taylor series expansion (Jacobian) of the function :math:`g`.
+        Qd (NDArray[float64]): The covariance matrix of :math:`w_k`.
     """
 
     g: Callable[[NDArray[float64]], NDArray[float64]]
@@ -66,10 +66,10 @@ class StandardMeasurementModel:
     :math:`h` is an arbitrary function, and :math:`v` is additive white Gaussian noise.
 
     Attributes:
-        z (NDArray): A column vector containing the measurement itself.
-        h (Callable[[NDArray], NDArray]): A function that maps the state space to measurement space.
-        H (NDArray): The first-order Taylor series expansion (i.e. Jacobian) of the function h.
-        R (NDArray): The covariance matrix of :math:`v`.
+        z (NDArray[float64]): A column vector containing the measurement itself.
+        h (Callable[[NDArray[float64]], NDArray[float64]]): A function that maps the state space to measurement space.
+        H (NDArray[float64]): The first-order Taylor series expansion (i.e. Jacobian) of the function h.
+        R (NDArray[float64]): The covariance matrix of :math:`v`.
     """
 
     z: NDArray[float64]
@@ -140,10 +140,10 @@ class StandardFusionStrategy(FusionStrategy, Protocol):
         the existing states and the added states will be set to zeroes.
 
         Args:
-            initial_estimate (NDArray): The initial estimate to populate the new states with.
-            initial_covariance (NDArray): The initial covariance matrix used to initialize the
+            initial_estimate (NDArray[float64]): The initial estimate to populate the new states with.
+            initial_covariance (NDArray[float64]): The initial covariance matrix used to initialize the
                 uncertainty of the new states.
-            cross_covariance (NDArray | None): A covariance matrix that describes the cross terms
+            cross_covariance (NDArray[float64] | None): A covariance matrix that describes the cross terms
                 between the new states and all previous states. If ``None``, the cross-terms will be
                 set to zero.
 
@@ -172,7 +172,7 @@ class StandardFusionStrategy(FusionStrategy, Protocol):
         calls to this strategy.
 
         Returns:
-            NDArray | None: An estimate if available. Returns ``None`` if no states have been added
+            NDArray[float64] | None: An estimate if available. Returns ``None`` if no states have been added
             yet.
         """
 
@@ -189,7 +189,7 @@ class StandardFusionStrategy(FusionStrategy, Protocol):
         length of ``new_estimate``.
 
         Args:
-            new_estimate (NDArray): The new estimate values that will overwrite the previous values.
+            new_estimate (NDArray[float64]): The new estimate values that will overwrite the previous values.
             first_index (int): The index of the first state to overwrite.
         """
         ...
@@ -205,7 +205,7 @@ class StandardFusionStrategy(FusionStrategy, Protocol):
         this strategy.
 
         Returns:
-            NDArray | None: The covariance of the current estimate. Returns ``None`` if no states
+            NDArray[float64] | None: The covariance of the current estimate. Returns ``None`` if no states
             have been added yet.
         """
 
@@ -225,7 +225,7 @@ class StandardFusionStrategy(FusionStrategy, Protocol):
         area equal to the size of ``new_covariance``.
 
         Args:
-            new_covariance (NDArray): The new covariance values that will overwrite a slice of the
+            new_covariance (NDArray[float64]): The new covariance values that will overwrite a slice of the
                 previous covariance matrix.
             first_row (int): The row of the first value to overwrite.
             first_col (int): The column of the first value to overwrite.

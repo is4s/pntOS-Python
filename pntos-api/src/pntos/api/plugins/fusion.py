@@ -38,14 +38,14 @@ class CrossCovariances:
     ``A`` and ``B`` and the cross-covariance matrix of ``A`` and ``C``.
 
     Attributes:
-        block_labels (List[str]): A list of labels of the :class:`StandardStateBlock` this structure
+        block_labels (list[str]): A list of labels of the :class:`StandardStateBlock` this structure
             contains the cross-covariances for.
-        cross_covariances (List[NDArray]): A list of cross-covariance matrices between a single
+        cross_covariances (list[NDArray[float64]]): A list of cross-covariance matrices between a single
             StateBlock and the set of StateBlocks listed in :attr:`block_labels`.
     """
 
-    block_labels: List[str]
-    cross_covariances: List[NDArray]
+    block_labels: list[str]
+    cross_covariances: list[NDArray[float64]]
 
 
 class StandardStateBlock(Protocol):
@@ -219,12 +219,14 @@ class VirtualStateBlock(Protocol):
         """
         pass
 
-    def convert_estimate(self, estimate: NDArray, time: TypeTimestamp) -> NDArray:
+    def convert_estimate(
+        self, estimate: NDArray[float64], time: TypeTimestamp
+    ) -> NDArray[float64]:
         """
         Convert just an estimate vector.
 
         Args:
-            estimate (NDArray): Estimate vector to convert, Nx1.
+            estimate (NDArray[float64]): Estimate vector to convert, Nx1.
             time (TypeTimestamp): Time that ``estimate`` is valid at.
 
         Returns:
@@ -232,7 +234,9 @@ class VirtualStateBlock(Protocol):
         """
         pass
 
-    def jacobian(self, estimate: NDArray, time: TypeTimestamp) -> NDArray:
+    def jacobian(
+        self, estimate: NDArray[float64], time: TypeTimestamp
+    ) -> NDArray[float64]:
         """
         Obtain the Jacobian of the transform performed by this instance.
 
@@ -240,11 +244,11 @@ class VirtualStateBlock(Protocol):
         differentiate with respect to.
 
         Args:
-            estimate (NDArray): Estimate vector associated with the return value of ``source``, Nx1.
+            estimate (NDArray[float64]): Estimate vector associated with the return value of ``source``, Nx1.
             time (TypeTimestamp): Time that ``estimate`` is valid at.
 
         Returns:
-            NDArray: An MxN matrix that may be used to pre-multiply ``estimate`` to obtain an M
+            NDArray[float64]: An MxN matrix that may be used to pre-multiply ``estimate`` to obtain an M
             length vector in ``target`` representation (to first order).
         """
         pass
@@ -309,7 +313,7 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
         Get a list of :class:`StandardStateBlock` labels that have been added to this fusion engine.
 
         Returns:
-            List[str] | None: A list of the :class:`StandardStateBlock` labels that have been added
+            list[str] | None: A list of the :class:`StandardStateBlock` labels that have been added
             to this fusion engine. Returns ``None`` if no state blocks have been added. Guaranteed
             to not return ``None`` if :meth:`get_num_states` returns a value other than 0.
         """
@@ -353,7 +357,7 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
             block_label (str)
 
         Returns:
-            NDArray | None: A copy of its current estimate vector. If ``block_label`` references a
+            NDArray[float64] | None: A copy of its current estimate vector. If ``block_label`` references a
             virtual state block (VSB) this will return a converted estimate, converted into the VSBs
             coordinate frame. Returns ``None`` if ``block_label`` does not correspond to a block
             that has been added to the fusion engine. Guaranteed to not return ``None`` when
@@ -373,7 +377,7 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
             block_label (str)
 
         Returns:
-            NDArray | None: A copy of its current covariance matrix. If ``block_label`` references a
+            NDArray[float64] | None: A copy of its current covariance matrix. If ``block_label`` references a
             virtual state block (VSB) this will return a converted covariance, converted into the
             VSBs coordinate frame. Returns ``None`` if ``block_label`` does not correspond to a
             block that has been added to the fusion engine. Guaranteed to not return ``None`` when
@@ -396,7 +400,7 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
             block_label2 (str)
 
         Returns:
-            NDArray | None: The cross-covariance matrix between ``block_label1`` and
+            NDArray[float64] | None: The cross-covariance matrix between ``block_label1`` and
             ``block_label2``. Returns ``None`` if ``block_label1`` or ``block_label2`` do not
             correspond to blocks that have been added to the fusion engine. Guaranteed to not return
             ``None`` when both ``block_label1`` and ``block_label2`` are in the list returned by
@@ -419,7 +423,7 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
 
         Args:
             block_label (str)
-            estimate (NDArray)
+            estimate (NDArray[float64])
         """
         pass
 
@@ -438,7 +442,7 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
 
         Args:
             block_label (str)
-            covariance (NDArray)
+            covariance (NDArray[float64])
         """
         pass
 
@@ -458,7 +462,7 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
         Args:
             block_label1 (str)
             block_label2 (str)
-            covariance (NDArray)
+            covariance (NDArray[float64])
         """
         pass
 
@@ -482,7 +486,7 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
         valid source. For that, call :meth:`has_virtual_state_block`.
 
         Returns:
-            List[str] | None: A list of the target labels of virtual state blocks that have been
+            list[str] | None: A list of the target labels of virtual state blocks that have been
             added. Returns ``None`` if no virtual state blocks have been added to this fusion
             engine.
         """
@@ -530,7 +534,7 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
         Get a list of the labels of measurement processors that have been added.
 
         Returns:
-            List[str] | None: List of labels of measurement processors that have been added. Returns
+            list[str] | None: list of labels of measurement processors that have been added. Returns
             ``None`` if no measurement processors have been added to this fusion engine.
         """
         pass
@@ -605,7 +609,7 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
 
         Args:
             time (TypeTimestamp)
-            block_labels (List[str]): An array of strings.
+            block_labels (list[str]): An array of strings.
 
         Returns:
             EstimateWithCovariance | None
@@ -631,20 +635,20 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
         are false then the result will be ``None``.
 
         Args:
-            block_labels (List[str]): An array of strings.
+            block_labels (list[str]): An array of strings.
 
         Returns:
             EstimateWithCovariance | None
         """
         pass
 
-    def give_state_block_aux_data(self, block_label: str, aux: List[Message]) -> None:
+    def give_state_block_aux_data(self, block_label: str, aux: list[Message]) -> None:
         """
         Route a list of messages of aux data to a :class:`StandardStateBlock`.
 
         Args:
             block_label (str)
-            aux (List[Message])
+            aux (list[Message])
         """
         pass
 
@@ -656,7 +660,7 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
 
         Args:
             processor_label (str)
-            aux (List[Message])
+            aux (list[Message])
         """
         pass
 
@@ -668,7 +672,7 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
 
         Args:
             target_label (str)
-            aux (List[Message])
+            aux (list[Message])
         """
         pass
 

@@ -69,10 +69,10 @@ class PlatformIntegrationPlugin(CommonPlugin, Protocol):
         :class:`ControllerPlugin`.
 
         Args:
-            plugins (List[CommonPlugin]): A subset of the ``plugins`` passed to the
+            plugins (list[CommonPlugin]): A subset of the ``plugins`` passed to the
                 :class:`ControllerPlugin`. Which plugins are passed to the PIP is implementation
                 specific and decided by the :class:`ControllerPlugin`.
-            plugin_resources_locations (List[str  |  None] | None, optional): Should be identical to
+            plugin_resources_locations (list[str  |  None] | None, optional): Should be identical to
                 what was passed to :meth:`ControllerPlugin.take_control`.
             initial_config (str | None, optional): Should be identical to what was passed to
                 :meth:`ControllerPlugin.take_control`.

@@ -113,18 +113,13 @@ class Aspn2LcmTransportPlugin(CommonPlugin, Protocol):
 
         return _general_handler
 
-    def listener_thread(self):
+    def listener_thread(self) -> None:
         self.lcm.subscribe('^((?!pntos).)*$', self.general_handler())
 
     def start_listening(self) -> None:
         # old: config_path="config/transport/is4s_transport_lcm"
         """Begin listening for lcm messages given input configuration"""
         self.lcm = LCM()
-
-        if self.lcm is None:
-            print('Failed to create lcm transport')
-            return
-
         self.listener = Thread(target=self.listener_thread, args=[])
         self.listener.start()
 
