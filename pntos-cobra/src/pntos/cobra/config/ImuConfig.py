@@ -10,4 +10,4 @@ class ImuConfig:
     gyro_bias_tau: tuple[float, float, float]
     gyro_rw_sigma: tuple[float, float, float]
 
-    group: str = "/config/cobra/imu_config/default"
+    group: str = '/config/cobra/imu_config/default'

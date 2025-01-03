@@ -9,4 +9,4 @@ class SensorConfig:
     destination_identifier: str  # e.g. Measurement Processor `identifier` field
     use_for_alignment: bool
     sensor_name: str
-    group: str = "/config/cobra/sensor_config/default"
+    group: str = '/config/cobra/sensor_config/default'

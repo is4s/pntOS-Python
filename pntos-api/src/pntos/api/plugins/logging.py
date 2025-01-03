@@ -23,8 +23,10 @@ class LoggingPlugin(CommonPlugin, Protocol):
         """
         Log a string to the logging plugin's sink.
 
-        `source_plugin_type` and `source_plugin_identifier` are information on the
-        plugin that sent the logout, `level` is the event severity, and `message` the
-        string contents to be logged.
+        Args:
+            source_plugin_type (type): Information on the plugin that sent the logout.
+            source_plugin_identifier (str): Information on the plugin that sent the logout.
+            level (LoggingLevel): The event severity.
+            message (str): The string contents to be logged.
         """
         pass

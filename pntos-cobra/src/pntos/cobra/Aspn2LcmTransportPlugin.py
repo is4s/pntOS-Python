@@ -34,7 +34,7 @@ class Aspn2LcmTransportPlugin(CommonPlugin, Protocol):
     subscription: LCMSubscription
 
     def __init__(self, mediator: Mediator):
-        self.identifier = "python-transport-lcm2-plugin"
+        self.identifier = 'python-transport-lcm2-plugin'
         self.mediator = mediator
 
     def init_plugin(
@@ -75,8 +75,8 @@ class Aspn2LcmTransportPlugin(CommonPlugin, Protocol):
 
         def _general_handler(channel: str, data: bytes) -> None:
             # Do not process messages sent from pntos.
-            if "pntos" in channel:
-                print("pntos channel message, not processing in aspn handler")
+            if 'pntos' in channel:
+                print('pntos channel message, not processing in aspn handler')
                 return
 
             untrans = positionvelocityattitude.decode(data)
@@ -107,19 +107,23 @@ class Aspn2LcmTransportPlugin(CommonPlugin, Protocol):
             trans.v2 = untrans.velocity[1]
             trans.v3 = untrans.velocity[2]
             trans.quaternion = untrans.attitude
-            msg = Message(trans, "")
+            msg = Message(trans, '')
 
             self.broadcast_message(msg)
 
         return _general_handler
 
-    def listener_thread(self) -> None:
-        self.lcm.subscribe("^((?!pntos).)*$", self.general_handler())
+    def listener_thread(self):
+        self.lcm.subscribe('^((?!pntos).)*$', self.general_handler())
 
     def start_listening(self) -> None:
         # old: config_path="config/transport/is4s_transport_lcm"
         """Begin listening for lcm messages given input configuration"""
         self.lcm = LCM()
+
+        if self.lcm is None:
+            print('Failed to create lcm transport')
+            return
 
         self.listener = Thread(target=self.listener_thread, args=[])
         self.listener.start()
@@ -132,7 +136,7 @@ class Aspn2LcmTransportPlugin(CommonPlugin, Protocol):
         if self.subscription is not None and self.lcm is not None:
             self.lcm.unsubscribe(self.subscription)
 
-        self.mediator.log_message(LoggingLevel.INFO, "LCM transport stopped")
+        self.mediator.log_message(LoggingLevel.INFO, 'LCM transport stopped')
 
     def broadcast_message(
         self, message: Message, channel_name: str | None = None
@@ -163,4 +167,4 @@ class Aspn2LcmTransportPlugin(CommonPlugin, Protocol):
             )
             self.lcm.publish(channel, translated.encode())
         else:
-            print("Invalid LCM message")
+            print('Invalid LCM message')

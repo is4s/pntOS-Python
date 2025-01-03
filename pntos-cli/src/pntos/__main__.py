@@ -1,1 +1,1 @@
-print("pntOS CLI stub")
+print('pntOS CLI stub')
