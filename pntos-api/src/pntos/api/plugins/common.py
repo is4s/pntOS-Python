@@ -45,7 +45,7 @@ class EstimateWithCovarianceType(Enum):
     Contains a mean (estimate) and covariance describing a rotation modeled by a multivariate
     Gaussian distribution, but the estimate is in quaternion form and the covariance is in tilt
     error form.
-    
+
       - :attr:`.EstimateWithCovariance.estimate` is size 4x1.
       - :attr:`.EstimateWithCovariance.covariance` is size 3x3, in :math:`\\text{radians}^2`.
     """
@@ -69,78 +69,12 @@ class EstimateWithCovariance:
     covariance: NDArray
 
 
-class FusionType(Enum):
-    """
-    An enumeration of the types of fusion that can be performed by pntOS.
-
-    An implementation of a :class:`FusionPlugin` will compare a model from this enum in its
-    :meth:`~FusionPlugin.is_fusion_type_supported` function. The return of
-    :meth:`~FusionPlugin.is_fusion_type_supported` indicates whether the input type of fusion engine
-    matches the type that will be produced by :meth:`~FusionPlugin.new_fusion_engine`.
-
-    Example:
-        Suppose we have a variable :class:`FusionPlugin` named ``plugin``. Then if the return value
-        of ``plugin.is_fusion_type_supported(FusionType.STANDARD_MODEL)`` is ``True``, then that
-        means that ``plugin.new_fusion_engine()`` will return a :class:`StandardFusionEngine`.
-    """
-
-    STANDARD_MODEL = 0
-    """
-    The standard model of fusion within pntOS. This model assumes that state estimates are
-    representable in a jointly Gaussian state vector and that updates of the state vector contain
-    only independent and identically distributed (i.i.d.) additive white Gaussian noise. See
-    :class:`StandardFusionEngine` for more information.
-    """
-
-    SAMPLED_MODEL = 1
-    """
-    The sampled model of fusion within pntOS. This model assumes that state
-    estimates are represented by discrete stochastic sample points of a 
-    probability density function (i.e. particles) and that propagate/update
-    functions will receive these samples and be able to arbitrarily modify 
-    each particle's weight, location, and add arbitrary noise to them.
-
-    Caution: 
-        **Unstable**: This feature is unstable and is not yet considered part of the stable pntOS
-        API. Usage of this feature is highly discouraged in non-experimental code, and its
-        definition may change at any time.
-    """
-
-    TIME_DELAYED_MODEL = 2
-    """
-    The time delayed model of fusion within pntOS. This model assumes that 
-    information about a state is retained across different time epochs and 
-    that historical estimate data is available for processing current time 
-    data.
-
-    Caution: 
-        **Unstable**: This feature is unstable and is not yet considered part of the stable pntOS
-        API. Usage of this feature is highly discouraged in non-experimental code, and its
-        definition may change at any time.
-    """
-
-    STANDARD_COMPILED_MODEL = 3
-    """
-    The standard model of fusion within pntOS, in compiled format. This 
-    model is identical to the standard model, with the exception that model
-    information is not available in function pointers on the machine itself
-    but instead binary blobs which have been pre-compiled. This mode is 
-    intended to facilitate usage in environments such as GPGPU filter 
-    implementations.
-
-    Caution: 
-        **Unstable**: This feature is unstable and is not yet considered part of the stable pntOS
-        API. Usage of this feature is highly discouraged in non-experimental code, and its
-        definition may change at any time.
-    """
-
-
 class LoggingLevel(Enum):
     """An enumeration of the types of log outs that are available in pntOS."""
 
     ERROR = 0
     """
-    This output indicates the program has entered an error state, and 
+    This output indicates the program has entered an error state, and
     likely needs to be inspected to discover what went wrong.
     """
 
@@ -152,14 +86,14 @@ class LoggingLevel(Enum):
 
     INFO = 2
     """
-    This output is designed to be informational, and may indicate correct 
+    This output is designed to be informational, and may indicate correct
     operation.
     """
 
     DEBUG = 3
     """
-    This output is designed to assist in debugging plugins by providing 
-    additional information about state and behavior which would be 
+    This output is designed to assist in debugging plugins by providing
+    additional information about state and behavior which would be
     otherwise unnecessary.
     """
 
@@ -175,7 +109,7 @@ class KeyValueStoreDataFormat(Enum):
 
     INI = 0
     """
-    Keys and their corresponding values are returned according to the INI 
+    Keys and their corresponding values are returned according to the INI
     file format specification.
     """
 
@@ -185,8 +119,8 @@ class KeyValueStoreDataFormat(Enum):
     """
 
 
-RegistryValueTypes = TypeVar(
-    'RegistryValueTypes', str, List[str], int, bool, float, NDArray, Message
+RegistryValueType = TypeVar(
+    'RegistryValueType', str, List[str], int, bool, float, NDArray, Message
 )
 
 
@@ -243,8 +177,8 @@ class KeyValueStore(Protocol):
         pass
 
     def get_value(
-        self, key: str, type: type[RegistryValueTypes]
-    ) -> RegistryValueTypes | None:
+        self, key: str, type: type[RegistryValueType]
+    ) -> RegistryValueType | None:
         """
         Get the value stored at ``key`` with return type ``type``.
 
@@ -256,10 +190,10 @@ class KeyValueStore(Protocol):
 
         Args:
             key (str)
-            type (type[RegistryValueTypes])
+            type (type[RegistryValueType])
 
         Returns:
-            RegistryValueTypes | None: Returns ``None`` if the key is not available. The return is
+            RegistryValueType | None: Returns ``None`` if the key is not available. The return is
             guaranteed to not be ``None`` if called with a valid key, which can be checked with
             :meth:`has_key`.
         """
@@ -282,13 +216,13 @@ class KeyValueStore(Protocol):
         """
         pass
 
-    def set_value(self, key: str, value: RegistryValueTypes) -> None:
+    def set_value(self, key: str, value: RegistryValueType) -> None:
         """
         Set the given key to the provided value.
 
         Args:
             key (str)
-            value (RegistryValueTypes): Can be of any type specified by :class:`ValueType`.
+            value (RegistryValueType): Can be of any type specified by :class:`ValueType`.
         """
         pass
 

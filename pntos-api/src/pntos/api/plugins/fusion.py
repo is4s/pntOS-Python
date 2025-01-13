@@ -1,28 +1,17 @@
 """Python API of pntOS."""
 
 from dataclasses import dataclass
-from typing import List, Protocol
+from typing import Any, List, Protocol, TypeVar
 
 from aspn23 import TypeTimestamp
 from numpy.typing import NDArray
 
-from .common import CommonPlugin, EstimateWithCovariance, FusionType, Message
+from .common import CommonPlugin, EstimateWithCovariance, Message
 from .fusion_strategy import (
     StandardDynamicsModel,
     StandardFusionStrategy,
     StandardMeasurementModel,
 )
-
-
-class CommonFusionEngine(Protocol):
-    """
-    Performs sensor fusion, estimating states.
-
-    A dynamic estimator exposing a state model provider consuming API capable of Bayesian inference
-    on non-linear discrete-time systems.
-    """
-
-    pass
 
 
 @dataclass
@@ -249,7 +238,7 @@ class VirtualStateBlock(Protocol):
         pass
 
 
-class StandardFusionEngine(CommonFusionEngine, Protocol):
+class StandardFusionEngine(Protocol):
     """
     An implementation of a fusion engine that supports the standard fusion model.
 
@@ -677,40 +666,45 @@ class StandardFusionEngine(CommonFusionEngine, Protocol):
         pass
 
 
+FusionEngineType = TypeVar('FusionEngineType', StandardFusionEngine, Any)
+
+
 class FusionPlugin(CommonPlugin, Protocol):
     """
-    Plugin that provides a :class:`CommonFusionEngine`.
+    Plugin that provides a fusion engine.
 
     A fusion engine allows data from multiple sensors to be integrated into a unified state
     estimate.
     """
 
-    def is_fusion_type_supported(self, type: FusionType) -> bool:
+    def is_fusion_type_supported(self, type: type[FusionEngineType]) -> bool:
         """
         Check if the plugin supports a given type of fusion.
 
         Args:
-            type (FusionType)
+            type (type[FusionEngineType])
 
         Returns:
             bool
         """
         pass
 
-    def new_fusion_engine(self, type: FusionType) -> CommonFusionEngine | None:
+    def new_fusion_engine(
+        self, type: type[FusionEngineType]
+    ) -> FusionEngineType | None:
         """
-        Create an instance of :class:`CommonFusionEngine`.
+        Create a fusion engine.
 
         Args:
-            type (FusionType): The :class:`FusionType` parameter specifies the type of
-                fusion that the returned value will support.
+            type (type[FusionEngineType]): This parameter specifies the type of fusion engine that
+            will be returned.
 
         Returns:
-            CommonFusionEngine | None: The :class:`FusionType` parameter specifies the type of
-            fusion that the returned value will support. For example, if the user passes in
-            ``FUSION_STANDARD_MODEL``, then the returned value will be a
-            :class:`StandardFusionEngine`. Returns ``None`` if ``type`` is not supported by this
-            fusion plugin (:meth:`is_fusion_type_supported` can be used to check the type before
-            calling this method). Otherwise the return is guaranteed to not be ``None``.
+            FusionEngineType | None: The ``type`` parameter specifies the type of fusion engine
+            that will be returned. For example, if the user passes in :class:`StandardFusionEngine`,
+            then an implementation of :class:`StandardFusionEngine` will be returned. Returns
+            ``None`` if ``type`` is not supported by this fusion plugin
+            (:meth:`is_fusion_type_supported` can be used to check the type before calling this
+            method). Otherwise the return is guaranteed to not be ``None``.
         """
         pass

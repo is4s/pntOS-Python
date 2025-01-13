@@ -1,8 +1,8 @@
 """Python API of pntOS."""
 
-from typing import Protocol
+from typing import Any, Protocol, TypeVar
 
-from .common import CommonPlugin, FusionType
+from .common import CommonPlugin
 from .fusion import (
     StandardFusionEngine,
     StandardMeasurementProcessor,
@@ -11,18 +11,7 @@ from .fusion import (
 )
 
 
-class CommonStateModelProvider(Protocol):
-    """
-    A collection of tools for modeling states and measurements.
-
-    Attributes:
-        engine_type (FusionType): The type of fusion model used by this state model provider.
-    """
-
-    engine_type: FusionType
-
-
-class StandardStateModelProvider(CommonStateModelProvider, Protocol):
+class StandardStateModelProvider(Protocol):
     """
     A collection of tools for modeling states and measurements.
 
@@ -217,12 +206,17 @@ class StandardStateModelProvider(CommonStateModelProvider, Protocol):
         pass
 
 
-class StateModelingPlugin(CommonPlugin, Protocol):
-    """A :class:`CommonPlugin` subclass that generates :class:`CommonStateModelProviders`."""
+StateModelProviderType = TypeVar(
+    'StateModelProviderType', StandardStateModelProvider, Any
+)
 
-    def is_fusion_type_supported(self, type: FusionType) -> bool:
+
+class StateModelingPlugin(CommonPlugin, Protocol):
+    """A :class:`CommonPlugin` subclass that generates state model providers."""
+
+    def is_fusion_type_supported(self, type: type[StateModelProviderType]) -> bool:
         """
-        Check if the plugin supports a given type of fusion. See :class:`FusionType`.
+        Check if the plugin supports a given type of fusion. See ``StateModelProviderType``.
 
         Args:
             type (FusionType)
@@ -233,19 +227,19 @@ class StateModelingPlugin(CommonPlugin, Protocol):
         pass
 
     def new_state_model_provider(
-        self, type: FusionType
-    ) -> CommonStateModelProvider | None:
+        self, type: type[StateModelProviderType]
+    ) -> StateModelProviderType | None:
         """
-        Generate an instance of :class:`CommonStateModelProvider`.
+        Generate a state model provider.
 
         Args:
             type (FusionType): Specifies the type of fusion that the returned value will
-                support. For example, if the user passes in ``STANDARD_MODEL``, then
-                the returned value will be castable to :class:`StandardStateModelProvider`.
+                support. For example, if the user passes in ``STANDARD_MODEL``, then the returned
+                value will be an implementation of :class:`StandardStateModelProvider`.
 
         Returns:
-            CommonStateModelProvider | None: A state model provider of the specified
-            :class:`FusionType` or None if ``type`` is not supported
-            (:meth:`is_fusion_type_supported` can be used to check ``type``).
+            StateModelProviderType | None: A state model provider which implements the specified
+            type or None if ``type`` is not supported (:meth:`is_fusion_type_supported` can be used
+            to check ``type``).
         """
         pass

@@ -10,7 +10,7 @@ from pntos.api import (
     Message,
     Registry,
     RegistryPlugin,
-    RegistryValueTypes,
+    RegistryValueType,
 )
 
 
@@ -70,8 +70,8 @@ class SimpleKeyValueStore(KeyValueStore):
         return key in self.store
 
     def get_value(
-        self, key: str, type: type[RegistryValueTypes]
-    ) -> RegistryValueTypes | None:
+        self, key: str, type: type[RegistryValueType]
+    ) -> RegistryValueType | None:
         out = self.store[key]
         if isinstance(out, type):
             return out
@@ -81,7 +81,7 @@ class SimpleKeyValueStore(KeyValueStore):
     def get_raw(self, key: str | None = None) -> bytes | None:
         return None
 
-    def set_value(self, key: str, value: RegistryValueTypes) -> None:
+    def set_value(self, key: str, value: RegistryValueType) -> None:
         self.store[key] = value
 
     def set_raw(self, key: str | None, bytes: bytes) -> None:
