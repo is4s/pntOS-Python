@@ -1,11 +1,11 @@
 """Python API of pntOS."""
 
-from typing import Protocol
+from abc import ABC, abstractmethod
 
 from pntos.api import CommonPlugin
 
 
-class UiPlugin(CommonPlugin, Protocol):
+class UiPlugin(CommonPlugin, ABC):
     """
     A plugin for a UI that is integrated directly into pntOS.
 
@@ -17,6 +17,7 @@ class UiPlugin(CommonPlugin, Protocol):
     as that is designed to represent requests from the system and not simply status updates.
     """
 
+    @abstractmethod
     def requires_main_thread(self) -> bool:
         """
         Check if this plugin needs to run on the main thread.
@@ -31,6 +32,7 @@ class UiPlugin(CommonPlugin, Protocol):
         """
         pass
 
+    @abstractmethod
     def run_main_thread(self) -> None:
         """
         Start plugin on the main thread.

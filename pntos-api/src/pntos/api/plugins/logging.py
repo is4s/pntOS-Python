@@ -1,11 +1,11 @@
 """Python API of pntOS."""
 
-from typing import Protocol
+from abc import ABC, abstractmethod
 
 from pntos.api import CommonPlugin, LoggingLevel
 
 
-class LoggingPlugin(CommonPlugin, Protocol):
+class LoggingPlugin(CommonPlugin, ABC):
     """
     Logging plugin.
 
@@ -13,6 +13,7 @@ class LoggingPlugin(CommonPlugin, Protocol):
     network, etc.).
     """
 
+    @abstractmethod
     def log(
         self,
         source_plugin_type: type[CommonPlugin],

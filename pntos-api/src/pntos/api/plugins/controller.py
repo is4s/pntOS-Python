@@ -1,11 +1,12 @@
 """Python API of pntOS."""
 
-from typing import List, Protocol
+from abc import ABC, abstractmethod
+from typing import List
 
 from pntos.api import CommonPlugin
 
 
-class ControllerPlugin(CommonPlugin, Protocol):
+class ControllerPlugin(CommonPlugin, ABC):
     """
     Controller plugin.
 
@@ -62,6 +63,7 @@ class ControllerPlugin(CommonPlugin, Protocol):
     controller's chosen concurrency primitive.
     """
 
+    @abstractmethod
     def take_control(
         self,
         plugins: List[CommonPlugin],

@@ -1,11 +1,11 @@
 """Python API of pntOS."""
 
-from typing import Protocol
+from abc import ABC, abstractmethod
 
 from pntos.api import CommonPlugin, Message
 
 
-class TransportPlugin(CommonPlugin, Protocol):
+class TransportPlugin(CommonPlugin, ABC):
     """
     Transport plugin.
 
@@ -13,6 +13,7 @@ class TransportPlugin(CommonPlugin, Protocol):
     the wire and sending data back to the sensors as needed.
     """
 
+    @abstractmethod
     def start_listening(self) -> None:
         """
         Start listening.
@@ -22,6 +23,7 @@ class TransportPlugin(CommonPlugin, Protocol):
         """
         pass
 
+    @abstractmethod
     def stop_listening(self) -> None:
         """
         Disable listening.
@@ -31,6 +33,7 @@ class TransportPlugin(CommonPlugin, Protocol):
         """
         pass
 
+    @abstractmethod
     def broadcast_message(
         self, message: Message, channel_name: str | None = None
     ) -> None:
