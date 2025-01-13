@@ -10,7 +10,7 @@ from .plugins.common import (
     Mediator as Mediator,
     Message as Message,
     Registry as Registry,
-    RegistryValueTypes as RegistryValueTypes,
+    RegistryValueType as RegistryValueType,
 )
 from .plugins.controller import ControllerPlugin as ControllerPlugin
 from .plugins.fusion import (
