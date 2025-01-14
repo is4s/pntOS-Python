@@ -186,8 +186,8 @@ class KeyValueStoreDataFormat(Enum):
     """
 
 
-RegistryValueTypes = TypeVar(
-    'RegistryValueTypes', str, list[str], int, bool, float, NDArray[float64], Message
+RegistryValueType = TypeVar(
+    'RegistryValueType', str, list[str], int, bool, float, NDArray[float64], Message
 )
 
 
