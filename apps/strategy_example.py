@@ -3,7 +3,6 @@ from numpy import float64
 from numpy.typing import NDArray
 from pntos.api.plugins.fusion_strategy import (
     FusionStrategyPlugin,
-    FusionType,
     StandardDynamicsModel,
     StandardFusionStrategy,
     StandardMeasurementModel,
@@ -11,8 +10,8 @@ from pntos.api.plugins.fusion_strategy import (
 
 
 def use_plugin(plugin: FusionStrategyPlugin):
-    assert plugin.is_fusion_type_supported(FusionType.STANDARD_MODEL)
-    filter = plugin.new_fusion_strategy(FusionType.STANDARD_MODEL)
+    assert plugin.is_fusion_type_supported(StandardFusionStrategy)
+    filter = plugin.new_fusion_strategy(StandardFusionStrategy)
     assert isinstance(filter, StandardFusionStrategy)
     filter.add_states(
         initial_estimate=np.zeros((3, 1)), initial_covariance=np.zeros((3, 3))

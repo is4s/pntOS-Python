@@ -244,8 +244,8 @@ class KeyValueStore(Protocol):
         pass
 
     def get_value(
-        self, key: str, type: type[RegistryValueTypes]
-    ) -> RegistryValueTypes | None:
+        self, key: str, type: type[RegistryValueType]
+    ) -> RegistryValueType | None:
         """
         Get the value stored at ``key`` with return type ``type``.
 
@@ -257,10 +257,10 @@ class KeyValueStore(Protocol):
 
         Args:
             key (str)
-            type (type[RegistryValueTypes])
+            type (type[RegistryValueType])
 
         Returns:
-            RegistryValueTypes | None: Returns ``None`` if the key is not available. The return is
+            RegistryValueType | None: Returns ``None`` if the key is not available. The return is
             guaranteed to not be ``None`` if called with a valid key, which can be checked with
             :meth:`has_key`.
         """
@@ -283,13 +283,13 @@ class KeyValueStore(Protocol):
         """
         pass
 
-    def set_value(self, key: str, value: RegistryValueTypes) -> None:
+    def set_value(self, key: str, value: RegistryValueType) -> None:
         """
         Set the given key to the provided value.
 
         Args:
             key (str)
-            value (RegistryValueTypes): Can be of any type specified by :class:`ValueType`.
+            value (RegistryValueType): Can be of any type specified by :class:`ValueType`.
         """
         pass
 

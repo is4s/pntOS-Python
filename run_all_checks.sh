@@ -7,6 +7,8 @@
 # - rye is on the PATH
 # - rye sync has been run, and the virtual environment it set up has been activated
 
+set -xe
+
 rye lint --fix
 rye fmt
 rye test -p pntos-cobra

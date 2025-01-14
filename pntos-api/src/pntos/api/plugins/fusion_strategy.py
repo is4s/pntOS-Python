@@ -1,28 +1,12 @@
 """Python API of pntOS."""
 
 from dataclasses import dataclass
-from typing import Callable, Protocol, runtime_checkable
+from typing import Any, Callable, Protocol, TypeVar, runtime_checkable
 
 from numpy import float64
 from numpy.typing import NDArray
 
-from pntos.api import CommonPlugin, FusionType
-
-
-@runtime_checkable
-class FusionStrategy(Protocol):
-    """
-    A computation engine for doing raw estimation.
-
-    This class is itself empty and only serves as a base class for different types of fusion
-    strategies. At this time, the only implementation of this protocol is
-    :class:`StandardFusionStrategy`. However, other fusion strategies will be added in the future,
-    so code that receives a FusionStrategy should use `isinstance
-    <https://docs.python.org/3/library/functions.html#isinstance>`__ to check that it is really a
-    :class:`StandardFusionStrategy` before using it.
-    """
-
-    pass
+from pntos.api import CommonPlugin
 
 
 @dataclass
@@ -79,7 +63,7 @@ class StandardMeasurementModel:
 
 
 @runtime_checkable
-class StandardFusionStrategy(FusionStrategy, Protocol):
+class StandardFusionStrategy(Protocol):
     """
     A Fusion strategy making linearized Bayesian assumptions.
 
@@ -286,6 +270,9 @@ class StandardFusionStrategy(FusionStrategy, Protocol):
         ...
 
 
+FusionStrategyType = TypeVar('FusionStrategyType', StandardFusionStrategy, Any)
+
+
 class FusionStrategyPlugin(CommonPlugin, Protocol):
     """
     A plugin that provides computational engines for estimation.
@@ -300,56 +287,55 @@ class FusionStrategyPlugin(CommonPlugin, Protocol):
     There are many ways to model sensor fusion, including very simple (linear
     Kalman filter) and complex (neural networks, factor graphs, etc.). This
     plugin aims to allow any and all of those models to be represented. It
-    achieves this by having multiple :class:`FusionType` s, so that the user may select
+    achieves this by having multiple fusion strategies, so that the user may select
     what kind of fusion they want. Currently, only the :class:`StandardFusionStrategy` is
     implemented, which is suitable for EKFs and filters that have similar
     interfaces to an EKF (such as a UKF). However, more strategy types are
     planned to be added in the future.
     """
 
-    def is_fusion_type_supported(self, fusion_type: FusionType) -> bool:
+    def is_fusion_type_supported(self, fusion_type: type[FusionStrategyType]) -> bool:
         """
-        Check if a particular fusion type is supported by :meth:`new_fusion_strategy`.
+        Check if a particular fusion strategy is supported by :meth:`new_fusion_strategy`.
 
         The :meth:`new_fusion_strategy` factory method on this class can create
-        :class:`FusionStrategy` of different types. However, :class:`FusionStrategyPlugin`
+        one or more types of fusion strategy. However, :class:`FusionStrategyPlugin`
         may not support all types (they must support at least one). Therefore,
         when a user receives a :class:`FusionStrategyPlugin`, they should:
 
         1. Initialize the plugin by calling :meth:`.init_plugin` (see :class:`CommonPlugin` for more
            information).
         2. Call :meth:`is_fusion_type_supported` to check that the plugin supports the
-           :class:`FusionType` that the user wants to use.
+           type that the user wants to use.
         3. If :meth:`is_fusion_type_supported` returned True, call the :meth:`new_fusion_strategy`
-           factory method to get a new :class:`FusionStrategy` of the desired :class:`FusionType`.
-        4. Downcast the returned :class:`FusionStrategy` to the selected :class:`FusionType`. For
-           example, if the user calls :meth:`new_fusion_strategy` with a ``fusion_type`` of
-           ``STANDARD_MODEL``, then the returned object should be downcast to a
-           :class:`StandardFusionStrategy`.
-        5. Proceed to use the fusion strategy to do estimation.
+           factory method to get a new fusion strategy of the desired fusion strategy.
+        4. Proceed to use the fusion strategy to do estimation.
 
         Args:
-            fusion_type (FusionType): The fusion type we are checking.
+            fusion_type (type[FusionStrategyType]): The fusion strategy type we are checking.
 
         Returns:
             bool: Whether or not we support the requested ``fusion_type``.
         """
         ...
 
-    def new_fusion_strategy(self, fusion_type: FusionType) -> FusionStrategy:
+    def new_fusion_strategy(
+        self, fusion_type: type[FusionStrategyType]
+    ) -> FusionStrategyType | None:
         """
         Create a new fusion strategy of the requested type.
 
-        Users must first ensure that the :class:`FusionType` is supported by calling
+        Users must first ensure that the fusion strategy is supported by calling
         :meth:`is_fusion_type_supported`.
 
         Args:
-            fusion_type (FusionType): The type of fusion plugin that we want returned.
+            fusion_type (type[FusionStrategyType]): The type of fusion strategy that we want
+            returned.
 
         Returns:
-            FusionStrategy: The newly created :class:`FusionStrategy`, which has a type that
-            corresponds to the ``fusion_type``. For example, if the user calls
-            :meth:`new_fusion_strategy` with a ``fusion_type`` of ``STANDARD_MODEL``, then the
-            returned object will be a :class:`StandardFusionStrategy`.
+            FusionStrategyType | None: The newly created fusion strategy, which is an
+            implementation of the type specified by ``fusion_type``. For example, if the user calls
+            :meth:`new_fusion_strategy` with a ``fusion_type`` of ``StandardFusionStrategy``, then
+            the returned object will be an implementation of :class:`StandardFusionStrategy`.
         """
         ...

@@ -1,7 +1,6 @@
 import time
 
-from pntos.api.plugins.common import LoggingLevel, Mediator
-from pntos.api.plugins.logging import LoggingPlugin
+from pntos.api import CommonPlugin, LoggingLevel, LoggingPlugin, Mediator
 from pntos.cobra.config.LoggingConfig import LoggingConfig
 
 global_global_log_level = LoggingLevel.INFO
@@ -92,7 +91,7 @@ class SimpleLoggingPlugin(LoggingPlugin):
 
     def log(
         self,
-        source_plugin_type: type,
+        source_plugin_type: type[CommonPlugin],
         source_plugin_identifier: str,
         level: LoggingLevel,
         message: str,

@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import Protocol
+from typing import Any, Protocol, TypeVar
 
 from aspn23 import TypeTimestamp
 from numpy import float64
@@ -200,7 +200,12 @@ class EwcInitializationStrategy(CommonInitializationStrategy):
         pass
 
 
-InitializationType = InertialInitializationStrategy | EwcInitializationStrategy
+InitializationType = TypeVar(
+    'InitializationType',
+    InertialInitializationStrategy,
+    EwcInitializationStrategy,
+    Any,
+)
 
 
 class InitializationPlugin(CommonPlugin, Protocol):
@@ -216,12 +221,12 @@ class InitializationPlugin(CommonPlugin, Protocol):
         definition may change at any time.
     """
 
-    def is_initialization_type_supported(self, type: InitializationType) -> bool:
+    def is_initialization_type_supported(self, type: type[InitializationType]) -> bool:
         """
         Check if given ``InitializationType`` is supported.
 
         Args:
-            type (InitializationType)
+            type (type[InitializationType])
 
         Returns:
             bool: ``True`` if the plugin supports a given type of mechanization, ``False``
@@ -230,26 +235,28 @@ class InitializationPlugin(CommonPlugin, Protocol):
         pass
 
     def new_initialization_strategy(
-        self, type: InitializationType, config_group: str | None = None
-    ) -> CommonInitializationStrategy | None:
+        self, type: type[InitializationType], config_group: str | None = None
+    ) -> InitializationType | None:
         """
         Create an instance of :class:`CommonInitializationStrategy`.
 
         Args:
-            type (InitializationType): Specifies the type of initializer that the returned value
+            type (type[InitializationType]): Specifies the type of initializer that the returned
+            value
                 will support. For example, if the user passes in
-                ``INERTIAL_INITIALIZATION_STRATEGY``, then the returned value will be an instance of
-                :class:`InertialInitializationStrategy`. If ``type`` is unsupported by the plugin,
-                then ``None`` will be returned. Please use :meth:`is_initialization_type_supported`
-                to check if the type is supported by the plugin.
+                ``INERTIAL_INITIALIZATION_STRATEGY``, then the returned value will be an
+                implementation of :class:`InertialInitializationStrategy`. If ``type`` is
+                unsupported by the plugin, then ``None`` will be returned. Please use
+                :meth:`is_initialization_type_supported` to check if the type is supported by the
+                plugin.
             config_group (str | None, optional): An optional parameter which can be used to specify
                 which group in the config should be used to set up the new initialization strategy.
                 This allows for multiple initialization strategy instances to exist with unique
                 settings.
 
         Returns:
-            CommonInitializationStrategy | None: The new initialization strategy instance. Returns
-            ``None`` if ``type`` is unsupported by this plugin (this can be checked using
+            InitializationType | None: The new initialization strategy object. Returns ``None``
+            if ``type`` is unsupported by this plugin (this can be checked using
             :meth:`is_initialization_type_supported`) or if ``config_group`` is invalid.
         """
         pass

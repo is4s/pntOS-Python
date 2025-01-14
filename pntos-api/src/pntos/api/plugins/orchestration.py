@@ -2,7 +2,7 @@
 
 from typing import Protocol
 
-from aspn23 import TypeTimestamp
+from aspn23 import AspnBase, TypeTimestamp
 
 from pntos.api import CommonPlugin, Message
 
@@ -22,7 +22,7 @@ class MessageStreamConfig(Protocol):
     """
 
     def sequenced_stream_add(
-        self, type: type, source_identifier: str | None = None
+        self, type: type[AspnBase], source_identifier: str | None = None
     ) -> None:
         """
         Request messages are streamed in sorted timestamp ordering.
@@ -31,13 +31,13 @@ class MessageStreamConfig(Protocol):
         streamed in sorted timestamp ordering.
 
         Args:
-            type (type)
+            type (type[AspnBase])
             source_identifier (str | None, optional)
         """
         pass
 
     def sequenced_stream_remove(
-        self, type: type, source_identifier: str | None = None
+        self, type: type[AspnBase], source_identifier: str | None = None
     ) -> None:
         """
         Request messages are no longer streamed in sorted timestamp ordering.
@@ -48,7 +48,7 @@ class MessageStreamConfig(Protocol):
         entire list of messages that was added with a previous call to :meth:`sequenced_stream_all`.
 
         Args:
-            type (type)
+            type (type[AspnBase])
             source_identifier (str | None, optional)
         """
         pass
@@ -66,7 +66,7 @@ class MessageStreamConfig(Protocol):
         pass
 
     def immediate_stream_add(
-        self, type: type, source_identifier: str | None = None
+        self, type: type[AspnBase], source_identifier: str | None = None
     ) -> None:
         """
         Request messages are streamed immediately.
@@ -75,13 +75,13 @@ class MessageStreamConfig(Protocol):
         streamed immediately without delay, buffering, or sorting.
 
         Args:
-            type (type)
+            type (type[AspnBase])
             source_identifier (str | None, optional)
         """
         pass
 
     def immediate_stream_remove(
-        self, type: type, source_identifier: str | None = None
+        self, type: type[AspnBase], source_identifier: str | None = None
     ) -> None:
         """
         Request messages are no longer streamed immediately.
@@ -92,7 +92,7 @@ class MessageStreamConfig(Protocol):
         that was added with a previous call to :meth:`immediate_stream_all`.
 
         Args:
-            type (type)
+            type (type[AspnBase])
             source_identifier (str | None, optional)
         """
         pass

@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import Protocol
+from typing import Any, List, Protocol, TypeVar
 
 from aspn23 import AspnBase, MeasurementImu, TypeTimestamp
 from numpy import float64
@@ -100,11 +100,6 @@ class InertialSolutionRangeType(Enum):
 class CommonInertial(Protocol):
     """
     A common base type for an inertial.
-
-    A user may use the :attr:`CommonInertial.mechanization_type` field to discover what type of
-    inertial this type actually is and then downcast to the appropriate inertial class. For example,
-    if :attr:`CommonInertial.mechanization_type` is ``STANDARD_INERTIAL_MECHANIZATION``, then this
-    instance is actually a :class:`StandardInertialMechanization`.
 
     Caution:
         **Unstable**: This feature is unstable and is not yet considered part of the stable pntOS
@@ -334,7 +329,9 @@ class StandardInertialMechanization(CommonInertial, Protocol):
         pass
 
 
-InertialType = StandardInertialMechanization | ExternalInertial
+InertialType = TypeVar(
+    'InertialType', StandardInertialMechanization, ExternalInertial, Any
+)
 
 
 class InertialPlugin(CommonPlugin, Protocol):
@@ -350,12 +347,12 @@ class InertialPlugin(CommonPlugin, Protocol):
         definition may change at any time.
     """
 
-    def is_inertial_type_supported(self, type: InertialType) -> bool:
+    def is_inertial_type_supported(self, type: type[InertialType]) -> bool:
         """
         Check if the plugin supports a given type of inertial.
 
         Args:
-            type (InertialType)
+            type (type[InertialType])
 
         Returns:
             bool: ``True`` if inertial type is supported, ``False`` otherwise.
@@ -363,24 +360,28 @@ class InertialPlugin(CommonPlugin, Protocol):
         pass
 
     def new_inertial(
-        self, type: InertialType, solution: Message, config_group: str | None = None
-    ) -> CommonInertial | None:
+        self,
+        type: type[InertialType],
+        solution: Message,
+        config_group: str | None = None,
+    ) -> InertialType | None:
         """
-        Create an instance of :class:`CommonInertial`.
+        Create an instance of an implementation of :class:`CommonInertial`.
 
         Args:
-            type (InertialType): Specifies the type of inertial that the returned value will
+            type (type[InertialType]): Specifies the type of inertial that the returned value will
                 support. For example, if the user passes in ``STANDARD_INERTIAL_MECHANIZATION``,
-                then the returned value will be castable to :class:`StandardInertialMechanization`.
-                If ``type`` is unsupported by the plugin, then ``None`` will be returned. Please use
-                :meth:`is_inertial_type_supported` to check if the type is supported by the plugin.
+                then the returned value will be an implementation of
+                :class:`StandardInertialMechanization`. If ``type`` is unsupported by the plugin,
+                then ``None`` will be returned. Please use :meth:`is_inertial_type_supported` to
+                check if the type is supported by the plugin.
             solution (Message): The initial solution (i.e. the alignment) to mechanize from.
             config_group (str | None, optional): An optional parameter which can be used to specify
                 which group in the config should be used to initialize the new inertial. This allows
                 for multiple inertial instances to exist with unique settings.
 
         Returns:
-            CommonInertial | None: A new inertial object. Returns ``None`` if ``type`` is
+            InertialType | None: A new inertial object. Returns ``None`` if ``type`` is
             unsupported, ``solution`` is invalid, or ``config_group`` is invalid.
             :meth:`is_inertial_type_supported` can be called to verify ``type`` before calling this
             method.
