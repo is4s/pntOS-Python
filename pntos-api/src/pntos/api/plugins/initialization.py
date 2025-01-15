@@ -1,8 +1,9 @@
 """Python API of pntOS."""
 
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum
-from typing import Any, Protocol, TypeVar
+from typing import Any, TypeVar
 
 from aspn23 import TypeTimestamp
 from numpy.typing import NDArray
@@ -64,7 +65,7 @@ class InitializationMotionNeeded(Enum):
     """No particular type of motion is required."""
 
 
-class CommonInitializationStrategy(Protocol):
+class CommonInitializationStrategy(ABC):
     """
     A common base type for initialization algorithms.
 
@@ -74,6 +75,7 @@ class CommonInitializationStrategy(Protocol):
         definition may change at any time.
     """
 
+    @abstractmethod
     def request_motion_needed(self) -> InitializationMotionNeeded:
         """
         Check the type of motion (if any) needed.
@@ -83,6 +85,7 @@ class CommonInitializationStrategy(Protocol):
         """
         pass
 
+    @abstractmethod
     def request_current_status(self) -> InitializationStatus:
         """
         Check the current initialization status.
@@ -92,6 +95,7 @@ class CommonInitializationStrategy(Protocol):
         """
         pass
 
+    @abstractmethod
     def process_pntos_message(self, message: Message) -> None:
         """
         Incorporate a new message into the initialization algorithm.
@@ -129,7 +133,7 @@ class InitialInertialSolution:
     status: InitializationStatus
 
 
-class InertialInitializationStrategy(CommonInitializationStrategy, Protocol):
+class InertialInitializationStrategy(CommonInitializationStrategy, ABC):
     """
     Generates an initial ASPN solution from sensor data.
 
@@ -139,6 +143,7 @@ class InertialInitializationStrategy(CommonInitializationStrategy, Protocol):
         definition may change at any time.
     """
 
+    @abstractmethod
     def request_solution(self) -> InitialInertialSolution:
         """
         Get the current initial solution.
@@ -185,6 +190,7 @@ class EwcInitializationStrategy(CommonInitializationStrategy):
         definition may change at any time.
     """
 
+    @abstractmethod
     def request_solution(self) -> InitialEstimateWithCovariance | None:
         """
         Get the current initial solution.
@@ -207,7 +213,7 @@ InitializationType = TypeVar(
 )
 
 
-class InitializationPlugin(CommonPlugin, Protocol):
+class InitializationPlugin(CommonPlugin, ABC):
     """
     An implementation of an initialization plugin.
 
@@ -220,6 +226,7 @@ class InitializationPlugin(CommonPlugin, Protocol):
         definition may change at any time.
     """
 
+    @abstractmethod
     def is_initialization_type_supported(self, type: type[InitializationType]) -> bool:
         """
         Check if given ``InitializationType`` is supported.
@@ -233,6 +240,7 @@ class InitializationPlugin(CommonPlugin, Protocol):
         """
         pass
 
+    @abstractmethod
     def new_initialization_strategy(
         self, type: type[InitializationType], config_group: str | None = None
     ) -> InitializationType | None:

@@ -1,11 +1,11 @@
 """Python API of pntOS."""
 
-from typing import Protocol
+from abc import ABC, abstractmethod
 
 from pntos.api import CommonPlugin, Registry
 
 
-class RegistryPlugin(CommonPlugin, Protocol):
+class RegistryPlugin(CommonPlugin, ABC):
     """
     Registry plugin.
 
@@ -13,6 +13,7 @@ class RegistryPlugin(CommonPlugin, Protocol):
     the `Internals` section for more information on the goal of this plugin.
     """
 
+    @abstractmethod
     def new_registry(self, initial_config: str | None = None) -> Registry:
         """
         Create a new registry based on the initial values stored in ``initial_config``.

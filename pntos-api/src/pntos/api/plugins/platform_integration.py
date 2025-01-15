@@ -1,11 +1,12 @@
 """Python API of pntOS."""
 
-from typing import List, Protocol
+from abc import ABC, abstractmethod
+from typing import List
 
 from pntos.api import CommonPlugin
 
 
-class PlatformIntegrationPlugin(CommonPlugin, Protocol):
+class PlatformIntegrationPlugin(CommonPlugin, ABC):
     """
     Platform integration plugin.
 
@@ -19,6 +20,7 @@ class PlatformIntegrationPlugin(CommonPlugin, Protocol):
         definition may change at any time.
     """
 
+    @abstractmethod
     def take_control(
         self,
         plugins: List[CommonPlugin],

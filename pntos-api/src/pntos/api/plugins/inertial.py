@@ -1,8 +1,9 @@
 """Python API of pntOS."""
 
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum
-from typing import Any, List, Protocol, TypeVar
+from typing import Any, List, TypeVar
 
 from aspn23 import AspnBase, MeasurementImu, TypeTimestamp
 from numpy.typing import NDArray
@@ -96,7 +97,7 @@ class InertialSolutionRangeType(Enum):
     INERTIAL_NO_UPDATES_WITHIN_RANGE = 1
 
 
-class CommonInertial(Protocol):
+class CommonInertial(ABC):
     """
     A common base type for an inertial.
 
@@ -106,6 +107,7 @@ class CommonInertial(Protocol):
         definition may change at any time.
     """
 
+    @abstractmethod
     def request_solution_message_type(self) -> type[AspnBase]:
         """
         Get the solution type.
@@ -117,6 +119,7 @@ class CommonInertial(Protocol):
         """
         pass
 
+    @abstractmethod
     def request_current_solution(self) -> Message:
         """
         Get the current inertial solution.
@@ -126,6 +129,7 @@ class CommonInertial(Protocol):
         """
         pass
 
+    @abstractmethod
     def request_solution(self, time: TypeTimestamp) -> Message | None:
         """
         Request solution at a specific time.
@@ -140,6 +144,7 @@ class CommonInertial(Protocol):
         """
         pass
 
+    @abstractmethod
     def request_solutions(
         self, time: List[TypeTimestamp], type: InertialSolutionRangeType
     ) -> List[Message] | None:
@@ -157,6 +162,7 @@ class CommonInertial(Protocol):
         """
         pass
 
+    @abstractmethod
     def is_time_in_range(self, time: TypeTimestamp) -> bool:
         """
         Check if a solution exists at a given time.
@@ -170,6 +176,7 @@ class CommonInertial(Protocol):
         """
         pass
 
+    @abstractmethod
     def request_earliest_time(self) -> TypeTimestamp:
         """
         Get the earliest available time at which a solution or forces and rates can be requested.
@@ -183,6 +190,7 @@ class CommonInertial(Protocol):
         """
         pass
 
+    @abstractmethod
     def request_latest_time(self) -> TypeTimestamp:
         """
         Get the latest available time at which a solution or forces and rates can be requested.
@@ -196,6 +204,7 @@ class CommonInertial(Protocol):
         """
         pass
 
+    @abstractmethod
     def request_process_pntos_message_types(self) -> List[type[AspnBase]]:
         """
         Returns an array of message types that are supported by this plugin.
@@ -206,6 +215,7 @@ class CommonInertial(Protocol):
         """
         pass
 
+    @abstractmethod
     def process_pntos_message(self, message: Message) -> None:
         """
         A new message to be incorporated into the computed inertial solution.
@@ -215,6 +225,7 @@ class CommonInertial(Protocol):
         """
         pass
 
+    @abstractmethod
     def request_forces_and_rates(
         self, time: TypeTimestamp
     ) -> InertialForcesRates | None:
@@ -231,6 +242,7 @@ class CommonInertial(Protocol):
         """
         pass
 
+    @abstractmethod
     def request_average_forces_and_rates(
         self, time1: TypeTimestamp, time2: TypeTimestamp
     ) -> InertialForcesRates | None:
@@ -257,7 +269,7 @@ class CommonInertial(Protocol):
 ExternalInertial = CommonInertial
 
 
-class StandardInertialMechanization(CommonInertial, Protocol):
+class StandardInertialMechanization(CommonInertial, ABC):
     """
     A struct produced by a :class:`InertialPlugin`. It generates solutions from raw IMU data.
 
@@ -267,6 +279,7 @@ class StandardInertialMechanization(CommonInertial, Protocol):
         definition may change at any time.
     """
 
+    @abstractmethod
     def request_reset_message_types(self) -> List[type[AspnBase]] | None:
         """
         Get valid types of reset messages.
@@ -278,6 +291,7 @@ class StandardInertialMechanization(CommonInertial, Protocol):
         """
         pass
 
+    @abstractmethod
     def reset_solution(self, message: Message) -> None:
         """
         Set the solution to the values in ``message``.
@@ -293,6 +307,7 @@ class StandardInertialMechanization(CommonInertial, Protocol):
         """
         pass
 
+    @abstractmethod
     def correct_sensor_errors(
         self, time: TypeTimestamp, errors: StandardInertialErrors
     ) -> None:
@@ -311,6 +326,7 @@ class StandardInertialMechanization(CommonInertial, Protocol):
         """
         pass
 
+    @abstractmethod
     def request_sensor_errors(
         self, time: TypeTimestamp
     ) -> StandardInertialErrors | None:
@@ -333,7 +349,7 @@ InertialType = TypeVar(
 )
 
 
-class InertialPlugin(CommonPlugin, Protocol):
+class InertialPlugin(CommonPlugin, ABC):
     """
     An implementation of an inertial plugin.
 
@@ -346,6 +362,7 @@ class InertialPlugin(CommonPlugin, Protocol):
         definition may change at any time.
     """
 
+    @abstractmethod
     def is_inertial_type_supported(self, type: type[InertialType]) -> bool:
         """
         Check if the plugin supports a given type of inertial.
@@ -358,6 +375,7 @@ class InertialPlugin(CommonPlugin, Protocol):
         """
         pass
 
+    @abstractmethod
     def new_inertial(
         self,
         type: type[InertialType],
