@@ -3,7 +3,7 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum
-from typing import Callable, List, TypeVar
+from typing import Callable, TypeVar
 
 from aspn23 import AspnBase, TypeTimestamp
 from numpy import float64
@@ -224,7 +224,7 @@ class KeyValueStore(ABC):
     """
 
     @abstractmethod
-    def get_key_array(self) -> List[str]:
+    def get_key_array(self) -> list[str]:
         """
         Get the array of keys which currently exist in this store.
 
@@ -526,7 +526,7 @@ class Registry(ABC):
         pass
 
     @abstractmethod
-    def get_group_array(self) -> List[str]:
+    def get_group_array(self) -> list[str]:
         """
         Get the array of groups which currently exist.
 
@@ -591,7 +591,7 @@ class Mediator(ABC):
     """
 
     @abstractmethod
-    def get_filter_description_list(self) -> List[str]:
+    def get_filter_description_list(self) -> list[str]:
         """
         Request a list of strings describing the solutions available.
 

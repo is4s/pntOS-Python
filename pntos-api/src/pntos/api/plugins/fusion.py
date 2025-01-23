@@ -2,7 +2,7 @@
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Any, List, TypeVar
+from typing import Any, TypeVar
 
 from aspn23 import TypeTimestamp
 from numpy import float64
@@ -216,7 +216,7 @@ class VirtualStateBlock(ABC):
         pass
 
     @abstractmethod
-    def convert_estimate(self, estimate: NDArray, time: TypeTimestamp) -> NDArray:
+    def convert_estimate(self, estimate: NDArray[float64], time: TypeTimestamp) -> NDArray[float64]:
         """
         Convert just an estimate vector.
 
@@ -230,7 +230,7 @@ class VirtualStateBlock(ABC):
         pass
 
     @abstractmethod
-    def jacobian(self, estimate: NDArray, time: TypeTimestamp) -> NDArray:
+    def jacobian(self, estimate: NDArray[float64], time: TypeTimestamp) -> NDArray[float64]:
         """
         Obtain the Jacobian of the transform performed by this instance.
 
@@ -306,7 +306,7 @@ class StandardFusionEngine(ABC):
         pass
 
     @abstractmethod
-    def get_state_block_labels(self) -> List[str] | None:
+    def get_state_block_labels(self) -> list[str] | None:
         """
         Get a list of :class:`StandardStateBlock` labels that have been added to this fusion engine.
 
@@ -346,7 +346,7 @@ class StandardFusionEngine(ABC):
         pass
 
     @abstractmethod
-    def get_state_block_estimate(self, block_label: str) -> NDArray | None:
+    def get_state_block_estimate(self, block_label: str) -> NDArray[float64] | None:
         """
         Get the estimate associated with a state block.
 
@@ -367,7 +367,7 @@ class StandardFusionEngine(ABC):
         pass
 
     @abstractmethod
-    def get_state_block_covariance(self, block_label: str) -> NDArray | None:
+    def get_state_block_covariance(self, block_label: str) -> NDArray[float64] | None:
         """
         Get the covariance associated with a state block.
 
@@ -411,7 +411,7 @@ class StandardFusionEngine(ABC):
         pass
 
     @abstractmethod
-    def set_state_block_estimate(self, block_label: str, estimate: NDArray) -> None:
+    def set_state_block_estimate(self, block_label: str, estimate: NDArray[float64]) -> None:
         """
         Update the estimate associated with a given state block.
 
@@ -429,7 +429,7 @@ class StandardFusionEngine(ABC):
         pass
 
     @abstractmethod
-    def set_state_block_covariance(self, block_label: str, covariance: NDArray) -> None:
+    def set_state_block_covariance(self, block_label: str, covariance: NDArray[float64]) -> None:
         """
         Update the covariance associated with a given state block.
 
@@ -481,7 +481,7 @@ class StandardFusionEngine(ABC):
         pass
 
     @abstractmethod
-    def get_virtual_state_block_target_labels(self) -> List[str] | None:
+    def get_virtual_state_block_target_labels(self) -> list[str] | None:
         """
         Gets a list of the target labels of virtual state blocks that have been added.
 
@@ -536,7 +536,7 @@ class StandardFusionEngine(ABC):
         pass
 
     @abstractmethod
-    def get_measurement_processor_labels(self) -> List[str] | None:
+    def get_measurement_processor_labels(self) -> list[str] | None:
         """
         Get a list of the labels of measurement processors that have been added.
 
@@ -656,7 +656,7 @@ class StandardFusionEngine(ABC):
         pass
 
     @abstractmethod
-    def give_state_block_aux_data(self, block_label: str, aux: List[Message]) -> None:
+    def give_state_block_aux_data(self, block_label: str, aux: list[Message]) -> None:
         """
         Route a list of messages of aux data to a :class:`StandardStateBlock`.
 

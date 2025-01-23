@@ -3,7 +3,7 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum
-from typing import Any, List, TypeVar
+from typing import Any, TypeVar
 
 from aspn23 import AspnBase, MeasurementImu, TypeTimestamp
 from numpy import float64
@@ -206,7 +206,7 @@ class CommonInertial(ABC):
         pass
 
     @abstractmethod
-    def request_process_pntos_message_types(self) -> List[type[AspnBase]]:
+    def request_process_pntos_message_types(self) -> list[type[AspnBase]]:
         """
         Returns an array of message types that are supported by this plugin.
 
@@ -281,7 +281,7 @@ class StandardInertialMechanization(CommonInertial, ABC):
     """
 
     @abstractmethod
-    def request_reset_message_types(self) -> List[type[AspnBase]] | None:
+    def request_reset_message_types(self) -> list[type[AspnBase]] | None:
         """
         Get valid types of reset messages.
 

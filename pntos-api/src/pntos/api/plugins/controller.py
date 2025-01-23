@@ -1,7 +1,6 @@
 """Python API of pntOS."""
 
 from abc import ABC, abstractmethod
-from typing import List
 
 from pntos.api import CommonPlugin
 

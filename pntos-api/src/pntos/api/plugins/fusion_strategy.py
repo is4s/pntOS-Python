@@ -150,7 +150,7 @@ class StandardFusionStrategy(ABC):
         ...
 
     @abstractmethod
-    def get_estimate(self) -> NDArray | None:
+    def get_estimate(self) -> NDArray[float64] | None:
         """
         Get the current internal estimate managed by this strategy.
 
@@ -165,7 +165,7 @@ class StandardFusionStrategy(ABC):
         """
 
     @abstractmethod
-    def set_estimate_slice(self, new_estimate: NDArray, first_index: int) -> None:
+    def set_estimate_slice(self, new_estimate: NDArray[float64], first_index: int) -> None:
         """
         Set a slice of the state estimates to a given set of values.
 
@@ -182,7 +182,7 @@ class StandardFusionStrategy(ABC):
         ...
 
     @abstractmethod
-    def get_covariance(self) -> NDArray | None:
+    def get_covariance(self) -> NDArray[float64] | None:
         """
         Get the covariance of the current estimate.
 

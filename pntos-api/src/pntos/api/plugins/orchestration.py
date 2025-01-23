@@ -1,7 +1,6 @@
 """Python API of pntOS."""
 
 from abc import ABC, abstractmethod
-from typing import List
 
 from aspn23 import AspnBase, TypeTimestamp
 
@@ -187,7 +186,7 @@ class OrchestrationPlugin(CommonPlugin, ABC):
         pass
 
     @abstractmethod
-    def get_filter_description_list(self) -> List[str]:
+    def get_filter_description_list(self) -> list[str]:
         """
         Get a list of strings describing the filters available in this :class:`OrchestrationPlugin`.
 

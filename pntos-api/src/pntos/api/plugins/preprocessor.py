@@ -1,7 +1,6 @@
 """Python API of pntOS."""
 
 from abc import ABC, abstractmethod
-from typing import List
 
 from pntos.api import CommonPlugin, Message
 
@@ -17,7 +16,7 @@ class Preprocessor(ABC):
     """
 
     @abstractmethod
-    def process_pntos_message(self, message: Message) -> List[Message]:
+    def process_pntos_message(self, message: Message) -> list[Message]:
         """
         Process a message.
 
