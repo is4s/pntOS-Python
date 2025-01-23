@@ -1,4 +1,5 @@
 from threading import Thread
+from typing import Callable
 
 from aspn23 import MeasurementPositionVelocityAttitude
 from aspn23_lcm import (

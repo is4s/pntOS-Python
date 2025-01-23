@@ -165,7 +165,9 @@ class StandardFusionStrategy(ABC):
         """
 
     @abstractmethod
-    def set_estimate_slice(self, new_estimate: NDArray[float64], first_index: int) -> None:
+    def set_estimate_slice(
+        self, new_estimate: NDArray[float64], first_index: int
+    ) -> None:
         """
         Set a slice of the state estimates to a given set of values.
 

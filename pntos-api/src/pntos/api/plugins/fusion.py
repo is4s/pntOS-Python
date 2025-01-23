@@ -216,7 +216,9 @@ class VirtualStateBlock(ABC):
         pass
 
     @abstractmethod
-    def convert_estimate(self, estimate: NDArray[float64], time: TypeTimestamp) -> NDArray[float64]:
+    def convert_estimate(
+        self, estimate: NDArray[float64], time: TypeTimestamp
+    ) -> NDArray[float64]:
         """
         Convert just an estimate vector.
 
@@ -230,7 +232,9 @@ class VirtualStateBlock(ABC):
         pass
 
     @abstractmethod
-    def jacobian(self, estimate: NDArray[float64], time: TypeTimestamp) -> NDArray[float64]:
+    def jacobian(
+        self, estimate: NDArray[float64], time: TypeTimestamp
+    ) -> NDArray[float64]:
         """
         Obtain the Jacobian of the transform performed by this instance.
 
@@ -411,7 +415,9 @@ class StandardFusionEngine(ABC):
         pass
 
     @abstractmethod
-    def set_state_block_estimate(self, block_label: str, estimate: NDArray[float64]) -> None:
+    def set_state_block_estimate(
+        self, block_label: str, estimate: NDArray[float64]
+    ) -> None:
         """
         Update the estimate associated with a given state block.
 
@@ -429,7 +435,9 @@ class StandardFusionEngine(ABC):
         pass
 
     @abstractmethod
-    def set_state_block_covariance(self, block_label: str, covariance: NDArray[float64]) -> None:
+    def set_state_block_covariance(
+        self, block_label: str, covariance: NDArray[float64]
+    ) -> None:
         """
         Update the covariance associated with a given state block.
 

@@ -1,4 +1,5 @@
 from threading import Thread
+from typing import Callable
 
 import numpy as np
 from aspn23 import (
