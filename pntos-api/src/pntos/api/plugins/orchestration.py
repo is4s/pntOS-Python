@@ -1,13 +1,14 @@
 """Python API of pntOS."""
 
-from typing import Protocol
+from abc import ABC, abstractmethod
+from typing import List
 
 from aspn23 import AspnBase, TypeTimestamp
 
 from pntos.api import CommonPlugin, Message
 
 
-class MessageStreamConfig(Protocol):
+class MessageStreamConfig(ABC):
     """
     Message stream configuration.
 
@@ -21,6 +22,7 @@ class MessageStreamConfig(Protocol):
     choose which messages are buffered and which are not.
     """
 
+    @abstractmethod
     def sequenced_stream_add(
         self, type: type[AspnBase], source_identifier: str | None = None
     ) -> None:
@@ -36,6 +38,7 @@ class MessageStreamConfig(Protocol):
         """
         pass
 
+    @abstractmethod
     def sequenced_stream_remove(
         self, type: type[AspnBase], source_identifier: str | None = None
     ) -> None:
@@ -53,6 +56,7 @@ class MessageStreamConfig(Protocol):
         """
         pass
 
+    @abstractmethod
     def sequenced_stream_all(self, enable: bool) -> None:
         """
         Request all messages are streamed in sorted timestamp ordering.
@@ -65,6 +69,7 @@ class MessageStreamConfig(Protocol):
         """
         pass
 
+    @abstractmethod
     def immediate_stream_add(
         self, type: type[AspnBase], source_identifier: str | None = None
     ) -> None:
@@ -80,6 +85,7 @@ class MessageStreamConfig(Protocol):
         """
         pass
 
+    @abstractmethod
     def immediate_stream_remove(
         self, type: type[AspnBase], source_identifier: str | None = None
     ) -> None:
@@ -97,6 +103,7 @@ class MessageStreamConfig(Protocol):
         """
         pass
 
+    @abstractmethod
     def immediate_stream_all(self, enable: bool) -> None:
         """
         Request all messages are streamed immediately without delay, buffering, or sorting.
@@ -107,7 +114,7 @@ class MessageStreamConfig(Protocol):
         pass
 
 
-class OrchestrationPlugin(CommonPlugin, Protocol):
+class OrchestrationPlugin(CommonPlugin, ABC):
     """
     Orchestration plugin.
 
@@ -132,6 +139,7 @@ class OrchestrationPlugin(CommonPlugin, Protocol):
         estimated by the orchestration engine can be returned to the system by registry updates.
     """
 
+    @abstractmethod
     def init_orchestration_plugin(
         self, plugins: list[CommonPlugin], stream_config: MessageStreamConfig
     ) -> None:
@@ -158,6 +166,7 @@ class OrchestrationPlugin(CommonPlugin, Protocol):
         """
         pass
 
+    @abstractmethod
     def process_pntos_message(self, message: Message, sequenced: bool) -> None:
         """
         Deliver a new message from an external to pntOS source into the orchestration plugin.
@@ -177,7 +186,8 @@ class OrchestrationPlugin(CommonPlugin, Protocol):
         """
         pass
 
-    def get_filter_description_list(self) -> list[str]:
+    @abstractmethod
+    def get_filter_description_list(self) -> List[str]:
         """
         Get a list of strings describing the filters available in this :class:`OrchestrationPlugin`.
 
@@ -214,6 +224,7 @@ class OrchestrationPlugin(CommonPlugin, Protocol):
         """
         pass
 
+    @abstractmethod
     def request_solutions(
         self,
         solution_times: list[TypeTimestamp],

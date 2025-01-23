@@ -1,6 +1,7 @@
 """Python API of pntOS."""
 
-from typing import Any, Protocol, TypeVar
+from abc import ABC, abstractmethod
+from typing import Any, TypeVar
 
 from .common import CommonPlugin
 from .fusion import (
@@ -11,7 +12,7 @@ from .fusion import (
 )
 
 
-class StandardStateModelProvider(Protocol):
+class StandardStateModelProvider(ABC):
     """
     A collection of tools for modeling states and measurements.
 
@@ -68,6 +69,7 @@ class StandardStateModelProvider(Protocol):
     block_identifiers: list[str]
     virtual_block_identifiers: list[str]
 
+    @abstractmethod
     def new_processor(
         self,
         processor_index: int,
@@ -118,6 +120,7 @@ class StandardStateModelProvider(Protocol):
         """
         pass
 
+    @abstractmethod
     def new_block(
         self,
         block_index: int,
@@ -164,6 +167,7 @@ class StandardStateModelProvider(Protocol):
         """
         pass
 
+    @abstractmethod
     def new_virtual_block(
         self,
         virtual_block_index: int,
@@ -211,9 +215,10 @@ StateModelProviderType = TypeVar(
 )
 
 
-class StateModelingPlugin(CommonPlugin, Protocol):
+class StateModelingPlugin(CommonPlugin, ABC):
     """A :class:`CommonPlugin` subclass that generates state model providers."""
 
+    @abstractmethod
     def is_fusion_type_supported(self, type: type[StateModelProviderType]) -> bool:
         """
         Check if the plugin supports a given type of fusion. See ``StateModelProviderType``.
@@ -226,6 +231,7 @@ class StateModelingPlugin(CommonPlugin, Protocol):
         """
         pass
 
+    @abstractmethod
     def new_state_model_provider(
         self, type: type[StateModelProviderType]
     ) -> StateModelProviderType | None:

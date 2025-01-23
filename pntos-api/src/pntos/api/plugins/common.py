@@ -1,8 +1,9 @@
 """Python API of pntOS."""
 
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum
-from typing import Callable, Protocol, TypeVar
+from typing import Callable, List, TypeVar
 
 from aspn23 import AspnBase, TypeTimestamp
 from numpy import float64
@@ -191,7 +192,7 @@ RegistryValueType = TypeVar(
 )
 
 
-class KeyValueStore(Protocol):
+class KeyValueStore(ABC):
     """
     A key-value store implemented with a string-pair key.
 
@@ -222,7 +223,8 @@ class KeyValueStore(Protocol):
             and :meth:`get_raw` methods.
     """
 
-    def get_key_array(self) -> list[str]:
+    @abstractmethod
+    def get_key_array(self) -> List[str]:
         """
         Get the array of keys which currently exist in this store.
 
@@ -231,6 +233,7 @@ class KeyValueStore(Protocol):
         """
         pass
 
+    @abstractmethod
     def has_key(self, key: str) -> bool:
         """
         Check whether or not a given key exists in the store.
@@ -243,6 +246,7 @@ class KeyValueStore(Protocol):
         """
         pass
 
+    @abstractmethod
     def get_value(
         self, key: str, type: type[RegistryValueType]
     ) -> RegistryValueType | None:
@@ -266,6 +270,7 @@ class KeyValueStore(Protocol):
         """
         pass
 
+    @abstractmethod
     def get_raw(self, key: str | None = None) -> bytes | None:
         """
         Get the value for the given ``key`` as an array of bytes.
@@ -283,6 +288,7 @@ class KeyValueStore(Protocol):
         """
         pass
 
+    @abstractmethod
     def set_value(self, key: str, value: RegistryValueType) -> None:
         """
         Set the given key to the provided value.
@@ -293,6 +299,7 @@ class KeyValueStore(Protocol):
         """
         pass
 
+    @abstractmethod
     def set_raw(self, key: str | None, bytes: bytes) -> None:
         """
         Set the given key to the provided value.
@@ -307,6 +314,7 @@ class KeyValueStore(Protocol):
         """
         pass
 
+    @abstractmethod
     def remove_key(self, key: str) -> bool:
         """
         Remove the given key from the registry.
@@ -321,6 +329,7 @@ class KeyValueStore(Protocol):
         """
         pass
 
+    @abstractmethod
     def batch_end(self) -> None:
         """
         Ends a batch operation.
@@ -359,6 +368,7 @@ class KeyValueStore(Protocol):
         """
         pass
 
+    @abstractmethod
     def batch_restart(self) -> None:
         """
         Restarts a batch.
@@ -375,6 +385,7 @@ class KeyValueStore(Protocol):
         """
         pass
 
+    @abstractmethod
     def request_notify(
         self,
         key: str | None,
@@ -407,6 +418,7 @@ class KeyValueStore(Protocol):
         """
         pass
 
+    @abstractmethod
     def remove_notify(
         self,
         key: str | None,
@@ -432,6 +444,7 @@ class KeyValueStore(Protocol):
         """
         pass
 
+    @abstractmethod
     def set_permanent(self, permanent: bool) -> bool:
         """
         Tag values modified with "set" methods as permanently stored.
@@ -468,7 +481,7 @@ class KeyValueStore(Protocol):
     data_format: KeyValueStoreDataFormat
 
 
-class Registry(Protocol):
+class Registry(ABC):
     """
     A registry of key/value data which is organized by (string) groups.
 
@@ -481,6 +494,7 @@ class Registry(Protocol):
     method.
     """
 
+    @abstractmethod
     def batch_start(self, group: str) -> KeyValueStore:
         """
         Begin a batch get/set operation.
@@ -511,7 +525,8 @@ class Registry(Protocol):
         """
         pass
 
-    def get_group_array(self) -> list[str]:
+    @abstractmethod
+    def get_group_array(self) -> List[str]:
         """
         Get the array of groups which currently exist.
 
@@ -521,6 +536,7 @@ class Registry(Protocol):
         """
         pass
 
+    @abstractmethod
     def has_group(self, group: str) -> bool:
         """
         Checks whether or not a given group has had any values added to it (for any key).
@@ -533,6 +549,7 @@ class Registry(Protocol):
         """
         pass
 
+    @abstractmethod
     def request_notify_new_group(self, callback: Callable[[str], None]) -> bool:
         """
         Register a callback which gets called each time a new group is made in the registry.
@@ -547,7 +564,7 @@ class Registry(Protocol):
         pass
 
 
-class Mediator(Protocol):
+class Mediator(ABC):
     """
     A set of callbacks which are handed to a pntOS plugin upon initialization.
 
@@ -573,7 +590,8 @@ class Mediator(Protocol):
             the pntOS global registry.
     """
 
-    def get_filter_description_list(self) -> list[str]:
+    @abstractmethod
+    def get_filter_description_list(self) -> List[str]:
         """
         Request a list of strings describing the solutions available.
 
@@ -610,6 +628,7 @@ class Mediator(Protocol):
         """
         pass
 
+    @abstractmethod
     def request_solutions(
         self,
         solution_times: list[TypeTimestamp],
@@ -637,6 +656,7 @@ class Mediator(Protocol):
         """
         pass
 
+    @abstractmethod
     def process_pntos_message(self, message: Message) -> None:
         """
         Send a new message to the system for arbitrary processing.
@@ -650,6 +670,7 @@ class Mediator(Protocol):
         """
         pass
 
+    @abstractmethod
     def broadcast_aspn_message(
         self,
         message: Message,
@@ -676,6 +697,7 @@ class Mediator(Protocol):
         """
         pass
 
+    @abstractmethod
     def log_message(self, level: LoggingLevel, message: str) -> None:
         """
         Log a message.
@@ -692,7 +714,7 @@ class Mediator(Protocol):
     registry: Registry
 
 
-class CommonPlugin(Protocol):
+class CommonPlugin(ABC):
     """
     Common definitions that all plugins must provide.
 
@@ -700,7 +722,7 @@ class CommonPlugin(Protocol):
     is composed as the first field on all of the concrete pntOS plugin structures. For example, the
     transport plugin is specified as::
 
-        class TransportPlugin(CommonPlugin, Protocol):
+        class TransportPlugin(CommonPlugin, ABC):
 
             def init_plugin(...):
                 ...init_plugin implementation...
@@ -722,6 +744,7 @@ class CommonPlugin(Protocol):
             used to determine the unique space this plugin receives in the system config.
     """
 
+    @abstractmethod
     def init_plugin(
         self,
         plugin_resources_location: str | None = None,
@@ -761,6 +784,7 @@ class CommonPlugin(Protocol):
         """
         pass
 
+    @abstractmethod
     def shutdown_plugin(self) -> None:
         """
         A function that will be called by pntOS when it is done using the plugin.

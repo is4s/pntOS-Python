@@ -1,7 +1,8 @@
 """Python API of pntOS."""
 
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Any, Callable, Protocol, TypeVar, runtime_checkable
+from typing import Any, Callable, TypeVar
 
 from numpy import float64
 from numpy.typing import NDArray
@@ -62,8 +63,7 @@ class StandardMeasurementModel:
     R: NDArray[float64]
 
 
-@runtime_checkable
-class StandardFusionStrategy(Protocol):
+class StandardFusionStrategy(ABC):
     """
     A Fusion strategy making linearized Bayesian assumptions.
 
@@ -99,6 +99,7 @@ class StandardFusionStrategy(Protocol):
        the propagate/updates that have occurred, they may call :meth:`get_estimate`.
     """
 
+    @abstractmethod
     def get_num_states(self) -> int:
         """
         Get the total number of states this filter is estimating.
@@ -110,6 +111,7 @@ class StandardFusionStrategy(Protocol):
         """
         ...
 
+    @abstractmethod
     def add_states(
         self,
         initial_estimate: NDArray[float64],
@@ -136,6 +138,7 @@ class StandardFusionStrategy(Protocol):
         """
         ...
 
+    @abstractmethod
     def remove_states(self, first_index: int, count: int) -> None:
         """
         Removes a set of states from the filter.
@@ -146,7 +149,8 @@ class StandardFusionStrategy(Protocol):
         """
         ...
 
-    def get_estimate(self) -> NDArray[float64] | None:
+    @abstractmethod
+    def get_estimate(self) -> NDArray | None:
         """
         Get the current internal estimate managed by this strategy.
 
@@ -160,9 +164,8 @@ class StandardFusionStrategy(Protocol):
             yet.
         """
 
-    def set_estimate_slice(
-        self, new_estimate: NDArray[float64], first_index: int
-    ) -> None:
+    @abstractmethod
+    def set_estimate_slice(self, new_estimate: NDArray, first_index: int) -> None:
         """
         Set a slice of the state estimates to a given set of values.
 
@@ -178,7 +181,8 @@ class StandardFusionStrategy(Protocol):
         """
         ...
 
-    def get_covariance(self) -> NDArray[float64] | None:
+    @abstractmethod
+    def get_covariance(self) -> NDArray | None:
         """
         Get the covariance of the current estimate.
 
@@ -193,6 +197,7 @@ class StandardFusionStrategy(Protocol):
             have been added yet.
         """
 
+    @abstractmethod
     def set_covariance_slice(
         self, new_covariance: NDArray[float64], first_row: int, first_col: int
     ) -> None:
@@ -216,6 +221,7 @@ class StandardFusionStrategy(Protocol):
         """
         ...
 
+    @abstractmethod
     def propagate(self, dynamics_model: StandardDynamicsModel) -> None:
         """
         Propagates the estimate of the state space forward in time.
@@ -236,6 +242,7 @@ class StandardFusionStrategy(Protocol):
         """
         ...
 
+    @abstractmethod
     def update(self, measurement_model: StandardMeasurementModel) -> None:
         """
         Updates the estimate of the state space, incorporating a new measurement.
@@ -252,6 +259,7 @@ class StandardFusionStrategy(Protocol):
                 this strategy is estimating.
         """
 
+    @abstractmethod
     def clone(self) -> 'StandardFusionStrategy':
         """
         Create a deep copy of this object.
@@ -273,7 +281,7 @@ class StandardFusionStrategy(Protocol):
 FusionStrategyType = TypeVar('FusionStrategyType', StandardFusionStrategy, Any)
 
 
-class FusionStrategyPlugin(CommonPlugin, Protocol):
+class FusionStrategyPlugin(CommonPlugin, ABC):
     """
     A plugin that provides computational engines for estimation.
 
@@ -294,6 +302,7 @@ class FusionStrategyPlugin(CommonPlugin, Protocol):
     planned to be added in the future.
     """
 
+    @abstractmethod
     def is_fusion_type_supported(self, fusion_type: type[FusionStrategyType]) -> bool:
         """
         Check if a particular fusion strategy is supported by :meth:`new_fusion_strategy`.
@@ -319,6 +328,7 @@ class FusionStrategyPlugin(CommonPlugin, Protocol):
         """
         ...
 
+    @abstractmethod
     def new_fusion_strategy(
         self, fusion_type: type[FusionStrategyType]
     ) -> FusionStrategyType | None:

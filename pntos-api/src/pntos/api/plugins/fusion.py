@@ -1,7 +1,8 @@
 """Python API of pntOS."""
 
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Any, List, Protocol, TypeVar
+from typing import Any, List, TypeVar
 
 from aspn23 import TypeTimestamp
 from numpy import float64
@@ -37,7 +38,7 @@ class CrossCovariances:
     cross_covariances: list[NDArray[float64]]
 
 
-class StandardStateBlock(Protocol):
+class StandardStateBlock(ABC):
     """
     A description of a set of states and their dynamics.
 
@@ -49,6 +50,7 @@ class StandardStateBlock(Protocol):
     label: str
     num_states: int
 
+    @abstractmethod
     def receive_aux_data(self, aux: list[Message]) -> None:
         """
         Receive and use an arbitrary collection of aux data.
@@ -62,6 +64,7 @@ class StandardStateBlock(Protocol):
         """
         pass
 
+    @abstractmethod
     def generate_dynamics(
         self,
         x_and_p: EstimateWithCovariance,
@@ -90,7 +93,7 @@ class StandardStateBlock(Protocol):
         pass
 
 
-class StandardMeasurementProcessor(Protocol):
+class StandardMeasurementProcessor(ABC):
     """
     A class that processes raw measurements/observations.
 
@@ -117,6 +120,7 @@ class StandardMeasurementProcessor(Protocol):
     label: str
     state_block_labels: list[str]
 
+    @abstractmethod
     def receive_aux_data(self, aux: list[Message]) -> None:
         """
         Receive and use an arbitrary collection of aux data.
@@ -130,6 +134,7 @@ class StandardMeasurementProcessor(Protocol):
         """
         pass
 
+    @abstractmethod
     def generate_model(
         self, message: Message, x_and_p: EstimateWithCovariance
     ) -> StandardMeasurementModel | None:
@@ -155,7 +160,7 @@ class StandardMeasurementProcessor(Protocol):
         pass
 
 
-class VirtualStateBlock(Protocol):
+class VirtualStateBlock(ABC):
     """
     A class used to convert a set of states from one representation to another.
 
@@ -178,6 +183,7 @@ class VirtualStateBlock(Protocol):
     source: str
     target: str
 
+    @abstractmethod
     def receive_aux_data(self, aux: list[Message]) -> None:
         """
         Receive and use an arbitrary collection of aux data.
@@ -191,6 +197,7 @@ class VirtualStateBlock(Protocol):
         """
         pass
 
+    @abstractmethod
     def convert(
         self,
         estimate_with_covariance: EstimateWithCovariance,
@@ -208,9 +215,8 @@ class VirtualStateBlock(Protocol):
         """
         pass
 
-    def convert_estimate(
-        self, estimate: NDArray[float64], time: TypeTimestamp
-    ) -> NDArray[float64]:
+    @abstractmethod
+    def convert_estimate(self, estimate: NDArray, time: TypeTimestamp) -> NDArray:
         """
         Convert just an estimate vector.
 
@@ -223,9 +229,8 @@ class VirtualStateBlock(Protocol):
         """
         pass
 
-    def jacobian(
-        self, estimate: NDArray[float64], time: TypeTimestamp
-    ) -> NDArray[float64]:
+    @abstractmethod
+    def jacobian(self, estimate: NDArray, time: TypeTimestamp) -> NDArray:
         """
         Obtain the Jacobian of the transform performed by this instance.
 
@@ -243,7 +248,7 @@ class VirtualStateBlock(Protocol):
         pass
 
 
-class StandardFusionEngine(Protocol):
+class StandardFusionEngine(ABC):
     """
     An implementation of a fusion engine that supports the standard fusion model.
 
@@ -266,6 +271,7 @@ class StandardFusionEngine(Protocol):
     """
 
     @property
+    @abstractmethod
     def time(self) -> TypeTimestamp:
         """
         Get the current time of the filter.
@@ -276,6 +282,7 @@ class StandardFusionEngine(Protocol):
         pass
 
     @property
+    @abstractmethod
     def strategy(self) -> StandardFusionStrategy | None:
         """
         The underlying algorithm used for Bayesian inference.
@@ -286,6 +293,7 @@ class StandardFusionEngine(Protocol):
         """
         pass
 
+    @abstractmethod
     def get_num_states(self) -> int:
         """
         Get the total number of states currently in the fusion engine.
@@ -297,7 +305,8 @@ class StandardFusionEngine(Protocol):
         """
         pass
 
-    def get_state_block_labels(self) -> list[str] | None:
+    @abstractmethod
+    def get_state_block_labels(self) -> List[str] | None:
         """
         Get a list of :class:`StandardStateBlock` labels that have been added to this fusion engine.
 
@@ -308,6 +317,7 @@ class StandardFusionEngine(Protocol):
         """
         pass
 
+    @abstractmethod
     def add_state_block(
         self,
         block: StandardStateBlock,
@@ -335,7 +345,8 @@ class StandardFusionEngine(Protocol):
         """
         pass
 
-    def get_state_block_estimate(self, block_label: str) -> NDArray[float64] | None:
+    @abstractmethod
+    def get_state_block_estimate(self, block_label: str) -> NDArray | None:
         """
         Get the estimate associated with a state block.
 
@@ -355,7 +366,8 @@ class StandardFusionEngine(Protocol):
         """
         pass
 
-    def get_state_block_covariance(self, block_label: str) -> NDArray[float64] | None:
+    @abstractmethod
+    def get_state_block_covariance(self, block_label: str) -> NDArray | None:
         """
         Get the covariance associated with a state block.
 
@@ -375,6 +387,7 @@ class StandardFusionEngine(Protocol):
         """
         pass
 
+    @abstractmethod
     def get_state_block_cross_covariance(
         self, block_label1: str, block_label2: str
     ) -> NDArray[float64] | None:
@@ -397,9 +410,8 @@ class StandardFusionEngine(Protocol):
         """
         pass
 
-    def set_state_block_estimate(
-        self, block_label: str, estimate: NDArray[float64]
-    ) -> None:
+    @abstractmethod
+    def set_state_block_estimate(self, block_label: str, estimate: NDArray) -> None:
         """
         Update the estimate associated with a given state block.
 
@@ -416,9 +428,8 @@ class StandardFusionEngine(Protocol):
         """
         pass
 
-    def set_state_block_covariance(
-        self, block_label: str, covariance: NDArray[float64]
-    ) -> None:
+    @abstractmethod
+    def set_state_block_covariance(self, block_label: str, covariance: NDArray) -> None:
         """
         Update the covariance associated with a given state block.
 
@@ -435,6 +446,7 @@ class StandardFusionEngine(Protocol):
         """
         pass
 
+    @abstractmethod
     def set_state_block_cross_covariance(
         self, block_label1: str, block_label2: str, covariance: NDArray[float64]
     ) -> None:
@@ -455,6 +467,7 @@ class StandardFusionEngine(Protocol):
         """
         pass
 
+    @abstractmethod
     def remove_state_block(self, block_label: str) -> None:
         """
         Remove the :class:`StandardStateBlock` matching ``block_label``.
@@ -467,7 +480,8 @@ class StandardFusionEngine(Protocol):
         """
         pass
 
-    def get_virtual_state_block_target_labels(self) -> list[str] | None:
+    @abstractmethod
+    def get_virtual_state_block_target_labels(self) -> List[str] | None:
         """
         Gets a list of the target labels of virtual state blocks that have been added.
 
@@ -481,6 +495,7 @@ class StandardFusionEngine(Protocol):
         """
         pass
 
+    @abstractmethod
     def has_virtual_state_block(self, vsb_target_label: str) -> bool:
         """
         Checks if the fusion engine has a :class:`VirtualStateBlock` with a matching target label.
@@ -497,6 +512,7 @@ class StandardFusionEngine(Protocol):
         """
         pass
 
+    @abstractmethod
     def add_virtual_state_block(self, virtual_state_block: VirtualStateBlock) -> None:
         """
         Add the given :class:`VirtualStateBlock` to the fusion engine.
@@ -509,6 +525,7 @@ class StandardFusionEngine(Protocol):
         """
         pass
 
+    @abstractmethod
     def remove_virtual_state_block(self, vsb_target_label: str) -> None:
         """
         Remove the :class:`VirtualStateBlock` matching ``vsb_target_label``.
@@ -518,7 +535,8 @@ class StandardFusionEngine(Protocol):
         """
         pass
 
-    def get_measurement_processor_labels(self) -> list[str] | None:
+    @abstractmethod
+    def get_measurement_processor_labels(self) -> List[str] | None:
         """
         Get a list of the labels of measurement processors that have been added.
 
@@ -528,6 +546,7 @@ class StandardFusionEngine(Protocol):
         """
         pass
 
+    @abstractmethod
     def add_measurement_processor(
         self, processor: StandardMeasurementProcessor
     ) -> None:
@@ -541,6 +560,7 @@ class StandardFusionEngine(Protocol):
         """
         pass
 
+    @abstractmethod
     def remove_measurement_processor(self, processor_label: str) -> None:
         """
         Remove a :class:`StandardMeasurementProcessor` previously added to the fusion engine.
@@ -553,6 +573,7 @@ class StandardFusionEngine(Protocol):
         """
         pass
 
+    @abstractmethod
     def propagate(self, time: TypeTimestamp) -> None:
         """
         Propagate the filter estimate forward in time.
@@ -564,6 +585,7 @@ class StandardFusionEngine(Protocol):
         """
         pass
 
+    @abstractmethod
     def update(self, processor_label: str, message: Message) -> None:
         """
         Update the filter with the given measurement.
@@ -576,6 +598,7 @@ class StandardFusionEngine(Protocol):
         """
         pass
 
+    @abstractmethod
     def peek_ahead(
         self, time: TypeTimestamp, block_labels: list[str]
     ) -> EstimateWithCovariance | None:
@@ -605,6 +628,7 @@ class StandardFusionEngine(Protocol):
         """
         pass
 
+    @abstractmethod
     def generate_x_and_p(
         self, block_labels: list[str]
     ) -> EstimateWithCovariance | None:
@@ -631,7 +655,8 @@ class StandardFusionEngine(Protocol):
         """
         pass
 
-    def give_state_block_aux_data(self, block_label: str, aux: list[Message]) -> None:
+    @abstractmethod
+    def give_state_block_aux_data(self, block_label: str, aux: List[Message]) -> None:
         """
         Route a list of messages of aux data to a :class:`StandardStateBlock`.
 
@@ -641,6 +666,7 @@ class StandardFusionEngine(Protocol):
         """
         pass
 
+    @abstractmethod
     def give_measurement_processor_aux_data(
         self, processor_label: str, aux: list[Message]
     ) -> None:
@@ -653,6 +679,7 @@ class StandardFusionEngine(Protocol):
         """
         pass
 
+    @abstractmethod
     def give_virtual_state_block_aux_data(
         self, target_label: str, aux: list[Message]
     ) -> None:
@@ -665,6 +692,7 @@ class StandardFusionEngine(Protocol):
         """
         pass
 
+    @abstractmethod
     def clone(self) -> 'StandardFusionEngine':
         """
         Produce a deep-copy this fusion engine instance.
@@ -678,7 +706,7 @@ class StandardFusionEngine(Protocol):
 FusionEngineType = TypeVar('FusionEngineType', StandardFusionEngine, Any)
 
 
-class FusionPlugin(CommonPlugin, Protocol):
+class FusionPlugin(CommonPlugin, ABC):
     """
     Plugin that provides a fusion engine.
 
@@ -686,6 +714,7 @@ class FusionPlugin(CommonPlugin, Protocol):
     estimate.
     """
 
+    @abstractmethod
     def is_fusion_type_supported(self, type: type[FusionEngineType]) -> bool:
         """
         Check if the plugin supports a given type of fusion.
@@ -698,6 +727,7 @@ class FusionPlugin(CommonPlugin, Protocol):
         """
         pass
 
+    @abstractmethod
     def new_fusion_engine(
         self, type: type[FusionEngineType]
     ) -> FusionEngineType | None:

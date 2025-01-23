@@ -1,11 +1,12 @@
 """Python API of pntOS."""
 
-from typing import Protocol
+from abc import ABC, abstractmethod
+from typing import List
 
 from pntos.api import CommonPlugin, Message
 
 
-class Preprocessor(Protocol):
+class Preprocessor(ABC):
     """
     A preprocessor.
 
@@ -15,7 +16,8 @@ class Preprocessor(Protocol):
         definition may change at any time.
     """
 
-    def process_pntos_message(self, message: Message) -> list[Message]:
+    @abstractmethod
+    def process_pntos_message(self, message: Message) -> List[Message]:
         """
         Process a message.
 
@@ -31,7 +33,7 @@ class Preprocessor(Protocol):
         pass
 
 
-class PreprocessorPlugin(CommonPlugin, Protocol):
+class PreprocessorPlugin(CommonPlugin, ABC):
     """
     An implementation of a preprocessor plugin.
 
@@ -52,6 +54,7 @@ class PreprocessorPlugin(CommonPlugin, Protocol):
 
     preprocessor_identifiers: list[str]
 
+    @abstractmethod
     def new_preprocessor(
         self, preprocessor_index: int, config_group: str | None = None
     ) -> Preprocessor:

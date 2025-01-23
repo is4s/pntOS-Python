@@ -1,5 +1,4 @@
 from threading import Thread
-from typing import Callable, Protocol
 
 from aspn23 import MeasurementPositionVelocityAttitude
 from aspn23_lcm import (
@@ -9,10 +8,10 @@ from aspn23_lcm import (
 )
 from lcm import LCM, LCMSubscription
 
-from pntos.api import CommonPlugin, LoggingLevel, Mediator, Message
+from pntos.api import LoggingLevel, Mediator, Message, TransportPlugin
 
 
-class Aspn23LcmTransportPlugin(CommonPlugin, Protocol):
+class Aspn23LcmTransportPlugin(TransportPlugin):
     """An example LCM Transport Plugin for ASPN23 implemented in Python"""
 
     identifier: str
