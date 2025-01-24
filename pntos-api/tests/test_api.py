@@ -79,7 +79,7 @@ def test_type_parameters() -> None:
     )
 
     logging_plugin = MockLoggingPlugin()
-    logging_plugin.log(MockLoggingPlugin, 'test', api.LoggingLevel.DEBUG, 'test')
+    logging_plugin.log(api.LoggingPlugin, 'test', api.LoggingLevel.DEBUG, 'test')
 
 
 class MockControllerPlugin(api.ControllerPlugin):
@@ -187,7 +187,7 @@ class MockLoggingPlugin(api.LoggingPlugin):
 
     def log(
         self,
-        source_plugin_type: type[api.CommonPlugin],
+        source_plugin_type: api.PluginType,
         source_plugin_identifier: str,
         level: api.LoggingLevel,
         message: str,

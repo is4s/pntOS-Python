@@ -52,7 +52,7 @@ from .plugins.initialization import (
     InitializationStatus as InitializationStatus,
     InitializationType as InitializationType,
 )
-from .plugins.logging import LoggingPlugin as LoggingPlugin
+from .plugins.logging import LoggingPlugin as LoggingPlugin, PluginType as PluginType
 from .plugins.orchestration import (
     MessageStreamConfig as MessageStreamConfig,
     OrchestrationPlugin as OrchestrationPlugin,
