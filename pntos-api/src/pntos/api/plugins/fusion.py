@@ -44,6 +44,13 @@ class StandardStateBlock(ABC):
     Attributes:
         label (str): The unique name for this state block.
         num_states (int): The number of states represented by this state block.
+
+    Note:
+        This class must have an operational ``__deepcopy__`` method. For most classes, the default
+        ``__deepcopy__`` method provided by Python will be sufficient. However, if the class has a
+        field which does not properly implement its own ``__deepcopy__`` (such as a C object wrapped
+        to Python), then the class will need to implement a custom ``__deepcopy__`` which properly
+        copies all fields.
     """
 
     label: str
@@ -114,6 +121,13 @@ class StandardMeasurementProcessor(ABC):
             blocks, and the returned StandardMeasurementModel.h and StandardMeasurementModel.H must
             respect these states. Note: ``state_block_labels[i]`` is the identifier for the ``i`` th
             state block this processor relates to.
+
+    Note:
+        This class must have an operational ``__deepcopy__`` method. For most classes, the default
+        ``__deepcopy__`` method provided by Python will be sufficient. However, if the class has a
+        field which does not properly implement its own ``__deepcopy__`` (such as a C object wrapped
+        to Python), then the class will need to implement a custom ``__deepcopy__`` which properly
+        copies all fields.
     """
 
     label: str
@@ -177,6 +191,13 @@ class VirtualStateBlock(ABC):
         source (str): The label associated with the representation this instance can transform
             *from*.
         target (str): The label associated with the representation this instance can transform *to*.
+
+    Note:
+        This class must have an operational ``__deepcopy__`` method. For most classes, the default
+        ``__deepcopy__`` method provided by Python will be sufficient. However, if the class has a
+        field which does not properly implement its own ``__deepcopy__`` (such as a C object wrapped
+        to Python), then the class will need to implement a custom ``__deepcopy__`` which properly
+        copies all fields.
     """
 
     source: str
@@ -262,6 +283,13 @@ class StandardFusionEngine(ABC):
     :attr:`StandardFusionEngine.strategy` field (if it is ``None`` then this fusion engine
     needs to be provided a strategy). While :attr:`StandardFusionEngine.strategy` is ``None``,
     all other methods are unsafe to be called.
+
+    Note:
+        This class must have an operational ``__deepcopy__`` method. For most classes, the default
+        ``__deepcopy__`` method provided by Python will be sufficient. However, if the class has a
+        field which does not properly implement its own ``__deepcopy__`` (such as a C object wrapped
+        to Python), then the class will need to implement a custom ``__deepcopy__`` which properly
+        copies all fields.
 
     Caution:
         **Unstable**: This feature is unstable and is not yet considered part of the stable pntOS
@@ -688,16 +716,6 @@ class StandardFusionEngine(ABC):
         Args:
             target_label (str)
             aux (List[Message])
-        """
-        pass
-
-    @abstractmethod
-    def clone(self) -> 'StandardFusionEngine':
-        """
-        Produce a deep-copy this fusion engine instance.
-
-        All state blocks and measurement processors held by the fusion engine will also be cloned.
-        The fusion strategy used by the fusion engine will also be cloned.
         """
         pass
 

@@ -96,6 +96,13 @@ class StandardFusionStrategy(ABC):
        incorporate the new information from the measurement.
     4. At any point, when the user wants to know the latest estimate given all
        the propagate/updates that have occurred, they may call :meth:`get_estimate`.
+
+    Note:
+        This class must have an operational ``__deepcopy__`` method. For most classes, the default
+        ``__deepcopy__`` method provided by Python will be sufficient. However, if the class has a
+        field which does not properly implement its own ``__deepcopy__`` (such as a C object wrapped
+        to Python), then the class will need to implement a custom ``__deepcopy__`` which properly
+        copies all fields.
     """
 
     @abstractmethod
@@ -257,24 +264,6 @@ class StandardFusionStrategy(ABC):
                 filter, as well as a model that describes how the measurement relates to the states
                 this strategy is estimating.
         """
-
-    @abstractmethod
-    def clone(self) -> 'StandardFusionStrategy':
-        """
-        Create a deep copy of this object.
-
-        The returned object will have all state copied, such that the original
-        and newly returned objects are entirely separate from each other. A
-        typical use case for this method is when a fault is detected in a
-        running filter, and the user wants to experiment on the filter while
-        still preserving the original state. In this case, the user may `clone`
-        a new filter to experiment with, but continue to have the original
-        available to go back to.
-
-        Returns:
-            StandardFusionStrategy: A deep copy of the object.
-        """
-        ...
 
 
 FusionStrategyType = TypeVar('FusionStrategyType', StandardFusionStrategy, Any)
