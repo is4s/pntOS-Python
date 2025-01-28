@@ -17,9 +17,7 @@ from aspn23 import (
 from pntos.api import (
     EstimateWithCovariance,
     EstimateWithCovarianceType,
-    KeyValueStore,
     Message,
-    Registry,
     StandardStateModelProvider,
 )
 from pntos.cobra import (
@@ -30,14 +28,9 @@ from pntos.cobra.GpsInsStateModelingPlugin import (
     GpsInsStateModelingPlugin,
     Pinson15NedBlock,
     PinsonPositionMeasurementProcessor,
-    calc_lat_factor,
-    calc_lon_factor,
 )
 from pntos.cobra.SimpleControllerPlugin import SimpleMediator
-from pntos.cobra.SimpleRegistryPlugin import (
-    SimpleKeyValueStore,
-    SimpleRegistry,
-)
+from pntos.cobra.utils.navutils import calc_lat_factor, calc_lon_factor
 
 my_config = [
     ImuConfig(
