@@ -47,15 +47,83 @@ from pntos.cobra.utils import (
 )
 
 
-def extract_pos(pva: MeasurementPVA):
+def extract_pos(pva) -> NDArray:
+    """Extract position from an ASPN23 PVA
+
+    Args:
+        pva (MeasurementPVA): The PVA.
+
+    Returns:
+        NDArray: The position as a 3-element array.
+    """
     return np.array([pva.p1, pva.p2, pva.p3])
 
 
-def extract_vel(pva: MeasurementPVA):
+def extract_vel(pva):
+    """Extract velocity from an ASPN23 PVA
+
+    Args:
+        pva (MeasurementPVA): The PVA.
+
+    Returns:
+        NDArray: The velocity as a 3-element array.
+    """
     return np.array([pva.v1, pva.v2, pva.v3])
 
 
 class Pinson15NedBlock(StandardStateBlock):
+    """A 15-state representation of the error model of an inertial navigation system in NED frame.
+
+    This block is based upon the model provided in the Titterton and Weston 2nd edition textbook (pg. 345). The
+    15-state model is created by combining the original 9x9 state block with the 6x6 G*u block
+    that relates the gyro biases and accelerometer biases to the tilt and velocity error states,
+    respectively. Additional changes include the conversion to North, East and Down position
+    errors in meters as opposed to the latitude (radians), longitude (radians) and altitude
+    (meters) error states in the book model. Note that the error states are additive, meaning in
+    general you add the error state to the uncorrected value to get the corrected value. Tilt
+    states require special handling; see below.
+
+    Tilt errors: The North, East and Down tilt errors are 3 small angle corrections that when
+    represented in skew-symmetric form and subtracted from an identity matrix may be interpreted as
+    a DCM that rotates a vector from an estimated navigation frame to the 'true' navigation frame,
+    to the extent that the error states are correct. A positive tilt error results in a negative
+    right-handed rotation about the axis to which it is attached. For example, if the sensor frame
+    is aligned with the local vertical with 90 degree heading (sensor x axis is aligned with East
+    axis), and the down tilt value is 1 degree, the corrected heading will be approximately 89
+    degrees.
+
+    The AspnBaseVector provided to this class should come from the inertial for which it is
+    providing error estimates. Accel and gyro bias states are generally in the inertial sensor frame,
+    but more precisely, they are in the frame that is related to the navigation frame by the
+    NavSolution::rot_mat provided in AspnBaseVector. This means that if the inertial
+    is mechanizing in the inertial sensor frame, then NavSolution::rot_mat should contain
+    `C_nav_to_sensor`, or the nav-to-sensor DCM, and the biases will be in the sensor frame. If the
+    inertial is mechanizing in the platform frame (which is very common), then
+    NavSolution::rot_mat should be `C_nav_to_platform`, the nav-to-platform DCM. The biases will be
+    with respect to that frame.
+
+    Note that these definitions only hold when using the 'additive error state' formulation
+    (true = estimated + error), the current assumption in all off-the-shelf measurement processors.
+    The opposite formulation will flip the sign on estimated values.
+
+    Order and description of states:
+        0 - North position error (m).
+        1 - East position error (m).
+        2 - Down position error (m).
+        3 - North velocity error (m/s).
+        4 - East velocity error (m/s).
+        5 - Down velocity error (m/s).
+        6 - North tilt error (rad).
+        7 - East tilt error (rad).
+        8 - Down tilt error (rad).
+        9 - Accel x-axis bias error (m/s^2) (See note on frame above).
+        10 - Accel y-axis bias error (m/s^2).
+        11 - Accel z-axis bias error (m/s^2).
+        12 - Gyro x-axis bias error (rad/s).
+        13 - Gyro y-axis bias error (rad/s).
+        14 - Gyro z-axis bias error (rad/s).
+    """
+
     _mediator: Mediator
     _imu_model: ImuModel
     _old_pva_aux: MeasurementPVA | None
@@ -89,6 +157,11 @@ class Pinson15NedBlock(StandardStateBlock):
         self._force_and_rate_aux = None
 
     def receive_aux_data(self, aux: list[Message]) -> None:
+        """Receive inertial PVA and forces as aux data.
+
+        Args:
+            aux (list[Message]): List of messages. Assumed to contain inertial solution in a PVA message and forces in an IMU message.
+        """
         for message in aux:
             if isinstance(message.wrapped_message, MeasurementPVA):
                 self._old_pva_aux = self._new_pva_aux
@@ -132,7 +205,12 @@ class Pinson15NedBlock(StandardStateBlock):
 
         return StandardDynamicsModel(g, Phi, Qd)
 
-    def scale_phi(self, Phi):
+    def scale_phi(self, Phi: NDArray):
+        """Scale first 15 elements of first 2 columns of `phi` such to account for change in rad to meter scale factors over propagation time.
+
+        Args:
+            Phi (NDArray): Matrix obtained by discretizing the propagation Jacobian. This matrix will be modified to account for the rad to meter scaling.
+        """
         if self._old_pva_aux is not None:
             pos = extract_pos(self._old_pva_aux)
             lat_factor0 = calc_lat_factor(pos[0], pos[2])
@@ -147,7 +225,16 @@ class Pinson15NedBlock(StandardStateBlock):
             Phi[:, 0] *= lat0Tolat1
             Phi[:, 1] *= lon0Tolon1
 
-    def generate_f_pinson15(self):
+    def generate_f_pinson15(self) -> NDArray:
+        """Generates the continuous time propagation matrix F, which is the Jacobian of the differential equations governing inertial error growth. Based upon the model given in Titterton and Weston, 2nd edition, section 12.3, with some variations as detailed below.
+
+        Returns:
+            NDArray: The F Matrix.
+        """
+        assert self._new_pva_aux is not None
+        assert self._new_pva_aux.quaternion is not None
+        assert self._force_and_rate_aux is not None
+
         pos = extract_pos(self._new_pva_aux)
         vel = extract_vel(self._new_pva_aux)
         force = self._force_and_rate_aux.meas_accel
@@ -291,6 +378,11 @@ class Pinson15NedBlock(StandardStateBlock):
         return F
 
     def generate_q_pinson15(self):
+        """Generates the continuous time process noise covariance matrix Q.
+
+        Returns:
+            NDArray: The Q Matrix.
+        """
         Q = self._pre_Q
         C_sensor_to_ned = quat_to_dcm(self._new_pva_aux.quaternion)
 
@@ -396,7 +488,7 @@ class PinsonPositionMeasurementProcessor(StandardMeasurementProcessor):
             ]
         )
         H = np.zeros((3, 15))
-        H[:, :3] = np.eye(3)  # TODO
+        H[:, :3] = np.eye(3)
 
         def h(x: NDArray):
             return H @ x
@@ -407,6 +499,8 @@ class PinsonPositionMeasurementProcessor(StandardMeasurementProcessor):
 
 
 class SimpleGpsInsStateModelProvider(StandardStateModelProvider):
+    """StandardStateModelProvider that offers a 15-state pinson state block and a position measurement processor."""
+
     _mediator: Mediator
 
     def __init__(self, mediator: Mediator):
@@ -423,6 +517,32 @@ class SimpleGpsInsStateModelProvider(StandardStateModelProvider):
         state_block_labels: list[str],
         config_group: str,
     ) -> PinsonPositionMeasurementProcessor | None:
+        """
+        Generate a new StandardMeasurementProcessor that describes the relationship between a measurement and a set of states.
+
+        Args:
+            processor_index (int): Index into self.processor_identifiers used to select the desired type of measurement processor.
+                - Index 0 corresponds to a PinsonPositionMeasurementProcessor.
+                - All other indices will result in a return value of None.
+            engine (StandardFusionEngine | None): An optional parameter that may be provided to the
+                new processor, such that the processor may interact with the fusion engine it
+                is being used in (for example, to add/remove states). Set it to
+                ``None`` when no engine is available for the processor to use.
+            label (str): A string which will be used to populate the ``label`` field
+                of the newly created processor. This ``label`` will be the unique
+                name for the returned instance of a processor, and used to
+                track the processor throughout its lifecycle. Note that it
+                differs from :attr:`processor_identifiers` which is the model's mechanism
+                for selecting the *type* of processor to create.
+            config_group (str): Indicates which (if any) parameter group in the
+                registry may be used to obtain additional configuration values to
+                generate the new processor. If the processor requires no
+                outside configuration, ``config_group`` may be ``None``.
+
+        Returns:
+            StandardMeasurementProcessor | None: The newly created StandardMeasurementProcessor or ``None`` when no processor can be produced
+            with the given ``processor_index``, ``engine``, and ``config_group``.
+        """
         if processor_index == 0:
             batch = self._mediator.registry.batch_start(config_group)
             l_ps_p = batch.get_value('lever_arm', np.ndarray)
@@ -450,6 +570,32 @@ class SimpleGpsInsStateModelProvider(StandardStateModelProvider):
         label: str,
         config_group: str,
     ) -> Pinson15NedBlock | None:
+        """
+        Generate a new StandardStateBlock that describes a set of states and how they propagate over time.
+
+        Args:
+            block_index (int): Index into self.block_identifiers used to select the desired type of state block.
+                - Index 0 corresponds to a Pinson15NedBlock.
+                - All other indices will result in a return value of None.
+            engine (StandardFusionEngine | None): An optional parameter that may be provided to the
+                new block, such that the block may interact with the fusion engine it
+                is being used in (for example, to add/remove states). Set it to
+                ``None`` when no engine is available for the block to use.
+            label (str): A string which will be used to populate the ``label`` field
+                of the newly created state block. This ``label`` will be the unique
+                name for the returned instance of a state block, and used to
+                track the state block throughout its lifecycle. Note that it
+                differs from :attr:`block_identifiers` which is the model's mechanism
+                for selecting the *kind* of state block to create.
+            config_group (str): Indicates which (if any) parameter group in the
+                registry may be used to obtain additional configuration values to
+                generate the new state block. If the state block requires no
+                outside configuration, ``config_group`` may be ``None``.
+
+        Returns:
+            StandardStateBlock | None: The newly created StandardStateBlock or ``None`` when no state block can be produced
+            with the given ``block_index``, ``engine``, and ``config_group``.
+        """
         if block_index == 0:
             batch = self._mediator.registry.batch_start(config_group)
             accel_bias_sigma = batch.get_value('accel_bias_sigma', np.ndarray)
@@ -495,6 +641,8 @@ class SimpleGpsInsStateModelProvider(StandardStateModelProvider):
 
 
 class SimpleGpsInsStateModelingPlugin(StateModelingPlugin):
+    """StateModelingPlugin that generates a SimpleGpsInsStateModelProvider."""
+
     _mediator: Mediator
 
     def __init__(self, identifier: str):
