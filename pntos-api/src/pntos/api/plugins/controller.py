@@ -1,7 +1,6 @@
 """Python API of pntOS."""
 
 from abc import ABC, abstractmethod
-from typing import List
 
 from pntos.api import CommonPlugin
 
@@ -66,8 +65,8 @@ class ControllerPlugin(CommonPlugin, ABC):
     @abstractmethod
     def take_control(
         self,
-        plugins: List[CommonPlugin],
-        plugin_resources_locations: List[str | None] | None = None,
+        plugins: list[CommonPlugin],
+        plugin_resources_locations: list[str | None] | None = None,
         initial_config: str | None = None,
     ) -> None:
         """
@@ -81,8 +80,8 @@ class ControllerPlugin(CommonPlugin, ABC):
         :meth:`PlatformIntegrationPlugin.take_control` method (if a PIP is in the ``plugins`` list).
 
         Args:
-            plugins (List[CommonPlugin]): An array of plugins available to the controller.
-            plugin_resources_locations (List[str  |  None] | None, optional): A list of strings
+            plugins (list[CommonPlugin]): An array of plugins available to the controller.
+            plugin_resources_locations (list[str  |  None] | None, optional): A list of strings
                 which represent a list of locations, one for each plugin in ``plugins``, where those
                 plugins may find auxiliary data if needed. The array can be ``None``,
                 otherwise the array is of the same length as ``plugins``. Each string may be

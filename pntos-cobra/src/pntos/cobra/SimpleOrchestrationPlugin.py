@@ -1,5 +1,3 @@
-from typing import List
-
 from aspn23 import TypeTimestamp
 
 from pntos.api import Mediator, OrchestrationPlugin
@@ -24,17 +22,17 @@ class SimpleOrchestrationPlugin(OrchestrationPlugin):
     identifier: str
 
     def init_orchestration_plugin(
-        self, plugins: List[CommonPlugin], stream_config: MessageStreamConfig
+        self, plugins: list[CommonPlugin], stream_config: MessageStreamConfig
     ) -> None:
         stream_config.immediate_stream_all(True)
 
     def process_pntos_message(self, message: Message, sequenced: bool) -> None:
         pass
 
-    def get_filter_description_list(self) -> List[str]:
+    def get_filter_description_list(self) -> list[str]:
         return []
 
     def request_solutions(
-        self, solution_times: List[TypeTimestamp], filter_description: str | None = None
-    ) -> List[Message]:
+        self, solution_times: list[TypeTimestamp], filter_description: str | None = None
+    ) -> list[Message]:
         return []

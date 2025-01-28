@@ -46,3 +46,7 @@ convention = "google"
 
 [tool.ruff.format]
 quote-style = "single"
+
+[tool.mypy]
+strict = true
+warn_unreachable = true

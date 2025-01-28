@@ -12,6 +12,6 @@ set -xe
 rye lint --fix
 rye fmt
 rye test -p pntos-cobra
-mypy pntos-api --no-implicit-reexport
-mypy pntos-cli --no-implicit-reexport
-mypy pntos-cobra --no-implicit-reexport
+mypy pntos-api
+mypy pntos-cli
+mypy pntos-cobra

@@ -46,7 +46,7 @@ class SimpleTransportPlugin(TransportPlugin):
     identifier: str
 
 
-def listen_for_messages(my_plugin: SimpleTransportPlugin):
+def listen_for_messages(my_plugin: SimpleTransportPlugin) -> None:
     while True:
         sleep(0.1)
         if my_plugin.listening:

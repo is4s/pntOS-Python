@@ -6,6 +6,7 @@ from enum import Enum
 from typing import Any, TypeVar
 
 from aspn23 import TypeTimestamp
+from numpy import float64
 from numpy.typing import NDArray
 
 from .common import CommonPlugin, EstimateWithCovariance, Message
@@ -116,7 +117,7 @@ class InitialInertialSolution:
     Attributes:
         solution (Message | None): The initial solution.
         inertial_errors (StandardInertialErrors | None): The inertial errors.
-        inertial_error_covariance (NDArray | None): The covariance matrix associated with the terms
+        inertial_error_covariance (NDArray[float64] | None): The covariance matrix associated with the terms
             in ``inertial_errors``.
         status (InitializationStatus): Indicates the current initialization status. Should be
             checked before using any of the other fields.
@@ -129,7 +130,7 @@ class InitialInertialSolution:
 
     solution: Message | None
     inertial_errors: StandardInertialErrors | None
-    inertial_error_covariance: NDArray | None
+    inertial_error_covariance: NDArray[float64] | None
     status: InitializationStatus
 
 

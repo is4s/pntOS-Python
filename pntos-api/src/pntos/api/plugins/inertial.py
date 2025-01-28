@@ -3,9 +3,10 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum
-from typing import Any, List, TypeVar
+from typing import Any, TypeVar
 
 from aspn23 import AspnBase, MeasurementImu, TypeTimestamp
+from numpy import float64
 from numpy.typing import NDArray
 
 from .common import CommonPlugin, Message
@@ -64,20 +65,20 @@ class StandardInertialErrors:
         definition may change at any time.
 
     Attributes:
-        accel_biases (NDArray): A 1D vector of length 3 containing biases for a 3-axis accelerometer
+        accel_biases (NDArray[float64]): A 1D vector of length 3 containing biases for a 3-axis accelerometer
             in the sensor's (X-Y-Z) frame, expressed in :math:`m/s^2`.
-        gyro_biases (NDArray): A 1D vector of length 3 containing biases for a 3-axis gyro in the
+        gyro_biases (NDArray[float64]): A 1D vector of length 3 containing biases for a 3-axis gyro in the
             sensor's (X-Y-Z) frame, expressed in :math:`rad/s`.
-        accel_scale_factors (NDArray): A 1D vector of length 3 containing scale factor errors for a
+        accel_scale_factors (NDArray[float64]): A 1D vector of length 3 containing scale factor errors for a
             3-axis accelerometer in the sensor's (X-Y-Z) frame, unitless.
-        gyro_scale_factors (NDArray): A 1D vector of length 3 containing scale factor errors for a
+        gyro_scale_factors (NDArray[float64]): A 1D vector of length 3 containing scale factor errors for a
             3-axis gyroscope in the sensor's (X-Y-Z) frame, unitless.
     """
 
-    accel_biases: NDArray
-    gyro_biases: NDArray
-    accel_scale_factors: NDArray
-    gyro_scale_factors: NDArray
+    accel_biases: NDArray[float64]
+    gyro_biases: NDArray[float64]
+    accel_scale_factors: NDArray[float64]
+    gyro_scale_factors: NDArray[float64]
 
 
 class InertialSolutionRangeType(Enum):
@@ -146,17 +147,17 @@ class CommonInertial(ABC):
 
     @abstractmethod
     def request_solutions(
-        self, time: List[TypeTimestamp], type: InertialSolutionRangeType
-    ) -> List[Message] | None:
+        self, time: list[TypeTimestamp], type: InertialSolutionRangeType
+    ) -> list[Message] | None:
         """
         Request solutions at multiple specific times.
 
         Args:
-            time (List[TypeTimestamp]): An array of times at which solutions are requested.
+            time (list[TypeTimestamp]): An array of times at which solutions are requested.
             type (InertialSolutionRangeType): The type of solution requested.
 
         Returns:
-            List[Message] | None: An array of solutions. Returns ``None`` if ``type`` is unsupported
+            list[Message] | None: An array of solutions. Returns ``None`` if ``type`` is unsupported
             by this inertial or every instance of ``time`` is outside the valid range. Otherwise
             guaranteed to not be ``None``.
         """
@@ -205,12 +206,12 @@ class CommonInertial(ABC):
         pass
 
     @abstractmethod
-    def request_process_pntos_message_types(self) -> List[type[AspnBase]]:
+    def request_process_pntos_message_types(self) -> list[type[AspnBase]]:
         """
         Returns an array of message types that are supported by this plugin.
 
         Returns:
-            List[type[AspnBase]]: An array of message types that are supported by this plugin as
+            list[type[AspnBase]]: An array of message types that are supported by this plugin as
             inputs to :meth:`process_pntos_message`.
         """
         pass
@@ -280,12 +281,12 @@ class StandardInertialMechanization(CommonInertial, ABC):
     """
 
     @abstractmethod
-    def request_reset_message_types(self) -> List[type[AspnBase]] | None:
+    def request_reset_message_types(self) -> list[type[AspnBase]] | None:
         """
         Get valid types of reset messages.
 
         Returns:
-            List[type[AspnBase]] | None: An array of message types that are supported by this plugin
+            list[type[AspnBase]] | None: An array of message types that are supported by this plugin
             for resetting the inertial solution, or ``None`` if resetting the inertial solution is
             an unsupported operation by the inertial plugin.
         """

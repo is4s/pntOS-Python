@@ -1,5 +1,3 @@
-from typing import List
-
 from aspn23 import TypeTimestamp
 
 from pntos.api import (
@@ -31,8 +29,8 @@ class SimpleControllerPlugin(ControllerPlugin):
 
     def take_control(
         self,
-        plugins: List[CommonPlugin],
-        plugin_resources_locations: List[str | None] | None = None,
+        plugins: list[CommonPlugin],
+        plugin_resources_locations: list[str | None] | None = None,
         initial_config: str | None = None,
     ) -> None:
         pass
@@ -42,16 +40,16 @@ class SimpleMediator(Mediator):
     transport_plugins: list[TransportPlugin]
     registry: Registry
 
-    def __init__(self, registry: Registry, transport_plugins):
+    def __init__(self, registry: Registry, transport_plugins: list[TransportPlugin]):
         self.registry = registry
         self.transport_plugins = transport_plugins
 
-    def get_filter_description_list(self) -> List[str]:
+    def get_filter_description_list(self) -> list[str]:
         return []
 
     def request_solutions(
-        self, solution_times: List[TypeTimestamp], filter_description: str | None = None
-    ) -> List[Message]:
+        self, solution_times: list[TypeTimestamp], filter_description: str | None = None
+    ) -> list[Message]:
         return []
 
     def process_pntos_message(self, message: Message) -> None:

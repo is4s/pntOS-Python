@@ -2,9 +2,10 @@
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Any, List, TypeVar
+from typing import Any, TypeVar
 
 from aspn23 import TypeTimestamp
+from numpy import float64
 from numpy.typing import NDArray
 
 from .common import CommonPlugin, EstimateWithCovariance, Message
@@ -27,14 +28,14 @@ class CrossCovariances:
     ``A`` and ``B`` and the cross-covariance matrix of ``A`` and ``C``.
 
     Attributes:
-        block_labels (List[str]): A list of labels of the :class:`StandardStateBlock` this structure
+        block_labels (list[str]): A list of labels of the :class:`StandardStateBlock` this structure
             contains the cross-covariances for.
-        cross_covariances (List[NDArray]): A list of cross-covariance matrices between a single
+        cross_covariances (list[NDArray[float64]]): A list of cross-covariance matrices between a single
             StateBlock and the set of StateBlocks listed in :attr:`block_labels`.
     """
 
-    block_labels: List[str]
-    cross_covariances: List[NDArray]
+    block_labels: list[str]
+    cross_covariances: list[NDArray[float64]]
 
 
 class StandardStateBlock(ABC):
@@ -236,21 +237,25 @@ class VirtualStateBlock(ABC):
         pass
 
     @abstractmethod
-    def convert_estimate(self, estimate: NDArray, time: TypeTimestamp) -> NDArray:
+    def convert_estimate(
+        self, estimate: NDArray[float64], time: TypeTimestamp
+    ) -> NDArray[float64]:
         """
         Convert just an estimate vector.
 
         Args:
-            estimate (NDArray): Estimate vector to convert, Nx1.
+            estimate (NDArray[float64]): Estimate vector to convert, Nx1.
             time (TypeTimestamp): Time that ``estimate`` is valid at.
 
         Returns:
-            NDArray: The converted vector, Mx1.
+            NDArray[float64]: The converted vector, Mx1.
         """
         pass
 
     @abstractmethod
-    def jacobian(self, estimate: NDArray, time: TypeTimestamp) -> NDArray:
+    def jacobian(
+        self, estimate: NDArray[float64], time: TypeTimestamp
+    ) -> NDArray[float64]:
         """
         Obtain the Jacobian of the transform performed by this instance.
 
@@ -258,11 +263,11 @@ class VirtualStateBlock(ABC):
         differentiate with respect to.
 
         Args:
-            estimate (NDArray): Estimate vector associated with the return value of ``source``, Nx1.
+            estimate (NDArray[float64]): Estimate vector associated with the return value of ``source``, Nx1.
             time (TypeTimestamp): Time that ``estimate`` is valid at.
 
         Returns:
-            NDArray: An MxN matrix that may be used to pre-multiply ``estimate`` to obtain an M
+            NDArray[float64]: An MxN matrix that may be used to pre-multiply ``estimate`` to obtain an M
             length vector in ``target`` representation (to first order).
         """
         pass
@@ -333,12 +338,12 @@ class StandardFusionEngine(ABC):
         pass
 
     @abstractmethod
-    def get_state_block_labels(self) -> List[str] | None:
+    def get_state_block_labels(self) -> list[str] | None:
         """
         Get a list of :class:`StandardStateBlock` labels that have been added to this fusion engine.
 
         Returns:
-            List[str] | None: A list of the :class:`StandardStateBlock` labels that have been added
+            list[str] | None: A list of the :class:`StandardStateBlock` labels that have been added
             to this fusion engine. Returns ``None`` if no state blocks have been added. Guaranteed
             to not return ``None`` if :meth:`get_num_states` returns a value other than 0.
         """
@@ -373,7 +378,7 @@ class StandardFusionEngine(ABC):
         pass
 
     @abstractmethod
-    def get_state_block_estimate(self, block_label: str) -> NDArray | None:
+    def get_state_block_estimate(self, block_label: str) -> NDArray[float64] | None:
         """
         Get the estimate associated with a state block.
 
@@ -384,7 +389,7 @@ class StandardFusionEngine(ABC):
             block_label (str)
 
         Returns:
-            NDArray | None: A copy of its current estimate vector. If ``block_label`` references a
+            NDArray[float64] | None: A copy of its current estimate vector. If ``block_label`` references a
             virtual state block (VSB) this will return a converted estimate, converted into the VSBs
             coordinate frame. Returns ``None`` if ``block_label`` does not correspond to a block
             that has been added to the fusion engine. Guaranteed to not return ``None`` when
@@ -394,7 +399,7 @@ class StandardFusionEngine(ABC):
         pass
 
     @abstractmethod
-    def get_state_block_covariance(self, block_label: str) -> NDArray | None:
+    def get_state_block_covariance(self, block_label: str) -> NDArray[float64] | None:
         """
         Get the covariance associated with a state block.
 
@@ -405,7 +410,7 @@ class StandardFusionEngine(ABC):
             block_label (str)
 
         Returns:
-            NDArray | None: A copy of its current covariance matrix. If ``block_label`` references a
+            NDArray[float64] | None: A copy of its current covariance matrix. If ``block_label`` references a
             virtual state block (VSB) this will return a converted covariance, converted into the
             VSBs coordinate frame. Returns ``None`` if ``block_label`` does not correspond to a
             block that has been added to the fusion engine. Guaranteed to not return ``None`` when
@@ -417,7 +422,7 @@ class StandardFusionEngine(ABC):
     @abstractmethod
     def get_state_block_cross_covariance(
         self, block_label1: str, block_label2: str
-    ) -> NDArray | None:
+    ) -> NDArray[float64] | None:
         """
         Get the cross covariance between the states associated with two state blocks.
 
@@ -429,7 +434,7 @@ class StandardFusionEngine(ABC):
             block_label2 (str)
 
         Returns:
-            NDArray | None: The cross-covariance matrix between ``block_label1`` and
+            NDArray[float64] | None: The cross-covariance matrix between ``block_label1`` and
             ``block_label2``. Returns ``None`` if ``block_label1`` or ``block_label2`` do not
             correspond to blocks that have been added to the fusion engine. Guaranteed to not return
             ``None`` when both ``block_label1`` and ``block_label2`` are in the list returned by
@@ -438,7 +443,9 @@ class StandardFusionEngine(ABC):
         pass
 
     @abstractmethod
-    def set_state_block_estimate(self, block_label: str, estimate: NDArray) -> None:
+    def set_state_block_estimate(
+        self, block_label: str, estimate: NDArray[float64]
+    ) -> None:
         """
         Update the estimate associated with a given state block.
 
@@ -451,12 +458,14 @@ class StandardFusionEngine(ABC):
 
         Args:
             block_label (str)
-            estimate (NDArray)
+            estimate (NDArray[float64])
         """
         pass
 
     @abstractmethod
-    def set_state_block_covariance(self, block_label: str, covariance: NDArray) -> None:
+    def set_state_block_covariance(
+        self, block_label: str, covariance: NDArray[float64]
+    ) -> None:
         """
         Update the covariance associated with a given state block.
 
@@ -469,13 +478,13 @@ class StandardFusionEngine(ABC):
 
         Args:
             block_label (str)
-            covariance (NDArray)
+            covariance (NDArray[float64])
         """
         pass
 
     @abstractmethod
     def set_state_block_cross_covariance(
-        self, block_label1: str, block_label2: str, covariance: NDArray
+        self, block_label1: str, block_label2: str, covariance: NDArray[float64]
     ) -> None:
         """
         Update the covariance between two state blocks.
@@ -490,7 +499,7 @@ class StandardFusionEngine(ABC):
         Args:
             block_label1 (str)
             block_label2 (str)
-            covariance (NDArray)
+            covariance (NDArray[float64])
         """
         pass
 
@@ -508,7 +517,7 @@ class StandardFusionEngine(ABC):
         pass
 
     @abstractmethod
-    def get_virtual_state_block_target_labels(self) -> List[str] | None:
+    def get_virtual_state_block_target_labels(self) -> list[str] | None:
         """
         Gets a list of the target labels of virtual state blocks that have been added.
 
@@ -516,7 +525,7 @@ class StandardFusionEngine(ABC):
         valid source. For that, call :meth:`has_virtual_state_block`.
 
         Returns:
-            List[str] | None: A list of the target labels of virtual state blocks that have been
+            list[str] | None: A list of the target labels of virtual state blocks that have been
             added. Returns ``None`` if no virtual state blocks have been added to this fusion
             engine.
         """
@@ -563,12 +572,12 @@ class StandardFusionEngine(ABC):
         pass
 
     @abstractmethod
-    def get_measurement_processor_labels(self) -> List[str] | None:
+    def get_measurement_processor_labels(self) -> list[str] | None:
         """
         Get a list of the labels of measurement processors that have been added.
 
         Returns:
-            List[str] | None: List of labels of measurement processors that have been added. Returns
+            list[str] | None: list of labels of measurement processors that have been added. Returns
             ``None`` if no measurement processors have been added to this fusion engine.
         """
         pass
@@ -627,7 +636,7 @@ class StandardFusionEngine(ABC):
 
     @abstractmethod
     def peek_ahead(
-        self, time: TypeTimestamp, block_labels: List[str]
+        self, time: TypeTimestamp, block_labels: list[str]
     ) -> EstimateWithCovariance | None:
         """
         Calculates the estimate and covariance at a requested time.
@@ -648,7 +657,7 @@ class StandardFusionEngine(ABC):
 
         Args:
             time (TypeTimestamp)
-            block_labels (List[str]): An array of strings.
+            block_labels (list[str]): An array of strings.
 
         Returns:
             EstimateWithCovariance | None
@@ -657,7 +666,7 @@ class StandardFusionEngine(ABC):
 
     @abstractmethod
     def generate_x_and_p(
-        self, block_labels: List[str]
+        self, block_labels: list[str]
     ) -> EstimateWithCovariance | None:
         """
         Generates the current estimate and covariance.
@@ -675,7 +684,7 @@ class StandardFusionEngine(ABC):
         are false then the result will be ``None``.
 
         Args:
-            block_labels (List[str]): An array of strings.
+            block_labels (list[str]): An array of strings.
 
         Returns:
             EstimateWithCovariance | None
@@ -683,39 +692,39 @@ class StandardFusionEngine(ABC):
         pass
 
     @abstractmethod
-    def give_state_block_aux_data(self, block_label: str, aux: List[Message]) -> None:
+    def give_state_block_aux_data(self, block_label: str, aux: list[Message]) -> None:
         """
         Route a list of messages of aux data to a :class:`StandardStateBlock`.
 
         Args:
             block_label (str)
-            aux (List[Message])
+            aux (list[Message])
         """
         pass
 
     @abstractmethod
     def give_measurement_processor_aux_data(
-        self, processor_label: str, aux: List[Message]
+        self, processor_label: str, aux: list[Message]
     ) -> None:
         """
         Route a list of messages of aux data to a :class:`StandardMeasurementProcessor`.
 
         Args:
             processor_label (str)
-            aux (List[Message])
+            aux (list[Message])
         """
         pass
 
     @abstractmethod
     def give_virtual_state_block_aux_data(
-        self, target_label: str, aux: List[Message]
+        self, target_label: str, aux: list[Message]
     ) -> None:
         """
         Route a list of messages of aux data to a :class:`VirtualStateBlock`.
 
         Args:
             target_label (str)
-            aux (List[Message])
+            aux (list[Message])
         """
         pass
 

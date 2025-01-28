@@ -3,9 +3,10 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum
-from typing import Callable, List, TypeVar
+from typing import Callable, TypeVar
 
 from aspn23 import AspnBase, TypeTimestamp
+from numpy import float64
 from numpy.typing import NDArray
 
 
@@ -59,15 +60,81 @@ class EstimateWithCovariance:
 
     Attributes:
         type (EstimateWithCovarianceType): Describes how the fields in this struct are used.
-        estimate (NDArray): An array of doubles representing an estimate vector. Usage depends on
+        estimate (NDArray[float64]): An array of doubles representing an estimate vector. Usage depends on
             the ``type`` field.
-        covariance (NDArray): An array of doubles representing a square covariance matrix. Data is
+        covariance (NDArray[float64]): An array of doubles representing a square covariance matrix. Data is
             stored in row major form. Usage depends on the ``type`` field.
     """
 
     type: EstimateWithCovarianceType
-    estimate: NDArray
-    covariance: NDArray
+    estimate: NDArray[float64]
+    covariance: NDArray[float64]
+
+
+class FusionType(Enum):
+    """
+    An enumeration of the types of fusion that can be performed by pntOS.
+
+    An implementation of a :class:`FusionPlugin` will compare a model from this enum in its
+    :meth:`~FusionPlugin.is_fusion_type_supported` function. The return of
+    :meth:`~FusionPlugin.is_fusion_type_supported` indicates whether the input type of fusion engine
+    matches the type that will be produced by :meth:`~FusionPlugin.new_fusion_engine`.
+
+    Example:
+        Suppose we have a variable :class:`FusionPlugin` named ``plugin``. Then if the return value
+        of ``plugin.is_fusion_type_supported(FusionType.STANDARD_MODEL)`` is ``True``, then that
+        means that ``plugin.new_fusion_engine()`` will return a :class:`StandardFusionEngine`.
+    """
+
+    STANDARD_MODEL = 0
+    """
+    The standard model of fusion within pntOS. This model assumes that state estimates are
+    representable in a jointly Gaussian state vector and that updates of the state vector contain
+    only independent and identically distributed (i.i.d.) additive white Gaussian noise. See
+    :class:`StandardFusionEngine` for more information.
+    """
+
+    SAMPLED_MODEL = 1
+    """
+    The sampled model of fusion within pntOS. This model assumes that state
+    estimates are represented by discrete stochastic sample points of a
+    probability density function (i.e. particles) and that propagate/update
+    functions will receive these samples and be able to arbitrarily modify
+    each particle's weight, location, and add arbitrary noise to them.
+
+    Caution:
+        **Unstable**: This feature is unstable and is not yet considered part of the stable pntOS
+        API. Usage of this feature is highly discouraged in non-experimental code, and its
+        definition may change at any time.
+    """
+
+    TIME_DELAYED_MODEL = 2
+    """
+    The time delayed model of fusion within pntOS. This model assumes that
+    information about a state is retained across different time epochs and
+    that historical estimate data is available for processing current time
+    data.
+
+    Caution:
+        **Unstable**: This feature is unstable and is not yet considered part of the stable pntOS
+        API. Usage of this feature is highly discouraged in non-experimental code, and its
+        definition may change at any time.
+    """
+
+    STANDARD_COMPILED_MODEL = 3
+    """
+    The standard model of fusion within pntOS, in compiled format. This
+    model is identical to the standard model, with the exception that model
+    information is not available in function pointers on the machine itself
+    but instead binary blobs which have been pre-compiled. This mode is
+    intended to facilitate usage in environments such as GPGPU filter
+    implementations.
+
+    Caution:
+        **Unstable**: This feature is unstable and is not yet considered part of the stable pntOS
+        API. Usage of this feature is highly discouraged in non-experimental code, and its
+        definition may change at any time.
+    """
 
 
 class LoggingLevel(Enum):
@@ -121,7 +188,7 @@ class KeyValueStoreDataFormat(Enum):
 
 
 RegistryValueType = TypeVar(
-    'RegistryValueType', str, List[str], int, bool, float, NDArray, Message
+    'RegistryValueType', str, list[str], int, bool, float, NDArray[float64], Message
 )
 
 
@@ -157,12 +224,12 @@ class KeyValueStore(ABC):
     """
 
     @abstractmethod
-    def get_key_array(self) -> List[str]:
+    def get_key_array(self) -> list[str]:
         """
         Get the array of keys which currently exist in this store.
 
         Returns:
-            List[str]: Returns ``None`` if no keys are available.
+            list[str]: Returns ``None`` if no keys are available.
         """
         pass
 
@@ -322,7 +389,7 @@ class KeyValueStore(ABC):
     def request_notify(
         self,
         key: str | None,
-        callback: Callable[[str, List[str], 'KeyValueStore'], None],
+        callback: Callable[[str, list[str], 'KeyValueStore'], None],
     ) -> bool:
         """
         Register a callback which gets called each time a key in the store is updated.
@@ -343,7 +410,7 @@ class KeyValueStore(ABC):
 
         Args:
             key (str | None)
-            callback (Callable[[str, List[str], "KeyValueStore"], None])
+            callback (Callable[[str, list[str], "KeyValueStore"], None])
 
         Returns:
             bool: ``True`` if the notifier was successfully registered, and ``False`` if the store
@@ -355,7 +422,7 @@ class KeyValueStore(ABC):
     def remove_notify(
         self,
         key: str | None,
-        callback: Callable[[str, List[str], 'KeyValueStore'], None],
+        callback: Callable[[str, list[str], 'KeyValueStore'], None],
     ) -> bool:
         """
         Removes a notification as requested by :meth:`request_notify`.
@@ -369,7 +436,7 @@ class KeyValueStore(ABC):
 
         Args:
             key (str | None)
-            callback (Callable[[str, List[str], "KeyValueStore"], None])
+            callback (Callable[[str, list[str], "KeyValueStore"], None])
 
         Returns:
             bool: ``True`` if removal was successful and ``False`` if it was not. ``False`` will be
@@ -459,12 +526,12 @@ class Registry(ABC):
         pass
 
     @abstractmethod
-    def get_group_array(self) -> List[str]:
+    def get_group_array(self) -> list[str]:
         """
         Get the array of groups which currently exist.
 
         Returns:
-            List[str]: The array of groups which currently exists. Returns ``None`` if no groups
+            list[str]: The array of groups which currently exists. Returns ``None`` if no groups
             exist.
         """
         pass
@@ -524,7 +591,7 @@ class Mediator(ABC):
     """
 
     @abstractmethod
-    def get_filter_description_list(self) -> List[str]:
+    def get_filter_description_list(self) -> list[str]:
         """
         Request a list of strings describing the solutions available.
 
@@ -557,21 +624,21 @@ class Mediator(ABC):
         matching.
 
         Returns:
-            List[str]: A list of strings describing the solutions available.
+            list[str]: A list of strings describing the solutions available.
         """
         pass
 
     @abstractmethod
     def request_solutions(
         self,
-        solution_times: List[TypeTimestamp],
+        solution_times: list[TypeTimestamp],
         filter_description: str | None = None,
-    ) -> List[Message]:
+    ) -> list[Message]:
         """
         Request filtering solutions at the times specified in the array ``solution_times``.
 
         Args:
-            solution_times (List[TypeTimestamp]): The number of time entries in ``solution_times``
+            solution_times (list[TypeTimestamp]): The number of time entries in ``solution_times``
                 is specified by ``num_solution_times``.
             filter_description (str | None, optional): To select which filter(s) to request
                 solutions from, enter a valid filter description string in ``filter_description``.
@@ -581,7 +648,7 @@ class Mediator(ABC):
                 the implementation should endeavor to return its best solution.
 
         Returns:
-            List[Message]: An array of messages containing the filter solutions for the requested
+            list[Message]: An array of messages containing the filter solutions for the requested
             ``solution_times``. The number of solutions should equal ``num_solution_times``,
             although some entries may be ``None`` if they are unavailable at the corresponding time
             in ``solution_times``. The returned :class:`Message` array may be ``None`` if
