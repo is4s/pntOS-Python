@@ -9,3 +9,4 @@ wheels/
 .DS_Store
 **/registry_permanency_files/
 .coverage
+.vscode
