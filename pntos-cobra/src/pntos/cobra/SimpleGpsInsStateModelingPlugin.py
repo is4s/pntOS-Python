@@ -406,7 +406,7 @@ class PinsonPositionMeasurementProcessor(StandardMeasurementProcessor):
         return StandardMeasurementModel(z, h, H, R)
 
 
-class GpsInsStateModelProvider(StandardStateModelProvider):
+class SimpleGpsInsStateModelProvider(StandardStateModelProvider):
     _mediator: Mediator
 
     def __init__(self, mediator: Mediator):
@@ -439,7 +439,7 @@ class GpsInsStateModelProvider(StandardStateModelProvider):
 
         self._mediator.log_message(
             LoggingLevel.ERROR,
-            f'Invalid processor index of {processor_index}. GpsInsStateModelProvider provides {len(self.processor_identifiers)} processors.',
+            f'Invalid processor index of {processor_index}. SimpleGpsInsStateModelProvider provides {len(self.processor_identifiers)} processors.',
         )
         return None
 
@@ -476,7 +476,7 @@ class GpsInsStateModelProvider(StandardStateModelProvider):
 
         self._mediator.log_message(
             LoggingLevel.ERROR,
-            f'Invalid block index of {block_index}. GpsInsStateModelProvider provides {len(self.block_identifiers)} state blocks.',
+            f'Invalid block index of {block_index}. SimpleGpsInsStateModelProvider provides {len(self.block_identifiers)} state blocks.',
         )
         return None
 
@@ -489,12 +489,12 @@ class GpsInsStateModelProvider(StandardStateModelProvider):
     ) -> VirtualStateBlock | None:
         self._mediator.log_message(
             LoggingLevel.ERROR,
-            f'Invalid virtual block index of {virtual_block_index}. GpsInsStateModelProvider provides {len(self.virtual_block_identifiers)} virtual state blocks.',
+            f'Invalid virtual block index of {virtual_block_index}. SimpleGpsInsStateModelProvider provides {len(self.virtual_block_identifiers)} virtual state blocks.',
         )
         return None
 
 
-class GpsInsStateModelingPlugin(StateModelingPlugin):
+class SimpleGpsInsStateModelingPlugin(StateModelingPlugin):
     _mediator: Mediator
 
     def __init__(self, identifier: str):
@@ -517,7 +517,7 @@ class GpsInsStateModelingPlugin(StateModelingPlugin):
         if not self.is_fusion_type_supported(type):
             return None
 
-        return GpsInsStateModelProvider(self._mediator)
+        return SimpleGpsInsStateModelProvider(self._mediator)
 
     def is_fusion_type_supported(self, type: StateModelProviderType) -> bool:
         return type == StandardStateModelProvider

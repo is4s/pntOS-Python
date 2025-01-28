@@ -24,12 +24,12 @@ from pntos.cobra import (
     SimpleRegistryPlugin,
 )
 from pntos.cobra.config import AlignmentConfig, ImuConfig, SensorConfig
-from pntos.cobra.GpsInsStateModelingPlugin import (
-    GpsInsStateModelingPlugin,
+from pntos.cobra.SimpleControllerPlugin import SimpleMediator
+from pntos.cobra.SimpleGpsInsStateModelingPlugin import (
     Pinson15NedBlock,
     PinsonPositionMeasurementProcessor,
+    SimpleGpsInsStateModelingPlugin,
 )
-from pntos.cobra.SimpleControllerPlugin import SimpleMediator
 from pntos.cobra.utils.navutils import calc_lat_factor, calc_lon_factor
 
 my_config = [
@@ -77,7 +77,7 @@ def mediator():
 
 @pytest.fixture
 def state_modeling_plugin(mediator):
-    sm_plugin = GpsInsStateModelingPlugin('gps_ins_state_modeling')
+    sm_plugin = SimpleGpsInsStateModelingPlugin('gps_ins_state_modeling')
     sm_plugin.init_plugin(mediator=mediator)
     return sm_plugin
 
