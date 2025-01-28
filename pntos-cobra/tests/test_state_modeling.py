@@ -20,12 +20,10 @@ from pntos.api import (
     Message,
     StandardStateModelProvider,
 )
-from pntos.cobra import (
-    SimpleRegistryPlugin,
-)
+from pntos.cobra import SimpleRegistryPlugin
 from pntos.cobra.config import AlignmentConfig, ImuConfig, SensorConfig
 from pntos.cobra.SimpleControllerPlugin import SimpleMediator
-from pntos.cobra.SimpleGpsInsStateModelingPlugin import (
+from pntos.cobra.state_modeling_simple_gps_ins import (
     Pinson15NedBlock,
     PinsonPositionMeasurementProcessor,
     SimpleGpsInsStateModelingPlugin,
@@ -204,7 +202,8 @@ def test_invalid_index(state_model_provider) -> None:
 
 
 def test_invalid_aux_data(
-    pinson_block: Pinson15NedBlock, position_mp: PinsonPositionMeasurementProcessor
+    pinson_block: Pinson15NedBlock,
+    position_mp: PinsonPositionMeasurementProcessor,
 ) -> None:
     bad_aux = Message(TypeHeader(0, 0, 0, 0), 'bad_aux')
     pinson_block.receive_aux_data([bad_aux])
@@ -223,11 +222,7 @@ def test_no_aux_data(
     x_and_p = EstimateWithCovariance(
         EstimateWithCovarianceType.EWC_GENERIC, np.zeros(15), np.eye(15)
     )
-    dm = pinson_block.generate_dynamics(
-        x_and_p,
-        TypeTimestamp(0),
-        TypeTimestamp(1),
-    )
+    dm = pinson_block.generate_dynamics(x_and_p, TypeTimestamp(0), TypeTimestamp(1))
     assert dm is None
 
     mm = position_mp.generate_model(pos_meas, x_and_p)
@@ -250,7 +245,9 @@ def test_stale_aux_data(
     assert mm is None
 
 
-def test_invalid_measurement(position_mp: PinsonPositionMeasurementProcessor) -> None:
+def test_invalid_measurement(
+    position_mp: PinsonPositionMeasurementProcessor,
+) -> None:
     x_and_p = EstimateWithCovariance(
         EstimateWithCovarianceType.EWC_GENERIC, np.zeros(15), np.eye(15)
     )
