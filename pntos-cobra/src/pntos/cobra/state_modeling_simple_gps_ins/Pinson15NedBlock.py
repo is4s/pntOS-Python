@@ -6,8 +6,8 @@ from aspn23 import (
     MeasurementPositionVelocityAttitude as MeasurementPVA,
     TypeTimestamp,
 )
+from numpy import float64
 from numpy.typing import NDArray
-
 from pntos.api.plugins.common import (
     EstimateWithCovariance,
     LoggingLevel,
@@ -27,26 +27,26 @@ from pntos.cobra.utils import (
 )
 
 
-def extract_pos(pva) -> NDArray:
+def extract_pos(pva: MeasurementPVA) -> NDArray[float64]:
     """Extract position from an ASPN23 PVA
 
     Args:
         pva (MeasurementPVA): The PVA.
 
     Returns:
-        NDArray: The position as a 3-element array.
+        NDArray[float64]: The position as a 3-element array.
     """
     return np.array([pva.p1, pva.p2, pva.p3])
 
 
-def extract_vel(pva):
+def extract_vel(pva: MeasurementPVA) -> NDArray[float64]:
     """Extract velocity from an ASPN23 PVA
 
     Args:
         pva (MeasurementPVA): The PVA.
 
     Returns:
-        NDArray: The velocity as a 3-element array.
+        NDArray[float64]: The velocity as a 3-element array.
     """
     return np.array([pva.v1, pva.v2, pva.v3])
 
@@ -109,7 +109,7 @@ class Pinson15NedBlock(StandardStateBlock):
     _old_pva_aux: MeasurementPVA | None
     _new_pva_aux: MeasurementPVA | None
     _force_and_rate_aux: MeasurementImu | None
-    _pre_Q: NDArray
+    _pre_Q: NDArray[float64]
 
     def __init__(self, label: str, mediator: Mediator, imu_model: ImuModel):
         self.label = label
@@ -180,18 +180,18 @@ class Pinson15NedBlock(StandardStateBlock):
 
         self.scale_phi(Phi)
 
-        def g(x: NDArray):
+        def g(x: NDArray[float64]) -> NDArray[float64]:
             return Phi @ x
 
         return StandardDynamicsModel(g, Phi, Qd)
 
-    def scale_phi(self, Phi: NDArray):
+    def scale_phi(self, Phi: NDArray[float64]) -> None:
         """Scale first 15 elements of first 2 columns of `phi` such to account for change in rad to meter scale factors over propagation time.
 
         Args:
-            Phi (NDArray): Matrix obtained by discretizing the propagation Jacobian. This matrix will be modified to account for the rad to meter scaling.
+            Phi (NDArray[float64]): Matrix obtained by discretizing the propagation Jacobian. This matrix will be modified to account for the rad to meter scaling.
         """
-        if self._old_pva_aux is not None:
+        if self._old_pva_aux is not None and self._new_pva_aux is not None:
             pos = extract_pos(self._old_pva_aux)
             lat_factor0 = calc_lat_factor(pos[0], pos[2])
             lon_factor0 = calc_lon_factor(pos[0], pos[2])
@@ -205,11 +205,11 @@ class Pinson15NedBlock(StandardStateBlock):
             Phi[:, 0] *= lat0Tolat1
             Phi[:, 1] *= lon0Tolon1
 
-    def generate_f_pinson15(self) -> NDArray:
+    def generate_f_pinson15(self) -> NDArray[float64]:
         """Generates the continuous time propagation matrix F, which is the Jacobian of the differential equations governing inertial error growth. Based upon the model given in Titterton and Weston, 2nd edition, section 12.3, with some variations as detailed below.
 
         Returns:
-            NDArray: The F Matrix.
+            NDArray[float64]: The F Matrix.
         """
         assert self._new_pva_aux is not None
         assert self._new_pva_aux.quaternion is not None
@@ -357,12 +357,14 @@ class Pinson15NedBlock(StandardStateBlock):
 
         return F
 
-    def generate_q_pinson15(self):
+    def generate_q_pinson15(self) -> NDArray[float64]:
         """Generates the continuous time process noise covariance matrix Q.
 
         Returns:
-            NDArray: The Q Matrix.
+            NDArray[float64]: The Q Matrix.
         """
+        assert self._new_pva_aux is not None
+        assert self._new_pva_aux.quaternion is not None
         Q = self._pre_Q
         C_sensor_to_ned = quat_to_dcm(self._new_pva_aux.quaternion)
 

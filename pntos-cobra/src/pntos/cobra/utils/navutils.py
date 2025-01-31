@@ -1,10 +1,11 @@
 from math import atan2, cos, sin, sqrt
 
 import numpy as np
+from numpy import float64
 from numpy.typing import NDArray
 
 
-def skew(angles):
+def skew(angles: NDArray[float64]) -> NDArray[float64]:
     return np.array(
         [
             [0, -angles[2], angles[1]],
@@ -14,25 +15,27 @@ def skew(angles):
     )
 
 
-def meridian_radius(lat):
+def meridian_radius(lat: float) -> float:
     sin_lat = sin(lat)
-    return RAD_E * (1 - ECC_SQUARE) / pow(1 - ECC_SQUARE * sin_lat * sin_lat, 1.5)
+    return float(
+        RAD_E * (1 - ECC_SQUARE) / pow(1 - ECC_SQUARE * sin_lat * sin_lat, 1.5)
+    )
 
 
-def transverse_radius(lat):
+def transverse_radius(lat: float) -> float:
     sin_lat = sin(lat)
-    return RAD_E / pow(1 - ECC_SQUARE * sin_lat * sin_lat, 0.5)
+    return float(RAD_E / pow(1 - ECC_SQUARE * sin_lat * sin_lat, 0.5))
 
 
-def calc_lat_factor(lat, alt):
+def calc_lat_factor(lat: float, alt: float) -> float:
     return meridian_radius(lat) + alt
 
 
-def calc_lon_factor(lat, alt):
+def calc_lon_factor(lat: float, alt: float) -> float:
     return (transverse_radius(lat) + alt) * cos(lat)
 
 
-def quat_to_dcm(quat: NDArray):
+def quat_to_dcm(quat: NDArray[float64]) -> NDArray[float64]:
     q0, q1, q2, q3 = quat
     a2 = pow(q0, 2)
     b2 = pow(q1, 2)
@@ -53,7 +56,7 @@ def quat_to_dcm(quat: NDArray):
     )
 
 
-def llh_to_ecef(llh: NDArray) -> NDArray:
+def llh_to_ecef(llh: NDArray[float64]) -> NDArray[float64]:
     a = RAD_E
     e2 = ECC_SQUARE
     phi, lam, h = llh
@@ -71,7 +74,7 @@ def llh_to_ecef(llh: NDArray) -> NDArray:
     )
 
 
-def ecef_to_llh(ecef: NDArray) -> NDArray:
+def ecef_to_llh(ecef: NDArray[float64]) -> NDArray[float64]:
     a = RAD_E
     e2 = ECC_SQUARE
     pm0 = sqrt(pow(ecef[0], 2) + pow(ecef[1], 2))
@@ -112,7 +115,7 @@ def ecef_to_llh(ecef: NDArray) -> NDArray:
     return np.array([phi0, lam, h0])
 
 
-def llh_to_cen(llh: NDArray) -> NDArray:
+def llh_to_cen(llh: NDArray[float64]) -> NDArray[float64]:
     clat = cos(llh[0])
     slat = sin(llh[0])
     clon = cos(llh[1])
@@ -140,7 +143,7 @@ class EarthModel:
     A5 = 4.3977311e-9
     A6 = 7.211e-13
 
-    def __init__(self, pos: NDArray, vel: NDArray):
+    def __init__(self, pos: NDArray[float64], vel: NDArray[float64]) -> None:
         lat, lon, alt_msl = pos
         vn, ve, vd = vel
 
@@ -171,7 +174,7 @@ class EarthModel:
 
         self.g_n = np.array([0.0, 0.0, self.calculate_gravity(alt_msl)])
 
-    def calculate_gravity(self, alt_msl):
+    def calculate_gravity(self, alt_msl: float) -> float:
         # Calculate gravity using Schwartz model
         sin2_l = pow(self.sin_l, 2)
         sin4_l = pow(sin2_l, 2)

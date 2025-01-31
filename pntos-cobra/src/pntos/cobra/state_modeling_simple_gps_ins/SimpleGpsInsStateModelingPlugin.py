@@ -1,8 +1,9 @@
+import builtins
 from typing import cast
 
 import numpy as np
+from numpy import float64
 from numpy.typing import NDArray
-
 from pntos.api.plugins.common import LoggingLevel, Mediator
 from pntos.api.plugins.fusion import StandardFusionEngine, VirtualStateBlock
 from pntos.api.plugins.state_modeling import (
@@ -66,9 +67,9 @@ class SimpleGpsInsStateModelProvider(StandardStateModelProvider):
         if processor_index == 0:
             batch = self._mediator.registry.batch_start(config_group)
             l_ps_p = batch.get_value('lever_arm', np.ndarray)
-            l_ps_p = cast(NDArray, l_ps_p)
             C_platform_to_sensor = batch.get_value('orientation', np.ndarray)
-            C_platform_to_sensor = cast(NDArray, C_platform_to_sensor)
+            assert C_platform_to_sensor is not None
+            assert l_ps_p is not None
             return PinsonPositionMeasurementProcessor(
                 label,
                 state_block_labels,
@@ -126,17 +127,24 @@ class SimpleGpsInsStateModelProvider(StandardStateModelProvider):
             gyro_rw_sigma = batch.get_value('gyro_rw_sigma', np.ndarray)
             batch.batch_end()
 
+            # TODO: would be nice to not have to check for None returns
+            assert accel_bias_sigma is not None
+            assert accel_bias_tau is not None
+            assert accel_rw_sigma is not None
+            assert gyro_bias_sigma is not None
+            assert gyro_bias_tau is not None
+            assert gyro_rw_sigma is not None
+
             return Pinson15NedBlock(
                 label,
                 self._mediator,
                 ImuModel(
-                    # TODO: would be nice to not have to cast
-                    cast(NDArray, accel_bias_sigma),
-                    cast(NDArray, accel_bias_tau),
-                    cast(NDArray, accel_rw_sigma),
-                    cast(NDArray, gyro_bias_sigma),
-                    cast(NDArray, gyro_bias_tau),
-                    cast(NDArray, gyro_rw_sigma),
+                    accel_bias_sigma,
+                    accel_bias_tau,
+                    accel_rw_sigma,
+                    gyro_bias_sigma,
+                    gyro_bias_tau,
+                    gyro_rw_sigma,
                 ),
             )
 
@@ -188,4 +196,4 @@ class SimpleGpsInsStateModelingPlugin(StateModelingPlugin):
         return SimpleGpsInsStateModelProvider(self._mediator)
 
     def is_fusion_type_supported(self, type: StateModelProviderType) -> bool:
-        return type == StandardStateModelProvider
+        return type is StandardStateModelProvider

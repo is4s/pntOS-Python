@@ -4,8 +4,8 @@ from aspn23 import (
     MeasurementPositionReferenceFrame,
     MeasurementPositionVelocityAttitude as MeasurementPVA,
 )
+from numpy import float64
 from numpy.typing import NDArray
-
 from pntos.api.plugins.common import (
     EstimateWithCovariance,
     LoggingLevel,
@@ -28,16 +28,16 @@ from pntos.cobra.utils import (
 class PinsonPositionMeasurementProcessor(StandardMeasurementProcessor):
     _mediator: Mediator
     _inertial_pva: MeasurementPVA | None
-    _l_ps_p: NDArray
-    _C_platform_to_sensor: NDArray
+    _l_ps_p: NDArray[float64]
+    _C_platform_to_sensor: NDArray[float64]
 
     def __init__(
         self,
         label: str,
         state_block_labels: list[str],
         mediator: Mediator,
-        l_ps_p: NDArray,
-        C_platform_to_sensor: NDArray,
+        l_ps_p: NDArray[float64],
+        C_platform_to_sensor: NDArray[float64],
     ):
         self.label = label
         self.state_block_labels = state_block_labels
@@ -129,7 +129,7 @@ class PinsonPositionMeasurementProcessor(StandardMeasurementProcessor):
         H = np.zeros((3, 15))
         H[:, :3] = np.eye(3)
 
-        def h(x: NDArray):
+        def h(x: NDArray[float64]) -> NDArray[float64]:
             return H @ x
 
         R = pos.covariance

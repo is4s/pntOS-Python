@@ -18,7 +18,10 @@ from pntos.api import (
     EstimateWithCovariance,
     EstimateWithCovarianceType,
     Message,
+    StandardMeasurementProcessor,
+    StandardStateBlock,
     StandardStateModelProvider,
+    StateModelProviderType,
 )
 from pntos.cobra import SimpleRegistryPlugin
 from pntos.cobra.config import AlignmentConfig, ImuConfig, SensorConfig
@@ -67,40 +70,54 @@ my_config = [
 
 
 @pytest.fixture
-def mediator():
+def mediator() -> SimpleMediator:
     registry_plugin = SimpleRegistryPlugin('Simple registry', config=my_config)
     registry = registry_plugin.new_registry()
     return SimpleMediator(registry, [])
 
 
 @pytest.fixture
-def state_modeling_plugin(mediator):
+def state_modeling_plugin(
+    mediator: SimpleMediator,
+) -> SimpleGpsInsStateModelingPlugin:
     sm_plugin = SimpleGpsInsStateModelingPlugin('gps_ins_state_modeling')
     sm_plugin.init_plugin(mediator=mediator)
     return sm_plugin
 
 
 @pytest.fixture
-def state_model_provider(state_modeling_plugin):
+def state_model_provider(
+    state_modeling_plugin: SimpleGpsInsStateModelingPlugin,
+) -> StateModelProviderType | None:
     return state_modeling_plugin.new_state_model_provider(StandardStateModelProvider)
 
 
 @pytest.fixture
-def pinson_block(state_model_provider):
-    return state_model_provider.new_block(
+def pinson_block(
+    state_model_provider: StateModelProviderType,
+) -> StandardStateBlock | None:
+    out = state_model_provider.new_block(
         0, None, 'pinson', '/config/cobra/imu_config/default'
     )
+    if isinstance(out, StandardStateBlock):
+        return out
+    return None
 
 
 @pytest.fixture
-def position_mp(state_model_provider):
-    return state_model_provider.new_processor(
+def position_mp(
+    state_model_provider: StateModelProviderType,
+) -> StandardMeasurementProcessor | None:
+    out = state_model_provider.new_processor(
         0, None, 'position', ['pinson'], '/config/cobra/sensor_config/default'
     )
+    if isinstance(out, StandardMeasurementProcessor):
+        return out
+    return None
 
 
 @pytest.fixture
-def pva_aux_data():
+def pva_aux_data() -> Message:
     return Message(
         MeasurementPositionVelocityAttitude(
             TypeHeader(0, 0, 0, 0),
@@ -123,7 +140,7 @@ def pva_aux_data():
 
 
 @pytest.fixture
-def zero_pva_aux_data():
+def zero_pva_aux_data() -> Message:
     return Message(
         MeasurementPositionVelocityAttitude(
             TypeHeader(0, 0, 0, 0),
@@ -146,7 +163,7 @@ def zero_pva_aux_data():
 
 
 @pytest.fixture
-def pos_meas():
+def pos_meas() -> Message:
     return Message(
         MeasurementPosition(
             TypeHeader(0, 0, 0, 0),
@@ -157,7 +174,7 @@ def pos_meas():
             1005,
             np.diag([25, 25, 100]),
             MeasurementPositionErrorModel.NONE,
-            [],
+            np.array([]),
             [],
         ),
         'pva_aux',
@@ -165,7 +182,7 @@ def pos_meas():
 
 
 @pytest.fixture
-def force_and_rate_aux_data():
+def force_and_rate_aux_data() -> Message:
     return Message(
         MeasurementImu(
             TypeHeader(0, 0, 0, 0),
@@ -179,14 +196,16 @@ def force_and_rate_aux_data():
     )
 
 
-def test_invalid_fusion_type(state_modeling_plugin) -> None:
+def test_invalid_fusion_type(
+    state_modeling_plugin: SimpleGpsInsStateModelingPlugin,
+) -> None:
     invalid_sm_provider = state_modeling_plugin.new_state_model_provider(
         EstimateWithCovarianceType
     )
     assert invalid_sm_provider is None
 
 
-def test_invalid_index(state_model_provider) -> None:
+def test_invalid_index(state_model_provider: StateModelProviderType) -> None:
     invalid_sb = state_model_provider.new_block(1, None, 'label', 'config/sb')
     assert invalid_sb is None
 
@@ -217,7 +236,7 @@ def test_invalid_aux_data(
 def test_no_aux_data(
     pinson_block: Pinson15NedBlock,
     position_mp: PinsonPositionMeasurementProcessor,
-    pos_meas,
+    pos_meas: Message,
 ) -> None:
     x_and_p = EstimateWithCovariance(
         EstimateWithCovarianceType.EWC_GENERIC, np.zeros(15), np.eye(15)
@@ -230,9 +249,13 @@ def test_no_aux_data(
 
 
 def test_stale_aux_data(
-    position_mp: PinsonPositionMeasurementProcessor, pva_aux_data, pos_meas
+    position_mp: PinsonPositionMeasurementProcessor,
+    pva_aux_data: Message,
+    pos_meas: Message,
 ) -> None:
-    inertial_pva: MeasurementPositionVelocityAttitude = pva_aux_data.wrapped_message
+    inertial_pva = pva_aux_data.wrapped_message
+    assert isinstance(inertial_pva, MeasurementPositionVelocityAttitude)
+    assert isinstance(pos_meas.wrapped_message, MeasurementPosition)
     pos_time = pos_meas.wrapped_message.time_of_validity
     # Set aux data ToV to be 1 second older than pos meas ToV
     inertial_pva.time_of_validity.elapsed_nsec = pos_time.elapsed_nsec - 1_000_000_000
@@ -258,10 +281,14 @@ def test_invalid_measurement(
 
 
 def test_generate_model(
-    position_mp: PinsonPositionMeasurementProcessor, pva_aux_data, pos_meas
+    position_mp: PinsonPositionMeasurementProcessor,
+    pva_aux_data: Message,
+    pos_meas: Message,
 ) -> None:
-    inertial_pva: MeasurementPositionVelocityAttitude = pva_aux_data.wrapped_message
-    pos: MeasurementPosition = pos_meas.wrapped_message
+    inertial_pva = pva_aux_data.wrapped_message
+    assert isinstance(inertial_pva, MeasurementPositionVelocityAttitude)
+    pos = pos_meas.wrapped_message
+    assert isinstance(pos, MeasurementPosition)
     position_mp.receive_aux_data([pva_aux_data])
     assert position_mp._inertial_pva is not None
     x_and_p = EstimateWithCovariance(
@@ -287,7 +314,9 @@ def test_generate_model(
 
 
 def test_generate_dynamics(
-    pinson_block: Pinson15NedBlock, zero_pva_aux_data, force_and_rate_aux_data
+    pinson_block: Pinson15NedBlock,
+    zero_pva_aux_data: Message,
+    force_and_rate_aux_data: Message,
 ) -> None:
     expected_Phi = np.array(
         [
@@ -809,6 +838,9 @@ def test_generate_dynamics(
         ]
     )
     pinson_block.receive_aux_data([zero_pva_aux_data, force_and_rate_aux_data])
+    assert isinstance(
+        zero_pva_aux_data.wrapped_message, MeasurementPositionVelocityAttitude
+    )
     time_from: TypeTimestamp = zero_pva_aux_data.wrapped_message.time_of_validity
     time_to = TypeTimestamp(time_from.elapsed_nsec + 1_000_000_000)
     x_and_p = EstimateWithCovariance(
@@ -826,7 +858,7 @@ def test_generate_dynamics(
 def test_copy(
     pinson_block: Pinson15NedBlock,
     position_mp: PinsonPositionMeasurementProcessor,
-    pva_aux_data,
+    pva_aux_data: Message,
 ) -> None:
     # copy pinson block and compare with new block
     new_pinson_block = deepcopy(pinson_block)
@@ -847,7 +879,7 @@ def test_copy(
     assert position_mp._inertial_pva is not None
 
     # copy MP and compare with new MP
-    new_position_mp = deepcopy(position_mp)
+    new_position_mp = deepcopy(position_mp)  # type: ignore[unreachable]
     assert new_position_mp._inertial_pva is not None
     assert new_position_mp._inertial_pva.p1 == position_mp._inertial_pva.p1
     # modify new MP and re-compare with original MP
