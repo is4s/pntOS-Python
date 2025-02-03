@@ -7,3 +7,4 @@ wheels/
 .venv
 .*_cache
 .DS_Store
+**/registry_permanency_files/
