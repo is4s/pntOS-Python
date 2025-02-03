@@ -42,10 +42,14 @@ def call_color_and_not(a: SimpleLoggingPlugin) -> None:
     call(a)
 
 
+def dummy_log(level: LoggingLevel, message: str) -> None:
+    pass
+
+
 def manual_test() -> None:
     """This is for user tests of the logger plugin, not for the pytest suite."""
     # Initialize registry through mediator to have config values for logger
-    registry = SimpleRegistry()
+    registry = SimpleRegistry(dummy_log)
     mediator = SimpleMediator(registry, [])
     config_group = 'config/logging/all'
     colorize_key = 'force_colorize'
@@ -82,7 +86,7 @@ def manual_test() -> None:
 
 def test(capsys: Any) -> None:
     # Initialize registry through mediator to have config values for logger
-    registry = SimpleRegistry()
+    registry = SimpleRegistry(dummy_log)
     mediator = SimpleMediator(registry, [])
     config_group = 'config/logging/all'
     colorize_key = 'force_colorize'

@@ -11,6 +11,7 @@ from .plugins.common import (
     Message as Message,
     Registry as Registry,
     RegistryValueType as RegistryValueType,
+    RegistryValueTypeUnion as RegistryValueTypeUnion,
 )
 from .plugins.controller import ControllerPlugin as ControllerPlugin
 from .plugins.fusion import (

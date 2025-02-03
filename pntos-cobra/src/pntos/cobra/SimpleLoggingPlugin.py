@@ -38,12 +38,12 @@ class SimpleLoggingPlugin(LoggingPlugin):
     ) -> None:
         if mediator:
             config = mediator.registry.batch_start(LoggingConfig.config_group)
-            if config.has_key(LoggingConfig.colorize_key):
+            if LoggingConfig.colorize_key in config:
                 self.colorize
                 config_colorize = config.get_value(LoggingConfig.colorize_key, bool)
                 if config_colorize is not None:
                     self.colorize = config_colorize
-            if config.has_key(LoggingConfig.global_log_level_key):
+            if LoggingConfig.global_log_level_key in config:
                 global_log_level_temp = config.get_value(
                     LoggingConfig.global_log_level_key, str
                 )
