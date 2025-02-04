@@ -11,8 +11,7 @@ dependencies = [
     "numpy>=1.26.4",
     "scipy>=1.15.2",
     "pntos-api>=0.1.0",
-    # LCM master branch - committed 24 October 2024
-    "lcm @ git+https://github.com/lcm-proj/lcm.git@8d638bb3aeae39fda5db59f43b85f3a4b3f9a6ac",
+    "lcm==1.5.1",
     # firehose-outputs main branch - committed 18 November 2024
     "aspn23 @ git+ssh://git@git.aspn.us/pntos/firehose-outputs.git@0f42a18e9c3a65462d10686eced7bb3e0f51eae8#subdirectory=aspn-py",
     "aspn23_lcm @ git+ssh://git@git.aspn.us/pntos/firehose-outputs.git@0f42a18e9c3a65462d10686eced7bb3e0f51eae8#subdirectory=lcm/python",
