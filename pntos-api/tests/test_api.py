@@ -85,14 +85,17 @@ def test_type_parameters() -> None:
 class MockControllerPlugin(api.ControllerPlugin):
     identifier = ''
 
-    def init_plugin(self, plugin_resources_location=None, mediator=None):
+    def init_plugin(self, plugin_resources_location=None, mediator=None):  # type: ignore
         return
 
-    def shutdown_plugin(self):
+    def shutdown_plugin(self):  # type: ignore
         return
 
-    def take_control(
-        self, plugins, plugin_resources_locations=None, initial_config=None
+    def take_control(  # type: ignore
+        self,
+        plugins,
+        plugin_resources_locations=None,
+        initial_config=None,
     ):
         return
 
@@ -100,10 +103,10 @@ class MockControllerPlugin(api.ControllerPlugin):
 class MockFusionPlugin(api.FusionPlugin):
     identifier = ''
 
-    def init_plugin(self, plugin_resources_location=None, mediator=None):
+    def init_plugin(self, plugin_resources_location=None, mediator=None):  # type: ignore
         return
 
-    def shutdown_plugin(self):
+    def shutdown_plugin(self):  # type: ignore
         return
 
     def is_fusion_type_supported(self, type: type[api.FusionEngineType]) -> bool:
@@ -118,10 +121,10 @@ class MockFusionPlugin(api.FusionPlugin):
 class MockFusionStrategyPlugin(api.FusionStrategyPlugin):
     identifier = ''
 
-    def init_plugin(self, plugin_resources_location=None, mediator=None):
+    def init_plugin(self, plugin_resources_location=None, mediator=None):  # type: ignore
         return
 
-    def shutdown_plugin(self):
+    def shutdown_plugin(self):  # type: ignore
         return
 
     def is_fusion_type_supported(
@@ -138,10 +141,10 @@ class MockFusionStrategyPlugin(api.FusionStrategyPlugin):
 class MockInertialPlugin(api.InertialPlugin):
     identifier = ''
 
-    def init_plugin(self, plugin_resources_location=None, mediator=None):
+    def init_plugin(self, plugin_resources_location=None, mediator=None):  # type: ignore
         return
 
-    def shutdown_plugin(self):
+    def shutdown_plugin(self):  # type: ignore
         return
 
     def is_inertial_type_supported(self, type: type[api.InertialType]) -> bool:
@@ -159,10 +162,10 @@ class MockInertialPlugin(api.InertialPlugin):
 class MockInitializationPlugin(api.InitializationPlugin):
     identifier = ''
 
-    def init_plugin(self, plugin_resources_location=None, mediator=None):
+    def init_plugin(self, plugin_resources_location=None, mediator=None):  # type: ignore
         return
 
-    def shutdown_plugin(self):
+    def shutdown_plugin(self):  # type: ignore
         return
 
     def is_initialization_type_supported(
@@ -179,10 +182,10 @@ class MockInitializationPlugin(api.InitializationPlugin):
 class MockLoggingPlugin(api.LoggingPlugin):
     identifier = ''
 
-    def init_plugin(self, plugin_resources_location=None, mediator=None):
+    def init_plugin(self, plugin_resources_location=None, mediator=None):  # type: ignore
         return
 
-    def shutdown_plugin(self):
+    def shutdown_plugin(self):  # type: ignore
         return
 
     def log(
@@ -198,35 +201,35 @@ class MockLoggingPlugin(api.LoggingPlugin):
 class MockOrchestrationPlugin(api.OrchestrationPlugin):
     identifier = ''
 
-    def init_plugin(self, plugin_resources_location=None, mediator=None):
+    def init_plugin(self, plugin_resources_location=None, mediator=None):  # type: ignore
         return
 
-    def shutdown_plugin(self):
+    def shutdown_plugin(self):  # type: ignore
         return
 
-    def init_orchestration_plugin(self, plugins, stream_config):
+    def init_orchestration_plugin(self, plugins, stream_config):  # type: ignore
         return
 
-    def get_filter_description_list(self):
+    def get_filter_description_list(self):  # type: ignore
         return None
 
-    def process_pntos_message(self, message, sequenced):
+    def process_pntos_message(self, message, sequenced):  # type: ignore
         return
 
-    def request_solutions(self, solution_times, filter_description=None):
+    def request_solutions(self, solution_times, filter_description=None):  # type: ignore
         return None
 
 
 class MockPlatformIntegrationPlugin(api.PlatformIntegrationPlugin):
     identifier = ''
 
-    def init_plugin(self, plugin_resources_location=None, mediator=None):
+    def init_plugin(self, plugin_resources_location=None, mediator=None):  # type: ignore
         return
 
-    def shutdown_plugin(self):
+    def shutdown_plugin(self):  # type: ignore
         return
 
-    def take_control(
+    def take_control(  # type: ignore
         self, plugins, plugin_resources_locations=None, initial_config=None
     ):
         return
@@ -235,79 +238,79 @@ class MockPlatformIntegrationPlugin(api.PlatformIntegrationPlugin):
 class MockPreprocessorPlugin(api.PreprocessorPlugin):
     identifier = ''
 
-    def init_plugin(self, plugin_resources_location=None, mediator=None):
+    def init_plugin(self, plugin_resources_location=None, mediator=None):  # type: ignore
         return
 
-    def shutdown_plugin(self):
+    def shutdown_plugin(self):  # type: ignore
         return
 
     preprocessor_identifiers = ['']
 
-    def new_preprocessor(self, preprocessor_index, config_group=None):
+    def new_preprocessor(self, preprocessor_index, config_group=None):  # type: ignore
         return None
 
 
 class MockRegistryPlugin(api.RegistryPlugin):
     identifier = ''
 
-    def init_plugin(self, plugin_resources_location=None, mediator=None):
+    def init_plugin(self, plugin_resources_location=None, mediator=None):  # type: ignore
         return
 
-    def shutdown_plugin(self):
+    def shutdown_plugin(self):  # type: ignore
         return
 
-    def new_registry(self, initial_config=None):
+    def new_registry(self, initial_config=None):  # type: ignore
         return None
 
 
 class MockStateModelingPlugin(api.StateModelingPlugin):
     identifier = ''
 
-    def init_plugin(self, plugin_resources_location=None, mediator=None):
+    def init_plugin(self, plugin_resources_location=None, mediator=None):  # type: ignore
         return
 
-    def shutdown_plugin(self):
+    def shutdown_plugin(self):  # type: ignore
         return
 
-    def is_fusion_type_supported(self, type):
+    def is_fusion_type_supported(self, type):  # type: ignore
         return False
 
-    def new_state_model_provider(self, type):
+    def new_state_model_provider(self, type):  # type: ignore
         return None
 
 
 class MockTransportPlugin(api.TransportPlugin):
     identifier = ''
 
-    def init_plugin(self, plugin_resources_location=None, mediator=None):
+    def init_plugin(self, plugin_resources_location=None, mediator=None):  # type: ignore
         return
 
-    def shutdown_plugin(self):
+    def shutdown_plugin(self):  # type: ignore
         return
 
-    def broadcast_message(self, message, channel_name=None):
+    def broadcast_message(self, message, channel_name=None):  # type: ignore
         return
 
-    def start_listening(self):
+    def start_listening(self):  # type: ignore
         return
 
-    def stop_listening(self):
+    def stop_listening(self):  # type: ignore
         return
 
 
 class MockUiPlugin(api.UiPlugin):
     identifier = ''
 
-    def init_plugin(self, plugin_resources_location=None, mediator=None):
+    def init_plugin(self, plugin_resources_location=None, mediator=None):  # type: ignore
         return
 
-    def shutdown_plugin(self):
+    def shutdown_plugin(self):  # type: ignore
         return
 
-    def requires_main_thread(self):
+    def requires_main_thread(self):  # type: ignore
         return False
 
-    def run_main_thread(self):
+    def run_main_thread(self):  # type: ignore
         return
 
 
