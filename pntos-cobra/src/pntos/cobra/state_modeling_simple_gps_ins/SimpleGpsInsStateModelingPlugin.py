@@ -2,8 +2,6 @@ import builtins
 from typing import cast
 
 import numpy as np
-from numpy import float64
-from numpy.typing import NDArray
 from pntos.api.plugins.common import LoggingLevel, Mediator
 from pntos.api.plugins.fusion import StandardFusionEngine, VirtualStateBlock
 from pntos.api.plugins.state_modeling import (
@@ -11,7 +9,8 @@ from pntos.api.plugins.state_modeling import (
     StateModelingPlugin,
     StateModelProviderType,
 )
-from pntos.cobra.utils import ImuModel
+from pntos.cobra.config import ImuConfig, SensorConfig, config_from_registry
+from pntos.cobra.utils import quat_to_dcm
 
 from .Pinson15NedBlock import Pinson15NedBlock
 from .PinsonPositionMeasurementProcessor import (
@@ -65,11 +64,12 @@ class SimpleGpsInsStateModelProvider(StandardStateModelProvider):
             with the given ``processor_index``, ``engine``, and ``config_group``.
         """
         if processor_index == 0:
-            batch = self._mediator.registry.batch_start(config_group)
-            l_ps_p = batch.get_value('lever_arm', np.ndarray)
-            C_platform_to_sensor = batch.get_value('orientation', np.ndarray)
-            assert C_platform_to_sensor is not None
-            assert l_ps_p is not None
+            sensor_config = config_from_registry(SensorConfig, self._mediator)
+            assert sensor_config is not None
+            l_ps_p = np.array(sensor_config.lever_arm)
+            C_platform_to_sensor = quat_to_dcm(
+                np.array(sensor_config.orientation)
+            )
             return PinsonPositionMeasurementProcessor(
                 label,
                 state_block_labels,
@@ -118,35 +118,10 @@ class SimpleGpsInsStateModelProvider(StandardStateModelProvider):
             with the given ``block_index``, ``engine``, and ``config_group``.
         """
         if block_index == 0:
-            batch = self._mediator.registry.batch_start(config_group)
-            accel_bias_sigma = batch.get_value('accel_bias_sigma', np.ndarray)
-            accel_bias_tau = batch.get_value('accel_bias_tau', np.ndarray)
-            accel_rw_sigma = batch.get_value('accel_rw_sigma', np.ndarray)
-            gyro_bias_sigma = batch.get_value('gyro_bias_sigma', np.ndarray)
-            gyro_bias_tau = batch.get_value('gyro_bias_tau', np.ndarray)
-            gyro_rw_sigma = batch.get_value('gyro_rw_sigma', np.ndarray)
-            batch.batch_end()
+            imu_config = config_from_registry(ImuConfig, self._mediator)
+            assert imu_config is not None
 
-            # TODO: would be nice to not have to check for None returns
-            assert accel_bias_sigma is not None
-            assert accel_bias_tau is not None
-            assert accel_rw_sigma is not None
-            assert gyro_bias_sigma is not None
-            assert gyro_bias_tau is not None
-            assert gyro_rw_sigma is not None
-
-            return Pinson15NedBlock(
-                label,
-                self._mediator,
-                ImuModel(
-                    accel_bias_sigma,
-                    accel_bias_tau,
-                    accel_rw_sigma,
-                    gyro_bias_sigma,
-                    gyro_bias_tau,
-                    gyro_rw_sigma,
-                ),
-            )
+            return Pinson15NedBlock(label, self._mediator, imu_config)
 
         self._mediator.log_message(
             LoggingLevel.ERROR,

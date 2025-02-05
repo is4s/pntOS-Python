@@ -865,13 +865,13 @@ def test_copy(
     assert (
         new_pinson_block._imu_model.accel_bias_sigma
         == pinson_block._imu_model.accel_bias_sigma
-    ).all()
+    )
     # modify new block and re-compare with original block
-    new_pinson_block._imu_model.accel_bias_sigma = np.ones(3)
+    new_pinson_block._imu_model.accel_bias_sigma = (1.0, 2.0, 3.0)
     assert not (
         new_pinson_block._imu_model.accel_bias_sigma
         == pinson_block._imu_model.accel_bias_sigma
-    ).all()
+    )
 
     # pass PVA aux data to position MP
     assert position_mp._inertial_pva is None

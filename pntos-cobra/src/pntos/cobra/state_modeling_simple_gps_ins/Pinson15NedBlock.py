@@ -16,10 +16,10 @@ from pntos.api.plugins.common import (
 )
 from pntos.api.plugins.fusion import StandardStateBlock
 from pntos.api.plugins.fusion_strategy import StandardDynamicsModel
+from pntos.cobra.config import ImuConfig
 from pntos.cobra.utils import (
     OMEGA_E,
     EarthModel,
-    ImuModel,
     calc_lat_factor,
     calc_lon_factor,
     quat_to_dcm,
@@ -105,13 +105,13 @@ class Pinson15NedBlock(StandardStateBlock):
     """
 
     _mediator: Mediator
-    _imu_model: ImuModel
+    _imu_model: ImuConfig
     _old_pva_aux: MeasurementPVA | None
     _new_pva_aux: MeasurementPVA | None
     _force_and_rate_aux: MeasurementImu | None
     _pre_Q: NDArray[float64]
 
-    def __init__(self, label: str, mediator: Mediator, imu_model: ImuModel):
+    def __init__(self, label: str, mediator: Mediator, imu_model: ImuConfig):
         self.label = label
         self.num_states = 15
         self._mediator = mediator
@@ -121,12 +121,12 @@ class Pinson15NedBlock(StandardStateBlock):
                 np.concatenate(
                     [
                         np.zeros(3),
-                        imu_model.accel_random_walk_sigma,
-                        imu_model.gyro_random_walk_sigma,
+                        imu_model.accel_rw_sigma,
+                        imu_model.gyro_rw_sigma,
                         imu_model.accel_bias_sigma
-                        * np.sqrt(2 / imu_model.accel_bias_tau),
+                        * np.sqrt(np.divide(2, imu_model.accel_bias_tau)),
                         imu_model.gyro_bias_sigma
-                        * np.sqrt(2 / imu_model.gyro_bias_tau),
+                        * np.sqrt(np.divide(2, imu_model.gyro_bias_tau)),
                     ]
                 ),
                 2,
