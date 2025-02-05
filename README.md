@@ -99,7 +99,7 @@ New contributions to this repo should pass the following checks, if they use oth
 ```bash
 ruff check --fix
 ruff format
-pytest pntos-*
+pytest
 mypy pntos-api
 mypy pntos-cli
 mypy pntos-cobra
@@ -114,7 +114,7 @@ New contributions to this repo should pass the following checks, if they use Rye
 ```bash
 rye lint --fix
 rye fmt
-rye test -p pntos-cobra
+pytest
 mypy pntos-api
 mypy pntos-cli
 mypy pntos-cobra

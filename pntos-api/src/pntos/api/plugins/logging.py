@@ -2,7 +2,35 @@
 
 from abc import ABC, abstractmethod
 
-from pntos.api import CommonPlugin, LoggingLevel
+from .common import CommonPlugin, LoggingLevel
+from .controller import ControllerPlugin
+from .fusion import FusionPlugin
+from .fusion_strategy import FusionStrategyPlugin
+from .inertial import InertialPlugin
+from .initialization import InitializationPlugin
+from .orchestration import OrchestrationPlugin
+from .platform_integration import PlatformIntegrationPlugin
+from .preprocessor import PreprocessorPlugin
+from .registry import RegistryPlugin
+from .state_modeling import StateModelingPlugin
+from .transport import TransportPlugin
+from .ui import UiPlugin
+
+PluginType = (
+    type[ControllerPlugin]
+    | type[FusionPlugin]
+    | type[FusionStrategyPlugin]
+    | type[InertialPlugin]
+    | type[InitializationPlugin]
+    | type['LoggingPlugin']
+    | type[OrchestrationPlugin]
+    | type[PlatformIntegrationPlugin]
+    | type[PreprocessorPlugin]
+    | type[RegistryPlugin]
+    | type[StateModelingPlugin]
+    | type[TransportPlugin]
+    | type[UiPlugin]
+)
 
 
 class LoggingPlugin(CommonPlugin, ABC):
@@ -16,7 +44,7 @@ class LoggingPlugin(CommonPlugin, ABC):
     @abstractmethod
     def log(
         self,
-        source_plugin_type: type[CommonPlugin],
+        source_plugin_type: PluginType,
         source_plugin_identifier: str,
         level: LoggingLevel,
         message: str,

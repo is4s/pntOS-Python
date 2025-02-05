@@ -37,6 +37,7 @@ ignore = ["D212", "D417"]
 "pntos-cli/*" = ["D"]
 "apps/*" = ["D"]
 "docs/*" = ["D"]
+"*/tests/*" = ["D100", "D101", "D102"]
 
 [tool.ruff.lint.isort]
 combine-as-imports = true
