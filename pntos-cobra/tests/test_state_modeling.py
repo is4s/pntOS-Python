@@ -24,13 +24,15 @@ from pntos.api import (
     StateModelProviderType,
 )
 from pntos.cobra import (
-    Pinson15NedBlock,
-    PinsonPositionMeasurementProcessor,
     SimpleGpsInsStateModelingPlugin,
+    SimpleMediator,
     SimpleRegistryPlugin,
 )
 from pntos.cobra.config import AlignmentConfig, ImuConfig, SensorConfig
-from pntos.cobra.SimpleControllerPlugin import SimpleMediator
+from pntos.cobra.internal import (
+    Pinson15NedBlock,
+    PinsonPositionMeasurementProcessor,
+)
 from pntos.cobra.utils.navutils import calc_lat_factor, calc_lon_factor
 
 my_config = [
