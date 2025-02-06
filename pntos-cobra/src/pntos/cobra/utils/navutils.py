@@ -186,7 +186,7 @@ class EarthModel:
         )
 
 
-# Explicitly define exports so that we can exclude symbosl imported by this file when doing `from navutils import *`.
+# Explicitly define exports so that we can exclude symbols imported by this file when doing `from navutils import *`.
 __all__ = [
     'skew',
     'meridian_radius',

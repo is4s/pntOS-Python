@@ -200,13 +200,16 @@ class Pinson15NedBlock(StandardStateBlock):
             lat_factor1 = calc_lat_factor(new_pos[0], new_pos[2])
             lon_factor1 = calc_lon_factor(new_pos[0], new_pos[2])
 
-            lat0Tolat1 = lat_factor1 / lat_factor0
-            lon0Tolon1 = lon_factor1 / lon_factor0
-            Phi[:, 0] *= lat0Tolat1
-            Phi[:, 1] *= lon0Tolon1
+            lat0_to_lat1 = lat_factor1 / lat_factor0
+            lon0_to_lon1 = lon_factor1 / lon_factor0
+            Phi[:, 0] *= lat0_to_lat1
+            Phi[:, 1] *= lon0_to_lon1
 
     def generate_f_pinson15(self) -> NDArray[float64]:
-        """Generates the continuous time propagation matrix F, which is the Jacobian of the differential equations governing inertial error growth. Based upon the model given in Titterton and Weston, 2nd edition, section 12.3, with some variations as detailed below.
+        """Generates the continuous time propagation matrix F.
+
+        F is the Jacobian of the differential equations governing inertial error growth.
+        This is based upon the model given in Titterton and Weston, 2nd edition.
 
         Returns:
             NDArray[float64]: The F Matrix.
