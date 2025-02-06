@@ -1,3 +1,5 @@
+from typing import cast
+
 import numpy as np
 from aspn23 import (
     MeasurementPosition,
@@ -46,15 +48,42 @@ class PinsonPositionMeasurementProcessor(StandardMeasurementProcessor):
         self._l_ps_p = l_ps_p
         self._C_platform_to_sensor = C_platform_to_sensor
 
-    def receive_aux_data(self, aux: list[Message]) -> None:
+    def validate_aux_data(self, aux: list[Message]) -> bool:
+        if not aux:
+            self._mediator.log_message(
+                LoggingLevel.ERROR,
+                f'PinsonPositionMeasurementProcessor expected aux data of type MeasurementPositionVelocityAttitude, but received empty list.',
+            )
+            return False
+
+        if len(aux) > 1:
+            self._mediator.log_message(
+                LoggingLevel.WARN,
+                f'PinsonPositionMeasurementProcessor expected a single MeasurementPositionVelocityAttitude aux message, but received {len(aux)} aux messages. Ignoring all except the first message.',
+            )
+
         if not isinstance(aux[0].wrapped_message, MeasurementPVA):
             self._mediator.log_message(
                 LoggingLevel.ERROR,
                 f'PinsonPositionMeasurementProcessor expected aux data of type MeasurementPositionVelocityAttitude, but got message of type {type(aux[0].wrapped_message)}.',
             )
+            return False
+
+        pva = aux[0].wrapped_message
+
+        if pva.quaternion is None:
+            self._mediator.log_message(
+                LoggingLevel.ERROR,
+                f'Pinson15NedBlock received PVA aux data with no quaternion at time {pva.time_of_validity.elapsed_nsec/1e9}s.',
+            )
+
+        return True
+
+    def receive_aux_data(self, aux: list[Message]) -> None:
+        if not self.validate_aux_data(aux):
             return
 
-        self._inertial_pva = aux[0].wrapped_message
+        self._inertial_pva = cast(MeasurementPVA, aux[0].wrapped_message)
 
     def generate_model(
         self, message: Message, x_and_p: EstimateWithCovariance

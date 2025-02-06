@@ -144,8 +144,15 @@ class Pinson15NedBlock(StandardStateBlock):
         """
         for message in aux:
             if isinstance(message.wrapped_message, MeasurementPVA):
+                pva = message.wrapped_message
+                if pva.quaternion is None:
+                    self._mediator.log_message(
+                        LoggingLevel.WARN,
+                        f'Pinson15NedBlock received PVA aux data with no quaternion at time {pva.time_of_validity.elapsed_nsec/1e9}s. Ignoring.',
+                    )
+                    continue
                 self._old_pva_aux = self._new_pva_aux
-                self._new_pva_aux = message.wrapped_message
+                self._new_pva_aux = pva
             elif isinstance(message.wrapped_message, MeasurementImu):
                 self._force_and_rate_aux = message.wrapped_message
             else:

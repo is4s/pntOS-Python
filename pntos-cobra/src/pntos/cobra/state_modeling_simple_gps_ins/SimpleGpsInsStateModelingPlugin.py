@@ -62,7 +62,12 @@ class SimpleGpsInsStateModelProvider(StandardStateModelProvider):
         """
         if processor_index == 0:
             sensor_config = config_from_registry(SensorConfig, self._mediator)
-            assert sensor_config is not None
+            if sensor_config is None:
+                self._mediator.log_message(
+                    LoggingLevel.ERROR,
+                    f'Could not get position sensor config from registry.',
+                )
+                return None
             l_ps_p = np.array(sensor_config.lever_arm)
             C_platform_to_sensor = quat_to_dcm(
                 np.array(sensor_config.orientation)
@@ -116,7 +121,12 @@ class SimpleGpsInsStateModelProvider(StandardStateModelProvider):
         """
         if block_index == 0:
             imu_config = config_from_registry(ImuConfig, self._mediator)
-            assert imu_config is not None
+            if imu_config is None:
+                self._mediator.log_message(
+                    LoggingLevel.ERROR,
+                    f'Could not get IMU config from registry.',
+                )
+                return None
 
             return Pinson15NedBlock(label, self._mediator, imu_config)
 
@@ -153,8 +163,8 @@ class SimpleGpsInsStateModelingPlugin(StateModelingPlugin):
         plugin_resources_location: str | None = None,
         mediator: Mediator | None = None,
     ) -> None:
-        assert mediator is not None
-        self._mediator = mediator
+        if mediator is not None:
+            self._mediator = mediator
 
     def shutdown_plugin(self) -> None:
         pass
