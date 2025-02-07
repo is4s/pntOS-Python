@@ -30,6 +30,8 @@ certifi==2024.2.2
     # via requests
 charset-normalizer==3.3.2
     # via requests
+coverage==7.6.10
+    # via pytest-cov
 decorator==5.1.1
     # via ipython
 docutils==0.21.2
@@ -92,6 +94,8 @@ pygments==2.18.0
     # via ipython
     # via sphinx
 pytest==8.2.0
+    # via pytest-cov
+pytest-cov==6.0.0
 pyyaml==6.0.2
     # via myst-parser
 requests==2.31.0

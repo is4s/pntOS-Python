@@ -99,7 +99,7 @@ New contributions to this repo should pass the following checks, if they use oth
 ```bash
 ruff check --fix
 ruff format
-pytest
+pytest --cov --cov-fail-under=75 --cov-report={term,html}
 mypy pntos-api
 mypy pntos-cli
 mypy pntos-cobra
@@ -114,7 +114,7 @@ New contributions to this repo should pass the following checks, if they use Rye
 ```bash
 rye lint --fix
 rye fmt
-pytest
+pytest --cov --cov-fail-under=75 --cov-report={term,html}
 mypy pntos-api
 mypy pntos-cli
 mypy pntos-cobra
@@ -125,6 +125,8 @@ Or, to run all the above commands at once, run:
 ```shell
 ./run_all_checks.sh
 ```
+
+You can view a detailed code coverage report from the `index.html` in the `htmlcov` directory.
 
 ### Rye Tooling Explanation
 
