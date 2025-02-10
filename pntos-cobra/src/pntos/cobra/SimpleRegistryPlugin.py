@@ -8,7 +8,6 @@ from typing import (
     ItemsView,
     Iterator,
     KeysView,
-    List,
     ValuesView,
 )
 
@@ -45,7 +44,7 @@ class SimpleKeyValueStore(KeyValueStore):
     """
 
     _store: dict[str, RegistryValueTypeUnion]
-    _callbacks: dict[None | str, List[Callable[[str, List[str], KeyValueStore], None]]]
+    _callbacks: dict[None | str, list[Callable[[str, list[str], KeyValueStore], None]]]
     _permanent_keys: set[str]
     _set_permanent: bool
     _modified_keys: set[str]
@@ -373,7 +372,7 @@ class SimpleKeyValueStore(KeyValueStore):
 
         # Run through keyed callbacks
         keys_per_callback: dict[
-            Callable[[str, List[str], KeyValueStore], None], List[str]
+            Callable[[str, list[str], KeyValueStore], None], list[str]
         ] = {}
         for k in self._modified_keys:
             if k in self._callbacks:
@@ -404,7 +403,7 @@ class SimpleKeyValueStore(KeyValueStore):
     def request_notify(
         self,
         key: str | None,
-        callback: Callable[[str, List[str], KeyValueStore], None],
+        callback: Callable[[str, list[str], KeyValueStore], None],
     ) -> bool:
         self._check_batch_operation()
         if key not in self._callbacks:
@@ -416,7 +415,7 @@ class SimpleKeyValueStore(KeyValueStore):
     def remove_notify(
         self,
         key: str | None,
-        callback: Callable[[str, List[str], KeyValueStore], None],
+        callback: Callable[[str, list[str], KeyValueStore], None],
     ) -> bool:
         self._check_batch_operation()
         while key in self._modified_keys:
@@ -488,7 +487,7 @@ class SimpleKeyValueStore(KeyValueStore):
 
 class SimpleRegistry(Registry):
     groups: Dict[str, SimpleKeyValueStore]
-    callbacks: List[Callable[[str], None]]
+    callbacks: list[Callable[[str], None]]
     _log: Callable[[LoggingLevel, str], None]
     _plugin_resources_location: str | None
     """
@@ -518,7 +517,7 @@ class SimpleRegistry(Registry):
         self.groups[group]._batch_live = True
         return self.groups[group]
 
-    def get_group_array(self) -> List[str]:
+    def get_group_array(self) -> list[str]:
         return list(self.groups.keys())
 
     def has_group(self, group: str) -> bool:

@@ -1,7 +1,6 @@
 import io
 import pickle
 import unittest
-from typing import List
 from unittest.mock import patch
 
 import numpy as np
@@ -309,7 +308,7 @@ class TestRegistry(unittest.TestCase):
         test_s_np_array = None
 
         m_str = 'String to string failed.'
-        m_list_str = 'List of strings to string failed.'
+        m_list_str = 'list of strings to string failed.'
         m_int = 'Int to string failed.'
         m_bool = 'Bool to string failed.'
         m_float = 'Float to string failed.'
@@ -317,7 +316,7 @@ class TestRegistry(unittest.TestCase):
 
         kv = self.reg.batch_start(self.test_group)
         kv.set_value('str', test_str)
-        kv.set_value('List[str]', test_list_str)
+        kv.set_value('list[str]', test_list_str)
         kv.set_value('int', test_int)
         kv.set_value('bool', test_bool)
         kv.set_value('float', test_float)
@@ -326,7 +325,7 @@ class TestRegistry(unittest.TestCase):
 
         kv = self.reg.batch_start(self.test_group)
         assert kv.get_value('str', str) == test_s_str, m_str
-        assert kv.get_value('List[str]', str) == test_s_list_str, m_list_str
+        assert kv.get_value('list[str]', str) == test_s_list_str, m_list_str
         assert kv.get_value('int', str) == test_s_int, m_int
         assert kv.get_value('bool', str) == test_s_bool, m_bool
         assert kv.get_value('float', str) == test_s_float, m_float
@@ -483,10 +482,10 @@ class TestRegistry(unittest.TestCase):
             test_kv.set_value(k, 0)
 
         callbacked_group: str = ''
-        callbacked_keys: List[str] = []
+        callbacked_keys: list[str] = []
         callbacked_kv: KeyValueStore = SimpleKeyValueStore('', dummy_log)
 
-        def test_callback(group: str, keys: List[str], kv: KeyValueStore) -> None:
+        def test_callback(group: str, keys: list[str], kv: KeyValueStore) -> None:
             nonlocal callbacked_group
             nonlocal callbacked_keys
             nonlocal callbacked_kv
@@ -516,10 +515,10 @@ class TestRegistry(unittest.TestCase):
             test_kv.set_value(k, 0)
 
         callbacked_group: str = ''
-        callbacked_keys: List[str] = []
+        callbacked_keys: list[str] = []
         callbacked_kv: KeyValueStore = SimpleKeyValueStore('', dummy_log)
 
-        def test_callback(group: str, keys: List[str], kv: KeyValueStore) -> None:
+        def test_callback(group: str, keys: list[str], kv: KeyValueStore) -> None:
             nonlocal callbacked_group
             nonlocal callbacked_keys
             nonlocal callbacked_kv
@@ -550,10 +549,10 @@ class TestRegistry(unittest.TestCase):
             test_kv.set_value(k, 0)
 
         callbacked_group: str = ''
-        callbacked_keys: List[str] = []
+        callbacked_keys: list[str] = []
         callbacked_kv: KeyValueStore = SimpleKeyValueStore('', dummy_log)
 
-        def test_callback(group: str, keys: List[str], kv: KeyValueStore) -> None:
+        def test_callback(group: str, keys: list[str], kv: KeyValueStore) -> None:
             nonlocal callbacked_group
             nonlocal callbacked_keys
             nonlocal callbacked_kv
@@ -598,10 +597,10 @@ class TestRegistry(unittest.TestCase):
             test_kv.set_value(k, 0)
 
         callbacked_group: str = ''
-        callbacked_keys: List[str] = []
+        callbacked_keys: list[str] = []
         callbacked_kv: KeyValueStore = SimpleKeyValueStore('', dummy_log)
 
-        def test_callback(group: str, keys: List[str], kv: KeyValueStore) -> None:
+        def test_callback(group: str, keys: list[str], kv: KeyValueStore) -> None:
             nonlocal callbacked_group
             nonlocal callbacked_keys
             nonlocal callbacked_kv
