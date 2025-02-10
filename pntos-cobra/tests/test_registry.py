@@ -25,19 +25,20 @@ from pntos.api import (
     RegistryValueTypeUnion,
 )
 from pntos.cobra import (
-    SimpleControllerPlugin,
     SimpleRegistryPlugin,
 )
 from pntos.cobra.config import (
     AlignmentConfig,
+    ConfigTypeUnion,
     ImuConfig,
     SensorConfig,
+    config_from_registry,
 )
 from pntos.cobra.SimpleRegistryPlugin import (
     SimpleKeyValueStore,
 )
 
-my_config = [
+my_config: list[ConfigTypeUnion] = [
     ImuConfig(
         accel_bias_sigma=(0.0098, 0.0098, 0.0098),
         accel_bias_tau=(3600.0, 3600.0, 3600.0),
@@ -45,6 +46,7 @@ my_config = [
         gyro_bias_sigma=(1.234e-6, 1.234e-6, 1.234e-6),
         gyro_bias_tau=(3600.0, 3600.0, 3600.0),
         gyro_rw_sigma=(0.001, 0.001, 0.001),
+        group='config/default/test',
     ),
     AlignmentConfig(
         initialPosCov=(9.0, 9.0, 9.0),
@@ -52,6 +54,7 @@ my_config = [
         initialTiltCov=(0.01, 0.01, 0.01),
         initialAccelBiasCov=(9.604e-5, 9.604e-5, 9.604e-5),
         initialGyroBiasCov=(2.3504074e-11, 2.3504074e-11, 2.3504074e-11),
+        group='config/default/test',
     ),
     SensorConfig(
         lever_arm=(0.0, 0.0, 0.0),
@@ -60,6 +63,7 @@ my_config = [
         destination_identifier='gps_measurement_processor',
         use_for_alignment=True,
         sensor_name='novatel',
+        group='config/default/test',
     ),
 ]
 
@@ -236,25 +240,21 @@ class TestRegistry(unittest.TestCase):
 
     def test_initial_config(self) -> None:
         registry = SimpleRegistryPlugin('Simple registry', config=my_config)
+        registry.init_plugin(mediator=DummyMediator())
         reg = registry.new_registry(None)
-        for config in my_config:
-            assert hasattr(config, 'group')
-            kvs = reg.batch_start(config.group)
-            for attribute in config.__dict__:
-                expected_value = getattr(config, attribute)
-                # Special case: convert tuples of floats to numpy arrays
-                if isinstance(expected_value, tuple):
-                    expected_value = np.array(expected_value)
-                    value_type = np.ndarray
-                else:
-                    value_type = type(expected_value)
-                actual_value = kvs.get_value(attribute, value_type)
-                if isinstance(expected_value, np.ndarray) and isinstance(
-                    actual_value, np.ndarray
-                ):
-                    assert np.allclose(expected_value, actual_value)
-                else:
-                    assert actual_value == expected_value
+        for expected in my_config:
+            collected = config_from_registry(  # type: ignore[type-var]
+                type(expected), registry.mediator, self.test_group
+            )
+            for expected_attr, collected_attr in zip(dir(expected), dir(collected)):
+                if not expected_attr.startswith('__'):  # Don't check dunders
+                    exp_val = getattr(expected, expected_attr)
+                    col_val = getattr(collected, collected_attr)
+                    assert type(exp_val) == type(col_val)
+                    if type(exp_val) == np.ndarray:
+                        assert np.all(exp_val == col_val)
+                    else:
+                        assert exp_val == col_val
 
     def test_add_to_registry(self) -> None:
         kv: KeyValueStore = self.reg.batch_start(self.test_group)
@@ -469,7 +469,7 @@ class TestRegistry(unittest.TestCase):
     @patch('sys.stdout', new_callable=io.StringIO)
     def test_batch_rules(self, mock_stdout: io.StringIO) -> None:
         if self.registry.mediator is None:  # Controller not implemented
-            return
+            return  # type: ignore[unreachable]
 
         kv = self.reg.batch_start(self.test_group)
         kv.batch_end()
@@ -752,7 +752,13 @@ class TestRegistry(unittest.TestCase):
         kv = self.reg.batch_start(self.test_group)
         key = 'invalid_type_key'
         value = ImuConfig(
-            (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0)
+            (0, 0, 0),
+            (0, 0, 0),
+            (0, 0, 0),
+            (0, 0, 0),
+            (0, 0, 0),
+            (0, 0, 0),
+            group='config/default/test',
         )
         # Have to type ignore this one because it's exactly what we're testing:
         kv[key] = value  # type: ignore[assignment]

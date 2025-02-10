@@ -1,0 +1,178 @@
+import unittest
+from dataclasses import fields
+
+import numpy as np
+from aspn23 import TypeTimestamp
+from pntos.api import LoggingLevel, Mediator, Message
+from pntos.cobra import SimpleRegistryPlugin
+from pntos.cobra.config import (
+    AlignmentConfig,
+    ConfigType,
+    ImuConfig,
+    SensorConfig,
+    config_from_registry,
+    config_to_registry,
+)
+
+DEBUG_LOG: str = ''
+CONFIG_TEST_GROUP = 'config_test_group'
+
+
+class DummyMediator(Mediator):
+    def get_filter_description_list(self) -> list[str]:
+        return []
+
+    def request_solutions(
+        self,
+        solution_times: list[TypeTimestamp],
+        filter_description: str | None = None,
+    ) -> list[Message]:
+        return []
+
+    def process_pntos_message(self, message: Message) -> None:
+        pass
+
+    def broadcast_aspn_message(
+        self,
+        message: Message,
+        transport: str | None = None,
+        destination_identifier: str | None = None,
+    ) -> None:
+        pass
+
+    def log_message(self, level: LoggingLevel, message: str) -> None:
+        DEBUG_LOG = message
+
+
+class TestConfigUtils(unittest.TestCase):
+    def __init__(self, name: str) -> None:
+        # Set up registry and mediator
+        registry_plugin = SimpleRegistryPlugin('Simple Registry Plugin')
+        registry_plugin.init_plugin(mediator=DummyMediator())
+        DummyMediator.registry = registry_plugin.new_registry()
+        self.mediator = DummyMediator()
+
+        super().__init__(name)
+
+    def test_AlignmentConfig_to_and_from_registry(self) -> None:
+        test_conf = AlignmentConfig(
+            (8.1, 8.2, 8.3),
+            (9.1, 9.2, 9.3),
+            (10.1, 10.2, 10.3),
+            (11.1, 11.2, 11.3),
+            (12.1, 12.2, 12.3),
+            group=CONFIG_TEST_GROUP,
+        )
+
+        # Test config_to_registry
+        config_to_registry(test_conf, self.mediator)
+        self._validate_conf_to_registry(test_conf)
+
+        # Test config_from_registry()
+        result_conf = config_from_registry(
+            AlignmentConfig, self.mediator, CONFIG_TEST_GROUP
+        )
+        assert result_conf is not None
+
+        self._validate_conf_from_registry(test_conf, result_conf)
+
+    def test_ImuConfig_to_from_registry(self) -> None:
+        test_conf = ImuConfig(
+            (2.1, 2.2, 2.3),
+            (3.1, 3.2, 3.3),
+            (4.1, 4.2, 4.3),
+            (5.1, 5.2, 5.3),
+            (6.1, 6.2, 6.3),
+            (7.1, 7.2, 7.3),
+            group=CONFIG_TEST_GROUP,
+        )
+
+        # Test config_to_registry
+        config_to_registry(test_conf, self.mediator)
+        self._validate_conf_to_registry(test_conf)
+
+        # Test config_from_registry()
+        result_conf = config_from_registry(ImuConfig, self.mediator, CONFIG_TEST_GROUP)
+        assert result_conf is not None
+
+        self._validate_conf_from_registry(test_conf, result_conf)
+
+    def test_SensorConfig_to_from_registry(self) -> None:
+        test_conf = SensorConfig(
+            (0.7, 0.8, 0.9),
+            (1.1, 2.2, 3.3, 4.4),
+            'hello',
+            'world',
+            True,
+            'NCC-1701',
+            group=CONFIG_TEST_GROUP,
+        )
+
+        # Test config_to_registry
+        config_to_registry(test_conf, self.mediator)
+        self._validate_conf_to_registry(test_conf)
+
+        # Test config_from_registry()
+        result_conf = config_from_registry(
+            SensorConfig, self.mediator, CONFIG_TEST_GROUP
+        )
+        assert result_conf is not None
+
+        self._validate_conf_from_registry(test_conf, result_conf)
+
+    def test_config_from_registry_return_none(self) -> None:
+        test_conf = SensorConfig(
+            (0.1, 0.2, 0.3),
+            (0.4, 0.5, 0.6, 0.7),
+            'hello',
+            'world',
+            True,
+            'NCC-1701',
+            group=CONFIG_TEST_GROUP,
+        )
+
+        # Test config_to_registry
+        config_to_registry(test_conf, self.mediator)
+        self._validate_conf_to_registry(test_conf)
+
+        # Whoops, modified a value in the registry
+        reg = self.mediator.registry.batch_start(CONFIG_TEST_GROUP)
+        reg['destination_identifier'] = ['not', 'the', 'right', 'type']
+        reg.batch_end()
+
+        # Test config_from_registry()
+        result_conf = config_from_registry(
+            SensorConfig, self.mediator, CONFIG_TEST_GROUP
+        )
+        assert result_conf is None
+
+    def _validate_conf_to_registry(self, test_conf: ConfigType) -> None:
+        kv = self.mediator.registry.batch_start(CONFIG_TEST_GROUP)
+        conf_fields = [f for f in fields(test_conf)]
+        for conf_field in conf_fields:
+            val = kv[conf_field.name]
+            conf_val = getattr(test_conf, conf_field.name)
+            if isinstance(val, np.ndarray):
+                assert np.all(val == conf_val)
+            else:
+                assert val == conf_val
+
+    def _validate_conf_from_registry(
+        self, test_conf: ConfigType, result_conf: ConfigType
+    ) -> None:
+        # Go through config values and validate that they were received correctly
+        test_fields = fields(test_conf)
+        result_fields = fields(result_conf)
+        assert test_fields == result_fields
+        for test_field, result_field in zip(test_fields, result_fields):
+            assert test_field.name == result_field.name
+            test_val = getattr(test_conf, test_field.name)
+            result_val = getattr(result_conf, result_field.name)
+            assert type(test_val) == type(result_val)
+            if isinstance(test_val, np.ndarray):
+                assert np.all(test_val == result_val)
+            else:
+                assert test_val == result_val
+
+        # Make sure there weren't any error messages:
+        assert DEBUG_LOG == ''

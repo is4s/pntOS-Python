@@ -27,6 +27,7 @@ from pntos.api import (
     RegistryValueType,
     RegistryValueTypeUnion,
 )
+from pntos.cobra.config import ConfigTypeUnion, config_to_registry
 
 REGISTRY_DATA_FORMAT = KeyValueStoreDataFormat.UNSPECIFIED
 REGISTRY_SEPARATOR = ', '
@@ -529,7 +530,7 @@ class SimpleRegistry(Registry):
 
 
 class SimpleRegistryPlugin(RegistryPlugin):
-    config: List[Any]
+    config: list[ConfigTypeUnion]
     registries: list[SimpleRegistry]
     log_levels: Dict[LoggingLevel, str] = {
         LoggingLevel.ERROR: 'ERROR',
@@ -538,23 +539,27 @@ class SimpleRegistryPlugin(RegistryPlugin):
         LoggingLevel.DEBUG: 'DEBUG',
     }
     _plugin_resources_location: str | None = None
+    mediator: Mediator
 
-    def __init__(self, identifier: str, config: List[Any] | None = None):
+    def __init__(
+        self, identifier: str, config: list[ConfigTypeUnion] | None = None
+    ) -> None:
         self.identifier = identifier
-        self.mediator: Mediator | None = None
         self.registries = []
-
-        self.config = []
-        if config is not None:
-            self.config = config
+        self.config = config if config is not None else []
 
     def init_plugin(
         self,
         plugin_resources_location: str | None = None,
         mediator: Mediator | None = None,
     ) -> None:
+        if mediator is None:
+            self._log(LoggingLevel.ERROR, 'This registry requires a mediator.')
+            return
         self.mediator = mediator
         self._plugin_resources_location = plugin_resources_location
+
+        # Make sure to only add supported configs to registry
 
     def shutdown_plugin(self) -> None:
         # Batch-end any open key-value stores
@@ -574,35 +579,10 @@ class SimpleRegistryPlugin(RegistryPlugin):
             )
         out = SimpleRegistry(self._log, self._plugin_resources_location)
 
-        # Check input config from constructor
-        config = []
-        for element in self.config:
-            if not hasattr(element, 'group'):
-                self._log(
-                    LoggingLevel.ERROR,
-                    f'Object {element.__name__} does not have a group field.'
-                    + ' This config will not '
-                    'be used.',
-                )
-                continue
-            if not isinstance(element.group, str):
-                self._log(
-                    LoggingLevel.ERROR,
-                    f"Object {element.__name__}'s group field is not a string. "
-                    + 'This config will not'
-                    ' be used.',
-                )
-            config += [element]
         # Use input config from constructor
-        for element in self.config:
-            kvs = out.batch_start(element.group)
-            for attribute in element.__dict__:
-                value = getattr(element, attribute)
-                # Special case: convert tuples of floats to numpy arrays
-                if isinstance(value, tuple):
-                    value = np.array(value)
-                kvs.set_value(attribute, value)
-            kvs.batch_end()
+        for conf in self.config:
+            config_to_registry(conf, self.mediator)
+
         self.registries.append(out)
         return out
 
@@ -610,4 +590,4 @@ class SimpleRegistryPlugin(RegistryPlugin):
         if self.mediator is not None:
             self.mediator.log_message(level, message)
         else:
-            print('[RegistryPlugin] ' + f'{self.log_levels[level]} ' + message)
+            print('[RegistryPlugin] ' + f'{self.log_levels[level]} ' + message)  # type: ignore[unreachable]
