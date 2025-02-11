@@ -31,7 +31,6 @@ class PinsonPositionMeasurementProcessor(StandardMeasurementProcessor):
     _mediator: Mediator
     _inertial_pva: MeasurementPVA | None
     _l_ps_p: NDArray[float64]
-    _C_platform_to_sensor: NDArray[float64]
 
     def __init__(
         self,
@@ -39,14 +38,12 @@ class PinsonPositionMeasurementProcessor(StandardMeasurementProcessor):
         state_block_labels: list[str],
         mediator: Mediator,
         l_ps_p: NDArray[float64],
-        C_platform_to_sensor: NDArray[float64],
     ):
         self.label = label
         self.state_block_labels = state_block_labels
         self._mediator = mediator
         self._inertial_pva = None
         self._l_ps_p = l_ps_p
-        self._C_platform_to_sensor = C_platform_to_sensor
 
     def validate_aux_data(self, aux: list[Message]) -> bool:
         if not aux:

@@ -70,14 +70,11 @@ class SimpleGpsInsStateModelProvider(StandardStateModelProvider):
                     f'Could not get position sensor config from registry.',
                 )
                 return None
-            l_ps_p = np.array(sensor_config.lever_arm)
-            C_platform_to_sensor = quat_to_dcm(np.array(sensor_config.orientation))
             return PinsonPositionMeasurementProcessor(
                 label,
                 state_block_labels,
                 self._mediator,
-                l_ps_p,
-                C_platform_to_sensor,
+                np.array(sensor_config.lever_arm),
             )
 
         self._mediator.log_message(
