@@ -52,8 +52,8 @@ class SimpleInitialization(InertialInitializationStrategy):
                 (
                     np.array(config.initial_accel_bias_var),
                     np.array(config.initial_gyro_bias_var),
-                    np.zeros(3),
-                    np.zeros(3),
+                    np.array(config.initial_accel_scale_factor_var),
+                    np.array(config.initial_gyro_scale_factor_var),
                 )
             )
         )
@@ -121,8 +121,8 @@ class SimpleInitialization(InertialInitializationStrategy):
         return StandardInertialErrors(
             accel_biases=np.array(config.initial_accel_bias),
             gyro_biases=np.array(config.initial_gyro_bias),
-            accel_scale_factors=np.zeros((3)),
-            gyro_scale_factors=np.zeros((3)),
+            accel_scale_factors=np.array(config.initial_accel_scale_factor),
+            gyro_scale_factors=np.array(config.initial_gyro_scale_factor),
         )
 
 

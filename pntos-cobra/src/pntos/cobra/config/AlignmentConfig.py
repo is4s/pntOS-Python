@@ -8,6 +8,8 @@ class AlignmentConfig:
     initial_rpy: tuple[float, float, float]
     initial_accel_bias: tuple[float, float, float]
     initial_gyro_bias: tuple[float, float, float]
+    initial_accel_scale_factor: tuple[float, float, float]
+    initial_gyro_scale_factor: tuple[float, float, float]
 
     initial_time: float
 
@@ -16,5 +18,7 @@ class AlignmentConfig:
     initial_tilt_var: tuple[float, float, float]
     initial_accel_bias_var: tuple[float, float, float]
     initial_gyro_bias_var: tuple[float, float, float]
+    initial_accel_scale_factor_var: tuple[float, float, float]
+    initial_gyro_scale_factor_var: tuple[float, float, float]
 
     group: str

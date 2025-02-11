@@ -31,6 +31,8 @@ def test() -> None:
     rpy = (0.123, 0.456, 0.789)
     accel_bias = (10, 11, 12)
     gyro_bias = (13, 14, 15)
+    accel_scale_factor = (16, 17, 18)
+    gyro_scale_factor = (19, 20, 21)
 
     time = 1.23
 
@@ -39,6 +41,8 @@ def test() -> None:
     tilt_var = (70, 80, 90)
     accel_bias_var = (100, 110, 120)
     gyro_bias_var = (130, 140, 150)
+    accel_scale_factor_var = (160, 170, 180)
+    gyro_scale_factor_var = (190, 200, 210)
 
     config = AlignmentConfig(
         initial_pos=pos,
@@ -46,12 +50,16 @@ def test() -> None:
         initial_rpy=rpy,
         initial_accel_bias=accel_bias,
         initial_gyro_bias=gyro_bias,
+        initial_accel_scale_factor=accel_scale_factor,
+        initial_gyro_scale_factor=gyro_scale_factor,
         initial_time=time,
         initial_pos_var=pos_var,
         initial_vel_var=vel_var,
         initial_tilt_var=tilt_var,
         initial_accel_bias_var=accel_bias_var,
         initial_gyro_bias_var=gyro_bias_var,
+        initial_accel_scale_factor_var=accel_scale_factor_var,
+        initial_gyro_scale_factor_var=gyro_scale_factor_var,
         group='test',
     )
 
@@ -98,9 +106,23 @@ def test() -> None:
     assert np.allclose(
         gyro_bias_var, np.diagonal(solution.inertial_error_covariance[3:6, 3:6])
     )
+    assert np.allclose(
+        accel_scale_factor_var,
+        np.diagonal(solution.inertial_error_covariance[6:9, 6:9]),
+    )
+    assert np.allclose(
+        gyro_scale_factor_var,
+        np.diagonal(solution.inertial_error_covariance[9:12, 9:12]),
+    )
     assert solution.inertial_errors is not None
     assert np.allclose(solution.inertial_errors.accel_biases, np.array(accel_bias))
     assert np.allclose(solution.inertial_errors.gyro_biases, np.array(gyro_bias))
+    assert np.allclose(
+        solution.inertial_errors.accel_scale_factors, np.array(accel_scale_factor)
+    )
+    assert np.allclose(
+        solution.inertial_errors.gyro_scale_factors, np.array(gyro_scale_factor)
+    )
     assert solution.status == InitializationStatus.INITIALIZED_GOOD
 
 
