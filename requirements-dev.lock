@@ -71,8 +71,11 @@ mypy==1.10.0
 mypy-extensions==1.0.0
     # via mypy
 myst-parser==4.0.0
+navtk @ git+ssh://git@git.aspn.us/pntos/navtk.git@b6729eda4fe5f8d9013f79d25ddce3e1b940b594
+    # via pntos-cobra
 numpy==1.26.4
     # via aspn23
+    # via navtk
     # via pntos-cobra
 packaging==24.0
     # via pytest

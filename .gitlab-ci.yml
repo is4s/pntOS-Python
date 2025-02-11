@@ -75,7 +75,7 @@ rye format:
 pytest-cov:
     stage: check
     tags:
-        - linux-light-runner
+        - linux-heavy-runner
     script:
         - docker run --rm -v $(pwd):/work -e CC=gcc -e CXX=g++ $DOCKER_IMAGE "rye sync && pytest --cov --cov-fail-under=75 --cov-report={term,html}"
     coverage:
@@ -87,7 +87,7 @@ pytest-cov:
 mypy:
     stage: check
     tags:
-        - linux-light-runner
+        - linux-heavy-runner
     script:
         - docker run --rm -dit -v $(pwd):/work --name pntos-python -e CC=gcc -e CXX=g++ $DOCKER_IMAGE bash
         - docker exec pntos-python rye sync
@@ -100,7 +100,7 @@ documentation check:
         GIT_SUBMODULE_STRATEGY: recursive
     stage: check
     tags:
-        - linux-light-runner
+        - linux-heavy-runner
     script:
         - docker run --workdir /work/docs --rm -dit -v $(pwd):/work --name pntos-python -e CC=gcc -e CXX=g++ $DOCKER_IMAGE bash
         - docker exec pntos-python rye sync
