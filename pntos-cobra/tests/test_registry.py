@@ -28,7 +28,7 @@ from pntos.cobra import (
 )
 from pntos.cobra.config import (
     AlignmentConfig,
-    ConfigTypeUnion,
+    BaseConfig,
     ImuConfig,
     SensorConfig,
     config_from_registry,
@@ -37,7 +37,7 @@ from pntos.cobra.SimpleRegistryPlugin import (
     SimpleKeyValueStore,
 )
 
-my_config: list[ConfigTypeUnion] = [
+my_config: list[BaseConfig] = [
     ImuConfig(
         accel_bias_sigma=(0.0098, 0.0098, 0.0098),
         accel_bias_tau=(3600.0, 3600.0, 3600.0),
@@ -252,7 +252,7 @@ class TestRegistry(unittest.TestCase):
         registry.init_plugin(mediator=DummyMediator())
         reg = registry.new_registry(None)
         for expected in my_config:
-            collected = config_from_registry(  # type: ignore[type-var]
+            collected = config_from_registry(
                 type(expected), registry.mediator, self.test_group
             )
             for expected_attr, collected_attr in zip(dir(expected), dir(collected)):
@@ -761,13 +761,13 @@ class TestRegistry(unittest.TestCase):
         kv = self.reg.batch_start(self.test_group)
         key = 'invalid_type_key'
         value = ImuConfig(
+            'config/default/test',
             (0, 0, 0),
             (0, 0, 0),
             (0, 0, 0),
             (0, 0, 0),
             (0, 0, 0),
             (0, 0, 0),
-            group='config/default/test',
         )
         # Have to type ignore this one because it's exactly what we're testing:
         kv[key] = value  # type: ignore[assignment]

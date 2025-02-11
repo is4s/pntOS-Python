@@ -1,8 +1,12 @@
 from dataclasses import dataclass
 
+from .BaseConfig import BaseConfig
+
 
 @dataclass
-class AlignmentConfig:
+class AlignmentConfig(BaseConfig):
+    group: str
+
     initial_pos: tuple[float, float, float]
     initial_vel: tuple[float, float, float]
     initial_rpy: tuple[float, float, float]
@@ -20,5 +24,3 @@ class AlignmentConfig:
     initial_gyro_bias_var: tuple[float, float, float]
     initial_accel_scale_factor_var: tuple[float, float, float]
     initial_gyro_scale_factor_var: tuple[float, float, float]
-
-    group: str
