@@ -40,15 +40,22 @@ class SimpleMediator(Mediator):
     transport_plugins: list[TransportPlugin]
     registry: Registry
 
-    def __init__(self, registry: Registry, transport_plugins: list[TransportPlugin]):
-        self.registry = registry
+    def __init__(
+        self,
+        registry: Registry | None,
+        transport_plugins: list[TransportPlugin],
+    ):
+        if registry is not None:
+            self.registry = registry
         self.transport_plugins = transport_plugins
 
     def get_filter_description_list(self) -> list[str]:
         return []
 
     def request_solutions(
-        self, solution_times: list[TypeTimestamp], filter_description: str | None = None
+        self,
+        solution_times: list[TypeTimestamp],
+        filter_description: str | None = None,
     ) -> list[Message]:
         return []
 

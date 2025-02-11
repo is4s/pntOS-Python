@@ -75,7 +75,7 @@ class TestConfigUtils(unittest.TestCase):
         )
 
         # Test config_to_registry
-        config_to_registry(test_conf, self.mediator)
+        config_to_registry(test_conf, self.mediator.registry)
         self._validate_conf_to_registry(test_conf)
 
         # Test config_from_registry()
@@ -98,7 +98,7 @@ class TestConfigUtils(unittest.TestCase):
         )
 
         # Test config_to_registry
-        config_to_registry(test_conf, self.mediator)
+        config_to_registry(test_conf, self.mediator.registry)
         self._validate_conf_to_registry(test_conf)
 
         # Test config_from_registry()
@@ -119,7 +119,7 @@ class TestConfigUtils(unittest.TestCase):
         )
 
         # Test config_to_registry
-        config_to_registry(test_conf, self.mediator)
+        config_to_registry(test_conf, self.mediator.registry)
         self._validate_conf_to_registry(test_conf)
 
         # Test config_from_registry()
@@ -142,7 +142,7 @@ class TestConfigUtils(unittest.TestCase):
         )
 
         # Test config_to_registry
-        config_to_registry(test_conf, self.mediator)
+        config_to_registry(test_conf, self.mediator.registry)
         self._validate_conf_to_registry(test_conf)
 
         # Whoops, modified a value in the registry

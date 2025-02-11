@@ -30,7 +30,7 @@ from pntos.cobra import (
 )
 from pntos.cobra.config import (
     AlignmentConfig,
-    ConfigTypeUnion,
+    BaseConfig,
     ImuConfig,
     SensorConfig,
 )
@@ -40,7 +40,7 @@ from pntos.cobra.internal import (
 )
 from pntos.cobra.utils.navutils import calc_lat_factor, calc_lon_factor
 
-my_config: list[ConfigTypeUnion] = [
+my_config: list[BaseConfig] = [
     ImuConfig(
         group='/config/cobra/imu',
         # HG9900 model
@@ -81,9 +81,12 @@ my_config: list[ConfigTypeUnion] = [
 
 @pytest.fixture
 def mediator() -> SimpleMediator:
+    mediator = SimpleMediator(None, [])
     registry_plugin = SimpleRegistryPlugin('Simple registry', config=my_config)
+    registry_plugin.init_plugin(mediator=mediator)
     registry = registry_plugin.new_registry()
-    return SimpleMediator(registry, [])
+    mediator.registry = registry
+    return mediator
 
 
 @pytest.fixture

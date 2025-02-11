@@ -3,7 +3,7 @@ from typing import Any, TypeVar, get_origin
 
 import numpy as np
 
-from pntos.api import LoggingLevel, Mediator, RegistryValueTypeUnion
+from pntos.api import LoggingLevel, Mediator, Registry, RegistryValueTypeUnion
 
 from .BaseConfig import BaseConfig
 
@@ -11,9 +11,7 @@ ConfigType = TypeVar('ConfigType', bound=BaseConfig)
 
 
 def config_from_registry(
-    config_type: type[ConfigType],
-    mediator: Mediator,
-    config_group: str,
+    config_type: type[ConfigType], mediator: Mediator, config_group: str
 ) -> ConfigType | None:
     conf_params = [f for f in fields(config_type)]
     kv = mediator.registry.batch_start(config_group)
@@ -48,9 +46,9 @@ def config_from_registry(
     return config_type(**out)  # type: ignore[arg-type]
 
 
-def config_to_registry(config: BaseConfig, mediator: Mediator) -> None:
+def config_to_registry(config: BaseConfig, registry: Registry) -> None:
     conf_params = [f for f in fields(config)]
-    kv = mediator.registry.batch_start(config.group)
+    kv = registry.batch_start(config.group)
 
     for param in conf_params:
         val_to_store = getattr(config, param.name)
