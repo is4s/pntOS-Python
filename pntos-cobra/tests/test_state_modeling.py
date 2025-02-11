@@ -28,15 +28,21 @@ from pntos.cobra import (
     SimpleMediator,
     SimpleRegistryPlugin,
 )
-from pntos.cobra.config import AlignmentConfig, ImuConfig, SensorConfig
+from pntos.cobra.config import (
+    AlignmentConfig,
+    ConfigTypeUnion,
+    ImuConfig,
+    SensorConfig,
+)
 from pntos.cobra.internal import (
     Pinson15NedBlock,
     PinsonPositionMeasurementProcessor,
 )
 from pntos.cobra.utils.navutils import calc_lat_factor, calc_lon_factor
 
-my_config = [
+my_config: list[ConfigTypeUnion] = [
     ImuConfig(
+        group='/config/cobra/imu',
         # HG9900 model
         accel_bias_sigma=(25 * 9.81e-6, 25 * 9.81e-6, 25 * 9.81e-6),
         accel_bias_tau=(3600.0, 3600.0, 3600.0),
@@ -54,6 +60,7 @@ my_config = [
         ),
     ),
     AlignmentConfig(
+        group='/config/cobra/alignment',
         initialPosCov=(9.0, 9.0, 9.0),
         initialVelCov=(0.1, 0.1, 0.1),
         initialTiltCov=(0.01, 0.01, 0.01),
@@ -61,6 +68,7 @@ my_config = [
         initialGyroBiasCov=(2.3504074e-11, 2.3504074e-11, 2.3504074e-11),
     ),
     SensorConfig(
+        group='/config/cobra/sensor',
         lever_arm=(0.0, 0.0, 0.0),
         orientation=(0.0, 0.0, 0.0, 0.0),
         source_identifier='lcm://cobranav/novatel',
@@ -98,9 +106,7 @@ def state_model_provider(
 def pinson_block(
     state_model_provider: StateModelProviderType,
 ) -> StandardStateBlock | None:
-    out = state_model_provider.new_block(
-        0, None, 'pinson', '/config/cobra/imu_config/default'
-    )
+    out = state_model_provider.new_block(0, None, 'pinson', '/config/cobra/imu')
     if isinstance(out, StandardStateBlock):
         return out
     return None
@@ -111,7 +117,7 @@ def position_mp(
     state_model_provider: StateModelProviderType,
 ) -> StandardMeasurementProcessor | None:
     out = state_model_provider.new_processor(
-        0, None, 'position', ['pinson'], '/config/cobra/sensor_config/default'
+        0, None, 'position', ['pinson'], '/config/cobra/sensor'
     )
     if isinstance(out, StandardMeasurementProcessor):
         return out

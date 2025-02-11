@@ -61,7 +61,9 @@ class SimpleGpsInsStateModelProvider(StandardStateModelProvider):
             with the given ``processor_index``, ``engine``, and ``config_group``.
         """
         if processor_index == 0:
-            sensor_config = config_from_registry(SensorConfig, self._mediator)
+            sensor_config = config_from_registry(
+                SensorConfig, self._mediator, config_group
+            )
             if sensor_config is None:
                 self._mediator.log_message(
                     LoggingLevel.ERROR,
@@ -69,9 +71,7 @@ class SimpleGpsInsStateModelProvider(StandardStateModelProvider):
                 )
                 return None
             l_ps_p = np.array(sensor_config.lever_arm)
-            C_platform_to_sensor = quat_to_dcm(
-                np.array(sensor_config.orientation)
-            )
+            C_platform_to_sensor = quat_to_dcm(np.array(sensor_config.orientation))
             return PinsonPositionMeasurementProcessor(
                 label,
                 state_block_labels,
@@ -120,7 +120,7 @@ class SimpleGpsInsStateModelProvider(StandardStateModelProvider):
             with the given ``block_index``, ``engine``, and ``config_group``.
         """
         if block_index == 0:
-            imu_config = config_from_registry(ImuConfig, self._mediator)
+            imu_config = config_from_registry(ImuConfig, self._mediator, config_group)
             if imu_config is None:
                 self._mediator.log_message(
                     LoggingLevel.ERROR,
