@@ -125,15 +125,11 @@ class PinsonPositionMeasurementProcessor(StandardMeasurementProcessor):
             ]
         )
 
-        # TODO: Can we assume inertial PVA already in platform frame?
         ecef_platform = llh_to_ecef(inertial_llh)
         C_nav_to_ecef = llh_to_cen(inertial_llh)
 
         assert self._inertial_pva.quaternion is not None
-        uncorr_C_nav_to_platform = quat_to_dcm(self._inertial_pva.quaternion)
-        # TODO: Do we need to correct inertial attitude before transforming to sensor frame?
-        tilt_err = x_and_p.estimate[6:9]
-        C_nav_to_platform = uncorr_C_nav_to_platform @ (np.eye(3) + skew(tilt_err))
+        C_nav_to_platform = quat_to_dcm(self._inertial_pva.quaternion)
 
         # Transform inertial position into sensor frame
         ecef_sensor = ecef_platform + C_nav_to_ecef @ (
@@ -141,7 +137,6 @@ class PinsonPositionMeasurementProcessor(StandardMeasurementProcessor):
         )
         llh_sensor = ecef_to_llh(ecef_sensor)
 
-        # TODO: use sensor pos for calculating lat factor, or corrected inertial pos instead?
         lat_factor = calc_lat_factor(llh[0], llh[2])
         lon_factor = calc_lon_factor(llh[0], llh[2])
         delta_pos = llh - llh_sensor
