@@ -29,7 +29,6 @@ from pntos.cobra import (
     SimpleRegistryPlugin,
 )
 from pntos.cobra.config import (
-    AlignmentConfig,
     BaseConfig,
     ImuConfig,
     SensorConfig,
@@ -58,14 +57,6 @@ my_config: list[BaseConfig] = [
             0.002 * np.pi / 180 / 60,
             0.002 * np.pi / 180 / 60,
         ),
-    ),
-    AlignmentConfig(
-        group='/config/cobra/alignment',
-        initialPosCov=(9.0, 9.0, 9.0),
-        initialVelCov=(0.1, 0.1, 0.1),
-        initialTiltCov=(0.01, 0.01, 0.01),
-        initialAccelBiasCov=(9.604e-5, 9.604e-5, 9.604e-5),
-        initialGyroBiasCov=(2.3504074e-11, 2.3504074e-11, 2.3504074e-11),
     ),
     SensorConfig(
         group='/config/cobra/sensor',
