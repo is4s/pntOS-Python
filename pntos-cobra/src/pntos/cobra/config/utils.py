@@ -5,12 +5,9 @@ import numpy as np
 
 from pntos.api import LoggingLevel, Mediator, RegistryValueTypeUnion
 
-from .AlignmentConfig import AlignmentConfig
-from .ImuConfig import ImuConfig
-from .SensorConfig import SensorConfig
+from .BaseConfig import BaseConfig
 
-ConfigType = TypeVar('ConfigType', AlignmentConfig, ImuConfig, SensorConfig)
-ConfigTypeUnion = AlignmentConfig | ImuConfig | SensorConfig
+ConfigType = TypeVar('ConfigType', bound=BaseConfig)
 
 
 def config_from_registry(
@@ -51,7 +48,7 @@ def config_from_registry(
     return config_type(**out)  # type: ignore[arg-type]
 
 
-def config_to_registry(config: ConfigTypeUnion, mediator: Mediator) -> None:
+def config_to_registry(config: BaseConfig, mediator: Mediator) -> None:
     conf_params = [f for f in fields(config)]
     kv = mediator.registry.batch_start(config.group)
 

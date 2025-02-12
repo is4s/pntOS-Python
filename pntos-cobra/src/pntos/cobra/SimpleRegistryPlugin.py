@@ -26,7 +26,7 @@ from pntos.api import (
     RegistryValueType,
     RegistryValueTypeUnion,
 )
-from pntos.cobra.config import ConfigTypeUnion, config_to_registry
+from pntos.cobra.config import BaseConfig, config_to_registry
 
 REGISTRY_DATA_FORMAT = KeyValueStoreDataFormat.UNSPECIFIED
 REGISTRY_SEPARATOR = ', '
@@ -529,7 +529,7 @@ class SimpleRegistry(Registry):
 
 
 class SimpleRegistryPlugin(RegistryPlugin):
-    config: list[ConfigTypeUnion]
+    config: list[BaseConfig]
     registries: list[SimpleRegistry]
     log_levels: Dict[LoggingLevel, str] = {
         LoggingLevel.ERROR: 'ERROR',
@@ -540,9 +540,7 @@ class SimpleRegistryPlugin(RegistryPlugin):
     _plugin_resources_location: str | None = None
     mediator: Mediator
 
-    def __init__(
-        self, identifier: str, config: list[ConfigTypeUnion] | None = None
-    ) -> None:
+    def __init__(self, identifier: str, config: list[BaseConfig] | None = None) -> None:
         self.identifier = identifier
         self.registries = []
         self.config = config if config is not None else []

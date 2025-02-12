@@ -7,7 +7,7 @@ from pntos.api import LoggingLevel, Mediator, Message
 from pntos.cobra import SimpleRegistryPlugin
 from pntos.cobra.config import (
     AlignmentConfig,
-    ConfigType,
+    BaseConfig,
     ImuConfig,
     SensorConfig,
     config_from_registry,
@@ -56,6 +56,7 @@ class TestConfigUtils(unittest.TestCase):
 
     def test_AlignmentConfig_to_and_from_registry(self) -> None:
         test_conf = AlignmentConfig(
+            CONFIG_TEST_GROUP,
             (1, 2, 3),
             (4, 5, 6),
             (7, 8, 9),
@@ -71,7 +72,6 @@ class TestConfigUtils(unittest.TestCase):
             (12.1, 12.2, 12.3),
             (13.1, 13.2, 13.3),
             (14.1, 15.2, 16.3),
-            group=CONFIG_TEST_GROUP,
         )
 
         # Test config_to_registry
@@ -88,13 +88,13 @@ class TestConfigUtils(unittest.TestCase):
 
     def test_ImuConfig_to_from_registry(self) -> None:
         test_conf = ImuConfig(
+            CONFIG_TEST_GROUP,
             (2.1, 2.2, 2.3),
             (3.1, 3.2, 3.3),
             (4.1, 4.2, 4.3),
             (5.1, 5.2, 5.3),
             (6.1, 6.2, 6.3),
             (7.1, 7.2, 7.3),
-            group=CONFIG_TEST_GROUP,
         )
 
         # Test config_to_registry
@@ -109,13 +109,13 @@ class TestConfigUtils(unittest.TestCase):
 
     def test_SensorConfig_to_from_registry(self) -> None:
         test_conf = SensorConfig(
+            CONFIG_TEST_GROUP,
             (0.7, 0.8, 0.9),
             (1.1, 2.2, 3.3, 4.4),
             'hello',
             'world',
             True,
             'NCC-1701',
-            group=CONFIG_TEST_GROUP,
         )
 
         # Test config_to_registry
@@ -132,13 +132,13 @@ class TestConfigUtils(unittest.TestCase):
 
     def test_config_from_registry_return_none(self) -> None:
         test_conf = SensorConfig(
+            CONFIG_TEST_GROUP,
             (0.1, 0.2, 0.3),
             (0.4, 0.5, 0.6, 0.7),
             'hello',
             'world',
             True,
             'NCC-1701',
-            group=CONFIG_TEST_GROUP,
         )
 
         # Test config_to_registry
@@ -156,7 +156,7 @@ class TestConfigUtils(unittest.TestCase):
         )
         assert result_conf is None
 
-    def _validate_conf_to_registry(self, test_conf: ConfigType) -> None:
+    def _validate_conf_to_registry(self, test_conf: BaseConfig) -> None:
         kv = self.mediator.registry.batch_start(CONFIG_TEST_GROUP)
         conf_fields = [f for f in fields(test_conf)]
         for conf_field in conf_fields:
@@ -168,7 +168,7 @@ class TestConfigUtils(unittest.TestCase):
                 assert val == conf_val
 
     def _validate_conf_from_registry(
-        self, test_conf: ConfigType, result_conf: ConfigType
+        self, test_conf: BaseConfig, result_conf: BaseConfig
     ) -> None:
         # Go through config values and validate that they were received correctly
         test_fields = fields(test_conf)
