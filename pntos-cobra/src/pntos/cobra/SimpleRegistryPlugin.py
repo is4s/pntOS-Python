@@ -189,7 +189,7 @@ class SimpleKeyValueStore(KeyValueStore):
         else:
             self._log(
                 LoggingLevel.ERROR,
-                f'Key {key} does not exist in store. Unable to delete',
+                f'Key {key} does not exist in store. Unable to delete.',
             )
         if key in self._modified_keys:
             self._modified_keys.remove(key)
@@ -220,13 +220,13 @@ class SimpleKeyValueStore(KeyValueStore):
                             LoggingLevel.ERROR,
                             'Unable to convert from type '
                             + f'{builtins.type(val)}'
-                            + f' to type {type}',
+                            + f' to type {type}.',
                         )
                 else:
                     self._log(
                         LoggingLevel.ERROR,
                         f'Conversion from type {builtins.type(val)}'
-                        + f' to type {type} unsupported',
+                        + f' to type {type} unsupported.',
                     )
 
             return None
@@ -295,7 +295,7 @@ class SimpleKeyValueStore(KeyValueStore):
         if key is None:
             self._log(
                 LoggingLevel.ERROR,
-                'This implementation requires a key to be passed to get_raw',
+                'This implementation requires a key to be passed to get_raw.',
             )
             return None
         out = self.get_value(key, str)
@@ -305,7 +305,7 @@ class SimpleKeyValueStore(KeyValueStore):
             if key not in self._store:
                 self._log(
                     LoggingLevel.ERROR,
-                    f'Key {key} does not exist in group {self._group}',
+                    f'Key {key} does not exist in group {self._group}.',
                 )
             else:
                 self._log(
@@ -320,7 +320,7 @@ class SimpleKeyValueStore(KeyValueStore):
             self._log(
                 LoggingLevel.ERROR,
                 f'Received invalid type {type(value)}.'
-                + f' Expected {RegistryValueTypeUnion}',
+                + f' Expected {RegistryValueTypeUnion}.',
             )
             return
         if self._set_permanent:
@@ -338,7 +338,7 @@ class SimpleKeyValueStore(KeyValueStore):
         if key is None:
             self._log(
                 LoggingLevel.ERROR,
-                'This implementation requires a key to be passed to set_raw',
+                'This implementation requires a key to be passed to set_raw.',
             )
             return
         self[key] = bytes.decode(self._encoding)
@@ -510,7 +510,7 @@ class SimpleRegistry(Registry):
             for callback in self.callbacks:
                 callback(group)
         if self.groups[group]._batch_live:
-            self._log(LoggingLevel.ERROR, 'Batch already live')
+            self._log(LoggingLevel.ERROR, 'Batch already live.')
         self.groups[group]._batch_live = True
         return self.groups[group]
 
@@ -569,7 +569,7 @@ class SimpleRegistryPlugin(RegistryPlugin):
             self._log(
                 LoggingLevel.ERROR,
                 'initial_config parameter is unsupported by this '
-                + 'implementation; ignoring values',
+                + 'implementation; ignoring values.',
             )
         out = SimpleRegistry(self._log, self._plugin_resources_location)
 
@@ -584,4 +584,4 @@ class SimpleRegistryPlugin(RegistryPlugin):
         if self.mediator is not None:
             self.mediator.log_message(level, message)
         else:
-            print('[RegistryPlugin] ' + f'{self.log_levels[level]} ' + message)  # type: ignore[unreachable]
+            print('[RegistryPlugin] ' + f'{self.log_levels[level]} {message}.')  # type: ignore[unreachable]

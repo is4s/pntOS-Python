@@ -50,7 +50,7 @@ class Aspn23LcmTransportPlugin(TransportPlugin):
             self.lcm.unsubscribe(self.subscription)
         # self.__init__(self.url, mediator=None)
         self.mediator.log_message(
-            LoggingLevel.INFO, 'shutdown_plugin for ' + self.identifier
+            LoggingLevel.INFO, f'shutdown_plugin for {self.identifier}.'
         )
 
     def general_handler(self) -> Callable[[str, bytes], None]:
@@ -67,7 +67,7 @@ class Aspn23LcmTransportPlugin(TransportPlugin):
             if 'pntos' in channel:
                 self.mediator.log_message(
                     LoggingLevel.INFO,
-                    'pntos channel message, not processing in aspn handler',
+                    'pntOS channel message, not processing in ASPN handler.',
                 )
                 return
             decoded = MeasurementPositionVelocityAttitude_LCM.decode(data)  # type: ignore[no-untyped-call]
@@ -94,7 +94,7 @@ class Aspn23LcmTransportPlugin(TransportPlugin):
         if self.subscription is not None and self.lcm is not None:
             self.lcm.unsubscribe(self.subscription)
 
-        self.mediator.log_message(LoggingLevel.INFO, 'LCM transport stopped')
+        self.mediator.log_message(LoggingLevel.INFO, 'LCM transport stopped.')
 
     def broadcast_message(
         self, message: Message, channel_name: str | None = None
@@ -109,4 +109,4 @@ class Aspn23LcmTransportPlugin(TransportPlugin):
             )
             self.lcm.publish(channel, translated.encode())  # type: ignore[no-untyped-call]
         else:
-            print('Invalid LCM message')
+            self.mediator.log_message(LoggingLevel.ERROR, 'Invalid LCM message.')
