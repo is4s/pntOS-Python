@@ -230,10 +230,7 @@ class SimpleKeyValueStore(KeyValueStore):
                     )
 
             return None
-        self._log(
-            LoggingLevel.ERROR,
-            f'Key error - key {key} not in store.',
-        )
+        self._log(LoggingLevel.ERROR, f'Key error - key {key} not in store.')
         return None
 
     def _return_str(self, val: Any) -> str | None:
@@ -578,7 +575,7 @@ class SimpleRegistryPlugin(RegistryPlugin):
 
         # Use input config from constructor
         for conf in self.config:
-            config_to_registry(conf, self.mediator)
+            config_to_registry(conf, out)
 
         self.registries.append(out)
         return out

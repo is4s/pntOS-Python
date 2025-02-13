@@ -17,3 +17,6 @@ from .SimpleRegistryPlugin import (
 from .SimpleTransportPlugin import (
     SimpleTransportPlugin as SimpleTransportPlugin,
 )
+from .state_modeling_simple_gps_ins.SimpleGpsInsStateModelingPlugin import (
+    SimpleGpsInsStateModelingPlugin as SimpleGpsInsStateModelingPlugin,
+)
