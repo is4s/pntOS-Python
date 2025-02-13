@@ -45,13 +45,13 @@ class PinsonPositionMeasurementProcessor(StandardMeasurementProcessor):
         self._inertial_pva = None
         self._l_ps_p = l_ps_p
 
-    def validate_aux_data(self, aux: list[Message]) -> bool:
+    def receive_aux_data(self, aux: list[Message]) -> None:
         if not aux:
             self._mediator.log_message(
                 LoggingLevel.ERROR,
                 f'PinsonPositionMeasurementProcessor expected aux data of type MeasurementPositionVelocityAttitude, but received empty list.',
             )
-            return False
+            return
 
         if len(aux) > 1:
             self._mediator.log_message(
@@ -64,23 +64,18 @@ class PinsonPositionMeasurementProcessor(StandardMeasurementProcessor):
                 LoggingLevel.ERROR,
                 f'PinsonPositionMeasurementProcessor expected aux data of type MeasurementPositionVelocityAttitude, but got message of type {type(aux[0].wrapped_message)}.',
             )
-            return False
+            return
 
         pva = aux[0].wrapped_message
 
         if pva.quaternion is None:
             self._mediator.log_message(
                 LoggingLevel.ERROR,
-                f'Pinson15NedBlock received PVA aux data with no quaternion at time {pva.time_of_validity.elapsed_nsec/1e9}s.',
+                f'Pinson15NedBlock received PVA aux data with no quaternion at time {pva.time_of_validity.elapsed_nsec / 1e9}s.',
             )
-
-        return True
-
-    def receive_aux_data(self, aux: list[Message]) -> None:
-        if not self.validate_aux_data(aux):
             return
 
-        self._inertial_pva = cast(MeasurementPVA, aux[0].wrapped_message)
+        self._inertial_pva = pva
 
     def generate_model(
         self, message: Message, x_and_p: EstimateWithCovariance
@@ -128,7 +123,10 @@ class PinsonPositionMeasurementProcessor(StandardMeasurementProcessor):
         ecef_platform = llh_to_ecef(inertial_llh)
         C_nav_to_ecef = llh_to_cen(inertial_llh)
 
+        # Already validated presence of quaternion when aux data was received. This
+        # assertion is just to satisfy mypy.
         assert self._inertial_pva.quaternion is not None
+
         C_nav_to_platform = quat_to_dcm(self._inertial_pva.quaternion)
 
         # Transform inertial position into sensor frame

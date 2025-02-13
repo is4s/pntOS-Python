@@ -148,7 +148,7 @@ class Pinson15NedBlock(StandardStateBlock):
                 if pva.quaternion is None:
                     self._mediator.log_message(
                         LoggingLevel.WARN,
-                        f'Pinson15NedBlock received PVA aux data with no quaternion at time {pva.time_of_validity.elapsed_nsec/1e9}s. Ignoring.',
+                        f'Pinson15NedBlock received PVA aux data with no quaternion at time {pva.time_of_validity.elapsed_nsec / 1e9}s. Ignoring.',
                     )
                     continue
                 self._old_pva_aux = self._new_pva_aux
@@ -221,6 +221,8 @@ class Pinson15NedBlock(StandardStateBlock):
         Returns:
             NDArray[float64]: The F Matrix.
         """
+        # Already validated aux data at top of generate_model. These assertions are just
+        # to satisfy mypy.
         assert self._new_pva_aux is not None
         assert self._new_pva_aux.quaternion is not None
         assert self._force_and_rate_aux is not None
@@ -373,6 +375,8 @@ class Pinson15NedBlock(StandardStateBlock):
         Returns:
             NDArray[float64]: The Q Matrix.
         """
+        # Already validated PVA aux at top of generate_model. These assertions are just
+        # to satisfy mypy.
         assert self._new_pva_aux is not None
         assert self._new_pva_aux.quaternion is not None
         Q = self._pre_Q
