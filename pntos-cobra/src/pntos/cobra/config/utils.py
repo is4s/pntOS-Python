@@ -21,7 +21,7 @@ def config_from_registry(
         val: RegistryValueTypeUnion | tuple[float, ...] | None = kv[param.name]
         if val is None:
             mediator.log_message(
-                LoggingLevel.ERROR,
+                LoggingLevel.WARN,
                 f'Could not retrieve {param.name} from store',
             )
             fail = True
@@ -37,6 +37,7 @@ def config_from_registry(
                 f'Expected field {param} in {config_type} to have type '
                 + f'{param.type} but received {type(val)} from registry.',
             )
+            kv.batch_end()
             return None
 
         out[param.name] = val
