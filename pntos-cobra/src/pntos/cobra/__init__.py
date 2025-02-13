@@ -2,6 +2,10 @@ from .SimpleControllerPlugin import (
     SimpleControllerPlugin as SimpleControllerPlugin,
     SimpleMediator as SimpleMediator,
 )
+from .SimpleInertialPlugin import (
+    SimpleInertial as SimpleInertial,
+    SimpleInertialPlugin as SimpleInertialPlugin,
+)
 from .SimpleInitializationPlugin import (
     SimpleInitialization as SimpleInitialization,
     SimpleInitializationPlugin as SimpleInitializationPlugin,
