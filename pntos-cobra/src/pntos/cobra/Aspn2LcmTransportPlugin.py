@@ -76,7 +76,10 @@ class Aspn2LcmTransportPlugin(TransportPlugin):
         def _general_handler(channel: str, data: bytes) -> None:
             # Do not process messages sent from pntos.
             if 'pntos' in channel:
-                print('pntos channel message, not processing in aspn handler')
+                self.mediator.log_message(
+                    LoggingLevel.ERROR,
+                    'pntOS channel message, not processing in ASPN handler.',
+                )
                 return
 
             untrans = positionvelocityattitude.decode(data)
@@ -131,7 +134,7 @@ class Aspn2LcmTransportPlugin(TransportPlugin):
         if self.subscription is not None and self.lcm is not None:
             self.lcm.unsubscribe(self.subscription)
 
-        self.mediator.log_message(LoggingLevel.INFO, 'LCM transport stopped')
+        self.mediator.log_message(LoggingLevel.INFO, 'LCM transport stopped.')
 
     def broadcast_message(
         self, message: Message, channel_name: str | None = None
@@ -162,4 +165,4 @@ class Aspn2LcmTransportPlugin(TransportPlugin):
             )
             self.lcm.publish(channel, translated.encode())
         else:
-            print('Invalid LCM message')
+            self.mediator.log_message(LoggingLevel.ERROR, 'Invalid LCM message.')

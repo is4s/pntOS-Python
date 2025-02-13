@@ -42,7 +42,7 @@ class SimpleInitialization(InertialInitializationStrategy):
         if config is None:
             self.mediator.log_message(
                 LoggingLevel.ERROR,
-                f'Failed to populate config from registry to config type AlignmentConfig and group {config_group}',
+                f'Failed to populate config from registry to config type AlignmentConfig and group {config_group}.',
             )
             return
         self.solution = Message(self._create_pva(config), 'Cobra simple initialization')
@@ -68,7 +68,7 @@ class SimpleInitialization(InertialInitializationStrategy):
 
     def process_pntos_message(self, message: Message) -> None:
         self.mediator.log_message(
-            LoggingLevel.WARN, 'process_pntos_message is unused, discarding message'
+            LoggingLevel.WARN, 'process_pntos_message is unused, discarding message.'
         )
 
     def request_solution(self) -> InitialInertialSolution:
@@ -140,7 +140,7 @@ class SimpleInitializationPlugin(InitializationPlugin):
         if mediator is not None:
             self.mediator = mediator
         else:
-            print('Error: mediator cannot be None')
+            print('Error: mediator cannot be None.')
 
     def shutdown_plugin(self) -> None:
         return
@@ -154,11 +154,11 @@ class SimpleInitializationPlugin(InitializationPlugin):
         if config_group is None:
             self.mediator.log_message(
                 LoggingLevel.ERROR,
-                'config_group is a required parameter for this plugin and cannot be None',
+                'config_group is a required parameter for this plugin and cannot be None.',
             )
             return None
         if issubclass(type, InertialInitializationStrategy):
             return SimpleInitialization(config_group, self.mediator)
         else:
-            self.mediator.log_message(LoggingLevel.ERROR, 'Unsupported type requested')
+            self.mediator.log_message(LoggingLevel.ERROR, 'Unsupported type requested.')
             return None
