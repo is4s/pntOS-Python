@@ -319,8 +319,7 @@ class SimpleKeyValueStore(KeyValueStore):
         if not self._check_valid_type(value):
             self._log(
                 LoggingLevel.ERROR,
-                f'Received invalid type {type(value)}.'
-                + f' Expected {RegistryValueTypeUnion}.',
+                f'Received invalid type {type(value)}. Expected {RegistryValueTypeUnion}.',
             )
             return
         if self._set_permanent:
@@ -584,4 +583,4 @@ class SimpleRegistryPlugin(RegistryPlugin):
         if self.mediator is not None:
             self.mediator.log_message(level, message)
         else:
-            print('[RegistryPlugin] ' + f'{self.log_levels[level]} {message}.')  # type: ignore[unreachable]
+            print(f'[RegistryPlugin] {self.log_levels[level]} {message}.')  # type: ignore[unreachable]
