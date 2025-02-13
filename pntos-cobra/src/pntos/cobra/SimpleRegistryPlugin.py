@@ -177,7 +177,7 @@ class SimpleKeyValueStore(KeyValueStore):
         if key in self._store:
             return self._store[key]
         self._log(
-            LoggingLevel.ERROR,
+            LoggingLevel.WARN,
             f"The key '{key}' is not found in the SimpleKeyValueStore.",
         )
         return None
@@ -217,20 +217,20 @@ class SimpleKeyValueStore(KeyValueStore):
                         return out
                     else:
                         self._log(
-                            LoggingLevel.ERROR,
+                            LoggingLevel.WARN,
                             'Unable to convert from type '
                             + f'{builtins.type(val)}'
                             + f' to type {type}.',
                         )
                 else:
                     self._log(
-                        LoggingLevel.ERROR,
+                        LoggingLevel.WARN,
                         f'Conversion from type {builtins.type(val)}'
                         + f' to type {type} unsupported.',
                     )
 
             return None
-        self._log(LoggingLevel.ERROR, f'Key error - key {key} not in store.')
+        self._log(LoggingLevel.WARN, f'Key error - key {key} not in store.')
         return None
 
     def _return_str(self, val: Any) -> str | None:
@@ -304,7 +304,7 @@ class SimpleKeyValueStore(KeyValueStore):
         else:
             if key not in self._store:
                 self._log(
-                    LoggingLevel.ERROR,
+                    LoggingLevel.WARN,
                     f'Key {key} does not exist in group {self._group}.',
                 )
             else:
