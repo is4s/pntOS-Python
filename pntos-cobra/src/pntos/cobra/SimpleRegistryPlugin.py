@@ -74,7 +74,6 @@ class SimpleKeyValueStore(KeyValueStore):
         self._permanent_keys = set([])
         self._callbacks = {}
         self._modified_keys = set([])
-        self._batch_live = True
         self._log = log_func
         self._plugin_resources_location = plugin_resources_location
         self.type_conversion: dict[Any, dict[Any, Any]] = {
@@ -141,6 +140,8 @@ class SimpleKeyValueStore(KeyValueStore):
 
         Will be None is conversion is not supported or conversion failed.
         """
+        # SimpleRegistry will check that this is false and set it to True
+        self._batch_live = False
 
         # Set up permanency
         if self._plugin_resources_location is not None:
