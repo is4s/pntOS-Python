@@ -76,13 +76,16 @@ my_config: list[BaseConfig] = [
     ),
 ]
 
-Dummy_log_out: str = ''
+DUMMY_LOG_OUT: str = ''
+ERROR_DETECTED: bool = False
+EXPECTED_LOG_OUTPUT: str = ''
 
 
 def dummy_log(level: LoggingLevel, message: str) -> None:
-    global Dummy_log_out
-    if level == LoggingLevel.ERROR:
-        Dummy_log_out = message
+    global DUMMY_LOG_OUT, ERROR_DETECTED
+    DUMMY_LOG_OUT = message
+    if level == LoggingLevel.ERROR and message != EXPECTED_LOG_OUTPUT:
+        assert ERROR_DETECTED == True, DUMMY_LOG_OUT
 
 
 class DummyMediator(Mediator):
@@ -248,6 +251,8 @@ class TestRegistry(unittest.TestCase):
             assert key not in test_kv, 'clear() ' + self.test_err[i]
 
     def test_initial_config(self) -> None:
+        global EXPECTED_LOG_OUTPUT
+        EXPECTED_LOG_OUTPUT = ''
         registry = SimpleRegistryPlugin('Simple registry', config=my_config)
         registry.init_plugin(mediator=DummyMediator())
         reg = registry.new_registry(None)
@@ -302,7 +307,8 @@ class TestRegistry(unittest.TestCase):
 
     def test_any_value_to_str(self) -> None:
         """NOTE: Message types are treated differently - not converted to str."""
-
+        global EXPECTED_LOG_OUTPUT
+        EXPECTED_LOG_OUTPUT = ''
         test_str = 'Hello There!'
         test_list_str = ['Hello', 'There']
         test_int = 42
@@ -339,9 +345,12 @@ class TestRegistry(unittest.TestCase):
         assert kv.get_value('int', str) == test_s_int, m_int
         assert kv.get_value('bool', str) == test_s_bool, m_bool
         assert kv.get_value('float', str) == test_s_float, m_float
+        EXPECTED_LOG_OUTPUT = "Conversion from type <class 'numpy.ndarray'> to type <class 'str'> unsupported."
         assert kv.get_value('np_array', str) == test_s_np_array, m_np_array
 
     def test_str_to_int(self) -> None:
+        global EXPECTED_LOG_OUTPUT
+        EXPECTED_LOG_OUTPUT = ''
         test_str_1 = '42'
         test_int_1 = 42
         test_str_2 = 'Not a number'
@@ -353,6 +362,9 @@ class TestRegistry(unittest.TestCase):
 
         kv.batch_restart()
         assert kv.get_value('str1', int) == test_int_1, 'Str to int failed.'
+        EXPECTED_LOG_OUTPUT = (
+            "Unable to convert from type <class 'str'> to type <class 'int'>."
+        )
         assert kv.get_value('str2', int) is None, 'Expected None, did not receive None.'
 
     def test_np_array_to_np_array(self) -> None:
@@ -477,13 +489,17 @@ class TestRegistry(unittest.TestCase):
 
     @patch('sys.stdout', new_callable=io.StringIO)
     def test_batch_rules(self, mock_stdout: io.StringIO) -> None:
+        global EXPECTED_LOG_OUTPUT, DUMMY_LOG_OUT, ERROR_DETECTED
+        EXPECTED_LOG_OUTPUT = ''
+        ERROR_DETECTED = False
         if self.registry.mediator is None:  # Controller not implemented
             return  # type: ignore[unreachable]
 
         kv = self.reg.batch_start(self.test_group)
         kv.batch_end()
+        EXPECTED_LOG_OUTPUT = 'Tried to use KeyValueStore outside of batch operation. (Make sure to use `batch_start`/`batch_restart` and `batch_end`)'
         kv.set_value('Enterprise', 1701)
-        assert Dummy_log_out != '', 'Did not catch misuse of Registry.'
+        assert not ERROR_DETECTED, 'Did not catch misuse of Registry.'
 
     def test_request_notify_no_key(self) -> None:
         test_keys = ['Resistance', 'is', 'futile.']
@@ -758,6 +774,9 @@ class TestRegistry(unittest.TestCase):
             assert key == self.test_keys[i], '__iter__ ' + self.test_err[i]
 
     def test_invalid_type_in_registry(self) -> None:
+        global ERROR_DETECTED, EXPECTED_LOG_OUTPUT
+        EXPECTED_LOG_OUTPUT = ''
+        ERROR_DETECTED = False
         kv = self.reg.batch_start(self.test_group)
         key = 'invalid_type_key'
         value = ImuConfig(
@@ -768,6 +787,9 @@ class TestRegistry(unittest.TestCase):
             (0, 0, 0),
             (0, 0, 0),
             (0, 0, 0),
+        )
+        EXPECTED_LOG_OUTPUT = (
+            f'Received invalid type {ImuConfig}. Expected {RegistryValueTypeUnion}.'
         )
         # Have to type ignore this one because it's exactly what we're testing:
         kv[key] = value  # type: ignore[assignment]
@@ -909,6 +931,17 @@ class TestRegistry(unittest.TestCase):
                 assert expected_vals[i] == actual_val, (
                     'set_permanent() ' + self.test_err[i]
                 )
+
+    def test_batch_start_error_where_kv_is_already_set_to_batch_live(self) -> None:
+        global EXPECTED_LOG_OUTPUT, ERROR_DETECTED, DUMMY_LOG_OUT
+        EXPECTED_LOG_OUTPUT = ''
+        registry = SimpleRegistryPlugin('Simple registry 2')
+        mediator = DummyMediator()
+        registry.init_plugin(mediator=mediator)
+        reg = registry.new_registry(None)
+        mediator.registry = reg
+        reg.batch_start('new_group')
+        assert not ERROR_DETECTED, DUMMY_LOG_OUT
 
     def compare_messages(self, m1: object, m2: object, depth: int = 0) -> bool:
         """The numpy arrays in Message objects do not seem to compare nicely
