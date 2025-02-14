@@ -252,8 +252,9 @@ class SimpleInertial(StandardInertialMechanization):
             self.inertial.add_data(imu_cpp)
         else:
             self.mediator.log_message(
-                LoggingLevel.ERROR,
-                'Message must be of type MeasurementImu.',
+                LoggingLevel.WARN,
+                'Invalid message type received; ignoring it. See '
+                'request_process_pntos_message_types() for valid message types.',
             )
 
     def request_forces_and_rates(
