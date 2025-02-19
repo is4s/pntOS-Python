@@ -1,21 +1,26 @@
 import numpy as np
 import pytest
 from aspn23_lcm import measurement_position_velocity_attitude
-from pntos.cobra import Aspn23LcmTransportPlugin, SimpleRegistryPlugin
+from pntos.api import LoggingLevel
+from pntos.cobra.Aspn23LcmTransportPlugin import Aspn23LcmTransportPlugin
 from pntos.cobra.SimpleControllerPlugin import SimpleMediator
+from pntos.cobra.SimpleRegistryPlugin import SimpleRegistry
+
+
+def dummy_log(level: LoggingLevel, message: str) -> None:
+    pass
 
 
 @pytest.fixture
 def mediator():
-    registry_plugin = SimpleRegistryPlugin('Registry', config=[])
-    registry_plugin.init_plugin()
-    registry = registry_plugin.new_registry([])
-    return SimpleMediator(registry, [])
+    registry = SimpleRegistry(dummy_log)
+    mediator = SimpleMediator(registry, [])
+    return mediator
 
 
 @pytest.fixture
 def transport_plugin(mediator):
-    plugin = Aspn23LcmTransportPlugin.Aspn23LcmTransportPlugin(mediator)
+    plugin = Aspn23LcmTransportPlugin(mediator)
     return plugin
 
 

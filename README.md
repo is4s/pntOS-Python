@@ -92,7 +92,7 @@ To begin development, refer to [Environment Setup](#environment-setup) for how t
 
 ### Checking Contributions using Pip
 
-First, make sure to install the dependencies via `pip3 install requirements-dev.lock`
+First, make sure to install the dependencies via `pip3 install -r requirements-dev.lock`
 
 New contributions to this repo should pass the following checks, if they use other tooling than Rye:
 
