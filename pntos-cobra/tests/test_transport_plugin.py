@@ -8,6 +8,7 @@ from pntos.cobra.SimpleControllerPlugin import SimpleMediator
 @pytest.fixture
 def mediator():
     registry_plugin = SimpleRegistryPlugin('Registry', config=[])
+    registry_plugin.init_plugin()
     registry = registry_plugin.new_registry([])
     return SimpleMediator(registry, [])
 
