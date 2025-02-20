@@ -56,7 +56,7 @@ class PreprocessorPlugin(CommonPlugin, ABC):
     @abstractmethod
     def new_preprocessor(
         self, preprocessor_index: int, config_group: str | None = None
-    ) -> Preprocessor:
+    ) -> Preprocessor | None:
         """
         Get a newly created :class:`Preprocessor`.
 
