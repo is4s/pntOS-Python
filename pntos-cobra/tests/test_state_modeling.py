@@ -37,7 +37,7 @@ from pntos.cobra.internal import (
     Pinson15NedBlock,
     PinsonPositionMeasurementProcessor,
 )
-from pntos.cobra.utils.navutils import calc_lat_factor, calc_lon_factor
+from pntos.cobra.utils.navutils import delta_lat_to_north, delta_lon_to_east
 
 my_config: list[BaseConfig] = [
     ImuConfig(
@@ -304,8 +304,8 @@ def test_generate_model(
     meas_llh = np.array([pos.term1, pos.term2, pos.term3])
     inertial_llh = np.array([inertial_pva.p1, inertial_pva.p2, inertial_pva.p3])
     delta_pos = meas_llh - inertial_llh
-    lat_factor = calc_lat_factor(meas_llh[0], meas_llh[2])
-    lon_factor = calc_lon_factor(meas_llh[0], meas_llh[2])
+    lat_factor = delta_lat_to_north(1, meas_llh[0], meas_llh[2])
+    lon_factor = delta_lon_to_east(1, meas_llh[0], meas_llh[2])
     exp_z = np.array(
         [delta_pos[0] * lat_factor, delta_pos[1] * lon_factor, -delta_pos[2]]
     )

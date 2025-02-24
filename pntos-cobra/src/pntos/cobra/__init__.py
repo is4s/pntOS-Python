@@ -12,6 +12,7 @@ from .SimpleInitializationPlugin import (
 )
 from .SimpleLoggingPlugin import SimpleLoggingPlugin as SimpleLoggingPlugin
 from .SimpleOrchestrationPlugin import (
+    SimpleMessageStreamConfig as SimpleMessageStreamConfig,
     SimpleOrchestrationPlugin as SimpleOrchestrationPlugin,
 )
 from .SimpleRegistryPlugin import (

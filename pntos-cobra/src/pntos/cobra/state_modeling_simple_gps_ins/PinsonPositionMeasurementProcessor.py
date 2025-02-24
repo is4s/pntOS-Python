@@ -17,8 +17,8 @@ from pntos.api.plugins.common import (
 from pntos.api.plugins.fusion import StandardMeasurementProcessor
 from pntos.api.plugins.fusion_strategy import StandardMeasurementModel
 from pntos.cobra.utils import (
-    calc_lat_factor,
-    calc_lon_factor,
+    delta_lat_to_north,
+    delta_lon_to_east,
     ecef_to_llh,
     llh_to_cen,
     llh_to_ecef,
@@ -135,8 +135,8 @@ class PinsonPositionMeasurementProcessor(StandardMeasurementProcessor):
         )
         llh_sensor = ecef_to_llh(ecef_sensor)
 
-        lat_factor = calc_lat_factor(llh[0], llh[2])
-        lon_factor = calc_lon_factor(llh[0], llh[2])
+        lat_factor = delta_lat_to_north(1, llh[0], llh[2])
+        lon_factor = delta_lon_to_east(1, llh[0], llh[2])
         delta_pos = llh - llh_sensor
         z = np.array(
             [

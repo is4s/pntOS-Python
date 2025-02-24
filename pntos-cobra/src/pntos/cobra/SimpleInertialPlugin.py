@@ -1,5 +1,3 @@
-from typing import List
-
 from aspn23 import (
     AspnBase,
     MeasurementImu,
@@ -85,8 +83,8 @@ class SimpleInertial(StandardInertialMechanization):
         )
 
     def request_solutions(
-        self, times: List[TypeTimestamp], type: InertialSolutionRangeType
-    ) -> List[Message] | None:
+        self, times: list[TypeTimestamp], type: InertialSolutionRangeType
+    ) -> list[Message] | None:
         if len(times) == 0:
             return None
         solutions = []
@@ -109,7 +107,7 @@ class SimpleInertial(StandardInertialMechanization):
     def request_latest_time(self) -> TypeTimestamp:
         return convert_timestamp_from_cpp(self.inertial.time_span()[1])
 
-    def request_process_pntos_message_types(self) -> List[type[AspnBase]]:
+    def request_process_pntos_message_types(self) -> list[type[AspnBase]]:
         return [MeasurementImu]
 
     def process_pntos_message(self, message: Message) -> None:
@@ -140,7 +138,7 @@ class SimpleInertial(StandardInertialMechanization):
         forces_and_rates = convert_imu_from_cpp(forces_and_rates_cpp)
         return InertialForcesRates(forces_and_rates, InertialFrame.INERTIAL_FRAME_NED)
 
-    def request_reset_message_types(self) -> List[type[AspnBase]] | None:
+    def request_reset_message_types(self) -> list[type[AspnBase]] | None:
         return [MeasurementPositionVelocityAttitude]
 
     def reset_solution(self, message: Message) -> None:
