@@ -1,22 +1,16 @@
-from .SimpleControllerPlugin import (
+from .simple_controller.SimpleControllerPlugin import (
     SimpleControllerPlugin as SimpleControllerPlugin,
-    SimpleMediator as SimpleMediator,
 )
-from .SimpleInertialPlugin import (
-    SimpleInertial as SimpleInertial,
-    SimpleInertialPlugin as SimpleInertialPlugin,
-)
+from .SimpleInertialPlugin import SimpleInertialPlugin as SimpleInertialPlugin
 from .SimpleInitializationPlugin import (
     SimpleInitialization as SimpleInitialization,
     SimpleInitializationPlugin as SimpleInitializationPlugin,
 )
 from .SimpleLoggingPlugin import SimpleLoggingPlugin as SimpleLoggingPlugin
 from .SimpleOrchestrationPlugin import (
-    SimpleMessageStreamConfig as SimpleMessageStreamConfig,
     SimpleOrchestrationPlugin as SimpleOrchestrationPlugin,
 )
 from .SimpleRegistryPlugin import (
-    SimpleRegistry as SimpleRegistry,
     SimpleRegistryPlugin as SimpleRegistryPlugin,
 )
 from .SimpleTransportPlugin import (

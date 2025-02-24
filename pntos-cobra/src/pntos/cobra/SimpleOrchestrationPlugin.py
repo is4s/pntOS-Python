@@ -42,11 +42,7 @@ from pntos.cobra.utils import (
     north_to_delta_lat,
     quat_to_dcm,
 )
-from pntos.cobra.utils.pluginutils import SortedPlugins, sort_plugins_dataclass
-
-# Enums for SimpleMessageStreamConfig
-IMMEDIATE_STREAM = False
-SEQUENCED_STREAM = True
+from pntos.cobra.utils.plugins import SortedPlugins, sort_plugins_dataclass
 
 # Solution Channels
 BEST_SOL_CHANNEL = '/solution/pntos/best'
@@ -102,7 +98,6 @@ class SimpleOrchestrationPlugin(OrchestrationPlugin):
             LoggingLevel.ERROR: 'ERROR:',
             LoggingLevel.WARN: 'WARNING:',
         }
-        SimpleMessageStreamConfig._log = self._log
         self.initialization_state: InitializationStatus = InitializationStatus.WAITING
         self.init_solution = None
         self.C_inertial_to_platform = np.array(
@@ -114,6 +109,14 @@ class SimpleOrchestrationPlugin(OrchestrationPlugin):
         plugin_resources_location: str | None = None,
         mediator: Mediator | None = None,
     ) -> None:
+        if mediator is None:
+            self._log(
+                LoggingLevel.ERROR,
+                'Orchestration was not handed a mediator. '
+                + 'Orchestration will be disabled.',
+            )
+            return
+        self.mediator = mediator
         if mediator is None:
             self._log(
                 LoggingLevel.ERROR,
@@ -683,86 +686,3 @@ class SimpleOrchestrationPlugin(OrchestrationPlugin):
             np.array([]),
             [],
         )
-
-
-class SimpleMessageStreamConfig(MessageStreamConfig):
-    # _message_lookup[type(AspnMessage)][source_identifier] -> is_sequenced?
-    _immediate_stream: set[type[AspnBase]] = set([])
-    _sequenced_stream: set[type[AspnBase]] = set([])
-    _last_all_call: bool = False  # True -> sequenced, False -> immediate
-    _log: Callable[[LoggingLevel, str], None] | None = None
-
-    def __init__(self) -> None:
-        pass
-
-    def _handle_source_identifier(self, source_identifier: str | None) -> None:
-        if source_identifier is not None:
-            if self._log is not None:
-                self._log(
-                    LoggingLevel.ERROR,
-                    'Filtering on source identifier is unimplemented.',
-                )
-            else:
-                print(
-                    '[MessageStreamConfig] ERROR: Filtering on source '
-                    + 'identifier is unimplemented.'
-                )
-
-    def sequenced_stream_add(
-        self, type: type[AspnBase], source_identifier: str | None = None
-    ) -> None:
-        self._handle_source_identifier(source_identifier)
-        if type in self._immediate_stream:
-            self._immediate_stream.remove(type)
-        self._sequenced_stream.add(type)
-
-    def sequenced_stream_remove(
-        self, type: type[AspnBase], source_identifier: str | None = None
-    ) -> None:
-        self._handle_source_identifier(source_identifier)
-        if type in self._sequenced_stream:
-            self._sequenced_stream.remove(type)
-
-    def sequenced_stream_all(self, enable: bool) -> None:
-        self._sequenced_stream = set([])
-        self._immediate_stream = set([])
-        self._last_all_call = SEQUENCED_STREAM
-
-    def immediate_stream_add(
-        self, type: type[AspnBase], source_identifier: str | None = None
-    ) -> None:
-        self._handle_source_identifier(source_identifier)
-        if type in self._sequenced_stream:
-            self._sequenced_stream.remove(type)
-        self._immediate_stream.add(type)
-
-    def immediate_stream_remove(
-        self, type: type[AspnBase], source_identifier: str | None = None
-    ) -> None:
-        self._handle_source_identifier(source_identifier)
-        if type in self._immediate_stream:
-            self._immediate_stream.remove(type)
-
-    def immediate_stream_all(self, enable: bool) -> None:
-        self._sequenced_stream = set([])
-        self._immediate_stream = set([])
-        self._last_all_call = IMMEDIATE_STREAM
-
-    def get_stream_status(
-        self, type: type[AspnBase], source_identifier: str | None = None
-    ) -> bool:
-        """
-        Returns true if the requested type will be streamed sequentially, and
-        False if the requested type will be immediately streamed.
-        """
-        self._handle_source_identifier(source_identifier)
-        if type in self._immediate_stream:
-            return IMMEDIATE_STREAM
-        if type in self._sequenced_stream:
-            return SEQUENCED_STREAM
-        # If type is not in either list, return the default
-        return self._last_all_call
-
-
-if __name__ == '__main__':
-    SimpleMessageStreamConfig()

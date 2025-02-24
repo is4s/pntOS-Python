@@ -18,6 +18,7 @@ from pntos.api import (
     EstimateWithCovariance,
     EstimateWithCovarianceType,
     Message,
+    RegistryPlugin,
     StandardMeasurementProcessor,
     StandardStateBlock,
     StandardStateModelProvider,
@@ -25,7 +26,6 @@ from pntos.api import (
 )
 from pntos.cobra import (
     SimpleGpsInsStateModelingPlugin,
-    SimpleMediator,
     SimpleRegistryPlugin,
 )
 from pntos.cobra.config import (
@@ -36,8 +36,9 @@ from pntos.cobra.config import (
 from pntos.cobra.internal import (
     Pinson15NedBlock,
     PinsonPositionMeasurementProcessor,
+    SimpleMediator,
 )
-from pntos.cobra.utils.navutils import delta_lat_to_north, delta_lon_to_east
+from pntos.cobra.utils.navigation import delta_lat_to_north, delta_lon_to_east
 
 my_config: list[BaseConfig] = [
     ImuConfig(
@@ -72,11 +73,11 @@ my_config: list[BaseConfig] = [
 
 @pytest.fixture
 def mediator() -> SimpleMediator:
-    mediator = SimpleMediator(None, [])
     registry_plugin = SimpleRegistryPlugin('Simple registry', config=my_config)
+    mediator = SimpleMediator(registry_plugin.identifier, RegistryPlugin)
     registry_plugin.init_plugin(mediator=mediator)
     registry = registry_plugin.new_registry()
-    mediator.registry = registry
+    SimpleMediator.registry = registry
     return mediator
 
 
