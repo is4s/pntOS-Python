@@ -27,12 +27,24 @@ def transverse_radius(lat: float) -> float:
     return float(RAD_E / pow(1 - ECC_SQUARE * sin_lat * sin_lat, 0.5))
 
 
-def calc_lat_factor(lat: float, alt: float) -> float:
-    return meridian_radius(lat) + alt
+def delta_lat_to_north(delta_lat: float, approx_lat: float, altitude: float) -> float:
+    return (meridian_radius(approx_lat) + altitude) * delta_lat
 
 
-def calc_lon_factor(lat: float, alt: float) -> float:
-    return (transverse_radius(lat) + alt) * cos(lat)
+def delta_lon_to_east(delta_lon: float, approx_lat: float, altitude: float) -> float:
+    return (transverse_radius(approx_lat) + altitude) * delta_lon * cos(approx_lat)
+
+
+def east_to_delta_lon(east_distance, approx_lat, altitude):
+    return east_distance / (
+        (transverse_radius(approx_lat) + altitude) * cos(approx_lat)
+    )
+
+
+def north_to_delta_lat(
+    north_distance: float, approx_lat: float, altitude: float
+) -> float:
+    return north_distance / (meridian_radius(approx_lat) + altitude)
 
 
 def quat_to_dcm(quat: NDArray[float64]) -> NDArray[float64]:
@@ -54,6 +66,51 @@ def quat_to_dcm(quat: NDArray[float64]) -> NDArray[float64]:
             [2 * (bd - ac), 2 * (cd + ab), a2 - b2 - c2 + d2],
         ]
     )
+
+
+def dcm_to_quat(dcm: NDArray[float64]):
+    d0 = dcm[0, 0]
+    d1 = dcm[1, 1]
+    d2 = dcm[2, 2]
+
+    pa = abs(1 + d0 + d1 + d2)
+    pb = abs(1 + d0 - d1 - d2)
+    pc = abs(1 - d0 + d1 - d2)
+    pd = abs(1 - d0 - d1 + d2)
+    q0 = 0.0
+    q1 = 0.0
+    q2 = 0.0
+    q3 = 0.0
+
+    if pa >= pb and pa >= pc and pa >= pd:
+        q0 = 0.5 * sqrt(pa)
+        q0t4 = 4 * q0
+        q1 = (dcm[2, 1] - dcm[1, 2]) / (q0t4)
+        q2 = (dcm[0, 2] - dcm[2, 0]) / (q0t4)
+        q3 = (dcm[1, 0] - dcm[0, 1]) / (q0t4)
+    elif pb >= pa and pb >= pc and pb >= pd:
+        q1 = 0.5 * sqrt(pb)
+        q1t4 = 4 * q1
+        q0 = (dcm[2, 1] - dcm[1, 2]) / (q1t4)
+        q2 = (dcm[1, 0] + dcm[0, 1]) / (q1t4)
+        q3 = (dcm[0, 2] + dcm[2, 0]) / (q1t4)
+    elif pc >= pa and pc >= pb and pc >= pd:
+        q2 = 0.5 * sqrt(pc)
+        q2t4 = 4 * q2
+        q0 = (dcm[0, 2] - dcm[2, 0]) / (q2t4)
+        q1 = (dcm[1, 0] + dcm[0, 1]) / (q2t4)
+        q3 = (dcm[2, 1] + dcm[1, 2]) / (q2t4)
+    else:
+        q3 = 0.5 * sqrt(pd)
+        q3t4 = 4 * q3
+        q0 = (dcm[1, 0] - dcm[0, 1]) / (q3t4)
+        q1 = (dcm[0, 2] + dcm[2, 0]) / (q3t4)
+        q2 = (dcm[2, 1] + dcm[1, 2]) / (q3t4)
+
+    if q0 <= 0:
+        return np.array([-q0, -q1, -q2, -q3])
+
+    return np.array([q0, q1, q2, q3])
 
 
 def llh_to_ecef(llh: NDArray[float64]) -> NDArray[float64]:
@@ -129,6 +186,22 @@ def llh_to_cen(llh: NDArray[float64]) -> NDArray[float64]:
     )
 
 
+def correct_dcm_with_tilt(
+    dcm: NDArray[float64], tilt: NDArray[float64]
+) -> NDArray[float64]:
+    sum_squares = np.sum(np.square(tilt))
+    if sum_squares > 0:
+        m = sqrt(sum_squares)
+        I = np.eye(3)
+        s = skew(tilt)
+        # Below is equivalent to I - sin(m) * s / m + dot((1 - cos(m)) * s, s) / pow(m, 2)
+        B = (1 - cos(m)) / sum_squares * np.linalg.matrix_power(s, 2) + (
+            -sin(m) / m * s + I
+        )
+        return B @ dcm
+    return dcm
+
+
 RAD_E = 6378137.0
 OMEGA_E = 7.2921151467e-5
 F = 1 / 298.257223563
@@ -157,8 +230,8 @@ class EarthModel:
         self.r_e = transverse_radius(lat)
         self.r_zero = sqrt(self.r_n * self.r_e)
 
-        self.lat_factor = calc_lat_factor(lat, alt_msl)
-        self.lon_factor = calc_lon_factor(lat, alt_msl)
+        self.lat_factor = delta_lat_to_north(1, lat, alt_msl)
+        self.lon_factor = delta_lon_to_east(1, lat, alt_msl)
 
         omega_en_n = np.array(
             [
@@ -191,10 +264,13 @@ __all__ = [
     'skew',
     'meridian_radius',
     'transverse_radius',
-    'calc_lat_factor',
-    'calc_lon_factor',
+    'delta_lat_to_north',
+    'delta_lon_to_east',
+    'north_to_delta_lat',
+    'east_to_delta_lon',
     'EarthModel',
     'quat_to_dcm',
+    'dcm_to_quat',
     'llh_to_ecef',
     'ecef_to_llh',
     'llh_to_cen',
@@ -202,4 +278,5 @@ __all__ = [
     'OMEGA_E',
     'F',
     'ECC_SQUARE',
+    'correct_dcm_with_tilt',
 ]

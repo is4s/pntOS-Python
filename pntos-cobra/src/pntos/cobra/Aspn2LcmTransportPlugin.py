@@ -9,16 +9,16 @@ from aspn23 import (
     TypeHeader,
     TypeTimestamp,
 )
-from datasources.lcm.messages.aspn.positionvelocityattitude import (  # type: ignore[import-untyped]
+from datasources.lcm.messages.aspn.positionvelocityattitude import (
     positionvelocityattitude,
 )
-from datasources.lcm.messages.aspn.types.geodeticposition3d_type import (  # type: ignore[import-untyped]
+from datasources.lcm.messages.aspn.types.geodeticposition3d_type import (
     geodeticposition3d_type,
 )
-from datasources.lcm.messages.aspn.types.header import (  # type: ignore[import-untyped]
+from datasources.lcm.messages.aspn.types.header import (
     header,
 )
-from datasources.lcm.messages.aspn.types.timestamp import (  # type: ignore[import-untyped]
+from datasources.lcm.messages.aspn.types.timestamp import (
     timestamp,
 )
 from lcm import LCM, LCMSubscription

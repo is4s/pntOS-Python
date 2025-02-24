@@ -20,8 +20,8 @@ from pntos.cobra.config import ImuConfig
 from pntos.cobra.utils import (
     OMEGA_E,
     EarthModel,
-    calc_lat_factor,
-    calc_lon_factor,
+    delta_lat_to_north,
+    delta_lon_to_east,
     quat_to_dcm,
     skew,
 )
@@ -200,12 +200,12 @@ class Pinson15NedBlock(StandardStateBlock):
         """
         if self._old_pva_aux is not None and self._new_pva_aux is not None:
             pos = extract_pos(self._old_pva_aux)
-            lat_factor0 = calc_lat_factor(pos[0], pos[2])
-            lon_factor0 = calc_lon_factor(pos[0], pos[2])
+            lat_factor0 = delta_lat_to_north(1, pos[0], pos[2])
+            lon_factor0 = delta_lon_to_east(1, pos[0], pos[2])
 
             new_pos = extract_pos(self._new_pva_aux)
-            lat_factor1 = calc_lat_factor(new_pos[0], new_pos[2])
-            lon_factor1 = calc_lon_factor(new_pos[0], new_pos[2])
+            lat_factor1 = delta_lat_to_north(1, new_pos[0], new_pos[2])
+            lon_factor1 = delta_lon_to_east(1, new_pos[0], new_pos[2])
 
             lat0_to_lat1 = lat_factor1 / lat_factor0
             lon0_to_lon1 = lon_factor1 / lon_factor0

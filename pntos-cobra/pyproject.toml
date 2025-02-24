@@ -9,6 +9,7 @@ authors = [
 # see https://github.com/astral-sh/rye/issues/957
 dependencies = [
     "numpy>=1.26.4",
+    "scipy>=1.15.2",
     "pntos-api>=0.1.0",
     # LCM master branch - committed 24 October 2024
     "lcm @ git+https://github.com/lcm-proj/lcm.git@8d638bb3aeae39fda5db59f43b85f3a4b3f9a6ac",

@@ -30,3 +30,6 @@ numpy==1.26.4
     # via aspn23
     # via navtk
     # via pntos-cobra
+    # via scipy
+scipy==1.15.2
+    # via pntos-cobra

@@ -77,6 +77,7 @@ numpy==1.26.4
     # via aspn23
     # via navtk
     # via pntos-cobra
+    # via scipy
 packaging==24.0
     # via pytest
     # via sphinx
@@ -104,6 +105,8 @@ pyyaml==6.0.2
 requests==2.31.0
     # via sphinx
 ruff==0.4.5
+scipy==1.15.2
+    # via pntos-cobra
 six==1.16.0
     # via asttokens
 snowballstemmer==2.2.0
