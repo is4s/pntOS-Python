@@ -14,6 +14,7 @@ from navtk.navutils import calculate_gravity_schwartz, rpy_to_quat
 from pntos.api import (
     ExternalInertial,
     InertialFrame,
+    InertialPlugin,
     InertialSolutionRangeType,
     LoggingLevel,
     Message,
@@ -21,8 +22,7 @@ from pntos.api import (
 )
 from pntos.cobra import SimpleInertialPlugin
 from pntos.cobra.config import InertialConfig, config_to_registry
-from pntos.cobra.SimpleControllerPlugin import SimpleMediator
-from pntos.cobra.SimpleRegistryPlugin import SimpleRegistry
+from pntos.cobra.internal import SimpleMediator, SimpleRegistry
 
 
 def generate_header() -> TypeHeader:
@@ -146,13 +146,13 @@ def test() -> None:
     """
 
     # Setup
+    plugin = SimpleInertialPlugin('Cobra inertial plugin')
     registry = SimpleRegistry(dummy_log)
-    mediator = SimpleMediator(registry, [])
+    mediator = SimpleMediator(plugin.identifier, InertialPlugin)
+    SimpleMediator.registry = registry
 
     config = InertialConfig(expected_dt=0.01, inertial_buffer_length=5.0, group='test')
     config_to_registry(config, registry)
-
-    plugin = SimpleInertialPlugin('Cobra inertial plugin')
 
     assert plugin.identifier == 'Cobra inertial plugin'
 

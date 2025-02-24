@@ -2,11 +2,10 @@ import re
 import time
 from typing import Any
 
-from pntos.api.plugins.common import LoggingLevel
+from pntos.api import CommonPlugin, LoggingLevel, LoggingPlugin, Mediator
+from pntos.cobra import SimpleLoggingPlugin
 from pntos.cobra.config.LoggingConfig import LoggingConfig
-from pntos.cobra.SimpleControllerPlugin import SimpleMediator
-from pntos.cobra.SimpleLoggingPlugin import SimpleLoggingPlugin
-from pntos.cobra.SimpleRegistryPlugin import SimpleRegistry
+from pntos.cobra.internal import SimpleMediator, SimpleRegistry
 
 expected_results: dict[LoggingLevel, str] = {
     LoggingLevel.DEBUG: 'Without color:\n[22/11/2024 14:33:24] [SimpleLoggingPlugin] [INFO] This is an INFO message\n[22/11/2024 14:33:24] [SimpleLoggingPlugin] [DEBUG] This is a DEBUG message\n[22/11/2024 14:33:24] [SimpleLoggingPlugin] [WARN] This is an WARNING message\n[22/11/2024 14:33:24] [SimpleLoggingPlugin] [ERROR] This is an ERROR message\nWith color:\n\x1b[37m[22/11/2024 14:33:24]\x1b[0m\x1b[90m [SimpleLoggingPlugin]\x1b[0m\x1b[92m [INFO] \x1b[0mThis is an INFO message\n\x1b[37m[22/11/2024 14:33:24]\x1b[0m\x1b[90m [SimpleLoggingPlugin]\x1b[0m\x1b[94m [DEBUG] \x1b[0mThis is a DEBUG message\n\x1b[37m[22/11/2024 14:33:24]\x1b[0m\x1b[90m [SimpleLoggingPlugin]\x1b[0m\x1b[93m [WARN] \x1b[0mThis is an WARNING message\n\x1b[37m[22/11/2024 14:33:24]\x1b[0m\x1b[90m [SimpleLoggingPlugin]\x1b[0m\x1b[91m [ERROR] \x1b[0mThis is an ERROR message\n',
@@ -46,11 +45,28 @@ def dummy_log(level: LoggingLevel, message: str) -> None:
     pass
 
 
-def manual_test() -> None:
+class DummyPlugin(CommonPlugin):
+    def __init__(self, identifier: str) -> None:
+        self.identifier = identifier
+
+    def init_plugin(
+        self,
+        plugin_resources_location: str | None = None,
+        mediator: Mediator | None = None,
+    ) -> None:
+        pass
+
+    def shutdown_plugin(self) -> None:
+        pass
+
+
+def test_manual() -> None:
     """This is for user tests of the logger plugin, not for the pytest suite."""
     # Initialize registry through mediator to have config values for logger
+    dummy_plugin = DummyPlugin('dummy plugin')
     registry = SimpleRegistry(dummy_log)
-    mediator = SimpleMediator(registry, [])
+    mediator = SimpleMediator(dummy_plugin.identifier, LoggingPlugin)
+    SimpleMediator.registry = registry
     config_group = 'config/logging/all'
     colorize_key = 'force_colorize'
     global_log_level_key = 'default_log_level'
@@ -86,8 +102,10 @@ def manual_test() -> None:
 
 def test(capsys: Any) -> None:
     # Initialize registry through mediator to have config values for logger
+    dummy_plugin = DummyPlugin('dummy plugin')
     registry = SimpleRegistry(dummy_log)
-    mediator = SimpleMediator(registry, [])
+    mediator = SimpleMediator(dummy_plugin.identifier, LoggingPlugin)
+    SimpleMediator.registry = registry
     config_group = 'config/logging/all'
     colorize_key = 'force_colorize'
     global_log_level_key = 'default_log_level'
@@ -197,4 +215,4 @@ def test(capsys: Any) -> None:
 
 
 if __name__ == '__main__':
-    manual_test()
+    test_manual()

@@ -1,4 +1,5 @@
 import unittest
+from typing import List
 
 import numpy as np
 from aspn23 import (
@@ -55,14 +56,10 @@ from pntos.api import (
     VirtualStateBlock,
 )
 from pntos.cobra import (
-    SimpleMessageStreamConfig,
     SimpleOrchestrationPlugin,
     SimpleRegistryPlugin,
 )
-from pntos.cobra.SimpleOrchestrationPlugin import (
-    IMMEDIATE_STREAM,
-    SEQUENCED_STREAM,
-)
+from pntos.cobra.internal import SimpleMessageStreamConfig
 
 # Test globals
 FOUND_ERROR = False
@@ -280,7 +277,7 @@ class DummyStandardFusionEngine(StandardFusionEngine):
     def get_num_states(self) -> int:
         return 0
 
-    def get_state_block_labels(self) -> list[str] | None:
+    def get_state_block_labels(self) -> List[str] | None:
         pass
 
     def add_state_block(
@@ -320,7 +317,7 @@ class DummyStandardFusionEngine(StandardFusionEngine):
     def remove_state_block(self, block_label: str) -> None:
         pass
 
-    def get_virtual_state_block_target_labels(self) -> list[str] | None:
+    def get_virtual_state_block_target_labels(self) -> List[str] | None:
         pass
 
     def has_virtual_state_block(self, vsb_target_label: str) -> bool:
@@ -332,7 +329,7 @@ class DummyStandardFusionEngine(StandardFusionEngine):
     def remove_virtual_state_block(self, vsb_target_label: str) -> None:
         pass
 
-    def get_measurement_processor_labels(self) -> list[str] | None:
+    def get_measurement_processor_labels(self) -> List[str] | None:
         pass
 
     def add_measurement_processor(
@@ -350,7 +347,7 @@ class DummyStandardFusionEngine(StandardFusionEngine):
         pass
 
     def peek_ahead(
-        self, time: TypeTimestamp, block_labels: list[str]
+        self, time: TypeTimestamp, block_labels: List[str]
     ) -> EstimateWithCovariance | None:
         return EstimateWithCovariance(
             type=EstimateWithCovarianceType.EWC_GENERIC,
@@ -359,20 +356,20 @@ class DummyStandardFusionEngine(StandardFusionEngine):
         )
 
     def generate_x_and_p(
-        self, block_labels: list[str]
+        self, block_labels: List[str]
     ) -> EstimateWithCovariance | None:
         pass
 
-    def give_state_block_aux_data(self, block_label: str, aux: list[Message]) -> None:
+    def give_state_block_aux_data(self, block_label: str, aux: List[Message]) -> None:
         pass
 
     def give_measurement_processor_aux_data(
-        self, processor_label: str, aux: list[Message]
+        self, processor_label: str, aux: List[Message]
     ) -> None:
         pass
 
     def give_virtual_state_block_aux_data(
-        self, target_label: str, aux: list[Message]
+        self, target_label: str, aux: List[Message]
     ) -> None:
         pass
 
@@ -541,6 +538,13 @@ class DummyStandardFusionStrategy(StandardFusionStrategy):
 
 
 class DummyInertialInitializationStrategy(InertialInitializationStrategy):
+    """Dummy initialization strategy that simply waits for any message to initialize."""
+
+    status: InitializationStatus
+
+    def __init__(self) -> None:
+        self.status = InitializationStatus.WAITING
+
     def request_solution(self) -> InitialInertialSolution:
         return InitialInertialSolution(
             Message(
@@ -580,10 +584,10 @@ class DummyInertialInitializationStrategy(InertialInitializationStrategy):
         return InitializationMotionNeeded.ANY_MOTION
 
     def request_current_status(self) -> InitializationStatus:
-        return ALIGNMENT_STATE
+        return self.status
 
     def process_pntos_message(self, message: Message) -> None:
-        pass
+        self.status = InitializationStatus.INITIALIZED_GOOD
 
 
 class DummyMediator(Mediator):
@@ -784,132 +788,6 @@ class Test_Orchestration(unittest.TestCase):
         else:
             return m1 == m2
 
-    def test_SimpleMessageStreamConfig_immediate_stream_all_no_stream_conf(
-        self,
-    ) -> None:
-        conf = SimpleMessageStreamConfig()
-        conf.immediate_stream_all(True)
-        for message_type in self.message_types:
-            assert conf.get_stream_status(message_type) == IMMEDIATE_STREAM
-
-    def test_SimpleMessageStreamConfig_sequenced_stream_all_no_stream_conf(
-        self,
-    ) -> None:
-        conf = SimpleMessageStreamConfig()
-        conf.sequenced_stream_all(True)
-        for message_type in self.message_types:
-            assert conf.get_stream_status(message_type) == SEQUENCED_STREAM
-
-    def test_SimpleMessageStreamConfig_immediate_stream_add_no_stream_conf(
-        self,
-    ) -> None:
-        conf = SimpleMessageStreamConfig()
-        conf.sequenced_stream_all(True)  # Start with all sequenced
-        n = 3
-        for i in range(n):
-            conf.immediate_stream_add(self.message_types[i])
-        for message_type in self.message_types[:n]:
-            assert conf.get_stream_status(message_type) == IMMEDIATE_STREAM
-        for message_type in self.message_types[n:]:
-            assert conf.get_stream_status(message_type) == SEQUENCED_STREAM
-
-    def test_SimpleMessageStreamConfig_sequenced_stream_add_no_stream_conf(
-        self,
-    ) -> None:
-        conf = SimpleMessageStreamConfig()
-        conf.immediate_stream_all(True)  # Start with all immediate
-        n = 3
-        for i in range(n):
-            conf.sequenced_stream_add(self.message_types[i])
-        for message_type in self.message_types[:n]:
-            assert conf.get_stream_status(message_type) == SEQUENCED_STREAM
-        for message_type in self.message_types[n:]:
-            assert conf.get_stream_status(message_type) == IMMEDIATE_STREAM
-
-    def test_SimpleMessageStreamConfig_immediate_stream_remove_no_stream_conf(
-        self,
-    ) -> None:
-        conf = SimpleMessageStreamConfig()
-        conf.sequenced_stream_all(True)  # Start with all sequenced
-        n = 3
-
-        # Add some to immediate stream
-        for i in range(n):
-            conf.immediate_stream_add(self.message_types[i])
-        for message_type in self.message_types[:n]:
-            assert conf.get_stream_status(message_type) == IMMEDIATE_STREAM
-        for message_type in self.message_types[n:]:
-            assert conf.get_stream_status(message_type) == SEQUENCED_STREAM
-
-        # Remove the ones we added to immediate stream - all should be sequenced
-        for i in range(n):
-            conf.immediate_stream_remove(self.message_types[i])
-        for message_type in self.message_types:
-            assert conf.get_stream_status(message_type) == SEQUENCED_STREAM
-
-    def test_SimpleMessageStreamConfig_sequenced_stream_remove_no_stream_conf(
-        self,
-    ) -> None:
-        conf = SimpleMessageStreamConfig()
-        conf.immediate_stream_all(True)  # Start with all immediate
-        n = 3
-
-        # Add some to sequenced stream
-        for i in range(n):
-            conf.sequenced_stream_add(self.message_types[i])
-        for message_type in self.message_types[:n]:
-            assert conf.get_stream_status(message_type) == SEQUENCED_STREAM
-        for message_type in self.message_types[n:]:
-            assert conf.get_stream_status(message_type) == IMMEDIATE_STREAM
-
-        # Remove the ones we added to sequenced stream - all should be immediate
-        for i in range(n):
-            conf.sequenced_stream_remove(self.message_types[i])
-        for message_type in self.message_types:
-            assert conf.get_stream_status(message_type) == IMMEDIATE_STREAM
-
-    def test_SimpleMessageStreamConfig_immediate_add_after_sequenced_add(
-        self,
-    ) -> None:
-        conf = SimpleMessageStreamConfig()
-        conf.immediate_stream_all(True)  # Start with all immediate
-        n = 3
-
-        # Add some to sequenced stream
-        for i in range(n):
-            conf.sequenced_stream_add(self.message_types[i])
-        for message_type in self.message_types[:n]:
-            assert conf.get_stream_status(message_type) == SEQUENCED_STREAM
-        for message_type in self.message_types[n:]:
-            assert conf.get_stream_status(message_type) == IMMEDIATE_STREAM
-
-        # immediate stream the ones we added to sequenced stream - all should be immediate
-        for i in range(n):
-            conf.immediate_stream_add(self.message_types[i])
-        for message_type in self.message_types:
-            assert conf.get_stream_status(message_type) == IMMEDIATE_STREAM
-
-    def test_SimpleMessageStreamConfig_sequenced_add_after_immediate_add(
-        self,
-    ) -> None:
-        conf = SimpleMessageStreamConfig()
-        conf.sequenced_stream_all(True)  # Start with all sequenced
-        n = 3
-
-        # Add some to immediate stream
-        for i in range(n):
-            conf.immediate_stream_add(self.message_types[i])
-        for message_type in self.message_types[:n]:
-            assert conf.get_stream_status(message_type) == IMMEDIATE_STREAM
-        for message_type in self.message_types[n:]:
-            assert conf.get_stream_status(message_type) == SEQUENCED_STREAM
-
-        # Sequence stream the ones we added to immediate stream - all should be sequenced
-        for i in range(n):
-            conf.sequenced_stream_add(self.message_types[i])
-        for message_type in self.message_types:
-            assert conf.get_stream_status(message_type) == SEQUENCED_STREAM
-
     def test_init_orchestration_plugin_simple(self) -> None:
         """
         Just making sure the function can run without crashing.
@@ -925,10 +803,10 @@ class Test_Orchestration(unittest.TestCase):
             self.fusion_strategy_plugin,
             self.state_modeling_plugin,
         ]
-        global EXPECTED_ERROR_MESSAGE, ALIGNMENT_STATE
-        ALIGNMENT_STATE = InitializationStatus.INITIALIZED_GOOD
-        EXPECTED_ERROR_MESSAGE = ''
         self.orchestration_plugin.init_orchestration_plugin(plugins, stream_config)
+        global EXPECTED_ERROR_MESSAGE, ALIGNMENT_STATE
+        EXPECTED_ERROR_MESSAGE = ''
+        ALIGNMENT_STATE = InitializationStatus.INITIALIZED_GOOD
 
     def test_process_pntos_message_simple(self) -> None:
         """

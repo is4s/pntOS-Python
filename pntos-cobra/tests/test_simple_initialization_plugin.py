@@ -4,26 +4,45 @@ from aspn23 import (
 )
 from navtk.navutils import quat_to_rpy
 from pntos.api import (
+    CommonPlugin,
     EwcInitializationStrategy,
     InertialInitializationStrategy,
     InitializationMotionNeeded,
     InitializationStatus,
     LoggingLevel,
+    LoggingPlugin,
+    Mediator,
 )
 from pntos.cobra import SimpleInitializationPlugin
 from pntos.cobra.config import AlignmentConfig, config_to_registry
-from pntos.cobra.SimpleControllerPlugin import SimpleMediator
-from pntos.cobra.SimpleRegistryPlugin import SimpleRegistry
+from pntos.cobra.internal import SimpleMediator, SimpleRegistry
 
 
 def dummy_log(level: LoggingLevel, message: str) -> None:
     pass
 
 
+class DummyPlugin(CommonPlugin):
+    def __init__(self, identifier: str) -> None:
+        self.identifier = identifier
+
+    def init_plugin(
+        self,
+        plugin_resources_location: str | None = None,
+        mediator: Mediator | None = None,
+    ) -> None:
+        pass
+
+    def shutdown_plugin(self) -> None:
+        pass
+
+
 def test() -> None:
     # Setup
+    dummy_plugin = DummyPlugin('dummy plugin')
     registry = SimpleRegistry(dummy_log)
-    mediator = SimpleMediator(registry, [])
+    mediator = SimpleMediator(dummy_plugin.identifier, LoggingPlugin)
+    SimpleMediator.registry = registry
     plugin = SimpleInitializationPlugin('Cobra simple initialization plugin')
 
     pos = (1, 2, 3)
@@ -101,7 +120,8 @@ def test() -> None:
 
     assert solution.inertial_error_covariance is not None
     assert np.allclose(
-        accel_bias_var, np.diagonal(solution.inertial_error_covariance[0:3, 0:3])
+        accel_bias_var,
+        np.diagonal(solution.inertial_error_covariance[0:3, 0:3]),
     )
     assert np.allclose(
         gyro_bias_var, np.diagonal(solution.inertial_error_covariance[3:6, 3:6])
@@ -118,7 +138,8 @@ def test() -> None:
     assert np.allclose(solution.inertial_errors.accel_biases, np.array(accel_bias))
     assert np.allclose(solution.inertial_errors.gyro_biases, np.array(gyro_bias))
     assert np.allclose(
-        solution.inertial_errors.accel_scale_factors, np.array(accel_scale_factor)
+        solution.inertial_errors.accel_scale_factors,
+        np.array(accel_scale_factor),
     )
     assert np.allclose(
         solution.inertial_errors.gyro_scale_factors, np.array(gyro_scale_factor)
