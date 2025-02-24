@@ -1,9 +1,6 @@
 import time
 
 from pntos.api import CommonPlugin, LoggingLevel, LoggingPlugin, Mediator
-from pntos.cobra.config.LoggingConfig import LoggingConfig
-
-global_global_log_level = LoggingLevel.INFO
 
 
 class fmts:
@@ -25,69 +22,49 @@ class fmts:
 
 
 class SimpleLoggingPlugin(LoggingPlugin):
-    global_log_level: LoggingLevel = LoggingConfig.global_log_level
-    colorize: bool = False
+    def __init__(
+        self,
+        identifier: str,
+        colorize: bool = True,
+        global_log_level: LoggingLevel = LoggingLevel.INFO,
+        date_time_format: str = '%d/%m/%Y %H:%M:%S',
+    ) -> None:
+        """
+        Cobra Simple Logging Plugin
 
-    def __init__(self, identifier: str):
+        Args:
+            identifier (str): Populates the ``CommonPlugin.identifier`` field.
+            colorize (bool): Prints colored log messages if true, uncolored if false.
+            global_log_level (LoggingLevel): Selects which log levels get printed. See
+            :meth:`log` for more info.
+            date_time_format (str): Specifies the date-time format according to the
+            available format specifiers. See ``time.strftime()`` for more info on
+            supported formats.
+        """
         self.identifier = identifier
+        self.colorize: bool = colorize
+        self.global_log_level: LoggingLevel = global_log_level
+        self.date_time_format: str = date_time_format
 
     def init_plugin(
         self,
         plugin_resources_location: str | None = None,
         mediator: Mediator | None = None,
     ) -> None:
-        if mediator:
-            config = mediator.registry.batch_start(LoggingConfig.config_group)
-            if LoggingConfig.colorize_key in config:
-                self.colorize
-                config_colorize = config.get_value(LoggingConfig.colorize_key, bool)
-                if config_colorize is not None:
-                    self.colorize = config_colorize
-            if LoggingConfig.global_log_level_key in config:
-                global_log_level_temp = config.get_value(
-                    LoggingConfig.global_log_level_key, str
-                )
-                if global_log_level_temp is not None:
-                    match global_log_level_temp:
-                        case 'error':
-                            self.global_log_level = LoggingLevel.ERROR
-                        case 'debug':
-                            self.global_log_level = LoggingLevel.DEBUG
-                        case 'warn':
-                            self.global_log_level = LoggingLevel.WARN
-                        case 'info':
-                            self.global_log_level = LoggingLevel.INFO
-                        case _:
-                            self.log(
-                                self.__class__,
-                                '',
-                                LoggingLevel.INFO,
-                                'logging level '
-                                + global_log_level_temp
-                                + ' is unknown, remaining at '
-                                + self.level_to_str(self.global_log_level),
-                            )
-
-                else:
-                    self.log(
-                        self.__class__,
-                        '',
-                        LoggingLevel.INFO,
-                        'using hard-coded global logging level '
-                        + self.level_to_str(self.global_log_level),
-                    )
-            else:
-                self.log(
-                    self.__class__,
-                    '',
-                    LoggingLevel.INFO,
-                    'using hard-coded global logging level '
-                    + self.level_to_str(self.global_log_level),
-                )
-            config.batch_end()
+        self.log(
+            self.__class__,
+            self.identifier,
+            LoggingLevel.INFO,
+            'using hard-coded global logging level ' + self.global_log_level.name,
+        )
 
     def shutdown_plugin(self) -> None:
-        return
+        self.log(
+            self.__class__,
+            self.identifier,
+            LoggingLevel.INFO,
+            ' Logging plugin shut down correctly.',
+        )
 
     def log(
         self,
@@ -116,14 +93,13 @@ class SimpleLoggingPlugin(LoggingPlugin):
         -global level: DEBUG - shows ERROR, WARN, INFO, or DEBUG
         """
         plugin_id = source_plugin_type.__name__
-        GLL = self.global_log_level
         INFO = LoggingLevel.INFO
         DEBUG = LoggingLevel.DEBUG
         WARN = LoggingLevel.WARN
 
         match level:
             case LoggingLevel.INFO:
-                if GLL is INFO or GLL is DEBUG:
+                if self.global_log_level is INFO or self.global_log_level is DEBUG:
                     self.output_time()
                     self.output_plugin_id(plugin_id)
                     if self.colorize:
@@ -132,7 +108,11 @@ class SimpleLoggingPlugin(LoggingPlugin):
                         print(' [INFO] ', end='')
                     print(message)
             case LoggingLevel.WARN:
-                if GLL is INFO or GLL is DEBUG or GLL is WARN:
+                if (
+                    self.global_log_level is INFO
+                    or self.global_log_level is DEBUG
+                    or self.global_log_level is WARN
+                ):
                     self.output_time()
                     self.output_plugin_id(plugin_id)
                     if self.colorize:
@@ -141,7 +121,7 @@ class SimpleLoggingPlugin(LoggingPlugin):
                         print(' [WARN] ', end='')
                     print(message)
             case LoggingLevel.DEBUG:
-                if GLL is DEBUG:
+                if self.global_log_level is DEBUG:
                     self.output_time()
                     self.output_plugin_id(plugin_id)
                     if self.colorize:
@@ -158,29 +138,18 @@ class SimpleLoggingPlugin(LoggingPlugin):
                     print(' [ERROR] ', end='')
                 print(message)
 
-    def level_to_str(self, level: LoggingLevel) -> str:
-        match level:
-            case LoggingLevel.DEBUG:
-                return 'debug'
-            case LoggingLevel.INFO:
-                return 'info'
-            case LoggingLevel.WARN:
-                return 'warning'
-            case LoggingLevel.ERROR:
-                return 'error'
-
     def output_time(self) -> None:
         if self.colorize:
             print(
                 fmts.LTGRAY
                 + '['
-                + time.strftime(LoggingConfig.dt_fmt)
+                + time.strftime(self.date_time_format)
                 + ']'
                 + fmts.ENDC,
                 end='',
             )
         else:
-            print('[' + time.strftime(LoggingConfig.dt_fmt) + ']', end='')
+            print('[' + time.strftime(self.date_time_format) + ']', end='')
 
     def output_plugin_id(self, plugin_id: str) -> None:
         if self.colorize:
