@@ -86,17 +86,16 @@ class Aspn23LcmTransportPlugin(TransportPlugin):
         """
         Generic listener for lcm messages to marshal to the mediator for processing.
 
-        NOTE: Current implementation only supports input from the following
-        sensors:
-            Altitude
-            Barometer
-            Delta-position
-            Heading
-            Imu
-            Position
-            Position-velocity-attitude
-            Satnav
-            Gps-lnav-ephemeris metadata
+        NOTE: Current implementation only supports message types:
+            MeasurementAltitude
+            MeasurementBarometer
+            MeasurementDeltaPosition
+            MeasurementHeading
+            MeasurementImu
+            MeasurementPosition
+            MeasurementPositionVelocityAttitude
+            MeasurementSatnav
+            MetadataGpsLnavEphemeris
         """
 
         def _general_handler(channel: str, data: bytes) -> None:
