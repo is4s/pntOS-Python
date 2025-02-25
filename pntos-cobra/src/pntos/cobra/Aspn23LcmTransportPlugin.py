@@ -82,7 +82,6 @@ class Aspn23LcmTransportPlugin(TransportPlugin):
         self.mediator.log_message(
             LoggingLevel.INFO, f'shutdown_plugin for {self.identifier}.'
         )
-        self.init_plugin(mediator=None)
 
     def general_handler(self) -> Callable[[str, bytes], None]:
         """

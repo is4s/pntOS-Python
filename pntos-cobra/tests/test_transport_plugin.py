@@ -2,6 +2,7 @@ import numpy as np
 import pytest
 from aspn23_lcm import measurement_position_velocity_attitude
 from pntos.api import LoggingLevel
+from pntos.cobra import SimpleRegistryPlugin
 from pntos.cobra.Aspn23LcmTransportPlugin import Aspn23LcmTransportPlugin
 from pntos.cobra.internal import SimpleMediator, SimpleRegistry
 
@@ -13,23 +14,28 @@ def dummy_log(level: LoggingLevel, message: str) -> None:
 @pytest.fixture
 def mediator():
     registry = SimpleRegistry(dummy_log)
-    mediator = SimpleMediator(registry, [])
+    SimpleMediator.registry = registry
+    mediator = SimpleMediator('registry plugin', SimpleRegistryPlugin)
     return mediator
 
 
 @pytest.fixture
-def transport_plugin(mediator):
+def transport_plugin(mediator: SimpleMediator) -> Aspn23LcmTransportPlugin:
     plugin = Aspn23LcmTransportPlugin(mediator)
     return plugin
 
 
-def test_initialize_plugin(transport_plugin, mediator) -> None:
+def test_initialize_plugin(
+    transport_plugin: Aspn23LcmTransportPlugin, mediator: SimpleMediator
+) -> None:
     transport_plugin.init_plugin('plugin_path', mediator)
     assert transport_plugin.identifier == 'python-transport-lcm23-plugin'
     assert transport_plugin.mediator is not None
 
 
-def test_handler(transport_plugin, mediator) -> None:
+def test_handler(
+    transport_plugin: Aspn23LcmTransportPlugin, mediator: SimpleMediator
+) -> None:
     transport_plugin.init_plugin('plugin_path', mediator)
     transport_plugin.start_listening()
 
@@ -82,4 +88,3 @@ def test_handler(transport_plugin, mediator) -> None:
     assert received_response.num_error_model_params == 0
 
     transport_plugin.shutdown_plugin()
-    assert transport_plugin.mediator is None
