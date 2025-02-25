@@ -20,8 +20,8 @@ def mediator():
 
 
 @pytest.fixture
-def transport_plugin(mediator: SimpleMediator) -> Aspn23LcmTransportPlugin:
-    plugin = Aspn23LcmTransportPlugin(mediator)
+def transport_plugin() -> Aspn23LcmTransportPlugin:
+    plugin = Aspn23LcmTransportPlugin('python-transport-lcm23-plugin')
     return plugin
 
 

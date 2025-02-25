@@ -55,9 +55,8 @@ class Aspn23LcmTransportPlugin(TransportPlugin):
     mediator: Mediator
     subscription: LCMSubscription
 
-    def __init__(self, mediator: Mediator):
-        self.identifier = 'python-transport-lcm23-plugin'
-        self.mediator = mediator
+    def __init__(self, identifier: str):
+        self.identifier = identifier
 
     def init_plugin(
         self,
