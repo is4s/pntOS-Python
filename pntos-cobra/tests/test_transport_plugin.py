@@ -2,8 +2,7 @@ import numpy as np
 import pytest
 from aspn23_lcm import measurement_position_velocity_attitude
 from pntos.api import LoggingLevel
-from pntos.cobra import SimpleRegistryPlugin
-from pntos.cobra.Aspn23LcmTransportPlugin import Aspn23LcmTransportPlugin
+from pntos.cobra import Aspn23LcmTransportPlugin, SimpleRegistryPlugin
 from pntos.cobra.internal import SimpleMediator, SimpleRegistry
 
 
