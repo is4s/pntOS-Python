@@ -167,6 +167,10 @@ class Aspn23LcmTransportPlugin(TransportPlugin):
             if aspn_msg:
                 message = Message(aspn_msg, channel)
                 self.broadcast_message(message, channel)
+            else:
+                self.mediator.log_message(
+                    LoggingLevel.WARN, 'LCM measurement is not recognized.'
+                )
 
         return _general_handler
 
