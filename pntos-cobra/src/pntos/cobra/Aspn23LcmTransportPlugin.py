@@ -80,7 +80,7 @@ class Aspn23LcmTransportPlugin(TransportPlugin):
         """
         self.stop_listening()
         self.mediator.log_message(
-            LoggingLevel.INFO, f'shutdown_plugin for {self.identifier}.'
+            LoggingLevel.INFO, f'Shutdown plugin for {self.identifier}.'
         )
 
     def general_handler(self) -> Callable[[str, bytes], None]:
