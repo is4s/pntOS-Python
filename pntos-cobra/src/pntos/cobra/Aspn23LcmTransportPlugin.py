@@ -82,7 +82,7 @@ class Aspn23LcmTransportPlugin(TransportPlugin):
         self.mediator.log_message(
             LoggingLevel.INFO, f'shutdown_plugin for {self.identifier}.'
         )
-        self.__init__(mediator=None)
+        self.init_plugin(mediator=None)
 
     def general_handler(self) -> Callable[[str, bytes], None]:
         """
@@ -173,7 +173,7 @@ class Aspn23LcmTransportPlugin(TransportPlugin):
 
         return _general_handler
 
-    def listener_thread(self):
+    def listener_thread(self) -> None:
         """Subscribe to specified channels (excluding any channels with "pntos")"""
         self.subscription = self.lcm.subscribe(
             '^((?!pntos).)*$', self.general_handler()
@@ -213,32 +213,31 @@ class Aspn23LcmTransportPlugin(TransportPlugin):
         )
         if isinstance(message.wrapped_message, MeasurementAltitude):
             translated = measurement_altitude_to_lcm(message.wrapped_message)
-            self.lcm.publish(channel_name, translated.encode())
         elif isinstance(message.wrapped_message, MeasurementBarometer):
             translated = measurement_barometer_to_lcm(message.wrapped_message)
-            self.lcm.publish(channel_name, translated.encode())
         elif isinstance(message.wrapped_message, MeasurementDeltaPosition):
             translated = measurement_delta_position_to_lcm(message.wrapped_message)
-            self.lcm.publish(channel_name, translated.encode())
         elif isinstance(message.wrapped_message, MeasurementHeading):
             translated = measurement_heading_to_lcm(message.wrapped_message)
-            self.lcm.publish(channel_name, translated.encode())
         elif isinstance(message.wrapped_message, MeasurementImu):
             translated = measurement_IMU_to_lcm(message.wrapped_message)
-            self.lcm.publish(channel_name, translated.encode())
         elif isinstance(message.wrapped_message, MeasurementPosition):
             translated = measurement_position_to_lcm(message.wrapped_message)
-            self.lcm.publish(channel_name, translated.encode())
         elif isinstance(message.wrapped_message, MeasurementPositionVelocityAttitude):
             translated = measurement_position_velocity_attitude_to_lcm(
                 message.wrapped_message
             )
-            self.lcm.publish(channel_name, translated.encode())
         elif isinstance(message.wrapped_message, MeasurementSatnav):
             translated = measurement_satnav_to_lcm(message.wrapped_message)
-            self.lcm.publish(channel_name, translated.encode())
         elif isinstance(message.wrapped_message, MetadataGpsLnavEphemeris):
             translated = metadata_GPS_Lnav_ephemeris_to_lcm(message.wrapped_message)
-            self.lcm.publish(channel_name, translated.encode())
-        else:
+
+        if translated is None:
             self.mediator.log_message(LoggingLevel.ERROR, 'Invalid LCM message')
+        elif channel_name is None:
+            self.mediator.log_message(
+                LoggingLevel.WARN,
+                'No channel name specified. This implementation requires a channel name.',
+            )
+        else:
+            self.lcm.publish(channel_name, translated.encode())

@@ -3,8 +3,7 @@ import pytest
 from aspn23_lcm import measurement_position_velocity_attitude
 from pntos.api import LoggingLevel
 from pntos.cobra.Aspn23LcmTransportPlugin import Aspn23LcmTransportPlugin
-from pntos.cobra.SimpleControllerPlugin import SimpleMediator
-from pntos.cobra.SimpleRegistryPlugin import SimpleRegistry
+from pntos.cobra.internal import SimpleMediator, SimpleRegistry
 
 
 def dummy_log(level: LoggingLevel, message: str) -> None:
