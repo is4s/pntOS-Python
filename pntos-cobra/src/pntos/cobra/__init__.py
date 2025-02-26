@@ -1,3 +1,6 @@
+from .Aspn23LcmTransportPlugin import (
+    Aspn23LcmTransportPlugin as Aspn23LcmTransportPlugin,
+)
 from .simple_controller.SimpleControllerPlugin import (
     SimpleControllerPlugin as SimpleControllerPlugin,
 )

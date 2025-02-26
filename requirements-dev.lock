@@ -20,7 +20,7 @@ aspn-lcm @ git+ssh://git@git.aspn.us/pntos/lcm-generated.git@21e03f8765605dcd3c8
 aspn23 @ git+ssh://git@git.aspn.us/pntos/firehose-outputs.git@0f42a18e9c3a65462d10686eced7bb3e0f51eae8#subdirectory=aspn-py
     # via pntos-api
     # via pntos-cobra
-aspn23-lcm @ git+ssh://git@git.aspn.us/pntos/firehose-outputs.git@0f42a18e9c3a65462d10686eced7bb3e0f51eae8#subdirectory=lcm/python
+aspn23-lcm @ git+ssh://git@git.aspn.us/pntos/firehose-outputs.git@b9c90ecaaad6d1b1fffba42f1b48e94fc3f8406a#subdirectory=lcm/python
     # via pntos-cobra
 asttokens==2.4.1
     # via stack-data
@@ -52,7 +52,7 @@ jedi==0.19.1
 jinja2==3.1.4
     # via myst-parser
     # via sphinx
-lcm @ git+https://github.com/lcm-proj/lcm.git@8d638bb3aeae39fda5db59f43b85f3a4b3f9a6ac
+lcm==1.5.1
     # via aspn-lcm
     # via aspn23-lcm
     # via pntos-cobra
