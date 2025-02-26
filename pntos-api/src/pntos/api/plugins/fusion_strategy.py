@@ -141,7 +141,7 @@ class StandardFusionStrategy(ABC):
                 set to zero.
 
         Returns:
-            int: Number of states being added to this filter.
+            int: Index of first state being added to this filter (zero indexed).
         """
         ...
 
@@ -151,7 +151,7 @@ class StandardFusionStrategy(ABC):
         Removes a set of states from the filter.
 
         Args:
-            first_index (int): Index of the first state to be removed.
+            first_index (int): Index of the first state to be removed (zero indexed).
             count (int): The number of states to be removed.
         """
         ...
