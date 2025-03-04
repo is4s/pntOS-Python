@@ -70,7 +70,7 @@ class Aspn23LcmTransportPlugin(TransportPlugin):
             )
             return
         message = Message(aspn_msg, channel)
-        self.broadcast_message(message, channel)
+        self.mediator.process_pntos_message(message)
 
     def listener_thread(self) -> None:
         """Subscribe to specified channels (excluding any channels with "pntos")"""

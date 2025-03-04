@@ -110,7 +110,7 @@ class Aspn2LcmTransportPlugin(TransportPlugin):
         trans.quaternion = untrans.attitude
         msg = Message(trans, '')
 
-        self.broadcast_message(msg)
+        self.mediator.process_pntos_message(msg)
 
     def listener_thread(self) -> None:
         self.lcm.subscribe('^((?!pntos).)*$', self._general_handler)
