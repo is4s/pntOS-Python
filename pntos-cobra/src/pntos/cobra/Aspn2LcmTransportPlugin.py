@@ -63,7 +63,7 @@ class Aspn2LcmTransportPlugin(TransportPlugin):
         """
         pass
 
-    def general_handler(self) -> Callable[[str, bytes], None]:
+    def _general_handler(self, channel: str, data: bytes) -> None:
         """
         Generic listener for lcm messages to marshal to the mediator for processing.
 
@@ -72,52 +72,48 @@ class Aspn2LcmTransportPlugin(TransportPlugin):
             Geodetic position
             Position-velocity-attitude
         """
-
-        def _general_handler(channel: str, data: bytes) -> None:
-            # Do not process messages sent from pntos.
-            if 'pntos' in channel:
-                self.mediator.log_message(
-                    LoggingLevel.ERROR,
-                    'pntOS channel message, not processing in ASPN handler.',
-                )
-                return
-
-            untrans = positionvelocityattitude.decode(data)
-            header = TypeHeader(0, 0, 0, 0)
-            time = TypeTimestamp(0)
-            frame = MeasurementPositionVelocityAttitudeReferenceFrame.GEODETIC
-            error_model = MeasurementPositionVelocityAttitudeErrorModel.NONE
-            trans = MeasurementPVA(
-                header,
-                time,
-                frame,
-                untrans.position[0],
-                untrans.position[1],
-                untrans.position[2],
-                untrans.velocity[0],
-                untrans.velocity[1],
-                untrans.velocity[2],
-                untrans.attitude,
-                untrans.covariance,
-                error_model,
-                np.empty(0),
-                [],
+        # Do not process messages sent from pntos.
+        if 'pntos' in channel:
+            self.mediator.log_message(
+                LoggingLevel.ERROR,
+                'pntOS channel message, not processing in ASPN handler.',
             )
-            trans.p1 = untrans.position[0]
-            trans.p2 = untrans.position[1]
-            trans.p3 = untrans.position[2]
-            trans.v1 = untrans.velocity[0]
-            trans.v2 = untrans.velocity[1]
-            trans.v3 = untrans.velocity[2]
-            trans.quaternion = untrans.attitude
-            msg = Message(trans, '')
+            return
 
-            self.broadcast_message(msg)
+        untrans = positionvelocityattitude.decode(data)
+        header = TypeHeader(0, 0, 0, 0)
+        time = TypeTimestamp(0)
+        frame = MeasurementPositionVelocityAttitudeReferenceFrame.GEODETIC
+        error_model = MeasurementPositionVelocityAttitudeErrorModel.NONE
+        trans = MeasurementPVA(
+            header,
+            time,
+            frame,
+            untrans.position[0],
+            untrans.position[1],
+            untrans.position[2],
+            untrans.velocity[0],
+            untrans.velocity[1],
+            untrans.velocity[2],
+            untrans.attitude,
+            untrans.covariance,
+            error_model,
+            np.empty(0),
+            [],
+        )
+        trans.p1 = untrans.position[0]
+        trans.p2 = untrans.position[1]
+        trans.p3 = untrans.position[2]
+        trans.v1 = untrans.velocity[0]
+        trans.v2 = untrans.velocity[1]
+        trans.v3 = untrans.velocity[2]
+        trans.quaternion = untrans.attitude
+        msg = Message(trans, '')
 
-        return _general_handler
+        self.broadcast_message(msg)
 
     def listener_thread(self) -> None:
-        self.lcm.subscribe('^((?!pntos).)*$', self.general_handler())
+        self.lcm.subscribe('^((?!pntos).)*$', self._general_handler)
 
     def start_listening(self) -> None:
         # old: config_path="config/transport/is4s_transport_lcm"

@@ -43,44 +43,38 @@ class Aspn23LcmTransportPlugin(TransportPlugin):
             LoggingLevel.INFO, f'Shutdown plugin for {self.identifier}.'
         )
 
-    def general_handler(self) -> Callable[[str, bytes], None]:
+    def _general_handler(self, channel: str, data: bytes) -> None:
         """
         Generic listener for lcm messages to marshal to the mediator for processing.
         """
+        # Do not process messages sent from pntos.
+        if 'pntos' in channel:
+            self.mediator.log_message(
+                LoggingLevel.INFO,
+                'pntOS channel message, not processing in ASPN handler.',
+            )
+            return
 
-        def _general_handler(channel: str, data: bytes) -> None:
-            # Do not process messages sent from pntos.
-            if 'pntos' in channel:
-                self.mediator.log_message(
-                    LoggingLevel.INFO,
-                    'pntOS channel message, not processing in ASPN handler.',
-                )
-                return
-
-            lcm_aspn_msg = decode_aspn_lcm_msg(data)
-            if lcm_aspn_msg is None:
-                self.mediator.log_message(
-                    LoggingLevel.WARN,
-                    f'Cannot decode message on channel {channel}. Ignoring message.',
-                )
-                return
-            aspn_msg = marshal_from_lcm(lcm_aspn_msg)
-            if aspn_msg is None:
-                self.mediator.log_message(
-                    LoggingLevel.WARN,
-                    f'Cannot marshal message on channel {channel} of type {type(aspn_msg)}. Ignoring message.',
-                )
-                return
-            message = Message(aspn_msg, channel)
-            self.broadcast_message(message, channel)
-
-        return _general_handler
+        lcm_aspn_msg = decode_aspn_lcm_msg(data)
+        if lcm_aspn_msg is None:
+            self.mediator.log_message(
+                LoggingLevel.WARN,
+                f'Cannot decode message on channel {channel}. Ignoring message.',
+            )
+            return
+        aspn_msg = marshal_from_lcm(lcm_aspn_msg)
+        if aspn_msg is None:
+            self.mediator.log_message(
+                LoggingLevel.WARN,
+                f'Cannot marshal message on channel {channel} of type {type(aspn_msg)}. Ignoring message.',
+            )
+            return
+        message = Message(aspn_msg, channel)
+        self.broadcast_message(message, channel)
 
     def listener_thread(self) -> None:
         """Subscribe to specified channels (excluding any channels with "pntos")"""
-        self.subscription = self.lcm.subscribe(
-            '^((?!pntos).)*$', self.general_handler()
-        )
+        self.subscription = self.lcm.subscribe('^((?!pntos).)*$', self._general_handler)
 
     def start_listening(self) -> None:
         """Begin listening for lcm messages given input configuration"""
