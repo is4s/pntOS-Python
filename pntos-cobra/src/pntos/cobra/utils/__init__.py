@@ -10,6 +10,11 @@ from .conversions import (
     convert_timestamp_from_cpp as convert_timestamp_from_cpp,
     convert_timestamp_to_cpp as convert_timestamp_to_cpp,
 )
+from .lcm_marshaling import (
+    decode_aspn_lcm_msg as decode_aspn_lcm_msg,
+    marshal_from_lcm as marshal_from_lcm,
+    marshal_to_lcm as marshal_to_lcm,
+)
 from .navigation import *
 from .plugins import (
     PluginDiscoveryError as PluginDiscoveryError,
