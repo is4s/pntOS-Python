@@ -4,6 +4,10 @@ from .Aspn23LcmTransportPlugin import (
 from .simple_controller.SimpleControllerPlugin import (
     SimpleControllerPlugin as SimpleControllerPlugin,
 )
+from .SimpleEkfFusionStrategyPlugin import (
+    SimpleEkfFusionStrategyPlugin as SimpleEkfFusionStrategyPlugin,
+)
+from .SimpleFusionPlugin import SimpleFusionPlugin as SimpleFusionPlugin
 from .SimpleInertialPlugin import SimpleInertialPlugin as SimpleInertialPlugin
 from .SimpleInitializationPlugin import (
     SimpleInitialization as SimpleInitialization,

@@ -1,3 +1,7 @@
+from .arrays import (
+    is_symmetric as is_symmetric,
+    validate_array as validate_array,
+)
 from .conversions import (
     convert_header_from_cpp as convert_header_from_cpp,
     convert_header_to_cpp as convert_header_to_cpp,
