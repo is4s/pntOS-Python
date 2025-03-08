@@ -10,7 +10,6 @@ from .SimpleEkfFusionStrategyPlugin import (
 from .SimpleFusionPlugin import SimpleFusionPlugin as SimpleFusionPlugin
 from .SimpleInertialPlugin import SimpleInertialPlugin as SimpleInertialPlugin
 from .SimpleInitializationPlugin import (
-    SimpleInitialization as SimpleInitialization,
     SimpleInitializationPlugin as SimpleInitializationPlugin,
 )
 from .SimpleLoggingPlugin import SimpleLoggingPlugin as SimpleLoggingPlugin
