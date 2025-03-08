@@ -6,6 +6,8 @@ from .SimpleEkfFusionStrategyPlugin import (
     SimpleEkfFusionStrategy as SimpleEkfFusionStrategy,
 )
 from .SimpleFusionPlugin import SimpleFusionEngine as SimpleFusionEngine
+from .SimpleInertialPlugin import SimpleInertial as SimpleInertial
+from .SimpleInitializationPlugin import SimpleInitialization as SimpleInitialization
 from .SimpleRegistryPlugin import (
     SimpleKeyValueStore as SimpleKeyValueStore,
     SimpleRegistry as SimpleRegistry,
