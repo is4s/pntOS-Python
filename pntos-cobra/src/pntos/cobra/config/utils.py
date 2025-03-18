@@ -1,4 +1,5 @@
 from dataclasses import fields
+from enum import Enum
 from typing import Any, TypeVar, get_origin
 
 import numpy as np
@@ -15,10 +16,10 @@ def config_from_registry(
 ) -> ConfigType | None:
     conf_params = [f for f in fields(config_type)]
     kv = mediator.registry.batch_start(config_group)
-    out: dict[str, RegistryValueTypeUnion | tuple[float, ...]] = {}
+    out: dict[str, RegistryValueTypeUnion | tuple[float, ...] | Enum] = {}
     fail = False
     for param in conf_params:
-        val: RegistryValueTypeUnion | tuple[float, ...] | None = kv[param.name]
+        val: RegistryValueTypeUnion | tuple[float, ...] | Enum | None = kv[param.name]
         if val is None:
             mediator.log_message(
                 LoggingLevel.WARN,
@@ -42,6 +43,9 @@ def config_from_registry(
                     if np.dtype[np.int_] in param.type.__args__:
                         # Convert to np array of ints
                         val = val.astype(int)
+        # Special case: enum. Convert integer back to enum type.
+        elif issubclass(param.type, Enum):
+            val = param.type(val)
 
         if not _confirm_types(val, param.type):
             mediator.log_message(
@@ -71,6 +75,8 @@ def config_to_registry(config: BaseConfig, registry: Registry) -> None:
             if len(val_to_store) > 0:
                 if isinstance(val_to_store[0], (int, float, np.int_)):
                     val_to_store = np.array(val_to_store, dtype=float)
+        elif isinstance(val_to_store, Enum):
+            val_to_store = val_to_store.value
         kv[param.name] = val_to_store
     kv.batch_end()
 
