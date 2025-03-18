@@ -266,13 +266,19 @@ class DummyFusionPlugin(FusionPlugin):
 
 
 class DummyStandardFusionEngine(StandardFusionEngine):
+    _strategy: StandardFusionStrategy
+
     @property
     def time(self) -> TypeTimestamp:
         return TypeTimestamp(0)
 
     @property
     def strategy(self) -> StandardFusionStrategy | None:
-        pass
+        return self._strategy
+
+    @strategy.setter
+    def strategy(self, strategy: StandardFusionStrategy) -> None:
+        self._strategy = strategy
 
     def get_num_states(self) -> int:
         return 0

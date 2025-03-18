@@ -325,6 +325,12 @@ class StandardFusionEngine(ABC):
         """
         pass
 
+    @strategy.setter
+    @abstractmethod
+    def strategy(self, strategy: StandardFusionStrategy) -> None:
+        """The setter for the :meth:`strategy` property on :class:`StandardFusionEngine`."""
+        pass
+
     @abstractmethod
     def get_num_states(self) -> int:
         """
