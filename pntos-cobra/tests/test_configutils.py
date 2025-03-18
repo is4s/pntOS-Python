@@ -173,7 +173,7 @@ class TestConfigUtils(unittest.TestCase):
 
     def _validate_conf_to_registry(self, test_conf: BaseConfig) -> None:
         kv = self.mediator.registry.batch_start(CONFIG_TEST_GROUP)
-        conf_fields = [f for f in fields(test_conf)]
+        conf_fields = [f for f in fields(test_conf) if f.name != 'group']
         for conf_field in conf_fields:
             val = kv[conf_field.name]
             conf_val = getattr(test_conf, conf_field.name)

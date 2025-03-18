@@ -14,7 +14,7 @@ ConfigType = TypeVar('ConfigType', bound=BaseConfig)
 def config_from_registry(
     config_type: type[ConfigType], mediator: Mediator, config_group: str
 ) -> ConfigType | None:
-    conf_params = [f for f in fields(config_type)]
+    conf_params = [f for f in fields(config_type) if f.name != 'group']
     kv = mediator.registry.batch_start(config_group)
     out: dict[str, RegistryValueTypeUnion | tuple[float, ...] | Enum] = {}
     fail = False
@@ -70,11 +70,11 @@ def config_from_registry(
     kv.batch_end()
     if fail:
         return None
-    return config_type(**out)  # type: ignore[arg-type]
+    return config_type(**out, group=config_group)  # type: ignore[arg-type]
 
 
 def config_to_registry(config: BaseConfig, registry: Registry) -> None:
-    conf_params = [f for f in fields(config)]
+    conf_params = [f for f in fields(config) if f.name != 'group']
     kv = registry.batch_start(config.group)
 
     for param in conf_params:
