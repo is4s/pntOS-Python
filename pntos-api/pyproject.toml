@@ -6,8 +6,8 @@ authors = [
     { name = "IS4S", email = "pntos@is4s.com" }
 ]
 dependencies = [
-    # firehose-outputs main branch - committed 18 November 2024
-    "aspn23 @ git+ssh://git@git.aspn.us/pntos/firehose-outputs.git@0f42a18e9c3a65462d10686eced7bb3e0f51eae8#subdirectory=aspn-py",
+    # firehose-outputs main branch - committed 19 March 2025
+    "aspn23 @ git+ssh://git@git.aspn.us/pntos/firehose-outputs.git@f5f5b2b4637517bb10299fb6be7248a2215fbb74#subdirectory=aspn-py",
 ]
 readme = "README.md"
 requires-python = ">= 3.11"
