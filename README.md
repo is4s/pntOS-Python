@@ -56,7 +56,36 @@ If that works, you are ready to move on to [running the examples](#running-examp
 
 ### Rye Environment Setup
 
-First, install Rye. Rye is available directly in homebrew on macOS and a variety of package managers on Linux distributions. Alternatively, you may use the [upstream install instructions](https://rye.astral.sh/guide/installation/).
+#### Installing Rye
+
+First, install [Rye](https://rye.astral.sh/guide/installation/). Rye is available through some system package managers.
+
+##### MacOS
+```sh
+    brew install rye
+```
+
+##### Other Linux Distributions
+
+If rye is unavailable through your system package manager, you can install it via the following commands:
+```sh
+    sudo apt update
+    sudo apt install curl
+    curl -sSf https://rye.astral.sh/get | bash
+```
+
+After running the last command, Rye will ask if you want to continue. Input `y` to proceed.
+
+Next, rye will bring up the following prompt:
+
+```
+    ? What should running `python` or `python3` do when you are not inside a Rye managed project? ›
+    Run a Python installed and managed by Rye
+    ❯ Run the old default Python (provided by your OS, pyenv, etc.)
+```
+We recommend selecting the 2nd option: `Run the old default Python (provided by your OS, pyenv, etc.)`
+
+#### Using Rye
 
 Once Rye is installed, we will sync the project in the project root directory:
 
