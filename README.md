@@ -119,30 +119,13 @@ No examples work yet (WIP!).
 
 To begin development, refer to [Environment Setup](#environment-setup) for how to setup development tooling and enter the configured venv. Once that is done, you can proceed to develop your new functionality in a feature branch. When your feature is complete and ready for us to review, there are a few code quality checks you should perform before opening a merge request. These steps vary depending on if you are using `pip` or `rye`, as described below.
 
-### Checking Contributions using Pip
+### Checking Contributions
 
-First, make sure to install the dependencies via `pip3 install -r requirements-dev.lock`
-
-New contributions to this repo should pass the following checks, if they use other tooling than Rye:
+New contributions to this repo should pass the following checks:
 
 ```bash
 ruff check --fix
 ruff format
-pytest --cov --cov-fail-under=75 --cov-report={term,html}
-mypy pntos-api
-mypy pntos-cli
-mypy pntos-cobra
-```
-
-Note that Rye will be used as the standard on the CI/CD side.
-
-### Checking Contributions using Rye
-
-New contributions to this repo should pass the following checks, if they use Rye:
-
-```bash
-rye lint --fix
-rye fmt
 pytest --cov --cov-fail-under=75 --cov-report={term,html}
 mypy pntos-api
 mypy pntos-cli

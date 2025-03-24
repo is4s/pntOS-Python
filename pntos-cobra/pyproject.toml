@@ -2,9 +2,7 @@
 name = "pntos-cobra"
 version = "0.1.0"
 description = "A Python implementation of a set of pntOS example plugins."
-authors = [
-    { name = "IS4S", email = "pntos@is4s.com" }
-]
+authors = [{ name = "IS4S", email = "pntos@is4s.com" }]
 # Git dependencies need exact commit hash for pip compatibility,
 # see https://github.com/astral-sh/rye/issues/957
 dependencies = [

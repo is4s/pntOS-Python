@@ -53,22 +53,23 @@ stages:
     - check
     - deploy
 
-rye lint:
+ruff check:
     stage: check
     tags:
-        - linux-light-runner
+        - linux-heavy-runner
     script:
-        - docker run --rm -v $(pwd):/work $DOCKER_IMAGE "rye lint"
+        - docker run --rm -v $(pwd):/work -e CC=gcc -e CXX=g++ $DOCKER_IMAGE "rye sync && ruff check"
 
-rye format:
+ruff format:
     stage: check
     tags:
-        - linux-light-runner
+        - linux-heavy-runner
     script:
         # Run the formatter to see if it produces a diff.
-        - docker run --rm -v $(pwd):/work $DOCKER_IMAGE "rye fmt"
-        # Don't let modification to the pyproject.toml files produce a diff.
+        - docker run --rm -v $(pwd):/work -e CC=gcc -e CXX=g++ $DOCKER_IMAGE "rye sync && ruff format"
+        # Don't let modification to the pyproject.toml and requirements.lock files produce a diff.
         - git checkout -- $(git ls-files | grep pyproject.toml)
+        - git checkout -- $(git ls-files | grep requirements.*.lock)
         # If there's a diff, fail the stage.
         - git diff --exit-code
 
