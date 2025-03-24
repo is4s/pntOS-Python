@@ -9,7 +9,7 @@
 
 set -xe
 
-rye lint --fix
+ruff check --fix
 ruff format
 pytest --cov --cov-fail-under=75 --cov-report={term,html}
 mypy pntos-api
