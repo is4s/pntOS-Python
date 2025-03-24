@@ -104,7 +104,7 @@ pyyaml==6.0.2
     # via myst-parser
 requests==2.31.0
     # via sphinx
-ruff==0.4.5
+ruff==0.7.0
 scipy==1.15.2
     # via pntos-cobra
 six==1.16.0

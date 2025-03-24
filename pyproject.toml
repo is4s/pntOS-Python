@@ -15,7 +15,7 @@ dev-dependencies = [
     "pytest-cov>=6.0.0",
     "sphinx>=7.3.7",
     "ipython>=8.24.0",
-    "ruff>=0.4.5",
+    "ruff==0.7.0",
     "mypy>=1.10.0",
     "pip>=24.0",
     "myst_parser>=4.0.0",
