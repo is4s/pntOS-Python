@@ -10,7 +10,7 @@
 set -xe
 
 rye lint --fix
-rye fmt
+ruff format
 pytest --cov --cov-fail-under=75 --cov-report={term,html}
 mypy pntos-api
 mypy pntos-cli
