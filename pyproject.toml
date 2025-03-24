@@ -2,11 +2,8 @@
 name = "pntos-virtual"
 version = "0.1.0"
 description = "A meta package for pntOS that contains the components of pntOS."
-authors = [
-    { name = "IS4S", email = "pntos@is4s.com" }
-]
-dependencies = [
-]
+authors = [{ name = "IS4S", email = "pntos@is4s.com" }]
+dependencies = []
 readme = "README.md"
 requires-python = ">= 3.11"
 
@@ -22,7 +19,7 @@ dev-dependencies = [
     "mypy>=1.10.0",
     "pip>=24.0",
     "myst_parser>=4.0.0",
-    "sphinx_rtd_theme>=3.0.2"
+    "sphinx_rtd_theme>=3.0.2",
 ]
 
 [tool.rye.workspace]

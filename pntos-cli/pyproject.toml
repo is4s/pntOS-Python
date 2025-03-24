@@ -2,9 +2,7 @@
 name = "pntos-cli"
 version = "0.1.0"
 description = "The CLI application for pntOS."
-authors = [
-    { name = "IS4S", email = "pntos@is4s.com" }
-]
+authors = [{ name = "IS4S", email = "pntos@is4s.com" }]
 dependencies = []
 readme = "README.md"
 requires-python = ">= 3.11"
