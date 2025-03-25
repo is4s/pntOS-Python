@@ -3,12 +3,37 @@ from enum import Enum
 from typing import Any, TypeVar, get_origin
 
 import numpy as np
+from navtk.filtering import ImuModel
 
 from pntos.api import LoggingLevel, Mediator, Registry, RegistryValueTypeUnion
 
 from .BaseConfig import BaseConfig
+from .ImuConfig import ImuConfig
 
 ConfigType = TypeVar('ConfigType', bound=BaseConfig)
+
+
+def imu_model_to_config(model: ImuModel, group: str) -> ImuConfig:
+    return ImuConfig(
+        accel_bias_sigma=tuple(model.accel_bias_sigma),
+        accel_bias_tau=tuple(model.accel_bias_tau),
+        accel_random_walk_sigma=tuple(model.accel_random_walk_sigma),
+        gyro_bias_sigma=tuple(model.gyro_bias_sigma),
+        gyro_bias_tau=tuple(model.gyro_bias_tau),
+        gyro_random_walk_sigma=tuple(model.gyro_random_walk_sigma),
+        group=group,
+    )
+
+
+def imu_model_from_config(config: ImuConfig) -> ImuModel:
+    return ImuModel(
+        accel_bias_sigma=np.array(config.accel_bias_sigma),
+        accel_bias_tau=np.array(config.accel_bias_tau),
+        accel_random_walk_sigma=np.array(config.accel_random_walk_sigma),
+        gyro_bias_sigma=np.array(config.gyro_bias_sigma),
+        gyro_bias_tau=np.array(config.gyro_bias_tau),
+        gyro_random_walk_sigma=np.array(config.gyro_random_walk_sigma),
+    )
 
 
 def config_from_registry(

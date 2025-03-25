@@ -12,4 +12,6 @@ from .StaticAlignmentConfig import (
 from .utils import (
     config_from_registry as config_from_registry,
     config_to_registry as config_to_registry,
+    imu_model_from_config as imu_model_from_config,
+    imu_model_to_config as imu_model_to_config,
 )

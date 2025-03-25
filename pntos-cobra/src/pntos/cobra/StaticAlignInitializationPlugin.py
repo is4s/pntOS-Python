@@ -12,9 +12,7 @@ from pntos.api import (
     Mediator,
     Message,
 )
-from pntos.cobra.config import (
-    config_from_registry,
-)
+from pntos.cobra.config import config_from_registry, imu_model_from_config
 from pntos.cobra.config.StaticAlignmentConfig import (
     AlignmentStrategy,
     ManualHeadingAlignmentConfig,
@@ -43,8 +41,9 @@ class StaticAlign(InertialInitializationStrategy):
                 f'Failed to populate config from registry to config type StaticAlignmentConfig and group {config_group}.',
             )
             return
+        imu_model = imu_model_from_config(config.imu_model)
         if config.strategy == AlignmentStrategy.STATIC:
-            self.aligner = StaticAlignment(config.imu_model, config.static_time)
+            self.aligner = StaticAlignment(imu_model, config.static_time)
         elif config.strategy == AlignmentStrategy.MANUAL_HEADING:
             heading_config = config_from_registry(
                 ManualHeadingAlignmentConfig, mediator, config_group
@@ -58,7 +57,7 @@ class StaticAlign(InertialInitializationStrategy):
             self.aligner = ManualHeadingAlignment(
                 heading_config.heading,
                 heading_config.heading_sigma,
-                config.imu_model,
+                imu_model,
                 config.static_time,
             )
 

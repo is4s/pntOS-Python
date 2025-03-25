@@ -1,9 +1,8 @@
 from dataclasses import dataclass
 from enum import Enum
 
-from navtk.filtering import ImuModel
-
 from .BaseConfig import BaseConfig
+from .ImuConfig import ImuConfig
 
 
 class AlignmentStrategy(Enum):
@@ -34,8 +33,9 @@ class AlignmentStrategy(Enum):
 @dataclass
 class StaticAlignmentConfig(BaseConfig):
     strategy: AlignmentStrategy
-    imu_model: ImuModel
     static_time: float
+    imu_model: ImuConfig
+
     group: str
 
 

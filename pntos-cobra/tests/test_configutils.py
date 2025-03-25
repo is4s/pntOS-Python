@@ -1,16 +1,19 @@
 import unittest
 from dataclasses import fields
+from enum import Enum
 
 import numpy as np
 from aspn23 import TypeTimestamp
-from pntos.api import LoggingLevel, Mediator, Message
+from pntos.api import LoggingLevel, Mediator, Message, RegistryValueTypeUnion
 from pntos.cobra import SimpleRegistryPlugin
 from pntos.cobra.config import (
+    AlignmentStrategy,
     BaseConfig,
     DownsamplerConfig,
     ImuConfig,
     ManualAlignmentConfig,
     SensorConfig,
+    StaticAlignmentConfig,
     config_from_registry,
     config_to_registry,
 )
@@ -145,6 +148,29 @@ class TestConfigUtils(unittest.TestCase):
         assert result_conf is not None
         self._validate_conf_from_registry(test_conf, result_conf)
 
+    def test_static_align_config_to_from_registry(self) -> None:
+        imu_model = ImuConfig(
+            CONFIG_TEST_GROUP,
+            (1.23, 2.34, 3.45),
+            (12.3, 23.4, 34.5),
+            (123.0, 234.0, 345.0),
+            (1e-1, 1e-2, 1e-3),
+            (2e-2, 3e-3, 4e-4),
+            (1.23e-10, 2.34e-10, 3.45e-10),
+        )
+        config = StaticAlignmentConfig(
+            CONFIG_TEST_GROUP, AlignmentStrategy.STATIC, 1.23, imu_model
+        )
+
+        # Verify config survives round trip
+        config_to_registry(config, self.mediator)
+        result_config = config_from_registry(
+            StaticAlignmentConfig, self.mediator, CONFIG_TEST_GROUP
+        )
+        assert result_config is not None
+        assert result_config.imu_model == config.imu_model
+        assert config == result_config
+
     def test_config_from_registry_return_none(self) -> None:
         test_conf = SensorConfig(
             CONFIG_TEST_GROUP,
@@ -175,10 +201,12 @@ class TestConfigUtils(unittest.TestCase):
         kv = self.mediator.registry.batch_start(CONFIG_TEST_GROUP)
         conf_fields = [f for f in fields(test_conf) if f.name != 'group']
         for conf_field in conf_fields:
-            val = kv[conf_field.name]
+            val: RegistryValueTypeUnion | Enum | None = kv[conf_field.name]
             conf_val = getattr(test_conf, conf_field.name)
             if isinstance(val, np.ndarray):
                 assert np.all(val == conf_val)
+            elif isinstance(conf_val, Enum):
+                val = type(conf_val)(val)
             else:
                 assert val == conf_val
 

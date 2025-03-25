@@ -24,9 +24,7 @@ from pntos.api import (
     Message,
 )
 from pntos.cobra import StaticAlignInitializationPlugin
-from pntos.cobra.config import (
-    config_to_registry,
-)
+from pntos.cobra.config import config_to_registry, imu_model_to_config
 from pntos.cobra.config.StaticAlignmentConfig import (
     AlignmentStrategy,
     ManualHeadingAlignmentConfig,
@@ -172,23 +170,27 @@ def test() -> None:
     # Create config for pure static alignment and test pure static alignment.
     static_time = 120.0
     group = 'test/config/static_align'
-    config = StaticAlignmentConfig(
-        strategy=AlignmentStrategy.STATIC,
-        imu_model=hg1700_model(),
-        static_time=static_time,
+    imu_config = imu_model_to_config(
+        model=hg1700_model(),
         group=group,
     )
-    config_to_registry(config, registry)
+    config = StaticAlignmentConfig(
+        strategy=AlignmentStrategy.STATIC,
+        static_time=static_time,
+        imu_model=imu_config,
+        group=group,
+    )
+    config_to_registry(config, mediator)
     _test_aligner(plugin, group, config.static_time, config.strategy)
 
     # Modify config for manual heading alignment and test it.
     config.strategy = AlignmentStrategy.MANUAL_HEADING
-    config_to_registry(config, registry)
+    config_to_registry(config, mediator)
 
     heading_config = ManualHeadingAlignmentConfig(
         heading=-np.pi / 2, heading_sigma=0.017453292519943295, group=group
     )
-    config_to_registry(heading_config, registry)
+    config_to_registry(heading_config, mediator)
     _test_aligner(plugin, group, config.static_time, config.strategy)
 
 
