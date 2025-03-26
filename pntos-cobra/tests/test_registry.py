@@ -41,10 +41,10 @@ my_config: list[BaseConfig] = [
     ImuConfig(
         accel_bias_sigma=(0.0098, 0.0098, 0.0098),
         accel_bias_tau=(3600.0, 3600.0, 3600.0),
-        accel_rw_sigma=(0.001, 0.001, 0.001),
+        accel_random_walk_sigma=(0.001, 0.001, 0.001),
         gyro_bias_sigma=(1.234e-6, 1.234e-6, 1.234e-6),
         gyro_bias_tau=(3600.0, 3600.0, 3600.0),
-        gyro_rw_sigma=(0.001, 0.001, 0.001),
+        gyro_random_walk_sigma=(0.001, 0.001, 0.001),
         group='config/default/test',
     ),
     AlignmentConfig(

@@ -46,14 +46,14 @@ my_config: list[BaseConfig] = [
         # HG9900 model
         accel_bias_sigma=(25 * 9.81e-6, 25 * 9.81e-6, 25 * 9.81e-6),
         accel_bias_tau=(3600.0, 3600.0, 3600.0),
-        accel_rw_sigma=(1e-12, 1e-12, 1e-12),
+        accel_random_walk_sigma=(1e-12, 1e-12, 1e-12),
         gyro_bias_sigma=(
             0.003 * np.pi / 180 / 3600,
             0.003 * np.pi / 180 / 3600,
             0.003 * np.pi / 180 / 3600,
         ),
         gyro_bias_tau=(3600.0, 3600.0, 3600.0),
-        gyro_rw_sigma=(
+        gyro_random_walk_sigma=(
             0.002 * np.pi / 180 / 60,
             0.002 * np.pi / 180 / 60,
             0.002 * np.pi / 180 / 60,

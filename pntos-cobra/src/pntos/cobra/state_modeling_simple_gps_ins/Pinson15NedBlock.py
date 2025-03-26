@@ -121,8 +121,8 @@ class Pinson15NedBlock(StandardStateBlock):
                 np.concatenate(
                     [
                         np.zeros(3),
-                        imu_model.accel_rw_sigma,
-                        imu_model.gyro_rw_sigma,
+                        imu_model.accel_random_walk_sigma,
+                        imu_model.gyro_random_walk_sigma,
                         imu_model.accel_bias_sigma
                         * np.sqrt(np.divide(2, imu_model.accel_bias_tau)),
                         imu_model.gyro_bias_sigma
