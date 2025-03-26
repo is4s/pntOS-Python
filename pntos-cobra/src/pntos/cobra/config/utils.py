@@ -19,7 +19,17 @@ def config_from_registry(
     out: dict[str, RegistryValueTypeUnion | tuple[float, ...] | Enum] = {}
     fail = False
     for param in conf_params:
-        val: RegistryValueTypeUnion | tuple[float, ...] | Enum | None = kv[param.name]
+        val = None
+        # Special case: nested config. Identifiable by the first field, which is called `group` and
+        # is a str.
+        try:
+            first_field = fields(param.type)[0]
+            if first_field.name == 'group' and first_field.type is str:
+                val = config_from_registry(param.type, mediator, config_group)
+        except TypeError:
+            pass
+        if val is None:
+            val = kv[param.name]
         if val is None:
             mediator.log_message(
                 LoggingLevel.WARN,
@@ -77,6 +87,13 @@ def config_to_registry(config: BaseConfig, registry: Registry) -> None:
                     val_to_store = np.array(val_to_store, dtype=float)
         elif isinstance(val_to_store, Enum):
             val_to_store = val_to_store.value
+        elif isinstance(val_to_store, BaseConfig):
+            if val_to_store.group != config.group:
+                print(
+                    'Warning: Nested config uses a different group. It will not be able to be retrieved via config_from_registry',
+                )
+            config_to_registry(val_to_store, registry)
+            continue
         kv[param.name] = val_to_store
     kv.batch_end()
 
