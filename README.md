@@ -121,18 +121,7 @@ To begin development, refer to [Environment Setup](#environment-setup) for how t
 
 ### Checking Contributions
 
-New contributions to this repo should pass the following checks:
-
-```bash
-ruff check --fix
-ruff format
-pytest --cov --cov-fail-under=75 --cov-report={term,html}
-mypy pntos-api
-mypy pntos-cli
-mypy pntos-cobra
-```
-
-Or, to run all the above commands at once, run:
+New contributions to this repo should pass the checks contained in `run_all_checks.sh`:
 
 ```shell
 ./run_all_checks.sh
