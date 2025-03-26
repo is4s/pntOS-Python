@@ -1,0 +1,4 @@
+    # .coveragerc
+    [run]
+    omit =
+        pntos-api/*

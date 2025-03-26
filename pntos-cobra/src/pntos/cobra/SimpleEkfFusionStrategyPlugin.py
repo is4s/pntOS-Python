@@ -87,7 +87,7 @@ class SimpleEkfFusionStrategy(StandardFusionStrategy):
         if first_index + count > self._num_states:
             self._mediator.log_message(
                 LoggingLevel.ERROR,
-                f'Tried to remove states [{first_index}:{first_index+count}] but '
+                f'Tried to remove states [{first_index}:{first_index + count}] but '
                 + f'state vector is only length {self._num_states}.',
             )
 
