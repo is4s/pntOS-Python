@@ -88,6 +88,8 @@ pexpect==4.9.0
 pip==24.0
 pluggy==1.5.0
     # via pytest
+pntos-python-datasets @ git+ssh://git@git.aspn.us/pntos/pntos-python-datasets.git@30200340c98caf2c4dbafe75dbafbceb91dc5a19
+    # via pntos-cobra
 prompt-toolkit==3.0.43
     # via ipython
 ptyprocess==0.7.0
