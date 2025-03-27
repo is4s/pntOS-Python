@@ -1,6 +1,7 @@
 import builtins
 import os
 import pickle
+from copy import copy
 from typing import (
     Any,
     Callable,
@@ -573,9 +574,14 @@ class SimpleRegistryPlugin(RegistryPlugin):
             )
         out = SimpleRegistry(self._log, self._plugin_resources_location)
 
+        # Make a copy of the mediator so we can attach the new registry to it and pass both together
+        # to config_to_registry without modifying our own mediator.
+        mediator = copy(self.mediator)
+        mediator.registry = out
+
         # Use input config from constructor
         for conf in self.config:
-            config_to_registry(conf, out)
+            config_to_registry(conf, mediator)
 
         self.registries.append(out)
         return out

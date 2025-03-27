@@ -73,9 +73,9 @@ def config_from_registry(
     return config_type(**out, group=config_group)  # type: ignore[arg-type]
 
 
-def config_to_registry(config: BaseConfig, registry: Registry) -> None:
+def config_to_registry(config: BaseConfig, mediator: Mediator) -> None:
     conf_params = [f for f in fields(config) if f.name != 'group']
-    kv = registry.batch_start(config.group)
+    kv = mediator.registry.batch_start(config.group)
 
     for param in conf_params:
         val_to_store = getattr(config, param.name)
@@ -89,10 +89,11 @@ def config_to_registry(config: BaseConfig, registry: Registry) -> None:
             val_to_store = val_to_store.value
         elif isinstance(val_to_store, BaseConfig):
             if val_to_store.group != config.group:
-                print(
-                    'Warning: Nested config uses a different group. It will not be able to be retrieved via config_from_registry',
+                mediator.log_message(
+                    LoggingLevel.WARN,
+                    'Nested config uses a different group. It will not be able to be retrieved via config_from_registry',
                 )
-            config_to_registry(val_to_store, registry)
+            config_to_registry(val_to_store, mediator)
             continue
         kv[param.name] = val_to_store
     kv.batch_end()

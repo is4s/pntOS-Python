@@ -152,7 +152,7 @@ def test() -> None:
     SimpleMediator.registry = registry
 
     config = InertialConfig(expected_dt=0.01, inertial_buffer_length=5.0, group='test')
-    config_to_registry(config, registry)
+    config_to_registry(config, mediator)
 
     assert plugin.identifier == 'Cobra inertial plugin'
 

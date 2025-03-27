@@ -76,7 +76,7 @@ class TestConfigUtils(unittest.TestCase):
         )
 
         # Test config_to_registry
-        config_to_registry(test_conf, self.mediator.registry)
+        config_to_registry(test_conf, self.mediator)
         self._validate_conf_to_registry(test_conf)
 
         # Test config_from_registry()
@@ -99,7 +99,7 @@ class TestConfigUtils(unittest.TestCase):
         )
 
         # Test config_to_registry
-        config_to_registry(test_conf, self.mediator.registry)
+        config_to_registry(test_conf, self.mediator)
         self._validate_conf_to_registry(test_conf)
 
         # Test config_from_registry()
@@ -120,7 +120,7 @@ class TestConfigUtils(unittest.TestCase):
         )
 
         # Test config_to_registry
-        config_to_registry(test_conf, self.mediator.registry)
+        config_to_registry(test_conf, self.mediator)
         self._validate_conf_to_registry(test_conf)
 
         # Test config_from_registry()
@@ -136,7 +136,7 @@ class TestConfigUtils(unittest.TestCase):
             CONFIG_TEST_GROUP, ['chan1', 'chan2', 'chan3'], [1, 2, 3]
         )
         # Test config_to_registry
-        config_to_registry(test_conf, self.mediator.registry)
+        config_to_registry(test_conf, self.mediator)
         self._validate_conf_to_registry(test_conf)
 
         result_conf = config_from_registry(
@@ -157,7 +157,7 @@ class TestConfigUtils(unittest.TestCase):
         )
 
         # Test config_to_registry
-        config_to_registry(test_conf, self.mediator.registry)
+        config_to_registry(test_conf, self.mediator)
         self._validate_conf_to_registry(test_conf)
 
         # Whoops, modified a value in the registry
