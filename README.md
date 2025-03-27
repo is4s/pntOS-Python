@@ -23,7 +23,7 @@ How you wish to set up your environment will determine which of the next section
 Begin by creating and entering a clean venv. We can create the venv in the
 `.venv` folder by running the following command in the project root directory:
 
-    python3 -m venv .venv
+    python3 -m venv .venv --prompt pntos-python
 
 Next, enter the venv. The steps to do this vary depending on your shell:
 
