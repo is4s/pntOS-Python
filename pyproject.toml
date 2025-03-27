@@ -1,5 +1,5 @@
 [project]
-name = "pntos-virtual"
+name = "pntos-python"
 version = "0.1.0"
 description = "A meta package for pntOS that contains the components of pntOS."
 authors = [{ name = "IS4S", email = "pntos@is4s.com" }]
