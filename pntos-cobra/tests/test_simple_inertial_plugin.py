@@ -82,16 +82,16 @@ def generate_pva() -> Message:
 def assert_pva_equal(
     pva1: MeasurementPositionVelocityAttitude, pva2: MeasurementPositionVelocityAttitude
 ) -> None:
-    assert pva1.time_of_validity.elapsed_nsec == pva1.time_of_validity.elapsed_nsec
-    assert pva1.p1 == pva1.p1
-    assert pva1.p2 == pva1.p2
-    assert pva1.p3 == pva1.p3
-    assert pva1.v1 == pva1.v1
-    assert pva1.v2 == pva1.v2
-    assert pva1.v3 == pva1.v3
+    assert pva1.time_of_validity.elapsed_nsec == pva2.time_of_validity.elapsed_nsec
+    assert pva1.p1 == pva2.p1
+    assert pva1.p2 == pva2.p2
+    assert pva1.p3 == pva2.p3
+    assert pva1.v1 == pva2.v1
+    assert pva1.v2 == pva2.v2
+    assert pva1.v3 == pva2.v3
     assert pva1.quaternion is not None
-    assert pva1.quaternion is not None
-    assert np.allclose(pva1.quaternion, pva1.quaternion)
+    assert pva2.quaternion is not None
+    assert np.allclose(pva1.quaternion, pva2.quaternion)
 
 
 def assert_pva_close_but_unequal(

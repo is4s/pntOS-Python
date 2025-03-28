@@ -8,6 +8,9 @@ from .SimpleEkfFusionStrategyPlugin import (
 from .SimpleFusionPlugin import SimpleFusionEngine as SimpleFusionEngine
 from .SimpleInertialPlugin import SimpleInertial as SimpleInertial
 from .SimpleInitializationPlugin import SimpleInitialization as SimpleInitialization
+from .SimplePreprocessorDownsamplerPlugin import (
+    SimplePreprocessorDownsampler as SimplePreprocessorDownsampler,
+)
 from .SimpleRegistryPlugin import (
     SimpleKeyValueStore as SimpleKeyValueStore,
     SimpleRegistry as SimpleRegistry,

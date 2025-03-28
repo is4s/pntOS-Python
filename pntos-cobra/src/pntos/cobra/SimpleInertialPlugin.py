@@ -176,7 +176,7 @@ class SimpleInertial(StandardInertialMechanization):
 
 
 class SimpleInertialPlugin(InertialPlugin):
-    mediator: Mediator
+    mediator: Mediator | None
 
     def __init__(self, identifier: str):
         self.identifier = identifier
@@ -189,6 +189,7 @@ class SimpleInertialPlugin(InertialPlugin):
         if mediator is not None:
             self.mediator = mediator
         else:
+            self.mediator = None
             print('Error: mediator cannot be None.')
 
     def shutdown_plugin(self) -> None:
@@ -203,6 +204,14 @@ class SimpleInertialPlugin(InertialPlugin):
         solution: Message,
         config_group: str | None = None,
     ) -> InertialType | None:
+        if self.mediator is None:
+            print(
+                'Error: mediator is None. '
+                + 'SimpleInertialPlugin.init_plugin '
+                + 'must be called and passed a valid mediator '
+                + 'before new_preprocessor.'
+            )
+            return None
         if config_group is None:
             self.mediator.log_message(
                 LoggingLevel.ERROR,

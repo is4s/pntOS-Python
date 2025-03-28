@@ -28,8 +28,20 @@ def config_from_registry(
             continue
 
         if isinstance(val, np.ndarray):
-            if hasattr(param.type, '__origin__') and get_origin(param.type) is tuple:
-                val = tuple(val)
+            if hasattr(param.type, '__origin__'):
+                p_type = get_origin(param.type)
+                if p_type is tuple:
+                    val = tuple(val)
+                elif p_type is list:
+                    # Convert numpy array to list
+                    if str(param.type) == 'list[int]':
+                        # Convert to list of ints
+                        val = val.astype(int)
+                    val = list(val)
+                elif p_type is np.ndarray:
+                    if np.dtype[np.int_] in param.type.__args__:
+                        # Convert to np array of ints
+                        val = val.astype(int)
 
         if not _confirm_types(val, param.type):
             mediator.log_message(
@@ -55,6 +67,10 @@ def config_to_registry(config: BaseConfig, registry: Registry) -> None:
         val_to_store = getattr(config, param.name)
         if isinstance(val_to_store, tuple):
             val_to_store = np.array(val_to_store, dtype=np.float64)
+        elif isinstance(val_to_store, list) or isinstance(val_to_store, np.ndarray):
+            if len(val_to_store) > 0:
+                if isinstance(val_to_store[0], (int, float, np.int_)):
+                    val_to_store = np.array(val_to_store, dtype=float)
         kv[param.name] = val_to_store
     kv.batch_end()
 
