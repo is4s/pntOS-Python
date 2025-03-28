@@ -16,6 +16,9 @@ from .SimpleLoggingPlugin import SimpleLoggingPlugin as SimpleLoggingPlugin
 from .SimpleOrchestrationPlugin import (
     SimpleOrchestrationPlugin as SimpleOrchestrationPlugin,
 )
+from .SimplePreprocessorDownsamplerPlugin import (
+    SimplePreprocessorDownsamplerPlugin as SimplePreprocessorDownsamplerPlugin,
+)
 from .SimpleRegistryPlugin import (
     SimpleRegistryPlugin as SimpleRegistryPlugin,
 )

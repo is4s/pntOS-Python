@@ -8,6 +8,7 @@ from pntos.cobra import SimpleRegistryPlugin
 from pntos.cobra.config import (
     AlignmentConfig,
     BaseConfig,
+    DownsamplerConfig,
     ImuConfig,
     SensorConfig,
     config_from_registry,
@@ -130,6 +131,20 @@ class TestConfigUtils(unittest.TestCase):
 
         self._validate_conf_from_registry(test_conf, result_conf)
 
+    def test_DownsamplerConfig_to_from_registry(self) -> None:
+        test_conf = DownsamplerConfig(
+            CONFIG_TEST_GROUP, ['chan1', 'chan2', 'chan3'], [1, 2, 3]
+        )
+        # Test config_to_registry
+        config_to_registry(test_conf, self.mediator.registry)
+        self._validate_conf_to_registry(test_conf)
+
+        result_conf = config_from_registry(
+            DownsamplerConfig, self.mediator, CONFIG_TEST_GROUP
+        )
+        assert result_conf is not None
+        self._validate_conf_from_registry(test_conf, result_conf)
+
     def test_config_from_registry_return_none(self) -> None:
         test_conf = SensorConfig(
             CONFIG_TEST_GROUP,
@@ -178,9 +193,10 @@ class TestConfigUtils(unittest.TestCase):
             assert test_field.name == result_field.name
             test_val = getattr(test_conf, test_field.name)
             result_val = getattr(result_conf, result_field.name)
-            assert type(test_val) == type(result_val)
+            assert type(test_val) is type(result_val)
             if isinstance(test_val, np.ndarray):
                 assert np.all(test_val == result_val)
+                assert test_val.dtype == result_val.dtype
             else:
                 assert test_val == result_val
 
