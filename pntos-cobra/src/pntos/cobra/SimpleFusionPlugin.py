@@ -473,6 +473,7 @@ class SimpleFusionEngine(StandardFusionEngine):
 
         # Propagate using the fusion strategy
         self._strategy.propagate(big_dynamics_model)
+        self.time = time
 
     def update(self, processor_label: str, message: Message) -> None:
         # Verify processor exists

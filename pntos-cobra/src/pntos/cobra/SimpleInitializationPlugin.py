@@ -52,8 +52,6 @@ class SimpleInitialization(InertialInitializationStrategy):
                 (
                     np.array(config.initial_accel_bias_var),
                     np.array(config.initial_gyro_bias_var),
-                    np.array(config.initial_accel_scale_factor_var),
-                    np.array(config.initial_gyro_scale_factor_var),
                 )
             )
         )

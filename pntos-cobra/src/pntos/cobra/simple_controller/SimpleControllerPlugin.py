@@ -84,7 +84,6 @@ class SimpleControllerPlugin(ControllerPlugin):
         self._log(LoggingLevel.INFO, 'Shutting down all plugins...')
         for plugin in self._plugins:
             plugin.shutdown_plugin()
-        exit(0)
 
     identifier: str
 
@@ -106,9 +105,13 @@ class SimpleControllerPlugin(ControllerPlugin):
             plugins_for_orchestration,
         ) = self._sort_and_validate_plugins(plugins)
 
+        # Hand mediators controller plugin so that mediators can call "shutdown_plugin"
+        # on error.
+        SimpleMediator._controller_plugin = self
+
         # initialize stream config and hand to mediator
         stream_config = SimpleMessageStreamConfig()
-        SimpleMediator.stream_config = stream_config
+        SimpleMediator._stream_config = stream_config
 
         # Create separate mediators to pass to each plugin
         mediators = [
@@ -151,7 +154,7 @@ class SimpleControllerPlugin(ControllerPlugin):
         )
 
         # Give mediators a logging plugin
-        SimpleMediator.logging_plugin = self._logging_plugin
+        SimpleMediator._logging_plugin = self._logging_plugin
 
         # call init_plugin() on all the other plugins
         for i, plugin in enumerate(self._plugins):
@@ -165,8 +168,8 @@ class SimpleControllerPlugin(ControllerPlugin):
             )
 
         # Give the mediators other needed plugins
-        SimpleMediator.transport_plugins = self._transport_plugins
-        SimpleMediator.orchestration_plugin = orchestration_plugin
+        SimpleMediator._transport_plugins = self._transport_plugins
+        SimpleMediator._orchestration_plugin = orchestration_plugin
 
         # Give the orchestration the plugins it needs
         orchestration_plugin.init_orchestration_plugin(
@@ -230,8 +233,6 @@ class SimpleControllerPlugin(ControllerPlugin):
             raise RuntimeError(
                 f'Expected at least one FusionPlugin but received {len(sorted_plugins.fusion_plugins)}.'
             )
-        for fusion_plugin in sorted_plugins.fusion_plugins:
-            plugins_for_orchestration.append(fusion_plugin)
 
         # Collect plugins to pass to orchestration
         plugins_for_orchestration.extend(sorted_plugins.fusion_plugins)
@@ -262,7 +263,7 @@ class SimpleControllerPlugin(ControllerPlugin):
         if self._logging_plugin is None:
             print(self._log_levels[level] + ' [Controller] ' + message)
         else:
-            self._logging_plugin.log(type(self), self.identifier, level, message)
+            self._logging_plugin.log(ControllerPlugin, self.identifier, level, message)
 
     def _main(self) -> None:
         """
@@ -276,11 +277,19 @@ class SimpleControllerPlugin(ControllerPlugin):
             if self._ui_plugin.requires_main_thread():
                 self._ui_plugin.run_main_thread()
 
-        else:  # wait for ctrl/cmd + c to exit
+        else:  # wait for ctrl + c to exit
+            self._log(
+                LoggingLevel.INFO,
+                'Press Ctrl + C at any time to shut down pntOS...',
+            )
             try:
                 while True:
                     input()
             except KeyboardInterrupt:
                 pass
 
+        self._log(
+            LoggingLevel.INFO, 'Keyboard interrupt detected. Shutting down pntOS.'
+        )
         self.shutdown_plugin()
+        exit(0)

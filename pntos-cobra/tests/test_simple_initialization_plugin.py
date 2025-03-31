@@ -126,14 +126,16 @@ def test() -> None:
     assert np.allclose(
         gyro_bias_var, np.diagonal(solution.inertial_error_covariance[3:6, 3:6])
     )
-    assert np.allclose(
-        accel_scale_factor_var,
-        np.diagonal(solution.inertial_error_covariance[6:9, 6:9]),
-    )
-    assert np.allclose(
-        gyro_scale_factor_var,
-        np.diagonal(solution.inertial_error_covariance[9:12, 9:12]),
-    )
+    if len(solution.inertial_error_covariance) >= 9:
+        assert np.allclose(
+            accel_scale_factor_var,
+            np.diagonal(solution.inertial_error_covariance[6:9, 6:9]),
+        )
+    if len(solution.inertial_error_covariance) >= 12:
+        assert np.allclose(
+            gyro_scale_factor_var,
+            np.diagonal(solution.inertial_error_covariance[9:12, 9:12]),
+        )
     assert solution.inertial_errors is not None
     assert np.allclose(solution.inertial_errors.accel_biases, np.array(accel_bias))
     assert np.allclose(solution.inertial_errors.gyro_biases, np.array(gyro_bias))

@@ -1,6 +1,7 @@
-from aspn23 import TypeTimestamp
+import bisect
+
+from aspn23 import MeasurementAccumulatedDistanceTraveled, TypeTimestamp
 from pntos.api import (
-    CommonPlugin,
     ControllerPlugin,
     LoggingLevel,
     LoggingPlugin,
@@ -15,12 +16,19 @@ from pntos.api import (
 from .SimpleMessageStreamConfig import SimpleMessageStreamConfig
 
 
+def _get_time(msg: Message) -> int:
+    return msg.wrapped_message.time_of_validity.elapsed_nsec  # type: ignore[attr-defined]
+
+
 class SimpleMediator(Mediator):
-    logging_plugin: LoggingPlugin | None = None
-    transport_plugins: list[TransportPlugin] = []
-    orchestration_plugin: OrchestrationPlugin | None = None
-    stream_config: SimpleMessageStreamConfig
+    _logging_plugin: LoggingPlugin | None = None
+    _transport_plugins: list[TransportPlugin] = []
+    _orchestration_plugin: OrchestrationPlugin | None = None
+    _controller_plugin: ControllerPlugin | None = None
+    _stream_config: SimpleMessageStreamConfig
     registry: Registry
+    _messages: list[Message] = []
+    _buffer_time_nsec: int = 2_000_000_000
     _log_levels: dict[LoggingLevel, str] = {
         LoggingLevel.DEBUG: 'DEBUG: ',
         LoggingLevel.ERROR: 'ERROR: ',
@@ -47,9 +55,9 @@ class SimpleMediator(Mediator):
 
     def get_filter_description_list(self) -> list[str]:
         assert (
-            self.orchestration_plugin is not None
+            self._orchestration_plugin is not None
         ), 'Orchestration plugin used before initialized and passed to mediator.'
-        return self.orchestration_plugin.get_filter_description_list()
+        return self._orchestration_plugin.get_filter_description_list()
 
     def request_solutions(
         self,
@@ -57,24 +65,31 @@ class SimpleMediator(Mediator):
         filter_description: str | None = None,
     ) -> list[Message]:
         assert (
-            self.orchestration_plugin is not None
+            self._orchestration_plugin is not None
         ), 'Orchestration plugin used before initialized and passed to mediator.'
-        return self.orchestration_plugin.request_solutions(
+        return self._orchestration_plugin.request_solutions(
             solution_times, filter_description
         )
 
     def process_pntos_message(self, message: Message) -> None:
-        # TODO (#65): Implement buffering for sequenced stream
         assert (
-            self.orchestration_plugin is not None
+            self._orchestration_plugin is not None
         ), 'Orchestration plugin used before initialized and passed to mediator.'
-        if self.stream_config.is_sequenced(type(message.wrapped_message)):
-            self.log_message(
-                LoggingLevel.ERROR,
-                'Sequenced message stream not supported. '
-                + 'Immediate streaming all messages.',
-            )
-        self.orchestration_plugin.process_pntos_message(message, False)
+        if self._stream_config.is_sequenced(type(message.wrapped_message)):
+            bisect.insort(self._messages, message, key=_get_time)
+        else:
+            self._orchestration_plugin.process_pntos_message(message, False)
+
+        process_until_time = (
+            message.wrapped_message.time_of_validity.elapsed_nsec  # type: ignore[attr-defined]
+            - self._buffer_time_nsec
+        )
+        process_until_index = bisect.bisect_left(
+            self._messages, process_until_time, key=_get_time
+        )
+        for m in self._messages[:process_until_index]:
+            self._orchestration_plugin.process_pntos_message(m, True)
+        self._messages = self._messages[process_until_index:]
 
     def broadcast_aspn_message(
         self,
@@ -83,24 +98,30 @@ class SimpleMediator(Mediator):
         destination_identifier: str | None = None,
     ) -> None:
         assert (
-            len(self.transport_plugins) != 0
+            len(self._transport_plugins) != 0
         ), 'Transport plugin used before initialized and passed to mediator.'
-        for transport_plugin in self.transport_plugins:
+        sent = False
+        for transport_plugin in self._transport_plugins:
             if transport is None or transport_plugin.identifier == transport:
                 transport_plugin.broadcast_message(message, destination_identifier)
-        else:
+                sent = True
+        if not sent:
             self.log_message(
                 LoggingLevel.WARN,
                 f'Transport "{transport}" not found. Unable to broadcast message.',
             )
 
     def log_message(self, level: LoggingLevel, message: str) -> None:
-        if self.logging_plugin is None:
+        if self._logging_plugin is None:
             print(f'[{self._attached_plugin_type}] {self._log_levels[level]} {message}')
-            return
-        self.logging_plugin.log(
-            self._attached_plugin_type,
-            self._attached_plugin_identifier,
-            level,
-            message,
-        )
+        else:
+            self._logging_plugin.log(
+                self._attached_plugin_type,
+                self._attached_plugin_identifier,
+                level,
+                message,
+            )
+        # This implementation shuts down pntos if an error is detected.
+        if level is LoggingLevel.ERROR and self._controller_plugin is not None:
+            self._controller_plugin.shutdown_plugin()
+            exit(1)

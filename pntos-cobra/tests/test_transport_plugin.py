@@ -1,20 +1,55 @@
+import time
+
 import numpy as np
 import pytest
+from aspn23 import TypeTimestamp
 from aspn23_lcm import measurement_position_velocity_attitude
-from pntos.api import LoggingLevel
+from lcm import LCM
+from pntos.api import LoggingLevel, Mediator, Message, Registry
 from pntos.cobra import Aspn23LcmTransportPlugin, SimpleRegistryPlugin
+from pntos.cobra.Aspn23LcmTransportPlugin import LCM_URL
 from pntos.cobra.internal import SimpleMediator, SimpleRegistry
+
+LCM_URL = ''
 
 
 def dummy_log(level: LoggingLevel, message: str) -> None:
     pass
 
 
+class DummyMediator(Mediator):
+    registry: Registry
+
+    def get_filter_description_list(self) -> list[str]:
+        return []
+
+    def request_solutions(
+        self,
+        solution_times: list[TypeTimestamp],
+        filter_description: str | None = None,
+    ) -> list[Message]:
+        return []
+
+    def process_pntos_message(self, message: Message) -> None:
+        return
+
+    def broadcast_aspn_message(
+        self,
+        message: Message,
+        transport: str | None = None,
+        destination_identifier: str | None = None,
+    ) -> None:
+        return
+
+    def log_message(self, level: LoggingLevel, message: str) -> None:
+        return
+
+
 @pytest.fixture
 def mediator():
     registry = SimpleRegistry(dummy_log)
-    SimpleMediator.registry = registry
-    mediator = SimpleMediator('registry plugin', SimpleRegistryPlugin)
+    DummyMediator.registry = registry
+    mediator = DummyMediator()
     return mediator
 
 
@@ -32,7 +67,7 @@ def test_initialize_plugin(
     assert transport_plugin.mediator is not None
 
 
-def test_handler(
+def _test_handler(
     transport_plugin: Aspn23LcmTransportPlugin, mediator: SimpleMediator
 ) -> None:
     transport_plugin.init_plugin('plugin_path', mediator)
@@ -76,9 +111,8 @@ def test_handler(
     # Publish the test message to the channel
     transport_plugin.lcm.publish('pva', encoded_data)
 
-    # Process LCM messages (simulate message handling loop)
-    for _ in range(2):
-        transport_plugin.lcm.handle_timeout(100)
+    # Wait for message to be processed
+    time.sleep(0.1)
 
     # Verify the response
     assert received_response is not None

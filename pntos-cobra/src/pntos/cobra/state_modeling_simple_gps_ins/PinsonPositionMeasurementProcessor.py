@@ -140,9 +140,9 @@ class PinsonPositionMeasurementProcessor(StandardMeasurementProcessor):
         delta_pos = llh - llh_sensor
         z = np.array(
             [
-                delta_pos[0] * lat_factor,
-                delta_pos[1] * lon_factor,
-                -delta_pos[2],
+                [delta_pos[0] * lat_factor],
+                [delta_pos[1] * lon_factor],
+                [-delta_pos[2]],
             ]
         )
         H = np.zeros((3, 15))
