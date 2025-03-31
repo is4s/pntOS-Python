@@ -2,13 +2,13 @@
 ## Overview
 
 This app is meant to be a simple demonstration of a sensor fusion between two
-sensors. In this case, it is the fusion between GPS and INS readings.
+sensors. In this case, it is the fusion between GPS position measurements and IMU readings.
 
 ## Running the App
 
 ### Open Local TCP Server
 
-In order to feed messages into the transport from an lcm log file, we need to first open
+In order to feed messages into the transport from an LCM log file, we need to first open
 a local TCP server in a new terminal:
 
 ```shell
@@ -57,7 +57,7 @@ You should see periodic printouts of an info message (shown below) followed by a
 printout of the current PVA solution message.
 
 ```shell
-[20/03/2025 17:04:27] [TransportPlugin] [INFO] Got a solution! <printout of pva message>
+[20/03/2025 17:04:27] [TransportPlugin] [INFO] Got a solution! <printout of PVA message>
 ```
 
 NOTE: This should change once we have a UI plugin.
