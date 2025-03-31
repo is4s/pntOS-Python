@@ -23,10 +23,10 @@ This should open the LCM LogPlayer GUI with a play button. You should see the fo
 - `/sensor/vn-100/imu`
 
 ### Run the App
-To run the app, run this command inside the python virtual environment from the root
-workspace directory:
+To run the app, run this command from the root workspace directory (with the python virtual
+environment activated):
 ```sh
-python apps/fusion_gps_ins/fusion_gps_ins.py
+apps/fusion_gps_ins/fusion_gps_ins.py
 ```
 You should see something like the following:
 ```sh

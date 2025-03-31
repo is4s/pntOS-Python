@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 # Grab the plugins we want off the shelf
 from pntos.api import LoggingLevel
 from pntos.cobra import (
