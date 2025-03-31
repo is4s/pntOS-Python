@@ -313,6 +313,12 @@ class StandardFusionEngine(ABC):
         """
         pass
 
+    @time.setter
+    @abstractmethod
+    def time(self, time: TypeTimestamp) -> None:
+        """Setter for the :meth:`StandardFusionEngine.time` property."""
+        pass
+
     @property
     @abstractmethod
     def strategy(self) -> StandardFusionStrategy | None:

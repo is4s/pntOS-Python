@@ -134,10 +134,15 @@ class DummyFusionPlugin(FusionPlugin):
 
 class DummyStandardFusionEngine(StandardFusionEngine):
     _strategy: StandardFusionStrategy
+    _time: TypeTimestamp = TypeTimestamp(0)
 
     @property
     def time(self) -> TypeTimestamp:
-        return TypeTimestamp(0)
+        return self._time
+
+    @time.setter
+    def time(self, time: TypeTimestamp) -> None:
+        self._time = time
 
     @property
     def strategy(self) -> StandardFusionStrategy | None:
