@@ -8,13 +8,13 @@ sensors. In this case, it is the fusion between GPS and INS readings.
 ### Open Local TCP Server
 In order to feed messages into the transport from an lcm log file, we need to first open
 a local TCP server in a new terminal:
-```sh
+```shell
 java -classpath $VIRTUAL_ENV/lib/python3.*/site-packages/share/java/lcm.jar lcm.lcm.TCPService
 ```
 
 ### Play LCM Log File
 Then we can play the log file in another terminal via:
-```sh
+```shell
 play-dataset
 ```
 This should open the LCM LogPlayer GUI with a play button. You should see the following channels:
@@ -25,11 +25,11 @@ This should open the LCM LogPlayer GUI with a play button. You should see the fo
 ### Run the App
 To run the app, run this command from the root workspace directory (with the python virtual
 environment activated):
-```sh
+```shell
 apps/fusion_gps_ins/fusion_gps_ins.py
 ```
 You should see something like the following:
-```sh
+```shell
 WARNING:  [Controller] Expected one UiPlugin but received 0. Running without a UI plugin.
 [20/03/2025 17:04:19] [LoggingPlugin] [INFO] using hard-coded global logging level INFO
 LCM tcpq: connecting...
@@ -43,7 +43,7 @@ Then push the `play` button in the LogPlayer.
 ### Validate Results
 You should see periodic printouts of an info message (shown below) followed by a
 printout of the current PVA solution message.
-```sh
+```shell
 [20/03/2025 17:04:27] [TransportPlugin] [INFO] Got a solution! <printout of pva message>
 ```
 NOTE: This should change once we have a UI plugin.
