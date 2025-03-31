@@ -42,12 +42,11 @@ You should see something like the following:
 
 ```shell
 WARNING:  [Controller] Expected one UiPlugin but received 0. Running without a UI plugin.
-[20/03/2025 17:04:19] [LoggingPlugin] [INFO] using hard-coded global logging level INFO
+[31/03/2025 11:55:06] [LoggingPlugin] [INFO] using hard-coded global logging level INFO
+[31/03/2025 11:55:06] [OrchestrationPlugin] [INFO] Aligned filter at TypeTimestamp(elapsed_nsec=1741194282046638848).
 LCM tcpq: connecting...
-[20/03/2025 17:04:19] [TransportPlugin] [INFO] LCM tcpq connected.
-[20/03/2025 17:04:19] [TransportPlugin] [INFO] Subscribed to all available channels.
-[20/03/2025 17:04:19] [TransportPlugin] [INFO] LCM message handler is running.
-[20/03/2025 17:04:19] [ControllerPlugin] [INFO] Press Ctrl + C at any time to shut down pntOS...
+[31/03/2025 11:55:06] [TransportPlugin] [INFO] LCM message handler is running.
+[31/03/2025 11:55:06] [ControllerPlugin] [INFO] Press Ctrl + C at any time to shut down pntOS...
 ```
 
 Then push the `play` button in the LogPlayer.
