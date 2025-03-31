@@ -78,6 +78,7 @@ def mediator() -> SimpleMediator:
     registry_plugin.init_plugin(mediator=mediator)
     registry = registry_plugin.new_registry()
     SimpleMediator.registry = registry
+    SimpleMediator._controller_plugin = None
     return mediator
 
 
@@ -308,7 +309,7 @@ def test_generate_model(
     lat_factor = delta_lat_to_north(1, meas_llh[0], meas_llh[2])
     lon_factor = delta_lon_to_east(1, meas_llh[0], meas_llh[2])
     exp_z = np.array(
-        [delta_pos[0] * lat_factor, delta_pos[1] * lon_factor, -delta_pos[2]]
+        [[delta_pos[0] * lat_factor], [delta_pos[1] * lon_factor], [-delta_pos[2]]]
     )
     assert np.array_equal(mm.H, exp_H)
     assert np.array_equal(mm.R, exp_R)

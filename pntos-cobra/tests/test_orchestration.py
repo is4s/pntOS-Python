@@ -80,12 +80,11 @@ MEASUREMENT_CHANNELS = [GPS_CHANNEL]
 ALIGNMENT_CHANNELS = [GPS_CHANNEL, IMU_CHANNEL]
 
 # State block parameters
-STATE_BLOCK_ID = 'pinson15'
-STATE_BLOCK_LABEL = 'pinson'
+STATE_BLOCK_LABEL = 'pinson15'
 STATE_BLOCK_CONFIG_GROUP = 'config/inertial_state'
 
 # Measurement processor parameters
-MEASUREMENT_PROCESSOR_ID = 'geodeticposition3d'
+MEASUREMENT_PROCESSOR_ID = 'pinson_position'
 MEASUREMENT_PROCESSOR_LABEL = 'gps'
 MEASUREMENT_PROCESSOR_CONFIG_GROUP = 'config/gp3d_state_modeling'
 
@@ -300,7 +299,7 @@ class DummyStandardFusionEngine(StandardFusionEngine):
         pass
 
     def get_state_block_estimate(self, block_label: str) -> NDArray[float64] | None:
-        return np.array([i / 10 for i in range(15)])
+        return np.array([[i / 10] for i in range(15)])
 
     def get_state_block_covariance(self, block_label: str) -> NDArray[float64] | None:
         pass
@@ -362,7 +361,7 @@ class DummyStandardFusionEngine(StandardFusionEngine):
     ) -> EstimateWithCovariance | None:
         return EstimateWithCovariance(
             type=EstimateWithCovarianceType.EWC_GENERIC,
-            estimate=np.array([i / 100 for i in range(15)]),
+            estimate=np.array([[i / 100] for i in range(15)]),
             covariance=np.zeros((15, 15)),
         )
 
@@ -472,7 +471,7 @@ class DummyStandardMeasurementProcessor(StandardMeasurementProcessor):
 
 class DummyStandardStateModelProvider(StandardStateModelProvider):
     processor_identifiers = [MEASUREMENT_PROCESSOR_ID]
-    block_identifiers = [STATE_BLOCK_ID]
+    block_identifiers = [STATE_BLOCK_LABEL]
     virtual_block_identifiers = []
 
     def new_processor(
@@ -554,7 +553,7 @@ class DummyInertialInitializationStrategy(InertialInitializationStrategy):
     status: InitializationStatus
 
     def __init__(self) -> None:
-        self.status = InitializationStatus.WAITING
+        self.status = InitializationStatus.INITIALIZED_GOOD
 
     def request_solution(self) -> InitialInertialSolution:
         return InitialInertialSolution(
@@ -598,7 +597,7 @@ class DummyInertialInitializationStrategy(InertialInitializationStrategy):
         return self.status
 
     def process_pntos_message(self, message: Message) -> None:
-        self.status = InitializationStatus.INITIALIZED_GOOD
+        pass
 
 
 class DummyMediator(Mediator):

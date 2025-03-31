@@ -10,6 +10,7 @@ from numpy.typing import NDArray
 from pntos.api import (
     EstimateWithCovariance,
     EstimateWithCovarianceType,
+    FusionPlugin,
     LoggingLevel,
     Message,
     StandardDynamicsModel,
@@ -118,7 +119,8 @@ def dummy_log(level: LoggingLevel, message: str) -> None:
 def test_manual():
     """User test for the Fusion Plugin."""
     registry = SimpleRegistry(dummy_log)
-    mediator = SimpleMediator(registry, [])
+    mediator = SimpleMediator(FusionPlugin, 'Fusion Plugin')
+    SimpleMediator.registry = registry
 
     # initialize the fusion plugin
     fusion_plugin = SimpleFusionPlugin(identifier='test_fusion_plugin')

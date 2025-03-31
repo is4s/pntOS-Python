@@ -49,21 +49,20 @@ BEST_SOL_CHANNEL = '/solution/pntos/best'
 IMU_SOL_CHANNEL = '/solution/pntos/imu'
 
 # Sensor input channels
-IMU_CHANNEL = '/sensor/sagem/imu'
-GPS_CHANNEL = '/sensor/ublox-neo-m9n-update/geodetic_pos'
+IMU_CHANNEL = '/sensor/vn-100/imu'
+GPS_CHANNEL = '/sensor/ublox/position'
 
 # Process_pntos_message mapping
 MEASUREMENT_CHANNELS = [GPS_CHANNEL]
 ALIGNMENT_CHANNELS = [GPS_CHANNEL, IMU_CHANNEL]
 
 # State block parameters
-STATE_BLOCK_ID = 'pinson15'
-STATE_BLOCK_LABEL = 'pinson'
+STATE_BLOCK_ID = STATE_BLOCK_LABEL = 'pinson15'
 STATE_BLOCK_LABELS = [STATE_BLOCK_LABEL]
 STATE_BLOCK_CONFIG_GROUP = 'config/inertial_state'
 
 # Measurement processor parameters
-MEASUREMENT_PROCESSOR_ID = 'geodeticposition3d'
+MEASUREMENT_PROCESSOR_ID = 'pinson_position'
 MEASUREMENT_PROCESSOR_LABEL = 'gps'
 MEASUREMENT_PROCESSOR_CONFIG_GROUP = 'config/gp3d_state_modeling'
 
@@ -117,14 +116,6 @@ class SimpleOrchestrationPlugin(OrchestrationPlugin):
             )
             return
         self.mediator = mediator
-        if mediator is None:
-            self._log(
-                LoggingLevel.ERROR,
-                'Orchestration was not handed a mediator. '
-                + 'Orchestration will be disabled.',
-            )
-            return
-        self.mediator = mediator
 
     def shutdown_plugin(self) -> None:
         pass
@@ -144,7 +135,8 @@ class SimpleOrchestrationPlugin(OrchestrationPlugin):
     def init_orchestration_plugin(
         self, plugins: list[CommonPlugin], stream_config: MessageStreamConfig
     ) -> None:
-        stream_config.immediate_stream_all(True)  # Take all messages as they come
+        stream_config.sequenced_stream_all(True)
+        stream_config.immediate_stream_add(MeasurementImu)
 
         self.measurement_channels: list[str] = MEASUREMENT_CHANNELS
         self.alignment_channels: list[str] = ALIGNMENT_CHANNELS
@@ -153,6 +145,9 @@ class SimpleOrchestrationPlugin(OrchestrationPlugin):
 
         self._set_up_fusion_engine()
         self._set_up_initializer()
+
+        if self._initialization_ready():
+            self._generate_initial_inertial_solution()
 
     def _sort_and_validate_plugins(self, plugin_list: list[CommonPlugin]) -> None:
         """
@@ -170,7 +165,8 @@ class SimpleOrchestrationPlugin(OrchestrationPlugin):
         if len(sorted_plugins.fusion_plugins) != 1:
             self._log(
                 LoggingLevel.ERROR,
-                f'Expected one FusionPlugin - received {len(sorted_plugins.fusion_plugins)}',
+                f'Expected one FusionPlugin - received {len(sorted_plugins.fusion_plugins)}'
+                + f': {[p.identifier for p in sorted_plugins.fusion_plugins]}',
             )
             return
         self.fusion_plugin = sorted_plugins.fusion_plugins[0]
@@ -219,7 +215,7 @@ class SimpleOrchestrationPlugin(OrchestrationPlugin):
         # Set up initializer
         init_strategy: InertialInitializationStrategy | None = (
             self.initialization_plugin.new_initialization_strategy(
-                InertialInitializationStrategy
+                InertialInitializationStrategy, config_group=ALIGNMENT_CONFIG_GROUP
             )
         )
         if init_strategy is None:
@@ -230,10 +226,6 @@ class SimpleOrchestrationPlugin(OrchestrationPlugin):
             )
             return None
         self.initializer = init_strategy
-
-        # Initialize filter if initializer is already ready
-        if self._initialization_ready():
-            self._generate_initial_inertial_solution()
 
     def _set_up_fusion_engine(self) -> None:
         """
@@ -254,6 +246,11 @@ class SimpleOrchestrationPlugin(OrchestrationPlugin):
             )
             return
 
+        # Give the fusion engine a strategy
+        fusion_engine.strategy = self.fusion_strategy_plugin.new_fusion_strategy(
+            StandardFusionStrategy
+        )
+
         # Get Pinson block and measurement processor
         block = None
         processor = None
@@ -264,7 +261,7 @@ class SimpleOrchestrationPlugin(OrchestrationPlugin):
             if provider is not None:
                 if STATE_BLOCK_ID in provider.block_identifiers:
                     block = provider.new_block(
-                        provider.block_identifiers.index(STATE_BLOCK_ID),
+                        provider.block_identifiers.index(STATE_BLOCK_LABEL),
                         fusion_engine,
                         STATE_BLOCK_LABEL,
                         STATE_BLOCK_CONFIG_GROUP,
@@ -282,20 +279,22 @@ class SimpleOrchestrationPlugin(OrchestrationPlugin):
         if block is None:
             self._log(
                 LoggingLevel.ERROR,
-                f'Unable to find state block "{STATE_BLOCK_ID}" - cannot initialize filter.',
+                f'Unable to find state block "{STATE_BLOCK_LABEL}" - cannot initialize filter.',
             )
             return
         ewc = EstimateWithCovariance(
             EstimateWithCovarianceType.EWC_GENERIC,
-            estimate=np.zeros(15),
+            estimate=np.zeros((15, 1)),
             covariance=np.zeros((15, 15)),
         )
         fusion_engine.add_state_block(block, ewc, None)
 
         if processor is None:
+            assert provider is not None
             self._log(
                 LoggingLevel.ERROR,
-                f'Unable to find measurement processor "{MEASUREMENT_PROCESSOR_ID}" - cannot initialize filter.',
+                f'Unable to find measurement processor "{MEASUREMENT_PROCESSOR_ID}" -'
+                + f' cannot initialize filter. Available measurement processors: {provider.processor_identifiers}',
             )
             return
         fusion_engine.add_measurement_processor(processor)
@@ -311,17 +310,17 @@ class SimpleOrchestrationPlugin(OrchestrationPlugin):
         imu.meas_accel = self.C_inertial_to_platform @ imu.meas_accel
         imu.meas_gyro = self.C_inertial_to_platform @ imu.meas_gyro
 
-    def _dispatch_to_initializer(self, message: Message) -> None:
-        """Send ``message`` to the initializer for alignment, and grab initial solution if available."""
-        self.initializer.process_pntos_message(message)
-
-        if self._initialization_ready():
-            self._generate_initial_inertial_solution()
-
     def _dispatch_to_fusion_engine(self, message: Message) -> None:
         """Send message to the fusion engine to update the filter.
 
-        Applies feedback to inertial solution and biases, and resets pinson error states afterward."""
+        Applies feedback to inertial solution and biases, and resets pinson error states
+        afterward."""
+
+        # Make sure measurement processor has most current aux data before update
+        self._send_inertial_aux_to_measurement_processor(
+            message.wrapped_message.time_of_validity  # type: ignore[attr-defined]
+        )
+        self._send_inertial_aux_to_pinson()
 
         # Update filter.
         self.fusion_engine.update(MEASUREMENT_PROCESSOR_LABEL, message)
@@ -372,15 +371,17 @@ class SimpleOrchestrationPlugin(OrchestrationPlugin):
             )
             return
 
-        imu_errors.accel_biases -= estimate[9:12]
-        imu_errors.gyro_biases -= estimate[12:15]
+        imu_errors.accel_biases -= estimate[9:12, 0]
+        imu_errors.gyro_biases -= estimate[12:15, 0]
         self.inertial.correct_sensor_errors(cur_time, imu_errors)
 
         # Assume zero error in states after applying feedback
-        self.fusion_engine.set_state_block_estimate(STATE_BLOCK_LABEL, np.zeros(15))
+        self.fusion_engine.set_state_block_estimate(
+            STATE_BLOCK_LABEL, np.zeros((15, 1))
+        )
 
     def _generate_initial_inertial_solution(self) -> None:
-        """Get the solution from the initialization strategy and initialize the inertial from it."""
+        """Get initial inertial solution and use it to set up the inertial."""
         self.init_solution = self.initializer.request_solution()
 
         if (
@@ -405,7 +406,7 @@ class SimpleOrchestrationPlugin(OrchestrationPlugin):
             return
 
         inertial_init_message = Message(
-            self.init_solution.solution, 'python orchestration'
+            self.init_solution.solution.wrapped_message, 'python orchestration'
         )
 
         inertial: StandardInertialMechanization | None = (
@@ -425,8 +426,9 @@ class SimpleOrchestrationPlugin(OrchestrationPlugin):
 
         self.inertial = inertial
 
-        inertial.correct_sensor_errors(
-            self.fusion_engine.time, self.init_solution.inertial_errors
+        self.inertial.correct_sensor_errors(
+            self.init_solution.solution.wrapped_message.time_of_validity,
+            self.init_solution.inertial_errors,
         )
 
         pva_cov = self.init_solution.solution.wrapped_message.covariance  # 9x9
@@ -437,9 +439,11 @@ class SimpleOrchestrationPlugin(OrchestrationPlugin):
             init_pinson_cov,
         )
 
+        init_time = self.init_solution.solution.wrapped_message.time_of_validity
+        self.fusion_engine.time = init_time
+
         self._send_inertial_aux_to_pinson()
 
-        init_time = self.init_solution.solution.wrapped_message.time_of_validity
         self._log(
             LoggingLevel.INFO,
             f'Aligned filter at {init_time}.',
@@ -450,6 +454,10 @@ class SimpleOrchestrationPlugin(OrchestrationPlugin):
         Utility function which returns true if the message's time of validity is greater
         than the current fusion engine time.
         """
+        # If we haven't received an initial solution, then any time counts:
+        if self.init_solution is None:
+            return True
+
         measurement = message.wrapped_message
         # get time - check for old messages
         if hasattr(measurement, 'time_of_validity'):
@@ -459,7 +467,9 @@ class SimpleOrchestrationPlugin(OrchestrationPlugin):
             else:  # Discard old messages
                 self._log(
                     LoggingLevel.DEBUG,
-                    f'Received old message ({message_time}ns) - discarding.',
+                    f'Received old message at time {message_time*1e-9:.9f}s on channel'
+                    + f' {message.source_identifier}. Filter is at time '
+                    + f'{self.fusion_engine.time.elapsed_nsec*1e-9:.9f}s. Discarding message',
                 )
                 return False
         else:
@@ -480,10 +490,6 @@ class SimpleOrchestrationPlugin(OrchestrationPlugin):
         return self.initialization_state is InitializationStatus.INITIALIZED_GOOD
 
     def process_pntos_message(self, message: Message, sequenced: bool) -> None:
-        if sequenced:
-            self._log(LoggingLevel.ERROR, 'Sequenced streamed messages not supported.')
-            return None
-
         # Rotate IMU measurements into platform frame
         if isinstance(message.wrapped_message, MeasurementImu):
             self._rotate_imu_meas(message.wrapped_message)
@@ -491,19 +497,22 @@ class SimpleOrchestrationPlugin(OrchestrationPlugin):
         if not self._has_valid_time(message):
             return
 
-        # If filter solution is not initialized, send messages to the alignment algorithm.
-        if (
-            not self._initialization_ready()
-            and message.source_identifier in self.alignment_channels
-        ):
-            self._dispatch_to_initializer(message)
+        # If filter solution is not initialized, send messages to the initializer.
+        if not self._initialization_ready():
+            if message.source_identifier not in self.alignment_channels:
+                return
+
+            self.initializer.process_pntos_message(message)
+            if not self._initialization_ready():
+                self._generate_initial_inertial_solution()
+            else:
+                return
 
         # If aligned, send messages to IMU or filter
-        if self._initialization_ready():
-            if message.source_identifier == INERTIAL_CHANNEL:
-                self.inertial.process_pntos_message(message)
-            elif message.source_identifier in self.measurement_channels:
-                self._dispatch_to_fusion_engine(message)
+        if message.source_identifier == INERTIAL_CHANNEL:
+            self.inertial.process_pntos_message(message)
+        elif message.source_identifier in self.measurement_channels:
+            self._dispatch_to_fusion_engine(message)
 
     def get_filter_description_list(self) -> list[str]:
         descriptions = []
@@ -535,6 +544,9 @@ class SimpleOrchestrationPlugin(OrchestrationPlugin):
         Utility function to request the best fusion strategy solution. Returns
         ``None`` if the fusion engine is unable to provide a solution for the requested time.
         """
+        # Make sure state block has current aux data before propagate
+        self._send_inertial_aux_to_pinson()
+
         x_and_p: EstimateWithCovariance | None = self.fusion_engine.peek_ahead(
             time, [STATE_BLOCK_LABEL]
         )
@@ -629,6 +641,7 @@ class SimpleOrchestrationPlugin(OrchestrationPlugin):
     def _send_inertial_aux_to_pinson(self) -> None:
         """Send the current inertial solution and forces to the Pinson15 state-block."""
         time = self.fusion_engine.time
+
         pva_message = self.inertial.request_solution(time)
         if pva_message is None:
             self._log(
@@ -647,6 +660,19 @@ class SimpleOrchestrationPlugin(OrchestrationPlugin):
 
         self.fusion_engine.give_state_block_aux_data(
             STATE_BLOCK_LABEL, [pva_message, imu_message]
+        )
+
+    def _send_inertial_aux_to_measurement_processor(self, time: TypeTimestamp) -> None:
+        """Send the current inertial solution to the position measurement processor."""
+        pva_message = self.inertial.request_solution(time)
+        if pva_message is None:
+            self._log(
+                LoggingLevel.ERROR,
+                f'Cannot send inertial aux to measurement processor. Solution not available at time {time}',
+            )
+            return
+        self.fusion_engine.give_measurement_processor_aux_data(
+            MEASUREMENT_PROCESSOR_LABEL, [pva_message]
         )
 
     def _apply_error_states(
@@ -674,13 +700,13 @@ class SimpleOrchestrationPlugin(OrchestrationPlugin):
             ),
             TypeTimestamp(pva.time_of_validity.elapsed_nsec),
             pva.reference_frame,
-            pva.p1 + north_to_delta_lat(x[0], pva.p1, pva.p3),
-            pva.p2 + east_to_delta_lon(x[1], pva.p1, pva.p3),
-            pva.p3 - x[2],
-            pva.v1 + x[3],
-            pva.v2 + x[4],
-            pva.v3 + x[5],
-            dcm_to_quat(correct_dcm_with_tilt(quat_to_dcm(pva.quaternion), x[6:9])),
+            pva.p1 + north_to_delta_lat(x[0, 0], pva.p1, pva.p3),
+            pva.p2 + east_to_delta_lon(x[1, 0], pva.p1, pva.p3),
+            pva.p3 - x[2, 0],
+            pva.v1 + x[3, 0],
+            pva.v2 + x[4, 0],
+            pva.v3 + x[5, 0],
+            dcm_to_quat(correct_dcm_with_tilt(quat_to_dcm(pva.quaternion), x[6:9, 0])),
             pva.covariance.copy(),
             MeasurementPositionVelocityAttitudeErrorModel.NONE,
             np.array([]),

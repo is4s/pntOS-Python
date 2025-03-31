@@ -593,7 +593,7 @@ class Test_SimpleControllerPlugin(unittest.TestCase):
         self.set_up_plugins()
         mediator = SimpleMediator(self.controller.identifier, ControllerPlugin)
         orchestration_plugin = DummyOrchestrationPlugin('Dummy orchestration')
-        SimpleMediator.orchestration_plugin = orchestration_plugin
+        SimpleMediator._orchestration_plugin = orchestration_plugin
         filter_description_list = mediator.get_filter_description_list()
         assert len(filter_description_list) == len(expected_filter_description_list)
         for i in range(len(filter_description_list)):

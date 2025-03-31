@@ -37,6 +37,7 @@ class SimpleInertial(StandardInertialMechanization):
     identifier: str = 'Cobra simple inertial'
 
     def __init__(self, config_group: str, mediator: Mediator, solution: Message):
+        self.mediator = mediator
         if not isinstance(
             solution.wrapped_message, MeasurementPositionVelocityAttitude
         ):
@@ -45,7 +46,6 @@ class SimpleInertial(StandardInertialMechanization):
                 'Message must be of type MeasurementPositionVelocityAttitude.',
             )
             return
-        self.mediator = mediator
 
         config = config_from_registry(InertialConfig, mediator, config_group)
         if config is None:
