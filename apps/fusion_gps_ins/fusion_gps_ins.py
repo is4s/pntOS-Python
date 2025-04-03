@@ -20,12 +20,12 @@ from pntos.cobra.config import AlignmentConfig, ImuConfig, InertialConfig, Senso
 my_config = [
     ImuConfig(
         group='config/inertial_state',
-        accel_bias_sigma=(0.0098, 0.0098, 0.0098),
-        accel_bias_tau=(3600.0, 3600.0, 3600.0),
-        accel_random_walk_sigma=(0.001, 0.001, 0.001),
-        gyro_bias_sigma=(1.234e-6, 1.234e-6, 1.234e-6),
-        gyro_bias_tau=(3600.0, 3600.0, 3600.0),
-        gyro_random_walk_sigma=(0.001, 0.001, 0.001),
+        accel_bias_sigma=(3.924e-5, 3.924e-5, 3.924e-5),
+        accel_bias_tau=(1800.0, 1800.0, 1800.0),
+        accel_random_walk_sigma=(3.887e-6, 3.887e-6, 3.887e-6),
+        gyro_bias_sigma=(8.848e-5, 8.848e-5, 8.848e-5),
+        gyro_bias_tau=(1800.0, 1800.0, 1800.0),
+        gyro_random_walk_sigma=(1.7277877e-7, 1.7277877e-7, 1.7277877e-7),
     ),
     AlignmentConfig(
         group='config/default/alignment',
