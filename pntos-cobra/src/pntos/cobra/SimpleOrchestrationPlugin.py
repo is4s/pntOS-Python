@@ -100,7 +100,24 @@ class SimpleOrchestrationPlugin(OrchestrationPlugin):
         self.initialization_state: InitializationStatus = InitializationStatus.WAITING
         self.init_solution = None
         self.C_inertial_to_platform = np.array(
-            [[0.0, 1.0, 0.0], [1.0, 0.0, 0.0], [0.0, 0.0, -1.0]], dtype=float64
+            [
+                [
+                    0.99616511,
+                    0.07092678,
+                    0.05122958,
+                ],
+                [
+                    -0.07006793,
+                    0.99737301,
+                    -0.01837285,
+                ],
+                [
+                    -0.05239813,
+                    0.01471285,
+                    0.99851789,
+                ],
+            ],
+            dtype=float64,
         )
 
     def init_plugin(
