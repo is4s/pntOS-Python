@@ -41,7 +41,7 @@ my_config = [
         initial_gyro_scale_factor=(0.0, 0.0, 0.0),
         initial_gyro_scale_factor_var=(0.0, 0.0, 0.0),
         initial_pos=(0.6941957531255563, -1.4675867257692263, 247.44),
-        initial_rpy=(-1.80625601e-02, 3.92176685e-02,  7.90609217e-22),
+        initial_rpy=(-1.80625601e-02, 3.92176685e-02, 0.13655456),
         initial_time=1741194282.046638768,
         initial_vel=(0.0, 0.0, 0.0),
     ),
