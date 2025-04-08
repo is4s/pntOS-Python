@@ -31,5 +31,7 @@ numpy==1.26.4
     # via navtk
     # via pntos-cobra
     # via scipy
+pntos-python-datasets @ git+ssh://git@git.aspn.us/pntos/pntos-python-datasets.git@30200340c98caf2c4dbafe75dbafbceb91dc5a19
+    # via pntos-cobra
 scipy==1.15.2
     # via pntos-cobra
