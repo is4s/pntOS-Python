@@ -12,12 +12,12 @@ a local TCP server in a new terminal:
 java -classpath $VIRTUAL_ENV/lib/python3.*/site-packages/share/java/lcm.jar lcm.lcm.TCPService
 ```
 
-### Load LCM Log File
-Then we can open the log file with `lcm-logplayer-gui` in another terminal:
+### Play LCM Log File
+Then we can play the log file in another terminal via:
 ```sh
-lcm-logplayer-gui --paused --lcm-url=tcpq:// .venv/lib/python3.11/site-packages/pntos_python_datasets/2025_03_05_12_04_log_1.log
+play-dataset
 ```
-This should open a gui with a play button. Select only the following channels:
+This should open the LCM LogPlayer GUI with a play button. You should see the following channels:
 - `/sensor/ins-d/pva`
 - `/sensor/ublox/position`
 - `/sensor/vn-100/imu`
@@ -26,7 +26,7 @@ This should open a gui with a play button. Select only the following channels:
 To run the app, run this command inside the python virtual environment from the root
 workspace directory:
 ```sh
-python apps/fusion_gps_ins/fusion_gps_ins.py 
+python apps/fusion_gps_ins/fusion_gps_ins.py
 ```
 You should see something like the following:
 ```sh
@@ -38,7 +38,7 @@ LCM tcpq: connecting...
 [20/03/2025 17:04:19] [TransportPlugin] [INFO] LCM message handler is running.
 [20/03/2025 17:04:19] [ControllerPlugin] [INFO] Press Ctrl + C at any time to shut down pntOS...
 ```
-Then push the `play` button on the lcm log-player gui.
+Then push the `play` button in the LogPlayer.
 
 ### Validate Results
 You should see periodic printouts of an info message (shown below) followed by a
