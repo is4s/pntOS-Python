@@ -107,7 +107,7 @@ class Aspn23LcmTransportPlugin(TransportPlugin):
                 solution = self.mediator.request_solutions([self.last_message_time])
                 if len(solution) > 0:
                     self.mediator.log_message(
-                        LoggingLevel.INFO, f'Got a solution! {solution}'
+                        LoggingLevel.DEBUG, f'Got a solution! {solution}'
                     )
                     self.mediator.broadcast_aspn_message(
                         solution[0],
