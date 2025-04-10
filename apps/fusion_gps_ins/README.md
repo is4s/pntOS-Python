@@ -43,7 +43,7 @@ You should see something like the following:
 ```shell
 WARNING:  [Controller] Expected one UiPlugin but received 0. Running without a UI plugin.
 [31/03/2025 11:55:06] [LoggingPlugin] [INFO] using hard-coded global logging level INFO
-[31/03/2025 11:55:06] [OrchestrationPlugin] [INFO] Aligned filter at TypeTimestamp(elapsed_nsec=1741194282046638848).
+[31/03/2025 11:55:06] [OrchestrationPlugin] [INFO] Aligned filter at TypeTimestamp(elapsed_nsec=1743621678330456320).
 LCM tcpq: connecting...
 [31/03/2025 11:55:06] [TransportPlugin] [INFO] LCM message handler is running.
 [31/03/2025 11:55:06] [ControllerPlugin] [INFO] Press Ctrl + C at any time to shut down pntOS...
