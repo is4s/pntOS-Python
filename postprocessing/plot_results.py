@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 from os import mkdir, path
+from sys import argv
 
 from lcm_stripper import harvest_by_channel
 from plots import plot_solution
@@ -28,3 +29,10 @@ def plot_results(lcmlog):
         True,
     )
     print(f'Plots have been saved to {filt_dir}')
+
+
+if __name__ == '__main__':
+    if len(argv) > 1:
+        plot_results(argv[1])
+    else:
+        raise Exception('Must provide path to LCM log file as first argument')
