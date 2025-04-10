@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import matplotlib.pyplot as plt
+import numpy as np
 
 plt.rcParams['figure.figsize'] = (10, 6)
 
@@ -151,10 +152,13 @@ def extract_pos_sigma(data):
     return sigma
 
 
-def extract_rpy(data):
+def extract_rpy(data, convert_rpy_to_prh: bool = False):
     rpy = zeros([len(data), 3])
     for k in range(0, len(data)):
         rpy[k, :] = quat_to_rpy(data[k].quaternion)
+    if convert_rpy_to_prh:
+        rpy = np.transpose(np.stack((rpy[:, 1], rpy[:, 0], -rpy[:, 2])))
+
     return rpy
 
 
@@ -355,7 +359,7 @@ def plot_solution(solution, truth, plot_dir, show_plots):
     tvel[:, 2] = -tvel[:, 2]
     trpy = None
     if truth[1].decode_class_name == 'positionvelocityattitude':
-        trpy = extract_rpy(truth[1].data)
+        trpy = extract_rpy(truth[1].data, True)
     tt = TimeData(truth[1].data)
     tned = lla_to_ned_vector(tlla, lat0, lon0, alt0)
 
