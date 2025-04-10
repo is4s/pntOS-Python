@@ -10,3 +10,10 @@ wheels/
 **/registry_permanency_files/
 .coverage
 .vscode
+
+# LCM Logger artifacts
+*.log
+
+# Plotting artifacts
+*.pickle
+*.png

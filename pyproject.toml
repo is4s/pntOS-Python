@@ -20,6 +20,7 @@ dev-dependencies = [
     "pip>=24.0",
     "myst_parser>=4.0.0",
     "sphinx_rtd_theme>=3.0.2",
+    "matplotlib"
 ]
 
 [tool.rye.workspace]
@@ -35,6 +36,7 @@ ignore = ["D212", "D417"]
 "pntos-cli/*" = ["D"]
 "apps/*" = ["D"]
 "docs/*" = ["D"]
+"postprocessing/*" = ["D"]
 "*/tests/*" = ["D100", "D101", "D102"]
 
 [tool.ruff.lint.isort]
