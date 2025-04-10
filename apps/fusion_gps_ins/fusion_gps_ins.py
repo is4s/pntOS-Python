@@ -29,7 +29,7 @@ my_config = [
     ),
     AlignmentConfig(
         group='config/default/alignment',
-        initial_pos_var=(9.0, 9.0, 9.0),
+        initial_pos_var=(9.0, 9.0, 25.0),
         initial_vel_var=(0.1, 0.1, 0.1),
         initial_tilt_var=(0.01, 0.01, 0.01),
         initial_accel_bias_var=(1e-10, 1e-10, 1e-10),
