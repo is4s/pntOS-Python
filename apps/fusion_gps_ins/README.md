@@ -29,6 +29,18 @@ This should open the LCM LogPlayer GUI with a play button. You should see the fo
 - `/sensor/ublox/position`
 - `/sensor/vn-100/imu`
 
+## Record Output
+
+In order to save off the solutions produced by pntOS and sent over the wire, start lcm-logger:
+
+```shell
+lcm-logger --lcm-url=tcpq:// pntos_output.log
+```
+
+This process will listen to any messages transmitted over LCM and record them to `pntos_output.log`.
+
+Alternatively, to just see the solution printed to the terminal, set the logging level to `DEBUG`.
+
 ### Run the App
 
 To run the app, run this command from the root workspace directory (with the python virtual
@@ -53,11 +65,8 @@ Then push the `play` button in the LogPlayer.
 
 ### Validate Results
 
-You should see periodic printouts of an info message (shown below) followed by a
-printout of the current PVA solution message.
+To plot the saved results run:
 
 ```shell
-[20/03/2025 17:04:27] [TransportPlugin] [INFO] Got a solution! <printout of PVA message>
+postprocessing/plot_results.py pntos_output.log
 ```
-
-NOTE: This should change once we have a UI plugin.
