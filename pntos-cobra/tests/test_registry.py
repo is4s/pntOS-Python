@@ -534,6 +534,21 @@ class TestRegistry(unittest.TestCase):
         assert set(callbacked_keys) == set(test_keys), 'Callback keys failed.'
         assert callbacked_kv == test_kv, 'Callback kv failed.'
 
+    def test_request_notify_no_modified_keys(self) -> None:
+        def callback_that_should_not_be_called(
+            group: str, keys: list[str], kv: KeyValueStore
+        ) -> None:
+            self.fail('Callback called but no keys were modified.')
+
+        # Callback shouldn't be called if all we do is request_notify
+        test_kv = self.reg.batch_start(self.test_group)
+        test_kv.request_notify(None, callback_that_should_not_be_called)
+        test_kv.batch_end()
+
+        # Callback shouldn't be called if all we do is start and end batch
+        test_kv.batch_restart()
+        test_kv.batch_end()
+
     def test_request_notify_multiple_keys(self) -> None:
         test_keys = ['Resistance', 'is', 'futile.']
         test_kv = self.reg.batch_start(self.test_group)
