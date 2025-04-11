@@ -61,7 +61,7 @@ def get_statistics(arr: np.ndarray):
     """
     m = np.nanmean(arr)
     std = np.nanstd(arr)
-    rms = np.nansum(np.square(arr)) / arr.size
+    rms = np.sqrt(np.nansum(np.square(arr)) / arr.size)
     abs_max = np.nanmax(np.abs(arr))
 
     statistics_str = (
