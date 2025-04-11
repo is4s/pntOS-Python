@@ -507,17 +507,10 @@ class TestRegistry(unittest.TestCase):
         for k in test_keys:
             test_kv.set_value(k, 0)
 
-        callbacked_group: str = ''
-        callbacked_keys: list[str] = []
-        callbacked_kv: KeyValueStore = SimpleKeyValueStore('', dummy_log)
-
         def test_callback(group: str, keys: list[str], kv: KeyValueStore) -> None:
-            nonlocal callbacked_group
-            nonlocal callbacked_keys
-            nonlocal callbacked_kv
-            callbacked_group = group
-            callbacked_keys = keys
-            callbacked_kv = kv
+            assert group == self.test_group, 'Callback group failed.'
+            assert set(keys) == set(test_keys), 'Callback keys failed.'
+            assert kv == test_kv, 'Callback kv failed.'
 
         test_kv.batch_end()
 
@@ -530,9 +523,20 @@ class TestRegistry(unittest.TestCase):
             test_kv.set_value(k, 1)
         test_kv.batch_end()
 
-        assert callbacked_group == self.test_group, 'Callback group failed.'
-        assert set(callbacked_keys) == set(test_keys), 'Callback keys failed.'
-        assert callbacked_kv == test_kv, 'Callback kv failed.'
+    def test_request_notify_no_modified_keys(self) -> None:
+        def callback_that_should_not_be_called(
+            group: str, keys: list[str], kv: KeyValueStore
+        ) -> None:
+            self.fail('Callback called but no keys were modified.')
+
+        # Callback shouldn't be called if all we do is request_notify
+        test_kv = self.reg.batch_start(self.test_group)
+        test_kv.request_notify(None, callback_that_should_not_be_called)
+        test_kv.batch_end()
+
+        # Callback shouldn't be called if all we do is start and end batch
+        test_kv.batch_restart()
+        test_kv.batch_end()
 
     def test_request_notify_multiple_keys(self) -> None:
         test_keys = ['Resistance', 'is', 'futile.']

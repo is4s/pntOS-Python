@@ -363,7 +363,7 @@ class SimpleKeyValueStore(KeyValueStore):
         self.set_permanent(False)
 
         # Run through non-keyed callbacks
-        if None in self._callbacks:
+        if None in self._callbacks and self._modified_keys:
             for callback in self._callbacks[None]:
                 callback(self._group, list(self._modified_keys), self)
 
