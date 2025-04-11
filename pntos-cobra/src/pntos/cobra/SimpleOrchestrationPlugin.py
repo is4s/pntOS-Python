@@ -99,25 +99,13 @@ class SimpleOrchestrationPlugin(OrchestrationPlugin):
         }
         self.initialization_state: InitializationStatus = InitializationStatus.WAITING
         self.init_solution = None
+        # Corresponds to an RPY of [0.35, 3.7, 1] in degrees
         self.C_inertial_to_platform = np.array(
             [
-                [
-                    0.99616511,
-                    0.07092678,
-                    0.05122958,
-                ],
-                [
-                    -0.07006793,
-                    0.99737301,
-                    -0.01837285,
-                ],
-                [
-                    -0.05239813,
-                    0.01471285,
-                    0.99851789,
-                ],
-            ],
-            dtype=float64,
+                [0.9977636308900033, -0.017057937866657782, 0.06462788584608446],
+                [0.017416028960199132, 0.9998359200298608, -0.0049814609603426405],
+                [-0.06453230825295797, 0.0060958817064601266, 0.9978969994031279],
+            ]
         )
 
     def init_plugin(
