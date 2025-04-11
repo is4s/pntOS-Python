@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 # Grab the plugins we want off the shelf
 from pntos.api import LoggingLevel
 from pntos.cobra import (
@@ -18,29 +20,29 @@ from pntos.cobra.config import AlignmentConfig, ImuConfig, InertialConfig, Senso
 my_config = [
     ImuConfig(
         group='config/inertial_state',
-        accel_bias_sigma=(0.0098, 0.0098, 0.0098),
-        accel_bias_tau=(3600.0, 3600.0, 3600.0),
-        accel_random_walk_sigma=(0.001, 0.001, 0.001),
-        gyro_bias_sigma=(1.234e-6, 1.234e-6, 1.234e-6),
-        gyro_bias_tau=(3600.0, 3600.0, 3600.0),
-        gyro_random_walk_sigma=(0.001, 0.001, 0.001),
+        accel_bias_sigma=(3.924e-5, 3.924e-5, 3.924e-5),
+        accel_bias_tau=(1800.0, 1800.0, 1800.0),
+        accel_random_walk_sigma=(3.887e-6, 3.887e-6, 3.887e-6),
+        gyro_bias_sigma=(8.848e-5, 8.848e-5, 8.848e-5),
+        gyro_bias_tau=(1800.0, 1800.0, 1800.0),
+        gyro_random_walk_sigma=(1.7277877e-7, 1.7277877e-7, 1.7277877e-7),
     ),
     AlignmentConfig(
         group='config/default/alignment',
-        initial_pos_var=(9.0, 9.0, 9.0),
-        initial_vel_var=(0.1, 0.1, 0.1),
-        initial_tilt_var=(0.01, 0.01, 0.01),
-        initial_accel_bias_var=(9.604e-5, 9.604e-5, 9.604e-5),
-        initial_gyro_bias_var=(2.3504074e-11, 2.3504074e-11, 2.3504074e-11),
-        initial_accel_bias=(0.0, 0.0, 0.0),
+        initial_pos_var=(9.0, 9.0, 25.0),
+        initial_vel_var=(1e-3, 1e-3, 1e-3),
+        initial_tilt_var=(1e-3, 1e-3, 1e-3),
+        initial_accel_bias_var=(1e-10, 1e-10, 1e-10),
+        initial_gyro_bias_var=(1e-15, 1e-15, 1e-15),
+        initial_accel_bias=(-0.00212767, 0.00059081, -0.05242679),
         initial_accel_scale_factor=(0.0, 0.0, 0.0),
         initial_accel_scale_factor_var=(0.0, 0.0, 0.0),
-        initial_gyro_bias=(0.0, 0.0, 0.0),
+        initial_gyro_bias=(-0.00165402, -0.00157491, -0.00133498),
         initial_gyro_scale_factor=(0.0, 0.0, 0.0),
         initial_gyro_scale_factor_var=(0.0, 0.0, 0.0),
-        initial_pos=(0.6941957531255563, -1.4675867257692263, 247.44),
-        initial_rpy=(0.0, 0.0, 0.0),
-        initial_time=1741194282.046638768,
+        initial_pos=(0.6939183923297865, -1.4680111371692746, 222.561),
+        initial_rpy=(0.0012876203558051373, -0.05315453753188288, 0.10972323851917268),
+        initial_time=1743621678.3304563,
         initial_vel=(0.0, 0.0, 0.0),
     ),
     SensorConfig(

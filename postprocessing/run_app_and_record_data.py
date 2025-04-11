@@ -1,0 +1,87 @@
+#!/usr/bin/env python3
+
+from os import environ, path, remove
+from site import getsitepackages
+from subprocess import PIPE, Popen
+from sys import argv, version_info
+from time import sleep
+
+from plot_results import plot_results
+
+OUTPUT_LOG_FILENAME = 'pntos_output.log'
+
+
+def run_pntos():
+    """Spin up pntOS and any supporting processes, wait, then spin them down."""
+    # Remove any pre-existing output
+    if path.exists(OUTPUT_LOG_FILENAME):
+        remove(OUTPUT_LOG_FILENAME)
+
+    # Start the relay
+    venv = environ['VIRTUAL_ENV']
+    minor = version_info.minor
+    relay_process = Popen(
+        [
+            'java',
+            '-classpath',
+            f'{venv}/lib/python3.{minor}/site-packages/share/java/lcm.jar',
+            'lcm.lcm.TCPService',
+        ],
+        stdout=PIPE,
+        stderr=PIPE,
+    )
+
+    # Block until we get the first output, meaning it has finished spinning up.
+    relay_process.stdout.readline()
+
+    # Start the logger
+    logger_process = Popen(
+        ['lcm-logger', '--lcm-url=tcpq://', OUTPUT_LOG_FILENAME],
+        stdout=PIPE,
+        stderr=PIPE,
+    )
+
+    # Start the app
+    cobra_process = Popen('apps/fusion_gps_ins/fusion_gps_ins.py')
+    sleep(1)  # Give the relay some time to start
+
+    # Start the log player
+    logplayer_process = Popen(
+        [
+            'lcm-logplayer',
+            '--lcm-url=tcpq://',
+            '--speed=1000',
+            f'{getsitepackages()[0]}/pntos_python_datasets/cobra_gps_ins_example_data.log',
+        ],
+        stdout=PIPE,
+        stderr=PIPE,
+    )
+
+    # Wait until there is some network traffic reported.
+    while True:
+        line = relay_process.stdout.readline().decode()
+        if not line or not '0.0 kB/s' in line:
+            break
+
+    # Wait until no more network traffic is reported.
+    while True:
+        line = relay_process.stdout.readline().decode()
+        if not line or '0.0 kB/s' in line:
+            break
+
+    # Shut it all down
+    logplayer_process.terminate()
+    Popen(['pkill', 'lcm-logplayer'])  # lcm-logplayer command spawns a child process
+    cobra_process.terminate()
+    logger_process.terminate()
+    relay_process.terminate()
+
+    # I don't like it when output comes through after the program finishes.
+    sleep(0.5)
+    print('pntOS Finished')
+
+
+if __name__ == '__main__':
+    if len(argv) < 2:
+        run_pntos()
+    plot_results(OUTPUT_LOG_FILENAME)

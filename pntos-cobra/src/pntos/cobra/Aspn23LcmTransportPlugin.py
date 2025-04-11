@@ -21,6 +21,7 @@ class Aspn23LcmTransportPlugin(TransportPlugin):
     last_message_time: TypeTimestamp | None
     handler: Thread | None
     _shutdown_threads: threading.Event
+    _channels: list[str]
 
     def __init__(self, identifier: str):
         self.identifier = identifier
@@ -28,6 +29,7 @@ class Aspn23LcmTransportPlugin(TransportPlugin):
         self._shutdown_threads = threading.Event()
         self.last_message_time = None
         self.handler = None
+        self._channels = []
 
     def init_plugin(
         self,
@@ -79,6 +81,12 @@ class Aspn23LcmTransportPlugin(TransportPlugin):
                 f'Cannot marshal message on channel {channel} of type {type(aspn_msg)}. Ignoring message.',
             )
             return
+        if channel not in self._channels:
+            self.mediator.log_message(
+                LoggingLevel.INFO,
+                f'Found new channel {channel}\t with a timestamp of {aspn_msg.time_of_validity.elapsed_nsec / 1e9}s',
+            )
+            self._channels.append(channel)
         self.last_message_time = aspn_msg.time_of_validity
         message = Message(aspn_msg, channel)
         self.mediator.process_pntos_message(message)
@@ -107,7 +115,7 @@ class Aspn23LcmTransportPlugin(TransportPlugin):
                 solution = self.mediator.request_solutions([self.last_message_time])
                 if len(solution) > 0:
                     self.mediator.log_message(
-                        LoggingLevel.INFO, f'Got a solution! {solution}'
+                        LoggingLevel.DEBUG, f'Got a solution! {solution}'
                     )
                     self.mediator.broadcast_aspn_message(
                         solution[0],
