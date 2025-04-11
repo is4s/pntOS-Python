@@ -6,7 +6,6 @@ import numpy as np
 plt.rcParams['figure.figsize'] = (10, 6)
 
 import os
-import pickle
 import sys
 
 import numpy as np
@@ -394,7 +393,6 @@ def plot_solution(solution, truth, plot_dir, show_plots):
     xlabel('Easting (s)')
     legend(leg)
     filename = os.path.join(plot_dir, 'ne_trajectory')
-    pickle.dump(fig, open(f'{filename}.pickle', 'wb'))
     savefig(f'{filename}.png', dpi=300)
 
     # LLA Postion vs. Time
@@ -422,7 +420,6 @@ def plot_solution(solution, truth, plot_dir, show_plots):
     xlabel(f'Relative time (sec), t0 = {t0}')
     legend(leg_w_sigma)
     filename = os.path.join(plot_dir, 'lla_position')
-    pickle.dump(fig, open(f'{filename}.pickle', 'wb'))
     savefig(f'{filename}.png', dpi=300)
 
     # NED Position vs. Time
@@ -443,7 +440,6 @@ def plot_solution(solution, truth, plot_dir, show_plots):
     xlabel(f'Relative time (sec), t0 = {t0}')
     legend(leg)
     filename = os.path.join(plot_dir, 'ned_position')
-    pickle.dump(fig, open(f'{filename}.pickle', 'wb'))
     savefig(f'{filename}.png', dpi=300)
 
     pos_sig = transpose(
@@ -488,7 +484,6 @@ def plot_solution(solution, truth, plot_dir, show_plots):
     ylabel('Down Error (m)')
     xlabel(f'Relative time (sec), t0 = {t0}')
     filename = os.path.join(plot_dir, 'ned_position_error')
-    pickle.dump(fig, open(f'{filename}.pickle', 'wb'))
     savefig(f'{filename}.png', dpi=300)
 
     # NED Velocity vs. Time
@@ -515,7 +510,6 @@ def plot_solution(solution, truth, plot_dir, show_plots):
     xlabel(f'Relative time (sec), t0 = {t0}')
     legend(leg_w_sigma)
     filename = os.path.join(plot_dir, 'ned_velocity')
-    pickle.dump(fig, open(f'{filename}.pickle', 'wb'))
     savefig(f'{filename}.png', dpi=300)
 
     vel_sig = transpose(
@@ -560,7 +554,6 @@ def plot_solution(solution, truth, plot_dir, show_plots):
     ylabel('Down Error (m/s)')
     xlabel(f'Relative time (sec), t0 = {t0}')
     filename = os.path.join(plot_dir, 'ned_velocity_error')
-    pickle.dump(fig, open(f'{filename}.pickle', 'wb'))
     savefig(f'{filename}.png', dpi=300)
 
     if rpy is not None and trpy is not None:
@@ -591,7 +584,6 @@ def plot_solution(solution, truth, plot_dir, show_plots):
         xlabel(f'Relative time (sec), t0 = {t0}')
         legend(leg_w_sigma)
         filename = os.path.join(plot_dir, 'rpy')
-        pickle.dump(fig, open(f'{filename}.pickle', 'wb'))
         savefig(f'{filename}.png', dpi=300)
 
         rpy_sig_deg = transpose(
@@ -636,27 +628,7 @@ def plot_solution(solution, truth, plot_dir, show_plots):
         ylabel('Down tilt (deg)')
         xlabel(f'Relative time (sec), t0 = {t0}')
         filename = os.path.join(plot_dir, 'ned_tilt_error')
-        pickle.dump(fig, open(f'{filename}.pickle', 'wb'))
         savefig(f'{filename}.png', dpi=300)
 
     if show_plots:
         show()
-
-
-def main(plot_dir):
-    # show all previously-saved plots under plot_dir
-    for subdir, _, files in os.walk(plot_dir):
-        for file in files:
-            if os.path.splitext(file)[1] == '.pickle':
-                pickle.load(open(os.path.join(subdir, file), 'rb'))
-
-    show()
-
-
-if __name__ == '__main__':
-    if len(sys.argv) != 2:
-        print('Usage: python plots.py [plot_dir]')
-        exit(1)
-
-    lcmlog = sys.argv[1]
-    main(lcmlog)
