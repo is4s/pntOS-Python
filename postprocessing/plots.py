@@ -330,15 +330,20 @@ def trim_extra_points(solution, truth):
     # when interpolating solution onto truth
     sol_start = solution[1].data[0].time_of_validity.elapsed_nsec
     truth_start = truth[1].data[0].time_of_validity.elapsed_nsec
-    while (sol_start - truth_start) > 1:
-        truth[1].data = truth[1].data[1:]
-        truth_start = truth[1].data[0].time_of_validity.elapsed_nsec
-
     sol_end = solution[1].data[-1].time_of_validity.elapsed_nsec
     truth_end = truth[1].data[-1].time_of_validity.elapsed_nsec
-    while (truth_end - sol_end) > 1:
-        truth[1].data = truth[1].data[:-1]
-        truth_end = truth[1].data[-1].time_of_validity.elapsed_nsec
+
+    start_idx = 0
+    while (sol_start - truth_start) > 1_000_000_000:
+        start_idx += 1
+        truth_start = truth[1].data[start_idx].time_of_validity.elapsed_nsec
+
+    end_idx = -1
+    while (truth_end - sol_end) > 1_000_000_000:
+        end_idx -= 1
+        truth_end = truth[1].data[end_idx].time_of_validity.elapsed_nsec
+
+    truth[1].data = truth[1].data[start_idx:end_idx]
 
 
 def plot_solution(solution, truth, plot_dir, show_plots):
