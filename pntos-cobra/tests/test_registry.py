@@ -507,17 +507,10 @@ class TestRegistry(unittest.TestCase):
         for k in test_keys:
             test_kv.set_value(k, 0)
 
-        callbacked_group: str = ''
-        callbacked_keys: list[str] = []
-        callbacked_kv: KeyValueStore = SimpleKeyValueStore('', dummy_log)
-
         def test_callback(group: str, keys: list[str], kv: KeyValueStore) -> None:
-            nonlocal callbacked_group
-            nonlocal callbacked_keys
-            nonlocal callbacked_kv
-            callbacked_group = group
-            callbacked_keys = keys
-            callbacked_kv = kv
+            assert group == self.test_group, 'Callback group failed.'
+            assert set(keys) == set(test_keys), 'Callback keys failed.'
+            assert kv == test_kv, 'Callback kv failed.'
 
         test_kv.batch_end()
 
@@ -529,10 +522,6 @@ class TestRegistry(unittest.TestCase):
         for k in test_keys:
             test_kv.set_value(k, 1)
         test_kv.batch_end()
-
-        assert callbacked_group == self.test_group, 'Callback group failed.'
-        assert set(callbacked_keys) == set(test_keys), 'Callback keys failed.'
-        assert callbacked_kv == test_kv, 'Callback kv failed.'
 
     def test_request_notify_no_modified_keys(self) -> None:
         def callback_that_should_not_be_called(
