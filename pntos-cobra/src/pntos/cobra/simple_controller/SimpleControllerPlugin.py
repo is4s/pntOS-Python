@@ -68,6 +68,7 @@ class SimpleControllerPlugin(ControllerPlugin):
         self._logging_plugin: LoggingPlugin | None = None
         self._transport_plugins: list[TransportPlugin] = []
         self._ui_plugin: UiPlugin | None = None
+        self._registry_plugin: RegistryPlugin | None = None
 
     def init_plugin(
         self,
@@ -82,8 +83,17 @@ class SimpleControllerPlugin(ControllerPlugin):
 
     def shutdown_plugin(self) -> None:
         self._log(LoggingLevel.INFO, 'Shutting down all plugins...')
+
         for plugin in self._plugins:
-            plugin.shutdown_plugin()
+            # Don't shut down registry and logging plugins before the others
+            if not isinstance(plugin, (RegistryPlugin, LoggingPlugin)):
+                plugin.shutdown_plugin()
+
+        # Now close the registry and logging plugin last
+        if self._registry_plugin is not None:
+            self._registry_plugin.shutdown_plugin()
+        if self._logging_plugin is not None:
+            self._logging_plugin.shutdown_plugin()
 
     identifier: str
 
@@ -97,7 +107,7 @@ class SimpleControllerPlugin(ControllerPlugin):
 
         # Make sure there are enough plugins to run
         (
-            registry_plugin,
+            self._registry_plugin,
             self._logging_plugin,
             self._transport_plugins,
             orchestration_plugin,
@@ -132,8 +142,8 @@ class SimpleControllerPlugin(ControllerPlugin):
                 plugin_resources_locations = None
 
         # Initialize registry plugin first thing
-        reg_i = self._plugins.index(registry_plugin)
-        registry_plugin.init_plugin(
+        reg_i = self._plugins.index(self._registry_plugin)
+        self._registry_plugin.init_plugin(
             None
             if plugin_resources_locations is None
             else plugin_resources_locations[reg_i],
@@ -141,7 +151,7 @@ class SimpleControllerPlugin(ControllerPlugin):
         )
 
         # Give mediators a registry
-        SimpleMediator.registry = registry_plugin.new_registry(initial_config)
+        SimpleMediator.registry = self._registry_plugin.new_registry(initial_config)
 
         # Initialize logger second
         assert self._logging_plugin is not None

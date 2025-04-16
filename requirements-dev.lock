@@ -46,6 +46,8 @@ executing==2.0.1
     # via stack-data
 fonttools==4.56.0
     # via matplotlib
+h5py==3.13.0
+    # via pntos-cobra
 idna==3.7
     # via requests
 imagesize==1.4.1
@@ -85,6 +87,7 @@ navtk @ git+ssh://git@git.aspn.us/pntos/navtk.git@cf84edb5e7c83b8ccf7fea012a8b42
 numpy==1.26.4
     # via aspn23
     # via contourpy
+    # via h5py
     # via matplotlib
     # via navtk
     # via pntos-cobra
@@ -97,7 +100,7 @@ parso==0.8.4
     # via jedi
 pexpect==4.9.0
     # via ipython
-pillow==11.2.0
+pillow==11.2.1
     # via matplotlib
 pip==24.0
 pluggy==1.5.0

@@ -18,6 +18,7 @@ from pntos.api import (
     StateModelingPlugin,
     TransportPlugin,
     UiPlugin,
+    UtilityPlugin,
 )
 
 
@@ -99,8 +100,10 @@ def find_base_plugin_type(plugin: CommonPlugin) -> PluginType:
         return StateModelingPlugin
     elif isinstance(plugin, TransportPlugin):
         return TransportPlugin
-    else:
+    elif isinstance(plugin, UiPlugin):
         return UiPlugin
+    else:
+        return UtilityPlugin
 
 
 def camel_to_snake(name: str) -> str:

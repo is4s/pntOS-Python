@@ -52,7 +52,10 @@ from .plugins.initialization import (
     InitializationStatus as InitializationStatus,
     InitializationType as InitializationType,
 )
-from .plugins.logging import LoggingPlugin as LoggingPlugin, PluginType as PluginType
+from .plugins.logging import (
+    LoggingPlugin as LoggingPlugin,
+    PluginType as PluginType,
+)
 from .plugins.orchestration import (
     MessageStreamConfig as MessageStreamConfig,
     OrchestrationPlugin as OrchestrationPlugin,
@@ -72,3 +75,4 @@ from .plugins.state_modeling import (
 )
 from .plugins.transport import TransportPlugin as TransportPlugin
 from .plugins.ui import UiPlugin as UiPlugin
+from .plugins.utility import UtilityPlugin as UtilityPlugin
