@@ -10,7 +10,7 @@ wheels/
 **/registry_permanency_files/
 .coverage
 .vscode
-
+*.hdf5
 # LCM Logger artifacts
 *.log
 

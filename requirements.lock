@@ -20,6 +20,8 @@ aspn23 @ git+ssh://git@git.aspn.us/pntos/firehose-outputs.git@f5f5b2b4637517bb10
     # via pntos-cobra
 aspn23-lcm @ git+ssh://git@git.aspn.us/pntos/firehose-outputs.git@f5f5b2b4637517bb10299fb6be7248a2215fbb74#subdirectory=lcm/python
     # via pntos-cobra
+h5py==3.13.0
+    # via pntos-cobra
 lcm==1.5.1
     # via aspn-lcm
     # via aspn23-lcm
@@ -28,6 +30,7 @@ navtk @ git+ssh://git@git.aspn.us/pntos/navtk.git@cf84edb5e7c83b8ccf7fea012a8b42
     # via pntos-cobra
 numpy==1.26.4
     # via aspn23
+    # via h5py
     # via navtk
     # via pntos-cobra
     # via scipy

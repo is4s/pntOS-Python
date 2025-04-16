@@ -4,6 +4,9 @@ from .Aspn23LcmTransportPlugin import (
 from .simple_controller.SimpleControllerPlugin import (
     SimpleControllerPlugin as SimpleControllerPlugin,
 )
+from .SimpleDiagnosticLogPlugin import (
+    SimpleDiagnosticLogPlugin as SimpleDiagnosticLogPlugin,
+)
 from .SimpleEkfFusionStrategyPlugin import (
     SimpleEkfFusionStrategyPlugin as SimpleEkfFusionStrategyPlugin,
 )

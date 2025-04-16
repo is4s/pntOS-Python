@@ -5,6 +5,7 @@ from pntos.api import LoggingLevel
 from pntos.cobra import (
     Aspn23LcmTransportPlugin,
     SimpleControllerPlugin,
+    SimpleDiagnosticLogPlugin,
     SimpleEkfFusionStrategyPlugin,
     SimpleFusionPlugin,
     SimpleGpsInsStateModelingPlugin,
@@ -74,6 +75,7 @@ plugins = [
     ),
     SimpleOrchestrationPlugin('Cobra Simple Orchestration Plugin'),
     SimpleRegistryPlugin('Cobra Simple Registry Plugin', config=my_config),
+    SimpleDiagnosticLogPlugin('Cobra Simple Diagnostic Plugin'),
 ]
 
 # Start the controller, and pass it all of the other plugins to use

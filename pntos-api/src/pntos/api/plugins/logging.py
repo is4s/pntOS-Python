@@ -15,6 +15,7 @@ from .registry import RegistryPlugin
 from .state_modeling import StateModelingPlugin
 from .transport import TransportPlugin
 from .ui import UiPlugin
+from .utility import UtilityPlugin
 
 PluginType = (
     type[ControllerPlugin]
@@ -30,6 +31,7 @@ PluginType = (
     | type[StateModelingPlugin]
     | type[TransportPlugin]
     | type[UiPlugin]
+    | type[UtilityPlugin]
 )
 
 
