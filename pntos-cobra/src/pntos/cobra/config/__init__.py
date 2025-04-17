@@ -3,10 +3,12 @@ from .DownsamplerConfig import DownsamplerConfig as DownsamplerConfig
 from .ImuConfig import ImuConfig as ImuConfig
 from .InertialConfig import InertialConfig as InertialConfig
 from .ManualAlignmentConfig import ManualAlignmentConfig as ManualAlignmentConfig
+from .ManualHeadingAlignmentConfig import (
+    ManualHeadingAlignmentConfig as ManualHeadingAlignmentConfig,
+)
 from .SensorConfig import SensorConfig as SensorConfig
 from .StaticAlignmentConfig import (
     AlignmentStrategy as AlignmentStrategy,
-    ManualHeadingAlignmentConfig as ManualHeadingAlignmentConfig,
     StaticAlignmentConfig as StaticAlignmentConfig,
 )
 from .utils import (

@@ -37,10 +37,3 @@ class StaticAlignmentConfig(BaseConfig):
     imu_model: ImuConfig
 
     group: str
-
-
-@dataclass
-class ManualHeadingAlignmentConfig(BaseConfig):
-    heading: float
-    heading_sigma: float
-    group: str

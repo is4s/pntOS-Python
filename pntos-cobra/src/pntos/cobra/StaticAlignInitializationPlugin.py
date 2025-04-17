@@ -13,9 +13,11 @@ from pntos.api import (
     Message,
 )
 from pntos.cobra.config import config_from_registry, imu_model_from_config
+from pntos.cobra.config.ManualHeadingAlignmentConfig import (
+    ManualHeadingAlignmentConfig,
+)
 from pntos.cobra.config.StaticAlignmentConfig import (
     AlignmentStrategy,
-    ManualHeadingAlignmentConfig,
     StaticAlignmentConfig,
 )
 from pntos.cobra.utils import convert_message, convert_pva_from_cpp

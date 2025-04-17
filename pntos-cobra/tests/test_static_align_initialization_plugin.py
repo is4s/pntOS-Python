@@ -25,9 +25,11 @@ from pntos.api import (
 )
 from pntos.cobra import StaticAlignInitializationPlugin
 from pntos.cobra.config import config_to_registry, imu_model_to_config
+from pntos.cobra.config.ManualHeadingAlignmentConfig import (
+    ManualHeadingAlignmentConfig,
+)
 from pntos.cobra.config.StaticAlignmentConfig import (
     AlignmentStrategy,
-    ManualHeadingAlignmentConfig,
     StaticAlignmentConfig,
 )
 from pntos.cobra.internal import SimpleMediator, SimpleRegistry
