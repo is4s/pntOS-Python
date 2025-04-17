@@ -82,7 +82,7 @@ def test() -> None:
         group='test',
     )
 
-    config_to_registry(config, registry)
+    config_to_registry(config, mediator)
 
     assert plugin.identifier == 'Cobra simple initialization plugin'
 

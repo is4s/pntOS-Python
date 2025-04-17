@@ -1,4 +1,5 @@
 from dataclasses import fields
+from enum import Enum
 from typing import Any, TypeVar, get_origin
 
 import numpy as np
@@ -13,12 +14,21 @@ ConfigType = TypeVar('ConfigType', bound=BaseConfig)
 def config_from_registry(
     config_type: type[ConfigType], mediator: Mediator, config_group: str
 ) -> ConfigType | None:
-    conf_params = [f for f in fields(config_type)]
+    conf_params = [f for f in fields(config_type) if f.name != 'group']
     kv = mediator.registry.batch_start(config_group)
-    out: dict[str, RegistryValueTypeUnion | tuple[float, ...]] = {}
+    out: dict[str, RegistryValueTypeUnion | tuple[float, ...] | Enum | BaseConfig] = {}
     fail = False
     for param in conf_params:
-        val: RegistryValueTypeUnion | tuple[float, ...] | None = kv[param.name]
+        val: RegistryValueTypeUnion | tuple | Enum | BaseConfig | None = kv[param.name]
+        # Special case: nested config. Identifiable by the first field, which is called `group` and
+        # is a str.
+        if val is None:
+            try:
+                first_field = fields(param.type)[0]
+                if first_field.name == 'group' and first_field.type is str:
+                    val = config_from_registry(param.type, mediator, config_group)
+            except TypeError:
+                pass
         if val is None:
             mediator.log_message(
                 LoggingLevel.WARN,
@@ -42,6 +52,9 @@ def config_from_registry(
                     if np.dtype[np.int_] in param.type.__args__:
                         # Convert to np array of ints
                         val = val.astype(int)
+        # Special case: enum. Convert integer back to enum type.
+        elif issubclass(param.type, Enum):
+            val = param.type(val)
 
         if not _confirm_types(val, param.type):
             mediator.log_message(
@@ -56,12 +69,12 @@ def config_from_registry(
     kv.batch_end()
     if fail:
         return None
-    return config_type(**out)  # type: ignore[arg-type]
+    return config_type(**out, group=config_group)  # type: ignore[arg-type]
 
 
-def config_to_registry(config: BaseConfig, registry: Registry) -> None:
-    conf_params = [f for f in fields(config)]
-    kv = registry.batch_start(config.group)
+def config_to_registry(config: BaseConfig, mediator: Mediator) -> None:
+    conf_params = [f for f in fields(config) if f.name != 'group']
+    kv = mediator.registry.batch_start(config.group)
 
     for param in conf_params:
         val_to_store = getattr(config, param.name)
@@ -71,6 +84,16 @@ def config_to_registry(config: BaseConfig, registry: Registry) -> None:
             if len(val_to_store) > 0:
                 if isinstance(val_to_store[0], (int, float, np.int_)):
                     val_to_store = np.array(val_to_store, dtype=float)
+        elif isinstance(val_to_store, Enum):
+            val_to_store = val_to_store.value
+        elif isinstance(val_to_store, BaseConfig):
+            if val_to_store.group != config.group:
+                mediator.log_message(
+                    LoggingLevel.WARN,
+                    'Nested config uses a different group. It will not be able to be retrieved via config_from_registry',
+                )
+            config_to_registry(val_to_store, mediator)
+            continue
         kv[param.name] = val_to_store
     kv.batch_end()
 

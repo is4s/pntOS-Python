@@ -76,7 +76,7 @@ class TestConfigUtils(unittest.TestCase):
         )
 
         # Test config_to_registry
-        config_to_registry(test_conf, self.mediator.registry)
+        config_to_registry(test_conf, self.mediator)
         self._validate_conf_to_registry(test_conf)
 
         # Test config_from_registry()
@@ -99,7 +99,7 @@ class TestConfigUtils(unittest.TestCase):
         )
 
         # Test config_to_registry
-        config_to_registry(test_conf, self.mediator.registry)
+        config_to_registry(test_conf, self.mediator)
         self._validate_conf_to_registry(test_conf)
 
         # Test config_from_registry()
@@ -120,7 +120,7 @@ class TestConfigUtils(unittest.TestCase):
         )
 
         # Test config_to_registry
-        config_to_registry(test_conf, self.mediator.registry)
+        config_to_registry(test_conf, self.mediator)
         self._validate_conf_to_registry(test_conf)
 
         # Test config_from_registry()
@@ -136,7 +136,7 @@ class TestConfigUtils(unittest.TestCase):
             CONFIG_TEST_GROUP, ['chan1', 'chan2', 'chan3'], [1, 2, 3]
         )
         # Test config_to_registry
-        config_to_registry(test_conf, self.mediator.registry)
+        config_to_registry(test_conf, self.mediator)
         self._validate_conf_to_registry(test_conf)
 
         result_conf = config_from_registry(
@@ -157,7 +157,7 @@ class TestConfigUtils(unittest.TestCase):
         )
 
         # Test config_to_registry
-        config_to_registry(test_conf, self.mediator.registry)
+        config_to_registry(test_conf, self.mediator)
         self._validate_conf_to_registry(test_conf)
 
         # Whoops, modified a value in the registry
@@ -173,7 +173,7 @@ class TestConfigUtils(unittest.TestCase):
 
     def _validate_conf_to_registry(self, test_conf: BaseConfig) -> None:
         kv = self.mediator.registry.batch_start(CONFIG_TEST_GROUP)
-        conf_fields = [f for f in fields(test_conf)]
+        conf_fields = [f for f in fields(test_conf) if f.name != 'group']
         for conf_field in conf_fields:
             val = kv[conf_field.name]
             conf_val = getattr(test_conf, conf_field.name)
