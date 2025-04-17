@@ -16,20 +16,19 @@ def config_from_registry(
 ) -> ConfigType | None:
     conf_params = [f for f in fields(config_type) if f.name != 'group']
     kv = mediator.registry.batch_start(config_group)
-    out: dict[str, RegistryValueTypeUnion | tuple[float, ...] | Enum] = {}
+    out: dict[str, RegistryValueTypeUnion | tuple[float, ...] | Enum | BaseConfig] = {}
     fail = False
     for param in conf_params:
-        val = None
+        val: RegistryValueTypeUnion | tuple | Enum | BaseConfig | None = kv[param.name]
         # Special case: nested config. Identifiable by the first field, which is called `group` and
         # is a str.
-        try:
-            first_field = fields(param.type)[0]
-            if first_field.name == 'group' and first_field.type is str:
-                val = config_from_registry(param.type, mediator, config_group)
-        except TypeError:
-            pass
         if val is None:
-            val = kv[param.name]
+            try:
+                first_field = fields(param.type)[0]
+                if first_field.name == 'group' and first_field.type is str:
+                    val = config_from_registry(param.type, mediator, config_group)
+            except TypeError:
+                pass
         if val is None:
             mediator.log_message(
                 LoggingLevel.WARN,
