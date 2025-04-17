@@ -27,9 +27,9 @@ from pntos.cobra import (
     SimpleRegistryPlugin,
 )
 from pntos.cobra.config import (
-    AlignmentConfig,
     BaseConfig,
     ImuConfig,
+    ManualAlignmentConfig,
     SensorConfig,
     config_from_registry,
 )
@@ -47,7 +47,7 @@ my_config: list[BaseConfig] = [
         gyro_random_walk_sigma=(0.001, 0.001, 0.001),
         group='config/default/test',
     ),
-    AlignmentConfig(
+    ManualAlignmentConfig(
         initial_pos=(1, 2, 3),
         initial_vel=(4, 5, 6),
         initial_rpy=(7, 8, 9),

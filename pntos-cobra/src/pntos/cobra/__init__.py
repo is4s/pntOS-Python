@@ -31,3 +31,7 @@ from .SimpleTransportPlugin import (
 from .state_modeling_simple_gps_ins.SimpleGpsInsStateModelingPlugin import (
     SimpleGpsInsStateModelingPlugin as SimpleGpsInsStateModelingPlugin,
 )
+from .StaticAlignInitializationPlugin import (
+    StaticAlign as StaticAlign,
+    StaticAlignInitializationPlugin as StaticAlignInitializationPlugin,
+)

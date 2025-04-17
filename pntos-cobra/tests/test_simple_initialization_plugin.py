@@ -14,7 +14,7 @@ from pntos.api import (
     Mediator,
 )
 from pntos.cobra import SimpleInitializationPlugin
-from pntos.cobra.config import AlignmentConfig, config_to_registry
+from pntos.cobra.config import ManualAlignmentConfig, config_to_registry
 from pntos.cobra.internal import SimpleMediator, SimpleRegistry
 
 
@@ -63,7 +63,7 @@ def test() -> None:
     accel_scale_factor_var = (160, 170, 180)
     gyro_scale_factor_var = (190, 200, 210)
 
-    config = AlignmentConfig(
+    config = ManualAlignmentConfig(
         initial_pos=pos,
         initial_vel=vel,
         initial_rpy=rpy,

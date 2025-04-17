@@ -1,14 +1,18 @@
 import aspn23_xtensor
 import numpy as np
 from aspn23 import (
+    AspnBase,
     MeasurementImu,
     MeasurementImuImuType,
+    MeasurementPosition,
+    MeasurementPositionReferenceFrame,
     MeasurementPositionVelocityAttitude,
     MeasurementPositionVelocityAttitudeErrorModel,
     MeasurementPositionVelocityAttitudeReferenceFrame,
     TypeHeader,
     TypeTimestamp,
 )
+from numpy.typing import NDArray
 
 
 def convert_header_to_cpp(
@@ -71,6 +75,7 @@ def convert_pva_to_cpp(
 
 def convert_pva_from_cpp(
     pva: aspn23_xtensor.MeasurementPositionVelocityAttitude,
+    covariance: NDArray | None = None,
 ) -> MeasurementPositionVelocityAttitude:
     header = TypeHeader(
         pva.get_vendor_id(),
@@ -79,6 +84,8 @@ def convert_pva_from_cpp(
         pva.get_sequence_id(),
     )
     time = TypeTimestamp(pva.get_time_of_validity().get_elapsed_nsec())
+    if covariance is None:
+        covariance = pva.get_covariance()
     return MeasurementPositionVelocityAttitude(
         header,
         time,
@@ -90,7 +97,7 @@ def convert_pva_from_cpp(
         pva.get_v2(),
         pva.get_v3(),
         pva.get_quaternion(),
-        pva.get_covariance(),
+        covariance,
         MeasurementPositionVelocityAttitudeErrorModel.NONE,
         np.array([]),
         [],
@@ -145,3 +152,47 @@ def convert_imu_to_cpp(imu: MeasurementImu) -> aspn23_xtensor.MeasurementImu:
     return aspn23_xtensor.MeasurementImu(
         header, time, imu_type, imu.meas_accel, imu.meas_gyro, []
     )
+
+
+def convert_reference_frame_to_cpp(
+    frame: MeasurementPositionReferenceFrame,
+) -> aspn23_xtensor.AspnMeasurementPositionReferenceFrame:
+    match frame:
+        case MeasurementPositionReferenceFrame.ECI:
+            return aspn23_xtensor.AspnMeasurementPositionReferenceFrame.ASPN_MEASUREMENT_POSITION_REFERENCE_FRAME_ECI
+        case MeasurementPositionReferenceFrame.GEODETIC:
+            return aspn23_xtensor.AspnMeasurementPositionReferenceFrame.ASPN_MEASUREMENT_POSITION_REFERENCE_FRAME_GEODETIC
+
+
+def convert_position_to_cpp(
+    position: MeasurementPosition,
+) -> aspn23_xtensor.MeasurementPosition:
+    header = convert_header_to_cpp(
+        position.header, aspn23_xtensor.AspnMessageType.ASPN_MEASUREMENT_POSITION
+    )
+    time = convert_timestamp_to_cpp(position.time_of_validity)
+    frame = convert_reference_frame_to_cpp(position.reference_frame)
+    latitude = position.term1 if position.term1 is not None else float('nan')
+    longitude = position.term2 if position.term2 is not None else float('nan')
+    altitude = position.term3 if position.term3 is not None else float('nan')
+    return aspn23_xtensor.MeasurementPosition(
+        header,
+        time,
+        frame,
+        latitude,
+        longitude,
+        altitude,
+        position.covariance,
+        aspn23_xtensor.AspnMeasurementPositionErrorModel.ASPN_MEASUREMENT_POSITION_ERROR_MODEL_NONE,
+        np.array([]),
+        [],
+    )
+
+
+def convert_message(message: AspnBase) -> aspn23_xtensor.TypeHeader | None:
+    if isinstance(message, MeasurementImu):
+        return convert_imu_to_cpp(message)
+    if isinstance(message, MeasurementPosition):
+        return convert_position_to_cpp(message)
+    # Support more types as-needed.
+    return None
