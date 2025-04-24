@@ -66,7 +66,8 @@ First, install [Rye](https://rye.astral.sh/guide/installation/). Rye is availabl
 system package managers.
 
 ##### MacOS
-```sh
+
+```shell
     brew install rye
 ```
 
@@ -74,7 +75,8 @@ system package managers.
 
 If rye is unavailable through your system package manager, you can install it via the following
 commands:
-```sh
+
+```shell
     sudo apt update
     sudo apt install curl
     curl -sSf https://rye.astral.sh/get | bash
@@ -84,7 +86,7 @@ After running the last command, Rye will ask if you want to continue. Input `y` 
 
 Next, rye will bring up the following prompt:
 
-```
+```shell
     ? What should running `python` or `python3` do when you are not inside a Rye managed project? ›
     Run a Python installed and managed by Rye
     ❯ Run the old default Python (provided by your OS, pyenv, etc.)
