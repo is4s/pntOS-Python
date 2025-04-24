@@ -120,7 +120,8 @@ modules.
 
 ## Running Examples
 
-No examples work yet (WIP!).
+Please see the [Fusion GPS/INS App README.md](apps/fusion_gps_ins/README.md) for instructions on
+running this app.
 
 ## Contributing
 
