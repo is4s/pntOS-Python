@@ -66,7 +66,7 @@ system package managers.
     brew install rye
 ```
 
-##### Other Linux Distributions
+##### Ubuntu
 
 If rye is unavailable through your system package manager, you can install it via the following
 commands:
