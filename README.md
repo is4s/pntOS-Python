@@ -40,20 +40,10 @@ Now we're ready to install pntos. In the project root directory, run:
 
     pip install -r requirements-dev.lock
 
-If successful, you should now have all of pntos-python registered in your venv. You can test to see
-if this is the case by opening a python interpreter and checking that importing the various
-components of pntOS and cobra works:
+**Note:** this command may take a while to run. It is building NavToolkit from source and
+downloading example data, which may take a lot of processing power and bandwidth, respectively.
 
-    $ python3
-    >>> import pntos.api as a
-    >>> import pntos.cobra as c
-    >>> c.SimpleControllerPlugin
-    <class 'pntos.cobra.SimpleControllerPlugin.SimpleControllerPlugin'>
-    >>> a.ControllerPlugin
-    <class 'pntos.api.plugins.controller.ControllerPlugin'>
-
-If that works, you are ready to move on to [running the examples](#running-examples)
-
+If successful, you are ready to move on to [Testing Your Installation](#testing-your-installation)
 
 ### Rye Environment Setup
 
@@ -99,7 +89,11 @@ Once Rye is installed, we will sync the project in the project root directory:
 
 The above command does a lot of work for you: it creates a new venv in the local `.venv` folder,
 installs all of the pntos-python packages into it, and installs a compatible version of the Python
-interpreter/pip for you. If all went well, you should now be able to enter the venv. The steps to do
+interpreter/pip for you. **Note:** this means that the above command may take a while to run. It is
+building NavToolkit from source and downloading example data, which may take a lot of processing
+power and bandwidth, respectively.
+
+If all went well, you should now be able to activate the venv. The steps to do
 this vary depending on your shell:
 
 **bash/zsh**: `source .venv/bin/activate`
@@ -108,19 +102,21 @@ this vary depending on your shell:
 
 **powershell** `.venv\Scripts\activate`
 
-Your shell should now be inside a venv that is ready to use pntos-python. You can confirm that this
-is the case by opening a python interpreter and checking that importing the various components of
-pntOS and Cobra works:
+Your shell should now be inside a venv that is ready to use pntos-python and you are ready to move
+on to [Testing Your Installation](#testing-your-installation).
 
-    $ python3
-    >>> import pntos.api as a
-    >>> import pntos.cobra as c
-    >>> c.SimpleControllerPlugin
-    <class 'pntos.cobra.SimpleControllerPlugin.SimpleControllerPlugin'>
-    >>> a.ControllerPlugin
+## Testing Your Installation
+
+If everything installed correctly, you now should be able to import classes from the API and Cobra
+modules.
+
+    $ python
+    >>> from pntos.api import ControllerPlugin
+    >>> from pntos.cobra import SimpleControllerPlugin
+    >>> SimpleControllerPlugin
+    <class 'pntos.cobra.simple_controller.SimpleControllerPlugin.SimpleControllerPlugin'>
+    >>> ControllerPlugin
     <class 'pntos.api.plugins.controller.ControllerPlugin'>
-
-If that works, you are ready to move on to [running the examples](#running-examples)
 
 ## Running Examples
 
