@@ -594,13 +594,13 @@ class SimpleOrchestrationPlugin(OrchestrationPlugin):
         self,
         solution_times: list[TypeTimestamp],
         filter_description: str | None = None,
-    ) -> list[Message]:
+    ) -> list[Message] | None:
         if not self._initialization_ready() or self.init_solution is None:
             self._log(
                 LoggingLevel.DEBUG,
                 'Unable to provide a solution - initialization not ready.',
             )
-            return []
+            return None
 
         if len(solution_times) != 1:
             self._log(
@@ -608,7 +608,7 @@ class SimpleOrchestrationPlugin(OrchestrationPlugin):
                 'This implementation of request_solutions requires a time array'
                 + f' of length one but received a time array of length {len(solution_times)}',
             )
-            return []
+            return None
 
         time = solution_times[0]
 
@@ -637,10 +637,10 @@ class SimpleOrchestrationPlugin(OrchestrationPlugin):
                 f'Solution {filter_description} was requested, but available solution '
                 + f'types are: {descriptions}',
             )
-            return []
+            return None
 
         if solution_out is None:
-            return []
+            return None
         return [solution_out]
 
     def _send_inertial_aux_to_pinson(self) -> None:

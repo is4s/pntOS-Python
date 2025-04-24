@@ -16,7 +16,7 @@ class Preprocessor(ABC):
     """
 
     @abstractmethod
-    def process_pntos_message(self, message: Message) -> list[Message]:
+    def process_pntos_message(self, message: Message) -> list[Message] | None:
         """
         Process a message.
 
@@ -24,7 +24,7 @@ class Preprocessor(ABC):
             message (Message): A message to be processed.
 
         Returns:
-            list[Message]: A list of :class:`Message` s. Usually this will be a single message, a
+            list[Message] | None: A list of :class:`Message` s. Usually this will be a single message, a
             modified version of ``message``. It could be ``None`` if ``message`` is rejected or
             dropped. The preprocessor could also accumulate several messages, returning ``None`` for
             each one then returning an array with multiple processed messages.

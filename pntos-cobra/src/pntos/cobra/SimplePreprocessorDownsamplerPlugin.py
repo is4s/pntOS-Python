@@ -70,7 +70,7 @@ class SimplePreprocessorDownsampler(Preprocessor):
                 # Setting to -1 so the first message is always processed
                 self._update_counters[channel] = -1
 
-    def process_pntos_message(self, message: Message) -> list[Message]:
+    def process_pntos_message(self, message: Message) -> list[Message] | None:
         identifier = message.source_identifier
         if identifier not in self._downsampling_factors:
             return [message]
@@ -82,7 +82,7 @@ class SimplePreprocessorDownsampler(Preprocessor):
         self._update_counters[identifier] = (count + 1) % factor
 
         if not self._update_counters[identifier] == 0:
-            return []
+            return None
 
         return [message]
 

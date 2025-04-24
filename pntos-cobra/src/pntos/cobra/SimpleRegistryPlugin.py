@@ -515,8 +515,11 @@ class SimpleRegistry(Registry):
         self.groups[group]._batch_live = True
         return self.groups[group]
 
-    def get_group_array(self) -> list[str]:
-        return list(self.groups.keys())
+    def get_group_array(self) -> list[str] | None:
+        if len(self.groups) == 0:
+            return None
+        else:
+            return list(self.groups.keys())
 
     def has_group(self, group: str) -> bool:
         return group in self.groups

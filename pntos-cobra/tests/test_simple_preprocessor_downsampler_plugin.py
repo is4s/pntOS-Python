@@ -107,6 +107,7 @@ def test_invalid_config_group(
     assert isinstance(t1_alt_meas, MeasurementAltitude)
 
     msg_list = ds.process_pntos_message(t1)
+    assert msg_list is not None
     assert len(msg_list) > 0
     # Both messages should come through because of invalid config
     assert isinstance(msg_list[0].wrapped_message, MeasurementAltitude)
@@ -126,10 +127,12 @@ def test_bad_channel(
 
     # All messages should come through
     msg_list = ds.process_pntos_message(bad)
+    assert msg_list is not None
     assert len(msg_list) > 0
     assert isinstance(msg_list[0].wrapped_message, MeasurementAltitude)
     assert_aspn_alt_equal(bad_alt_meas, msg_list[0].wrapped_message)
     msg_list = ds.process_pntos_message(bad)
+    assert msg_list is not None
     assert isinstance(msg_list[0].wrapped_message, MeasurementAltitude)
     assert_aspn_alt_equal(bad_alt_meas, msg_list[0].wrapped_message)
 
@@ -142,17 +145,19 @@ def test_channel_one(
     assert isinstance(t1_alt_meas, MeasurementAltitude)
 
     msg_list = downsampler.process_pntos_message(t1)
+    assert msg_list is not None
     assert len(msg_list) > 0
     assert isinstance(msg_list[0].wrapped_message, MeasurementAltitude)
     assert_aspn_alt_equal(t1_alt_meas, msg_list[0].wrapped_message)
     msg_list = downsampler.process_pntos_message(t1)
-    assert len(msg_list) == 0
+    assert msg_list is None
     msg_list = downsampler.process_pntos_message(t1)
+    assert msg_list is not None
     assert len(msg_list) > 0
     assert isinstance(msg_list[0].wrapped_message, MeasurementAltitude)
     assert_aspn_alt_equal(t1_alt_meas, msg_list[0].wrapped_message)
     msg_list = downsampler.process_pntos_message(t1)
-    assert len(msg_list) == 0
+    assert msg_list is None
 
 
 def test_channel_two(
@@ -164,14 +169,16 @@ def test_channel_two(
 
     # 1 every 3 messages should come through
     msg_list = downsampler.process_pntos_message(t2)
+    assert msg_list is not None
     assert len(msg_list) > 0
     assert isinstance(msg_list[0].wrapped_message, MeasurementAltitude)
     assert_aspn_alt_equal(t2_alt_meas, msg_list[0].wrapped_message)
     msg_list = downsampler.process_pntos_message(t2)
-    assert len(msg_list) == 0
+    assert msg_list is None
     msg_list = downsampler.process_pntos_message(t2)
-    assert len(msg_list) == 0
+    assert msg_list is None
     msg_list = downsampler.process_pntos_message(t2)
+    assert msg_list is not None
     assert len(msg_list) > 0
     assert isinstance(msg_list[0].wrapped_message, MeasurementAltitude)
     assert_aspn_alt_equal(t2_alt_meas, msg_list[0].wrapped_message)
@@ -186,14 +193,18 @@ def test_channel_three(
 
     # All messages should come through
     msg_list = downsampler.process_pntos_message(t3)
+    assert msg_list is not None
+    assert len(msg_list) > 0
+    assert isinstance(msg_list[0].wrapped_message, MeasurementAltitude)
+    assert msg_list is not None
+    assert_aspn_alt_equal(t3_alt_meas, msg_list[0].wrapped_message)
+    msg_list = downsampler.process_pntos_message(t3)
+    assert msg_list is not None
     assert len(msg_list) > 0
     assert isinstance(msg_list[0].wrapped_message, MeasurementAltitude)
     assert_aspn_alt_equal(t3_alt_meas, msg_list[0].wrapped_message)
     msg_list = downsampler.process_pntos_message(t3)
-    assert len(msg_list) > 0
-    assert isinstance(msg_list[0].wrapped_message, MeasurementAltitude)
-    assert_aspn_alt_equal(t3_alt_meas, msg_list[0].wrapped_message)
-    msg_list = downsampler.process_pntos_message(t3)
+    assert msg_list is not None
     assert len(msg_list) > 0
     assert isinstance(msg_list[0].wrapped_message, MeasurementAltitude)
     assert_aspn_alt_equal(t3_alt_meas, msg_list[0].wrapped_message)

@@ -718,12 +718,12 @@ class Registry(ABC):
         pass
 
     @abstractmethod
-    def get_group_array(self) -> list[str]:
+    def get_group_array(self) -> list[str] | None:
         """
         Get the array of groups which currently exist.
 
         Returns:
-            list[str]: The array of groups which currently exists. Returns ``None`` if no groups
+            list[str] | None: The array of groups which currently exists. Returns ``None`` if no groups
             exist.
         """
         pass
@@ -825,7 +825,7 @@ class Mediator(ABC):
         self,
         solution_times: list[TypeTimestamp],
         filter_description: str | None = None,
-    ) -> list[Message]:
+    ) -> list[Message] | None:
         """
         Request filtering solutions at the times specified in the array ``solution_times``.
 
@@ -840,7 +840,7 @@ class Mediator(ABC):
                 the implementation should endeavor to return its best solution.
 
         Returns:
-            list[Message]: An array of messages containing the filter solutions for the requested
+            list[Message] | None: An array of messages containing the filter solutions for the requested
             ``solution_times``. The number of solutions should equal ``num_solution_times``,
             although some entries may be ``None`` if they are unavailable at the corresponding time
             in ``solution_times``. The returned :class:`Message` array may be ``None`` if
