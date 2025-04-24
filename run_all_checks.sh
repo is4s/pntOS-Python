@@ -14,6 +14,7 @@ ruff format
 pytest --cov --cov-fail-under=75 --cov-report={term,html} --cov-config=.coveragerc
 mypy pntos-api
 mypy pntos-cobra
+mypy apps
 
 set +x
 

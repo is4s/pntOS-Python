@@ -93,6 +93,7 @@ mypy:
         - docker exec pntos-python rye sync
         - docker exec pntos-python mypy pntos-api --no-implicit-reexport
         - docker exec pntos-python mypy pntos-cobra --no-implicit-reexport
+        - docker exec pntos-python mypy apps --no-implicit-reexport
 
 documentation check:
     variables:
