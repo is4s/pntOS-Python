@@ -15,7 +15,12 @@ from pntos.cobra import (
     SimpleOrchestrationPlugin,
     SimpleRegistryPlugin,
 )
-from pntos.cobra.config import AlignmentConfig, ImuConfig, InertialConfig, SensorConfig
+from pntos.cobra.config import (
+    ImuConfig,
+    InertialConfig,
+    ManualAlignmentConfig,
+    SensorConfig,
+)
 
 # Set up configuration parameters
 my_config = [
@@ -28,7 +33,7 @@ my_config = [
         gyro_bias_tau=(1800.0, 1800.0, 1800.0),
         gyro_random_walk_sigma=(1.7277877e-7, 1.7277877e-7, 1.7277877e-7),
     ),
-    AlignmentConfig(
+    ManualAlignmentConfig(
         group='config/default/alignment',
         initial_pos_var=(9.0, 9.0, 25.0),
         initial_vel_var=(1e-3, 1e-3, 1e-3),
