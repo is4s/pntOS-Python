@@ -63,7 +63,7 @@ class SimpleMediator(Mediator):
         self,
         solution_times: list[TypeTimestamp],
         filter_description: str | None = None,
-    ) -> list[Message]:
+    ) -> list[Message] | None:
         assert (
             self._orchestration_plugin is not None
         ), 'Orchestration plugin used before initialized and passed to mediator.'

@@ -610,8 +610,8 @@ class DummyMediator(Mediator):
         self,
         solution_times: list[TypeTimestamp],
         filter_description: str | None = None,
-    ) -> list[Message]:
-        return []
+    ) -> list[Message] | None:
+        return None
 
     def process_pntos_message(self, message: Message) -> None:
         return
@@ -908,6 +908,7 @@ class Test_Orchestration(unittest.TestCase):
         expected_solution = self.expected_pva_best
 
         solutions = self.orchestration_plugin.request_solutions(solution_times)
+        assert solutions is not None
         assert len(solutions) == 1
         assert self.compare_messages(solutions[0], expected_solution)
 
@@ -925,6 +926,7 @@ class Test_Orchestration(unittest.TestCase):
             solutions = self.orchestration_plugin.request_solutions(
                 solution_times, description
             )
+            assert solutions is not None
             assert len(solutions) == 1
             assert self.compare_messages(solutions[0], expected), solutions[0]
 

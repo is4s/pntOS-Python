@@ -424,8 +424,8 @@ class DummyMediator(Mediator):
         self,
         solution_times: list[TypeTimestamp],
         filter_description: str | None = None,
-    ) -> list[Message]:
-        return []
+    ) -> list[Message] | None:
+        return None
 
     def process_pntos_message(self, message: Message) -> None:
         return
@@ -501,8 +501,8 @@ class DummyOrchestrationPlugin(OrchestrationPlugin):
         self,
         solution_times: List[TypeTimestamp],
         filter_description: str | None = None,
-    ) -> List[Message]:
-        return []
+    ) -> List[Message] | None:
+        return None
 
 
 class Test_SimpleControllerPlugin(unittest.TestCase):

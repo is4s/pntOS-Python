@@ -113,7 +113,7 @@ class Aspn23LcmTransportPlugin(TransportPlugin):
                 > 1_000_000_000
             ):
                 solution = self.mediator.request_solutions([self.last_message_time])
-                if len(solution) > 0:
+                if solution is not None:
                     self.mediator.log_message(
                         LoggingLevel.DEBUG, f'Got a solution! {solution}'
                     )
