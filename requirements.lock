@@ -11,7 +11,6 @@
 
 -e file:pntos-api
     # via pntos-cobra
--e file:pntos-cli
 -e file:pntos-cobra
 aspn-lcm @ git+ssh://git@git.aspn.us/pntos/lcm-generated.git@21e03f8765605dcd3c8d8d6bb7091ebeef24ee23#subdirectory=python
     # via pntos-cobra

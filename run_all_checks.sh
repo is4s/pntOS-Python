@@ -13,7 +13,6 @@ ruff check --fix
 ruff format
 pytest --cov --cov-fail-under=75 --cov-report={term,html} --cov-config=.coveragerc
 mypy pntos-api
-mypy pntos-cli
 mypy pntos-cobra
 
 set +x

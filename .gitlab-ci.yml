@@ -92,7 +92,6 @@ mypy:
         - docker run --rm -dit -v $(pwd):/work --name pntos-python -e CC=gcc -e CXX=g++ $DOCKER_IMAGE bash
         - docker exec pntos-python rye sync
         - docker exec pntos-python mypy pntos-api --no-implicit-reexport
-        - docker exec pntos-python mypy pntos-cli --no-implicit-reexport
         - docker exec pntos-python mypy pntos-cobra --no-implicit-reexport
 
 documentation check:

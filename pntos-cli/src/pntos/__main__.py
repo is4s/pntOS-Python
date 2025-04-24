@@ -1,1 +1,0 @@
-print('pntOS CLI stub')
