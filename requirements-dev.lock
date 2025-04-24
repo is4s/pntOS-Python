@@ -11,7 +11,6 @@
 
 -e file:pntos-api
     # via pntos-cobra
--e file:pntos-cli
 -e file:pntos-cobra
 alabaster==0.7.16
     # via sphinx

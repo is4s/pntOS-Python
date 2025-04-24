@@ -33,7 +33,6 @@ ignore = ["D212", "D417"]
 
 [tool.ruff.lint.per-file-ignores]
 "pntos-cobra/*" = ["D"]
-"pntos-cli/*" = ["D"]
 "apps/*" = ["D"]
 "docs/*" = ["D"]
 "postprocessing/*" = ["D"]
