@@ -88,7 +88,7 @@ Next, rye will bring up the following prompt:
     Run a Python installed and managed by Rye
     ❯ Run the old default Python (provided by your OS, pyenv, etc.)
 ```
-We recommend selecting the 2nd option: `Run the old default Python (provided by your OS, pyenv,
+We recommend selecting the second option: `Run the old default Python (provided by your OS, pyenv,
 etc.)`
 
 #### Using Rye
