@@ -42,6 +42,9 @@ docutils==0.21.2
     # via myst-parser
     # via sphinx
     # via sphinx-rtd-theme
+exceptiongroup==1.2.2
+    # via ipython
+    # via pytest
 executing==2.0.1
     # via stack-data
 fonttools==4.56.0
@@ -156,6 +159,11 @@ sphinxcontrib-serializinghtml==1.1.10
     # via sphinx
 stack-data==0.6.3
     # via ipython
+tomli==2.2.1
+    # via coverage
+    # via mypy
+    # via pytest
+    # via sphinx
 traitlets==5.14.3
     # via ipython
     # via matplotlib-inline
