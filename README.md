@@ -33,7 +33,7 @@ Next, enter the venv. The steps to do this vary depending on your shell:
 
 **fish**: `source .venv/bin/activate.fish`
 
-**powershell** `.venv/bin/activate.ps1`
+**powershell** `.venv\Scripts\activate`
 
 Your shell should now be inside the venv. It is recommended that you upgrade your pip to the latest:
 
@@ -107,7 +107,7 @@ this vary depending on your shell:
 
 **fish**: `source .venv/bin/activate.fish`
 
-**powershell** `.venv/bin/activate.ps1`
+**powershell** `.venv\Scripts\activate`
 
 Your shell should now be inside a venv that is ready to use pntos-python. You can confirm that this
 is the case by opening a python interpreter and checking that importing the various components of
