@@ -128,8 +128,7 @@ running this app.
 To begin development, refer to [Environment Setup](#environment-setup) for how to setup development
 tooling and enter the configured venv. Once that is done, you can proceed to develop your new
 functionality in a feature branch. When your feature is complete and ready for us to review, there
-are a few code quality checks you should perform before opening a merge request. These steps vary
-depending on if you are using `pip` or `rye`, as described below.
+are a few code quality checks you should perform before opening a merge request.
 
 ### Checking Contributions
 
