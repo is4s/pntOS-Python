@@ -5,7 +5,15 @@ and an example implementation called Cobra.
 
 ## Environment Setup
 
-Make sure that you have **at least `python3.10`** installed.
+Please ensure you have the following tools installed:
+
+- Python 3.10 or later
+- A C++ compiler
+- git
+- GLib
+- OpenBLAS
+
+Ubuntu users can reference `Dockerfile` for the names of packages to install the above.
 
 We currently support two toolchains: A standard `pip`-based workflow, and a `Rye`-based workflow:
 
