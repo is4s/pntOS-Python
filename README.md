@@ -8,7 +8,7 @@ A meta package for pntOS that contains the components of pntOS.
 
 ## Environment Setup
 
-Make sure that you have **at least `python3.11`** installed.
+Make sure that you have **at least `python3.10`** installed.
 
 We currently support two toolchains: A standard `pip`-based workflow, and a more experimental `Rye`-based workflow:
 

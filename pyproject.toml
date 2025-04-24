@@ -5,7 +5,7 @@ description = "A meta package for pntOS that contains the components of pntOS."
 authors = [{ name = "IS4S", email = "pntos@is4s.com" }]
 dependencies = []
 readme = "README.md"
-requires-python = ">= 3.11"
+requires-python = ">= 3.10"
 
 [tool.rye]
 virtual = true

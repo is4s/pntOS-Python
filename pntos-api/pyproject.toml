@@ -8,7 +8,7 @@ dependencies = [
     "aspn23 @ git+ssh://git@git.aspn.us/pntos/firehose-outputs.git@f5f5b2b4637517bb10299fb6be7248a2215fbb74#subdirectory=aspn-py",
 ]
 readme = "README.md"
-requires-python = ">= 3.11"
+requires-python = ">= 3.10"
 
 [build-system]
 requires = ["hatchling"]

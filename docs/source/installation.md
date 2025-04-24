@@ -19,7 +19,7 @@ The following steps:
 
 ## Install Manually with `pip install`
 
-If you prefer, you can use `pip` to directly install your dependencies into an existing Python interpreter. Note that as of Python 3.11, the Python team no longer supports `pip install`ing packages directly into a system Python interpreter (see PEP 668 for more details). Therefore, you will need to create a virtual Python environment (such as with `venv`, `conda`, etc.) and install Conda into that.
+If you prefer, you can use `pip` to directly install your dependencies into an existing Python interpreter. Note that as of Python 3.10, the Python team no longer supports `pip install`ing packages directly into a system Python interpreter (see PEP 668 for more details). Therefore, you will need to create a virtual Python environment (such as with `venv`, `conda`, etc.) and install Conda into that.
 
 These instructions walk through the process of using Python's built-in `venv` module to create a virtual Python environment, and then `pip install`ing Cobra into that environment. You should be familiar with what virtual environments are if you use this approach; further reading [here](https://docs.python.org/3/library/venv.html).
 

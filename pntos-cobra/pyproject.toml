@@ -22,7 +22,7 @@ dependencies = [
     "pntos-python-datasets @ git+ssh://git@git.aspn.us/pntos/pntos-python-datasets.git@main",
 ]
 readme = "README.md"
-requires-python = ">= 3.11"
+requires-python = ">= 3.10"
 
 [build-system]
 requires = ["hatchling"]
