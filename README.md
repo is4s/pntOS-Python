@@ -153,6 +153,11 @@ Note that files that are installed via a local path are installed as [editable
 installs](https://setuptools.pypa.io/en/latest/userguide/development_mode.html) and are
 automatically updated whenever a file in that package is updated.
 
+## Viewing Documentation
+
+[You can view the hosted, pre-generated documentation
+here](https://pntos.pages.aspn.us/pntos-python/).
+
 ## Generating Documentation
 
 This section assumes you have a Python environment with the necessary dependencies installed. Please
