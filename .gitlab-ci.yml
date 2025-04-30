@@ -112,6 +112,18 @@ documentation check:
         - docs/build/html/index.html  # must be first, expose_as links to the first entry
         - docs/build/html # ..but all the other files *also* need to be in the archive
 
+GPS INS App:
+    stage: check
+    tags:
+        - linux-heavy-runner
+    script:
+        - docker run --rm -dit -v $(pwd):/work --name pntos-python -e CC=gcc -e CXX=g++ $DOCKER_IMAGE bash
+        - docker exec pntos-python rye sync
+        - docker exec pntos-python postprocessing/run_app_and_record_data.py
+    artifacts:
+        paths:
+            - pntos_output/
+
 pages:
     stage: deploy
     tags: [linux-light-runner]
