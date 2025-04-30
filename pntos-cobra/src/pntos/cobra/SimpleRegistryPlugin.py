@@ -321,7 +321,7 @@ class SimpleKeyValueStore(KeyValueStore):
         if not self._check_valid_type(value):
             self._log(
                 LoggingLevel.ERROR,
-                f'Received invalid type {type(value)}. Expected {RegistryValueTypeUnion}.',
+                f'Received invalid type {type(value)} from key "{key}". Expected {RegistryValueTypeUnion}.',
             )
             return
         if self._set_permanent:

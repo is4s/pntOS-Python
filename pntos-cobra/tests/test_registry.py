@@ -792,9 +792,7 @@ class TestRegistry(unittest.TestCase):
             (0, 0, 0),
             (0, 0, 0),
         )
-        EXPECTED_LOG_OUTPUT = (
-            f'Received invalid type {ImuConfig}. Expected {RegistryValueTypeUnion}.'
-        )
+        EXPECTED_LOG_OUTPUT = f'Received invalid type {ImuConfig} from key "invalid_type_key". Expected {RegistryValueTypeUnion}.'
         # Have to type ignore this one because it's exactly what we're testing:
         kv[key] = value  # type: ignore[assignment]
         assert key not in kv, 'Expected failure to insert value - but key exists.'
