@@ -26,7 +26,6 @@ from .lcm_marshaling import (
 )
 from .navigation import *
 from .plugins import (
-    PluginDiscoveryError as PluginDiscoveryError,
     SortedPlugins as SortedPlugins,
     camel_to_snake as camel_to_snake,
     find_base_plugin_type as find_base_plugin_type,
