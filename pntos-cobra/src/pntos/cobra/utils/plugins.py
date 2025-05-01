@@ -1,6 +1,5 @@
 import re
 from dataclasses import dataclass, field
-from typing import TypeVar
 
 from pntos.api import (
     CommonPlugin,
@@ -39,6 +38,7 @@ class SortedPlugins:
     state_modeling_plugins: list[StateModelingPlugin] = field(default_factory=list)
     transport_plugins: list[TransportPlugin] = field(default_factory=list)
     ui_plugins: list[UiPlugin] = field(default_factory=list)
+    utility_plugins: list[UtilityPlugin] = field(default_factory=list)
 
 
 def sort_plugins_dataclass(plugins: list[CommonPlugin]) -> SortedPlugins:
@@ -71,7 +71,8 @@ def sort_plugins_dataclass(plugins: list[CommonPlugin]) -> SortedPlugins:
             sorted_data.transport_plugins.append(plugin)
         elif isinstance(plugin, UiPlugin):
             sorted_data.ui_plugins.append(plugin)
-
+        elif isinstance(plugin, UtilityPlugin):
+            sorted_data.utility_plugins.append(plugin)
     return sorted_data
 
 
@@ -102,8 +103,12 @@ def find_base_plugin_type(plugin: CommonPlugin) -> PluginType:
         return TransportPlugin
     elif isinstance(plugin, UiPlugin):
         return UiPlugin
-    else:
+    elif isinstance(plugin, UtilityPlugin):
         return UtilityPlugin
+    else:
+        raise TypeError(
+            f'Plugin of type {type(plugin).__name__} has no base plugin type.'
+        )
 
 
 def camel_to_snake(name: str) -> str:
@@ -131,8 +136,3 @@ def camel_to_snake(name: str) -> str:
 
     """
     return re.sub(r'(?<!^)(?=[A-Z])', '_', name).lower()
-
-
-class PluginDiscoveryError(Exception):
-    def __init__(self, *args) -> None:  # type: ignore[no-untyped-def]
-        super().__init__(*args)
