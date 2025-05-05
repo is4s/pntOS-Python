@@ -1,11 +1,11 @@
 from typing import Callable
 
 from pntos.api import (
-    CommonPlugin,
     KeyValueStore,
     LoggingLevel,
     Mediator,
     RegistryValueTypeUnion,
+    UtilityPlugin,
 )
 from pntos.cobra.utils import save_to_hdf5_file
 
@@ -13,7 +13,7 @@ GROUP_TO_WATCH = 'diagnostics'
 OUTPUT_FILE = './OUTPUT.hdf5'
 
 
-class SimpleDiagnosticLogPlugin(CommonPlugin):
+class SimpleDiagnosticLogPlugin(UtilityPlugin):
     _store: dict[str, list[RegistryValueTypeUnion]] = {}
 
     def __init__(self, identifier: str, output_file: str = './OUTPUT.hdf5') -> None:
