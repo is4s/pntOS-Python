@@ -14,7 +14,21 @@ release = '0.1.0'
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions = ['myst_parser', 'sphinx.ext.napoleon', 'sphinx.ext.autodoc']
+extensions = [
+    'myst_parser',
+    'sphinx.ext.napoleon',
+    'sphinx.ext.autodoc',
+    'sphinx.ext.mathjax',
+    'sphinx_design',
+]
+
+# Myst settings
+myst_enable_extensions = [
+    'dollarmath',  # For inline and block math using $...$
+    'amsmath',  # For LaTeX dmath
+    'attrs_inline',  # For inline attributes on things like images
+]
+myst_heading_anchors = 3
 
 # Napoleon settings
 napoleon_google_docstring = True
@@ -53,7 +67,11 @@ branding_dir = '../branding_assets/branding/'
 html_static_path = ['../_static', branding_dir]
 
 html_logo = branding_dir + 'pntOs_Logo_Gradient_Light_Horizontal.png'
-html_theme_options = {'logo_only': True}
+html_theme_options = {
+    'logo_only': True,
+    'collapse_navigation': True,
+}
+html_favicon = '../branding_assets/branding/favicon.ico'
 
 
 def setup(app):
