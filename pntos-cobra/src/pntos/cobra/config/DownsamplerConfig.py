@@ -5,6 +5,10 @@ from .BaseConfig import BaseConfig
 
 @dataclass
 class DownsamplerConfig(BaseConfig):
+    """
+    Configuration for the downsampler preprocessor.
+    """
+
     channels_to_downsample: list[str]
     """
     A list of channels to downsample
