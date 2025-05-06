@@ -33,7 +33,21 @@ class AlignmentStrategy(Enum):
 @dataclass
 class StaticAlignmentConfig(BaseConfig):
     strategy: AlignmentStrategy
+    """
+    The desired alignment strategy.
+    """
+
     static_time: float
+    """
+    The amount of IMU data that must be collected
+    before calculating an alignment. (s)
+    """
+
     imu_model: ImuConfig
+    """
+    A nested config that contains IMU model info.
+
+    For more information, see ImuConfig.py.
+    """
 
     group: str
