@@ -25,15 +25,16 @@ class SimpleControllerPlugin(ControllerPlugin):
 
     Here are the plugins and corresponding expected number of instances this controller
     looks for:
-        - FusionPlugin - at least 1
-        - FusionStrategyPlugin - at least 1
-        - InertialPlugin - at least 1
-        - UiPlugin - optionally 1
-        - OrchestrationPlugin - only 1
-        - InitializationPlugin - at lest 1
-        - TransportPlugin - at least 1
-        - RegistryPlugin - only 1
-        - LoggingPlugin - only 1
+
+    - FusionPlugin - at least 1
+    - FusionStrategyPlugin - at least 1
+    - InertialPlugin - at least 1
+    - UiPlugin - optionally 1
+    - OrchestrationPlugin - only 1
+    - InitializationPlugin - at least 1
+    - TransportPlugin - at least 1
+    - RegistryPlugin - only 1
+    - LoggingPlugin - only 1
 
     It checks for the expected plugins, sets up mediators, and then passes the
     mediators to each plugin in :meth:`init_plugin`, initializes the orchestration

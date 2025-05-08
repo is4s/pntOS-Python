@@ -30,7 +30,7 @@ class SimpleDiagnosticLogPlugin(UtilityPlugin):
 
         Args:
             identifier (str): The plugin identifier passed to the
-            :meth:`CommonPlugin.identifier` field.
+                :meth:`CommonPlugin.identifier` field.
         """
         self.identifier = identifier
         self._output_file = output_file

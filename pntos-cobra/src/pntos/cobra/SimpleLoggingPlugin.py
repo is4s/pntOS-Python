@@ -36,10 +36,10 @@ class SimpleLoggingPlugin(LoggingPlugin):
             identifier (str): Populates the ``CommonPlugin.identifier`` field.
             colorize (bool): Prints colored log messages if true, uncolored if false.
             global_log_level (LoggingLevel): Selects which log levels get printed. See
-            :meth:`log` for more info.
+                :meth:`log` for more info.
             date_time_format (str): Specifies the date-time format according to the
-            available format specifiers. See ``time.strftime()`` for more info on
-            supported formats.
+                available format specifiers. See ``time.strftime()`` for more info on
+                supported formats.
         """
         self.identifier = identifier
         self.colorize: bool = colorize
