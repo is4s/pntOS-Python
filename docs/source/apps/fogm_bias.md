@@ -1,4 +1,15 @@
 # FOGM Bias App - TODO
 
-Talk about all the changes to go from [](./fusion_gps_ins.md) to
-this app. This should satisfy [#113](https://git.aspn.us/pntos/pntos-python/-/issues/113).
+## Overview
+
+This app is meant to (TODO)...
+
+## TODO:
+
+Walk through this app documenting changes - should satisfy [#113](https://git.aspn.us/pntos/pntos-python/-/issues/113).
+
+## Expected Results
+
+For instructions of how to run this app, see [](../first_app.md). After running the app you should see the following results:
+
+TODO - describe expected results.

@@ -7,4 +7,15 @@ pntOS
 
 pntOS python
     TODO - write definition
+
+Cobra
+    TODO - write definition
+
+App
+    TODO - write definition
+
+ASPN
+    TODO - write definition
+
+
 ```
