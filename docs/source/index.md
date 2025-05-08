@@ -48,8 +48,9 @@ glossary
 ```
 
 ```{toctree}
-:caption: API Documentation
+:caption: Documentation
 :hidden:
 :maxdepth: 1
-api
+documentation/api
+cobra
 ```

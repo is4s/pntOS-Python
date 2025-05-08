@@ -50,10 +50,14 @@ napoleon_attr_annotations = True
 autodoc_member_order = 'bysource'
 autodoc_default_options = {
     'show-inheritance': True,
+    'members': True,
+    'imported-members': True,
+    'show-inheritance': True,
 }
 autodoc_preserve_defaults = True
 autodoc_typehints = 'none'
 autodoc_typehints_description_target = 'documented'
+autodoc_warningiserror = True
 
 templates_path = ['_templates']
 exclude_patterns = []

@@ -16,18 +16,16 @@ class SimplePreprocessorDownsampler(Preprocessor):
 
     def __init__(self, config_group: str, mediator: Mediator):
         """
-        A simple downsampling preprocessor that reduces the amount
-        of data processed. It collects a list of channels and factors
-        from the registry and allows 1 out of every N messages to pass
-        through. This is done for every channel 'c' and factor 'N'.
-        Where c = channel[i] and N = factor[i].
+        A simple downsampling preprocessor that reduces the amount of data processed.
+
+        It collects a list of channels and factors from the registry and allows 1 out of
+        every ``N`` messages to pass through. This is done for every channel ``c`` and factor
+        ``N``. Where ``c = channel[i]`` and ``N = factor[i]``.
 
         Args:
-            config_group (str): The config group to be
-            extracted from the registry.
-
-            mediator (Mediator): The mediator that will handle
-            and has access to the registry that contains 'config_group'
+            config_group (str): The config group to be extracted from the registry.
+            mediator (Mediator): The mediator that will handle and has access to the
+                registry that contains 'config_group'.
 
         """
         self._downsampling_factors = {}
@@ -97,7 +95,7 @@ class SimplePreprocessorDownsamplerPlugin(PreprocessorPlugin):
 
         Args:
             identifier (str): The plugin identifier used to set
-            this plugin's :attr:`identifier` field.
+                this plugin's :attr:`identifier` field.
         """
         self.identifier = identifier
         self.preprocessor_identifiers = ['preprocessor_downsampler']

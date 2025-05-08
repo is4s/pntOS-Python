@@ -303,7 +303,7 @@ class FusionStrategyPlugin(CommonPlugin, ABC):
         may not support all types (they must support at least one). Therefore,
         when a user receives a :class:`FusionStrategyPlugin`, they should:
 
-        1. Initialize the plugin by calling :meth:`.init_plugin` (see :class:`CommonPlugin` for more
+        1. Initialize the plugin by calling :meth:`init_plugin` (see :class:`CommonPlugin` for more
            information).
         2. Call :meth:`is_fusion_type_supported` to check that the plugin supports the
            type that the user wants to use.

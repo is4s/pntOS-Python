@@ -88,7 +88,7 @@ class SimpleOrchestrationPlugin(OrchestrationPlugin):
 
         Args:
             identifier (str): The plugin identifier passed to the
-            :meth:`CommonPlugin.identifier` field.
+                :meth:`CommonPlugin.identifier` field.
         """
         self.identifier: str = identifier
         self.log_level_strings: dict[LoggingLevel, str] = {
