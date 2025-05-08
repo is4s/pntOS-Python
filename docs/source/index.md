@@ -29,6 +29,7 @@ frequent_questions
 
 ```{toctree}
 :caption: Tutorial Apps
+:name: tutorial-apps
 :numbered:
 apps/fusion_gps_ins
 apps/fogm_bias
