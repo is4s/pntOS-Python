@@ -1,10 +1,10 @@
 FROM ubuntu:24.04
 
-# Install dependencies needed to build the LCM wheel.
-RUN apt update && apt install git libglib2.0-dev build-essential -y
+# Install dependencies needed to bring in upstream projects via their source
+RUN apt update && apt install git -y
 
-# Install dependencies needed to build the NavToolkit wheel.
-RUN apt update && apt install libopenblas-dev -y
+# Install dependencies needed to run LCM.
+RUN apt update && apt install libglib2.0-dev -y
 
 # Install dependencies needed to install Rye.
 RUN apt update && apt install curl -y
@@ -15,6 +15,9 @@ RUN curl -sSf https://rye.astral.sh/get | RYE_INSTALL_OPTION="--yes" bash
 
 # Install java (needed to run app)
 RUN apt update && apt install default-jre-headless -y
+
+# Install make (needed to build docs)
+RUN apt update && apt install make -y
 
 WORKDIR /work
 ENTRYPOINT ["/bin/bash", "-c"]
