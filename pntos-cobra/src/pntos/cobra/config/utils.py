@@ -1,5 +1,6 @@
 from dataclasses import fields
 from enum import Enum
+from inspect import isclass
 from typing import Any, TypeVar, get_origin
 
 import numpy as np
@@ -78,7 +79,7 @@ def config_from_registry(
                         # Convert to np array of ints
                         val = val.astype(int)
         # Special case: enum. Convert integer back to enum type.
-        elif issubclass(param.type, Enum):
+        elif isclass(param.type) and issubclass(param.type, Enum):
             val = param.type(val)
 
         if not _confirm_types(val, param.type):
