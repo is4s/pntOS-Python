@@ -74,7 +74,7 @@ ruff format:
         # If there's a diff, fail the stage.
         - git diff --exit-code
 
-pytest-cov:
+Python 3.10 Test:
     stage: check
     tags:
         - linux-light-runner
@@ -85,6 +85,16 @@ pytest-cov:
     artifacts:
       paths:
         - htmlcov/*
+
+Python 3.13 Test:
+    stage: check
+    tags:
+        - linux-light-runner
+    script:
+        # Switch the Python version to 3.13
+        - echo 3.13 > .python-version
+        - docker run --rm -v $(pwd):/work -e WHEELHOUSE_URL=${WHEELHOUSE_URL} $DOCKER_IMAGE "rye sync -v && pytest --cov --cov-fail-under=75 --cov-report={term,html}  --cov-config=.coveragerc"
+
 mypy:
     stage: check
     tags:
