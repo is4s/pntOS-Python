@@ -30,8 +30,14 @@ Please ensure you have the following tools installed:
 - Python 3.10 or later
 - git
 - GLib
+- Java
+- Tkinter
 
-Ubuntu users can reference `Dockerfile` for the names of packages to install the above.
+Ubuntu users can use the following command to install the above dependencies:
+
+```shell
+sudo apt update && sudo apt install python3 git libglib2.0-dev default-jre-headless python3-tk
+```
 
 We currently support two toolchains: A standard `pip`-based workflow, and a `Rye`-based workflow:
 
