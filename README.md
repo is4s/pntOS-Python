@@ -205,6 +205,28 @@ you just generated.
 
 Please see the following sections for some potential failures and how to resolve them.
 
+### Invalid Source URL
+
+An error like:
+
+```
+error: invalid source url
+
+Caused by:
+    relative URL without a base
+```
+
+is caused by the `WHEELHOUSE_URL` environment variable not being set as expected. You can run:
+
+```shell
+echo $WHEELHOUSE_URL
+```
+
+and you should get output of the form
+`https://<TOKEN_NAME>:<TOKEN_VALUE>@git.aspn.us/api/v4/projects/94/packages/pypi/simple`. If that is
+not the case, please see [Authentication](#authentication) for instructions on setting that
+environment variable.
+
 ### Errors when Building NavToolkit from Source
 
 When running `rye sync -v` or a `pip install -r` command to install install this project, one of the
