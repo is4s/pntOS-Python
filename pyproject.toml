@@ -3,7 +3,7 @@ name = "pntos-python"
 version = "0.1.0"
 description = "A meta package for pntOS that contains the components of pntOS."
 authors = [{ name = "IS4S", email = "pntos@is4s.com" }]
-dependencies = ["pntos-api", "pntos-cobra"]
+dependencies = []
 readme = "README.md"
 requires-python = ">= 3.10"
 
@@ -11,7 +11,7 @@ requires-python = ">= 3.10"
 package=false
 
 [tool.uv.workspace]
-members = ["pntos-*"]
+members = ["pntos-api", "pntos-cobra"]
 
 [tool.uv.sources]
 pntos-api = { workspace = true }
@@ -29,7 +29,9 @@ dev = [
     "myst_parser>=4.0.0",
     "sphinx_rtd_theme>=3.0.2",
     "sphinx-design",
-    "matplotlib"
+    "matplotlib",
+    "pntos-cobra",
+    "pntos-api"
 ]
 
 [tool.ruff.lint]

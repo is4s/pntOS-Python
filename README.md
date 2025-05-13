@@ -119,7 +119,7 @@ modules, and one folder that defines applications which use those modules.
 Whenever you type `uv sync` it recurses into every `pntos-*` folder and finds the `pyproject.toml`
 in there. It then installs the `dependencies` subkey in that file, and places them in the *top
 level* `uv.lock`. Generating the `requirements.txt` is then done as a separate step, by running
-`uv pip compile pyproject.toml -o requirements.txt`.
+`uv export --no-hashes > requirements.txt` in the project root.
 
 Note that files that are installed via a local path are installed as [editable
 installs](https://setuptools.pypa.io/en/latest/userguide/development_mode.html) and are
@@ -174,7 +174,7 @@ and you should get output of the form
 not the case, please see [Authentication](#authentication) for instructions on setting that
 environment variable.
 
-### NavTk Issue
+### Navtk Issue
 
 An error like:
 

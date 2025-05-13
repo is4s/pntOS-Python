@@ -1125,10 +1125,6 @@ requires-dist = [
 name = "pntos-python"
 version = "0.1.0"
 source = { virtual = "." }
-dependencies = [
-    { name = "pntos-api" },
-    { name = "pntos-cobra" },
-]
 
 [package.dev-dependencies]
 dev = [
@@ -1138,6 +1134,8 @@ dev = [
     { name = "mypy" },
     { name = "myst-parser" },
     { name = "pip" },
+    { name = "pntos-api" },
+    { name = "pntos-cobra" },
     { name = "pytest" },
     { name = "pytest-cov" },
     { name = "ruff" },
@@ -1148,10 +1146,6 @@ dev = [
 ]
 
 [package.metadata]
-requires-dist = [
-    { name = "pntos-api", editable = "pntos-api" },
-    { name = "pntos-cobra", editable = "pntos-cobra" },
-]
 
 [package.metadata.requires-dev]
 dev = [
@@ -1160,6 +1154,8 @@ dev = [
     { name = "mypy", specifier = ">=1.10.0" },
     { name = "myst-parser", specifier = ">=4.0.0" },
     { name = "pip", specifier = ">=24.0" },
+    { name = "pntos-api", editable = "pntos-api" },
+    { name = "pntos-cobra", editable = "pntos-cobra" },
     { name = "pytest", specifier = ">=8.2.0" },
     { name = "pytest-cov", specifier = ">=6.0.0" },
     { name = "ruff", specifier = "==0.7.0" },
