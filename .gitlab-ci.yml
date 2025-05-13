@@ -70,7 +70,8 @@ ruff format:
         - docker run --rm -v $(pwd):/work -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE "uv sync -v && ruff format"
         # Don't let modification to the pyproject.toml and requirements.lock files produce a diff.
         - git checkout -- $(git ls-files | grep pyproject.toml)
-        - git checkout -- $(git ls-files | grep requirements.*.lock)
+        - git checkout -- $(git ls-files | grep requirements.txt)
+        - git checkout -- $(git ls-files | grep uv.lock)
         # If there's a diff, fail the stage.
         - git diff --exit-code
 
@@ -114,7 +115,7 @@ documentation check:
         - linux-light-runner
     script:
         - docker run --workdir /work/docs --rm -dit -v $(pwd):/work --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
-        - docker exec pntos-python ruv sync -v
+        - docker exec pntos-python uv sync -v
         # Build the documentation
         - docker exec -e TZ=UTC pntos-python make html
     artifacts:
