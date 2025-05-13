@@ -68,7 +68,7 @@ Your shell should now be inside the venv. It is recommended that you upgrade you
 
 Now we're ready to install pntos. In the project root directory, run:
 
-    pip install -v -r requirements-dev.lock --extra-index-url=${WHEELHOUSE_URL}
+    pip install -v -r requirements-dev.lock --extra-index-url=$WHEELHOUSE_URL
 
 **Note:** this command may take a while to run. It is downloading example data, which may take a lot
 of bandwidth.
