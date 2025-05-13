@@ -3,7 +3,7 @@ name = "pntos-python"
 version = "0.1.0"
 description = "A meta package for pntOS that contains the components of pntOS."
 authors = [{ name = "IS4S", email = "pntos@is4s.com" }]
-dependencies = []
+dependencies = ["pntos-api", "pntos-cobra"]
 readme = "README.md"
 requires-python = ">= 3.10"
 
@@ -30,6 +30,31 @@ dev-dependencies = [
 
 [tool.rye.workspace]
 members = ["pntos-*"]
+
+[tool.uv]
+package=false
+
+[tool.uv.workspace]
+members = ["pntos-*"]
+
+[tool.uv.sources]
+pntos-api = { workspace = true }
+pntos-cobra = { workspace = true }
+
+[dependency-groups]
+dev = [
+    "pytest>=8.2.0",
+    "pytest-cov>=6.0.0",
+    "sphinx>=7.3.7",
+    "ipython>=8.24.0",
+    "ruff==0.7.0",
+    "mypy>=1.10.0",
+    "pip>=24.0",
+    "myst_parser>=4.0.0",
+    "sphinx_rtd_theme>=3.0.2",
+    "sphinx-design",
+    "matplotlib"
+]
 
 [tool.ruff.lint]
 extend-select = ["I"]
