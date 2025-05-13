@@ -15,6 +15,16 @@ ConfigType = TypeVar('ConfigType', bound=BaseConfig)
 
 
 def imu_model_to_config(model: ImuModel, group: str) -> ImuConfig:
+    """
+    Stores a provided IMU model inside an :class:`ImuConfig` object.
+
+    Args:
+        model (ImuModel): The IMU model to store.
+        group (str): The config group the :class:`ImuConfig` object should be stored under in the registry.
+
+    Returns:
+        ImuConfig
+    """
     return ImuConfig(
         accel_bias_sigma=tuple(model.accel_bias_sigma),
         accel_bias_tau=tuple(model.accel_bias_tau),
@@ -27,6 +37,15 @@ def imu_model_to_config(model: ImuModel, group: str) -> ImuConfig:
 
 
 def imu_model_from_config(config: ImuConfig) -> ImuModel:
+    """
+    Grabs the :class:`ImuModel` object nested within the provided :class:`ImuConfig` object.
+
+    Args:
+        config (ImuConfig): The :class:`ImuConfig` object to grab an :class:`ImuModel` object from.
+
+    Returns:
+        ImuModel
+    """
     return ImuModel(
         accel_bias_sigma=np.array(config.accel_bias_sigma),
         accel_bias_tau=np.array(config.accel_bias_tau),
@@ -40,6 +59,23 @@ def imu_model_from_config(config: ImuConfig) -> ImuModel:
 def config_from_registry(
     config_type: type[ConfigType], mediator: Mediator, config_group: str
 ) -> ConfigType | None:
+    """
+    A utility function that returns a specific config based on the config type and group.
+
+    This function will attempt to convert fields stored in the registry back to their
+    original type specified in the ``config_type`` object. If it is unable to do so, it will
+    log the error and continue. If the function is unable to grab a specific field from the
+    registry, the error is considered fatal and the function will return ``None``.
+
+    Args:
+        config_type (ConfigType): The config type of the config being pulled from the registry.
+        This is necessary for appropriately returning the fields as their expected types.
+        mediator (Mediator): :class:`Mediator` object to access the registry and log messages.
+        config_group (str): The config group used to find the config object within the registry.
+
+    Returns:
+        ConfigType | None
+    """
     conf_params = [f for f in fields(config_type) if f.name != 'group']
     kv = mediator.registry.batch_start(config_group)
     out: dict[str, RegistryValueTypeUnion | tuple[float, ...] | Enum | BaseConfig] = {}
@@ -99,6 +135,18 @@ def config_from_registry(
 
 
 def config_to_registry(config: BaseConfig, mediator: Mediator) -> None:
+    """
+    A utility function that stores a config in the registry.
+
+    This function will convert certain types (list[float], list|nd.array[int], Enum, tuple[float])
+    unsupported by the registry to the corresponding supported type represented ``RegistryValueType``.
+    It also supports storing nested config objects, though it expects the nested object to have the
+    same config group as the wrapping object.
+
+    Args:
+        config (BaseConfig): The config to be stored in the registry.
+        mediator (Mediator): :class:`Mediator` object to access the registry and log messages.
+    """
     conf_params = [f for f in fields(config) if f.name != 'group']
     kv = mediator.registry.batch_start(config.group)
 
@@ -125,6 +173,16 @@ def config_to_registry(config: BaseConfig, mediator: Mediator) -> None:
 
 
 def _confirm_types(out_val: Any, expected_type: type[Any]) -> bool:
+    """
+    A helper function to compare types while considering aliases.
+
+    Args:
+        out_val (Any): Object whose type is to be validated.
+        expected_type (type[Any]): The expected type of `out_val`.
+
+    Returns:
+        bool
+    """
     out_type = type(out_val)
 
     # Check if expected_type is generic alias (list[str], tuple[float], ect...)
