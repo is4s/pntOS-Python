@@ -49,7 +49,7 @@ ASPN is a community-developed data standard that describes what PNT data may be
 exchanged for consistent usage and interoperability of PNT estimators across different
 systems, sources, and users. pntOS utilizes ASPN data standards wherever relevant.  
 
-For more information, see [](./aspn.md#aspn-tldr---todo).
+For more information, see [](./aspn.md).
 ```
 
 ```{dropdown} Is pntOS an operating system?
