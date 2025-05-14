@@ -5,7 +5,7 @@ and an example implementation called Cobra.
 
 ## Authentication
 
-To download the necessary dependencies, you will need to types of authentication set up:
+To download the necessary dependencies, you will need two types of authentication set up:
 
 - An SSH key
 - A Personal Access Token (PAT)
