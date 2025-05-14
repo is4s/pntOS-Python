@@ -139,12 +139,12 @@ def config_from_registry(
 
 def config_to_registry(config: BaseConfig, mediator: Mediator) -> None:
     """
-    A utility function that stores a config in the registry.
+    A utility function that inserts a config into the registry.
 
     This function will convert certain types (list[float], list|nd.array[int], Enum, tuple[float])
-    unsupported by the registry to the corresponding supported type represented ``RegistryValueType``.
+    unsupported by the registry to the corresponding supported type represented by ``RegistryValueType``.
     It also supports storing nested config objects, though it expects the nested object to have the
-    same config group as the wrapping object.
+    same config group as the outer object.
 
     Args:
         config (BaseConfig): The config to be stored in the registry.
