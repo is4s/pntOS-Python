@@ -7,29 +7,32 @@ dependencies = []
 readme = "README.md"
 requires-python = ">= 3.10"
 
-[[tool.rye.sources]]
-name = "wheelhouse"
-url = "${WHEELHOUSE_URL}"
+[tool.uv]
+package=false
 
-[tool.rye]
-virtual = true
-managed = true
-dev-dependencies = [
+[tool.uv.workspace]
+members = ["pntos-api", "pntos-cobra"]
+
+[tool.uv.sources]
+pntos-api = { workspace = true }
+pntos-cobra = { workspace = true }
+
+[dependency-groups]
+dev = [
     "pytest>=8.2.0",
     "pytest-cov>=6.0.0",
     "sphinx>=7.3.7",
     "ipython>=8.24.0",
     "ruff==0.7.0",
-    "mypy>=1.10.0",
+    "mypy==1.10.0",
     "pip>=24.0",
     "myst_parser>=4.0.0",
     "sphinx_rtd_theme>=3.0.2",
     "sphinx-design",
     "matplotlib",
+    "pntos-cobra",
+    "pntos-api"
 ]
-
-[tool.rye.workspace]
-members = ["pntos-*"]
 
 [tool.ruff.lint]
 extend-select = ["I"]

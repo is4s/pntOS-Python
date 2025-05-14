@@ -6,12 +6,11 @@ RUN apt update && apt install git -y
 # Install dependencies needed to run LCM.
 RUN apt update && apt install libglib2.0-dev -y
 
-# Install dependencies needed to install Rye.
+# Install dependencies needed to install Uv.
 RUN apt update && apt install curl -y
 
-# Install Rye
-ENV PATH=/root/.rye/shims:$PATH
-RUN curl -sSf https://rye.astral.sh/get | RYE_INSTALL_OPTION="--yes" bash
+# Install Uv
+RUN curl -LsSf https://astral.sh/uv/install.sh | UV_UNMANAGED_INSTALL="/usr/local/bin" bash
 
 # Install java (needed to run app)
 RUN apt update && apt install default-jre-headless -y

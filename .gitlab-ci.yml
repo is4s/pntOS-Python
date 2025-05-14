@@ -9,7 +9,7 @@ workflow:
 
 variables:
   GIT_CLEAN_FLAGS: -xdff
-  WHEELHOUSE_URL: https://gitlab-ci-token:${CI_JOB_TOKEN}@git.aspn.us/api/v4/projects/94/packages/pypi/simple
+  UV_INDEX: https://gitlab-ci-token:${CI_JOB_TOKEN}@git.aspn.us/api/v4/projects/94/packages/pypi/simple
 
 default:
     retry:
@@ -59,7 +59,7 @@ ruff check:
     tags:
         - linux-light-runner
     script:
-        - docker run --rm -v $(pwd):/work -e WHEELHOUSE_URL=${WHEELHOUSE_URL} $DOCKER_IMAGE "rye sync -v && ruff check"
+        - docker run --rm -v $(pwd):/work -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE "uv sync -v && ruff check"
 
 ruff format:
     stage: check
@@ -67,10 +67,11 @@ ruff format:
         - linux-light-runner
     script:
         # Run the formatter to see if it produces a diff.
-        - docker run --rm -v $(pwd):/work -e WHEELHOUSE_URL=${WHEELHOUSE_URL} $DOCKER_IMAGE "rye sync -v && ruff format"
+        - docker run --rm -v $(pwd):/work -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE "uv sync -v && ruff format"
         # Don't let modification to the pyproject.toml and requirements.lock files produce a diff.
         - git checkout -- $(git ls-files | grep pyproject.toml)
-        - git checkout -- $(git ls-files | grep requirements.*.lock)
+        - git checkout -- $(git ls-files | grep requirements.txt)
+        - git checkout -- $(git ls-files | grep uv.lock)
         # If there's a diff, fail the stage.
         - git diff --exit-code
 
@@ -79,7 +80,7 @@ Python 3.10 Test:
     tags:
         - linux-light-runner
     script:
-        - docker run --rm -v $(pwd):/work -e WHEELHOUSE_URL=${WHEELHOUSE_URL} $DOCKER_IMAGE "rye sync -v && pytest --cov --cov-fail-under=75 --cov-report={term,html}  --cov-config=.coveragerc"
+        - docker run --rm -v $(pwd):/work -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE "uv sync -v && pytest --cov --cov-fail-under=75 --cov-report={term,html}  --cov-config=.coveragerc"
     coverage:
         '/TOTAL.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
     artifacts:
@@ -93,15 +94,15 @@ Python 3.13 Test:
     script:
         # Switch the Python version to 3.13
         - echo 3.13 > .python-version
-        - docker run --rm -v $(pwd):/work -e WHEELHOUSE_URL=${WHEELHOUSE_URL} $DOCKER_IMAGE "rye sync -v && pytest --cov --cov-fail-under=75 --cov-report={term,html}  --cov-config=.coveragerc"
+        - docker run --rm -v $(pwd):/work -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE "uv sync -v && pytest --cov --cov-fail-under=75 --cov-report={term,html}  --cov-config=.coveragerc"
 
 mypy:
     stage: check
     tags:
         - linux-light-runner
     script:
-        - docker run --rm -dit -v $(pwd):/work --name pntos-python -e WHEELHOUSE_URL=${WHEELHOUSE_URL} $DOCKER_IMAGE bash
-        - docker exec pntos-python rye sync -v
+        - docker run --rm -dit -v $(pwd):/work --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
+        - docker exec pntos-python uv sync -v
         - docker exec pntos-python mypy pntos-api --no-implicit-reexport
         - docker exec pntos-python mypy pntos-cobra --no-implicit-reexport
         - docker exec pntos-python mypy apps --no-implicit-reexport
@@ -113,8 +114,8 @@ documentation check:
     tags:
         - linux-light-runner
     script:
-        - docker run --workdir /work/docs --rm -dit -v $(pwd):/work --name pntos-python -e WHEELHOUSE_URL=${WHEELHOUSE_URL} $DOCKER_IMAGE bash
-        - docker exec pntos-python rye sync -v
+        - docker run --workdir /work/docs --rm -dit -v $(pwd):/work --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
+        - docker exec pntos-python uv sync -v
         # Build the documentation
         - docker exec -e TZ=UTC pntos-python make html
     artifacts:
@@ -128,8 +129,8 @@ GPS INS App:
     tags:
         - linux-light-runner
     script:
-        - docker run --rm -dit -v $(pwd):/work --name pntos-python -e WHEELHOUSE_URL=${WHEELHOUSE_URL} $DOCKER_IMAGE bash
-        - docker exec pntos-python rye sync -v
+        - docker run --rm -dit -v $(pwd):/work --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
+        - docker exec pntos-python uv sync -v
         - docker exec pntos-python postprocessing/run_app_and_record_data.py
     artifacts:
         paths:

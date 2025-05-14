@@ -5,7 +5,7 @@ and an example implementation called Cobra.
 
 ## Authentication
 
-To download the necessary dependencies, you will need to types of authentication set up:
+To download the necessary dependencies, you will need two types of authentication set up:
 
 - An SSH key
 - A Personal Access Token (PAT)
@@ -20,7 +20,7 @@ To use the PAT, set the following environment variable, replacing `<TOKEN_NAME>`
 the name of your token and `<TOKEN_VALUE>` with the value of your token:
 
 ```shell
-export WHEELHOUSE_URL=https://<TOKEN_NAME>:<TOKEN_VALUE>@git.aspn.us/api/v4/projects/94/packages/pypi/simple
+export UV_INDEX=https://<TOKEN_NAME>:<TOKEN_VALUE>@git.aspn.us/api/v4/projects/94/packages/pypi/simple
 ```
 
 ## Environment Setup
@@ -39,17 +39,9 @@ Ubuntu users can use the following command to install the above dependencies:
 sudo apt update && sudo apt install python3 git libglib2.0-dev default-jre-headless python3-tk
 ```
 
-We currently support two toolchains: A standard `pip`-based workflow, and a `Rye`-based workflow:
+You are now ready to set up your python environment.
 
-**Pip**: If you already have your own workflows or prefer to just use vanilla `pip`, you might
-prefer this route.
-
-**Rye**: If you're looking for an all in one experience that runs things for you, you might prefer
-this route.
-
-How you wish to set up your environment will determine which of the next sections you follow.
-
-### Pip Environment Setup
+### Python Environment Setup
 
 Begin by creating and entering a clean venv. We can create the venv in the
 `.venv` folder by running the following command in the project root directory:
@@ -68,70 +60,13 @@ Your shell should now be inside the venv. It is recommended that you upgrade you
 
 Now we're ready to install pntos. In the project root directory, run:
 
-    pip install -v -r requirements-dev.lock --extra-index-url=$WHEELHOUSE_URL
+    pip install -v -r requirements.txt --extra-index-url=$UV_INDEX
 
 **Note:** this command may take a while to run. It is downloading example data, which may take a lot
 of bandwidth.
 
 If successful, you are ready to move on to [Testing Your Installation](#testing-your-installation).
 If not, please see [Errata](#errata) for troubleshooting help.
-
-### Rye Environment Setup
-
-#### Installing Rye
-
-First, install [Rye](https://rye.astral.sh/guide/installation/). Rye is available through some
-system package managers.
-
-##### MacOS
-
-```shell
-    brew install rye
-```
-
-##### Ubuntu
-
-If rye is unavailable through your system package manager, you can install it via the following
-commands:
-
-```shell
-    sudo apt update
-    sudo apt install curl
-    curl -sSf https://rye.astral.sh/get | bash
-```
-
-After running the last command, Rye will ask if you want to continue. Input `y` to proceed.
-
-Next, rye will bring up the following prompt:
-
-```shell
-    ? What should running `python` or `python3` do when you are not inside a Rye managed project? ›
-    Run a Python installed and managed by Rye
-    ❯ Run the old default Python (provided by your OS, pyenv, etc.)
-```
-We recommend selecting the second option: `Run the old default Python (provided by your OS, pyenv,
-etc.)`
-
-#### Using Rye
-
-Once Rye is installed, we will sync the project in the project root directory:
-
-    rye sync -v
-
-The above command does a lot of work for you: it creates a new venv in the local `.venv` folder,
-installs all of the pntos-python packages into it, and installs a compatible version of the Python
-interpreter/pip for you. **Note:** this means that the above command may take a while to run. It is
-downloading example data, which may take a lot of bandwidth.
-
-If all went well, you should now be able to activate the venv (if not, please see [Errata](#errata)
-for troubleshooting help). The steps to do this vary depending on your shell:
-
-**bash/zsh**: `source .venv/bin/activate`
-
-**fish**: `source .venv/bin/activate.fish`
-
-Your shell should now be inside a venv that is ready to use pntos-python and you are ready to move
-on to [Testing Your Installation](#testing-your-installation).
 
 ## Testing Your Installation
 
@@ -153,10 +88,10 @@ running this app.
 
 ## Contributing
 
-To begin development, refer to [Environment Setup](#environment-setup) for how to setup development
-tooling and enter the configured venv. Once that is done, you can proceed to develop your new
-functionality in a feature branch. When your feature is complete and ready for us to review, there
-are a few code quality checks you should perform before opening a merge request.
+To begin development, you will want to first install and configure `uv`. Once that is done, you can 
+proceed to develop your new functionality in a feature branch. When your feature is complete and 
+ready for us to review, there are a few code quality checks you should perform before opening a 
+merge request.
 
 ### Checking Contributions
 
@@ -168,14 +103,21 @@ New contributions to this repo should pass the checks contained in `run_all_chec
 
 You can view a detailed code coverage report from the `index.html` in the `htmlcov` directory.
 
-### Rye Tooling Explanation
+### Uv Tooling Explanation
 
-Rye allows us to manage this repository as a monorepo. We have a few base folders which act as our
+uv allows us to manage this repository as a monorepo. We have a few base folders which act as our
 modules, and one folder that defines applications which use those modules.
 
-Whenever you type `rye sync` it recurses into every `pntos-*` folder and finds the `pyproject.toml`
-in there. It then installs the `dependencies` subkey in that file, and places them in the *top
-level* `requirements.lock`.
+Whenever you type `uv sync` it recurses into the `pntos-*` folders and finds the `pyproject.toml`
+in there. It then installs the `dependencies` subkey in those files, and places them in the top
+level `uv.lock`. Generating the `requirements.txt` and `requirements-dev.txt` is then done as a
+separate step, by running:
+
+```shell
+uv sync
+uv export --frozen --no-dev --all-packages --no-hashes > requirements.txt
+uv export --frozen --all-packages --no-hashes > requirements-dev.txt
+```
 
 Note that files that are installed via a local path are installed as [editable
 installs](https://setuptools.pypa.io/en/latest/userguide/development_mode.html) and are
@@ -189,8 +131,8 @@ here](https://pntos.pages.aspn.us/pntos-python/).
 ## Generating Documentation
 
 This section assumes you have a Python environment with the necessary dependencies installed. Please
-see [Rye Environment Setup](#rye-environment-setup) or [Pip Environment
-Setup](#pip-environment-setup) for more information on how to do so.
+see [Python Environment
+Setup](#python-environment-setup) for more information on how to do so.
 
 To build the documentation, you'll first need to initialize the git submodule:
 
@@ -211,21 +153,18 @@ you just generated.
 
 Please see the following sections for some potential failures and how to resolve them.
 
-### Invalid Source URL
+### Unauthorized Error
 
 An error like:
 
 ```
-error: invalid source url
-
-Caused by:
-    relative URL without a base
+HTTP status client error (401 Unauthorized) for url
 ```
 
-is caused by the `WHEELHOUSE_URL` environment variable not being set as expected. You can run:
+is caused by the `UV_INDEX` environment variable not being set as expected. You can run:
 
 ```shell
-echo $WHEELHOUSE_URL
+echo $UV_INDEX
 ```
 
 and you should get output of the form
@@ -233,9 +172,21 @@ and you should get output of the form
 not the case, please see [Authentication](#authentication) for instructions on setting that
 environment variable.
 
+### Navtk Issue
+
+An error like:
+
+```
+ERROR: Could not find a version that satisfies the requirement navtk
+```
+
+is caused by not passing `--extra-index-url=$UV_INDEX` into `pip install`, or the variable
+`UV_INDEX` not being set. Please see [Authentication](#authentication) for instructions on setting that
+environment variable.
+
 ### Errors when Building NavToolkit from Source
 
-When running `rye sync -v` or a `pip install -r` command to install install this project, one of the
+When running a `pip install -r` command to install this project, one of the
 dependencies installed is NavToolkit. The system will attempt to download and install a prebuilt
 NavToolkit wheel. However, each wheel is built for a specific set of systems so it is possible your
 system will not have coverage. If that's the case, your system will instead attempt to build the
