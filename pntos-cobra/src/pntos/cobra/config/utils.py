@@ -60,18 +60,21 @@ def config_from_registry(
     config_type: type[ConfigType], mediator: Mediator, config_group: str
 ) -> ConfigType | None:
     """
-    A utility function that returns a specific config based on the config type and group.
+    A utility function that extracts the requested config from the registry.
 
-    This function will attempt to convert fields stored in the registry back to their
-    original type specified in the ``config_type`` object. If it is unable to do so, it will
-    log the error and continue. If the function is unable to grab a specific field from the
-    registry, the error is considered fatal and the function will return ``None``.
+    This function is used to extract requested configs loaded into the registry by
+    ``config_to_registry``. Since that function converts objects into registry compliant
+    types, this function attempts to convert them back to their original type specified
+    within the ``config_type`` parameter. If it is unable to do so, it will log the error
+    and continue. If the function is unable to grab a field from the registry,
+    (e.g. the ``accel_bias_sigma`` in an ImuConfig) the error is considered fatal
+    and the function will return ``None``.
 
     Args:
-        config_type (ConfigType): The config type of the config being pulled from the registry.
-        This is necessary for appropriately returning the fields as their expected types.
-        mediator (Mediator): :class:`Mediator` object to access the registry and log messages.
-        config_group (str): The config group used to find the config object within the registry.
+        config_type (ConfigType): The parameter that specifies which config the user wants to receive.
+        mediator (Mediator): The :class:`Mediator` object which contains the registry the
+        config will be extracted from.
+        config_group (str): The registry group which contains the config being extracted.
 
     Returns:
         ConfigType | None
