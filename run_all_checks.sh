@@ -4,8 +4,8 @@
 
 # Runs all checks necessary for contributing. This script assumes:
 # - The current working directory is the pntos-python root project directory
-# - rye is on the PATH
-# - rye sync has been run, and the virtual environment it set up has been activated
+# - uv is on the PATH
+# - uv sync has been run, and the virtual environment it set up has been activated
 
 set -xe
 

@@ -39,17 +39,9 @@ Ubuntu users can use the following command to install the above dependencies:
 sudo apt update && sudo apt install python3 git libglib2.0-dev default-jre-headless python3-tk
 ```
 
-We currently support two toolchains: A standard `pip`-based workflow, and a `Rye`-based workflow:
+You are now ready to set up your python environment.
 
-**Pip**: If you already have your own workflows or prefer to just use vanilla `pip`, you might
-prefer this route.
-
-**Rye**: If you're looking for an all in one experience that runs things for you, you might prefer
-this route.
-
-How you wish to set up your environment will determine which of the next sections you follow.
-
-### Pip Environment Setup
+### Python Environment Setup
 
 Begin by creating and entering a clean venv. We can create the venv in the
 `.venv` folder by running the following command in the project root directory:
@@ -133,8 +125,8 @@ here](https://pntos.pages.aspn.us/pntos-python/).
 ## Generating Documentation
 
 This section assumes you have a Python environment with the necessary dependencies installed. Please
-see [Rye Environment Setup](#rye-environment-setup) or [Pip Environment
-Setup](#pip-environment-setup) for more information on how to do so.
+see [Python Environment
+Setup](#python-environment-setup) for more information on how to do so.
 
 To build the documentation, you'll first need to initialize the git submodule:
 
@@ -188,7 +180,7 @@ environment variable.
 
 ### Errors when Building NavToolkit from Source
 
-When running `rye sync -v` or a `pip install -r` command to install install this project, one of the
+When running a `pip install -r` command to install this project, one of the
 dependencies installed is NavToolkit. The system will attempt to download and install a prebuilt
 NavToolkit wheel. However, each wheel is built for a specific set of systems so it is possible your
 system will not have coverage. If that's the case, your system will instead attempt to build the
