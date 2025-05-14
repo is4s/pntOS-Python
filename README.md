@@ -164,7 +164,7 @@ HTTP status client error (401 Unauthorized) for url
 is caused by the `UV_INDEX` environment variable not being set as expected. You can run:
 
 ```shell
-echo UV_INDEX
+echo $UV_INDEX
 ```
 
 and you should get output of the form
