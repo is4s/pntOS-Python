@@ -15,6 +15,16 @@ ConfigType = TypeVar('ConfigType', bound=BaseConfig)
 
 
 def imu_model_to_config(model: ImuModel, group: str) -> ImuConfig:
+    """
+    Stores a provided IMU model inside an :class:`ImuConfig` object.
+
+    Args:
+        model (ImuModel): The IMU model to store.
+        group (str): The config group the :class:`ImuConfig` object should be stored under in the registry.
+
+    Returns:
+        ImuConfig
+    """
     return ImuConfig(
         accel_bias_sigma=tuple(model.accel_bias_sigma),
         accel_bias_tau=tuple(model.accel_bias_tau),
@@ -27,6 +37,15 @@ def imu_model_to_config(model: ImuModel, group: str) -> ImuConfig:
 
 
 def imu_model_from_config(config: ImuConfig) -> ImuModel:
+    """
+    Grabs the :class:`ImuModel` object nested within the provided :class:`ImuConfig` object.
+
+    Args:
+        config (ImuConfig): The :class:`ImuConfig` object to grab an :class:`ImuModel` object from.
+
+    Returns:
+        ImuModel
+    """
     return ImuModel(
         accel_bias_sigma=np.array(config.accel_bias_sigma),
         accel_bias_tau=np.array(config.accel_bias_tau),
@@ -40,6 +59,26 @@ def imu_model_from_config(config: ImuConfig) -> ImuModel:
 def config_from_registry(
     config_type: type[ConfigType], mediator: Mediator, config_group: str
 ) -> ConfigType | None:
+    """
+    A utility function that extracts the requested config from the registry.
+
+    This function is used to extract requested configs loaded into the registry by
+    ``config_to_registry``. Since that function converts objects into registry compliant
+    types, this function attempts to convert them back to their original type specified
+    within the ``config_type`` parameter. If it is unable to do so, it will log the error
+    and continue. If the function is unable to grab a field from the registry,
+    (e.g. the ``accel_bias_sigma`` in an ImuConfig) the error is considered fatal
+    and the function will return ``None``.
+
+    Args:
+        config_type (ConfigType): The parameter that specifies which config the user wants to receive.
+        mediator (Mediator): The :class:`Mediator` object which contains the registry the
+        config will be extracted from.
+        config_group (str): The registry group which contains the config being extracted.
+
+    Returns:
+        ConfigType | None
+    """
     conf_params = [f for f in fields(config_type) if f.name != 'group']
     kv = mediator.registry.batch_start(config_group)
     out: dict[str, RegistryValueTypeUnion | tuple[float, ...] | Enum | BaseConfig] = {}
@@ -99,6 +138,18 @@ def config_from_registry(
 
 
 def config_to_registry(config: BaseConfig, mediator: Mediator) -> None:
+    """
+    A utility function that inserts a config into the registry.
+
+    This function will convert certain types (list[float], list|nd.array[int], Enum, tuple[float])
+    unsupported by the registry to the corresponding supported type represented by ``RegistryValueType``.
+    It also supports storing nested config objects, though it expects the nested object to have the
+    same config group as the outer object.
+
+    Args:
+        config (BaseConfig): The config to be stored in the registry.
+        mediator (Mediator): :class:`Mediator` object to access the registry and log messages.
+    """
     conf_params = [f for f in fields(config) if f.name != 'group']
     kv = mediator.registry.batch_start(config.group)
 
@@ -125,6 +176,18 @@ def config_to_registry(config: BaseConfig, mediator: Mediator) -> None:
 
 
 def _confirm_types(out_val: Any, expected_type: type[Any]) -> bool:
+    """
+    A helper function which determines if the type of ``out_val`` is equivalent to ``expected_type``.
+    If equivalent, returns true otherwise returns false.
+    This function supports the case where ``expected_type`` is a generic alias.
+
+    Args:
+        out_val (Any): Object whose type is to be validated.
+        expected_type (type[Any]): The expected type of `out_val`.
+
+    Returns:
+        bool
+    """
     out_type = type(out_val)
 
     # Check if expected_type is generic alias (list[str], tuple[float], ect...)
