@@ -177,7 +177,9 @@ def config_to_registry(config: BaseConfig, mediator: Mediator) -> None:
 
 def _confirm_types(out_val: Any, expected_type: type[Any]) -> bool:
     """
-    A helper function to compare types while considering aliases.
+    A helper function which determines if the type of ``out_val`` is equivalent to ``expected_type``.
+    If equivalent, returns true otherwise returns false.
+    This function supports the case where ``expected_type`` is a generic alias.
 
     Args:
         out_val (Any): Object whose type is to be validated.
