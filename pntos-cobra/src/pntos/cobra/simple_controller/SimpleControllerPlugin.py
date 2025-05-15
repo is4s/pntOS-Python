@@ -297,10 +297,8 @@ class SimpleControllerPlugin(ControllerPlugin):
                 while True:
                     input()
             except KeyboardInterrupt:
+                self._log(LoggingLevel.INFO, 'Keyboard Interrupt Detected.')
                 pass
 
-        self._log(
-            LoggingLevel.INFO, 'Keyboard interrupt detected. Shutting down pntOS.'
-        )
         self.shutdown_plugin()
         exit(0)
