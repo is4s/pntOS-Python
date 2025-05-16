@@ -1,17 +1,16 @@
 # Running Your First App
 
-In the `{workspace-root}/apps` directory, there are several off-the-shelf {term}`apps <App>`
-of increasing complexity assembled from off-the-shelf {term}`Cobra` plugins that serve to
-demonstrate {term}`pntOS Python` and the development process for you to build your own
-{term}`apps <App>`.
-This page serves as an introduction to running an arbitrary {term}`Cobra` {term}`app
-<App>`. For more details on any particular app, refer to the corresponding page in the
-{ref}`tutorial-apps` section of the docs.
+In the `{workspace-root}/apps` directory, there are several off-the-shelf {term}`apps
+<App>` of increasing complexity assembled from off-the-shelf {term}`Cobra` plugins that
+serve to demonstrate the {term}`Python pntOS API` and the development process for you to
+build your own {term}`apps <App>`. This page serves as an introduction to running an
+arbitrary {term}`Cobra` {term}`app <App>`. For more details on any particular app, refer
+to the corresponding page in the {ref}`tutorial-apps` section of the docs.
 
 ## Running an App
 
 A python app consists of a python script containing all plugin imports, config, and code
-needed to start a particular instance of {term}`pntOS`. The {term}`Cobra` plugin set
+needed to start a particular instance of Python pntOS. The {term}`Cobra` plugin set
 currently contains a [Transport plugin](./plugins/transport_plugin.md) that retrieves
 {term}`ASPN` messages from an
 [LCM](https://github.com/lcm-proj/lcm)
@@ -26,11 +25,11 @@ relay, and playing back a log file to feed data into pntOS.
 
 These instructions assume an active virtual environment as outlined in the
 [](./installation.md). If you currently have that virtual environment activated, skip to
-[](#open-local-tcp-server).
+[](#start-a-local-tcp-server).
 
 If you have not yet created a python virtual environment for the [`pntos-python`
 repository](https://git.aspn.us/pntos/pntos-python), follow the instructions in [](./installation.md) then go
-to [](#open-local-tcp-server). 
+to [](#start-a-local-tcp-server). 
 
 If you have created the virtual environment but it is not currently activated, run this
 command from the root directory to enter into the virtual environment:
@@ -78,7 +77,7 @@ to `DEBUG` when initializing the {py:obj}`pntos.cobra.SimpleLoggingPlugin`.
 ### Select an App
 
 The available apps can be found in each subfolder of the `{workspace-root}/apps`
-directory. If this is your first time with {term}`pntOS Python`, it is recommending you
+directory. If this is your first time with the {term}`Python pntOS API`, it is recommending you
 start with the `fusion_gps_ins` app. If you are running your own custom app, just switch
 out the paths to the off-the-shelf apps with the path to your app in the following instructions. 
 
