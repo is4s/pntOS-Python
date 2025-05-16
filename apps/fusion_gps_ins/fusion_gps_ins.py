@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 
-# Grab the plugins we want off the shelf
+# API imports
 from pntos.api import LoggingLevel
+
+# Import Cobra plugins and config structs
 from pntos.cobra import (
     Aspn23LcmTransportPlugin,
     SimpleControllerPlugin,
-    SimpleDiagnosticLogPlugin,
     SimpleEkfFusionStrategyPlugin,
     SimpleFusionPlugin,
     SimpleGpsInsStateModelingPlugin,
@@ -22,7 +23,7 @@ from pntos.cobra.config import (
     SensorConfig,
 )
 
-# Set up configuration parameters
+# Config setup
 my_config = [
     ImuConfig(
         group='config/inertial_state',
@@ -65,7 +66,7 @@ my_config = [
     ),
 ]
 
-# Create all of our plugins
+# Instantiate all of our plugins
 controller = SimpleControllerPlugin('Cobra Simple Controller Plugin')
 plugins = [
     Aspn23LcmTransportPlugin('Cobra Aspn23-lcm Transport Plugin'),
@@ -80,12 +81,8 @@ plugins = [
     ),
     SimpleOrchestrationPlugin('Cobra Simple Orchestration Plugin'),
     SimpleRegistryPlugin('Cobra Simple Registry Plugin', config=my_config),
-    SimpleDiagnosticLogPlugin('Cobra Simple Diagnostic Plugin'),
 ]
 
 # Start the controller, and pass it all of the other plugins to use
-
 controller.init_plugin()
-controller.take_control(
-    plugins=plugins, plugin_resources_locations=None, initial_config=None
-)
+controller.take_control(plugins)
