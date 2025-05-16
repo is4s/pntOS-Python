@@ -31,7 +31,7 @@ class SimpleTransportPlugin(TransportPlugin):
 
     def start_listening(self) -> None:
         self.listening = True
-        Thread(target=listen_for_messages).start()
+        Thread(target=listen_for_messages, args=(self,)).start()
 
     def stop_listening(self) -> None:
         self.listening = False
