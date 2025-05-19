@@ -46,7 +46,9 @@ You are now ready to set up your python environment.
 Begin by creating and entering a clean venv. We can create the venv in the
 `.venv` folder by running the following command in the project root directory:
 
-    python3 -m venv .venv --prompt pntos-python
+```shell
+python3 -m venv .venv --prompt pntos-python
+```
 
 Next, enter the venv. The steps to do this vary depending on your shell:
 
@@ -56,11 +58,15 @@ Next, enter the venv. The steps to do this vary depending on your shell:
 
 Your shell should now be inside the venv. It is recommended that you upgrade your pip to the latest:
 
-    pip install --upgrade pip
+```shell
+pip install --upgrade pip
+```
 
 Now we're ready to install pntos. In the project root directory, run:
 
-    pip install -v -r requirements.txt --extra-index-url=$UV_INDEX
+```shell
+pip install -v -r requirements.txt --extra-index-url=$UV_INDEX
+```
 
 **Note:** this command may take a while to run. It is downloading example data, which may take a lot
 of bandwidth.
@@ -88,9 +94,9 @@ running this app.
 
 ## Contributing
 
-To begin development, you will want to first install and configure `uv`. Once that is done, you can 
-proceed to develop your new functionality in a feature branch. When your feature is complete and 
-ready for us to review, there are a few code quality checks you should perform before opening a 
+To begin development, you will want to first install and configure `uv`. Once that is done, you can
+proceed to develop your new functionality in a feature branch. When your feature is complete and
+ready for us to review, there are a few code quality checks you should perform before opening a
 merge request.
 
 ### Checking Contributions
