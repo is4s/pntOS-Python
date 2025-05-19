@@ -23,6 +23,9 @@ the name of your token and `<TOKEN_VALUE>` with the value of your token:
 export UV_INDEX=https://<TOKEN_NAME>:<TOKEN_VALUE>@git.aspn.us/api/v4/projects/94/packages/pypi/simple
 ```
 
+You may wish to permanently set the above variable. For example, bash users can add the above line
+to their `~/.bashrc` script.
+
 ## Environment Setup
 
 Please ensure you have the following tools installed:
