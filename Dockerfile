@@ -3,6 +3,9 @@ FROM ubuntu:24.04
 # Install dependencies needed to bring in upstream projects via their source
 RUN apt update && apt install git -y
 
+# Install python, and everything it needs to create a virtual environment.
+RUN apt update && apt install python3 python3-venv -y
+
 # Install dependencies needed to run LCM.
 RUN apt update && apt install libglib2.0-dev -y
 
