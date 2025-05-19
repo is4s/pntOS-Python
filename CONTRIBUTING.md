@@ -1,10 +1,4 @@
-
-To begin development, you will want to first install and configure `uv`. Once that is done, you can
-proceed to develop your new functionality in a feature branch. When your feature is complete and
-ready for us to review, there are a few code quality checks you should perform before opening a
-merge request.
-
-### Checking Contributions
+# Checking Contributions
 
 New contributions to this repo should pass the checks contained in `run_all_checks.sh`:
 
@@ -14,14 +8,18 @@ New contributions to this repo should pass the checks contained in `run_all_chec
 
 You can view a detailed code coverage report from the `index.html` in the `htmlcov` directory.
 
-### Uv Tooling Explanation
+# Updating Dependencies
 
-uv allows us to manage this repository as a monorepo. We have a few base folders which act as our
+Updating the `requirements.txt` and `requirements-minimal.txt` files requires the tool `uv`.
+
+`uv` allows us to manage this repository as a monorepo. We have a few base folders which act as our
 modules, and one folder that defines applications which use those modules.
 
 Whenever you type `uv sync` it recurses into the `pntos-*` folders and finds the `pyproject.toml`
 in there. It then installs the `dependencies` subkey in those files, and places them in the top
-level `uv.lock`. Generating the `requirements.txt` and `requirements-dev.txt` is then done as a
+level `uv.lock`.
+
+Generating the `requirements.txt` and `requirements-dev.txt` is then done as a
 separate step, by running:
 
 ```shell
