@@ -114,7 +114,7 @@ pillow==11.2.1
 pip==25.1.1
 pluggy==1.5.0
     # via pytest
-pntos-python-datasets @ git+ssh://git@git.aspn.us/pntos/pntos-python-datasets.git@64b88705a2bb762ec618b9960229986120d000b9
+pntos-python-datasets==0.1.0
     # via pntos-cobra
 prompt-toolkit==3.0.51
     # via ipython
