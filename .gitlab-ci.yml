@@ -77,6 +77,24 @@ ruff format:
         # If there's a diff, fail the stage.
         - git diff --exit-code
 
+requirements up-to-date:
+    stage: check
+    tags:
+        - linux-light-runner
+    script:
+        - docker run --rm -dit -v $(pwd):/work --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
+        # Generate uv.lock
+        - docker exec pntos-python uv sync -v
+        # Generate requirements*.txt files
+        - docker exec pntos-python uv export --frozen --no-dev --all-packages --no-hashes > requirements-minimal.txt
+        - docker exec pntos-python uv export --frozen --all-packages --no-hashes > requirements.txt
+        # Revert URL surgery to sources and generated output
+        - find pntos-* -type f -name "pyproject.toml" -exec sed -i -e "s|git+$TOKEN_URL|git+ssh://git@git.aspn.us/|g" {} \+
+        - find . -type f -name "requirements*.txt" -exec sed -i -e "s|git+https://|git+ssh://git@|g" {} \+
+        - sed -i -e "s|https://git.aspn.us/pntos|ssh://git@git.aspn.us/pntos|g" uv.lock
+        # If there's still a diff, then there's unsynced changes; fail the job.
+        - git diff --exit-code
+
 Python 3.10 Test:
     stage: check
     tags:
