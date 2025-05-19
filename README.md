@@ -121,8 +121,8 @@ separate step, by running:
 
 ```shell
 uv sync
-uv export --frozen --no-dev --all-packages --no-hashes > requirements.txt
-uv export --frozen --all-packages --no-hashes > requirements-dev.txt
+uv export --frozen --no-dev --all-packages --no-hashes > requirements-minimal.txt
+uv export --frozen --all-packages --no-hashes > requirements.txt
 ```
 
 Note that files that are installed via a local path are installed as [editable

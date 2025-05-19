@@ -72,7 +72,7 @@ ruff format:
         # Don't let modification to the pyproject.toml and requirements.lock files produce a diff.
         - git checkout -- $(git ls-files | grep pyproject.toml)
         - git checkout -- $(git ls-files | grep requirements.txt)
-        - git checkout -- $(git ls-files | grep requirements-dev.txt)
+        - git checkout -- $(git ls-files | grep requirements-minimal.txt)
         - git checkout -- $(git ls-files | grep uv.lock)
         # If there's a diff, fail the stage.
         - git diff --exit-code
@@ -145,7 +145,7 @@ pip workflow check:
     script:
         - docker run --rm -dit -v $(pwd):/work --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
         - docker exec pntos-python python3 -m venv /work/.venv
-        - docker exec pntos-python .venv/bin/pip install -v -r requirements-dev.txt --extra-index-url=${UV_INDEX}
+        - docker exec pntos-python .venv/bin/pip install -v -r requirements.txt --extra-index-url=${UV_INDEX}
         - docker exec pntos-python postprocessing/run_app_and_record_data.py
 
 pages:
