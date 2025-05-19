@@ -9,10 +9,10 @@ RUN apt update && apt install python3 python3-venv -y
 # Install dependencies needed to run LCM.
 RUN apt update && apt install libglib2.0-dev -y
 
-# Install dependencies needed to install Uv.
+# Install dependencies needed to install uv.
 RUN apt update && apt install curl -y
 
-# Install Uv
+# Install uv
 RUN curl -LsSf https://astral.sh/uv/install.sh | UV_UNMANAGED_INSTALL="/usr/local/bin" bash
 
 # Install java (needed to run app)
