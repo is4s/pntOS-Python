@@ -134,13 +134,7 @@ This section assumes you have a Python environment with the necessary dependenci
 see [Python Environment
 Setup](#python-environment-setup) for more information on how to do so.
 
-To build the documentation, you'll first need to initialize the git submodule:
-
-```shell
-git submodule update --init --recursive
-```
-
-Then, from the `docs/` directory, you can build the docs with:
+From the `docs/` directory, you can build the docs with:
 
 ```shell
 make html
@@ -172,12 +166,12 @@ and you should get output of the form
 not the case, please see [Authentication](#authentication) for instructions on setting that
 environment variable.
 
-### Navtk Issue
+### Could not Find Package
 
 An error like:
 
 ```
-ERROR: Could not find a version that satisfies the requirement navtk
+ERROR: Could not find a version that satisfies the requirement <package name>
 ```
 
 is caused by not passing `--extra-index-url=$UV_INDEX` into `pip install`, or the variable

@@ -31,7 +31,9 @@ dev = [
     "sphinx-design",
     "matplotlib",
     "pntos-cobra",
-    "pntos-api"
+    "pntos-api",
+    # Generated from commit a44dac604ec22c200e092e65dfe0d62cb9fe32c3 on 19 May 2025
+    "pntos-python-docs-data==0.1.0"
 ]
 
 [tool.ruff.lint]

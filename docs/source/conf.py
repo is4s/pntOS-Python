@@ -1,3 +1,5 @@
+from site import getsitepackages
+
 # Configuration file for the Sphinx documentation builder.
 #
 # For the full list of built-in configuration values, see the documentation:
@@ -67,7 +69,8 @@ exclude_patterns = []
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
 html_theme = 'sphinx_rtd_theme'
-branding_dir = '../branding_assets/branding/'
+site_packages_dir = getsitepackages()[0]
+branding_dir = f'{site_packages_dir}/branding/'
 html_static_path = ['../_static', branding_dir]
 
 html_logo = branding_dir + 'pntOs_Logo_Gradient_Light_Horizontal.png'
@@ -75,7 +78,7 @@ html_theme_options = {
     'logo_only': True,
     'collapse_navigation': True,
 }
-html_favicon = '../branding_assets/branding/favicon.ico'
+html_favicon = f'{branding_dir}/favicon.ico'
 
 
 def setup(app):
