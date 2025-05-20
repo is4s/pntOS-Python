@@ -134,13 +134,7 @@ This section assumes you have a Python environment with the necessary dependenci
 see [Python Environment
 Setup](#python-environment-setup) for more information on how to do so.
 
-To build the documentation, you'll first need to initialize the git submodule:
-
-```shell
-git submodule update --init --recursive
-```
-
-Then, from the `docs/` directory, you can build the docs with:
+From the `docs/` directory, you can build the docs with:
 
 ```shell
 make html
