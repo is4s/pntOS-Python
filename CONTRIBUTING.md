@@ -19,7 +19,7 @@ Whenever you type `uv sync` it recurses into the `pntos-*` folders and finds the
 in there. It then installs the `dependencies` subkey in those files, and places them in the top
 level `uv.lock`.
 
-Generating the `requirements.txt` and `requirements-dev.txt` is then done as a
+Generating the `requirements.txt` and `requirements-minimal.txt` is then done as a
 separate step, by running:
 
 ```shell
