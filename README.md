@@ -39,7 +39,7 @@ Please ensure you have the following tools installed:
 Ubuntu users can use the following command to install the above dependencies:
 
 ```shell
-sudo apt update && sudo apt install python3 python3-venv git libglib2.0-dev default-jre-headless python3-tk
+sudo apt update && sudo apt install python3 python3-venv git libglib2.0-dev default-jre python3-tk
 ```
 
 You are now ready to set up your python environment.
