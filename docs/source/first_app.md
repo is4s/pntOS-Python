@@ -29,7 +29,7 @@ These instructions assume an active virtual environment as outlined in the
 
 If you have not yet created a python virtual environment for the [`pntos-python`
 repository](https://git.aspn.us/pntos/pntos-python), follow the instructions in [](./installation.md) then go
-to [](#start-a-local-tcp-server). 
+to [](#start-a-local-tcp-server).
 
 If you have created the virtual environment but it is not currently activated, run this
 command from the root directory to enter into the virtual environment:
@@ -58,7 +58,8 @@ play-dataset
 This should open the LCM LogPlayer GUI with a play button. You should see the following channels:
 
 - `/sensor/ins-d/pva`
-- `/sensor/ublox/position`
+- `/sensor/ublox-ZED-F9T/position`
+- `/sensor/ublox-ZED-F9T/velocity`
 - `/sensor/vn-100/imu`
 
 ## Record Output
@@ -79,7 +80,7 @@ to `DEBUG` when initializing the {py:obj}`pntos.cobra.SimpleLoggingPlugin`.
 The available apps can be found in each subfolder of the `{workspace-root}/apps`
 directory. If this is your first time with the {term}`Python pntOS API`, it is recommending you
 start with the `fusion_gps_ins` app. If you are running your own custom app, just switch
-out the paths to the off-the-shelf apps with the path to your app in the following instructions. 
+out the paths to the off-the-shelf apps with the path to your app in the following instructions.
 
 The available off-the-shelf apps are in the
 {ref}`tutorial-apps` section of these docs.

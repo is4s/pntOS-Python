@@ -65,7 +65,7 @@ my_config = [
     ),
     OrchestrationConfig(
         imu_channel='/sensor/vn-100/imu',
-        gps_channel='/sensor/ublox/position',
+        gps_channel='/sensor/ublox-ZED-F9T/position',
         group='config/orchestration',
     ),
 ]  # End Config
