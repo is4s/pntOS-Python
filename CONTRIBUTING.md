@@ -1,4 +1,6 @@
-# Checking Contributions
+# Contributing
+
+## Checking Contributions
 
 New contributions to this repo should pass the checks contained in `run_all_checks.sh`. Using an
 activated virtual environment with all of this project's dependencies installed (see installation
@@ -10,7 +12,7 @@ instructions on how to set this up), run:
 
 You can view a detailed code coverage report from the `index.html` in the `htmlcov` directory.
 
-# Updating Dependencies
+## Updating Dependencies
 
 Updating the `requirements.txt` and `requirements-minimal.txt` files requires the tool `uv`.
 
