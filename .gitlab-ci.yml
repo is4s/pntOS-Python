@@ -41,7 +41,7 @@ default:
         # https://gitlab-ci-token:[MASKED]@git.aspn.us/pntos/pntos.git
         - export TOKEN_URL="$(echo $CI_REPOSITORY_URL | sed -E 's/(.*git.aspn.us\/).*/\1/g')"
 
-        # Modify the pyproject.toml and requirements*.lock dependencies to use the CI token URL.
+        # Modify the pyproject.toml and requirements*.txt dependencies to use the CI token URL.
         - find pntos-* -type f -name "pyproject.toml" -exec sed -i -e "s|git+ssh://git@git.aspn.us/|git+$TOKEN_URL|g" {} \+
         - find . -type f -name "requirements*.txt" -exec sed -i -e "s|git+ssh://git@git.aspn.us/|git+$TOKEN_URL|g" {} \+
 
@@ -69,7 +69,7 @@ ruff format:
     script:
         # Run the formatter to see if it produces a diff.
         - docker run --rm -v $(pwd):/work -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE "uv sync -v && ruff format"
-        # Don't let modification to the pyproject.toml and requirements.lock files produce a diff.
+        # Don't let modification to the pyproject.toml, requirements*.txt, or uv.lock files produce a diff.
         - git checkout -- $(git ls-files | grep pyproject.toml)
         - git checkout -- $(git ls-files | grep requirements.txt)
         - git checkout -- $(git ls-files | grep requirements-minimal.txt)
