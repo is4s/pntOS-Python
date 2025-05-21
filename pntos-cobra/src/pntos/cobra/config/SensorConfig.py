@@ -22,16 +22,6 @@ class SensorConfig(BaseConfig):
     The corresponding DCM would be C_sensor_to_platform.
     """
 
-    source_identifier: str
-    """
-    The source of the sensor's measurements e.g. an LCM channel name.
-    """
-
-    destination_identifier: str
-    """
-    The destination for the sensor's measurements
-    e.g. a measurement processor's 'identifier' field.
-    """
     use_for_alignment: bool
     """
     If true this config will be used during alignment with the platform frame.

@@ -128,7 +128,7 @@ For more information on making your own config objects, see the docstrings for {
 So, with that background, we can now understand what is happening next in the app:
 ```{literalinclude} ../../../apps/fusion_gps_ins/fusion_gps_ins.py
 :start-at: "my_config"
-:end-at: "]"
+:end-at: "] # End Config"
 :lineno-match:
 ```
 Here we populate a list of config objects with initial values and assign them a group.
@@ -150,6 +150,7 @@ Here's a brief description of what each config object is used for in this app:
 | {py:obj}`ManualAlignmentConfig <pntos.cobra.config.ManualAlignmentConfig>` | Configuration to manually align the inertial unit to the platform frame.                                                                                  |
 | {py:obj}`SensorConfig <pntos.cobra.config.SensorConfig>`                   | Information about the GPS antenna's relationship to the platform frame.                                                                                   |
 | {py:obj}`InertialConfig <pntos.cobra.config.InertialConfig>`               | Configuration for the inertial mechanization and buffering.                                                                                               |
+| {py:obj}`OrchestrationConfig <pntos.cobra.config.OrchestrationConfig>`     | Configuration that defines the channels to use for alignment, mechanization, and fusion.                                                                  |
 
 Now that we have our config set up in `my_config`, let's look at instantiating our plugins.
 

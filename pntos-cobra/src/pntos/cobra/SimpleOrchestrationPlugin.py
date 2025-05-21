@@ -35,6 +35,7 @@ from pntos.api import (
     StandardStateModelProvider,
     StateModelingPlugin,
 )
+from pntos.cobra.config import OrchestrationConfig, config_from_registry
 from pntos.cobra.utils import (
     correct_dcm_with_tilt,
     dcm_to_quat,
@@ -52,10 +53,6 @@ IMU_SOL_CHANNEL = '/solution/pntos/imu'
 IMU_CHANNEL = '/sensor/vn-100/imu'
 GPS_CHANNEL = '/sensor/ublox/position'
 
-# Process_pntos_message mapping
-MEASUREMENT_CHANNELS = [GPS_CHANNEL]
-ALIGNMENT_CHANNELS = [GPS_CHANNEL, IMU_CHANNEL]
-
 # State block parameters
 STATE_BLOCK_ID = STATE_BLOCK_LABEL = 'pinson15'
 STATE_BLOCK_LABELS = [STATE_BLOCK_LABEL]
@@ -68,7 +65,6 @@ MEASUREMENT_PROCESSOR_CONFIG_GROUP = 'config/gp3d_state_modeling'
 
 # Inertial parameters
 INERTIAL_GROUP = 'config/inertial'
-INERTIAL_CHANNEL = IMU_CHANNEL
 
 # Config groups
 ALIGNMENT_CONFIG_GROUP = 'config/default/alignment'
@@ -143,8 +139,24 @@ class SimpleOrchestrationPlugin(OrchestrationPlugin):
         stream_config.sequenced_stream_all(True)
         stream_config.immediate_stream_add(MeasurementImu)
 
-        self.measurement_channels: list[str] = MEASUREMENT_CHANNELS
-        self.alignment_channels: list[str] = ALIGNMENT_CHANNELS
+        orch_config_group = 'config/orchestration'
+        orch_config = config_from_registry(
+            OrchestrationConfig, self.mediator, orch_config_group
+        )
+
+        if orch_config is None:
+            self._log(
+                LoggingLevel.ERROR,
+                'Unable to grab the orchestration config from the registry. Filter cannot be implemented.',
+            )
+            return
+
+        self.measurement_channels: list[str] = [orch_config.gps_channel]
+        self.alignment_channels: list[str] = [
+            orch_config.gps_channel,
+            orch_config.imu_channel,
+        ]
+        self.inertial_channel = orch_config.imu_channel
 
         self._sort_and_validate_plugins(plugins)
 
@@ -514,7 +526,7 @@ class SimpleOrchestrationPlugin(OrchestrationPlugin):
                 return
 
         # If aligned, send messages to IMU or filter
-        if message.source_identifier == INERTIAL_CHANNEL:
+        if message.source_identifier == self.inertial_channel:
             self.inertial.process_pntos_message(message)
         elif message.source_identifier in self.measurement_channels:
             self._dispatch_to_fusion_engine(message)

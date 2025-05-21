@@ -68,8 +68,6 @@ my_config: list[BaseConfig] = [
     SensorConfig(
         lever_arm=(0.0, 0.0, 0.0),
         orientation=(0.0, 0.0, 0.0, 0.0),
-        source_identifier='lcm://cobranav/novatel',
-        destination_identifier='gps_measurement_processor',
         use_for_alignment=True,
         sensor_name='novatel',
         group='config/default/test',

@@ -20,6 +20,7 @@ from pntos.cobra.config import (
     ImuConfig,
     InertialConfig,
     ManualAlignmentConfig,
+    OrchestrationConfig,
     SensorConfig,
 )
 
@@ -56,15 +57,18 @@ my_config = [
         group='config/gp3d_state_modeling',
         lever_arm=(0.0, 0.0, 0.0),
         orientation=(0.0, 0.0, 0.0, 0.0),
-        source_identifier='lcm://cobranav/novatel',
-        destination_identifier='gps_measurement_processor',
         use_for_alignment=True,
         sensor_name='novatel',
     ),
     InertialConfig(
         group='config/inertial', expected_dt=0.01, inertial_buffer_length=10.0
     ),
-]
+    OrchestrationConfig(
+        imu_channel='/sensor/vn-100/imu',
+        gps_channel='/sensor/ublox/position',
+        group='config/orchestration',
+    ),
+]  # End Config
 
 # Instantiate all of our plugins
 controller = SimpleControllerPlugin('Cobra Simple Controller Plugin')
