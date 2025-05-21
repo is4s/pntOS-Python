@@ -23,6 +23,9 @@ the name of your token and `<TOKEN_VALUE>` with the value of your token:
 export UV_INDEX=https://<TOKEN_NAME>:<TOKEN_VALUE>@git.aspn.us/api/v4/projects/94/packages/pypi/simple
 ```
 
+You may wish to permanently set the above variable. For example, bash users can add the above line
+to their `~/.bashrc` script.
+
 ## Environment Setup
 
 Please ensure you have the following tools installed:
@@ -36,7 +39,7 @@ Please ensure you have the following tools installed:
 Ubuntu users can use the following command to install the above dependencies:
 
 ```shell
-sudo apt update && sudo apt install python3 git libglib2.0-dev default-jre-headless python3-tk
+sudo apt update && sudo apt install python3 python3-venv git libglib2.0-dev default-jre-headless python3-tk
 ```
 
 You are now ready to set up your python environment.
@@ -46,7 +49,9 @@ You are now ready to set up your python environment.
 Begin by creating and entering a clean venv. We can create the venv in the
 `.venv` folder by running the following command in the project root directory:
 
-    python3 -m venv .venv --prompt pntos-python
+```shell
+python3 -m venv .venv --prompt pntos-python
+```
 
 Next, enter the venv. The steps to do this vary depending on your shell:
 
@@ -56,11 +61,15 @@ Next, enter the venv. The steps to do this vary depending on your shell:
 
 Your shell should now be inside the venv. It is recommended that you upgrade your pip to the latest:
 
-    pip install --upgrade pip
+```shell
+pip install --upgrade pip
+```
 
 Now we're ready to install pntos. In the project root directory, run:
 
-    pip install -v -r requirements.txt --extra-index-url=$UV_INDEX
+```shell
+pip install -v -r requirements.txt --extra-index-url=$UV_INDEX
+```
 
 **Note:** this command may take a while to run. It is downloading example data, which may take a lot
 of bandwidth.
@@ -88,40 +97,7 @@ running this app.
 
 ## Contributing
 
-To begin development, you will want to first install and configure `uv`. Once that is done, you can 
-proceed to develop your new functionality in a feature branch. When your feature is complete and 
-ready for us to review, there are a few code quality checks you should perform before opening a 
-merge request.
-
-### Checking Contributions
-
-New contributions to this repo should pass the checks contained in `run_all_checks.sh`:
-
-```shell
-./run_all_checks.sh
-```
-
-You can view a detailed code coverage report from the `index.html` in the `htmlcov` directory.
-
-### Uv Tooling Explanation
-
-uv allows us to manage this repository as a monorepo. We have a few base folders which act as our
-modules, and one folder that defines applications which use those modules.
-
-Whenever you type `uv sync` it recurses into the `pntos-*` folders and finds the `pyproject.toml`
-in there. It then installs the `dependencies` subkey in those files, and places them in the top
-level `uv.lock`. Generating the `requirements.txt` and `requirements-dev.txt` is then done as a
-separate step, by running:
-
-```shell
-uv sync
-uv export --frozen --no-dev --all-packages --no-hashes > requirements.txt
-uv export --frozen --all-packages --no-hashes > requirements-dev.txt
-```
-
-Note that files that are installed via a local path are installed as [editable
-installs](https://setuptools.pypa.io/en/latest/userguide/development_mode.html) and are
-automatically updated whenever a file in that package is updated.
+Please see `CONTRIBUTING.md` for more information on how to contribute to this project.
 
 ## Viewing Documentation
 
