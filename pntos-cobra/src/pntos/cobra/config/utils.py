@@ -91,7 +91,9 @@ def config_from_registry(
             try:
                 first_field = fields(param.type)[0]
                 if first_field.name == 'group' and first_field.type is str:
+                    kv.batch_end()
                     val = config_from_registry(param.type, mediator, config_group)
+                    kv.batch_restart()
             except TypeError:
                 pass
         if val is None:
@@ -169,7 +171,9 @@ def config_to_registry(config: BaseConfig, mediator: Mediator) -> None:
                     LoggingLevel.WARN,
                     'Nested config uses a different group. It will not be able to be retrieved via config_from_registry',
                 )
+            kv.batch_end()
             config_to_registry(val_to_store, mediator)
+            kv.batch_restart()
             continue
         kv[param.name] = val_to_store
     kv.batch_end()

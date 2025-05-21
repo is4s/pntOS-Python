@@ -59,6 +59,7 @@ from pntos.cobra import (
     SimpleOrchestrationPlugin,
     SimpleRegistryPlugin,
 )
+from pntos.cobra.config import OrchestrationConfig, config_to_registry
 from pntos.cobra.internal import SimpleMessageStreamConfig
 
 # Test globals
@@ -676,11 +677,18 @@ class Test_Orchestration(unittest.TestCase):
             self.registry_plugin,
         ]
 
+        config = OrchestrationConfig(
+            imu_channel='/sensor/vn-100/imu',
+            gps_channel='/sensor/ublox/position',
+            group='config/orchestration',
+        )
+
         # Run init_plugin on all the plugins
         for plugin in plugins:
             plugin.init_plugin(mediator=DummyMediator())
 
         DummyMediator.registry = self.registry_plugin.new_registry()
+        config_to_registry(config, DummyMediator())
 
     @property
     def test_header(self) -> TypeHeader:

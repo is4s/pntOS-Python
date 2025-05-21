@@ -116,8 +116,6 @@ class TestConfigUtils(unittest.TestCase):
             CONFIG_TEST_GROUP,
             (0.7, 0.8, 0.9),
             (1.1, 2.2, 3.3, 4.4),
-            'hello',
-            'world',
             True,
             'NCC-1701',
         )
@@ -176,8 +174,6 @@ class TestConfigUtils(unittest.TestCase):
             CONFIG_TEST_GROUP,
             (0.1, 0.2, 0.3),
             (0.4, 0.5, 0.6, 0.7),
-            'hello',
-            'world',
             True,
             'NCC-1701',
         )
@@ -188,7 +184,7 @@ class TestConfigUtils(unittest.TestCase):
 
         # Whoops, modified a value in the registry
         reg = self.mediator.registry.batch_start(CONFIG_TEST_GROUP)
-        reg['destination_identifier'] = ['not', 'the', 'right', 'type']
+        reg['use_for_alignment'] = ['wrong type']
         reg.batch_end()
 
         # Test config_from_registry()

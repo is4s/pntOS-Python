@@ -6,6 +6,7 @@ from .ManualAlignmentConfig import ManualAlignmentConfig as ManualAlignmentConfi
 from .ManualHeadingAlignmentConfig import (
     ManualHeadingAlignmentConfig as ManualHeadingAlignmentConfig,
 )
+from .OrchestrationConfig import OrchestrationConfig as OrchestrationConfig
 from .SensorConfig import SensorConfig as SensorConfig
 from .StaticAlignmentConfig import (
     AlignmentStrategy as AlignmentStrategy,
