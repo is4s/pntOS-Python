@@ -51,7 +51,7 @@ IMU_SOL_CHANNEL = '/solution/pntos/imu'
 
 # Sensor input channels
 IMU_CHANNEL = '/sensor/vn-100/imu'
-GPS_CHANNEL = '/sensor/ublox/position'
+GPS_CHANNEL = '/sensor/ublox-ZED-F9T/position'
 
 # State block parameters
 STATE_BLOCK_ID = STATE_BLOCK_LABEL = 'pinson15'

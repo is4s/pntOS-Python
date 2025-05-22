@@ -29,7 +29,7 @@ These instructions assume an active virtual environment as outlined in the
 
 If you have not yet created a python virtual environment for the [`pntos-python`
 repository](https://git.aspn.us/pntos/pntos-python), follow the instructions in [](./installation.md) then go
-to [](#start-a-local-tcp-server). 
+to [](#start-a-local-tcp-server).
 
 If you have created the virtual environment but it is not currently activated, run this
 command from the root directory to enter into the virtual environment:
@@ -49,16 +49,27 @@ java -classpath $VIRTUAL_ENV/lib/python3.*/site-packages/share/java/lcm.jar lcm.
 
 ### Play LCM Log File
 
-Then we can play the log file in another terminal via:
+The `pntos-python-datasets` package installs a script to find the installed data and start playing
+it back:
 
 ```shell
 play-dataset
 ```
 
+```{note}
+If you would like to see what the above command is doing or would like to know where the dataset
+exists on the disk, you can run the command with a `-v` verbose flag:
+
+    play-dataset -v
+
+Running the above will print out the exact command the script executes before executing it.
+```
+
 This should open the LCM LogPlayer GUI with a play button. You should see the following channels:
 
 - `/sensor/ins-d/pva`
-- `/sensor/ublox/position`
+- `/sensor/ublox-ZED-F9T/position`
+- `/sensor/ublox-ZED-F9T/velocity`
 - `/sensor/vn-100/imu`
 
 ## Record Output
@@ -79,7 +90,7 @@ to `DEBUG` when initializing the {py:obj}`pntos.cobra.SimpleLoggingPlugin`.
 The available apps can be found in each subfolder of the `{workspace-root}/apps`
 directory. If this is your first time with the {term}`Python pntOS API`, it is recommending you
 start with the `fusion_gps_ins` app. If you are running your own custom app, just switch
-out the paths to the off-the-shelf apps with the path to your app in the following instructions. 
+out the paths to the off-the-shelf apps with the path to your app in the following instructions.
 
 The available off-the-shelf apps are in the
 {ref}`tutorial-apps` section of these docs.
@@ -112,6 +123,15 @@ LCM tcpq: connecting...
 ```
 
 Then push the `play` button in the LogPlayer.
+
+```{note}
+This app uses real data. There is some jitter present in the IMU sensor timestamps which will
+produce a few warnings in the output. They are of the form:
+
+    [warning] Suspicious dt of 0.015978679000000003 compared against nominal of 0.010000062688925596 detected at time 1747683329.241135205s
+
+A more complex app might, for example, use a Preprocessor plugin to correct the incoming data.
+```
 
 ### Validate Results
 
@@ -150,6 +170,15 @@ LCM tcpq: connecting...
 ```
 
 Then push the `play` button in the LogPlayer.
+
+```{note}
+This app uses real data. There is some jitter present in the IMU sensor timestamps which will
+produce a few warnings in the output. They are of the form:
+
+    [warning] Suspicious dt of 0.015978679000000003 compared against nominal of 0.010000062688925596 detected at time 1747683329.241135205s
+
+A more complex app might, for example, use a Preprocessor plugin to correct the incoming data.
+```
 
 ### Validate Results
 

@@ -360,7 +360,6 @@ def plot_solution(solution, truth, plot_dir, show_plots):
     lon0 = tlla[0, 1]
     alt0 = tlla[0, 2]
     tvel = extract_vel(truth[1])
-    tvel[:, 2] = -tvel[:, 2]
     trpy = None
     if truth[1].decode_class_name == 'positionvelocityattitude':
         trpy = extract_rpy(truth[1].data, True)
