@@ -137,7 +137,7 @@ documentation check:
         - docker run --workdir /work/docs --rm -dit -v $(pwd):/work --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
         - docker exec pntos-python uv sync -v
         # Build the documentation
-        - docker exec -e TZ=UTC pntos-python make html
+        - docker exec -e TZ=UTC pntos-python make html SPHINXOPTS="-W"
     artifacts:
         expose_as: "documentation"
         paths:
