@@ -16,11 +16,10 @@ To set up an SSH key, use `ssh-keygen` and add the public portion of your key to
 To set up a PAT, go to [your git.aspn.us
 profile](https://git.aspn.us/-/user_settings/personal_access_tokens) and add a new token with `read_api` privileges.
 
-To use the PAT, set the following environment variable, replacing `<TOKEN_NAME>` with
-the name of your token and `<TOKEN_VALUE>` with the value of your token:
+To use the PAT, set the following environment variable, replacing `<TOKEN_VALUE>` with the value of your token:
 
 ```shell
-export UV_INDEX=https://<TOKEN_NAME>:<TOKEN_VALUE>@git.aspn.us/api/v4/projects/94/packages/pypi/simple
+export UV_INDEX=https://:<TOKEN_VALUE>@git.aspn.us/api/v4/projects/94/packages/pypi/simple
 ```
 
 You may wish to permanently set the above variable. For example, bash users can add the above line
@@ -122,7 +121,7 @@ echo $UV_INDEX
 ```
 
 and you should get output of the form
-`https://<TOKEN_NAME>:<TOKEN_VALUE>@git.aspn.us/api/v4/projects/94/packages/pypi/simple`. If that is
+`https://:<TOKEN_VALUE>@git.aspn.us/api/v4/projects/94/packages/pypi/simple`. If that is
 not the case, please see [Authentication](#authentication) for instructions on setting that
 environment variable.
 
