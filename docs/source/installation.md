@@ -1,7 +1,7 @@
 # Installation Guide
 
 This guide will walk you through setting up a python virtual environment for running
-{term}`Cobra` {term}`apps <App>`.
+the example {term}`apps <App>` which utilize {term}`Cobra` plugins.
 
 ## Authentication
 
