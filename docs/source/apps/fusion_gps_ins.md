@@ -128,7 +128,7 @@ For more information on making your own config objects, see the docstrings for {
 So, with that background, we can now understand what is happening next in the app:
 ```{literalinclude} ../../../apps/fusion_gps_ins/fusion_gps_ins.py
 :start-at: "my_config"
-:end-at: "]"
+:end-at: "# End Config"
 :lineno-match:
 ```
 Here we populate a list of config objects with initial values and assign them a group.
