@@ -16,3 +16,20 @@ footer {
     background-size: 10%;
     background-repeat: no-repeat;
 }
+/* make inline code samples less jarring */
+.rst-content code.literal,
+.rst-content tt.literal { color: #222; }
+
+.rst-content a code.literal,
+.rst-content a tt.literal { color: #2980b9; }
+
+.rst-content a:visited code.literal,
+.rst-content a:visited tt.literal { color: #9b59b6; }
+
+.rst-content code, .rst-content tt, code, .rst-content a.reference.internal[href*="_1_"] {
+       border: none;
+       background: #f3f3f3;
+       font-family: SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New,Courier,monospace;
+       font-size: 0.9em;
+       padding: 0.05em 1px;
+}
