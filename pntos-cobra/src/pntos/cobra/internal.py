@@ -21,3 +21,6 @@ from .state_modeling_simple_gps_ins.Pinson15NedBlock import (
 from .state_modeling_simple_gps_ins.PinsonPositionMeasurementProcessor import (
     PinsonPositionMeasurementProcessor as PinsonPositionMeasurementProcessor,
 )
+from .state_modeling_simple_gps_ins.PinsonVelocityMeasurementProcessor import (
+    PinsonVelocityMeasurementProcessor as PinsonVelocityMeasurementProcessor,
+)

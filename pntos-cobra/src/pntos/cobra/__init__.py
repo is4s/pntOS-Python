@@ -11,6 +11,9 @@ from .SimpleEkfFusionStrategyPlugin import (
     SimpleEkfFusionStrategyPlugin as SimpleEkfFusionStrategyPlugin,
 )
 from .SimpleFusionPlugin import SimpleFusionPlugin as SimpleFusionPlugin
+from .SimpleGpsVelOrchestrationPlugin import (
+    SimpleGpsVelOrchestrationPlugin as SimpleGpsVelOrchestrationPlugin,
+)
 from .SimpleInertialPlugin import SimpleInertialPlugin as SimpleInertialPlugin
 from .SimpleInitializationPlugin import (
     SimpleInitializationPlugin as SimpleInitializationPlugin,

@@ -19,4 +19,9 @@ class OrchestrationConfig(BaseConfig):
     The name of the gps channel whose messages will be used for alignment and the fusion engine.
     """
 
+    velocity_channel: str = 'unused'
+    """
+    The name of the velocity channel whose messages will be used for measurement updates in the fusion engine.
+    """
+
     group: str
