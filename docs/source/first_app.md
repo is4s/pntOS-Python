@@ -114,6 +114,15 @@ LCM tcpq: connecting...
 
 Then push the `play` button in the LogPlayer.
 
+```{note}
+This app uses real data. There is some jitter present in the IMU sensor timestamps which will
+produce a few warnings in the output. They are of the form:
+
+    [warning] Suspicious dt of 0.015978679000000003 compared against nominal of 0.010000062688925596 detected at time 1747683329.241135205s
+
+A more complex app might, for example, use a Preprocessor plugin to correct the incoming data.
+```
+
 ### Validate Results
 
 To plot the saved results run:
@@ -151,6 +160,15 @@ LCM tcpq: connecting...
 ```
 
 Then push the `play` button in the LogPlayer.
+
+```{note}
+This app uses real data. There is some jitter present in the IMU sensor timestamps which will
+produce a few warnings in the output. They are of the form:
+
+    [warning] Suspicious dt of 0.015978679000000003 compared against nominal of 0.010000062688925596 detected at time 1747683329.241135205s
+
+A more complex app might, for example, use a Preprocessor plugin to correct the incoming data.
+```
 
 ### Validate Results
 
