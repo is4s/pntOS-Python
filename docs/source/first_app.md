@@ -49,10 +49,20 @@ java -classpath $VIRTUAL_ENV/lib/python3.*/site-packages/share/java/lcm.jar lcm.
 
 ### Play LCM Log File
 
-Then we can play the log file in another terminal via:
+The `pntos-python-datasets` package installs a script to find the installed data and start playing
+it back:
 
 ```shell
 play-dataset
+```
+
+```{note}
+If you would like to see what the above command is doing or would like to know where the dataset
+exists on the disk, you can run the command with a `-v` verbose flag:
+
+    play-dataset -v
+
+Running the above will print out the exact command the script executes before executing it.
 ```
 
 This should open the LCM LogPlayer GUI with a play button. You should see the following channels:
