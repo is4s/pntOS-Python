@@ -45,13 +45,22 @@ def run_pntos():
     cobra_process = Popen('apps/fusion_gps_ins/fusion_gps_ins.py')
     sleep(1)  # Give the relay some time to start
 
+    log_filename = None
+    for site in getsitepackages():
+        candidate = f'{site}/pntos_python_datasets/cobra_gps_ins_example_data.log'
+        if path.exists(candidate):
+            log_filename = candidate
+            break
+    if log_filename is None:
+        raise Exception('Could not find log file.')
+
     # Start the log player
     logplayer_process = Popen(
         [
             'lcm-logplayer',
             '--lcm-url=tcpq://',
             '--speed=1000',
-            f'{getsitepackages()[0]}/pntos_python_datasets/cobra_gps_ins_example_data.log',
+            log_filename,
         ],
         stdout=PIPE,
         stderr=PIPE,
