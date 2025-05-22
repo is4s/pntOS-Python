@@ -7,12 +7,10 @@ from pntos.api.plugins.state_modeling import (
     StateModelProviderType,
 )
 from pntos.cobra.config import ImuConfig, SensorConfig, config_from_registry
-from pntos.cobra.utils import quat_to_dcm
 
 from .Pinson15NedBlock import Pinson15NedBlock
-from .PinsonPositionMeasurementProcessor import (
-    PinsonPositionMeasurementProcessor,
-)
+from .PinsonPositionMeasurementProcessor import PinsonPositionMeasurementProcessor
+from .PinsonVelocityMeasurementProcessor import PinsonVelocityMeasurementProcessor
 
 
 class SimpleGpsInsStateModelProvider(StandardStateModelProvider):
@@ -22,7 +20,7 @@ class SimpleGpsInsStateModelProvider(StandardStateModelProvider):
 
     def __init__(self, mediator: Mediator):
         self._mediator = mediator
-        self.processor_identifiers = ['pinson_position']
+        self.processor_identifiers = ['pinson_position', 'pinson_velocity']
         self.block_identifiers = ['pinson15']
         self.virtual_block_identifiers = []
 
@@ -33,13 +31,14 @@ class SimpleGpsInsStateModelProvider(StandardStateModelProvider):
         label: str,
         state_block_labels: list[str],
         config_group: str,
-    ) -> PinsonPositionMeasurementProcessor | None:
+    ) -> PinsonPositionMeasurementProcessor | PinsonVelocityMeasurementProcessor | None:
         """
         Generate a new StandardMeasurementProcessor that describes the relationship between a measurement and a set of states.
 
         Args:
             processor_index (int): Index into self.processor_identifiers used to select the desired type of measurement processor.
                 - Index 0 corresponds to a PinsonPositionMeasurementProcessor.
+                - Index 1 corresponds to a PinsonVelocityMeasurementProcessor.
                 - All other indices will result in a return value of None.
             engine (StandardFusionEngine | None): An optional parameter that may be provided to the
                 new processor, such that the processor may interact with the fusion engine it
@@ -60,22 +59,29 @@ class SimpleGpsInsStateModelProvider(StandardStateModelProvider):
             StandardMeasurementProcessor | None: The newly created StandardMeasurementProcessor or ``None`` when no processor can be produced
             with the given ``processor_index``, ``engine``, and ``config_group``.
         """
-        if processor_index == 0:
-            sensor_config = config_from_registry(
-                SensorConfig, self._mediator, config_group
-            )
-            if sensor_config is None:
-                self._mediator.log_message(
-                    LoggingLevel.ERROR,
-                    f'Could not get position sensor config from registry.',
+        match processor_index:
+            case 0:
+                sensor_config = config_from_registry(
+                    SensorConfig, self._mediator, config_group
                 )
-                return None
-            return PinsonPositionMeasurementProcessor(
-                label,
-                state_block_labels,
-                self._mediator,
-                np.array(sensor_config.lever_arm),
-            )
+                if sensor_config is None:
+                    self._mediator.log_message(
+                        LoggingLevel.ERROR,
+                        f'Could not get position sensor config from registry.',
+                    )
+                    return None
+                return PinsonPositionMeasurementProcessor(
+                    label,
+                    state_block_labels,
+                    self._mediator,
+                    np.array(sensor_config.lever_arm),
+                )
+            case 1:
+                return PinsonVelocityMeasurementProcessor(
+                    label,
+                    state_block_labels,
+                    self._mediator,
+                )
 
         self._mediator.log_message(
             LoggingLevel.ERROR,

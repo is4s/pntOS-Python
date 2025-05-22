@@ -71,7 +71,7 @@ class PinsonPositionMeasurementProcessor(StandardMeasurementProcessor):
         if pva.quaternion is None:
             self._mediator.log_message(
                 LoggingLevel.ERROR,
-                f'Pinson15NedBlock received PVA aux data with no quaternion at time {pva.time_of_validity.elapsed_nsec / 1e9}s.',
+                f'PinsonPositionMeasurementProcessor received PVA aux data with no quaternion at time {pva.time_of_validity.elapsed_nsec / 1e9}s.',
             )
             return
 

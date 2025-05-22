@@ -11,6 +11,9 @@ from aspn23 import (
     MeasurementPositionVelocityAttitude,
     MeasurementPositionVelocityAttitudeErrorModel,
     MeasurementPositionVelocityAttitudeReferenceFrame,
+    MeasurementVelocity,
+    MeasurementVelocityErrorModel,
+    MeasurementVelocityReferenceFrame,
     TypeHeader,
     TypeTimestamp,
 )
@@ -36,6 +39,7 @@ from pntos.cobra.config import (
 from pntos.cobra.internal import (
     Pinson15NedBlock,
     PinsonPositionMeasurementProcessor,
+    PinsonVelocityMeasurementProcessor,
     SimpleMediator,
 )
 from pntos.cobra.utils.navigation import delta_lat_to_north, delta_lon_to_east
@@ -119,6 +123,18 @@ def position_mp(
 
 
 @pytest.fixture
+def velocity_mp(
+    state_model_provider: StateModelProviderType,
+) -> StandardMeasurementProcessor | None:
+    out = state_model_provider.new_processor(
+        1, None, 'velocity', ['pinson'], '/config/cobra/sensor'
+    )
+    if isinstance(out, StandardMeasurementProcessor):
+        return out
+    return None
+
+
+@pytest.fixture
 def pva_aux_data() -> Message:
     return Message(
         MeasurementPositionVelocityAttitude(
@@ -179,7 +195,26 @@ def pos_meas() -> Message:
             np.array([]),
             [],
         ),
-        'pva_aux',
+        'gps_position',
+    )
+
+
+@pytest.fixture
+def vel_meas() -> Message:
+    return Message(
+        MeasurementVelocity(
+            TypeHeader(0, 0, 0, 0),
+            TypeTimestamp(1_000_000_000),
+            MeasurementVelocityReferenceFrame.NED,
+            2.2,
+            3.3,
+            4.4,
+            np.diag([1, 4, 0.5]),
+            MeasurementVelocityErrorModel.NONE,
+            np.array([]),
+            [],
+        ),
+        'gps_velocity',
     )
 
 
@@ -208,16 +243,16 @@ def test_invalid_fusion_type(
 
 
 def test_invalid_index(state_model_provider: StateModelProviderType) -> None:
-    invalid_sb = state_model_provider.new_block(1, None, 'label', 'config/sb')
+    invalid_sb = state_model_provider.new_block(100, None, 'label', 'config/sb')
     assert invalid_sb is None
 
     invalid_mp = state_model_provider.new_processor(
-        1, None, 'label', ['state_block_labels'], 'config/mp'
+        100, None, 'label', ['state_block_labels'], 'config/mp'
     )
     assert invalid_mp is None
 
     invalid_vsb = state_model_provider.new_virtual_block(
-        0, 'source', 'target', 'config/vsb'
+        100, 'source', 'target', 'config/vsb'
     )
     assert invalid_vsb is None
 
@@ -282,7 +317,7 @@ def test_invalid_measurement(
     assert mm is None
 
 
-def test_generate_model(
+def test_generate_model_gps(
     position_mp: PinsonPositionMeasurementProcessor,
     pva_aux_data: Message,
     pos_meas: Message,
@@ -309,6 +344,35 @@ def test_generate_model(
     exp_z = np.array(
         [[delta_pos[0] * lat_factor], [delta_pos[1] * lon_factor], [-delta_pos[2]]]
     )
+    assert np.array_equal(mm.H, exp_H)
+    assert np.array_equal(mm.R, exp_R)
+    assert np.array_equal(mm.h(x_and_p.estimate), np.zeros(3))
+    assert np.allclose(mm.z, exp_z)
+
+
+def test_generate_model_vel(
+    velocity_mp: PinsonVelocityMeasurementProcessor,
+    pva_aux_data: Message,
+    vel_meas: Message,
+) -> None:
+    inertial_pva = pva_aux_data.wrapped_message
+    assert isinstance(inertial_pva, MeasurementPositionVelocityAttitude)
+    vel = vel_meas.wrapped_message
+    assert isinstance(vel, MeasurementVelocity)
+    velocity_mp.receive_aux_data([pva_aux_data])
+    assert velocity_mp._inertial_pva is not None
+    x_and_p = EstimateWithCovariance(
+        EstimateWithCovarianceType.EWC_GENERIC, np.zeros(15), np.eye(15)
+    )
+    mm = velocity_mp.generate_model(vel_meas, x_and_p)
+    assert mm is not None
+    exp_H = np.zeros((3, 15))
+    exp_H[:, 3:6] = np.eye(3)
+    exp_R = vel.covariance
+    meas_vel = np.array([vel.x, vel.y, vel.z])
+    inertial_vel = np.array([inertial_pva.v1, inertial_pva.v2, inertial_pva.v3])
+    delta_vel = meas_vel - inertial_vel
+    exp_z = delta_vel[:, np.newaxis]
     assert np.array_equal(mm.H, exp_H)
     assert np.array_equal(mm.R, exp_R)
     assert np.array_equal(mm.h(x_and_p.estimate), np.zeros(3))
