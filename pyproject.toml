@@ -8,7 +8,7 @@ readme = "README.md"
 requires-python = ">= 3.10"
 
 [tool.uv]
-package=false
+package = false
 
 [tool.uv.workspace]
 members = ["pntos-api", "pntos-cobra"]
@@ -29,11 +29,12 @@ dev = [
     "myst_parser>=4.0.0",
     "sphinx_rtd_theme>=3.0.2",
     "sphinx-design",
+    "sphinx-copybutton",
     "matplotlib",
     "pntos-cobra",
     "pntos-api",
     # Generated from commit a44dac604ec22c200e092e65dfe0d62cb9fe32c3 on 19 May 2025
-    "pntos-python-docs-data==0.1.0"
+    "pntos-python-docs-data==0.1.0",
 ]
 
 [tool.ruff.lint]

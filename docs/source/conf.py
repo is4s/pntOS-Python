@@ -22,6 +22,7 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.mathjax',
     'sphinx_design',
+    'sphinx_copybutton',
 ]
 
 # Myst settings
