@@ -45,6 +45,7 @@ troubleshooting
 :caption: Other
 genindex
 glossary
+contributing
 ```
 
 ```{toctree}
