@@ -190,7 +190,7 @@ might include the:
 * [Inertial Plugin](#inertial)
 * [Initialization Plugin](#initialization)
 * [State Modeling Plugin](#state-modeling)
-* {py:obj}`Preprocessor Plugin<pntos.api.PreprocessorPlugin>`
+* [Preprocessor Plugin](#preprocessor)
 
 ### Fusion
 
@@ -281,6 +281,19 @@ position and LLH position could bridge the gap.
 
 In short, {py:obj}`Virtual State Block<pntos.api.VirtualStateBlock>`s convert the
 states provided by {py:obj}`State Block<pntos.api.StandardStateBlock>`s.
+
+## Preprocessor
+
+The Preprocessor plugin can be used by either the Controller plugin or the Orchestration plugin. It
+generates at least one type of {py:obj}`Preprocessor<pntos.api.Preprocessor>`.
+
+The job of the Preprocessor is simple: consume a {py:obj}`Message<pntos.api.Message>` and, when
+applicable, modify it somehow. There are several ways a Preprocessor plugin could go about this. A
+couple example cases:
+
+- A Preprocessor plugin could detect faulty data and reject it, returning nothing.
+- A Preprocessor plugin could mitigate issues in a sensor by editing the data before it is sent to
+  the filter.
 
 ## Another View of the Python pntOS API
 
