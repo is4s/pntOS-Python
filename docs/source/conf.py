@@ -1,3 +1,4 @@
+from shutil import copytree, rmtree
 from site import getsitepackages
 
 # Configuration file for the Sphinx documentation builder.
@@ -72,6 +73,11 @@ exclude_patterns = []
 html_theme = 'sphinx_rtd_theme'
 site_packages_dir = getsitepackages()[0]
 branding_dir = f'{site_packages_dir}/branding/'
+
+# Copy images from site packages into docs directory
+rmtree('images', ignore_errors=True)
+copytree(src=branding_dir + '/figures/', dst='images')
+
 html_static_path = ['../_static', branding_dir]
 
 html_logo = branding_dir + 'pntOs_Logo_Gradient_Light_Horizontal.png'

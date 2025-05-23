@@ -1,13 +1,12 @@
-.. _cobra-documentation:
-
 Cobra Documentation
 ===================
 
 This is automatically generated documentation for the ``pntos.cobra`` module. 
 
 This consists of the top-level plugin exports (see {ref}`cobra-plugins-doc`), along with
-two sub-namespaces:
+three sub-namespaces:
 - ``pntos.cobra.config`` (See {ref}`cobra-config`)
+- ``pntos.cobra.utils`` (See {ref}`cobra-utils`)
 - ``pntos.cobra.internal`` (see {ref}`cobra-internal`)
 
 ```{note}
@@ -24,6 +23,11 @@ documentation/cobra_plugins
 ```{toctree} 
 :hidden:
 documentation/cobra_config
+```
+
+```{toctree} 
+:hidden:
+documentation/cobra_utils
 ```
 
 ```{toctree} 
