@@ -185,21 +185,12 @@ black box solution or broken up into more modular components. In the latter case
 of one or more filters has access to a bank of filtering plugins. Filtering plugins
 might include the:
 
-* [Integrity Plugin](#integrity)
 * [Fusion Plugin](#fusion)
 * [Fusion Strategy Plugin](#fusion-strategy)
 * [Inertial Plugin](#inertial)
 * [Initialization Plugin](#initialization)
 * [State Modeling Plugin](#state-modeling)
 * {py:obj}`Preprocessor Plugin<pntos.api.PreprocessorPlugin>`
-
-### Integrity
-
-The {py:obj}`Integrity Plugin<pntos.api.IntegrityPlugin>` is relatively tightly involved
-with the {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>`. It is
-responsible for ensuring that the pntOS solution is robust and resilient to sensor
-faults. This could range from protecting against faulty sensors, to improper state
-models, to malicious attacks from an outside party.
 
 ### Fusion
 
@@ -319,9 +310,8 @@ Plugin<pntos.api.PlatformIntegrationPlugin>`, {py:obj}`Orchestration
 Plugin<pntos.api.OrchestrationPlugin>`, {py:obj}`Fusion Plugin<pntos.api.FusionPlugin>`,
 {py:obj}`Fusion Strategy Plugin<pntos.api.FusionStrategyPlugin>`, {py:obj}`State
 Modeling Plugin<pntos.api.StateModelingPlugin>`, {py:obj}`Inertial
-Plugin<pntos.api.InertialPlugin>`, {py:obj}`Initialization
-Plugin<pntos.api.InitializationPlugin>`, and {py:obj}`Integrity
-Plugin<pntos.api.IntegrityPlugin>`. Next we'll move on to the remaining plugins: the
+Plugin<pntos.api.InertialPlugin>`, and {py:obj}`Initialization
+Plugin<pntos.api.InitializationPlugin>`. Next we'll move on to the remaining plugins: the
 `Database Plugin`, {py:obj}`Logging Plugin<pntos.api.LoggingPlugin>`, {py:obj}`Registry
 Plugin<pntos.api.RegistryPlugin>`, and {py:obj}`User Interface (UI)
 Plugin<pntos.api.UiPlugin>`.
