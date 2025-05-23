@@ -312,7 +312,7 @@ Plugin<pntos.api.OrchestrationPlugin>`, {py:obj}`Fusion Plugin<pntos.api.FusionP
 Modeling Plugin<pntos.api.StateModelingPlugin>`, {py:obj}`Inertial
 Plugin<pntos.api.InertialPlugin>`, and {py:obj}`Initialization
 Plugin<pntos.api.InitializationPlugin>`. Next we'll move on to the remaining plugins: the
-`Database Plugin`, {py:obj}`Logging Plugin<pntos.api.LoggingPlugin>`, {py:obj}`Registry
+{py:obj}`Logging Plugin<pntos.api.LoggingPlugin>`, {py:obj}`Registry
 Plugin<pntos.api.RegistryPlugin>`, and {py:obj}`User Interface (UI)
 Plugin<pntos.api.UiPlugin>`.
 
