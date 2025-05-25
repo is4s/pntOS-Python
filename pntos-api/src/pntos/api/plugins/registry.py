@@ -36,10 +36,10 @@ class RegistryPlugin(CommonPlugin, ABC):
             Registry: The newly created registry.
 
         Note:
-            The returned :class:`Registry` should be capable of producing :class:`KeyValueStore`
+            The returned :class:`pntos.api.Registry` should be capable of producing :class:`pntos.api.KeyValueStore`
             structs that are able to be used concurrently. Thus if the user uses the return value of
             this method to start two batches, one on group "foo" and the other on group "bar", then
-            concurrent access to both of the resulting :class:`KeyValueStore` structs for "foo" and
+            concurrent access to both of the resulting :class:`pntos.api.KeyValueStore` structs for "foo" and
             "bar" should be supported (i.e. no shared mutable state between them that is not
             synchronized).
         """

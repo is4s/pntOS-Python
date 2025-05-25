@@ -272,7 +272,7 @@ ExternalInertial = CommonInertial
 
 class StandardInertialMechanization(CommonInertial, ABC):
     """
-    A struct produced by a :class:`InertialPlugin`. It generates solutions from raw IMU data.
+    A struct produced by a :class:`pntos.api.InertialPlugin`. It generates solutions from raw IMU data.
 
     Caution:
         **Unstable**: This feature is unstable and is not yet considered part of the stable pntOS
@@ -339,7 +339,7 @@ class StandardInertialMechanization(CommonInertial, ABC):
 
         Returns:
             StandardInertialErrors | None: Inertial errors at ``time`` if ``time`` is in the valid
-            range (:meth:`~CommonInertial.is_time_in_range` can be used to check ``time`` before
+            range (:meth:`pntos.api.CommonInertial.is_time_in_range` can be used to check ``time`` before
             calling this method), ``None`` otherwise.
         """
         pass
@@ -354,7 +354,7 @@ class InertialPlugin(CommonPlugin, ABC):
     """
     An implementation of an inertial plugin.
 
-    This plugin generates :class:`CommonInertial` instances which may be used to generate INS
+    This plugin generates :class:`pntos.api.CommonInertial` instances which may be used to generate INS
     solutions from raw IMU data.
 
     Caution:
@@ -384,13 +384,13 @@ class InertialPlugin(CommonPlugin, ABC):
         config_group: str | None = None,
     ) -> InertialType | None:
         """
-        Create an instance of an implementation of :class:`CommonInertial`.
+        Create an instance of an implementation of :class:`pntos.api.CommonInertial`.
 
         Args:
             type (type[InertialType]): Specifies the type of inertial that the returned value will
                 support. For example, if the user passes in ``STANDARD_INERTIAL_MECHANIZATION``,
                 then the returned value will be an implementation of
-                :class:`StandardInertialMechanization`. If ``type`` is unsupported by the plugin,
+                :class:`pntos.api.StandardInertialMechanization`. If ``type`` is unsupported by the plugin,
                 then ``None`` will be returned. Please use :meth:`is_inertial_type_supported` to
                 check if the type is supported by the plugin.
             solution (Message): The initial solution (i.e. the alignment) to mechanize from.

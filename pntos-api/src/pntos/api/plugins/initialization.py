@@ -199,7 +199,7 @@ class EwcInitializationStrategy(CommonInitializationStrategy):
         Returns:
             InitialEstimateWithCovariance | None: The current initial solution. Will be ``None`` if
             the initialization strategy has not yet finished. Use
-            :meth:`CommonInitializationStrategy.request_current_status` to check current status of
+            :meth:`pntos.api.CommonInitializationStrategy.request_current_status` to check current status of
             the strategy. If the status is ``INITIALIZING_FINE`` or ``INITIALIZED_GOOD``, then the
             result is guaranteed to not be ``None``.
         """
@@ -218,7 +218,7 @@ class InitializationPlugin(CommonPlugin, ABC):
     """
     An implementation of an initialization plugin.
 
-    This plugin generates :class:`CommonInitializationStrategy` instances which may be used to
+    This plugin generates :class:`pntos.api.CommonInitializationStrategy` instances which may be used to
     generate an initial solution from additional external sensor data, such as IMU data.
 
     Caution:
@@ -246,14 +246,14 @@ class InitializationPlugin(CommonPlugin, ABC):
         self, type: type[InitializationType], config_group: str | None = None
     ) -> InitializationType | None:
         """
-        Create an instance of :class:`CommonInitializationStrategy`.
+        Create an instance of :class:`pntos.api.CommonInitializationStrategy`.
 
         Args:
             type (type[InitializationType]): Specifies the type of initializer that the returned
             value
                 will support. For example, if the user passes in
                 ``INERTIAL_INITIALIZATION_STRATEGY``, then the returned value will be an
-                implementation of :class:`InertialInitializationStrategy`. If ``type`` is
+                implementation of :class:`pntos.api.InertialInitializationStrategy`. If ``type`` is
                 unsupported by the plugin, then ``None`` will be returned. Please use
                 :meth:`is_initialization_type_supported` to check if the type is supported by the
                 plugin.

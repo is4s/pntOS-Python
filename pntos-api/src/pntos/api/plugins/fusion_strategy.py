@@ -287,7 +287,7 @@ class FusionStrategyPlugin(CommonPlugin, ABC):
     Kalman filter) and complex (neural networks, factor graphs, etc.). This
     plugin aims to allow any and all of those models to be represented. It
     achieves this by having multiple fusion strategies, so that the user may select
-    what kind of fusion they want. Currently, only the :class:`StandardFusionStrategy` is
+    what kind of fusion they want. Currently, only the :class:`pntos.api.StandardFusionStrategy` is
     implemented, which is suitable for EKFs and filters that have similar
     interfaces to an EKF (such as a UKF). However, more strategy types are
     planned to be added in the future.
@@ -298,15 +298,15 @@ class FusionStrategyPlugin(CommonPlugin, ABC):
         """
         Check if a particular fusion strategy is supported by :meth:`new_fusion_strategy`.
 
-        The :meth:`new_fusion_strategy` factory method on this class can create
-        one or more types of fusion strategy. However, :class:`FusionStrategyPlugin`
-        may not support all types (they must support at least one). Therefore,
-        when a user receives a :class:`FusionStrategyPlugin`, they should:
+        The :meth:`new_fusion_strategy` factory method on this class can create one or more types of
+        fusion strategy. However, :class:`pntos.api.FusionStrategyPlugin` may not support all types
+        (they must support at least one). Therefore, when a user receives a
+        :class:`pntos.api.FusionStrategyPlugin`, they should:
 
-        1. Initialize the plugin by calling :meth:`init_plugin` (see :class:`CommonPlugin` for more
-           information).
-        2. Call :meth:`is_fusion_type_supported` to check that the plugin supports the
-           type that the user wants to use.
+        1. Initialize the plugin by calling :meth:`pntos.api.CommonPlugin.init_plugin` (see
+           :class:`pntos.api.CommonPlugin` for more information).
+        2. Call :meth:`is_fusion_type_supported` to check that the plugin supports the type that the
+           user wants to use.
         3. If :meth:`is_fusion_type_supported` returned True, call the :meth:`new_fusion_strategy`
            factory method to get a new fusion strategy of the desired fusion strategy.
         4. Proceed to use the fusion strategy to do estimation.
@@ -337,6 +337,6 @@ class FusionStrategyPlugin(CommonPlugin, ABC):
             FusionStrategyType | None: The newly created fusion strategy, which is an
             implementation of the type specified by ``fusion_type``. For example, if the user calls
             :meth:`new_fusion_strategy` with a ``fusion_type`` of ``StandardFusionStrategy``, then
-            the returned object will be an implementation of :class:`StandardFusionStrategy`.
+            the returned object will be an implementation of :class:`pntos.api.StandardFusionStrategy`.
         """
         ...

@@ -13,7 +13,7 @@ class UiPlugin(CommonPlugin, ABC):
     externally, this plugin allows users to write a GUI that has direct access to pntOS via the
     plugin API. This allows for low latency and high performance GUI/UIs to be generated. Note that
     this plugin is designed for developer/research style UIs and not production environments. A user
-    display in a production environment is better modeled as a :class:`PlatformIntegrationPlugin`,
+    display in a production environment is better modeled as a :class:`pntos.api.PlatformIntegrationPlugin`,
     as that is designed to represent requests from the system and not simply status updates.
     """
 

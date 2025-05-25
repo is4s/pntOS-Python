@@ -13,7 +13,7 @@ class ControllerPlugin(CommonPlugin, ABC):
     plugins.
 
     In ordinary operation, an app will import plugins, initialize a controller plugin, and then
-    call :meth:`ControllerPlugin.take_control` on the controller plugin, passing in a list of
+    call :meth:`pntos.api.ControllerPlugin.take_control` on the controller plugin, passing in a list of
     ``plugins`` that it imported.
 
     From that point forward, the controller is responsible for all activity. It may
@@ -23,8 +23,8 @@ class ControllerPlugin(CommonPlugin, ABC):
     - The controller should not load new plugins - it should work with the ``plugins`` passed to it
       in the :meth:`take_control` parameters.
 
-    - The controller must call :meth:`CommonPlugin.init_plugin` on any plugin it wishes to use prior
-      to using any other functionality on that plugin. The controller must pass a :class:`Mediator`
+    - The controller must call :meth:`pntos.api.CommonPlugin.init_plugin` on any plugin it wishes to use prior
+      to using any other functionality on that plugin. The controller must pass a :class:`pntos.api.Mediator`
       that the plugin may use to communicate back to the controller. This callback design allows the
       controller to abstract away the concurrency model - in particular, a callback function may be
       anything from a direct invocation of a Python function to a shim that utilizes IPC channels to
@@ -36,7 +36,7 @@ class ControllerPlugin(CommonPlugin, ABC):
     run-time environment sensing. Outside of some initialization in the app, the controller is the
     conceptual "main" function.
 
-    When the controller is provided a :class:`PlatformIntegrationPlugin` as one of the plugins in
+    When the controller is provided a :class:`pntos.api.PlatformIntegrationPlugin` as one of the plugins in
     the ``plugins`` list passed to :meth:`take_control`, that indicates to the controller that
     platform-specific control logic exists and must be used. In this case, the controller's primary
     objective's are to:
@@ -44,13 +44,13 @@ class ControllerPlugin(CommonPlugin, ABC):
     - Pick the concurrency model being used (multiprocessed, multithreaded, coroutines,
       single-threaded, etc.).
     - Spin up the concurrency primitives to implement the chosen concurrency type.
-    - Provide a :class:`Mediator` to all plugins in their :meth:`CommonPlugin.init_plugin` call that
+    - Provide a :class:`pntos.api.Mediator` to all plugins in their :meth:`pntos.api.CommonPlugin.init_plugin` call that
       enables inter-plugin communication.
 
     After that task is accomplished, the controller should call the
-    :meth:`PlatformIntegrationPlugin.take_control` function and allow the
-    :class:`PlatformIntegrationPlugin` (PIP) to actively call functions on the ``plugins`` list.
-    Once the :meth:`PlatformIntegrationPlugin.take_control` has been called, the controller must
+    :meth:`pntos.api.PlatformIntegrationPlugin.take_control` function and allow the
+    :class:`pntos.api.PlatformIntegrationPlugin` (PIP) to actively call functions on the ``plugins`` list.
+    Once the :meth:`pntos.api.PlatformIntegrationPlugin.take_control` has been called, the controller must
     lock/synchronize the controller's and the PIP's access to function calls in the ``plugins``
     list, such that any action the PIP might take will not interfere with the controller's actions
     (or, equivalently, actions that the mediator provided by the controller is taking). One simple
@@ -75,9 +75,9 @@ class ControllerPlugin(CommonPlugin, ABC):
         Takes over primary control of the program from the app, using the ``plugins`` to process
         data, generate fused estimates, and ultimately produce and output PNT solutions.
         :meth:`take_control` must use the plugins passed to it and construct a full pntOS system.
-        Please see the description of the :class:`PlatformIntegrationPlugin` (PIP) for a description
+        Please see the description of the :class:`pntos.api.PlatformIntegrationPlugin` (PIP) for a description
         of duties of this function compared to the duties of the
-        :meth:`PlatformIntegrationPlugin.take_control` method (if a PIP is in the ``plugins`` list).
+        :meth:`pntos.api.PlatformIntegrationPlugin.take_control` method (if a PIP is in the ``plugins`` list).
 
         Args:
             plugins (list[CommonPlugin]): An array of plugins available to the controller.
