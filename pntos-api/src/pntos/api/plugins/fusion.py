@@ -774,7 +774,7 @@ class FusionPlugin(CommonPlugin, ABC):
 
         Args:
             type (type[FusionEngineType]): This parameter specifies the type of fusion engine that
-            will be returned.
+                will be returned.
 
         Returns:
             FusionEngineType | None: The ``type`` parameter specifies the type of fusion engine

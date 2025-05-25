@@ -73,7 +73,7 @@ def config_from_registry(
     Args:
         config_type (ConfigType): The parameter that specifies which config the user wants to receive.
         mediator (Mediator): The :class:`pntos.api.Mediator` object which contains the registry the
-        config will be extracted from.
+                             config will be extracted from.
         config_group (str): The registry group which contains the config being extracted.
 
     Returns:

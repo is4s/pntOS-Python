@@ -464,11 +464,11 @@ class KeyValueStore(ABC):
 
         Args:
             key (str | None)
-            callback (Callable[[str, list[str], "KeyValueStore"], None]): A
-            function with a function definition compatible with::
+            callback (Callable[[str, list[str], KeyValueStore], None]): A
+                function with a function definition compatible with::
 
-                def my_callback(group: str, modified_keys: list[str], kv: KeyValueStore) -> None:
-                    ...
+                    def my_callback(group: str, modified_keys: list[str], kv: KeyValueStore) -> None:
+                        ...
 
         Returns:
             bool: ``True`` if the notifier was successfully registered, and ``False`` if the store
@@ -494,7 +494,7 @@ class KeyValueStore(ABC):
 
         Args:
             key (str | None)
-            callback (Callable[[str, list[str], "KeyValueStore"], None])
+            callback (Callable[[str, list[str], KeyValueStore], None])
 
         Returns:
             bool: ``True`` if removal was successful and ``False`` if it was not. ``False`` will be
