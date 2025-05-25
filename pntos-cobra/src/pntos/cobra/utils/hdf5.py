@@ -87,8 +87,8 @@ def load_from_hdf5_file(
     Utility function for loading data from an HDF5 file into python.
 
     This function is intended to unpack an HDF5 file that was packed by
-    :class:`save_to_hdf5_file` into a dictionary of keys and lists of logged values.
-    See :class:`save_to_hdf5_file` for more information.
+    :func:`save_to_hdf5_file` into a dictionary of keys and lists of logged values.
+    See :func:`save_to_hdf5_file` for more information.
 
     Args:
         file (str): Path to ``.hdf5`` file.
