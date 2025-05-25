@@ -95,7 +95,7 @@ class SimplePreprocessorDownsamplerPlugin(PreprocessorPlugin):
 
         Args:
             identifier (str): The plugin identifier used to set
-                this plugin's :attr:`identifier` field.
+                this plugin's :attr:`pntos.api.CommonPlugin.identifier` field.
         """
         self.identifier = identifier
         self.preprocessor_identifiers = ['preprocessor_downsampler']

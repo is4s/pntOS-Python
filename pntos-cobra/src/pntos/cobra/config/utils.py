@@ -38,10 +38,10 @@ def imu_model_to_config(model: ImuModel, group: str) -> ImuConfig:
 
 def imu_model_from_config(config: ImuConfig) -> ImuModel:
     """
-    Grabs the :class:`ImuModel` object nested within the provided :class:`ImuConfig` object.
+    Grabs the ``ImuModel`` object nested within the provided :class:`ImuConfig` object.
 
     Args:
-        config (ImuConfig): The :class:`ImuConfig` object to grab an :class:`ImuModel` object from.
+        config (ImuConfig): The :class:`ImuConfig` object to grab an ``ImuModel`` object from.
 
     Returns:
         ImuModel
@@ -72,7 +72,7 @@ def config_from_registry(
 
     Args:
         config_type (ConfigType): The parameter that specifies which config the user wants to receive.
-        mediator (Mediator): The :class:`Mediator` object which contains the registry the
+        mediator (Mediator): The :class:`pntos.api.Mediator` object which contains the registry the
         config will be extracted from.
         config_group (str): The registry group which contains the config being extracted.
 
@@ -150,7 +150,7 @@ def config_to_registry(config: BaseConfig, mediator: Mediator) -> None:
 
     Args:
         config (BaseConfig): The config to be stored in the registry.
-        mediator (Mediator): :class:`Mediator` object to access the registry and log messages.
+        mediator (Mediator): :class:`pntos.api.Mediator` object to access the registry and log messages.
     """
     conf_params = [f for f in fields(config) if f.name != 'group']
     kv = mediator.registry.batch_start(config.group)

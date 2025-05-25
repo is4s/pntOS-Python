@@ -37,15 +37,15 @@ class SimpleControllerPlugin(ControllerPlugin):
     - LoggingPlugin - only 1
 
     It checks for the expected plugins, sets up mediators, and then passes the
-    mediators to each plugin in :meth:`init_plugin`, initializes the orchestration
+    mediators to each plugin in :meth:`pntos.api.CommonPlugin.init_plugin`, initializes the orchestration
     plugin, then passes off to the :meth:`_main` function.
 
-    Inside the main function, calls :meth:`start_listening` on all transport plugins,
-    checks if the UI needs to update (and passes it the thread if so), then waits for a
-    ctrl/cmd+c to exit pntOS.
+    Inside the main function, calls :meth:`pntos.api.TransportPlugin.start_listening` on all
+    transport plugins, checks if the UI needs to update (and passes it the thread if so), then waits
+    for a ctrl/cmd+c to exit pntOS.
 
     The TransportPlugins will initiate the necessary filtering through their calls to
-    :meth:`process_pntos_message`.
+    :meth:`pntos.api.Mediator.process_pntos_message`.
     """
 
     _plugin_resources_location: str | None
@@ -62,7 +62,7 @@ class SimpleControllerPlugin(ControllerPlugin):
 
         Args:
             identifier (str): The plugin identifier passed to the
-                :meth:`CommonPlugin.identifier` field.
+                :meth:`pntos.api.CommonPlugin.identifier` field.
         """
         self.identifier = identifier
         self._plugins: list[CommonPlugin] = []

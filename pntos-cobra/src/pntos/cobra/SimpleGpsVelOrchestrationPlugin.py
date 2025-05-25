@@ -88,7 +88,7 @@ class SimpleGpsVelOrchestrationPlugin(OrchestrationPlugin):
 
         Args:
             identifier (str): The plugin identifier passed to the
-                :meth:`CommonPlugin.identifier` field.
+                :meth:`pntos.api.CommonPlugin.identifier` field.
         """
         self.identifier: str = identifier
         self.log_level_strings: dict[LoggingLevel, str] = {
@@ -256,7 +256,7 @@ class SimpleGpsVelOrchestrationPlugin(OrchestrationPlugin):
         Utility function to put together the components of the fusion engine.
 
         Returns:
-            :class:`StandardFusionEngine` | None: Returns a functional fusion engine
+            :class:`pntos.api.StandardFusionEngine` | None: Returns a functional fusion engine
             with all necessary components, or ``None`` if fusion engine setup fails.
         """
         # Make a fusion engine
@@ -555,7 +555,7 @@ class SimpleGpsVelOrchestrationPlugin(OrchestrationPlugin):
         """
         Utility function to poll the state of the init strategy plugin.
 
-        Populates self.initialization_state with the relevant :class:`InitializationStatus`.
+        Populates self.initialization_state with the relevant :class:`pntos.api.InitializationStatus`.
         """
         self.initialization_state = self.initializer.request_current_status()
         return self.initialization_state is InitializationStatus.INITIALIZED_GOOD
