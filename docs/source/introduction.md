@@ -29,8 +29,8 @@ This project consists of the following main parts:
 | [Cobra Apps](./first_app.md)                                                                 | `apps/`                           | Each app loads a set of Cobra plugins, defines any config values, and starts the plugins. |
 ```
 
-While pntOS is analogous to an operating system in its functionality, it is not a true
-operating system. For more information, see {ref}`is-pntos-an-operating-system`.
+While pntOS is analogous to an operating system in terms of its comprehensive scope, it is not a true
+operating system in the sense of a kernel. For more information, see {ref}`is-pntos-an-operating-system`.
 
 ## High Level Overview
 
