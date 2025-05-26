@@ -1,15 +1,15 @@
-# Introduction - TODO
+# Introduction
 
 ## Motivation
 
 Many Position, Navigation, and Timing (PNT) systems are [stovepipe systems](https://en.wikipedia.org/wiki/Stovepipe_system)
-that are designed for a specific configuration of sensors to solve a particular PNT need. PNT
-threats are evolving rapidly. In particular, GPS-denied environments are becoming more
-common. Complementary PNT approaches mitigate these threats but changing current PNT
+that are designed for a specific configuration of sensors to solve a particular PNT need. However,
+reliance on PNT in industry is evolving rapidly, and GNSS-challenged environments are becoming more
+commonplace. Complementary PNT approaches mitigate these threats, but changing current PNT
 systems is a slow and expensive process.
 
 The Python pntOS Application Programming Interface (API) is designed to address this
-situation. It has broken up the concept of a PNT system into its component pieces
+situation. It has broken up the concept of a PNT sensor fusion system into its component pieces
 (called plugins) and defined an API to standardize their interactions, allowing for
 plugins to be individually swappable. In order to aid development of new plugins,
 [`pntos-python`](https://git.aspn.us/pntos/pntos-python) provides not only a full Python
