@@ -41,7 +41,7 @@ where pntOS is receiving and processing data from three sensors and producing a 
 
 ![](images/pntos_overview.svg)
 
-The data comes from the three sensors on the left and is processed by a set of Python pntOS plugins,
+In this example, the data comes from the three sensors on the left and is processed by a set of Python pntOS plugins,
 and then a solution is produced on the right. As you can see in the figure, pntOS accepts both ASPN
 and non-ASPN data from sensors, and will operate in a heterogeneous environment where both ASPN and
 non-ASPN sensor data is available.
