@@ -68,24 +68,46 @@ to see how Python pntOS breaks down the problem into a set of isolated plugins.
 
 ## Python pntOS API Plugin Breakdown
 
-We will start at the bottom of the diagram with the {term}`App` and work our way through
-the control flow. You can find more details about the {term}`Cobra` implementations of
-these plugins in the [](./plugins.md) section of these docs.
+The following figure extends our example from the previous section, showing more detail of 
+how Python pntOS works internally:
 
-TODO: Edit this graphic
 ![image](images/pntos_overview2.svg)
+**TODO**: Edit this with a version of the image that replaces the loader with an App.
+
+
+We will now discuss how pntOS processes the sensor data into a PNT Solution, starting
+at the bottom of the figure with the {term}`App` and working our way through
+the control flow. You can find more details about the {term}`Cobra` implementations of
+each of these plugins in the [](./plugins.md) section of these docs.
+
 
 ### App
 
-An {term}`App` consists of a single Python script that is responsible for the following:
-* Import plugin objects
-* Define any config values
-* Create a controller plugin
-* Create a list of other plugins to pass to the controller
-* Lastly, pass the list of plugins off to the controller with
-{py:obj}`ControllerPlugin.take_control()<pntos.api.ControllerPlugin.take_control>` to
-pass control to the {py:obj}`Controller Plugin<pntos.api.ControllerPlugin>` and start
-the system.
+In Python pntOS terminology, an {term}`App` consists of a single Python script that is 
+responsible for the following:
+
+* Importing the desired Python pntOS plugin definitions from Cobra or elsewhere
+* Defining any initial config, either inline or from a config file
+* Creating an instance of a controller plugin
+* Creating a list of instances of other plugins to pass to the controller, as desired
+* Calling {py:obj}`ControllerPlugin.take_control()<pntos.api.ControllerPlugin.take_control>` on the 
+  controller plugin we created to start the system. The controller plugin is passed in the 
+  list of the other plugins we created, and is now responsible for setting up the system using them. 
+  Once {py:obj}`ControllerPlugin.take_control()<pntos.api.ControllerPlugin.take_control>` is called,
+  the {term}`App`'s job is done, and the {py:obj}`Controller Plugin<pntos.api.ControllerPlugin>` coordinates
+  the pntOS system going forward.
+
+```{note}
+One way to think of an {term}`App` is that it is a simple Python script that kicks off the system, finds the plugins and
+config that we want to use, then hands off control to the {py:obj}`Controller Plugin<pntos.api.ControllerPlugin>`. 
+The {py:obj}`Controller Plugin<pntos.api.ControllerPlugin>` is the conceptual "main" function of Python pntOS,
+in that {py:obj}`ControllerPlugin.take_control()<pntos.api.ControllerPlugin.take_control>` is where the plugins are
+wired up to talk to each other, told to start listening and processing data, and so forth.
+```
+
+You can find an example of an {term}`App` that performs GPS/INS sensor fusion from sensor
+data it receives of an LCM network bus [here](https://git.aspn.us/pntos/pntos-python/-/blob/main/apps/fusion_gps_ins/fusion_gps_ins.py?ref_type=heads)
+(For instructions on how to run this example app, see [running an app](first_app.md)).
 
 ### Controller
 
