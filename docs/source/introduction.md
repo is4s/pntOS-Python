@@ -34,24 +34,34 @@ operating system in the sense of a kernel. For more information, see {ref}`is-pn
 
 ## High Level Overview
 
-First let's look at the Python pntOS API as a black box. It accepts measurements from
-various sensors, performs data fusion or filtering, and produces a navigation solution.
-All navigation data used internally in the Python pntOS API is ASPN-formatted data. Most
-sensors do not output ASPN data so the data needs to be converted before it can be used.
-This can happen in a few places:
+First let's consider overall objectives of the Python pntOS API. At the toplevel, a set of pntOS
+plugins aims to accept measurements from various sensors, perform data fusion and filtering on the sensor data, 
+and then produce a navigation solution. This concept is illustrated below, with an example experimental setup
+where pntOS is receiving and processing data from three sensors and producing a fused navigation solution:
 
-* In between the sensor and pntOS
-* In the pntOS [](./plugins/transport_plugin.md)
-* In the sensor itself
-
-The following image illustrates these operating modes in order from top to
-bottom respectively:
-
-TODO: Edit this graphic
 ![](images/pntos_overview.svg)
 
-Next we'll open up the the Python pntOS API box and discuss some of the core components and
-plugins that make up the Python pntOS API.
+The data comes from the three sensors on the left and is processed by a set of Python pntOS plugins,
+and then a solution is produced on the right. As you can see in the figure, pntOS accepts both ASPN
+and non-ASPN data from sensors, and will operate in a heterogeneous environment where both ASPN and
+non-ASPN sensor data is available.
+
+```{note}
+All navigation data used internally by Python pntOS plugins must be ASPN-formatted; thus, 
+the cleanest way to send data into pntOS is in the ASPN format, as shown by the "ASPN Native Sensor"
+in the figure. However, most sensors do not output ASPN data natively, and so the data needs
+to be converted to ASPN before it can be used by pntOS internally.
+This conversion can happen in two places:
+
+1. In-between the sensor and pntOS, by using an ASPN adapter that intercepts the data and converts it
+  to ASPN, as shown by the top sensor in the above figure. 
+2. Inside the pntOS [](./plugins/transport_plugin.md), which is designed to accept non-ASPN sensor
+  data off the wire and convert it to ASPN for use by the other pntOS plugins. The middle sensor 
+  in the figure above sends proprietary sensor data directly into pntOS, so its data would need
+  to be converted into ASPN by a transport plugin. We'll learn more about the transport plugin
+  and how it converts incoming data to ASPN in later sections.
+
+```
 
 ## Python pntOS API Components
 
