@@ -12,7 +12,7 @@ The Python pntOS Application Programming Interface (API) is designed to address 
 situation. It has broken up the concept of a PNT sensor fusion system into its component pieces
 (called plugins) and defined an API to standardize their interactions, allowing for
 plugins to be individually swappable. In order to aid development of new plugins,
-[`pntos-python`](https://git.aspn.us/pntos/pntos-python) provides not only a full Python
+[pntos-python](https://git.aspn.us/pntos/pntos-python) provides not only a full Python
 API, but also a set of plugins and {term}`Apps<App>` to serve as a reference implementation
 (called {term}`Cobra`).
 
