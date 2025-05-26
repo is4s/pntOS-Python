@@ -28,21 +28,36 @@ open a new shell.
 
 ## Environment Setup
 
-Please ensure you have the following tools installed:
+Setting up your environment is done in two steps: installing native dependencies and then setting up your Python
+environment.
 
-- Python 3.10 or later
-- git
-- GLib
-- Java
-- Tkinter
+### Install Native Dependencies
 
-Ubuntu users can use the following command to install the above dependencies:
+Please ensure you have the following packages installed and available on your system:
+
+| Package              | Reason Needed                          |
+|----------------------|----------------------------------------|
+| Python 3.10 or later | Needed to run Cobra                    |
+| Git                  | Needed to acquire Cobra's dependencies |
+| Glib2                | Needed for LCM tools, not by Cobra     |
+| Java                 | Needed for LCM tools, not by Cobra     |
+| Tkinter              | Needed for plotting filter results     |
+
+Ubuntu 22.04 users can use the following command to install the above packages:
 
 ```shell
 sudo apt update && sudo apt install python3 python3-venv git libglib2.0-dev default-jre python3-tk
 ```
 
-You are now ready to set up your python environment.
+Users of other operating systems will need to install the above packages using
+their operating system's package manager.
+
+```{note}
+While Cobra has been tested and is known to work on many different operating systems, currently only Ubuntu 22.04
+is officially supported. We anticipate adding support for many more operating systems before our 1.0 release.
+```
+
+You are now ready to set up your python environment in the next section.
 
 ### Python Environment Setup
 
