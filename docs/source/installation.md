@@ -61,7 +61,7 @@ You are now ready to set up your python environment in the next section.
 
 ### Python Environment Setup
 
-Begin by creating and entering a clean venv. We can create the venv in the
+We will begin by creating and entering a clean venv. We can create the venv in the
 `.venv` folder by running the following command in the project root directory:
 
 ```shell
@@ -120,7 +120,7 @@ modules.
 
 ## Errata
 
-Please see the following sections for some potential failures and how to resolve them.
+This section lists some potential failures you may encounter and how to resolve them.
 
 ### Unauthorized Error
 
