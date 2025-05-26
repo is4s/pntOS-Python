@@ -101,7 +101,7 @@ of bandwidth.
 ```
 
 If successful, you are ready to move on to [Testing Your Installation](#testing-your-installation).
-If not, please see [Errata](#errata) for troubleshooting help.
+If not, please see [Errata](#errata--troubleshooting) for troubleshooting help.
 
 ## Testing Your Installation
 
@@ -118,9 +118,16 @@ modules in the Python interpreter:
     <class 'pntos.api.plugins.controller.ControllerPlugin'>
 ```
 
-If you are able to access these classes successfully, you are ready to move on to [running your first app](first_app.md).
+If you are able to access these classes successfully, then congratulations, you are ready to
+start using Cobra! Your next steps are to try running a sample Cobra app, or start the tutorial
+on how Cobra works. If you'd like to try running a sample app, you should head over to
+[running your first app](first_app.md). If you'd like to learn more about how Cobra works first, 
+head over to the [introduction to Cobra](introduction.md).
 
-## Errata
+
+
+
+## Errata & Troubleshooting
 
 This section lists some potential failures you may encounter and how to resolve them.
 
@@ -166,10 +173,3 @@ NavToolkit module from source.
 If you encounter any errors during this process, please see [NavToolkit's
 documentation](https://git.aspn.us/pntos/navtk) for instructions on building the NavToolkit module
 from source and installing it.
-
-## Next Steps
-
-| Link    | Description    |
-| --- | --- |
-| [](./first_app.md)    | Instructions for running your first {term}`App`.    |
-| [](./introduction.md)    | An overview of the {term}`Python pntOS API` and {term}`Cobra`.    |
