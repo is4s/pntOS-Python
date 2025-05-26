@@ -106,7 +106,7 @@ If not, please see [Errata](#errata) for troubleshooting help.
 ## Testing Your Installation
 
 If everything installed correctly, you now should be able to import classes from the API and Cobra
-modules.
+modules in the Python interpreter:
 
 ```shell
     $ python
@@ -117,6 +117,8 @@ modules.
     >>> ControllerPlugin
     <class 'pntos.api.plugins.controller.ControllerPlugin'>
 ```
+
+If you are able to access these classes successfully, you are ready to move on to [running your first app](first_app.md).
 
 ## Errata
 
