@@ -63,7 +63,10 @@ This conversion can happen in two places:
 
 ```
 
-## Python pntOS API Components
+Now that we've covered what pntOS' top-level objectives are, we will dive into the Python pntOS APIs
+to see how Python pntOS breaks down the problem into a set of isolated plugins.
+
+## Python pntOS API Plugin Breakdown
 
 We will start at the bottom of the diagram with the {term}`App` and work our way through
 the control flow. You can find more details about the {term}`Cobra` implementations of
