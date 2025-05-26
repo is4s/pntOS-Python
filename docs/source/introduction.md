@@ -125,7 +125,7 @@ wired up to talk to each other, told to start listening and processing data, and
 ```
 
 You can find an example of an {term}`App` that performs GPS/INS sensor fusion from sensor
-data it receives of an LCM network bus [here](https://git.aspn.us/pntos/pntos-python/-/blob/main/apps/fusion_gps_ins/fusion_gps_ins.py?ref_type=heads)
+data it receives from an LCM network bus [here](https://git.aspn.us/pntos/pntos-python/-/blob/main/apps/fusion_gps_ins/fusion_gps_ins.py?ref_type=heads)
 (For instructions on how to run this example app, see [running an app](first_app.md)).
 
 ### Controller
