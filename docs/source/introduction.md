@@ -2,8 +2,8 @@
 
 ## Motivation
 
-Most Position, Navigation, and Timing (PNT) systems are "stovepipe" systems that are
-designed for a specific configuration of sensors to solve a particular PNT need. PNT
+Many Position, Navigation, and Timing (PNT) systems are [stovepipe systems](https://en.wikipedia.org/wiki/Stovepipe_system)
+that are designed for a specific configuration of sensors to solve a particular PNT need. PNT
 threats are evolving rapidly. In particular, GPS-denied environments are becoming more
 common. Complementary PNT approaches mitigate these threats but changing current PNT
 systems is a slow and expensive process.
