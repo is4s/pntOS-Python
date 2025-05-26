@@ -58,8 +58,8 @@ This conversion can happen in two places:
 2. Inside the pntOS [](./plugins/transport_plugin.md), which is designed to accept non-ASPN sensor
   data off the wire and convert it to ASPN for use by the other pntOS plugins. The middle sensor 
   in the figure above sends proprietary sensor data directly into pntOS, so its data would need
-  to be converted into ASPN by a transport plugin. We'll learn more about the transport plugin
-  and how it converts incoming data to ASPN in later sections.
+  to be converted into ASPN by a transport plugin inside pntOS. We'll learn more about the transport 
+  plugin and how it converts incoming data to ASPN in later sections.
 
 ```
 
