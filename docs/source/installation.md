@@ -22,8 +22,9 @@ To use the PAT, set the following environment variable, replacing `<TOKEN_VALUE>
 export UV_INDEX=https://:<TOKEN_VALUE>@git.aspn.us/api/v4/projects/94/packages/pypi/simple
 ```
 
-You may wish to permanently set the above `UV_INDEX` variable. For example, bash users can add the above line
-to their `~/.bashrc` script.
+You may wish to permanently set the above `UV_INDEX` variable. For example, bash users can add the above `export` line
+to their `~/.bashrc` script. If this is not done, the user will need to re-run the above `export` line each time they
+open a new shell.
 
 ## Environment Setup
 
