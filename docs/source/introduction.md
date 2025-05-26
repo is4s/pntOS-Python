@@ -63,21 +63,40 @@ This conversion can happen in two places:
 
 ```
 
-Now that we've covered what pntOS' top-level objectives are, we will dive into the Python pntOS APIs
-to see how Python pntOS breaks down the problem into a set of isolated plugins.
+Now that we've covered what pntOS' top-level objectives are, in the next section we will dive into 
+the details of a system that implements the Python pntOS APIs, to see how Python pntOS breaks down 
+the problem into a set of isolated plugins.
 
 ## Python pntOS API Plugin Breakdown
 
 The following figure extends our example from the previous section, showing more detail of 
-how Python pntOS works internally:
+how a Python pntOS system works internally:
 
 ![image](images/pntos_overview2.svg)
 **TODO**: Edit this with a version of the image that replaces the loader with an App.
 
 
-We will now discuss how pntOS processes the sensor data into a PNT Solution, starting
-at the bottom of the figure with the {term}`App` and working our way through
-the control flow. You can find more details about the {term}`Cobra` implementations of
+We are going to walk through this diagram step by step, examining each stage in the process
+of pntOS ingesting sensor data from the left and processing it to form a PNT Solution output
+on the right. We will start at the bottom of the figure with the {term}`App` and work our way through
+the control flow. In particular, in the next few sections we will walk through how:
+
+1. The {term}`App` kick starts the system, then transfers control to the
+  {py:obj}`Controller Plugin<pntos.api.ControllerPlugin>`, passing it a list of plugins to use.
+2. The {py:obj}`Controller Plugin<pntos.api.ControllerPlugin>` takes in the list of plugins and
+  wires them up to be able to communicate with each other via the
+  {py:obj}`Mediator<pntos.api.Mediator>`.
+3. The {py:obj}`Transport Plugin<pntos.api.TransportPlugin>` receives data off the wire from a
+  sensor, then delivers that data to the {py:obj}`Mediator<pntos.api.Mediator>`.
+4. The {py:obj}`Mediator<pntos.api.Mediator>` routes the sensor data it receives from the
+  {py:obj}`Transport Plugin<pntos.api.TransportPlugin>` to the 
+  {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>`
+5. The {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` receives the sensor data
+  and processes it into a solution, and makes the PNT solution available to anyone who calls 
+  {py:obj}`OrchestrationPlugin.request_solutions()<pntos.api.OrchestrationPlugin.request_solutions()>`
+
+
+You can find more details about the {term}`Cobra` implementations of
 each of these plugins in the [](./plugins.md) section of these docs.
 
 
@@ -111,7 +130,8 @@ data it receives of an LCM network bus [here](https://git.aspn.us/pntos/pntos-py
 
 ### Controller
 
-From this point forward, the {py:obj}`Controller Plugin<pntos.api.ControllerPlugin>` is
+Once the app has called {py:obj}`ControllerPlugin.take_control()<pntos.api.ControllerPlugin.take_control>`, 
+the {py:obj}`Controller Plugin<pntos.api.ControllerPlugin>` is
 responsible for all activity in the app. It may use any of the plugins it was passed
 as desired. The {py:obj}`Controller Plugin<pntos.api.ControllerPlugin>` defines any and
 all input and output it supports, which plugins are loaded or used, and the type
