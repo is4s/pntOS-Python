@@ -17,6 +17,7 @@ from pntos.cobra import (
     SimpleRegistryPlugin,
 )
 from pntos.cobra.config import (
+    FogmConfig,
     ImuConfig,
     InertialConfig,
     ManualAlignmentConfig,
@@ -62,6 +63,11 @@ my_config = [
     ),
     InertialConfig(
         group='config/inertial', expected_dt=0.01, inertial_buffer_length=10.0
+    ),
+    FogmConfig(
+        group='config/pos_sensor_error',
+        sigma=(1.5, 1.5, 10.0),
+        tau=(30.0, 30.0, 300000.0),
     ),
     OrchestrationConfig(
         imu_channel='/sensor/vn-100/imu',

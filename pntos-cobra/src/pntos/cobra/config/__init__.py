@@ -1,5 +1,6 @@
 from .BaseConfig import BaseConfig as BaseConfig
 from .DownsamplerConfig import DownsamplerConfig as DownsamplerConfig
+from .FogmConfig import FogmConfig as FogmConfig
 from .ImuConfig import ImuConfig as ImuConfig
 from .InertialConfig import InertialConfig as InertialConfig
 from .ManualAlignmentConfig import ManualAlignmentConfig as ManualAlignmentConfig

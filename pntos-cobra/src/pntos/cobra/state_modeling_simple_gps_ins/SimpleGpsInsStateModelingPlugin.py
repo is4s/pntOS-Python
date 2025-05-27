@@ -6,22 +6,32 @@ from pntos.api.plugins.state_modeling import (
     StateModelingPlugin,
     StateModelProviderType,
 )
-from pntos.cobra.config import ImuConfig, SensorConfig, config_from_registry
+from pntos.cobra.config import FogmConfig, ImuConfig, SensorConfig, config_from_registry
 
+from .FogmBlock import FogmBlock
 from .Pinson15NedBlock import Pinson15NedBlock
 from .PinsonPositionMeasurementProcessor import PinsonPositionMeasurementProcessor
 from .PinsonVelocityMeasurementProcessor import PinsonVelocityMeasurementProcessor
+from .PinsonWithNedFogmPositionMeasurementProcessor import (
+    PinsonWithNedFogmPositionMeasurementProcessor,
+)
 
 
 class SimpleGpsInsStateModelProvider(StandardStateModelProvider):
-    """StandardStateModelProvider that offers a 15-state pinson state block and a position measurement processor."""
+    """StandardStateModelProvider that offers a 15-state pinson state block, variable-size
+    Fogm Block and a position measurement processor.
+    """
 
     _mediator: Mediator
 
     def __init__(self, mediator: Mediator):
         self._mediator = mediator
-        self.processor_identifiers = ['pinson_position', 'pinson_velocity']
-        self.block_identifiers = ['pinson15']
+        self.processor_identifiers = [
+            'pinson_position',
+            'pinson_velocity',
+            'pinson_with_ned_fogm_position',
+        ]
+        self.block_identifiers = ['pinson15', 'fogm']
         self.virtual_block_identifiers = []
 
     def new_processor(
@@ -31,7 +41,12 @@ class SimpleGpsInsStateModelProvider(StandardStateModelProvider):
         label: str,
         state_block_labels: list[str],
         config_group: str,
-    ) -> PinsonPositionMeasurementProcessor | PinsonVelocityMeasurementProcessor | None:
+    ) -> (
+        PinsonPositionMeasurementProcessor
+        | PinsonWithNedFogmPositionMeasurementProcessor
+        | PinsonVelocityMeasurementProcessor
+        | None
+    ):
         """
         Generate a new StandardMeasurementProcessor that describes the relationship between a measurement and a set of states.
 
@@ -39,6 +54,7 @@ class SimpleGpsInsStateModelProvider(StandardStateModelProvider):
             processor_index (int): Index into self.processor_identifiers used to select the desired type of measurement processor.
                 - Index 0 corresponds to a PinsonPositionMeasurementProcessor.
                 - Index 1 corresponds to a PinsonVelocityMeasurementProcessor.
+                - Index 2 corresponds to a PinsonWithNedFogmPositionMeasurementProcessor.
                 - All other indices will result in a return value of None.
             engine (StandardFusionEngine | None): An optional parameter that may be provided to the
                 new processor, such that the processor may interact with the fusion engine it
@@ -82,6 +98,22 @@ class SimpleGpsInsStateModelProvider(StandardStateModelProvider):
                     state_block_labels,
                     self._mediator,
                 )
+            case 2:
+                sensor_config = config_from_registry(
+                    SensorConfig, self._mediator, config_group
+                )
+                if sensor_config is None:
+                    self._mediator.log_message(
+                        LoggingLevel.ERROR,
+                        f'Could not get position sensor config from registry.',
+                    )
+                    return None
+                return PinsonWithNedFogmPositionMeasurementProcessor(
+                    label,
+                    state_block_labels,
+                    self._mediator,
+                    np.array(sensor_config.lever_arm),
+                )
 
         self._mediator.log_message(
             LoggingLevel.ERROR,
@@ -95,13 +127,14 @@ class SimpleGpsInsStateModelProvider(StandardStateModelProvider):
         engine: StandardFusionEngine | None,
         label: str,
         config_group: str,
-    ) -> Pinson15NedBlock | None:
+    ) -> Pinson15NedBlock | FogmBlock | None:
         """
         Generate a new StandardStateBlock that describes a set of states and how they propagate over time.
 
         Args:
             block_index (int): Index into self.block_identifiers used to select the desired type of state block.
                 - Index 0 corresponds to a Pinson15NedBlock.
+                - Index 1 corresponds to a FogmBlock.
                 - All other indices will result in a return value of None.
             engine (StandardFusionEngine | None): An optional parameter that may be provided to the
                 new block, such that the block may interact with the fusion engine it
@@ -132,6 +165,22 @@ class SimpleGpsInsStateModelProvider(StandardStateModelProvider):
                 return None
 
             return Pinson15NedBlock(label, self._mediator, imu_config)
+
+        if block_index == 1:
+            fogm_config = config_from_registry(FogmConfig, self._mediator, config_group)
+            if fogm_config is None:
+                self._mediator.log_message(
+                    LoggingLevel.ERROR,
+                    f'Could not get fogm config from registry.',
+                )
+                return None
+
+            return FogmBlock(
+                label,
+                self._mediator,
+                np.array(fogm_config.sigma),
+                np.array(fogm_config.tau),
+            )
 
         self._mediator.log_message(
             LoggingLevel.ERROR,

@@ -524,7 +524,7 @@ class SimpleFusionEngine(StandardFusionEngine):
             big_H[:, self._sb[label].start_index : self._sb[label].stop_index] = (
                 measurement_model.H[:, mp_num_states:stop_index]
             )
-            mp_num_states += stop_index
+            mp_num_states = stop_index
 
         # Make the h(x) function that operates on the full x rather than just the
         # x specified by the measurement processor's state_block_labels
@@ -538,6 +538,7 @@ class SimpleFusionEngine(StandardFusionEngine):
                 x_mp[start_index : start_index + self._sb[label].num_states] = full_x[
                     self._sb[label].start_index : self._sb[label].stop_index
                 ]
+                start_index += self._sb[label].num_states
 
             # Calculate and return the h(x) output
             h_out = measurement_model.h(x_mp)
