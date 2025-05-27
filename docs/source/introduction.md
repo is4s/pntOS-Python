@@ -571,7 +571,7 @@ the {py:obj}`Controller Plugin<pntos.api.ControllerPlugin>` is the unit of modul
 that defines concurrency, because it implements the {py:obj}`Mediator<pntos.api.Mediator>`.
 ```
 
-### Orchestration
+## Orchestration
 
 TODO: the tour goes into here, rework the below.
 
