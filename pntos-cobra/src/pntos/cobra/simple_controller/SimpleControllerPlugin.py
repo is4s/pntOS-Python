@@ -62,7 +62,7 @@ class SimpleControllerPlugin(ControllerPlugin):
 
         Args:
             identifier (str): The plugin identifier passed to the
-                :meth:`pntos.api.CommonPlugin.identifier` field.
+                :attr:`pntos.api.CommonPlugin.identifier` field.
         """
         self.identifier = identifier
         self._plugins: list[CommonPlugin] = []
