@@ -713,7 +713,7 @@ class Registry(ABC):
         Note:
             While a batch is active, access to the store may be denied to other users. Thus a user
             should endeavour to call :meth:`pntos.api.KeyValueStore.batch_end` as soon as possible after they
-            are done getting/setting values in the returned :meth:`pntos.api.KeyValueStore`.
+            are done getting/setting values in the returned :class:`pntos.api.KeyValueStore`.
 
         Args:
             group (str)
