@@ -230,7 +230,7 @@ class StateModelingPlugin(CommonPlugin, ABC):
         Check if the plugin supports a given type of fusion. See ``StateModelProviderType``.
 
         Args:
-            type (FusionType)
+            type (StateModelProviderType)
 
         Returns:
             bool
@@ -245,7 +245,7 @@ class StateModelingPlugin(CommonPlugin, ABC):
         Generate a state model provider.
 
         Args:
-            type (FusionType): Specifies the type of fusion that the returned value will
+            type (StateModelProviderType): Specifies the type of fusion that the returned value will
                 support. For example, if the user passes in ``STANDARD_MODEL``, then the returned
                 value will be an implementation of :class:`pntos.api.StandardStateModelProvider`.
 
