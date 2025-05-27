@@ -52,6 +52,8 @@ class InertialForcesRates:
 
     forces_and_rates: MeasurementImu
     frame: InertialFrame
+    """The frame at which the forces and rates are valid.
+    """
 
 
 @dataclass

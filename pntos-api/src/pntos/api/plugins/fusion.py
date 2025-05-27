@@ -35,7 +35,12 @@ class CrossCovariances:
     """
 
     block_labels: list[str]
+    """The labels of the two state blocks which ``cross_covariances`` is valid for.
+    """
+
     cross_covariances: list[NDArray[float64]]
+    """The correlations between the state blocks.
+    """
 
 
 class StandardStateBlock(ABC):

@@ -52,6 +52,8 @@ class PreprocessorPlugin(CommonPlugin, ABC):
     """
 
     preprocessor_identifiers: list[str]
+    """Strings describing the preprocessors the provider can create.
+    """
 
     @abstractmethod
     def new_preprocessor(

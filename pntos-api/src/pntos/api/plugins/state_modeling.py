@@ -66,8 +66,14 @@ class StandardStateModelProvider(ABC):
     """
 
     processor_identifiers: list[str]
+    """Strings describing the measurement processors the provider can create.
+    """
     block_identifiers: list[str]
+    """Strings describing the state blocks the provider can create.
+    """
     virtual_block_identifiers: list[str]
+    """Strings describing the virtual state blocks the provider can create.
+    """
 
     @abstractmethod
     def new_processor(

@@ -75,7 +75,10 @@ class EstimateWithCovariance:
 
     type: EstimateWithCovarianceType
     estimate: NDArray[float64]
+    """An estimate vector."""
+
     covariance: NDArray[float64]
+    """A covariance matrix, describing the errors in the estimate."""
 
 
 class LoggingLevel(Enum):
@@ -672,6 +675,8 @@ class KeyValueStore(ABC):
         pass
 
     data_format: KeyValueStoreDataFormat
+    """Defines the underlying format which the data in the key-value store will be stored as.
+    """
 
 
 class Registry(ABC):
@@ -993,3 +998,8 @@ class CommonPlugin(ABC):
         pass
 
     identifier: str
+    """ A string identifier uniquely identifying this plugin.
+
+    This string will be used to determine the unique space this plugin receives in the system
+    config.
+    """
