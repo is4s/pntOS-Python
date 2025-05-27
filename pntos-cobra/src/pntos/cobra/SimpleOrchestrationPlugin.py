@@ -54,12 +54,16 @@ IMU_CHANNEL = '/sensor/vn-100/imu'
 GPS_CHANNEL = '/sensor/ublox-ZED-F9T/position'
 
 # State block parameters
+FOGM_STATE_BLOCK_ID = 'fogm'
+FOGM_STATE_BLOCK_LABEL = 'pos_fogm'
+FOGM_STATE_BLOCK_CONFIG_GROUP = 'config/pos_sensor_error'
+
 STATE_BLOCK_ID = STATE_BLOCK_LABEL = 'pinson15'
-STATE_BLOCK_LABELS = [STATE_BLOCK_LABEL]
 STATE_BLOCK_CONFIG_GROUP = 'config/inertial_state'
+STATE_BLOCK_LABELS = [STATE_BLOCK_LABEL, FOGM_STATE_BLOCK_LABEL]
 
 # Measurement processor parameters
-MEASUREMENT_PROCESSOR_ID = 'pinson_position'
+MEASUREMENT_PROCESSOR_ID = 'pinson_with_ned_fogm_position'
 MEASUREMENT_PROCESSOR_LABEL = 'gps'
 MEASUREMENT_PROCESSOR_CONFIG_GROUP = 'config/gp3d_state_modeling'
 
@@ -268,8 +272,9 @@ class SimpleOrchestrationPlugin(OrchestrationPlugin):
             StandardFusionStrategy
         )
 
-        # Get Pinson block and measurement processor
+        # Get state blocks and measurement processor
         block = None
+        fogm_block = None
         processor = None
         for plugin in self.state_modeling_plugins:
             provider: StandardStateModelProvider | None = (
@@ -278,10 +283,17 @@ class SimpleOrchestrationPlugin(OrchestrationPlugin):
             if provider is not None:
                 if STATE_BLOCK_ID in provider.block_identifiers:
                     block = provider.new_block(
-                        provider.block_identifiers.index(STATE_BLOCK_LABEL),
+                        provider.block_identifiers.index(STATE_BLOCK_ID),
                         fusion_engine,
                         STATE_BLOCK_LABEL,
                         STATE_BLOCK_CONFIG_GROUP,
+                    )
+                if FOGM_STATE_BLOCK_ID in provider.block_identifiers:
+                    fogm_block = provider.new_block(
+                        provider.block_identifiers.index(FOGM_STATE_BLOCK_ID),
+                        fusion_engine,
+                        FOGM_STATE_BLOCK_LABEL,
+                        FOGM_STATE_BLOCK_CONFIG_GROUP,
                     )
                 if MEASUREMENT_PROCESSOR_ID in provider.processor_identifiers:
                     processor = provider.new_processor(
@@ -292,7 +304,7 @@ class SimpleOrchestrationPlugin(OrchestrationPlugin):
                         MEASUREMENT_PROCESSOR_CONFIG_GROUP,
                     )
 
-        # Make state block
+        # Make state blocks
         if block is None:
             self._log(
                 LoggingLevel.ERROR,
@@ -301,10 +313,23 @@ class SimpleOrchestrationPlugin(OrchestrationPlugin):
             return
         ewc = EstimateWithCovariance(
             EstimateWithCovarianceType.EWC_GENERIC,
-            estimate=np.zeros((15, 1)),
-            covariance=np.zeros((15, 15)),
+            estimate=np.zeros((block.num_states, 1)),
+            covariance=np.zeros((block.num_states, block.num_states)),
         )
         fusion_engine.add_state_block(block, ewc, None)
+        if fogm_block is None:
+            self._log(
+                LoggingLevel.WARN,
+                f'Unable to find state block "{FOGM_STATE_BLOCK_LABEL}" - continuing.',
+            )
+        else:
+            # TODO how are configuring initial conditions for blocks
+            ewc = EstimateWithCovariance(
+                EstimateWithCovarianceType.EWC_GENERIC,
+                estimate=np.zeros((fogm_block.num_states, 1)),
+                covariance=(np.eye(fogm_block.num_states) * 9.0),
+            )
+            fusion_engine.add_state_block(fogm_block, ewc, None)
 
         if processor is None:
             assert provider is not None

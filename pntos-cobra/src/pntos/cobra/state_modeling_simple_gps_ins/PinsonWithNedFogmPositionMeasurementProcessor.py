@@ -24,9 +24,10 @@ from pntos.cobra.utils import (
 )
 
 
-class PinsonPositionMeasurementProcessor(StandardMeasurementProcessor):
+class PinsonWithNedFogmPositionMeasurementProcessor(StandardMeasurementProcessor):
     """
-    Generates a model that maps a position measurement to an inertial error state block.
+    Generates a model that maps a position measurement to an inertial error state
+    block and a position measurement error block.
     """
 
     _mediator: Mediator
@@ -44,11 +45,13 @@ class PinsonPositionMeasurementProcessor(StandardMeasurementProcessor):
         """
         Args:
             label (str): Name of processor.
-            state_block_labels (list[str]): A 1-element list of labels of state blocks this
-            processor can update. The single entry should refer to a Pinson-style
+            state_block_labels (list[str]): A 2-length list of labels of state blocks this
+            processor can update. The first entry should refer to a Pinson-style
             state block of at least size 9, with NED position errors in meters as
             the first three states and NED tilt errors, in radians, as states 6:9.
-            mediator (Mediator): a Mediator instance.
+            The second state block entry should refer to a 3-element FOGM
+            state block that models the position sensor errors in the NED frame.
+            mediator (Mediator): a Mediator instance
             l_ps_p (NDArray[float64]): A 3-element array representing the lever arm from the
             platform frame origin to the position sensor origin, in the platform frame, in
             units of meters.
@@ -58,11 +61,11 @@ class PinsonPositionMeasurementProcessor(StandardMeasurementProcessor):
         self._mediator = mediator
         self._inertial_pva = None
         self._l_ps_p = l_ps_p
-        self._num_required_blocks = 1
+        self._num_required_blocks = 2
         if len(state_block_labels) != self._num_required_blocks:
             self._mediator.log_message(
                 LoggingLevel.ERROR,
-                'PinsonPositionMeasurementProcessor requires {} state blocks, got {}.'.format(
+                'PinsonWithNedFogmPositionMeasurementProcessor requires {} state blocks, got {}.'.format(
                     self._num_required_blocks, state_block_labels
                 ),
             )
@@ -71,20 +74,25 @@ class PinsonPositionMeasurementProcessor(StandardMeasurementProcessor):
         if not aux:
             self._mediator.log_message(
                 LoggingLevel.ERROR,
-                f'PinsonPositionMeasurementProcessor expected aux data of type MeasurementPositionVelocityAttitude, but received empty list.',
+                f'PinsonWithNedFogmPositionMeasurementProcessor expected aux data of type\
+                MeasurementPositionVelocityAttitude, but received empty list.',
             )
             return
 
         if len(aux) > 1:
             self._mediator.log_message(
                 LoggingLevel.WARN,
-                f'PinsonPositionMeasurementProcessor expected a single MeasurementPositionVelocityAttitude aux message, but received {len(aux)} aux messages. Ignoring all except the first message.',
+                f'PinsonWithNedFogmPositionMeasurementProcessor expected a single \
+                MeasurementPositionVelocityAttitude aux message, but received\
+                {len(aux)} aux messages. Ignoring all except the first message.',
             )
 
         if not isinstance(aux[0].wrapped_message, MeasurementPVA):
             self._mediator.log_message(
                 LoggingLevel.ERROR,
-                f'PinsonPositionMeasurementProcessor expected aux data of type MeasurementPositionVelocityAttitude, but got message of type {type(aux[0].wrapped_message)}.',
+                f'PinsonWithNedFogmPositionMeasurementProcessor expected aux data of type\
+                MeasurementPositionVelocityAttitude, but got message of\
+                type {type(aux[0].wrapped_message)}.',
             )
             return
 
@@ -93,7 +101,8 @@ class PinsonPositionMeasurementProcessor(StandardMeasurementProcessor):
         if pva.quaternion is None:
             self._mediator.log_message(
                 LoggingLevel.ERROR,
-                f'PinsonPositionMeasurementProcessor received PVA aux data with no quaternion at time {pva.time_of_validity.elapsed_nsec / 1e9}s.',
+                f'PinsonWithNedFogmPositionMeasurementProcessor received PVA aux data with no quaternion\
+                at time {pva.time_of_validity.elapsed_nsec / 1e9}s.',
             )
             return
 
@@ -105,14 +114,16 @@ class PinsonPositionMeasurementProcessor(StandardMeasurementProcessor):
         if len(self.state_block_labels) != self._num_required_blocks:
             self._mediator.log_message(
                 LoggingLevel.ERROR,
-                f'PinsonPositionMeasurementProcessor has wrong number of state blocks. Cannot generate model.',
+                f'PinsonWithNedFogmPositionMeasurementProcessor has wrong number of state blocks. Cannot generate model.',
             )
             return None
 
         if not isinstance(message.wrapped_message, MeasurementPosition):
             self._mediator.log_message(
                 LoggingLevel.ERROR,
-                f'PinsonPositionMeasurementProcessor expected message of type MeasurementPosition, but got message of type {type(message.wrapped_message)}. Cannot process message.',
+                f'PinsonWithNedFogmPositionMeasurementProcessorexpected message of type\
+                MeasurementPosition, but got message of type \
+                {type(message.wrapped_message)}. Cannot process message.',
             )
             return None
 
@@ -121,7 +132,8 @@ class PinsonPositionMeasurementProcessor(StandardMeasurementProcessor):
         if self._inertial_pva is None:
             self._mediator.log_message(
                 LoggingLevel.ERROR,
-                f'PinsonPositionMeasurementProcessor cannot process message at time {time.elapsed_nsec / 1e9}s as it has not received inertial PVA aux data.',
+                f'PinsonWithNedFogmPositionMeasurementProcessor cannot process message at time\
+                {time.elapsed_nsec / 1e9}s as it has not received inertial PVA aux data.',
             )
             return None
 
@@ -129,14 +141,19 @@ class PinsonPositionMeasurementProcessor(StandardMeasurementProcessor):
         if abs(pva_aux_time.elapsed_nsec - time.elapsed_nsec) > 1000:
             self._mediator.log_message(
                 LoggingLevel.ERROR,
-                f'PinsonPositionMeasurementProcessor cannot process message at time {time.elapsed_nsec / 1e9}s as inertial PVA aux data is at a different time (t={pva_aux_time.elapsed_nsec / 1e9}s).',
+                f'PinsonWithNedFogmPositionMeasurementProcessor cannot process message at time\
+                {time.elapsed_nsec / 1e9}s as inertial PVA aux data is at a\
+                different time (t={pva_aux_time.elapsed_nsec / 1e9}s).',
             )
             return None
 
         if pos.reference_frame is not MeasurementPositionReferenceFrame.GEODETIC:
             self._mediator.log_message(
                 LoggingLevel.ERROR,
-                f'PinsonPositionMeasurementProcessor expected MeasurementPosition with a reference from of GEODETIC, but got measurement at time {time.elapsed_nsec / 1e9}s with a reference frame of {pos.reference_frame}. Cannot process message.',
+                f'PinsonWithNedFogmPositionMeasurementProcessor expected MeasurementPosition\
+                with a reference from of GEODETIC, but got measurement at\
+                time {time.elapsed_nsec / 1e9}s with a reference frame of\
+                {pos.reference_frame}.Cannot process message.',
             )
             return None
 
@@ -163,11 +180,13 @@ class PinsonPositionMeasurementProcessor(StandardMeasurementProcessor):
         H = np.zeros((3, x_and_p.estimate.shape[0]))
         H[:, 0:3] = np.eye(3)
         H[:, 6:9] = C_platform_to_nav @ self._l_ps_p
+        H[:, -3:] = -np.eye(3)
 
         def h(x: NDArray[float64]) -> NDArray[float64]:
             return (
                 x[0:3, 0]
                 + (np.eye(3) - skew(x[6:9, 0])) @ C_platform_to_nav @ self._l_ps_p
+                - x[-3:, 0]
             ).reshape(3, 1)
 
         R = pos.covariance

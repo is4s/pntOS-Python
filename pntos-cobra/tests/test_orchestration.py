@@ -1,5 +1,4 @@
 import unittest
-from typing import List
 
 import numpy as np
 from aspn23 import (
@@ -16,51 +15,42 @@ from aspn23 import (
     TypeHeader,
     TypeTimestamp,
 )
+from navtk.navutils import rpy_to_quat
 from numpy import float64
-from numpy.typing import NDArray
 from pntos.api import (
-    CrossCovariances,
-    EstimateWithCovariance,
-    EstimateWithCovarianceType,
     FusionEngineType,
     FusionPlugin,
     FusionStrategyPlugin,
     FusionStrategyType,
-    InertialForcesRates,
-    InertialFrame,
-    InertialInitializationStrategy,
     InertialPlugin,
-    InertialSolutionRangeType,
     InertialType,
-    InitialInertialSolution,
-    InitializationMotionNeeded,
     InitializationPlugin,
     InitializationStatus,
     InitializationType,
-    LoggingLevel,
-    Mediator,
     Message,
     OrchestrationPlugin,
-    Registry,
-    StandardDynamicsModel,
-    StandardFusionEngine,
-    StandardFusionStrategy,
-    StandardInertialErrors,
-    StandardInertialMechanization,
-    StandardMeasurementModel,
-    StandardMeasurementProcessor,
-    StandardStateBlock,
-    StandardStateModelProvider,
     StateModelingPlugin,
     StateModelProviderType,
-    VirtualStateBlock,
 )
+from pntos.api.plugins.registry import RegistryPlugin
 from pntos.cobra import (
+    SimpleEkfFusionStrategyPlugin,
+    SimpleFusionPlugin,
+    SimpleGpsInsStateModelingPlugin,
+    SimpleInertialPlugin,
+    SimpleInitializationPlugin,
     SimpleOrchestrationPlugin,
     SimpleRegistryPlugin,
 )
-from pntos.cobra.config import OrchestrationConfig, config_to_registry
-from pntos.cobra.internal import SimpleMessageStreamConfig
+from pntos.cobra.config import (
+    FogmConfig,
+    ImuConfig,
+    InertialConfig,
+    ManualAlignmentConfig,
+    OrchestrationConfig,
+    SensorConfig,
+)
+from pntos.cobra.internal import SimpleMediator, SimpleMessageStreamConfig
 
 # Test globals
 FOUND_ERROR = False
@@ -92,546 +82,56 @@ MEASUREMENT_PROCESSOR_CONFIG_GROUP = 'config/gp3d_state_modeling'
 # Inertial parameters
 INERTIAL_GROUP = 'config/inertial'
 INERTIAL_CHANNEL = IMU_CHANNEL
-
-
-class DummyInitializationPlugin(InitializationPlugin):
-    def __init__(self, identifier: str) -> None:
-        self.identifier = identifier
-
-    def init_plugin(
-        self,
-        plugin_resources_location: str | None = None,
-        mediator: Mediator | None = None,
-    ) -> None:
-        self.mediator = mediator
-
-    def shutdown_plugin(self) -> None:
-        return
-
-    def is_initialization_type_supported(self, type: type[InitializationType]) -> bool:
-        return True
-
-    def new_initialization_strategy(
-        self, type: type[InitializationType], config_group: str | None = None
-    ) -> InitializationType | None:
-        if issubclass(type, InertialInitializationStrategy):
-            return DummyInertialInitializationStrategy()
-        else:
-            return None
-
-
-class DummyStandardInertialMechanization(StandardInertialMechanization):
-    message: Message | None = None
-
-    def request_solution_message_type(self) -> type[AspnBase]:
-        return MeasurementImu
-
-    def request_current_solution(self) -> Message:
-        return Message(
-            MeasurementPositionVelocityAttitude(
-                header=TypeHeader(0, 1, 2, 3),
-                time_of_validity=TypeTimestamp(1000),
-                covariance=np.zeros((9, 9)),
-                error_model=MeasurementPositionVelocityAttitudeErrorModel.NONE,
-                error_model_params=np.array([]),
-                integrity=[],
-                p1=1.0,
-                p2=2.0,
-                p3=3.0,
-                v1=1.1,
-                v2=2.1,
-                v3=3.1,
-                quaternion=np.array([1.0, 1.1, 1.2, 1.3]),
-                reference_frame=MeasurementPositionVelocityAttitudeReferenceFrame.GEODETIC,
-            ),
-            GPS_CHANNEL,
-        )
-
-    def request_solution(self, time: TypeTimestamp) -> Message | None:
-        return self.request_current_solution()
-
-    def request_solutions(
-        self, time: list[TypeTimestamp], type: InertialSolutionRangeType
-    ) -> list[Message] | None:
-        return [self.request_current_solution()]
-
-    def is_time_in_range(self, time: TypeTimestamp) -> bool:
-        return True
-
-    def request_earliest_time(self) -> TypeTimestamp:
-        return TypeTimestamp(0)
-
-    def request_latest_time(self) -> TypeTimestamp:
-        return TypeTimestamp(1000)
-
-    def request_process_pntos_message_types(self) -> list[type[AspnBase]]:
-        return []
-
-    def request_forces_and_rates(
-        self, time: TypeTimestamp
-    ) -> InertialForcesRates | None:
-        return InertialForcesRates(
-            MeasurementImu(
-                TypeHeader(0, 1, 2, 3),
-                TypeTimestamp(1000),
-                MeasurementImuImuType.INTEGRATED,
-                np.array([0.0, 0.1, 0.2]),
-                np.array([1.0, 1.1, 1.2]),
-                [],
-            ),
-            InertialFrame.INERTIAL_FRAME_NED,
-        )
-
-    def request_average_forces_and_rates(
-        self, time1: TypeTimestamp, time2: TypeTimestamp
-    ) -> InertialForcesRates | None:
-        return None
-
-    def process_pntos_message(self, message: Message) -> None:
-        self.message = message
-        return
-
-    def request_reset_message_types(self) -> list[type[AspnBase]] | None:
-        return None
-
-    def reset_solution(self, message: Message) -> None:
-        return None
-
-    def correct_sensor_errors(
-        self, time: TypeTimestamp, errors: StandardInertialErrors
-    ) -> None:
-        return None
-
-    def request_sensor_errors(
-        self, time: TypeTimestamp
-    ) -> StandardInertialErrors | None:
-        return StandardInertialErrors(
-            np.array([0.1, 0.2, 0.3]),
-            np.array([0.4, 0.5, 0.6]),
-            np.array([0.7, 0.8, 0.9]),
-            np.array([1.0, 1.1, 1.2]),
-        )
-
-
-class DummyInertialPlugin(InertialPlugin):
-    def __init__(self, identifier: str) -> None:
-        self.identifier = identifier
-
-    def init_plugin(
-        self,
-        plugin_resources_location: str | None = None,
-        mediator: Mediator | None = None,
-    ) -> None:
-        self.mediator = mediator
-
-    def shutdown_plugin(self) -> None:
-        return
-
-    def is_inertial_type_supported(self, type: type[InertialType]) -> bool:
-        return True
-
-    def new_inertial(
-        self,
-        type: type[InertialType],
-        solution: Message,
-        config_group: str | None = None,
-    ) -> InertialType | None:
-        return DummyStandardInertialMechanization()
-
-
-class DummyFusionPlugin(FusionPlugin):
-    def __init__(self, identifier: str) -> None:
-        self.identifier = identifier
-
-    def init_plugin(
-        self,
-        plugin_resources_location: str | None = None,
-        mediator: Mediator | None = None,
-    ) -> None:
-        self.mediator = mediator
-
-    def shutdown_plugin(self) -> None:
-        return
-
-    def is_fusion_type_supported(self, type: type[FusionEngineType]) -> bool:
-        return True
-
-    def new_fusion_engine(
-        self, type: type[FusionEngineType]
-    ) -> FusionEngineType | None:
-        if issubclass(type, StandardFusionEngine):
-            return DummyStandardFusionEngine()
-        else:
-            return None
-
-
-class DummyStandardFusionEngine(StandardFusionEngine):
-    _strategy: StandardFusionStrategy
-    _time: TypeTimestamp = TypeTimestamp(0)
-
-    @property
-    def time(self) -> TypeTimestamp:
-        return self._time
-
-    @time.setter
-    def time(self, time: TypeTimestamp) -> None:
-        self._time = time
-
-    @property
-    def strategy(self) -> StandardFusionStrategy | None:
-        return self._strategy
-
-    @strategy.setter
-    def strategy(self, strategy: StandardFusionStrategy) -> None:
-        self._strategy = strategy
-
-    def get_num_states(self) -> int:
-        return 0
-
-    def get_state_block_labels(self) -> List[str] | None:
-        pass
-
-    def add_state_block(
-        self,
-        block: StandardStateBlock,
-        initial_estimate_covariance: EstimateWithCovariance,
-        cross_covariances: CrossCovariances | None = None,
-    ) -> None:
-        pass
-
-    def get_state_block_estimate(self, block_label: str) -> NDArray[float64] | None:
-        return np.array([[i / 10] for i in range(15)])
-
-    def get_state_block_covariance(self, block_label: str) -> NDArray[float64] | None:
-        pass
-
-    def get_state_block_cross_covariance(
-        self, block_label1: str, block_label2: str
-    ) -> NDArray[float64] | None:
-        pass
-
-    def set_state_block_estimate(
-        self, block_label: str, estimate: NDArray[float64]
-    ) -> None:
-        pass
-
-    def set_state_block_covariance(
-        self, block_label: str, covariance: NDArray[float64]
-    ) -> None:
-        pass
-
-    def set_state_block_cross_covariance(
-        self, block_label1: str, block_label2: str, covariance: NDArray[float64]
-    ) -> None:
-        pass
-
-    def remove_state_block(self, block_label: str) -> None:
-        pass
-
-    def get_virtual_state_block_target_labels(self) -> List[str] | None:
-        pass
-
-    def has_virtual_state_block(self, vsb_target_label: str) -> bool:
-        return False
-
-    def add_virtual_state_block(self, virtual_state_block: VirtualStateBlock) -> None:
-        pass
-
-    def remove_virtual_state_block(self, vsb_target_label: str) -> None:
-        pass
-
-    def get_measurement_processor_labels(self) -> List[str] | None:
-        pass
-
-    def add_measurement_processor(
-        self, processor: StandardMeasurementProcessor
-    ) -> None:
-        pass
-
-    def remove_measurement_processor(self, processor_label: str) -> None:
-        pass
-
-    def propagate(self, time: TypeTimestamp) -> None:
-        pass
-
-    def update(self, processor_label: str, message: Message) -> None:
-        pass
-
-    def peek_ahead(
-        self, time: TypeTimestamp, block_labels: List[str]
-    ) -> EstimateWithCovariance | None:
-        return EstimateWithCovariance(
-            type=EstimateWithCovarianceType.EWC_GENERIC,
-            estimate=np.array([[i / 100] for i in range(15)]),
-            covariance=np.zeros((15, 15)),
-        )
-
-    def generate_x_and_p(
-        self, block_labels: List[str]
-    ) -> EstimateWithCovariance | None:
-        pass
-
-    def give_state_block_aux_data(self, block_label: str, aux: List[Message]) -> None:
-        pass
-
-    def give_measurement_processor_aux_data(
-        self, processor_label: str, aux: List[Message]
-    ) -> None:
-        pass
-
-    def give_virtual_state_block_aux_data(
-        self, target_label: str, aux: List[Message]
-    ) -> None:
-        pass
-
-    def clone(self) -> 'DummyStandardFusionEngine':
-        return self
-
-
-class DummyFusionStrategyPlugin(FusionStrategyPlugin):
-    def __init__(self, identifier: str) -> None:
-        self.identifier = identifier
-
-    def init_plugin(
-        self,
-        plugin_resources_location: str | None = None,
-        mediator: Mediator | None = None,
-    ) -> None:
-        self.mediator = mediator
-
-    def shutdown_plugin(self) -> None:
-        return
-
-    def is_fusion_type_supported(self, fusion_type: type[FusionStrategyType]) -> bool:
-        return True
-
-    def new_fusion_strategy(
-        self, fusion_type: type[FusionStrategyType]
-    ) -> FusionStrategyType | None:
-        return DummyStandardFusionStrategy()
-
-
-class DummyStateModelingPlugin(StateModelingPlugin):
-    def __init__(self, identifier: str) -> None:
-        self.identifier = identifier
-
-    def init_plugin(
-        self,
-        plugin_resources_location: str | None = None,
-        mediator: Mediator | None = None,
-    ) -> None:
-        self.mediator = mediator
-
-    def shutdown_plugin(self) -> None:
-        return
-
-    def is_fusion_type_supported(self, type: type[StateModelProviderType]) -> bool:
-        return True
-
-    def new_state_model_provider(
-        self, type: type[StateModelProviderType]
-    ) -> StateModelProviderType | None:
-        return DummyStandardStateModelProvider()
-
-
-class DummyStandardStateBlock(StandardStateBlock):
-    label: str
-    num_states: int = 15
-
-    def __init__(self, label: str) -> None:
-        self.label = label
-
-    def receive_aux_data(self, aux: list[Message]) -> None:
-        return
-
-    def generate_dynamics(
-        self,
-        x_and_p: EstimateWithCovariance,
-        time_from: TypeTimestamp,
-        time_to: TypeTimestamp,
-    ) -> StandardDynamicsModel | None:
-        return None
-
-
-class DummyStandardMeasurementProcessor(StandardMeasurementProcessor):
-    label: str
-    state_block_labels: list[str]
-
-    def __init__(self, label: str, state_block_labels: list[str]) -> None:
-        self.label = label
-        self.state_block_labels = state_block_labels
-
-    def receive_aux_data(self, aux: list[Message]) -> None:
-        return
-
-    def generate_model(
-        self, message: Message, x_and_p: EstimateWithCovariance
-    ) -> StandardMeasurementModel | None:
-        return None
-
-
-class DummyStandardStateModelProvider(StandardStateModelProvider):
-    processor_identifiers = [MEASUREMENT_PROCESSOR_ID]
-    block_identifiers = [STATE_BLOCK_LABEL]
-    virtual_block_identifiers = []
-
-    def new_processor(
-        self,
-        processor_index: int,
-        engine: StandardFusionEngine | None,
-        label: str,
-        state_block_labels: list[str],
-        config_group: str,
-    ) -> StandardMeasurementProcessor | None:
-        return DummyStandardMeasurementProcessor(label, state_block_labels)
-
-    def new_block(
-        self,
-        block_index: int,
-        engine: StandardFusionEngine | None,
-        label: str,
-        config_group: str,
-    ) -> StandardStateBlock | None:
-        return DummyStandardStateBlock(label)
-
-    def new_virtual_block(
-        self,
-        virtual_block_index: int,
-        source_label: str,
-        target_label: str,
-        config_group: str,
-    ) -> VirtualStateBlock | None:
-        return None
-
-
-class DummyStandardFusionStrategy(StandardFusionStrategy):
-    def get_num_states(self) -> int:
-        return 0
-
-    def add_states(
-        self,
-        initial_estimate: NDArray[float64],
-        initial_covariance: NDArray[float64],
-        cross_covariance: NDArray[float64] | None = None,
-    ) -> int:
-        return 0
-
-    def remove_states(self, first_index: int, count: int) -> None:
-        pass
-
-    def get_estimate(self) -> NDArray[float64] | None:
-        return None
-
-    def set_estimate_slice(
-        self, new_estimate: NDArray[float64], first_index: int
-    ) -> None:
-        pass
-
-    def get_covariance(self) -> NDArray[float64] | None:
-        pass
-
-    def set_covariance_slice(
-        self,
-        new_covariance: NDArray[float64],
-        first_row: int,
-        first_col: int,
-    ) -> None:
-        pass
-
-    def propagate(self, dynamics_model: StandardDynamicsModel) -> None:
-        pass
-
-    def update(self, measurement_model: StandardMeasurementModel) -> None:
-        pass
-
-    def clone(self) -> 'DummyStandardFusionStrategy':
-        return self
-
-
-class DummyInertialInitializationStrategy(InertialInitializationStrategy):
-    """Dummy initialization strategy that simply waits for any message to initialize."""
-
-    status: InitializationStatus
-
-    def __init__(self) -> None:
-        self.status = InitializationStatus.INITIALIZED_GOOD
-
-    def request_solution(self) -> InitialInertialSolution:
-        return InitialInertialSolution(
-            Message(
-                wrapped_message=MeasurementPositionVelocityAttitude(
-                    header=TypeHeader(
-                        vendor_id=0, device_id=1, context_id=2, sequence_id=3
-                    ),
-                    time_of_validity=TypeTimestamp(elapsed_nsec=1000),
-                    reference_frame=MeasurementPositionVelocityAttitudeReferenceFrame.GEODETIC,
-                    p1=1.0,
-                    p2=2.0000000028949256,
-                    p3=2.98,
-                    v1=1.1300000000000001,
-                    v2=2.14,
-                    v3=3.15,
-                    quaternion=np.array(
-                        [
-                            1.9992092093502731,
-                            1.9022032841808882,
-                            2.057372072808313,
-                            0.7091255263879387,
-                        ]
-                    ),
-                    covariance=np.zeros([9, 9]),
-                    error_model=MeasurementPositionVelocityAttitudeErrorModel.NONE,
-                    error_model_params=np.array([], dtype=float64),
-                    integrity=[],
-                ),
-                source_identifier='/solution/pntos/best',
-            ),
-            StandardInertialErrors(np.zeros(3), np.zeros(3), np.ones(3), np.ones(3)),
-            np.zeros([12, 12]),  # pretend that it's the errors for a Pinson21
-            InitializationStatus.INITIALIZED_GOOD,
-        )
-
-    def request_motion_needed(self) -> InitializationMotionNeeded:
-        return InitializationMotionNeeded.ANY_MOTION
-
-    def request_current_status(self) -> InitializationStatus:
-        return self.status
-
-    def process_pntos_message(self, message: Message) -> None:
-        pass
-
-
-class DummyMediator(Mediator):
-    registry: Registry
-
-    def get_filter_description_list(self) -> list[str]:
-        return []
-
-    def request_solutions(
-        self,
-        solution_times: list[TypeTimestamp],
-        filter_description: str | None = None,
-    ) -> list[Message] | None:
-        return None
-
-    def process_pntos_message(self, message: Message) -> None:
-        return
-
-    def broadcast_aspn_message(
-        self,
-        message: Message,
-        transport: str | None = None,
-        destination_identifier: str | None = None,
-    ) -> None:
-        return
-
-    def log_message(self, level: LoggingLevel, message: str) -> None:
-        if level is LoggingLevel.ERROR:
-            ERROR_MESSAGE = message
-            FOUND_ERROR = True
-            assert (
-                not FOUND_ERROR and ERROR_MESSAGE != EXPECTED_ERROR_MESSAGE
-            ), ERROR_MESSAGE
+align_config = ManualAlignmentConfig(
+    group='config/default/alignment',
+    initial_pos_var=(0, 0, 0),
+    initial_vel_var=(0, 0, 0),
+    initial_tilt_var=(0, 0, 0),
+    initial_accel_bias_var=(1e-10, 1e-10, 1e-10),
+    initial_gyro_bias_var=(1e-15, 1e-15, 1e-15),
+    initial_accel_bias=(-0.00212767, 0.00059081, -0.05242679),
+    initial_accel_scale_factor=(0.0, 0.0, 0.0),
+    initial_accel_scale_factor_var=(0.0, 0.0, 0.0),
+    initial_gyro_bias=(-0.00165402, -0.00157491, -0.00133498),
+    initial_gyro_scale_factor=(0.0, 0.0, 0.0),
+    initial_gyro_scale_factor_var=(0.0, 0.0, 0.0),
+    initial_pos=(0.6939183923297865, -1.4680111371692746, 222.561),
+    initial_rpy=(0.0012876203558051373, -0.05315453753188288, 0.10972323851917268),
+    initial_time=0.0,
+    initial_vel=(0.0, 0.0, 0.0),
+)
+my_config = [
+    ImuConfig(
+        group='config/inertial_state',
+        accel_bias_sigma=(3.924e-5, 3.924e-5, 3.924e-5),
+        accel_bias_tau=(1800.0, 1800.0, 1800.0),
+        accel_random_walk_sigma=(3.887e-6, 3.887e-6, 3.887e-6),
+        gyro_bias_sigma=(8.848e-5, 8.848e-5, 8.848e-5),
+        gyro_bias_tau=(1800.0, 1800.0, 1800.0),
+        gyro_random_walk_sigma=(1.7277877e-7, 1.7277877e-7, 1.7277877e-7),
+    ),
+    align_config,
+    SensorConfig(
+        group='config/gp3d_state_modeling',
+        lever_arm=(0.0, 0.0, 0.0),
+        orientation=(0.0, 0.0, 0.0, 0.0),
+        use_for_alignment=True,
+        sensor_name='novatel',
+    ),
+    InertialConfig(
+        group='config/inertial', expected_dt=0.01, inertial_buffer_length=10.0
+    ),
+    FogmConfig(
+        group='config/pos_sensor_error',
+        sigma=(1.5, 1.5, 10.0),
+        tau=(30.0, 30.0, 300000.0),
+    ),
+    OrchestrationConfig(
+        imu_channel='/sensor/vn-100/imu',
+        gps_channel='/sensor/ublox-ZED-F9T/position',
+        group='config/orchestration',
+    ),
+]
 
 
 class Test_Orchestration(unittest.TestCase):
@@ -650,18 +150,20 @@ class Test_Orchestration(unittest.TestCase):
         self.orchestration_plugin: OrchestrationPlugin = SimpleOrchestrationPlugin(
             'SimpleOrchestrationPlugin'
         )
-        self.initialization_plugin: InitializationPlugin = DummyInitializationPlugin(
-            'DummyInitializationPlugin'
+        self.initialization_plugin: InitializationPlugin = SimpleInitializationPlugin(
+            'Cobra Simple Initialization Plugin'
         )
-        self.inertial_plugin: InertialPlugin = DummyInertialPlugin(
-            'DummyInertialPlugin'
+        self.inertial_plugin: InertialPlugin = SimpleInertialPlugin(
+            'Cobra Simple Inertial Plugin'
         )
-        self.fusion_plugin: FusionPlugin = DummyFusionPlugin('DummyFusionPlugin')
-        self.fusion_strategy_plugin: FusionStrategyPlugin = DummyFusionStrategyPlugin(
-            'DummyFusionStrategyPlugin'
+        self.fusion_plugin: FusionPlugin = SimpleFusionPlugin(
+            'Cobra Simple Fusion Plugin'
         )
-        self.state_modeling_plugin: StateModelingPlugin = DummyStateModelingPlugin(
-            'DummyStateModelingPlugin'
+        self.fusion_strategy_plugin: FusionStrategyPlugin = (
+            SimpleEkfFusionStrategyPlugin('Cobra Simple Fusion Strategy Plugin')
+        )
+        self.state_modeling_plugin: StateModelingPlugin = (
+            SimpleGpsInsStateModelingPlugin('Cobra Simple State Modeling Plugin')
         )
         self.registry_plugin: SimpleRegistryPlugin = SimpleRegistryPlugin(
             'SimpleRegistryPlugin'
@@ -677,18 +179,15 @@ class Test_Orchestration(unittest.TestCase):
             self.registry_plugin,
         ]
 
-        config = OrchestrationConfig(
-            imu_channel='/sensor/vn-100/imu',
-            gps_channel='/sensor/ublox-ZED-F9T/position',
-            group='config/orchestration',
-        )
-
+        registry_plugin = SimpleRegistryPlugin('Simple registry', config=my_config)
+        mediator = SimpleMediator(registry_plugin.identifier, RegistryPlugin)
+        registry_plugin.init_plugin(mediator=mediator)
+        registry = registry_plugin.new_registry()
+        SimpleMediator.registry = registry
+        SimpleMediator._controller_plugin = None
         # Run init_plugin on all the plugins
         for plugin in plugins:
-            plugin.init_plugin(mediator=DummyMediator())
-
-        DummyMediator.registry = self.registry_plugin.new_registry()
-        config_to_registry(config, DummyMediator())
+            plugin.init_plugin(mediator=mediator)
 
     @property
     def test_header(self) -> TypeHeader:
@@ -703,55 +202,40 @@ class Test_Orchestration(unittest.TestCase):
         return Message(
             wrapped_message=MeasurementPositionVelocityAttitude(
                 header=TypeHeader(
-                    vendor_id=0, device_id=1, context_id=2, sequence_id=3
+                    vendor_id=0, device_id=0, context_id=0, sequence_id=0
                 ),
-                time_of_validity=TypeTimestamp(elapsed_nsec=1000),
+                time_of_validity=TypeTimestamp(
+                    elapsed_nsec=int(align_config.initial_time * 1e9)
+                ),
                 reference_frame=MeasurementPositionVelocityAttitudeReferenceFrame.GEODETIC,
-                p1=1.0,
-                p2=2.0000000028949256,
-                p3=2.98,
-                v1=1.1300000000000001,
-                v2=2.14,
-                v3=3.15,
-                quaternion=np.array(
-                    [
-                        1.9992092093502731,
-                        1.9022032841808882,
-                        2.057372072808313,
-                        0.7091255263879387,
-                    ]
+                p1=align_config.initial_pos[0],
+                p2=align_config.initial_pos[1],
+                p3=align_config.initial_pos[2],
+                v1=align_config.initial_vel[0],
+                v2=align_config.initial_vel[1],
+                v3=align_config.initial_vel[2],
+                quaternion=rpy_to_quat(
+                    np.array(
+                        [
+                            align_config.initial_rpy[0],
+                            align_config.initial_rpy[1],
+                            align_config.initial_rpy[2],
+                        ]
+                    )
                 ),
                 covariance=np.zeros([9, 9]),
                 error_model=MeasurementPositionVelocityAttitudeErrorModel.NONE,
                 error_model_params=np.array([], dtype=float64),
                 integrity=[],
             ),
-            source_identifier='/solution/pntos/best',
+            source_identifier=BEST_SOL_CHANNEL,
         )
 
     @property
     def expected_pva_dead_reckoning(self) -> Message:
-        return Message(
-            wrapped_message=MeasurementPositionVelocityAttitude(
-                header=TypeHeader(
-                    vendor_id=0, device_id=1, context_id=2, sequence_id=3
-                ),
-                time_of_validity=TypeTimestamp(elapsed_nsec=1000),
-                reference_frame=MeasurementPositionVelocityAttitudeReferenceFrame.GEODETIC,
-                p1=1.0,
-                p2=2.0,
-                p3=3.0,
-                v1=1.1,
-                v2=2.1,
-                v3=3.1,
-                quaternion=np.array([1.0, 1.1, 1.2, 1.3]),
-                covariance=np.zeros((9, 9)),
-                error_model=MeasurementPositionVelocityAttitudeErrorModel.NONE,
-                error_model_params=np.array([], dtype=float64),
-                integrity=[],
-            ),
-            source_identifier='/solution/pntos/imu',
-        )
+        ms = self.expected_pva_best
+        ms.source_identifier = IMU_SOL_CHANNEL
+        return ms
 
     def generate_imu_message(self, source_identifier: str = 'source') -> Message:
         return Message(
@@ -804,6 +288,8 @@ class Test_Orchestration(unittest.TestCase):
                         return False
             return True
         else:
+            print('m1 {}'.format(m1))
+            print('m2 {}'.format(m2))
             return m1 == m2
 
     def test_init_orchestration_plugin_simple(self) -> None:
@@ -918,6 +404,8 @@ class Test_Orchestration(unittest.TestCase):
         solutions = self.orchestration_plugin.request_solutions(solution_times)
         assert solutions is not None
         assert len(solutions) == 1
+        print(solutions[0])
+        print(expected_solution)
         assert self.compare_messages(solutions[0], expected_solution)
 
     def test_request_solutions_using_filter_descriptions(self) -> None:

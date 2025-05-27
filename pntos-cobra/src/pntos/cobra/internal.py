@@ -15,6 +15,9 @@ from .SimpleRegistryPlugin import (
     SimpleKeyValueStore as SimpleKeyValueStore,
     SimpleRegistry as SimpleRegistry,
 )
+from .state_modeling_simple_gps_ins.FogmBlock import (
+    FogmBlock as FogmBlock,
+)
 from .state_modeling_simple_gps_ins.Pinson15NedBlock import (
     Pinson15NedBlock as Pinson15NedBlock,
 )
@@ -23,4 +26,7 @@ from .state_modeling_simple_gps_ins.PinsonPositionMeasurementProcessor import (
 )
 from .state_modeling_simple_gps_ins.PinsonVelocityMeasurementProcessor import (
     PinsonVelocityMeasurementProcessor as PinsonVelocityMeasurementProcessor,
+)
+from .state_modeling_simple_gps_ins.PinsonWithNedFogmPositionMeasurementProcessor import (
+    PinsonWithNedFogmPositionMeasurementProcessor as PinsonWithNedFogmPositionMeasurementProcessor,
 )
