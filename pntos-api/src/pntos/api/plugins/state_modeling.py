@@ -203,7 +203,7 @@ class StandardStateModelProvider(ABC):
                 requires no outside configuration, ``config_group`` may be ``None``.
 
         Returns:
-            VirtualStateBlock | None: The newly created :class:`VirtualStateBlock`or ``None`` when
+            VirtualStateBlock | None: The newly created :class:`VirtualStateBlock` or ``None`` when
             no virtual state block can be produced with the given ``virtual_block_index`` and
             ``config_group``.
         """

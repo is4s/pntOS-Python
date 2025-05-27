@@ -57,7 +57,7 @@ class PlatformIntegrationPlugin(CommonPlugin, ABC):
           - Routing data from transport plugin to orchestration/initialization/inertial plugins.
           - Routing requests for registry data to registry plugins.
 
-        :class:`PlatformIntegrationPplugin` responsibilities:
+        :class:`PlatformIntegrationPlugin` responsibilities:
           - Platform specific outputs.
           - Responding to moding commands from platform.
           - Routing situational awareness information to other pntOS plugins (via registry
