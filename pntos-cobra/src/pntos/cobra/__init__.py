@@ -11,6 +11,9 @@ from .SimpleEkfFusionStrategyPlugin import (
     SimpleEkfFusionStrategyPlugin as SimpleEkfFusionStrategyPlugin,
 )
 from .SimpleFusionPlugin import SimpleFusionPlugin as SimpleFusionPlugin
+from .SimpleGpsOrchestrationPlugin import (
+    SimpleGpsOrchestrationPlugin as SimpleGpsOrchestrationPlugin,
+)
 from .SimpleGpsVelOrchestrationPlugin import (
     SimpleGpsVelOrchestrationPlugin as SimpleGpsVelOrchestrationPlugin,
 )
@@ -19,9 +22,6 @@ from .SimpleInitializationPlugin import (
     SimpleInitializationPlugin as SimpleInitializationPlugin,
 )
 from .SimpleLoggingPlugin import SimpleLoggingPlugin as SimpleLoggingPlugin
-from .SimpleOrchestrationPlugin import (
-    SimpleOrchestrationPlugin as SimpleOrchestrationPlugin,
-)
 from .SimplePreprocessorDownsamplerPlugin import (
     SimplePreprocessorDownsamplerPlugin as SimplePreprocessorDownsamplerPlugin,
 )

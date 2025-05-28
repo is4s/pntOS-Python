@@ -73,7 +73,7 @@ INERTIAL_GROUP = 'config/inertial'
 ALIGNMENT_CONFIG_GROUP = 'config/default/alignment'
 
 
-class SimpleOrchestrationPlugin(OrchestrationPlugin):
+class SimpleGpsOrchestrationPlugin(OrchestrationPlugin):
     mediator: Mediator
     init_solution: InitialInertialSolution | None
     fusion_plugin: FusionPlugin
