@@ -156,6 +156,18 @@ GPS INS App:
         paths:
             - pntos_output/
 
+GPS INS Velocity App:
+    stage: check
+    tags:
+        - linux-light-runner
+    script:
+        - docker run --rm -dit -v $(pwd):/work --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
+        - docker exec pntos-python uv sync -v
+        - docker exec pntos-python postprocessing/run_app_and_record_data.py fusion_gps_vel_ins
+    artifacts:
+        paths:
+            - pntos_output/
+
 pip workflow check:
     stage: check
     tags:
