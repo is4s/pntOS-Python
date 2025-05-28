@@ -11,7 +11,7 @@ from plot_results import plot_results
 OUTPUT_LOG_FILENAME = 'pntos_output.log'
 
 
-def run_pntos():
+def run_pntos(app_to_run: str = 'fusion_gps_ins'):
     """Spin up pntOS and any supporting processes, wait, then spin them down."""
     # Remove any pre-existing output
     if path.exists(OUTPUT_LOG_FILENAME):
@@ -42,7 +42,7 @@ def run_pntos():
     )
 
     # Start the app
-    cobra_process = Popen('apps/fusion_gps_ins/fusion_gps_ins.py')
+    cobra_process = Popen(f'apps/{app_to_run}/{app_to_run}.py')
     sleep(1)  # Give the relay some time to start
 
     log_filename = None
@@ -93,4 +93,6 @@ def run_pntos():
 if __name__ == '__main__':
     if len(argv) < 2:
         run_pntos()
+    elif len(argv) == 2:
+        run_pntos(argv[1])
     plot_results(OUTPUT_LOG_FILENAME)
