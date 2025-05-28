@@ -495,7 +495,7 @@ and thats it! we've now set up a pipeline that forwards all data received by a
 {py:obj}`Transport Plugin<pntos.api.TransportPlugin>` into the
 {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>`.
 
-# A Simple Controller Plugin Example
+### A Simple Controller Plugin Example
 
 The {py:obj}`SimpleControllerPlugin<pntos.cobra.SimpleControllerPlugin>` is designed to be a simple implementation 
 of a {py:obj}`Controller Plugin<pntos.api.ControllerPlugin>` to demonstrate the concepts
@@ -571,7 +571,7 @@ the {py:obj}`Controller Plugin<pntos.api.ControllerPlugin>` is the unit of modul
 that defines concurrency, because it implements the {py:obj}`Mediator<pntos.api.Mediator>`.
 ```
 
-## Orchestration
+### Orchestration
 
 TODO: the tour goes into here, rework the below.
 
