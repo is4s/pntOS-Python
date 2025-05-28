@@ -54,17 +54,22 @@ IMU_CHANNEL = '/sensor/vn-100/imu'
 GPS_CHANNEL = '/sensor/ublox-ZED-F9T/position'
 
 # State block parameters
+FOGM_STATE_BLOCK_ID = 'fogm'
+FOGM_STATE_BLOCK_LABEL = 'pos_fogm'
+FOGM_STATE_BLOCK_CONFIG_GROUP = 'config/pos_sensor_error'
+
 STATE_BLOCK_ID = STATE_BLOCK_LABEL = 'pinson15'
-STATE_BLOCK_LABELS = [STATE_BLOCK_LABEL]
 STATE_BLOCK_CONFIG_GROUP = 'config/inertial_state'
 
 # Measurement processor parameters
-GPS_MEASUREMENT_PROCESSOR_ID = 'pinson_position'
+GPS_MEASUREMENT_PROCESSOR_ID = 'pinson_with_ned_fogm_position'
 GPS_MEASUREMENT_PROCESSOR_LABEL = 'gps'
 GPS_MEASUREMENT_PROCESSOR_CONFIG_GROUP = 'config/gp3d_state_modeling'
+GPS_MP_STATE_BLOCK_LABELS = [STATE_BLOCK_LABEL, FOGM_STATE_BLOCK_LABEL]
 VEL_MEASUREMENT_PROCESSOR_ID = 'pinson_velocity'
 VEL_MEASUREMENT_PROCESSOR_LABEL = 'vel'
 VEL_MEASUREMENT_PROCESSOR_CONFIG_GROUP = 'config/gp3d_state_modeling'
+VEL_MP_STATE_BLOCK_LABELS = [STATE_BLOCK_LABEL]
 
 # Inertial parameters
 INERTIAL_GROUP = 'config/inertial'
@@ -274,8 +279,9 @@ class SimpleGpsVelOrchestrationPlugin(OrchestrationPlugin):
             StandardFusionStrategy
         )
 
-        # Get Pinson block and measurement processors
+        # Get state blocks and measurement processor
         block = None
+        fogm_block = None
         gps_processor = None
         vel_processor = None
         for plugin in self.state_modeling_plugins:
@@ -285,10 +291,17 @@ class SimpleGpsVelOrchestrationPlugin(OrchestrationPlugin):
             if provider is not None:
                 if STATE_BLOCK_ID in provider.block_identifiers:
                     block = provider.new_block(
-                        provider.block_identifiers.index(STATE_BLOCK_LABEL),
+                        provider.block_identifiers.index(STATE_BLOCK_ID),
                         fusion_engine,
                         STATE_BLOCK_LABEL,
                         STATE_BLOCK_CONFIG_GROUP,
+                    )
+                if FOGM_STATE_BLOCK_ID in provider.block_identifiers:
+                    fogm_block = provider.new_block(
+                        provider.block_identifiers.index(FOGM_STATE_BLOCK_ID),
+                        fusion_engine,
+                        FOGM_STATE_BLOCK_LABEL,
+                        FOGM_STATE_BLOCK_CONFIG_GROUP,
                     )
                 if GPS_MEASUREMENT_PROCESSOR_ID in provider.processor_identifiers:
                     gps_processor = provider.new_processor(
@@ -297,7 +310,7 @@ class SimpleGpsVelOrchestrationPlugin(OrchestrationPlugin):
                         ),
                         fusion_engine,
                         GPS_MEASUREMENT_PROCESSOR_LABEL,
-                        STATE_BLOCK_LABELS,
+                        GPS_MP_STATE_BLOCK_LABELS,
                         GPS_MEASUREMENT_PROCESSOR_CONFIG_GROUP,
                     )
                 if VEL_MEASUREMENT_PROCESSOR_ID in provider.processor_identifiers:
@@ -307,11 +320,11 @@ class SimpleGpsVelOrchestrationPlugin(OrchestrationPlugin):
                         ),
                         fusion_engine,
                         VEL_MEASUREMENT_PROCESSOR_LABEL,
-                        STATE_BLOCK_LABELS,
+                        VEL_MP_STATE_BLOCK_LABELS,
                         VEL_MEASUREMENT_PROCESSOR_CONFIG_GROUP,
                     )
 
-        # Make state block
+        # Make state blocks
         if block is None:
             self._log(
                 LoggingLevel.ERROR,
@@ -320,10 +333,24 @@ class SimpleGpsVelOrchestrationPlugin(OrchestrationPlugin):
             return
         ewc = EstimateWithCovariance(
             EstimateWithCovarianceType.EWC_GENERIC,
-            estimate=np.zeros((15, 1)),
-            covariance=np.zeros((15, 15)),
+            estimate=np.zeros((block.num_states, 1)),
+            covariance=np.zeros((block.num_states, block.num_states)),
         )
         fusion_engine.add_state_block(block, ewc, None)
+
+        if fogm_block is None:
+            self._log(
+                LoggingLevel.WARN,
+                f'Unable to find state block "{FOGM_STATE_BLOCK_LABEL}" - continuing.',
+            )
+        else:
+            # TODO how are configuring initial conditions for blocks
+            ewc = EstimateWithCovariance(
+                EstimateWithCovarianceType.EWC_GENERIC,
+                estimate=np.zeros((fogm_block.num_states, 1)),
+                covariance=(np.eye(fogm_block.num_states) * 9.0),
+            )
+            fusion_engine.add_state_block(fogm_block, ewc, None)
 
         if gps_processor is None:
             assert provider is not None
