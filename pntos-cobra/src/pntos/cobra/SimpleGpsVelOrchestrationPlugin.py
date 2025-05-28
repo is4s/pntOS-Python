@@ -280,7 +280,7 @@ class SimpleGpsVelOrchestrationPlugin(OrchestrationPlugin):
         )
 
         # Get state blocks and measurement processor
-        block = None
+        pinson_block = None
         fogm_block = None
         gps_processor = None
         vel_processor = None
@@ -290,7 +290,7 @@ class SimpleGpsVelOrchestrationPlugin(OrchestrationPlugin):
             )
             if provider is not None:
                 if STATE_BLOCK_ID in provider.block_identifiers:
-                    block = provider.new_block(
+                    pinson_block = provider.new_block(
                         provider.block_identifiers.index(STATE_BLOCK_ID),
                         fusion_engine,
                         STATE_BLOCK_LABEL,
@@ -325,7 +325,7 @@ class SimpleGpsVelOrchestrationPlugin(OrchestrationPlugin):
                     )
 
         # Make state blocks
-        if block is None:
+        if pinson_block is None:
             self._log(
                 LoggingLevel.ERROR,
                 f'Unable to find state block "{STATE_BLOCK_LABEL}" - cannot initialize filter.',
@@ -333,10 +333,10 @@ class SimpleGpsVelOrchestrationPlugin(OrchestrationPlugin):
             return
         ewc = EstimateWithCovariance(
             EstimateWithCovarianceType.EWC_GENERIC,
-            estimate=np.zeros((block.num_states, 1)),
-            covariance=np.zeros((block.num_states, block.num_states)),
+            estimate=np.zeros((pinson_block.num_states, 1)),
+            covariance=np.zeros((pinson_block.num_states, pinson_block.num_states)),
         )
-        fusion_engine.add_state_block(block, ewc, None)
+        fusion_engine.add_state_block(pinson_block, ewc, None)
 
         if fogm_block is None:
             self._log(
