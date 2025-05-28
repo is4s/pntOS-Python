@@ -144,18 +144,18 @@ postprocessing/plot_results.py pntos_output.log
 For more information on the expected results for this app, see [](./apps/fusion_gps_ins.md#expected-results).
 ````
 
-````{tab-item} FOGM Bias App
-:sync: fogm-bias-app
-For documentation specifically explaining the `fogm_bias` app, see
-[](./apps/fogm_bias.md).
+````{tab-item} GPS INS Velocity Fusion App
+:sync: vel-app
+For documentation specifically explaining the this app, see
+[](./apps/fusion_gps_vel_ins.md).
 
-### Run the FOGM Bias App
+### Position and Velocity Update App
 
 To run this app, run this command from the root workspace directory (with the python virtual
 environment activated):
 
 ```shell
-apps/fogm_bias/fogm_bias.py
+apps/fusion_gps_vel_ins/fusion_gps_vel_ins.py
 ```
 
 You should see something like the following:
@@ -188,7 +188,7 @@ To plot the saved results run:
 postprocessing/plot_results.py pntos_output.log
 ```
 
-For more information on the expected results for this app, see [](./apps/fogm_bias.md#expected-results).
+For more information on the expected results for this app, see [](./apps/fusion_gps_vel_ins.md#expected-results).
 ````
 
 `````
