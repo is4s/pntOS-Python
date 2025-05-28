@@ -1,4 +1,4 @@
-# 2. FOGM Bias App - TODO
+# 2. Fusion GPS Velocity INS App - TODO
 
 ## Overview
 

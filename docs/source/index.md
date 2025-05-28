@@ -1,8 +1,8 @@
 <!--
 Cobra documentation master file.
 You can adapt this file completely to your liking, but it should at least
-contain the root `toctree` directive. 
---> 
+contain the root `toctree` directive.
+-->
 Welcome to pntOS Python's documentation!
 ========================================
 
@@ -31,7 +31,7 @@ frequent_questions
 :caption: Tutorial Apps
 :name: tutorial-apps
 apps/fusion_gps_ins
-apps/fogm_bias
+apps/fusion_gps_vel_ins
 ```
 
 ```{toctree}
