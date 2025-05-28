@@ -531,7 +531,8 @@ request a solution from the {py:obj}`Orchestration Plugin<pntos.api.Orchestratio
 another plugin requests a solution and sends it out onto the network bus as Python pntOS' solution, see 
 [the Aspn23LcmTransportPlugin](https://git.aspn.us/pntos/pntos-python/-/blob/main/pntos-cobra/src/pntos/cobra/Aspn23LcmTransportPlugin.py?ref_type=heads#L115).
 
-
+<!-- TODO: Fix the fact that step3 in our example doesn't actually do what our walkthrough expects -->
+<!-- TODO: Break out TutorialXPlugin plugins, and dont use the Simple plugins here, which don't track what we're trying to do -->
 ```{note}
 
 Because all data passing between plugins are sent through one or more 
@@ -573,24 +574,258 @@ that defines concurrency, because it implements the {py:obj}`Mediator<pntos.api.
 
 ### Orchestration
 
-TODO: the tour goes into here, rework the below.
+In the last few steps of the tour, we developed a {py:obj}`Controller Plugin<pntos.api.ControllerPlugin>`
+that utilized a {py:obj}`Transport Plugin<pntos.api.TransportPlugin>` and 
+{py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` to set up a navigation system.
+Next, we walked through how a simple {py:obj}`Transport Plugin<pntos.api.TransportPlugin>`
+could be implemented that delivers received data from the wire into its {py:obj}`Mediator<pntos.api.Mediator>`, 
+and then we implemented a {py:obj}`Mediator<pntos.api.Mediator>` that forwarded that data from the transport into the
+{py:obj}`OrchestrationPlugin.process_pntos_message<pntos.api.OrchestrationPlugin.process_pntos_message>` method.
+we then assumed that the {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` would do something with
+the data it was sent, and when we later called 
+{py:obj}`request_solutions()<pntos.api.OrchestrationPlugin.request_solutions()>`
+on the {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` it would return a solution.
+The last piece of the puzzle, then, is for us to implement an 
+{py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` that does exactly that: 
+takes in sensor data and produce solutions.
 
-The {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` contains the core
-navigation data fusion and filtering functionality. It is responsible for calculating a
-navigation solution from the incoming sensor data. It performs this task by calling out
-to various plugins which define the actual sensor fusion algorithm, state space, and
-sensor error models. Thus its primary duties are to orchestrate the flow of data
-into/out of filters, and picking the set of navigation-related plugins which are used to
-model errors and generate estimates.
+The {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` contains two methods of interest
+to us:
 
-For more information about {term}`Cobra` implementation of the {py:obj}`Orchestration
-Plugin<pntos.api.OrchestrationPlugin>`, see [](./plugins/orchestration_plugin.md).
+- {py:obj}`OrchestrationPlugin.process_pntos_message<pntos.api.OrchestrationPlugin.process_pntos_message>`,
+  which accepts {py:obj}`pntOS messages<pntos.api.Message>` (wrapped ASPN messages) and processes them
+  internally.
+- {py:obj}`OrchestrationPlugin.request_solutions<pntos.api.OrchestrationPlugin.request_solutions>`,
+  which allows the controller to request a solution at a later time. Note that this method takes as
+  parameters a _list_ of times and string descriptions, so that the controller may ask for a solution
+  at multiple times and of multiple types all at once.
+
+```{note}
+The {py:obj}`OrchestrationPlugin.request_solutions<pntos.api.OrchestrationPlugin.request_solutions>` method has some
+complicated parameters in order to handle advanced real-world use cases (for example, needing to return a set of
+times that are reset-free, for delta poses). However, using it is pretty straightforward if you just want
+the best solution that an {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` has
+at a given time `t`. All you need to do is pass in the string "BEST" for the `filter_description` parameter, 
+and the time `t` as a length=1 `List` for the `solution_times` parameter. e.g.
+
+  ```Python
+  # The time I want a solution at (in nanoseconds since ASPN epoch)
+  nsecs=50000
+  # Ask the orchestration plugin for the best solution it has at time=`nsecs`
+  my_orchestration_plugin.request_solutions(solution_times=[aspn.TypeTimestamp(nsecs)], 
+                                            filter_description="BEST")
+```
+
+In most Python pntOS systems, an {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` will receive a stream
+of data from repeated calls to its {py:obj}`process_pntos_message<pntos.api.OrchestrationPlugin.process_pntos_message>`
+method, and it will process those messages during the duration of those calls, doing whatever sensor
+fusion or filtering it sees fit to do internally. Separately, the controller (or some other plugin, via calling
+the {py:obj}`Mediator.request_solutions<pntos.api.Mediator.request_solutions>` method on their 
+{py:obj}`Mediator<pntos.api.Mediator>`) will ask the orchestration plugin for a solution at a given time
+by calling {py:obj}`OrchestrationPlugin.request_solutions<pntos.api.OrchestrationPlugin.request_solutions>`. Thus
+the goal of a {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` is to write an algorithm that accepts
+a continuous stream of data and produced filter solutions asynchronously at some later time.
+
+Because the {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` is the heart of the navigation
+algorithm being used by Python pntOS, it is a very open ended plugin. The design of Python pntOS is to
+allow for a flexible architecture that enables any kind of navigation solution to be developed. For example,
+one classical way to implement the {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` would be via an
+extended Kalman filter (EKF), which propagates and updates to each measurement as they are received. (optionally
+with some amount of buffering or re-ordering messages internally). In this case, the 
+{py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` would likely want to buffer solutions that the EKF
+produced, and when a {py:obj}`OrchestrationPlugin.request_solutions<pntos.api.OrchestrationPlugin.request_solutions>`
+came in, the plugin would look for the nearest solution and return it (potentially after interpolation to the 
+requested time). Alternatively, someone could write an advanced algorithm, that produces
+solutions completely differently; for example, a neural network that takes in measurements as context and produces
+solutions from a set of trained weights. Because of the vast number of ways that an
+{py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` could be implemented, which is equal to the number
+of ways a navigation solution could be produced, range from trivial single-filter EKF approaches to
+multi-model adaptive estimation (MMAE) multi-filter approaches with integrity and beyond.
+
+### Implementing a Custom Orchestration Plugin
+
+In our {term}`App`, we were interested in our own custom {py:obj}`MyOrchestrationPlugin`. The outline of the
+simplest possible {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` would look like this:
+
+
+```Python
+from aspn23 import TypeTimestamp
+from pntos.api import (
+    OrchestrationPlugin,
+    Mediator,
+    Message,
+    CommonPlugin,
+    MessageStreamConfig,
+)
+
+class MyOrchestrationPlugin(OrchestrationPlugin):
+    def __init__(self, identifier: str):
+        self.identifier = identifier
+
+    def init_orchestration_plugin(
+        self, plugins: list[CommonPlugin], stream_config: MessageStreamConfig
+    ) -> None:
+        stream_config.immediate_stream_all(True)
+
+    def process_pntos_message(self, message: Message, sequenced: bool) -> None:
+        print(f'Got Message: {message}')
+        # TODO: Process the ASPN message, and save the result off to `self`,
+        # so `request_solutions` can access it later
+
+    def request_solutions(
+        self, solution_times: list[TypeTimestamp], filter_description: str | None = None
+    ) -> list[Message] | None:
+        # This method should use the solution computed in `process_pntos_message`
+        # and stored away in `self` in order to return a solution at the requested time.
+        return None
+
+    def get_filter_description_list(self) -> list[str]:
+        # We only have one solution, our 'best' solution
+        return ["BEST"]
+
+    def init_plugin(
+        self,
+        plugin_resources_location: str | None = None,
+        mediator: Mediator | None = None,
+    ) -> None:
+        self.mediator = mediator
+
+    def shutdown_plugin(self) -> None:
+        pass
+
+```
+
+Let's walk through this example step by step. We'll skip the imports, which are just bringing in symbols from the
+pntOS Python APIs. The constructor:
+
+```Python
+def __init__(self, identifier: str):
+    self.identifier = identifier
+```
+
+simply takes in a name for this plugin that is human readable and stores it off. The next method:
+
+```Python
+def init_orchestration_plugin(
+    self, plugins: list[CommonPlugin], stream_config: MessageStreamConfig
+) -> None:
+    stream_config.immediate_stream_all(True)
+```
+
+is where the plugin tells the controller how it wants measurements delivered to it. The
+{py:obj}`Controller Plugin<pntos.api.ControllerPlugin>` will call this method, pass in the
+{py:obj}`stream_config<pntos.api.MessageStreamConfig>`, and see what methods the
+{py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` calls on the
+{py:obj}`stream_config<pntos.api.MessageStreamConfig>` in order to determine how the 
+{py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` wants data delivered. In this case,
+we will call {py:obj}`MessageStreamConfig.immediate_stream_all<pntos.api.MessageStreamConfig.immediate_stream_all>`,
+which is how the {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` indicates to the
+{py:obj}`Controller Plugin<pntos.api.ControllerPlugin>` that no buffering should be done, and that the
+{py:obj}`Controller Plugin<pntos.api.ControllerPlugin>` should deliver all data to the orchestration plugin
+immediately as data is received, even if data is coming in out of order according to their timestamps.
+
+The next method is where we receive ASPN data:
+
+```Python
+def process_pntos_message(self, message: Message, sequenced: bool) -> None:
+    print(f'Got Message: {message}')
+    # TODO: Process the ASPN message, and save the result off to `self`,
+    # so `request_solutions` can access it later
+```
+
+In this trivial example, we take the data in and print its contents to the screen. However,
+in a real {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` this is where we would perform
+sensor fusion, taking the {py:obj}`pntOS message<pntos.api.Message>` we just received and sending into our
+algorithm, e.g. performing an update in an EKF. The results of this processing should be saved off on `self`
+and not immediately used (we will use it in the next method).
+
+The next method is:
+
+```Python
+def request_solutions(
+    self, solution_times: list[TypeTimestamp], filter_description: str | None = None
+) -> list[Message] | None:
+    # This method should use the solution computed in `process_pntos_message`
+    # and stored away in `self` in order to return a solution at the requested time.
+    return None
+```
+
+This is where we return a solution to the caller. A caller may request a solution at a set of different times,
+and so our `solution_times` parameter is a list of timestamps that the caller wants out solution at.
+The `filter_description` parameter where callers can request different types of solutions. For example,
+we might offer our "best" solution as one that uses all the available information, but also offer a solution
+that only uses inertial data. However, all {py:obj}`Orchestration Plugins<pntos.api.OrchestrationPlugin>`
+reserve the right to return `None` here, which indicates that they do not have a good solution for the requested
+times. This can happen if the `solution_times` fall outside the range where we have computed a solution, for
+example. We'll return `None` for our trivial example here, but to fill out our example, we should use the
+solution we previously computed and return it here, if we have a solution at or near the requested time.
+
+That brings us to our next method:
+
+```Python
+def get_filter_description_list(self) -> list[str]:
+    # We only have one solution, our 'best' solution
+    return ["BEST"]
+```
+
+Here we define which types of solutions we offer. For this example, we'll only offer one type of solution: our best.
+The strings as a `filter_description` into {py:obj}`request_solutions<pntos.api.OrchestrationPlugin.request_solutions>`
+above must be in the list we return here. Therefore, the only valid string a user should pass into the 
+{py:obj}`request_solutions<pntos.api.OrchestrationPlugin.request_solutions>` parameter `filter_description` is `"BEST"`.
+
+Which leave us with two last methods:
+```Python
+def init_plugin(
+    self,
+    plugin_resources_location: str | None = None,
+    mediator: Mediator | None = None,
+) -> None:
+    self.mediator = mediator
+
+def shutdown_plugin(self) -> None:
+    pass
+```
+
+The former is where this plugin receives its {py:obj}`Mediator<pntos.api.Mediator>` as all plugins do, as we've
+discussed at length previously in the tour. The latter gives the plugin a place where it can clean up after itself
+during shutdown, if needed, which we can safely leave blank here.
+
+...and thats it! While the above plugin is not yet usable (it always returns `None` when asked for a solution),
+the next step is to fill in the {py:obj}`process_pntos_message<pntos.api.OrchestrationPlugin.process_pntos_message>`
+method with your desired sensor fusion algorithm, and then return
+the solution generated in `request_solutions`.
+
+### A Simple Orchestration Plugin Example
+
+In the previous section we developed the scaffolding for an 
+{py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>`, which did not yet return a result. To do so,
+we would need to pick a sensor fusion approach and implement it within 
+{py:obj}`process_pntos_message<pntos.api.OrchestrationPlugin.process_pntos_message>`.
+
+The {py:obj}`SimpleOrchestrationPlugin<pntos.cobra.SimpleOrchestrationPlugin>` is designed to be a simple implementation 
+of a {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` which demonstrates how one might write an
+{py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` using a single EKF to do GPS/INS. The source code
+of the {py:obj}`SimpleOrchestrationPlugin<pntos.cobra.SimpleOrchestrationPlugin>` can be
+[found here](https://git.aspn.us/pntos/pntos-python/-/blob/main/pntos-cobra/src/pntos/cobra/SimpleOrchestrationPlugin.py).
+We can see from the source code that complementary nav ASPN messages are 
+[sent to the EKF](https://git.aspn.us/pntos/pntos-python/-/blob/main/pntos-cobra/src/pntos/cobra/SimpleOrchestrationPlugin.py#L558)
+inside the {py:obj}`process_pntos_message<pntos.api.OrchestrationPlugin.process_pntos_message>`
+method, and that [buffered solutions from the EKF are returned](https://git.aspn.us/pntos/pntos-python/-/blob/main/pntos-cobra/src/pntos/cobra/SimpleOrchestrationPlugin.py#L666)
+by the {py:obj}`request_solutions<pntos.api.OrchestrationPlugin.request_solutions>`, as described above.
+
+<!-- TODO: Level 1 vs Level 2, and a link to the Level 2 docs when they exist -->
+<!-- TODO: Tie this walkthrough to real code that exists somewhere in a repo, and show them how to actually run this example -->
+<!-- TODO: Part 2 of the tour could be the Level 2 integration tour -->
 
 ### End of the Tour
 
-TODO: Redirect people to the sample app, or to the advanced topics below (level 2 integration)
+This ends the guided tour through Python pntOS. Hopefully at this point you have a toplevel understanding
+of how an {term}`App` kicks off a system, how the controller sets up a transport to send its data to a mediator,
+how the mediator sends sensor data it receives from the transport through to the orchestration plugin, 
+and how an orchestration plugin produces solutions from the sensor data it has received.
 
-## Next Steps
+Here are some next steps we recommend people move to after finishing the tour, depending on what they would like
+to try next:
 
 | Link                    | Description                                                                                                     |
 | ----------------------- | --------------------------------------------------------------------------------------------------------------- |
