@@ -1,4 +1,4 @@
-from numpy import float64
+from numpy import allclose, float64
 from numpy.typing import NDArray
 
 from pntos.api import LoggingLevel, Mediator
@@ -47,13 +47,29 @@ def validate_array(
         )
 
 
-def is_symmetric(mat: NDArray[float64], rtol: float = 1e-5, atol: float = 1e-8) -> bool:
-    rows = mat.shape[0]
-    for row in range(rows):
-        for col in range(1, rows):
-            a = mat[row, col]
-            precision = atol + (rtol * abs(a))
-            if abs(mat[row, col] - a) > precision:
-                return False
+def is_symmetric(
+    mat: NDArray[float64], mediator: Mediator, rtol: float = 1e-5, atol: float = 1e-8
+) -> bool:
+    """
+    This function will compare a matrix with its transpose and determine if the two are equivalent within a provided tolerance.
+    If the two are equivalent, the matrix is symmetric and this function returns ``True``, else returns ``False``.
 
-    return True
+    NOTE: Symmetry requires a matrix to be square, if ``mat`` is not a 2-D square matrix this function will log an error and return ``False``.
+
+    Args:
+        mat (NDArray[float64]): The matrix to be examined.
+        rtol (float): A coefficient multiplied with every value in the matrix to generate a relative tolerance.
+        atol (float): An absolute value added directly the relative tolerance which creates an overall tolerance.
+
+    Returns:
+        bool
+    """
+    shape = mat.shape
+    if len(shape) == 2:
+        if shape[0] == shape[1]:
+            return allclose(mat, mat.T, rtol, atol)
+    mediator.log_message(
+        LoggingLevel.ERROR,
+        f'Expected matrix to be 2D and square but got shape {shape}',
+    )
+    return False
