@@ -19,7 +19,7 @@ navigation systems with the {term}`Python pntOS API` and {term}`Cobra`.
 ## App Walkthrough
 
 Let's walk through this first app piece by piece. You can find the first app file at
-[`pntos-python/apps/fusion_gps_ins/fusion_gps_ins.py`](https://git.aspn.us/pntos/pntos-python/-/blob/main/apps/fusion_gps_ins/fusion_gps_ins.py?ref_type=heads)
+[`pntos-python/apps/fusion_gps_ins.py`](https://git.aspn.us/pntos/pntos-python/-/blob/main/apps/fusion_gps_ins.py?ref_type=heads)
 to follow along. Let's get started by examining how you import elements from the `pntos` module.
 
 ### Imports
@@ -46,7 +46,7 @@ a plugin in an app.
 
 In this case, we need to import the {py:obj}`LoggingLevel <pntos.api.LoggingLevel>` enum
 from the API:
-```{literalinclude} ../../../apps/fusion_gps_ins/fusion_gps_ins.py
+```{literalinclude} ../../../apps/fusion_gps_ins.py
 :start-at: "from pntos.api import"
 :end-before: "from pntos.cobra"
 :lineno-match:
@@ -54,7 +54,7 @@ from the API:
 
 This is used for initializing the global log level of the {py:obj}`SimpleLoggingPlugin
 <pntos.cobra.SimpleLoggingPlugin>` later in the app:
-```{literalinclude} ../../../apps/fusion_gps_ins/fusion_gps_ins.py
+```{literalinclude} ../../../apps/fusion_gps_ins.py
 :start-at: "SimpleLoggingPlugin("
 :end-at: ")"
 :lineno-match:
@@ -66,7 +66,7 @@ This is used for initializing the global log level of the {py:obj}`SimpleLogging
 
 You should only see plugin imports from the top-level of [`pntos.cobra`](../documentation/cobra_plugins.rst). For instance,
 check out where the app imports the following {term}`Cobra` plugins:
-```{literalinclude} ../../../apps/fusion_gps_ins/fusion_gps_ins.py
+```{literalinclude} ../../../apps/fusion_gps_ins.py
 :start-at: "from pntos.cobra import ("
 :end-at: ")"
 :lineno-match:
@@ -82,7 +82,7 @@ The
 submodule contains {term}`Cobra` config objects and a few utility functions relevant
 specifically to these config objects. We'll explore these more in the next section, but
 for now we need the following config objects for this GPS INS fusion app:
-```{literalinclude} ../../../apps/fusion_gps_ins/fusion_gps_ins.py
+```{literalinclude} ../../../apps/fusion_gps_ins.py
 :start-at: "from pntos.cobra.config import ("
 :end-at: ")"
 :lineno-match:
@@ -126,7 +126,7 @@ For more information on making your own config objects, see the docstrings for {
 ```
 
 So, with that background, we can now understand what is happening next in the app:
-```{literalinclude} ../../../apps/fusion_gps_ins/fusion_gps_ins.py
+```{literalinclude} ../../../apps/fusion_gps_ins.py
 :start-at: "my_config"
 :end-at: "# End Config"
 :lineno-match:
@@ -164,7 +164,7 @@ Now we have everything we need to get our plugins running. All that's left is:
 
 #### 1. Instantiate Controller Plugin
 We can instantiate our controller plugin like so:
-```{literalinclude} ../../../apps/fusion_gps_ins/fusion_gps_ins.py
+```{literalinclude} ../../../apps/fusion_gps_ins.py
 :start-at: "controller = "
 :end-before: "plugins = "
 :lineno-match:
@@ -172,7 +172,7 @@ We can instantiate our controller plugin like so:
 
 #### 2. Generate List of Plugins
 Next we can instantiate all the other plugins we want in this app and put them in a list:
-```{literalinclude} ../../../apps/fusion_gps_ins/fusion_gps_ins.py
+```{literalinclude} ../../../apps/fusion_gps_ins.py
 :start-at: "plugins = "
 :end-at: "]"
 :lineno-match:
@@ -195,7 +195,7 @@ since we've got a controller plugin and a list of instantiated plugins, let's se
 start up the controller:
 
 #### 3. Call `init_plugin` on Controller
-```{literalinclude} ../../../apps/fusion_gps_ins/fusion_gps_ins.py
+```{literalinclude} ../../../apps/fusion_gps_ins.py
 :start-at: "controller.init_plugin()"
 :end-at: ")"
 :lineno-match:
