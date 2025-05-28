@@ -141,7 +141,7 @@ class SimpleEkfFusionStrategy(StandardFusionStrategy):
         self._P[first_row:last_row, first_col:last_col] = new_covariance
 
     def _symmetricize_covariance(self, rtol: float = 1e-5, atol: float = 1e-8) -> None:
-        if not is_symmetric(self._P, rtol, atol):
+        if not is_symmetric(self._P, self._mediator, rtol, atol):
             self._P = 0.5 * (self._P + self._P.T)
 
     def propagate(self, dynamics_model: StandardDynamicsModel) -> None:
