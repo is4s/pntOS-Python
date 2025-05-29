@@ -592,8 +592,6 @@ class SimpleGpsOrchestrationPlugin(OrchestrationPlugin):
         Utility function to request the best fusion strategy solution. Returns
         ``None`` if the fusion engine is unable to provide a solution for the requested time.
         """
-        # Make sure state block has current aux data before propagate
-        self._send_inertial_aux_to_pinson()
 
         x_and_p: EstimateWithCovariance | None = self.fusion_engine.peek_ahead(
             time, [STATE_BLOCK_LABEL]
