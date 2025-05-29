@@ -49,10 +49,6 @@ from pntos.cobra.utils.plugins import SortedPlugins, sort_plugins_dataclass
 BEST_SOL_CHANNEL = '/solution/pntos/best'
 IMU_SOL_CHANNEL = '/solution/pntos/imu'
 
-# Sensor input channels
-IMU_CHANNEL = '/sensor/vn-100/imu'
-GPS_CHANNEL = '/sensor/ublox-ZED-F9T/position'
-
 # State block parameters
 FOGM_STATE_BLOCK_ID = 'fogm'
 FOGM_STATE_BLOCK_LABEL = 'pos_fogm'
