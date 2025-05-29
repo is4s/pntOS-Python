@@ -51,7 +51,6 @@ IMU_SOL_CHANNEL = '/solution/pntos/imu'
 
 # Sensor input channels
 IMU_CHANNEL = '/sensor/vn-100/imu'
-GPS_CHANNEL = '/sensor/ublox-ZED-F9T/position'
 
 # State block parameters
 FOGM_STATE_BLOCK_ID = 'fogm'
@@ -99,12 +98,12 @@ class SimpleOrchestrationPlugin(OrchestrationPlugin):
         }
         self.initialization_state: InitializationStatus = InitializationStatus.WAITING
         self.init_solution = None
-        # Corresponds to an RPY of [0.35, 3.7, 1] in degrees
+        # Corresponds to an RPY of [0.35, 3.7, -1] in degrees
         self.C_inertial_to_platform = np.array(
             [
-                [0.9977636308900033, -0.017057937866657782, 0.06462788584608446],
-                [0.017416028960199132, 0.9998359200298608, -0.0049814609603426405],
-                [-0.06453230825295797, 0.0060958817064601266, 0.9978969994031279],
+                [0.99776363, 0.01784622, 0.06441467],
+                [-0.01741603, 0.99982216, -0.00723391],
+                [-0.06453231, 0.00609588, 0.997897],
             ]
         )
 

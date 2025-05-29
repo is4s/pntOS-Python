@@ -19,7 +19,7 @@ from .PinsonWithNedFogmPositionMeasurementProcessor import (
 
 class SimpleGpsInsStateModelProvider(StandardStateModelProvider):
     """StandardStateModelProvider that offers a 15-state pinson state block, variable-size
-    Fogm Block and a position measurement processor.
+    Fogm Block and various position measurement processors.
     """
 
     _mediator: Mediator
