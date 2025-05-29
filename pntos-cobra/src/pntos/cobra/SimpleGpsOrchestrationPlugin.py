@@ -59,12 +59,12 @@ FOGM_STATE_BLOCK_CONFIG_GROUP = 'config/pos_sensor_error'
 
 STATE_BLOCK_ID = STATE_BLOCK_LABEL = 'pinson15'
 STATE_BLOCK_CONFIG_GROUP = 'config/inertial_state'
-STATE_BLOCK_LABELS = [STATE_BLOCK_LABEL, FOGM_STATE_BLOCK_LABEL]
 
 # Measurement processor parameters
-MEASUREMENT_PROCESSOR_ID = 'pinson_with_ned_fogm_position'
-MEASUREMENT_PROCESSOR_LABEL = 'gps'
-MEASUREMENT_PROCESSOR_CONFIG_GROUP = 'config/gp3d_state_modeling'
+GPS_MEASUREMENT_PROCESSOR_ID = 'pinson_with_ned_fogm_position'
+GPS_MEASUREMENT_PROCESSOR_LABEL = 'gps'
+GPS_MEASUREMENT_PROCESSOR_CONFIG_GROUP = 'config/gp3d_state_modeling'
+GPS_MP_STATE_BLOCK_LABELS = [STATE_BLOCK_LABEL, FOGM_STATE_BLOCK_LABEL]
 
 # Inertial parameters
 INERTIAL_GROUP = 'config/inertial'
@@ -154,7 +154,9 @@ class SimpleGpsOrchestrationPlugin(OrchestrationPlugin):
             )
             return
 
-        self.measurement_channels: list[str] = [orch_config.gps_channel]
+        self.measurement_channels: dict[str, str] = {
+            orch_config.gps_channel: GPS_MEASUREMENT_PROCESSOR_LABEL
+        }
         self.alignment_channels: list[str] = [
             orch_config.gps_channel,
             orch_config.imu_channel,
@@ -274,7 +276,7 @@ class SimpleGpsOrchestrationPlugin(OrchestrationPlugin):
         # Get state blocks and measurement processor
         pinson_block = None
         fogm_block = None
-        processor = None
+        gps_processor = None
         for plugin in self.state_modeling_plugins:
             provider: StandardStateModelProvider | None = (
                 plugin.new_state_model_provider(StandardStateModelProvider)
@@ -294,13 +296,15 @@ class SimpleGpsOrchestrationPlugin(OrchestrationPlugin):
                         FOGM_STATE_BLOCK_LABEL,
                         FOGM_STATE_BLOCK_CONFIG_GROUP,
                     )
-                if MEASUREMENT_PROCESSOR_ID in provider.processor_identifiers:
-                    processor = provider.new_processor(
-                        provider.processor_identifiers.index(MEASUREMENT_PROCESSOR_ID),
+                if GPS_MEASUREMENT_PROCESSOR_ID in provider.processor_identifiers:
+                    gps_processor = provider.new_processor(
+                        provider.processor_identifiers.index(
+                            GPS_MEASUREMENT_PROCESSOR_ID
+                        ),
                         fusion_engine,
-                        MEASUREMENT_PROCESSOR_LABEL,
-                        STATE_BLOCK_LABELS,
-                        MEASUREMENT_PROCESSOR_CONFIG_GROUP,
+                        GPS_MEASUREMENT_PROCESSOR_LABEL,
+                        GPS_MP_STATE_BLOCK_LABELS,
+                        GPS_MEASUREMENT_PROCESSOR_CONFIG_GROUP,
                     )
 
         # Make state blocks
@@ -316,6 +320,7 @@ class SimpleGpsOrchestrationPlugin(OrchestrationPlugin):
             covariance=np.zeros((pinson_block.num_states, pinson_block.num_states)),
         )
         fusion_engine.add_state_block(pinson_block, ewc, None)
+
         if fogm_block is None:
             self._log(
                 LoggingLevel.WARN,
@@ -330,15 +335,15 @@ class SimpleGpsOrchestrationPlugin(OrchestrationPlugin):
             )
             fusion_engine.add_state_block(fogm_block, ewc, None)
 
-        if processor is None:
+        if gps_processor is None:
             assert provider is not None
             self._log(
                 LoggingLevel.ERROR,
-                f'Unable to find measurement processor "{MEASUREMENT_PROCESSOR_ID}" -'
+                f'Unable to find measurement processor "{GPS_MEASUREMENT_PROCESSOR_ID}" -'
                 + f' cannot initialize filter. Available measurement processors: {provider.processor_identifiers}',
             )
             return
-        fusion_engine.add_measurement_processor(processor)
+        fusion_engine.add_measurement_processor(gps_processor)
 
         self.fusion_engine = fusion_engine
 
@@ -358,14 +363,15 @@ class SimpleGpsOrchestrationPlugin(OrchestrationPlugin):
         afterward."""
         meas_time = message.wrapped_message.time_of_validity  # type: ignore[attr-defined]
         # Make sure measurement processor has most current aux data before update
-        self._send_inertial_aux_to_measurement_processor(meas_time)
+        mp_label = self.measurement_channels[message.source_identifier]
+        self._send_inertial_aux_to_measurement_processor(meas_time, mp_label)
         self._send_inertial_aux_to_pinson()
 
         # Propagate to measurement time
         self.fusion_engine.propagate(meas_time)
 
         # Update filter.
-        self.fusion_engine.update(MEASUREMENT_PROCESSOR_LABEL, message)
+        self.fusion_engine.update(mp_label, message)
 
         # Feedback states to inertial.
         estimate = self.fusion_engine.get_state_block_estimate(STATE_BLOCK_LABEL)
@@ -509,9 +515,9 @@ class SimpleGpsOrchestrationPlugin(OrchestrationPlugin):
             else:  # Discard old messages
                 self._log(
                     LoggingLevel.DEBUG,
-                    f'Received old message at time {message_time*1e-9:.9f}s on channel'
+                    f'Received old message at time {message_time * 1e-9:.9f}s on channel'
                     + f' {message.source_identifier}. Filter is at time '
-                    + f'{self.fusion_engine.time.elapsed_nsec*1e-9:.9f}s. Discarding message',
+                    + f'{self.fusion_engine.time.elapsed_nsec * 1e-9:.9f}s. Discarding message',
                 )
                 return False
         else:
@@ -704,8 +710,10 @@ class SimpleGpsOrchestrationPlugin(OrchestrationPlugin):
             STATE_BLOCK_LABEL, [pva_message, imu_message]
         )
 
-    def _send_inertial_aux_to_measurement_processor(self, time: TypeTimestamp) -> None:
-        """Send the current inertial solution to the position measurement processor."""
+    def _send_inertial_aux_to_measurement_processor(
+        self, time: TypeTimestamp, mp_label: str
+    ) -> None:
+        """Send the current inertial solution to the specified measurement processor."""
         pva_message = self.inertial.request_solution(time)
         if pva_message is None:
             self._log(
@@ -713,9 +721,7 @@ class SimpleGpsOrchestrationPlugin(OrchestrationPlugin):
                 f'Cannot send inertial aux to measurement processor. Solution not available at time {time}',
             )
             return
-        self.fusion_engine.give_measurement_processor_aux_data(
-            MEASUREMENT_PROCESSOR_LABEL, [pva_message]
-        )
+        self.fusion_engine.give_measurement_processor_aux_data(mp_label, [pva_message])
 
     def _apply_error_states(
         self, pva: MeasurementPositionVelocityAttitude, x: NDArray[float64]
