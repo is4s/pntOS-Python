@@ -29,20 +29,20 @@ from pntos.cobra.config import (
 my_config = [
     ImuConfig(
         group='config/inertial_state',
-        accel_bias_sigma=(3.924e-5, 3.924e-5, 3.924e-5),
-        accel_bias_tau=(1800.0, 1800.0, 1800.0),
+        accel_bias_sigma=(2.4e-3, 2.4e-3, 2.4e-3),
+        accel_bias_tau=(300.0, 300.0, 300.0),
         accel_random_walk_sigma=(3.887e-6, 3.887e-6, 3.887e-6),
-        gyro_bias_sigma=(8.848e-5, 8.848e-5, 8.848e-5),
-        gyro_bias_tau=(1800.0, 1800.0, 1800.0),
-        gyro_random_walk_sigma=(1.7277877e-7, 1.7277877e-7, 1.7277877e-7),
+        gyro_bias_sigma=(2e-4, 2e-4, 2e-4),
+        gyro_bias_tau=(500.0, 500.0, 500.0),
+        gyro_random_walk_sigma=(9.9e-4, 9.9e-4, 6.7e-5),
     ),
     ManualAlignmentConfig(
         group='config/default/alignment',
-        initial_pos_var=(9.0, 9.0, 25.0),
+        initial_pos_var=(0.1, 0.1, 0.1),
         initial_vel_var=(1e-3, 1e-3, 1e-3),
-        initial_tilt_var=(1e-3, 1e-3, 1e-3),
-        initial_accel_bias_var=(1e-10, 1e-10, 1e-10),
-        initial_gyro_bias_var=(1e-15, 1e-15, 1e-15),
+        initial_tilt_var=(5e-4, 5e-4, 5e-4),
+        initial_accel_bias_var=(5.2e-3, 5.2e-3, 5.2e-3),
+        initial_gyro_bias_var=(9e-6, 9e-6, 9e-6),
         initial_accel_bias=(-0.0023383, 0.00085563, -0.05412892),
         initial_accel_scale_factor=(0.0, 0.0, 0.0),
         initial_accel_scale_factor_var=(0.0, 0.0, 0.0),
@@ -56,18 +56,18 @@ my_config = [
     ),
     SensorConfig(
         group='config/gp3d_state_modeling',
-        lever_arm=(0.0, 0.0, 0.0),
+        lever_arm=(-0.50, 0.38, -0.05),
         orientation=(0.0, 0.0, 0.0, 0.0),
         use_for_alignment=True,
-        sensor_name='novatel',
+        sensor_name='position',
     ),
     InertialConfig(
         group='config/inertial', expected_dt=0.01, inertial_buffer_length=10.0
     ),
     FogmConfig(
         group='config/pos_sensor_error',
-        sigma=(1.5, 1.5, 10.0),
-        tau=(30.0, 30.0, 300000.0),
+        sigma=(1.5, 1.5, 2.0),
+        tau=(300.0, 300.0, 200.0),
     ),
     OrchestrationConfig(
         imu_channel='/sensor/vn-100/imu',

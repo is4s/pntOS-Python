@@ -75,12 +75,13 @@ class SimpleInertial(StandardInertialMechanization):
         )
 
     def request_solution(self, time: TypeTimestamp) -> Message | None:
-        return Message(
-            convert_pva_from_cpp(
-                self.inertial.calc_pva(convert_timestamp_to_cpp(time))
-            ),
-            self.identifier,
-        )
+        p_cpp = self.inertial.calc_pva(convert_timestamp_to_cpp(time))
+        if p_cpp:
+            return Message(
+                convert_pva_from_cpp(p_cpp),
+                self.identifier,
+            )
+        return None
 
     def request_solutions(
         self, times: list[TypeTimestamp], type: InertialSolutionRangeType

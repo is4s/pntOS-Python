@@ -6,7 +6,6 @@ import numpy as np
 plt.rcParams['figure.figsize'] = (10, 6)
 
 import os
-import sys
 
 import numpy as np
 from navtk.navutils import (
@@ -18,16 +17,7 @@ from navtk.navutils import (
     quat_to_rpy,
     rpy_to_dcm,
 )
-from numpy import (
-    array,
-    diagonal,
-    diff,
-    dot,
-    rad2deg,
-    sqrt,
-    transpose,
-    zeros,
-)
+from numpy import array, diagonal, diff, dot, mean, rad2deg, sqrt, transpose, zeros
 from pylab import (
     figure,
     gca,
@@ -42,6 +32,29 @@ from pylab import (
     ylabel,
 )
 from scipy.interpolate import interp1d
+
+# Lever arm adjustment relating output to truth/comparison source, in platform frame
+la_p_to_truth = array([1.05290845, 0.42257009, 0.15724435])
+
+# Additional NED offset subtracted from truth to account for additional frame misalignments or similar, meters
+true_ned_off = array([0, 0, 0])
+
+
+def common_interp(x: np.ndarray, y: np.ndarray, x_interp: np.ndarray):
+    """
+    Interpolate data using common arguments.
+
+    Args:
+        - x (np.ndarray): n-length array of data x values, 1 dimensional
+        - y (np.ndarray): nxk sized array of data y values
+        - x_interp: m-length array of x values to interpolate y to, same units as x
+
+    Returns:
+        - y interpolated along the 0th axis
+    """
+    return interp1d(
+        x, y, bounds_error=False, fill_value=(y[0, :], y[-1, :]), axis=0, kind='cubic'
+    )(x_interp)
 
 
 def get_statistics(arr: np.ndarray):
@@ -134,14 +147,7 @@ def vel_from_llh(llh, t):
     ned_diff[:, 2] = ned_diff[:, 2] / t_diff
     # Vel at midpoints, need to interpolate back to original time
     t_vel = t[0:-1] + 0.5 * t_diff
-    return transpose(
-        interp1d(
-            t_vel,
-            transpose(ned_diff),
-            bounds_error=False,
-            fill_value='extrapolate',
-        )(t)
-    )
+    return common_interp(t_vel, ned_diff, t)
 
 
 def extract_pos_sigma(data):
@@ -211,14 +217,7 @@ def extract_vel_sigma(data_struct):
         sig_sm[:, 2] /= t.dt
         # Sigmas are at midpoints, need to interpolate back to original times
         t_mid = t.raw_time[0:-1] + 0.5 * t.dt
-        return transpose(
-            interp1d(
-                t_mid,
-                transpose(sig_sm),
-                bounds_error=False,
-                fill_value='extrapolate',
-            )(t.raw_time)
-        )
+        return common_interp(t_mid, sig_sm, t.raw_time)
     elif data_struct.decode_class_name == 'positionvelocityattitude':
         sigma = zeros([len(data_struct.data), 3])
         for k in range(0, len(data_struct.data)):
@@ -258,7 +257,7 @@ def calc_tilts(rpy1, rpy2):
             tilts[k, :] = np.array([np.nan, np.nan, np.nan])
         else:
             tilts[k, :] = dcm_to_rpy(
-                dot(transpose(rpy_to_dcm(rpy1[k, :])), rpy_to_dcm(rpy2[k, :]))
+                dot(rpy_to_dcm(rpy1[k, :]), transpose(rpy_to_dcm(rpy2[k, :])))
             )
     return tilts
 
@@ -345,6 +344,24 @@ def trim_extra_points(solution, truth):
     truth[1].data = truth[1].data[start_idx:end_idx]
 
 
+def interp_to_low_rate(d1, d2):
+    """
+    Interpolates all values to common times, usin the lowest rate
+    d1: list of arrays. First is nx1 times in seconds, rest are nxm
+    d2: list of arrays. First is kx1 times in seconds, rest are kxl
+    """
+    r1 = mean(diff(d1[0]))
+    r2 = mean(diff(d2[0]))
+    if r1 < r2:
+        for k in range(1, len(d1)):
+            d1[k] = common_interp(d1[0], d1[k], d2[0])
+        d1[0] = d2[0]
+    else:
+        for k in range(1, len(d2)):
+            d2[k] = common_interp(d2[0], d2[k], d1[0])
+        d2[0] = d1[0]
+
+
 def plot_solution(solution, truth, plot_dir, show_plots):
     title = os.path.basename(plot_dir)
     sort_solution(solution)
@@ -355,30 +372,75 @@ def plot_solution(solution, truth, plot_dir, show_plots):
     leg_w_sigma = [solution[0], truth[0], '+/- 1 sigma']
 
     # Extract truth solution
+    tt = TimeData(truth[1].data)
     tlla = extract_lla(truth[1].data)
-    lat0 = tlla[0, 0]
-    lon0 = tlla[0, 1]
-    alt0 = tlla[0, 2]
     tvel = extract_vel(truth[1])
     trpy = None
+    truth_array = [tt.raw_time, tlla, tvel]
     if truth[1].decode_class_name == 'positionvelocityattitude':
         trpy = extract_rpy(truth[1].data, True)
-    tt = TimeData(truth[1].data)
-    tned = lla_to_ned_vector(tlla, lat0, lon0, alt0)
+        trpy = np.unwrap(trpy, axis=0)
+        truth_array.append(trpy)
 
     # Extract (most likely the filter) solution
     t = TimeData(solution[1].data)
     lla = extract_lla(solution[1].data)
     pos_sig = extract_pos_sigma(solution[1].data)
-    sig = convert_ned_sigma_to_lla_sigma(pos_sig, lla)
-    ned = lla_to_ned_vector(lla, lat0, lon0, alt0)
     vel = extract_vel(solution[1])
     vel_sig = extract_vel_sigma(solution[1])
     rpy = None
     rpy_sig = None
+    sol_array = [t.raw_time, lla, pos_sig, vel, vel_sig]
     if solution[1].decode_class_name == 'positionvelocityattitude':
         rpy = extract_rpy(solution[1].data)
+        rpy = np.unwrap(rpy, axis=0)
         rpy_sig = extract_tilt_sigma(solution[1].data)
+        sol_array += [rpy, rpy_sig]
+
+    interp_to_low_rate(truth_array, sol_array)
+    tt.raw_time = truth_array[0]
+    tlla = truth_array[1]
+    tvel = truth_array[2]
+    if truth[1].decode_class_name == 'positionvelocityattitude':
+        trpy = truth_array[3]
+    t.raw_time = sol_array[0]
+    lla = sol_array[1]
+    pos_sig = sol_array[2]
+    vel = sol_array[3]
+    vel_sig = sol_array[4]
+    if solution[1].decode_class_name == 'positionvelocityattitude':
+        rpy = sol_array[5]
+        rpy_sig = sol_array[6]
+
+    lat0 = tlla[0, 0]
+    lon0 = tlla[0, 1]
+    alt0 = tlla[0, 2]
+    sig = convert_ned_sigma_to_lla_sigma(pos_sig, lla)
+    ned = lla_to_ned_vector(lla, lat0, lon0, alt0)
+
+    if truth[1].decode_class_name == 'positionvelocityattitude':
+        latfac = delta_lat_to_north(1.0, lat0, alt0)
+        lonfac = delta_lon_to_east(1.0, lat0, alt0)
+        cnbs = [rpy_to_dcm(trpy[k, :]) for k in range(0, trpy.shape[0])]
+        dts = diff(tt.raw_time)
+        rot_rates = array(
+            [
+                dcm_to_rpy(cnbs[k].T @ cnbs[k + 1]) / dts[k]
+                for k in range(0, len(cnbs) - 1)
+            ]
+        )
+        mid_time = (tt.raw_time[0:-1] + tt.raw_time[1:]) / 2.0
+        for k in range(0, rot_rates.shape[0] - 5):
+            rot_rates[k, :] = np.mean(rot_rates[k : (k + 5), :], axis=0)
+        rot_rates = common_interp(mid_time, rot_rates, tt.raw_time)
+        for k in range(0, tlla.shape[0]):
+            lanav = cnbs[k] @ la_p_to_truth + true_ned_off
+            tvel[k, :] -= cnbs[k] @ np.cross(rot_rates[k, :], la_p_to_truth)
+            tlla[k, 0] -= lanav[0] / latfac
+            tlla[k, 1] -= lanav[1] / lonfac
+            tlla[k, 2] += lanav[2]
+
+    tned = lla_to_ned_vector(tlla, lat0, lon0, alt0)
 
     t0 = min(t.t0, tt.t0)
     rel_time = t.raw_time - t0
@@ -441,23 +503,6 @@ def plot_solution(solution, truth, plot_dir, show_plots):
     filename = os.path.join(plot_dir, 'ned_position')
     savefig(f'{filename}.png', dpi=300)
 
-    pos_sig = transpose(
-        interp1d(
-            t.raw_time,
-            transpose(pos_sig),
-            bounds_error=False,
-            fill_value='extrapolate',
-        )(tt.raw_time)
-    )
-    ned = transpose(
-        interp1d(
-            t.raw_time,
-            transpose(ned),
-            bounds_error=False,
-            fill_value='extrapolate',
-        )(tt.raw_time)
-    )
-
     fig = figure(f'NED Pos Error {title}')
     north_pos_err = tned[:, 0] - ned[:, 0]
     east_pos_err = tned[:, 1] - ned[:, 1]
@@ -510,23 +555,6 @@ def plot_solution(solution, truth, plot_dir, show_plots):
     legend(leg_w_sigma)
     filename = os.path.join(plot_dir, 'ned_velocity')
     savefig(f'{filename}.png', dpi=300)
-
-    vel_sig = transpose(
-        interp1d(
-            t.raw_time,
-            transpose(vel_sig),
-            bounds_error=False,
-            fill_value='extrapolate',
-        )(tt.raw_time)
-    )
-    vel = transpose(
-        interp1d(
-            t.raw_time,
-            transpose(vel),
-            bounds_error=False,
-            fill_value='extrapolate',
-        )(tt.raw_time)
-    )
 
     fig = figure(f'NED Vel Error {title}')
     north_vel_error = tvel[:, 0] - vel[:, 0]
@@ -585,24 +613,6 @@ def plot_solution(solution, truth, plot_dir, show_plots):
         filename = os.path.join(plot_dir, 'rpy')
         savefig(f'{filename}.png', dpi=300)
 
-        rpy_sig_deg = transpose(
-            interp1d(
-                t.raw_time,
-                transpose(rpy_sig_deg),
-                bounds_error=False,
-                fill_value='extrapolate',
-            )(tt.raw_time)
-        )
-        rpy = np.unwrap(rpy, axis=0)
-        trpy = np.unwrap(trpy, axis=0)
-        rpy = transpose(
-            interp1d(
-                t.raw_time,
-                transpose(rpy),
-                bounds_error=False,
-                fill_value='extrapolate',
-            )(tt.raw_time)
-        )
         tilts = rad2deg(calc_tilts(trpy, rpy))
 
         fig = figure(f'NED Tilt Error {title}')
