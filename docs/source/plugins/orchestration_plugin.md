@@ -1,21 +1,25 @@
-# Orchestration Plugin - TODO
+# Orchestration Plugin
 
-## API Discussion
+The {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` contains the core
+navigation data fusion and filtering functionality. It is responsible for calculating a
+navigation solution from the incoming sensor data. It usually performs this task by calling out
+to various plugins which define the actual sensor fusion algorithm, state space, and
+sensor error models. Thus its primary duties are to orchestrate the flow of data
+into/out of filters, and picking the set of navigation-related plugins which are used to
+model errors and generate estimates.
 
-Write about the high-level goal of this plugin type according to the API perhaps including:
-- Overall intent of the plugin (where it fits into pntOS as a whole)
-- Any particularly tricky/fine-grained points users would be likely to miss in the API
-- Particular areas where the API is strict
-- Particular areas where the API leaves decisions to the user
-- How this plugin is intended to interface with other plugins
-- What objects this plugins is required/perhaps expected to implement (e.g.
-  `MessageStreamConfig` or `Mediator`)
+![](../images/pntos_overview3.svg)
 
-## Cobra Implementation
+The {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` could be a single
+black box solution or broken up into more modular components. In the latter case, a bank
+of one or more filters has access to a bank of filtering plugins. Filtering plugins
+might include the:
 
-Write about the Cobra implementation:
-- Design decisions related to this plugin
-- If there are various versions of this plugin:
-    - List different versions
-    - Describe the intent of each version
-    - Document key differences between each version
+* [](./fusion_plugin.md)
+* [](./fusion_strategy_plugin.md)
+* [](./inertial_plugin.md)
+* [](./initialization_plugin.md)
+* [](./state_modeling_plugin.md)
+* [](./preprocessor_plugin.md)
+
+<!-- TODO (#176) https://git.aspn.us/pntos/pntos-python/-/issues/176 -->

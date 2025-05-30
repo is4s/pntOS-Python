@@ -1,21 +1,14 @@
-# Preprocessor Plugin - TODO
+# Preprocessor Plugin
 
-## API Discussion
+A {py:obj}`Preprocessor Plugin<pntos.api.PreprocessorPlugin>` allows for data
+manipulation before incoming {py:obj}`Message<pntos.api.Message>`s are passed into the
+filter. It takes in one message, and then returns 0, 1, or multiple messages. Imaging a
+simple preprocessor which validates incoming {term}`ASPN` messages before they enter the
+filter. It might return 0 messages if it encounters a faulty message, and return 1
+message (pass through the input message) if the message is valid. A
+{py:obj}`Preprocessor Plugin<pntos.api.PreprocessorPlugin>` might also be used for
+something like a camera where a frame message comes in, and then range to point messages
+come out for each observation in the frame. In this case, 1 message would come into the
+plugin, and more than 1 message may come out of the plugin.
 
-Write about the high-level goal of this plugin type according to the API perhaps including:
-- Overall intent of the plugin (where it fits into pntOS as a whole)
-- Any particularly tricky/fine-grained points users would be likely to miss in the API
-- Particular areas where the API is strict
-- Particular areas where the API leaves decisions to the user
-- How this plugin is intended to interface with other plugins
-- What objects this plugins is required/perhaps expected to implement (e.g.
-  `MessageStreamConfig` or `Mediator`)
-
-## Cobra Implementation
-
-Write about the Cobra implementation:
-- Design decisions related to this plugin
-- If there are various versions of this plugin:
-    - List different versions
-    - Describe the intent of each version
-    - Document key differences between each version
+<!-- TODO (#178) https://git.aspn.us/pntos/pntos-python/-/issues/178 -->
