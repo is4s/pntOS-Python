@@ -1,7 +1,7 @@
 # Installation Guide
 
 This guide will walk you through setting up a python virtual environment for running
-{term}`Cobra` {term}`apps <App>`.
+the example {term}`apps <App>` which utilize {term}`Cobra` plugins.
 
 ## Authentication
 
@@ -22,30 +22,46 @@ To use the PAT, set the following environment variable, replacing `<TOKEN_VALUE>
 export UV_INDEX=https://:<TOKEN_VALUE>@git.aspn.us/api/v4/projects/94/packages/pypi/simple
 ```
 
-You may wish to permanently set the above variable. For example, bash users can add the above line
-to their `~/.bashrc` script.
+You may wish to permanently set the above `UV_INDEX` variable. For example, bash users can add the above `export` line
+to their `~/.bashrc` script. If this is not done, the user will need to re-run the above `export` line each time they
+open a new shell.
 
 ## Environment Setup
 
-Please ensure you have the following tools installed:
+Setting up your environment is done in two steps: installing native dependencies and then setting up your Python
+environment.
 
-- Python 3.10 or later
-- git
-- GLib
-- Java
-- Tkinter
+### Install Native Dependencies
 
-Ubuntu users can use the following command to install the above dependencies:
+Please ensure you have the following packages installed and available on your system:
+
+| Package              | Reason Needed                      |
+|----------------------|------------------------------------|
+| Python 3.10 or later | Needed to run Cobra                |
+| Git                  | Needed to acquire dependencies     |
+| Glib2                | Needed for LCM tools, to run Apps  |
+| Java                 | Needed for LCM tools, to run Apps  |
+| Tkinter              | Needed for plotting filter results |
+
+Ubuntu 22.04 users can use the following command to install the above packages:
 
 ```shell
 sudo apt update && sudo apt install python3 python3-venv git libglib2.0-dev default-jre python3-tk
 ```
 
-You are now ready to set up your python environment.
+Users of other operating systems will need to install the above packages using
+their operating system's package manager.
+
+```{note}
+While Cobra has been tested and is known to work on many different operating systems, currently only Ubuntu 22.04
+and 24.04 is officially supported. We anticipate adding support for many more operating systems before our 1.0 release.
+```
+
+You are now ready to set up your python environment in the next section.
 
 ### Python Environment Setup
 
-Begin by creating and entering a clean venv. We can create the venv in the
+We will begin by creating and entering a clean venv. We can create the venv in the
 `.venv` folder by running the following command in the project root directory:
 
 ```shell
@@ -85,12 +101,12 @@ of bandwidth.
 ```
 
 If successful, you are ready to move on to [Testing Your Installation](#testing-your-installation).
-If not, please see [Errata](#errata) for troubleshooting help.
+If not, please see [Errata](#errata--troubleshooting) for troubleshooting help.
 
 ## Testing Your Installation
 
 If everything installed correctly, you now should be able to import classes from the API and Cobra
-modules.
+modules in the Python interpreter:
 
 ```shell
     $ python
@@ -102,9 +118,18 @@ modules.
     <class 'pntos.api.plugins.controller.ControllerPlugin'>
 ```
 
-## Errata
+If you are able to access these classes successfully, then congratulations, you are ready to
+start using Cobra! Your next steps are to try running a sample Cobra app, or start the tutorial
+on how Cobra works. If you'd like to try running a sample app, you should head over to
+[running your first app](first_app.md). If you'd like to learn more about how Cobra works first, 
+head over to the [introduction to Cobra](introduction.md).
 
-Please see the following sections for some potential failures and how to resolve them.
+
+
+
+## Errata & Troubleshooting
+
+This section lists some potential failures you may encounter and how to resolve them.
 
 ### Unauthorized Error
 
@@ -148,10 +173,3 @@ NavToolkit module from source.
 If you encounter any errors during this process, please see [NavToolkit's
 documentation](https://git.aspn.us/pntos/navtk) for instructions on building the NavToolkit module
 from source and installing it.
-
-## Next Steps
-
-| Link    | Description    |
-| --- | --- |
-| [](./first_app.md)    | Instructions for running your first {term}`App`.    |
-| [](./introduction.md)    | An overview of the {term}`Python pntOS API` and {term}`Cobra`.    |
