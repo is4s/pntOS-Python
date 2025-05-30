@@ -88,7 +88,7 @@ to `DEBUG` when initializing the {py:obj}`pntos.cobra.SimpleLoggingPlugin`.
 ### Select an App
 
 The available apps can be found in each subfolder of the `{workspace-root}/apps`
-directory. If this is your first time with the {term}`Python pntOS API`, it is recommending you
+directory. If this is your first time with the {term}`Python pntOS API`, it is recommended you
 start with the `fusion_gps_ins` app. If you are running your own custom app, just switch
 out the paths to the off-the-shelf apps with the path to your app in the following instructions.
 
