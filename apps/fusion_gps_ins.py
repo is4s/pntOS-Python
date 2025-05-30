@@ -74,7 +74,8 @@ my_config = [
         gps_channel='/sensor/ublox-ZED-F9T/position',
         group='config/orchestration',
     ),
-]  # End Config
+]
+# End Config
 
 # Instantiate all of our plugins
 controller = SimpleControllerPlugin('Cobra Simple Controller Plugin')

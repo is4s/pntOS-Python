@@ -48,7 +48,7 @@ In this case, we need to import the {py:obj}`LoggingLevel <pntos.api.LoggingLeve
 from the API:
 ```{literalinclude} ../../../apps/fusion_gps_ins.py
 :start-at: "from pntos.api import"
-:end-before: "from pntos.cobra"
+:end-at: "from pntos.api import"
 :lineno-match:
 ```
 
@@ -178,16 +178,16 @@ Next we can instantiate all the other plugins we want in this app and put them i
 :lineno-match:
 ```
 You'll notice that all the plugins take in an {py:obj}`identifier
-<pntos.api.CommonPlugin.identifier>` on init by {term}`Cobra` convention in order to populate the
-{py:obj}`CommonPlugin.identifier <pntos.api.CommonPlugin.identifier>` field which all plugins
+<pntos.api.CommonPlugin>` on init by {term}`Cobra` convention in order to populate the
+{py:obj}`CommonPlugin.identifier <pntos.api.CommonPlugin>` field which all plugins
 inherit. However, there are two plugins which take an extra input here at instantiation in this app:
 
 ```{table}
 :width: 80%
 | Plugin                                                                  | Extra Arg    | Extra Arg Description                                                                                                                                                                                                                                                                                                                                                                                                                             |
 | ----------------------------------------------------------------------- | --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| {py:obj}`SimpleLoggingPlugin<pntos.cobra.SimpleLoggingPlugin.__init__>` |  `global_log_level`   | Takes a global log level parameter to select which log levels to display. For more info, see [](../plugins/logging_plugin.md)|
-| {py:obj}`SimpleRegistryPlugin<pntos.cobra.SimpleRegistryPlugin>`        |   `config`  | Takes in a list of config objects on instantiation to populate new registries (from {py:obj}`SimpleRegistryPlugin.new_registry()<pntos.cobra.SimpleRegistryPlugin.new_registry>`) For more information on registry plugins, see [](../plugins/registry_plugin.md)               |
+| {py:obj}`SimpleLoggingPlugin<pntos.cobra.SimpleLoggingPlugin.__init__>` |  `global_log_level`   | Takes a global log level parameter to select which log levels to display. For more info, see [](../plugins/logging_plugin.md).|
+| {py:obj}`SimpleRegistryPlugin<pntos.cobra.SimpleRegistryPlugin>`        |   `config`  | Takes in a list of config objects on instantiation to populate new registries. For more information on registry plugins, see [](../plugins/registry_plugin.md)               |
 ```
 
 We'll explore the roles of all these plugins in the app later in [](#plugins-overview), but for now
