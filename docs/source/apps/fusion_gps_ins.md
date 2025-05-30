@@ -1,4 +1,4 @@
-# 1. GPS INS Fusion App - TODO (#Expected App Results section)
+# 1. GPS INS Fusion App
 
 Welcome to the first of the {term}`Cobra` tutorial {term}`apps <App>`!
 
@@ -246,4 +246,10 @@ this app:
 
 For instructions of how to run this app, see [](../first_app.md). After running the app you should see the following results:
 
-TODO - describe expected results.
+![](../images/gps_ins_expected_traj.png)
+
+The Northing vs. Easting Trajectory plot which displays the INS-D PVA output and the Cobra PVA solution. It may be hard to tell, but they lie on top of one another, which is exactly what we want to see!
+
+![](../images/gps_ins_expected_vel_err.png)
+
+The NED Velocity Error plot which displays the velocity error between the INS-D PVA output and the Cobra PVA solution at each time epoch.
