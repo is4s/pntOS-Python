@@ -155,9 +155,3 @@ Last, let's add in some checking to make this robust to future changes and actua
 ```
 
 And we're done! We have now modified  `SimpleGpsOrchestrationPlugin`, turning it into `SimpleGpsVelOrchestrationPlugin`.
-
-## Expected Results
-
-For instructions of how to run this app, see [](../first_app.md). After running the app you should see the following results:
-
-TODO - describe expected results.
