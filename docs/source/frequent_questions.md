@@ -1,3 +1,8 @@
+<!-- TODO: remove this -->
+```{eval-rst}
+:orphan:
+```
+
 # Frequently Asked Questions - TODO
 
 ```{dropdown} Who can benefit from pntOS?
@@ -7,7 +12,7 @@ pntOS was designed for the DoD community and it is an ideal architecture for any
 building a {term}`PNT` solution for any operational environment, regardless of privacy needs or
 programming language. Custom plugins can be developed using any programming language and
 can either be made available to the pntOS community or used for proprietary applications
-without risk of disclosure. 
+without risk of disclosure.
 
 pntOS is a great solution for both operational and S&T applications.
 ```
@@ -19,7 +24,7 @@ pntOS is not a specific piece of code, collection of plugins, or program but is 
 plugin architecture. This means pntOS defines the components and message formats that
 all pntOS implementations must follow via APIs. When someone uses pntOS to create a {term}`PNT`
 sensor fusion application, they have created a pntOS implementation. An example of an
-implementation is Cobra.  
+implementation is Cobra.
 
 For more information, see [](./introduction.md)
 ```
@@ -34,16 +39,16 @@ Ask Kyle. And John.
 :name: what-is-viper
 
 Viper (sometimes referred to as Viper reference plugins) is the name of a specific
-implementation of the pntOS architecture. Viper is written in C and C++. 
+implementation of the pntOS architecture. Viper is written in C and C++.
 ```
 
 ```{dropdown} What is NavToolkit?
 :name: what-is-navtoolkit
 
 NavToolkit (sometimes abbreviated to navtk) is a software library that contains
-navigation algorithms that are used in the implementation of pntOS plugins in both 
-C and Python. Anyone is free to develop plugins using their own internal software 
-libraries.  
+navigation algorithms that are used in the implementation of pntOS plugins in both
+C and Python. Anyone is free to develop plugins using their own internal software
+libraries.
 
 For more information, see [](./navtk.md#navtk-reference---todo).
 ```
@@ -53,7 +58,7 @@ For more information, see [](./navtk.md#navtk-reference---todo).
 
 ASPN is a community-developed data standard that describes what {term}`PNT` data may be
 exchanged for consistent usage and interoperability of {term}`PNT` estimators across different
-systems, sources, and users. pntOS utilizes ASPN data standards wherever relevant.  
+systems, sources, and users. pntOS utilizes ASPN data standards wherever relevant.
 
 For more information, see [](./aspn.md).
 ```
@@ -64,5 +69,5 @@ For more information, see [](./aspn.md).
 No, pntOS is not a true operating system. pntOS received its name due to the ways it is
 analogous to an OS, such as how it manages the basic functions in a {term}`PNT` system and is a
 tool used for building systems. In this way pntOS is similar to ROS (Robot Operating
-System). 
+System).
 ```

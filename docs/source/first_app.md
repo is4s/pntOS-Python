@@ -188,7 +188,9 @@ To plot the saved results run:
 postprocessing/plot_results.py pntos_output.log
 ```
 
-For more information on the expected results for this app, see [](./apps/fusion_gps_vel_ins.md#expected-results).
+These plots should look fairly similar to the first app's plots, since the position update will be
+the dominating update. To be able to see a bigger difference, try inducing a position measurement
+outage to see the velocity update constrain the solution's drift.
 ````
 
 `````
