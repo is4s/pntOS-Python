@@ -19,12 +19,12 @@ installation
 first_app
 ```
 
+<!-- TODO: add `dataflow` back in to this index -->
+<!-- TODO #114: add `frequent_questions` back in to this index -->
 ```{toctree}
 :caption: What is pntOS?
 introduction
 plugins
-dataflow
-frequent_questions
 ```
 
 ```{toctree}
@@ -34,11 +34,11 @@ apps/fusion_gps_ins
 apps/fusion_gps_vel_ins
 ```
 
+<!-- TODO #114: add `navtk` back in to this index -->
+<!-- TODO: add `troubleshooting` back in to this index -->
 ```{toctree}
 :caption: Reference
 aspn
-navtk
-troubleshooting
 ```
 
 ```{toctree}
