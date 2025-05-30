@@ -40,7 +40,10 @@ perform sensor fusion on the sensor data, and finally produce a resulting naviga
 This concept is illustrated below, with an example experimental setup where pntOS is receiving and processing
 data from three sensors and producing a fused navigation solution:
 
-![](images/pntos_overview.svg)
+```{image} images/pntos_overview.svg
+:width: 80%
+:align: center
+```
 
 In this example, the data comes from the three sensors on the left and is processed by a set of Python pntOS plugins;
 Python pntOS then produces a solution on the right. Data from all three sensors are accepted by pntOS,
@@ -77,9 +80,9 @@ The Python pntOS black box in the figure from the previous section is really a c
 of plugins that are utilized by an app, as shown here:
 
 
-![image](images/pntos_overview2.svg)
-<!-- **TODO**: Edit this with a version of the image that replaces the loader with an App. -->
-
+```{image} images/pntos_overview2.svg
+:align: center
+```
 
 In this tour, we will dive into the details of how one would go about implementing
 each of the components of pntOS in the above figure, examining each part of Python pntOS piece by piece
@@ -218,12 +221,10 @@ network, and an {py:obj}`Orchestration Plugin<pntos.api.Orchestration Plugin>` c
 _consumes_ sensor data and produces PNT solutions. Then the implementation of
 {py:obj}`take_control()<pntos.api.ControllerPlugin.take_control>` would ideally set up a pipeline that looked like this:
 
+```{image} images/Graph_13.svg
+:width: 80%
+:align: center
 ```
-        (sensor data)              (ASPN sensor data)                    (ASPN solution)
-Network       ->        my_transport      ->             my_orchestration      ->      Output
-```
-<!-- **TODO** Figure here if we have time, instead of text drawing. Similar to the figure above, with other details cut,
-such as the external sensors. -->
 
 To set up that chain of data flow, the {py:obj}`take_control()<pntos.api.ControllerPlugin.take_control>` method
 would need to perform the following steps in order:
@@ -292,9 +293,9 @@ Because the design of pntOS is such that all plugins must communicate with other
 {py:obj}`Mediator<pntos.api.Mediator>`, that means that our previous figure actually should look like:
 
 
-```
-        (sensor data)                 (ASPN sensor data)       (ASPN sensor data)                 (ASPN solution)
-Network       ->        Transport Plugin      ->        Mediator      ->      Orchestration Plugin      ->      Output
+```{image} images/Graph_14.svg
+:width: 80%
+:align: center
 ```
 
 That is, the {py:obj}`Transport Plugin<pntos.api.TransportPlugin>` cannot directly send data to the
@@ -442,9 +443,9 @@ In the previous section, we explored how the transport plugin delivered sensor d
 {py:obj}`Mediator<pntos.api.Mediator>`. Recall that in the [](#the-mediator-and-init_plugin) section,
 we decided that the data flow we wanted to support was this:
 
-```
-        (sensor data)                 (ASPN sensor data)       (ASPN sensor data)                 (ASPN solution)
-Network       ->        Transport Plugin      ->        Mediator      ->      Orchestration Plugin      ->      Output
+```{image} images/Graph_14.svg
+:width: 80%
+:align: center
 ```
 
 Also recall that in the [](#understanding-the-controller-plugin) section, we outlined our implementation

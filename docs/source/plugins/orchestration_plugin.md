@@ -8,7 +8,7 @@ sensor error models. Thus its primary duties are to orchestrate the flow of data
 into/out of filters, and picking the set of navigation-related plugins which are used to
 model errors and generate estimates.
 
-![](../images/pntos_overview3.svg)
+![](../images/pntos_overview3.png)
 
 The {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` could be a single
 black box solution or broken up into more modular components. In the latter case, a bank
