@@ -10,10 +10,10 @@ from pntos.cobra import (
     SimpleEkfFusionStrategyPlugin,
     SimpleFusionPlugin,
     SimpleGpsInsStateModelingPlugin,
+    SimpleGpsOrchestrationPlugin,
     SimpleInertialPlugin,
     SimpleInitializationPlugin,
     SimpleLoggingPlugin,
-    SimpleOrchestrationPlugin,
     SimpleRegistryPlugin,
 )
 from pntos.cobra.config import (
@@ -89,7 +89,7 @@ plugins = [
         'Cobra Simple Logging Plugin',
         global_log_level=LoggingLevel.INFO,  # Switch to `DEBUG` for more informative log output
     ),
-    SimpleOrchestrationPlugin('Cobra Simple Orchestration Plugin'),
+    SimpleGpsOrchestrationPlugin('Cobra Simple Orchestration Plugin'),
     SimpleRegistryPlugin('Cobra Simple Registry Plugin', config=my_config),
 ]
 

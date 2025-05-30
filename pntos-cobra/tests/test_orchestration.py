@@ -37,9 +37,9 @@ from pntos.cobra import (
     SimpleEkfFusionStrategyPlugin,
     SimpleFusionPlugin,
     SimpleGpsInsStateModelingPlugin,
+    SimpleGpsOrchestrationPlugin,
     SimpleInertialPlugin,
     SimpleInitializationPlugin,
-    SimpleOrchestrationPlugin,
     SimpleRegistryPlugin,
 )
 from pntos.cobra.config import (
@@ -147,8 +147,8 @@ class Test_Orchestration(unittest.TestCase):
 
     def set_up_plugins(self) -> None:
         # Instantiate a fresh set of plugins
-        self.orchestration_plugin: OrchestrationPlugin = SimpleOrchestrationPlugin(
-            'SimpleOrchestrationPlugin'
+        self.orchestration_plugin: OrchestrationPlugin = SimpleGpsOrchestrationPlugin(
+            'SimpleGpsOrchestrationPlugin'
         )
         self.initialization_plugin: InitializationPlugin = SimpleInitializationPlugin(
             'Cobra Simple Initialization Plugin'

@@ -108,7 +108,7 @@ To run this app, run this command from the root workspace directory (with the py
 environment activated):
 
 ```shell
-apps/fusion_gps_ins/fusion_gps_ins.py
+apps/fusion_gps_ins.py
 ```
 
 You should see something like the following:
@@ -155,7 +155,7 @@ To run this app, run this command from the root workspace directory (with the py
 environment activated):
 
 ```shell
-apps/fusion_gps_vel_ins/fusion_gps_vel_ins.py
+apps/fusion_gps_vel_ins.py
 ```
 
 You should see something like the following:

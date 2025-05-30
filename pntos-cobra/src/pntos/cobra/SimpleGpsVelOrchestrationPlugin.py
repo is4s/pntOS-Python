@@ -49,10 +49,6 @@ from pntos.cobra.utils.plugins import SortedPlugins, sort_plugins_dataclass
 BEST_SOL_CHANNEL = '/solution/pntos/best'
 IMU_SOL_CHANNEL = '/solution/pntos/imu'
 
-# Sensor input channels
-IMU_CHANNEL = '/sensor/vn-100/imu'
-GPS_CHANNEL = '/sensor/ublox-ZED-F9T/position'
-
 # State block parameters
 FOGM_STATE_BLOCK_ID = 'fogm'
 FOGM_STATE_BLOCK_LABEL = 'pos_fogm'
@@ -619,8 +615,6 @@ class SimpleGpsVelOrchestrationPlugin(OrchestrationPlugin):
         Utility function to request the best fusion strategy solution. Returns
         ``None`` if the fusion engine is unable to provide a solution for the requested time.
         """
-        # Make sure state block has current aux data before propagate
-        self._send_inertial_aux_to_pinson()
 
         x_and_p: EstimateWithCovariance | None = self.fusion_engine.peek_ahead(
             time, [STATE_BLOCK_LABEL]
