@@ -1,16 +1,11 @@
 # 2. Fusion GPS Velocity INS App
 
 The `fusion_gps_vel_ins.py` app is very similar to the `fusion_gps_ins.py` app. It's essentially a clone with one
-significant difference: the addition of a velocity update. This tutorial will walk through transforming the
-`fusion_gps_ins.py` app into the `fusion_gps_vel_ins.py` app in order to demonstrate how to start with a Cobra app and
-hack it into what you desire.
+significant difference: the addition of a velocity update. This tutorial will demonstrate how to fit a Cobra app to your needs by transforming the `fusion_gps_ins.py` app into the `fusion_gps_vel_ins.py` app.
 
 ## Changes to the App Script
 
-Changes to the `fusion_gps_ins.py` script will actually be fairly minimal. Currently, the Orchestration plugin it uses
-is hard-coded to only use a single measurement processor for the sake of simplicity. So we'll swap it out with another
-Orchestration plugin which is hard-coded to use two measurement processors: the same position update measurement
-processor as before and an added velocity update measurement processor.
+Changes to the `fusion_gps_ins.py` script will actually be fairly minimal. Currently, its Orchestration plugin is fixed to a single measurement processor. So, we'll replace it with another Orchestration plugin designed to use the same position update processor with an additional velocity update processor.
 Begin by updating the import to bring in the new Orchestration plugin:
 
 ```diff
@@ -36,8 +31,7 @@ Then update the script so the new Orchestration plugin is created instead of the
  ]
  ```
 
- Last, this new plugin requires a little bit more config. Update the config to tell it which channel it should get its
- velocity update from:
+ Last, update the config to tell it which channel it should get its velocity update from:
 
 ```diff
      OrchestrationConfig(
@@ -54,12 +48,9 @@ Now you've updated `fusion_gps_ins.py` to match `fusion_gps_vel_ins.py`. But wha
 
 ## Changes to SimpleGpsOrchestrationPlugin
 
-Similar to how `fusion_gps_vel_ins.py` is a clone of `fusion_gps_ins.py` with some small modifications,
-`SimpleGpsVelOrchestrationPlugin` is a clone of `SimpleGpsOrchestrationPlugin` with a few changes. For the next part of
-this tutorial, we'll show how to create `SimpleGpsVelOrchestrationPlugin` by modifying `SimpleGpsOrchestrationPlugin` to
-use an extra velocity measurement processor.
+Similar to how `fusion_gps_vel_ins.py` starts as a clone of `fusion_gps_ins.py` , `SimpleGpsVelOrchestrationPlugin` starts as a clone of `SimpleGpsOrchestrationPlugin` and is modified to use an extra velocity measurement processor. Let's take a look at these changes.
 
-First, we'll need to update some of the hard-coded measurement processor parameters, adding new values for the
+First, we'll need to update some of the fixed measurement processor parameters, adding new values for the
 measurement processor:
 
 ```diff
@@ -97,15 +88,11 @@ Next, while not a functional difference, the two Orchestration plugins are named
 +class SimpleGpsVelOrchestrationPlugin(OrchestrationPlugin):
 ```
 
-More interestingly, now instead of always routing measurement data to one measurement processor the Orchestration plugin
-will now need to decide which measurement processor gets a measurement. We've already set up variables containing the
-various channels we need to sort of the labels of measurement processor that need to receive data from each channel, so
-add that information into the lookup table that the orchestration plugin:
+More interestingly, instead of always routing measurement data to one measurement processor, the Orchestration plugin will now need to decide which processor gets a measurement. To achieve this, we associate the channels with the measurement processor labels via a lookup table like so:
 
 ```diff
          self.measurement_channels: dict[str, str] = {
 -            orch_config.gps_channel: GPS_MEASUREMENT_PROCESSOR_LABEL
-+            orch_config.gps_channel: GPS_MEASUREMENT_PROCESSOR_LABEL,
 +            orch_config.velocity_channel: VEL_MEASUREMENT_PROCESSOR_LABEL,
 ```
 
