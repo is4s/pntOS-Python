@@ -1,21 +1,14 @@
-# Inertial Plugin - TODO
+# Inertial Plugin
 
-## API Discussion
+The {py:obj}`Inertial Plugin<pntos.api.InertialPlugin>` serves as a factory for
+inertials. There are two types: the {py:obj}`StandardInertialMechanization` and the {py:obj}`ExternalInertial`.
 
-Write about the high-level goal of this plugin type according to the API perhaps including:
-- Overall intent of the plugin (where it fits into pntOS as a whole)
-- Any particularly tricky/fine-grained points users would be likely to miss in the API
-- Particular areas where the API is strict
-- Particular areas where the API leaves decisions to the user
-- How this plugin is intended to interface with other plugins
-- What objects this plugins is required/perhaps expected to implement (e.g.
-  `MessageStreamConfig` or `Mediator`)
+The {py:obj}`StandardInertialMechanization` receives an
+initial {term}`PVA` alignment and {term}`IMU` measurements which it mechanizes to
+produce {term}`INS` solutions. It might also handle inertial feedback from the {py:obj}`Orchestration
+Plugin<pntos.api.OrchestrationPlugin>`.
 
-## Cobra Implementation
+The other type of inertial is the {py:obj}`ExternalInertial`, which tracks an
+external {term}`INS` and buffers the solution. 
 
-Write about the Cobra implementation:
-- Design decisions related to this plugin
-- If there are various versions of this plugin:
-    - List different versions
-    - Describe the intent of each version
-    - Document key differences between each version
+<!-- TODO (#173) https://git.aspn.us/pntos/pntos-python/-/issues/173 -->

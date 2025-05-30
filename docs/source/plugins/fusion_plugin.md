@@ -1,21 +1,13 @@
-# Fusion Plugin - TODO
+# Fusion Plugin
 
-## API Discussion
+The {py:obj}`Fusion Plugin<pntos.api.FusionPlugin>` accepts sensor measurements (and
+possibly a reference {term}`PVA` solution from the {py:obj}`Inertial
+Plugin<pntos.api.InertialPlugin>`) via the {py:obj}`Orchestration
+Plugin<pntos.api.OrchestrationPlugin>` and uses them to generate a fused {term}`PNT` solution.
 
-Write about the high-level goal of this plugin type according to the API perhaps including:
-- Overall intent of the plugin (where it fits into pntOS as a whole)
-- Any particularly tricky/fine-grained points users would be likely to miss in the API
-- Particular areas where the API is strict
-- Particular areas where the API leaves decisions to the user
-- How this plugin is intended to interface with other plugins
-- What objects this plugins is required/perhaps expected to implement (e.g.
-  `MessageStreamConfig` or `Mediator`)
+The Fusion plugin may also dispatch to a {py:obj}`Fusion Strategy
+Plugin<pntos.api.FusionStrategyPlugin>` to do the {term}`PNT` fusion. In this case, it does all the book-keeping to keep track of
+which state blocks and measurement processors correspond to which states in the
+{py:obj}`Fusion Strategy Plugin<pntos.api.FusionStrategyPlugin>`.
 
-## Cobra Implementation
-
-Write about the Cobra implementation:
-- Design decisions related to this plugin
-- If there are various versions of this plugin:
-    - List different versions
-    - Describe the intent of each version
-    - Document key differences between each version
+<!-- TODO (#171) https://git.aspn.us/pntos/pntos-python/-/issues/171 -->

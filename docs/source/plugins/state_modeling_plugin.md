@@ -1,21 +1,48 @@
-# State Modeling Plugin - TODO
+# State Modeling Plugin
 
-## API Discussion
+The {py:obj}`State Modeling Plugin<pntos.api.StateModelingPlugin>` contains lists of
+{py:obj}`Measurement Processor<pntos.api.StandardMeasurementProcessor>`s, {py:obj}`State
+Block<pntos.api.StandardStateBlock>`s, and {py:obj}`Virtual State
+Block<pntos.api.VirtualStateBlock>`s and a factory to construct them (the {py:obj}`State
+Model Provider<pntos.api.StandardStateModelProvider>`). At the {py:obj}`Orchestration
+Plugin<pntos.api.OrchestrationPlugin>`'s request it constructs these objects and adds
+them to the fusion engine (e.g.
+{py:obj}`StandardFusionEngine<pntos.api.StandardFusionEngine>`).
 
-Write about the high-level goal of this plugin type according to the API perhaps including:
-- Overall intent of the plugin (where it fits into pntOS as a whole)
-- Any particularly tricky/fine-grained points users would be likely to miss in the API
-- Particular areas where the API is strict
-- Particular areas where the API leaves decisions to the user
-- How this plugin is intended to interface with other plugins
-- What objects this plugins is required/perhaps expected to implement (e.g.
-  `MessageStreamConfig` or `Mediator`)
+Below is some very brief information about {py:obj}`Measurement
+Processor<pntos.api.StandardMeasurementProcessor>`s, {py:obj}`State
+Block<pntos.api.StandardStateBlock>`s, and {py:obj}`Virtual State
+Block<pntos.api.VirtualStateBlock>`s.
 
-## Cobra Implementation
+## Measurement Processor
 
-Write about the Cobra implementation:
-- Design decisions related to this plugin
-- If there are various versions of this plugin:
-    - List different versions
-    - Describe the intent of each version
-    - Document key differences between each version
+{py:obj}`Measurement Processor<pntos.api.StandardMeasurementProcessor>`s are
+responsible for providing the model that the Filter Strategy uses to update its states
+given a sensor measurement.
+
+![image](../images/measurement_processor.svg)
+
+## State Block
+
+{py:obj}`State Block<pntos.api.StandardStateBlock>`s provide the Filter Strategy with
+states and a model to propagate those states.
+
+![image](../images/state_block.svg)
+
+## Virtual State Block
+
+Consider the case where a given {py:obj}`State Block<pntos.api.StandardStateBlock>`
+provides three Latitude-Longitude-Altitude (LLH) states and a given {py:obj}`Measurement
+Processor<pntos.api.StandardMeasurementProcessor>` provides a model to update three
+Earth Centered, Earth Fixed (ECEF) position states. Normally this {py:obj}`Measurement
+Processor<pntos.api.StandardMeasurementProcessor>` and {py:obj}`State
+Block<pntos.api.StandardStateBlock>` would be incompatible with each other, but a
+{py:obj}`Virtual State Block<pntos.api.VirtualStateBlock>` that converts between ECEF
+position and LLH position could bridge the gap.
+
+In short, {py:obj}`Virtual State Block<pntos.api.VirtualStateBlock>`s convert the
+states provided by {py:obj}`State Block<pntos.api.StandardStateBlock>`s.
+
+
+
+<!-- TODO (#179) https://git.aspn.us/pntos/pntos-python/-/issues/179 -->

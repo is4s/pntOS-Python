@@ -1,21 +1,11 @@
-# Fusion Strategy Plugin - TODO
+# Fusion Strategy Plugin
 
-## API Discussion
+The {py:obj}`Fusion Strategy Plugin<pntos.api.FusionStrategyPlugin>` does the core
+estimation work. It determines what type of estimator is used, such as an Extended
+Kalman Filter (EKF), Rao-Blackwellized Particle Filter (RBPF), or something else. It
+usually receives models from the state blocks, virtual state blocks, and measurement
+processors in the {py:obj}`State Modeling Plugin<pntos.api.StateModelingPlugin>` via the
+{py:obj}`Fusion Plugin<pntos.api.FusionPlugin>` and propagates and updates its states
+accordingly.
 
-Write about the high-level goal of this plugin type according to the API perhaps including:
-- Overall intent of the plugin (where it fits into pntOS as a whole)
-- Any particularly tricky/fine-grained points users would be likely to miss in the API
-- Particular areas where the API is strict
-- Particular areas where the API leaves decisions to the user
-- How this plugin is intended to interface with other plugins
-- What objects this plugins is required/perhaps expected to implement (e.g.
-  `MessageStreamConfig` or `Mediator`)
-
-## Cobra Implementation
-
-Write about the Cobra implementation:
-- Design decisions related to this plugin
-- If there are various versions of this plugin:
-    - List different versions
-    - Describe the intent of each version
-    - Document key differences between each version
+<!-- TODO (#172) https://git.aspn.us/pntos/pntos-python/-/issues/172 -->

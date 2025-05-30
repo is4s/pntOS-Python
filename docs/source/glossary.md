@@ -1,4 +1,4 @@
-# Glossary - TODO
+# Glossary
 
 ```{glossary}
 :sorted:
@@ -28,17 +28,39 @@ Cobra
 
 
 App
-    TODO - write definition
+    A single Python script that the user may run and produces a working Python pntOS system.
+    For more details on apps, see [the reference tutorial apps](./apps/fusion_gps_ins.md).
 
 ASPN
-    TODO - write definition
+    A data standard that describes what {term}`PNT` data should be exchanged for consistent 
+    usage and interoperability of {term}`PNT` estimators across different systems, sources, and
+    users. For the purposes of the {term}`Python pntOS API`, ASPN is the data standard used for
+    passing navigation information between plugins. For more information, see the 
+    [ASPN FAQ](./aspn.md).
 
 Python pntOS API
-    TODO - write definition
+    An Application Programming Interface (API) written in Python that defines a Position, 
+    Navigation, and Timing Operating System (pntOS). The Python pntOS API consists of abstract 
+    plugin definitions which can be found in the 
+    [pntos-api/src/pntos/api/plugins](https://git.aspn.us/pntos/pntos-python/-/tree/main/pntos-api/src/pntos/api/plugins?ref_type=heads)
+    in the [`pntos-python`](https://git.aspn.us/pntos/pntos-python/-/tree/main?ref_type=heads) 
+    repository. {term}`Cobra` is an example implementation of the Python pntOS API. For more 
+    information, see the [Introduction](./introduction.md).
 
 PVA
-    TODO - write definition
+    Position, Velocity, and Attitude. This is usually in reference to a wrapped 
+    `MeasurementPositionVelocityAttitude` {py:obj}`Message<pntos.api.Message>`.
 
 LCM
-    TODO - write definition
+    Lightweight Communications and Marshalling. For more information see [the LCM 
+    documentation](https://lcm-proj.github.io/lcm/index.html).
+
+IMU
+    Inertial Measurement Unit
+
+INS
+    Inertial Navigation System
+
+PNT
+    Positioning, Navigation, and Timing    
 ```

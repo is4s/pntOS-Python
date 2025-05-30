@@ -1,21 +1,18 @@
-# Initialization Plugin - TODO
+# Initialization Plugin
 
-## API Discussion
+The {py:obj}`Initialization Pluign<pntos.api.InitializationPlugin>` is a factory for two
+types of initializers: 
 
-Write about the high-level goal of this plugin type according to the API perhaps including:
-- Overall intent of the plugin (where it fits into pntOS as a whole)
-- Any particularly tricky/fine-grained points users would be likely to miss in the API
-- Particular areas where the API is strict
-- Particular areas where the API leaves decisions to the user
-- How this plugin is intended to interface with other plugins
-- What objects this plugins is required/perhaps expected to implement (e.g.
-  `MessageStreamConfig` or `Mediator`)
+| Initialization                                                                     | Description                                                                                                                                                                                                                   |
+| ---------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| {py:obj}`InertialInitializationStrategy<pntos.api.InertialInitializationStrategy>` | Calculates an initial solution for inertial mechanization (such as in the {py:obj}`Inertial Plugin<pntos.api.InertialPlugin>`). This could be as simple as a manual alignment, or something more complex like gyrocompassing. |
+| {py:obj}`InitialEstimateWithCovariance<pntos.api.InitialEstimateWithCovariance>`   | A more generic initialization strategy, used for setting an initial estimate and covariance. Usually, this would be used to initialize a state block.                                                                         |
 
-## Cobra Implementation
+Both strategies allow the {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>`
+to query whether motion is needed, stationary data is needed, or if the initializer
+doesn't care about motion. Additionally, the {py:obj}`Orchestration
+Plugin<pntos.api.OrchestrationPlugin>` can query the status of the initialization so
+that the {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` knows when the
+initial solution is ready.
 
-Write about the Cobra implementation:
-- Design decisions related to this plugin
-- If there are various versions of this plugin:
-    - List different versions
-    - Describe the intent of each version
-    - Document key differences between each version
+<!-- TODO (#174) https://git.aspn.us/pntos/pntos-python/-/issues/174 -->
