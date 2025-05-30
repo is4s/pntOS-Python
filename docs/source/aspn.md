@@ -23,9 +23,10 @@ In pntOS-python, the {py:obj}`Message<pntos.api.Message>` class functions as a c
 ```
 
 ```{dropdown} Where do ASPN messages get consumed?
-There are many places where ASPN messages are consumed and/or relayed to other components in pntOS. For example, the {py:obj}`Mediator<pntos.api.Mediator>` has a {py:obj}`process_pntos_message()<pntos.api.Mediator.process_pntos_message>` function that will relay a message to the system for processing, whereas a preprocessor may take in a message with {py:obj}`process_pntos_message()<pntos.api.Preprocessor.process_pntos_message>` and perform a function such as downsampling (which can effectively just be dropping messages). 
+There are many places where ASPN messages are consumed and/or relayed to other components in pntOS. For example, the {py:obj}`Mediator<pntos.api.Mediator>` has a {py:obj}`process_pntos_message()<pntos.api.Mediator.process_pntos_message>` function that will relay a message to the system for processing, whereas a preprocessor may take in a message with {py:obj}`process_pntos_message()<pntos.api.Preprocessor.process_pntos_message>` and perform a function such as downsampling (which can effectively just be dropping messages).
 
 Now, since ASPN messages are wrapped inside a pntOS `Message` as `AspnBase`, it is important for components expecting a specific ASPN type to check for that type upon the arrival of a `Message` (e.g. a plugin expecting IMU measurements should make sure incoming `Message` objects are wrapping a `MeasurementIMU` ASPN object).
 
-For more information on how data flows within pntOS-Python see [](./dataflow.md).
+<!-- TODO: Uncomment the below line once the section is written -->
+<!-- For more information on how data flows within pntOS-Python see [](./dataflow.md). -->
 ```
