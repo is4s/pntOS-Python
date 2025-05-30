@@ -35,13 +35,13 @@ environment.
 
 Please ensure you have the following packages installed and available on your system:
 
-| Package              | Reason Needed                          |
-|----------------------|----------------------------------------|
-| Python 3.10 or later | Needed to run Cobra                    |
-| Git                  | Needed to acquire Cobra's dependencies |
-| Glib2                | Needed for LCM tools, not by Cobra     |
-| Java                 | Needed for LCM tools, not by Cobra     |
-| Tkinter              | Needed for plotting filter results     |
+| Package              | Reason Needed                      |
+|----------------------|------------------------------------|
+| Python 3.10 or later | Needed to run Cobra                |
+| Git                  | Needed to acquire dependencies     |
+| Glib2                | Needed for LCM tools, to run Apps  |
+| Java                 | Needed for LCM tools, to run Apps  |
+| Tkinter              | Needed for plotting filter results |
 
 Ubuntu 22.04 users can use the following command to install the above packages:
 
@@ -54,7 +54,7 @@ their operating system's package manager.
 
 ```{note}
 While Cobra has been tested and is known to work on many different operating systems, currently only Ubuntu 22.04
-is officially supported. We anticipate adding support for many more operating systems before our 1.0 release.
+and 24.04 is officially supported. We anticipate adding support for many more operating systems before our 1.0 release.
 ```
 
 You are now ready to set up your python environment in the next section.

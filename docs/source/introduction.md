@@ -12,7 +12,7 @@ The Python pntOS Application Programming Interface (API) is designed to address 
 situation. It has broken up the concept of a PNT sensor fusion system into its component pieces
 (called plugins) and defined an API to standardize their interactions, allowing for
 plugins to be individually swappable. In order to aid development of new plugins,
-[pntos-python](https://git.aspn.us/pntos/pntos-python) provides not only a [full Python
+[`pntos-python`](https://git.aspn.us/pntos/pntos-python) provides not only a [full Python
 API](./documentation/api.rst),
 but also a set of plugins and {term}`Apps<App>` to serve as a reference implementation
 (called {term}`Cobra`).
@@ -34,7 +34,7 @@ operating system in the sense of a kernel. For more information, see {ref}`is-pn
 
 ## High Level Overview of Python pntOS
 
-At the toplevel, the Python pntOS API defines a set of plugins that collectively: accept sensor data from various sensors,
+At the top-level, the Python pntOS API defines a set of plugins that collectively: accept sensor data from various sensors,
 perform sensor fusion on the sensor data, and finally produce a resulting navigation solution. 
 This concept is illustrated below, with an example experimental setup where pntOS is receiving and processing
 data from three sensors and producing a fused navigation solution:
@@ -49,23 +49,23 @@ non-ASPN sensor data is available.
 
 ```{note}
 All navigation data used internally by Python pntOS plugins must be ASPN-formatted (with exceptions
-made for truly exceptional use cases); thus, the cleanest way to send data into pntOS 
+made for truly exceptional use cases); thus, the cleanest way to send data into Python pntOS 
 is in the ASPN format, as shown by the "ASPN Native Sensor" in the figure. However, most
 sensors do not output ASPN data natively, and such  non-ASPN sensor data needs to be converted to ASPN before
 it can be used by pntOS internally. This conversion can happen in two places:
 
-1. In-between the sensor and pntOS, by using an ASPN adapter that intercepts the data and converts it
+1. In-between the sensor and Python pntOS, by using an ASPN adapter that intercepts the data and converts it
   to ASPN, as shown by the top sensor in the above figure. 
 2. Inside Python pntOS, there is a plugin called the [Transport Plugin](./plugins/transport_plugin.md), which is designed to
   accept non-ASPN sensor data off the wire and convert it to ASPN for use by the other pntOS plugins. 
-  The middle sensor in the figure above sends proprietary sensor data directly into pntOS, so its data would need
-  to be converted into ASPN by a [Transport Plugin](./plugins/transport_plugin.md) inside pntOS. 
-  We'll learn more about the transport plugin and how it converts incoming data to ASPN in the 
+  The middle sensor in the figure above sends proprietary sensor data directly into Python pntOS, so its data would need
+  to be converted into ASPN by a [Transport Plugin](./plugins/transport_plugin.md) inside Python pntOS. 
+  We'll learn more about the Transport Plugin and how it converts incoming data to ASPN in the 
   [tour of Python pntOS](#a-tour-of-python-pntos).
 
 ```
 
-Now that we've covered what pntOS' top-level objectives are, we will shift gears and take
+Now that we've covered the top-level objectives of pntOS, we will shift gears and take
 a brief tour of Python pntOS, walking through a Python pntOS system and examining
 how Python pntOS decomposes the "sensor data in, sensor fusion solution out" problem into a set of
 isolated plugins.
@@ -101,11 +101,6 @@ section we will walk through how:
   and processes it into a solution, and makes the PNT solution available to anyone who calls 
   {py:obj}`OrchestrationPlugin.request_solutions()<pntos.api.OrchestrationPlugin.request_solutions()>`.
 
-
-You can find more details about the {term}`Cobra` implementations of
-each of these plugins in the [Plugin Reference](./plugins.md) section of these docs.
-
-
 ### The App
 
 All Python pntOS solutions start with an {term}`App`. In Python pntOS terminology, an {term}`App` consists 
@@ -135,7 +130,7 @@ Most apps will look very similar to each other, with the only changes being whic
 decided to use and what config stanzas it needs. You can find an example of a full-fledged {term}`App` that performs
 GPS/INS sensor fusion from sensor data it receives from an LCM network bus
 [here](https://git.aspn.us/pntos/pntos-python/-/blob/main/apps/fusion_gps_ins/fusion_gps_ins.py?ref_type=heads).
-For instructions on how to run this example app, see [running an app](first_app.md).
+For instructions on how to run this example app, see [Running Your First App](first_app.md).
 
 ### Implementing Our Own Custom App
 
@@ -178,7 +173,7 @@ my_controller = SimpleControllerPlugin("My Controller Name")
 other_plugin_list = [my_orchestration, my_transport, my_registry, my_logging]
 
 # Give the controller control, and pass it the list of other plugins
-my_controller.take_control(other_plugin_list)
+my_controller.take_control(plugins=other_plugin_list)
 ```
 
 ...and thats it! Once our {term}`App` calls
@@ -193,7 +188,7 @@ next stop on our tour.
 Once the {term}`App` has called {py:obj}`ControllerPlugin.take_control()<pntos.api.ControllerPlugin.take_control>`, 
 the {py:obj}`Controller Plugin<pntos.api.ControllerPlugin>` is
 responsible for all activity in the app going forward. The {py:obj}`Controller Plugin<pntos.api.ControllerPlugin>`
-has one method on it, namely {py:obj}`take_control()<pntos.api.ControllerPlugin.take_control>`, so implementing
+has one method on it called {py:obj}`take_control()<pntos.api.ControllerPlugin.take_control>`, so implementing
 that method is all that is needed to fully implement a {py:obj}`Controller Plugin<pntos.api.ControllerPlugin>`. 
 Thus, we will turn out attention towards what is required to implement 
 the {py:obj}`take_control()<pntos.api.ControllerPlugin.take_control>` method.
@@ -265,7 +260,7 @@ we might pass it into the {py:obj}`Orchestration Plugin<pntos.api.OrchestrationP
 The answer lies in the mediator, and the {py:obj}`init_plugin()<pntos.api.CommonPlugin.init_plugin>` call in Step 0
 that we overlooked.
 
-### The Mediator and init_plugin
+### The Mediator and `init_plugin`
 
 In Python pntOS, plugins do not ever directly communicate with each other. Instead, when the 
 {py:obj}`Controller Plugin<pntos.api.ControllerPlugin>` receives a list of plugins as a parameter to its
@@ -288,12 +283,12 @@ Mediators are so named because they implement the computer science [mediator des
 pattern](https://en.wikipedia.org/wiki/Mediator_pattern) concept. They represent an abstraction of the
 middleware between plugins, and allow plugins to be used in a variety of concurrency models (multi-threaded,
 single-threaded, coroutines, distributed computing, etc.) without the plugin knowing or caring how
-comms between plugins is actually being implemented. While the inversion-of-control that comes with
+communications between plugins is actually being implemented. While the inversion-of-control that comes with
 using a Mediator pattern adds complexity, it is necessary to support swappable/pluggable concurrency models.
 ```
 
 Because the design of pntOS is such that all plugins must communicate with other plugins via the
-{py:obj}`Mediator<pntos.api.Mediator>`, that means that our previous figure actually should look like
+{py:obj}`Mediator<pntos.api.Mediator>`, that means that our previous figure actually should look like:
 
 
 ```
@@ -313,9 +308,7 @@ into the next stage. In order to understand how to do that, it would be helpful 
 how the {py:obj}`Transport Plugin<pntos.api.TransportPlugin>`
 is implemented and how it delivers data to its {py:obj}`Mediator<pntos.api.Mediator>`. Thus, 
 let's take a detour and look at how a simple {py:obj}`Transport Plugin<pntos.api.TransportPlugin>`
-is implemented, and then we'll return to the implementation of
-{py:obj}`take_control()<pntos.api.ControllerPlugin.take_control>` in a minute,
-armed with that knowledge and better prepared to implement Step 2 of the
+is implemented, and then, armed with that knowledge, we'll return to Step 2 of the
 {py:obj}`take_control()<pntos.api.ControllerPlugin.take_control>` method.
 
 ### Understanding the Transport Plugin
@@ -412,7 +405,7 @@ message, then pass the {py:obj}`pntos.api.Message<pntos.api.Message>` into
 {py:obj}`Mediator.process_pntos_message(message)<pntos.api.Mediator.process_pntos_message>`. The sensor data
 will now be delivered to the {py:obj}`Mediator<pntos.api.Mediator>` and the 
 {py:obj}`Transport Plugin<pntos.api.TransportPlugin>` can move on to the next sensor data in its loop (or
-go back to waiting for data from the wire, for networked {py:obj}`Transport Plugins<pntos.api.TransportPlugin>`)
+go back to waiting for data from the wire, for networked {py:obj}`Transport Plugins<pntos.api.TransportPlugin>`).
 
 ### A Simple Transport Plugin Example
 
@@ -427,7 +420,7 @@ We can see from the source that it is very similar to the simple approach we've 
 - Saves off its {py:obj}`Mediator<pntos.api.Mediator>` in its
   {py:obj}`init_plugin()<pntos.api.CommonPlugin.init_plugin>` method
 - Implements the {py:obj}`TransportPlugin.start_listening()<pntos.api.TransportPlugin.start_listening>`
-  as a `while` loop that sends a all-zeros dummy data set into the {py:obj}`Mediator<pntos.api.Mediator>`.
+  as a `while` loop that sends an all-zeros dummy data set into the {py:obj}`Mediator<pntos.api.Mediator>`.
 - Implements {py:obj}`TransportPlugin.stop_listening()<pntos.api.TransportPlugin.stop_listening>`
   as a boolean that interrupts the `while` loop in 
   {py:obj}`TransportPlugin.start_listening()<pntos.api.TransportPlugin.start_listening>`.
@@ -581,7 +574,7 @@ Next, we walked through how a simple {py:obj}`Transport Plugin<pntos.api.Transpo
 could be implemented that delivers received data from the wire into its {py:obj}`Mediator<pntos.api.Mediator>`, 
 and then we implemented a {py:obj}`Mediator<pntos.api.Mediator>` that forwarded that data from the transport into the
 {py:obj}`OrchestrationPlugin.process_pntos_message<pntos.api.OrchestrationPlugin.process_pntos_message>` method.
-we then assumed that the {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` would do something with
+We then assumed that the {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` would do something with
 the data it was sent, and when we later called 
 {py:obj}`request_solutions()<pntos.api.OrchestrationPlugin.request_solutions()>`
 on the {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` it would return a solution.
@@ -623,24 +616,24 @@ fusion or filtering it sees fit to do internally. Separately, the controller (or
 the {py:obj}`Mediator.request_solutions<pntos.api.Mediator.request_solutions>` method on their 
 {py:obj}`Mediator<pntos.api.Mediator>`) will ask the orchestration plugin for a solution at a given time
 by calling {py:obj}`OrchestrationPlugin.request_solutions<pntos.api.OrchestrationPlugin.request_solutions>`. Thus
-the goal of a {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` is to write an algorithm that accepts
+the goal of an {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` is to write an algorithm that accepts
 a continuous stream of data and produced filter solutions asynchronously at some later time.
 
 Because the {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` is the heart of the navigation
 algorithm being used by Python pntOS, it is a very open ended plugin. The design of Python pntOS is to
 allow for a flexible architecture that enables any kind of navigation solution to be developed. For example,
 one classical way to implement the {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` would be via an
-extended Kalman filter (EKF), which propagates and updates to each measurement as they are received. (optionally
+extended Kalman filter (EKF), which propagates and updates to each measurement as it is received. (optionally
 with some amount of buffering or re-ordering messages internally). In this case, the 
 {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` would likely want to buffer solutions that the EKF
 produced, and when a {py:obj}`OrchestrationPlugin.request_solutions<pntos.api.OrchestrationPlugin.request_solutions>`
 came in, the plugin would look for the nearest solution and return it (potentially after interpolation to the 
-requested time). Alternatively, someone could write an advanced algorithm, that produces
+requested time). Alternatively, someone could write an advanced algorithm that produces
 solutions completely differently; for example, a neural network that takes in measurements as context and produces
 solutions from a set of trained weights. Because of the vast number of ways that an
-{py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` could be implemented, which is equal to the number
-of ways a navigation solution could be produced, range from trivial single-filter EKF approaches to
-multi-model adaptive estimation (MMAE) multi-filter approaches with integrity and beyond.
+{py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` could be implemented, there is no one "correct"
+way to write one. Everything from trivial single-filter EKF approaches to
+multi-model adaptive estimation (MMAE) multi-filter approaches that include integrity are supported, and beyond.
 
 ### Implementing a Custom Orchestration Plugin
 
@@ -735,7 +728,7 @@ def process_pntos_message(self, message: Message, sequenced: bool) -> None:
 
 In this trivial example, we take the data in and print its contents to the screen. However,
 in a real {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` this is where we would perform
-sensor fusion, taking the {py:obj}`pntOS message<pntos.api.Message>` we just received and sending into our
+sensor fusion, taking the {py:obj}`pntOS message<pntos.api.Message>` we just received and sending it into our
 algorithm, e.g. performing an update in an EKF. The results of this processing should be saved off on `self`
 and not immediately used (we will use it in the next method).
 
@@ -751,14 +744,15 @@ def request_solutions(
 ```
 
 This is where we return a solution to the caller. A caller may request a solution at a set of different times,
-and so our `solution_times` parameter is a list of timestamps that the caller wants out solution at.
-The `filter_description` parameter where callers can request different types of solutions. For example,
+and so our `solution_times` parameter is a list of timestamps that the caller wants our solution at.
+The `filter_description` parameter is where callers can request different types of solutions. For example,
 we might offer our "best" solution as one that uses all the available information, but also offer a solution
-that only uses inertial data. However, all {py:obj}`Orchestration Plugins<pntos.api.OrchestrationPlugin>`
+that only uses inertial data. No matter the `filter_description` parameter however, all 
+{py:obj}`Orchestration Plugins<pntos.api.OrchestrationPlugin>`
 reserve the right to return `None` here, which indicates that they do not have a good solution for the requested
 times. This can happen if the `solution_times` fall outside the range where we have computed a solution, for
-example. We'll return `None` for our trivial example here, but to fill out our example, we should use the
-solution we previously computed and return it here, if we have a solution at or near the requested time.
+example. We'll return `None` for our trivial example here, but to fill out our [custom app](#implementing-our-own-custom-app),
+we should use the solution we previously computed and return it in this function, if we have a solution at or near the requested time.
 
 That brings us to our next method:
 
