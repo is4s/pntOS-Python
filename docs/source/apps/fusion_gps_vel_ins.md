@@ -48,7 +48,7 @@ Now you've updated `fusion_gps_ins.py` to match `fusion_gps_vel_ins.py`. But wha
 
 ## Changes to SimpleGpsOrchestrationPlugin
 
-Similar to how `fusion_gps_vel_ins.py` starts as a clone of `fusion_gps_ins.py` , `SimpleGpsVelOrchestrationPlugin` starts as a clone of `SimpleGpsOrchestrationPlugin` and is modified to use an extra velocity measurement processor. Let's take a look at these changes.
+Similar to how `fusion_gps_vel_ins.py` starts as a clone of `fusion_gps_ins.py` , `SimpleGpsVelOrchestrationPlugin` starts as a clone of `SimpleGpsOrchestrationPlugin` and is modified to add a velocity measurement processor. Let's take a look at these changes.
 
 First, we'll need to update some of the fixed measurement processor parameters, adding new values for the
 measurement processor:
@@ -92,7 +92,7 @@ More interestingly, instead of always routing measurement data to one measuremen
 
 ```diff
          self.measurement_channels: dict[str, str] = {
--            orch_config.gps_channel: GPS_MEASUREMENT_PROCESSOR_LABEL
+             orch_config.gps_channel: GPS_MEASUREMENT_PROCESSOR_LABEL
 +            orch_config.velocity_channel: VEL_MEASUREMENT_PROCESSOR_LABEL,
 ```
 
