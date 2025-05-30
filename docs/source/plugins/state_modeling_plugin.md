@@ -32,9 +32,9 @@ states and a model to propagate those states.
 ## Virtual State Block
 
 Consider the case where a given {py:obj}`State Block<pntos.api.StandardStateBlock>`
-provides three Latitude-Longitude-Altitude (LLH) states and a given {py:obj}`Measurement
+provides three latitude-longitude-altitude (LLH) states and a given {py:obj}`Measurement
 Processor<pntos.api.StandardMeasurementProcessor>` provides a model to update three
-Earth Centered, Earth Fixed (ECEF) position states. Normally this {py:obj}`Measurement
+Earth-centered, Earth-fixed (ECEF) position states. Normally this {py:obj}`Measurement
 Processor<pntos.api.StandardMeasurementProcessor>` and {py:obj}`State
 Block<pntos.api.StandardStateBlock>` would be incompatible with each other, but a
 {py:obj}`Virtual State Block<pntos.api.VirtualStateBlock>` that converts between ECEF

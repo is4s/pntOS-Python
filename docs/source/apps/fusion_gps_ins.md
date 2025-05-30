@@ -4,13 +4,13 @@ Welcome to the first of the {term}`Cobra` tutorial {term}`apps <App>`!
 
 ## Overview
 
-A {term}`Cobra` {term}`app <App>` consists of a single python script which imports
+A {term}`Cobra` {term}`app <App>` consists of a single Python script which imports
 plugins, instantiates plugins, sets config, and calls
 {py:obj}`take_control() <pntos.api.ControllerPlugin.take_control>` on the controller
 plugin to run the plugins.
 
-This app is meant to be a simple demonstration of an app that accomplishes sensor 
-fusion between two sensors. In this case it is the fusion between GPS position 
+This app is meant to be a simple demonstration of an app that accomplishes sensor
+fusion between two sensors. In this case it is the fusion between GPS position
 measurements and IMU readings using a simple set of {term}`Cobra` plugins. Each subsequent app
 will build on the previous app(s) with a small tweak or expanded capability to
 walk you through the process of building increasingly complex sensor-fusion and
@@ -24,7 +24,7 @@ to follow along. Let's get started by examining how you import elements from the
 
 ### Imports
 
-Assuming we've [installed](../installation.md) the `pntos` python module, we can import
+Assuming we've [installed](../installation.md) the `pntos` Python module, we can import
 {term}`Python pntOS API` or {term}`Cobra` objects from a few different submodules within
 the `pntos` module:
 
@@ -71,8 +71,8 @@ check out where the app imports the following {term}`Cobra` plugins:
 :end-at: ")"
 :lineno-match:
 ```
-Notice that each of the imports from `pntos.cobra` is a plugin as indicated by the 
-suffix of each object name. We'll walk through what each of these plugins are doing 
+Notice that each of the imports from `pntos.cobra` is a plugin as indicated by the
+suffix of each object name. We'll walk through what each of these plugins are doing
 further along in [](#plugins-overview). For now, on to the config imports.
 
 #### Cobra Config Imports
@@ -111,10 +111,10 @@ uses to unpack these objects into the registry at the specified group, and allow
 plugins to retrieve config objects back from the registry.
 
 ```{note}
-While these helper functions can make it appear that we are storing unsupported types 
-in the registry (see {py:obj}`RegistryValueTypeUnion<pntos.api.RegistryValueTypeUnion>` 
-for the supported registry types), the reality is that these utility functions unpack the 
-dataclass fields into types the registry does support. Thus, the config dataclasses only 
+While these helper functions can make it appear that we are storing unsupported types
+in the registry (see {py:obj}`RegistryValueTypeUnion<pntos.api.RegistryValueTypeUnion>`
+for the supported registry types), the reality is that these utility functions unpack the
+dataclass fields into types the registry does support. Thus, the config dataclasses only
 support the types specified in the documentation for {py:obj}`config_to_registry
 <pntos.cobra.config.config_to_registry>` and {py:obj}`config_from_registry
 <pntos.cobra.config.config_from_registry>`.
@@ -135,7 +135,7 @@ Here we populate a list of config objects with initial values and assign them a 
 Normally some of these values (such as the `ManualAlignmentConfig` parameters) would be
 estimated by an {py:obj}`InitializationPlugin <pntos.api.InitializationPlugin>` or
 through some other mechanism, but for the sake of simplicity in this first app, these
-values are hard-coded here - easy for us to see.
+values are hard-coded here and easy for us to see.
 
 ```{note}
 Prepending the group name with `config/*` is good practice for these objects so that
@@ -157,8 +157,8 @@ Now that we have our config set up in `my_config`, let's look at instantiating o
 ### Instantiate Plugins
 
 Now we have everything we need to get our plugins running. All that's left is:
-1. Instantiate the [controller plugin](../plugins/controller_plugin.md)
-2. Generate a list of plugin objects we want this app to run
+1. Instantiate the [controller plugin](../plugins/controller_plugin.md).
+2. Generate a list of plugin objects we want this app to run.
 3. Call {py:obj}`init_plugin() <pntos.api.CommonPlugin.init_plugin>` on the controller plugin.
 4. Hand the list of plugins off to the controller with {py:obj}`take_control() <pntos.api.ControllerPlugin.take_control>`.
 
@@ -187,7 +187,7 @@ inherit. However, there are two plugins which take an extra input here at instan
 | Plugin                                                                  | Extra Arg    | Extra Arg Description                                                                                                                                                                                                                                                                                                                                                                                                                             |
 | ----------------------------------------------------------------------- | --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | {py:obj}`SimpleLoggingPlugin<pntos.cobra.SimpleLoggingPlugin.__init__>` |  `global_log_level`   | Takes a global log level parameter to select which log levels to display. For more info, see [](../plugins/logging_plugin.md).|
-| {py:obj}`SimpleRegistryPlugin<pntos.cobra.SimpleRegistryPlugin>`        |   `config`  | Takes in a list of config objects on instantiation to populate new registries. For more information on registry plugins, see [](../plugins/registry_plugin.md)               |
+| {py:obj}`SimpleRegistryPlugin<pntos.cobra.SimpleRegistryPlugin>`        |   `config`  | Takes in a list of config objects on instantiation to populate new registries. For more information on registry plugins, see [](../plugins/registry_plugin.md).               |
 ```
 
 We'll explore the roles of all these plugins in the app later in [](#plugins-overview), but for now

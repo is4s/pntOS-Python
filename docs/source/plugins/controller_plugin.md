@@ -36,19 +36,14 @@ communicate back to the {py:obj}`Controller Plugin<pntos.api.ControllerPlugin>`,
 invoking the function pointers on their {py:obj}`Mediator<pntos.api.Mediator>`.
 
 The {py:obj}`Mediator<pntos.api.Mediator>` therefore is where concurrency and
-synchronization are decided. Continuing the example of a multithreaded implementation
+synchronization are decided. In the case of a multithreaded implementation
 where each plugin is in a separate thread, the {py:obj}`Controller
 Plugin<pntos.api.ControllerPlugin>` might implement a simple
 {py:obj}`Mediator<pntos.api.Mediator>` by creating and storing internally a set of mutex
 locks, one per thread, and then locking each call to a
 {py:obj}`Mediator<pntos.api.Mediator>` function using a mutex. The
 {py:obj}`Mediator<pntos.api.Mediator>` function calls would then consist of locking
-logic followed by routing calls from one plugin to another. In our current example
-illustrated in the above diagram, we are routing data the {py:obj}`Transport
-Plugin<pntos.api.TransportPlugin>` received from a sensor through the
-{py:obj}`Mediator<pntos.api.Mediator>`, which in turn (after synchronization according
-to its concurrency model) sends the data on to the {py:obj}`Orchestration
-Plugin<pntos.api.OrchestrationPlugin>`.
+logic followed by routing calls from one plugin to another.
 
 As another example, suppose instead we were writing a multiprocessed controller. In this
 case, the controller might ``fork()`` to put plugins into their own processes, and then

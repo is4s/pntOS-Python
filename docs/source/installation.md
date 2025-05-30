@@ -1,6 +1,6 @@
 # Installation Guide
 
-This guide will walk you through setting up a python virtual environment for running
+This guide will walk you through setting up a Python virtual environment for running
 the example {term}`apps <App>` which utilize {term}`Cobra` plugins.
 
 ## Authentication
@@ -57,7 +57,7 @@ While Cobra has been tested and is known to work on many different operating sys
 and 24.04 is officially supported. We anticipate adding support for many more operating systems before our 1.0 release.
 ```
 
-You are now ready to set up your python environment in the next section.
+You are now ready to set up your Python environment in the next section.
 
 ### Python Environment Setup
 
@@ -150,7 +150,7 @@ and you should get output of the form
 not the case, please see [Authentication](#authentication) for instructions on setting that
 environment variable.
 
-### Could not Find Package
+### Could Not Find Package
 
 An error like:
 
@@ -162,7 +162,7 @@ is caused by not passing `--extra-index-url=$UV_INDEX` into `pip install`, or th
 `UV_INDEX` not being set. Please see [Authentication](#authentication) for instructions on setting that
 environment variable.
 
-### Errors when Building NavToolkit from Source
+### Errors When Building NavToolkit From Source
 
 When running a `pip install -r` command to install this project, one of the
 dependencies installed is NavToolkit. The system will attempt to download and install a prebuilt

@@ -10,7 +10,7 @@ It may be easier to think of it with an analogy. Consider two people having a co
 ASPN standards are represented by a set of YAML files. These sets are what make up ASPN versions and can be used as a basis for language specific implementations of ASPN. For example, the ASPN23 YAML files were used by the IS4S team to construct various implementations such as ASPN23-C, ASPN23-Python, ASPN23-LCM, and others. These respective emulations have their own methods of replicating the standards; C and LCM both use structs whereas Python would use classes. Ultimately, they are all implementing the same thing, though at times may have minor differences such ASPN23-LCM adding LCM specific fields.
 ```
 
-```{dropdown} What is the difference between ASPN-Python and the Python Flavor of ASPN-LCM?
+```{dropdown} What is the difference between ASPN-Python and the Python flavor of ASPN-LCM?
 First lets clearly define what each of these are. ASPN-Python is a pure python implementation of the ASPN YAMLs. For each ASPN message in those YAMLs, there is a Python class designed to be as compliant as possible with the specific ASPN version standard it is constructed around. On the other hand, ASPN-LCM aims to achieve the same goal while also adding some LCM related fields to its structs. The "Python flavor" is simply the code-gen done on the base ASPN-LCM to make it more accessible through Python. So, the ASPN-LCM Python flavor is just an interface for users that plan on handling ASPN messages and relaying or receiving them through LCM.
 ```
 

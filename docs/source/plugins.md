@@ -19,7 +19,7 @@ Plugin](./plugins/orchestration_plugin.md) can optionally incorporate other plug
 a sensor fusion filter. These optional plugins include:
 * [**Fusion Plugin**](./plugins/fusion_plugin.md): Used by the [Orchestration
 Plugin](./plugins/orchestration_plugin.md) to generate a sensor fusion engine. The [Orchestration
-Plugin](./plugins/orchestration_plugin.md) can use components from the following to
+Plugin](./plugins/orchestration_plugin.md) can use components from the following
 plugins to assemble the fusion engine.
     * [**Fusion Strategy Plugin**](./plugins/fusion_strategy_plugin.md): Provides an
       estimation strategy to the fusion engine.

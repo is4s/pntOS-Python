@@ -2,7 +2,7 @@
 
 ## Motivation
 
-Many Position, Navigation, and Timing ({term}`PNT`) systems are [stovepipe
+Many position, navigation, and timing ({term}`PNT`) systems are [stovepipe
 systems](https://en.wikipedia.org/wiki/Stovepipe_system) that are designed for a
 specific configuration of sensors to solve a particular {term}`PNT` need. However,
 reliance on {term}`PNT` in industry is evolving rapidly, and GNSS-challenged
@@ -10,7 +10,7 @@ environments are becoming more commonplace. Complementary {term}`PNT` approaches
 mitigate these limitations, but changing current {term}`PNT` systems is a slow and
 expensive process.
 
-The Python pntOS Application Programming Interface (API) is designed to address this
+The Python pntOS application programming interface (API) is designed to address this
 situation. It has broken up the concept of a {term}`PNT` sensor fusion system into its
 component pieces (called plugins) and defined an API to standardize their interactions,
 allowing for plugins to be individually swappable. In order to aid development of new
@@ -91,7 +91,7 @@ We will start at the bottom of the figure with the {term}`App` (which is the ent
 Python pntOS system) and work our way through the control flow. In particular, in this
 section we will walk through how:
 
-1. The {term}`App` kick starts the system, then transfers control to the
+1. The {term}`App` kickstarts the system, then transfers control to the
   {py:obj}`Controller Plugin<pntos.api.ControllerPlugin>`, passing it a list of plugins to use.
 2. The {py:obj}`Controller Plugin<pntos.api.ControllerPlugin>` takes in the list of plugins and
   wires them up to be able to communicate with each other via the
@@ -347,10 +347,10 @@ this tour:
   its other methods.
 - {py:obj}`TransportPlugin.start_listening()<pntos.api.TransportPlugin.start_listening>`, which is called
   by the controller when this {py:obj}`Transport Plugin<pntos.api.TransportPlugin>` should start listening to its
-  data source
+  data source.
 - {py:obj}`TransportPlugin.stop_listening()<pntos.api.TransportPlugin.stop_listening>`, which is called
   by the controller when this {py:obj}`Transport Plugin<pntos.api.TransportPlugin>` should stop listening to its
-  data source
+  data source.
 
 ```{note}
 Every plugin in Python pntOS is guaranteed to have its
@@ -454,8 +454,7 @@ method as the following four steps:
 
 0. First call {py:obj}`init_plugin()<pntos.api.CommonPlugin.init_plugin>` on both
   {py:obj}`my_transport<pntos.api.TransportPlugin>` and
-  {py:obj}`my_orchestration<pntos.api.OrchestrationPlugin>` plugins before using them
-  (more on why we need to do this in a minute).
+  {py:obj}`my_orchestration<pntos.api.OrchestrationPlugin>` plugins before using them.
 1. Tell {py:obj}`my_transport<pntos.api.TransportPlugin>` to start listening to its network bus,
   by calling {py:obj}`my_transport.start_listening()<pntos.api.TransportPlugin.start_listening>`.
 2. Take the sensor data received from {py:obj}`my_transport<pntos.api.TransportPlugin>` and send
@@ -512,7 +511,7 @@ is similar to the approach we've described above, namely:
   which is our Step 1 above.
 - The [implementation of SimpleMediator.process_pntos_message](https://git.aspn.us/pntos/pntos-python/-/blob/main/pntos-cobra/src/pntos/cobra/simple_controller/SimpleMediator.py#L74)
   does some simple error checking and then
-  [passes messages received from the Transport Plugin into the orchestration plugin's process_pntos_message](https://git.aspn.us/pntos/pntos-python/-/blob/main/pntos-cobra/src/pntos/cobra/simple_controller/SimpleMediator.py#L91),
+  [passes messages received from the transport plugin into the orchestration plugin's process_pntos_message](https://git.aspn.us/pntos/pntos-python/-/blob/main/pntos-cobra/src/pntos/cobra/simple_controller/SimpleMediator.py#L91),
   which is our Step 2 above.
 
 One notable difference in {py:obj}`SimpleControllerPlugin<pntos.cobra.SimpleControllerPlugin>` compared to the approach
@@ -523,7 +522,7 @@ however the {py:obj}`SimpleControllerPlugin<pntos.cobra.SimpleControllerPlugin>`
 {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` but does not force the
 {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` to produce a solution. Instead, it allows other plugins to
 request a solution from the {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>`. For an example of where
-another plugin requests a solution and sends it out onto the network bus as Python pntOS' solution, see
+another plugin requests a solution and sends it out onto the network bus as Python pntOS's solution, see
 [the Aspn23LcmTransportPlugin](https://git.aspn.us/pntos/pntos-python/-/blob/main/pntos-cobra/src/pntos/cobra/Aspn23LcmTransportPlugin.py?ref_type=heads#L115).
 
 <!-- TODO: Fix the fact that step3 in our example doesn't actually do what our walkthrough expects -->
@@ -622,11 +621,11 @@ the goal of an {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` is 
 a continuous stream of data and produces filter solutions asynchronously at some later time.
 
 Because the {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` is the heart of the navigation
-algorithm being used by Python pntOS, it is a very open-ended plugin. The design of Python pntOS
-allows for a flexible architecture that enables any kind of navigation solution to be developed. For example,
+algorithm being used by Python pntOS, it is a very open-ended plugin. The design of Python pntOS is to
+allow for a flexible architecture that enables any kind of navigation solution to be developed. For example,
 one classical way to implement the {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` would be via an
-extended Kalman filter (EKF), which propagates and updates to each measurement as it is received. (Optionally
-with some amount of buffering or re-ordering messages internally). In this case, the 
+extended Kalman filter (EKF), which propagates and updates to each measurement as it is received (optionally
+with some amount of buffering or re-ordering messages internally). In this case, the
 {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` would likely want to buffer solutions that the EKF
 produced, and when a {py:obj}`OrchestrationPlugin.request_solutions<pntos.api.OrchestrationPlugin.request_solutions>`
 came in, the plugin would look for the nearest solution and return it (potentially after interpolation to the
@@ -698,7 +697,7 @@ def __init__(self, identifier: str):
     self.identifier = identifier
 ```
 
-simply takes in a name for this plugin that is human readable and stores it off. The next method:
+simply takes in a name for this plugin that is human-readable and stores it off. The next method:
 
 ```Python
 def init_orchestration_plugin(

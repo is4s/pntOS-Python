@@ -2,7 +2,7 @@
 
 The `fusion_gps_vel_ins.py` app is very similar to the `fusion_gps_ins.py` app. It's essentially a clone with one
 significant difference: the addition of a velocity update. This tutorial will walk through transforming the
-`fusion_gps_ins.py` app into the `fusion_gps_vel_ins.py` app in order to demonstrate how to start with an Cobra app and
+`fusion_gps_ins.py` app into the `fusion_gps_vel_ins.py` app in order to demonstrate how to start with a Cobra app and
 hack it into what you desire.
 
 ## Changes to the App Script
