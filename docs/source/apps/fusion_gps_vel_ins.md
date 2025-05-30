@@ -40,7 +40,7 @@ Then update the script so the new Orchestration plugin is created instead of the
          group='config/orchestration',
 +        velocity_channel='/sensor/ublox-ZED-F9T/velocity',
      ),
- ]  # End Config
+ ]
 ```
 
 Now you've updated `fusion_gps_ins.py` to match `fusion_gps_vel_ins.py`. But what's this new
