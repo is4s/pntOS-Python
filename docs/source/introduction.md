@@ -615,9 +615,9 @@ method, and it will process those messages during the duration of those calls, d
 fusion or filtering it sees fit to do internally. Separately, the controller (or some other plugin, via calling
 the {py:obj}`Mediator.request_solutions<pntos.api.Mediator.request_solutions>` method on their 
 {py:obj}`Mediator<pntos.api.Mediator>`) will ask the orchestration plugin for a solution at a given time
-by calling {py:obj}`OrchestrationPlugin.request_solutions<pntos.api.OrchestrationPlugin.request_solutions>`. Thus
+by calling {py:obj}`OrchestrationPlugin.request_solutions<pntos.api.OrchestrationPlugin.request_solutions>`. Thus,
 the goal of an {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` is to write an algorithm that accepts
-a continuous stream of data and produced filter solutions asynchronously at some later time.
+a continuous stream of data and produces filter solutions asynchronously at some later time.
 
 Because the {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` is the heart of the navigation
 algorithm being used by Python pntOS, it is a very open ended plugin. The design of Python pntOS is to
