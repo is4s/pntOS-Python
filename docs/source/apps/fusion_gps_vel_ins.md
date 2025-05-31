@@ -92,7 +92,7 @@ More interestingly, instead of always routing measurement data to one measuremen
 
 ```diff
          self.measurement_channels: dict[str, str] = {
-             orch_config.gps_channel: GPS_MEASUREMENT_PROCESSOR_LABEL
+             orch_config.gps_channel: GPS_MEASUREMENT_PROCESSOR_LABEL,
 +            orch_config.velocity_channel: VEL_MEASUREMENT_PROCESSOR_LABEL,
 ```
 
