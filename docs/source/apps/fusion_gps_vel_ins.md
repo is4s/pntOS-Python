@@ -126,23 +126,23 @@ Then add a case to the logic that looks for the available measurement processors
 Next, add in some checking to make this robust to future changes:
 
 ```diff
-                covariance=(np.eye(fogm_block.num_states) * 9.0),
-            )
-+       if gps_processor is None:
-+           assert provider is not None
-+           self._log(
-+               LoggingLevel.ERROR,
-+               f'Unable to find measurement processor "{GPS_MEASUREMENT_PROCESSOR_ID}" -'
-+               + f' cannot initialize filter. Available measurement processors: {provider.processor_identifiers}',
-+           )
-+           return
+         fusion_engine.add_measurement_processor(gps_processor)
+
++        if vel_processor is None:
++            assert provider is not None
++            self._log(
++                LoggingLevel.ERROR,
++                f'Unable to find measurement processor "{VEL_MEASUREMENT_PROCESSOR_ID}" -'
++                + f' cannot initialize filter. Available measurement processors: {provider.processor_identifiers}',
++            )
++            return
 ```
 
 Finally, right below where you added the last bit, add the measurement processor to the fusion
 engine so it can be used:
 
 ```diff
-+        fusion_engine.add_measurement_processor(gps_processor)
++        fusion_engine.add_measurement_processor(vel_processor)
 ```
 
 And we're done! We have now modified  `SimpleGpsOrchestrationPlugin`, turning it into `SimpleGpsVelOrchestrationPlugin`.
