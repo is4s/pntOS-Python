@@ -74,11 +74,11 @@ measurement processor:
 +VEL_MP_STATE_BLOCK_LABELS = [STATE_BLOCK_LABEL]
 ```
 
-Since the {py:obj}`StandardStateModelProvider` can provide multiple measurement processors,
+Since the {py:obj}`pntos.api.StandardStateModelProvider` can provide multiple measurement processors,
 `VEL_MEASUREMENT_PROCESSOR_ID` will be used to ensure we request the right measurement processor from the provider.
 
 `VEL_MEASUREMENT_PROCESSOR_LABEL` contains the label we'll give the new measurement processor once it has been created.
-This is a unique identifier that will help the {py:obj}`StandardFusionEngine` route velocity measurements to this
+This is a unique identifier that will help the {py:obj}`pntos.api.StandardFusionEngine` route velocity measurements to this
 measurement processor.
 
 `VEL_MEASUREMENT_PROCESSOR_CONFIG_GROUP` contains the group in the registry that the measurement processor can use to
@@ -110,7 +110,7 @@ add that information into the lookup table that the orchestration plugin:
 ```
 
 Now let's refactor the Orchestration plugin to actually create the measurement provider from the
-{py:obj}`StandardStateModelProvider`. First create a placeholder variable:
+{py:obj}`pntos.api.StandardStateModelProvider`. First create a placeholder variable:
 
 ```diff
          pinson_block = None

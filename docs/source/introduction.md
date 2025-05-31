@@ -102,7 +102,7 @@ section we will walk through how:
   {py:obj}`Transport Plugin<pntos.api.TransportPlugin>` to the
   {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>`.
 5. The {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` receives the sensor data
-  and processes it into a solution, then makes the PNT solution available to anyone who calls 
+  and processes it into a solution, then makes the PNT solution available to anyone who calls
   {py:obj}`OrchestrationPlugin.request_solutions()<pntos.api.OrchestrationPlugin.request_solutions()>`.
 
 ### The App
@@ -146,7 +146,7 @@ For the purposes of this tour, suppose we defined a new app that used five plugi
 | Transport Plugin     | A plugin that listens for sensor data from a network and converts it to ASPN format (if needed) |
 | Registry Plugin      | A plugin that stores key/value pairs, and comes pre-populated with values from a config file    |
 | Logging Plugin       | A plugin that takes errors/warnings and prints them to a log (e.g. the console)                 |
-| Controller Plugin    | A plugin that receives all the other plugins and takes over control from the App               | 
+| Controller Plugin    | A plugin that receives all the other plugins and takes over control from the App               |
 
 Furthermore, suppose we wanted to use off-the-shelf Cobra plugins for the transport, registry, logging, and controller
 plugins, but wanted to implement our own sensor fusion solution in a custom
@@ -193,8 +193,8 @@ Once the {term}`App` has called {py:obj}`ControllerPlugin.take_control()<pntos.a
 the {py:obj}`Controller Plugin<pntos.api.ControllerPlugin>` is
 responsible for all activity in the app going forward. The {py:obj}`Controller Plugin<pntos.api.ControllerPlugin>`
 has one method on it called {py:obj}`take_control()<pntos.api.ControllerPlugin.take_control>`, so implementing
-that method is all that is needed to fully implement a {py:obj}`Controller Plugin<pntos.api.ControllerPlugin>`. 
-Thus, we will turn our attention towards what is required to implement 
+that method is all that is needed to fully implement a {py:obj}`Controller Plugin<pntos.api.ControllerPlugin>`.
+Thus, we will turn our attention towards what is required to implement
 the {py:obj}`take_control()<pntos.api.ControllerPlugin.take_control>` method.
 
 
@@ -217,7 +217,7 @@ Let's suppose we wanted to start with the simplest possible implementation of
 {py:obj}`take_control()<pntos.api.ControllerPlugin.take_control>`, and so we decided to throw out
 `my_registry` (configuration) and `my_logging` (error logging) plugins for the moment. Then we would be left with two: A
 {py:obj}`Transport Plugin<pntos.api.TransportPlugin>` called `my_transport`, which _produces_ sensor data from the
-network, and an {py:obj}`Orchestration Plugin<pntos.api.Orchestration Plugin>` called `my_orchestration`, which
+network, and an {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` called `my_orchestration`, which
 _consumes_ sensor data and produces PNT solutions. Then the implementation of
 {py:obj}`take_control()<pntos.api.ControllerPlugin.take_control>` would ideally set up a pipeline that looked like this:
 
@@ -254,10 +254,10 @@ in our hand (it was passed in as a parameter) and we can directly call the
 {py:obj}`my_transport.start_listening()<pntos.api.TransportPlugin.start_listening>` method on it. Similarly,
 Step 3 is relatively straightforward, as we have the {py:obj}`my_orchestration<pntos.api.OrchestrationPlugin>`
 in our hand (it was passed in as a parameter) and we can directly call the
-{py:obj}`my_orchestration.request_solutions()<pntos.api.OrchestrationPlugin.request_solutions()>` method on it. However, 
+{py:obj}`my_orchestration.request_solutions()<pntos.api.OrchestrationPlugin.request_solutions()>` method on it. However,
 Step 2 requires us to receive data from the {py:obj}`Transport Plugin<pntos.api.TransportPlugin>` so that
-we can pass it into the {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>`'s 
-  {py:obj}`process_message()<pntos.api.OrchestrationPlugin.process_message()>`. How do we do that?
+we can pass it into the {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>`'s
+  {py:obj}`process_message()<pntos.api.OrchestrationPlugin.process_pntos_message()>`. How do we do that?
 
 The answer lies in the mediator, and the {py:obj}`init_plugin()<pntos.api.CommonPlugin.init_plugin>` call in Step 0
 that we overlooked.
@@ -462,9 +462,9 @@ method as the following four steps:
   {py:obj}`my_orchestration<pntos.api.OrchestrationPlugin>`'s
   {py:obj}`process_pntos_message()<pntos.api.OrchestrationPlugin.process_pntos_message>`, which accepts ASPN sensor data
   and processes it into a solution.
-3. Call {py:obj}`my_orchestration<pntos.api.OrchestrationPlugin>`'s 
-  {py:obj}`request_solutions()<pntos.api.OrchestrationPlugin.request_solutions()>`, which asks the 
-  {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` to return the PNT solution it has computed 
+3. Call {py:obj}`my_orchestration<pntos.api.OrchestrationPlugin>`'s
+  {py:obj}`request_solutions()<pntos.api.OrchestrationPlugin.request_solutions()>`, which asks the
+  {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` to return the PNT solution it has computed
   by utilizing all previously received data from Step 2.
 
 At the time, we knew how to implement Steps 1 and 3, but didn't understand how to implement Step 2.
@@ -496,10 +496,10 @@ of a {py:obj}`Controller Plugin<pntos.api.ControllerPlugin>` to demonstrate the 
 above, which is why it was chosen as the controller for our [custom app](#implementing-our-own-custom-app).
 The source code of the {py:obj}`SimpleControllerPlugin<pntos.cobra.SimpleControllerPlugin>` can be
 [found here](https://git.aspn.us/pntos/pntos-python/-/blob/main/pntos-cobra/src/pntos/cobra/simple_controller/SimpleControllerPlugin.py),
-along with its {py:obj}`SimpleMediator<pntos.cobra.SimpleMediator>`
+along with its {py:obj}`SimpleMediator<pntos.cobra.internal.SimpleMediator>`
 [here](https://git.aspn.us/pntos/pntos-python/-/blob/main/pntos-cobra/src/pntos/cobra/simple_controller/SimpleMediator.py).
 
-We can see from the source code that the {py:obj}`SimpleMediator<pntos.cobra.SimpleMediator>`
+We can see from the source code that the {py:obj}`SimpleMediator<pntos.cobra.internal.SimpleMediator>`
 is similar to the approach we've described above, namely:
 
 - In the [take_control](https://git.aspn.us/pntos/pntos-python/-/blob/main/pntos-cobra/src/pntos/cobra/simple_controller/SimpleControllerPlugin.py?ref_type=heads#L101)
@@ -535,7 +535,7 @@ the {py:obj}`Mediator<pntos.api.Mediator>` is where all concurrency and
 synchronization are decided. In the single-threaded case, the Mediator implementation
 can be relatively simple, but in the more advanced cases such as multi-processed
 or distributed, they can become quite complicated. For example, in a multi-threaded implementation
-where each plugin is in a separate thread but share a single 
+where each plugin is in a separate thread but share a single
 {py:obj}`Mediator<pntos.api.Mediator>`, the {py:obj}`Controller
 Plugin<pntos.api.ControllerPlugin>` might implement the single
 {py:obj}`Mediator<pntos.api.Mediator>` by creating and storing internally a set of mutex
@@ -547,7 +547,7 @@ locks (and therefore performance bottlenecks), a fine-grained locking strategy p
 and per-{py:obj}`Mediator<pntos.api.Mediator>` is likely desired, which will require
 additional complexity.
 
-In another example, 
+In another example,
 suppose instead we were writing a multi-processed controller. In this
 case, the controller might ``fork()`` to put plugins into their own processes, and then
 write a {py:obj}`Mediator<pntos.api.Mediator>` that opens IPC communication primitives
@@ -579,8 +579,8 @@ We then assumed that the {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPl
 the data it was sent, and when we later called
 {py:obj}`request_solutions()<pntos.api.OrchestrationPlugin.request_solutions()>`
 on the {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` it would return a solution.
-The last piece of the puzzle, then, is for us to implement an 
-{py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` that does exactly that: 
+The last piece of the puzzle, then, is for us to implement an
+{py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` that does exactly that:
 takes in sensor data and produces solutions.
 
 The {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` contains two methods of interest
@@ -638,7 +638,7 @@ multi-model adaptive estimation (MMAE) multi-filter approaches that include inte
 
 ### Implementing a Custom Orchestration Plugin
 
-In our {term}`App`, we were interested in our own custom {py:obj}`MyOrchestrationPlugin`. The outline of the
+In our {term}`App`, we were interested in our own custom `MyOrchestrationPlugin`. The outline of the
 simplest possible {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` would look like this:
 
 
@@ -797,15 +797,15 @@ In the previous section we developed the scaffolding for an
 we would need to pick a sensor fusion approach and implement it within
 {py:obj}`process_pntos_message<pntos.api.OrchestrationPlugin.process_pntos_message>`.
 
-The {py:obj}`SimpleOrchestrationPlugin<pntos.cobra.SimpleOrchestrationPlugin>` is designed to be a simple implementation
+The {py:obj}`SimpleGpsOrchestrationPlugin<pntos.cobra.SimpleGpsOrchestrationPlugin>` is designed to be a simple implementation
 of a {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` which demonstrates how one might write an
 {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` using a single EKF to do GPS/INS. The source code
-of the {py:obj}`SimpleOrchestrationPlugin<pntos.cobra.SimpleOrchestrationPlugin>` can be
-[found here](https://git.aspn.us/pntos/pntos-python/-/blob/main/pntos-cobra/src/pntos/cobra/SimpleOrchestrationPlugin.py).
+of the {py:obj}`SimpleGpsOrchestrationPlugin<pntos.cobra.SimpleGpsOrchestrationPlugin>` can be
+[found here](https://git.aspn.us/pntos/pntos-python/-/blob/main/pntos-cobra/src/pntos/cobra/SimpleGpsOrchestrationPlugin.py).
 We can see from the source code that complementary nav ASPN messages are
-[sent to the EKF](https://git.aspn.us/pntos/pntos-python/-/blob/main/pntos-cobra/src/pntos/cobra/SimpleOrchestrationPlugin.py#L558)
+[sent to the EKF](https://git.aspn.us/pntos/pntos-python/-/blob/main/pntos-cobra/src/pntos/cobra/SimpleGpsOrchestrationPlugin.py#L558)
 inside the {py:obj}`process_pntos_message<pntos.api.OrchestrationPlugin.process_pntos_message>`
-method, and that [buffered solutions from the EKF are returned](https://git.aspn.us/pntos/pntos-python/-/blob/main/pntos-cobra/src/pntos/cobra/SimpleOrchestrationPlugin.py#L666)
+method, and that [buffered solutions from the EKF are returned](https://git.aspn.us/pntos/pntos-python/-/blob/main/pntos-cobra/src/pntos/cobra/SimpleGpsOrchestrationPlugin.py#L666)
 by the {py:obj}`request_solutions<pntos.api.OrchestrationPlugin.request_solutions>`, as described above.
 
 <!-- TODO: Level 1 vs Level 2, and a link to the Level 2 docs when they exist -->
