@@ -2,7 +2,7 @@
 
 A {py:obj}`Preprocessor Plugin<pntos.api.PreprocessorPlugin>` allows for data
 manipulation before incoming {py:obj}`Message<pntos.api.Message>`s are passed into the
-filter. It takes in one message, and then returns 0, 1, or multiple messages. Imaging a
+filter. It takes in one message, and then returns 0, 1, or multiple messages. Imagine a
 simple preprocessor which validates incoming {term}`ASPN` messages before they enter the
 filter. It might return 0 messages if it encounters a faulty message, and return 1
 message (pass through the input message) if the message is valid. A

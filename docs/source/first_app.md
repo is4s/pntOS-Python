@@ -9,13 +9,13 @@ to the corresponding page in the {ref}`tutorial-apps` section of the docs.
 
 ## Running an App
 
-A python app consists of a python script containing all plugin imports, config, and code
+A Python app consists of a Python script containing all plugin imports, config, and code
 needed to start a particular instance of Python pntOS. The {term}`Cobra` plugin set
-currently contains a [Transport plugin](./plugins/transport_plugin.md) that retrieves
+contains a [Transport plugin](./plugins/transport_plugin.md) that retrieves
 {term}`ASPN` messages from an
 [LCM](https://github.com/lcm-proj/lcm)
 relay. This allows pntOS to ingest data either from sensors sending ASPN measurements
-live, or - in the case of the tutorial apps - from an LCM log file replaying data over
+live, or (in the case of the tutorial apps) from an LCM log file replaying data over
 the relay.
 
 These instructions will walk you through starting a generic app, spinning up the LCM
@@ -27,20 +27,29 @@ These instructions assume an active virtual environment as outlined in the
 [](./installation.md). If you currently have that virtual environment activated, skip to
 [](#start-a-local-tcp-server).
 
-If you have not yet created a python virtual environment for the [`pntos-python`
+If you have not yet created a Python virtual environment for the [`pntos-python`
 repository](https://git.aspn.us/pntos/pntos-python), follow the instructions in [](./installation.md) then go
 to [](#start-a-local-tcp-server).
 
-If you have created the virtual environment but it is not currently activated, run this
-command from the root directory to enter into the virtual environment:
+If you have created the virtual environment but it is not currently activated, run the below command 
+from the root directory to enter the virtual environment. The command varies depending on your shell:
 
-```shell
+`````{tab-set}
+````{tab-item} **bash/zsh**
+```
 source .venv/bin/activate
 ```
+````
+````{tab-item} **fish**
+```
+source .venv/bin/activate.fish
+```
+````
+`````
 
 ### Start a Local TCP Server
 
-In order to feed messages into the transport from an LCM log file, we need to first start
+In order to feed messages into the transport plugin from an LCM log file, we need to first start
 a local TCP server (located in the virtual environment) in a new terminal:
 
 ```shell
@@ -72,7 +81,7 @@ This should open the LCM LogPlayer GUI with a play button. You should see the fo
 - `/sensor/ublox-ZED-F9T/velocity`
 - `/sensor/vn-100/imu`
 
-## Record Output
+### Record Output
 
 In order to save off the solutions produced by pntOS and sent over the wire, start lcm-logger:
 
@@ -104,7 +113,7 @@ For documentation specifically explaining the `fusion_gps_ins` app, see
 
 ### Run the GPS INS Fusion App
 
-To run this app, run this command from the root workspace directory (with the python virtual
+To run this app, run this command from the root workspace directory (with the Python virtual
 environment activated):
 
 ```shell
@@ -151,7 +160,7 @@ For documentation specifically explaining the this app, see
 
 ### Position and Velocity Update App
 
-To run this app, run this command from the root workspace directory (with the python virtual
+To run this app, run this command from the root workspace directory (with the Python virtual
 environment activated):
 
 ```shell

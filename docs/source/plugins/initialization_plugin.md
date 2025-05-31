@@ -1,6 +1,6 @@
 # Initialization Plugin
 
-The {py:obj}`Initialization Pluign<pntos.api.InitializationPlugin>` is a factory for two
+The {py:obj}`Initialization Plugin<pntos.api.InitializationPlugin>` is a factory for two
 types of initializers: 
 
 | Initialization                                                                     | Description                                                                                                                                                                                                                   |

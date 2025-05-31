@@ -6,7 +6,7 @@ Plugin<pntos.api.InertialPlugin>`) via the {py:obj}`Orchestration
 Plugin<pntos.api.OrchestrationPlugin>` and uses them to generate a fused {term}`PNT` solution.
 
 The Fusion plugin may also dispatch to a {py:obj}`Fusion Strategy
-Plugin<pntos.api.FusionStrategyPlugin>` to do the {term}`PNT` fusion. In this case, it does all the book-keeping to keep track of
+Plugin<pntos.api.FusionStrategyPlugin>` to do the {term}`PNT` fusion. In this case, it does all the bookkeeping to keep track of
 which state blocks and measurement processors correspond to which states in the
 {py:obj}`Fusion Strategy Plugin<pntos.api.FusionStrategyPlugin>`.
 
