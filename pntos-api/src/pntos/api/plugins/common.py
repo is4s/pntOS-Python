@@ -142,7 +142,7 @@ RegistryValueType = TypeVar(
     Message,
 )
 """
-A ``TypeVar`` of the types allowed in :class:`pntos.api.KeyValueStore`. 
+A ``TypeVar`` of the types allowed in :class:`pntos.api.KeyValueStore`.
 
 A ``TypeVar`` is particularly for cases where a method needs to guarantee that
 the type on an input is the same as the returned type.
@@ -161,7 +161,7 @@ RegistryValueTypeUnion = (
     str | list[str] | int | bool | float | NDArray[float64] | Message
 )
 """
-This is a union of all types allowed in :class:`pntos.api.KeyValueStore`. 
+This is a union of all types allowed in :class:`pntos.api.KeyValueStore`.
 
 This is particularly for cases where a method does not need to guarantee that
 the type on an input is the same as the returned type.
@@ -169,7 +169,7 @@ the type on an input is the same as the returned type.
 Example:
     For example, :meth:`pntos.api.KeyValueStore.set_value` does not need to guarantee that
     the input and the return type are the same since it returns `None`. Thus,
-    :meth:`set_value` would be a good place to use ``RegistryValueTypeUnion``
+    :meth:`pntos.api.KeyValueStore.set_value` would be a good place to use ``RegistryValueTypeUnion``
     in the type description::
 
         def set_value(self, key: str, value: RegistryValueTypeUnion) -> None
