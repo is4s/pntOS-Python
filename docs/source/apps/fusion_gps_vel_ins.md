@@ -138,7 +138,8 @@ Next, add in some checking to make this robust to future changes:
 +           return
 ```
 
-Finally, add the measurement processor to the fusion engine so it can be used:
+Finally, right below where you added the last bit, add the measurement processor to the fusion
+engine so it can be used:
 
 ```diff
 +        fusion_engine.add_measurement_processor(gps_processor)
