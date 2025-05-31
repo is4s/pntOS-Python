@@ -75,7 +75,8 @@ my_config = [
         group='config/orchestration',
         velocity_channel='/sensor/ublox-ZED-F9T/velocity',
     ),
-]  # End Config
+]
+# End Config
 
 # Instantiate all of our plugins
 controller = SimpleControllerPlugin('Cobra Simple Controller Plugin')

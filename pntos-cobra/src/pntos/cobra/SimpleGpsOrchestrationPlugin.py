@@ -152,7 +152,7 @@ class SimpleGpsOrchestrationPlugin(OrchestrationPlugin):
             return
 
         self.measurement_channels: dict[str, str] = {
-            orch_config.gps_channel: GPS_MEASUREMENT_PROCESSOR_LABEL
+            orch_config.gps_channel: GPS_MEASUREMENT_PROCESSOR_LABEL,
         }
         self.alignment_channels: list[str] = [
             orch_config.gps_channel,
