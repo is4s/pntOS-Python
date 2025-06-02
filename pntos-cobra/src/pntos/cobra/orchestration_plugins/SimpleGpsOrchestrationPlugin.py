@@ -48,8 +48,9 @@ from pntos.cobra.utils.plugins import (
     sort_plugins_dataclass,
 )
 from scipy.linalg import block_diag
+
 from .orchestration_utils import (
-    update_filter_and_feedback_states,
+    dispatch_to_fusion_engine,
     validate_plugins,
 )
 
@@ -186,7 +187,7 @@ class SimpleGpsOrchestrationPlugin(OrchestrationPlugin):
         """
         sorted_plugins: SortedPlugins = sort_plugins_dataclass(plugin_list)
 
-        validate_plugins(self, sorted_plugins, self._log)
+        validate_plugins(self, sorted_plugins)
 
         # Find and store preprocessors
         for identifier, config_group in zip(PREPROCESSOR_IDS, PREPROCESSOR_GROUPS):
@@ -312,25 +313,14 @@ class SimpleGpsOrchestrationPlugin(OrchestrationPlugin):
 
         self.fusion_engine = fusion_engine
 
-    def _dispatch_to_fusion_engine(self, message: Message) -> None:
-        """Send message to the fusion engine to update the filter.
+    def _rotate_imu_meas(self, imu: MeasurementImu) -> None:
+        """Rotate IMU measurement into platform frame.
 
-        Applies feedback to inertial solution and biases, and resets pinson error states
-        afterward."""
-        meas_time = message.wrapped_message.time_of_validity  # type: ignore[attr-defined]
-        # Make sure measurement processor has most current aux data before update
-        mp_label = self.measurement_channels[message.source_identifier]
-        self._send_inertial_aux_to_measurement_processor(meas_time, mp_label)
-        self._send_inertial_aux_to_pinson()
-
-        update_filter_and_feedback_states(
-            self.fusion_engine,
-            self.inertial,
-            message,
-            mp_label,
-            STATE_BLOCK_LABEL,
-            self._log,
-        )
+        Args:
+            message (MeasurementImu): IMU ASPN message to rotate.
+        """
+        imu.meas_accel = self.C_inertial_to_platform @ imu.meas_accel
+        imu.meas_gyro = self.C_inertial_to_platform @ imu.meas_gyro
 
     def _generate_initial_inertial_solution(self) -> None:
         """Get initial inertial solution and use it to set up the inertial."""
@@ -492,7 +482,7 @@ class SimpleGpsOrchestrationPlugin(OrchestrationPlugin):
         if message.source_identifier == self.inertial_channel:
             self.inertial.process_pntos_message(message)
         elif message.source_identifier in self.measurement_channels:
-            self._dispatch_to_fusion_engine(message)
+            dispatch_to_fusion_engine(self, message, STATE_BLOCK_LABEL)
 
     def get_filter_description_list(self) -> list[str]:
         descriptions = []

@@ -1,5 +1,3 @@
-from typing import Callable
-
 from aspn23 import (
     MeasurementPositionVelocityAttitude,
     MeasurementPositionVelocityAttitudeErrorModel,
@@ -12,8 +10,6 @@ from pntos.api import (
     LoggingLevel,
     Message,
     OrchestrationPlugin,
-    StandardFusionEngine,
-    StandardInertialMechanization,
 )
 from pntos.cobra.utils import (
     SortedPlugins,
@@ -28,7 +24,6 @@ from pntos.cobra.utils import (
 def validate_plugins(
     orch_plugin: OrchestrationPlugin,
     sorted_plugins: SortedPlugins,
-    log_func: Callable[[LoggingLevel, str], None],
 ) -> None:
     """
     Utility function that verifies the number of plugins within ``sorted_plugins`` match
@@ -39,7 +34,7 @@ def validate_plugins(
     """
     # Fusion Plugin
     if len(sorted_plugins.fusion_plugins) != 1:
-        log_func(
+        orch_plugin._log(
             LoggingLevel.ERROR,
             f'Expected one FusionPlugin - received {len(sorted_plugins.fusion_plugins)}'
             + f': {[p.identifier for p in sorted_plugins.fusion_plugins]}',
@@ -49,7 +44,7 @@ def validate_plugins(
 
     # Fusion Strategy Plugin
     if len(sorted_plugins.fusion_strategy_plugins) != 1:
-        log_func(
+        orch_plugin._log(
             LoggingLevel.ERROR,
             'Expected one FusionStrategyPlugin - received '
             + f'{len(sorted_plugins.fusion_strategy_plugins)}',
@@ -59,7 +54,7 @@ def validate_plugins(
 
     # Inertial Plugin
     if len(sorted_plugins.inertial_plugins) != 1:
-        log_func(
+        orch_plugin._log(
             LoggingLevel.ERROR,
             f'Expected one InertialPlugin - received '
             + f'{len(sorted_plugins.inertial_plugins)}',
@@ -69,7 +64,7 @@ def validate_plugins(
 
     # Initialization Plugin
     if len(sorted_plugins.initialization_plugins) != 1:
-        log_func(
+        orch_plugin._log(
             LoggingLevel.ERROR,
             'Expected one InitializationPlugin - received '
             + f'{len(sorted_plugins.initialization_plugins)}',
@@ -79,7 +74,7 @@ def validate_plugins(
 
     # State Modeling Plugin
     if len(sorted_plugins.state_modeling_plugins) == 0:
-        log_func(
+        orch_plugin._log(
             LoggingLevel.ERROR,
             f'Expected at least one StateModelingPlugin - received none.',
         )
@@ -87,35 +82,84 @@ def validate_plugins(
     orch_plugin.state_modeling_plugins = sorted_plugins.state_modeling_plugins
 
 
-def update_filter_and_feedback_states(
-    fusion_engine: StandardFusionEngine,
-    inertial: StandardInertialMechanization,
-    message: Message,
-    mp_label: str,
-    sb_label: str,
-    log_func: Callable[[LoggingLevel, str], None],
+def send_inertial_aux_to_measurement_processor(
+    orch_plugin: OrchestrationPlugin, time: TypeTimestamp, mp_label: str
 ) -> None:
-    meas_time = message.wrapped_message.time_of_validity
+    """Send the current inertial solution to the specified measurement processor."""
+    pva_message = orch_plugin.inertial.request_solution(time)
+    if pva_message is None:
+        orch_plugin._log(
+            LoggingLevel.ERROR,
+            f'Cannot send inertial aux to measurement processor. Solution not available at time {time}',
+        )
+        return
+    orch_plugin.fusion_engine.give_measurement_processor_aux_data(
+        mp_label, [pva_message]
+    )
+
+
+def send_inertial_aux_to_pinson(
+    orch_plugin: OrchestrationPlugin, sb_label: str
+) -> None:
+    """Send the current inertial solution and forces to the Pinson15 state-block."""
+    time = orch_plugin.fusion_engine.time
+
+    pva_message = orch_plugin.inertial.request_solution(time)
+    if pva_message is None:
+        orch_plugin._log(
+            LoggingLevel.ERROR,
+            f'Cannot send inertial aux to pinson block. Solution not available at time {time}',
+        )
+        return
+    imu = orch_plugin.inertial.request_forces_and_rates(time)
+    if imu is None:
+        orch_plugin._log(
+            LoggingLevel.ERROR,
+            f'Cannot send inertial aux to pinson block. Forces not available at time {time}',
+        )
+        return
+    imu_message = Message(imu.forces_and_rates, 'Orchestration forces and rates')
+
+    orch_plugin.fusion_engine.give_state_block_aux_data(
+        sb_label, [pva_message, imu_message]
+    )
+
+
+def dispatch_to_fusion_engine(
+    orch_plugin: OrchestrationPlugin,
+    message: Message,
+    sb_label: str,
+) -> None:
+    """Send message to the fusion engine to update the filter.
+
+    Applies feedback to inertial solution and biases, and resets pinson error states
+    afterward."""
+    meas_time = message.wrapped_message.time_of_validity  # type: ignore[attr-defined]
+    # Make sure measurement processor has most current aux data before update
+    mp_label = orch_plugin.measurement_channels[message.source_identifier]
+    send_inertial_aux_to_measurement_processor(orch_plugin, meas_time, mp_label)
+    send_inertial_aux_to_pinson(orch_plugin, sb_label)
+
     # Propagate to measurement time
-    fusion_engine.propagate(meas_time)
+    orch_plugin.fusion_engine.propagate(meas_time)
 
     # Update filter.
-    fusion_engine.update(mp_label, message)
+    orch_plugin.fusion_engine.update(mp_label, message)
 
     # Feedback states to inertial.
-    estimate = fusion_engine.get_state_block_estimate(sb_label)
+    estimate = orch_plugin.fusion_engine.get_state_block_estimate(sb_label)
     if estimate is None:
-        log_func(
+        orch_plugin._log(
             LoggingLevel.ERROR,
             'Unable to obtain estimate from fusion engine.',
         )
         return
 
-    cur_time = fusion_engine.time
-    inertial_pva_message = inertial.request_solution(cur_time)
+    cur_time = orch_plugin.fusion_engine.time
+    inertial_pva_message = orch_plugin.inertial.request_solution(cur_time)
 
     if inertial_pva_message is None:
-        log_func(
+        orch_plugin._log(
             LoggingLevel.ERROR,
             f'Unable to obtain solution from inertial at time {cur_time}.',
         )
@@ -125,7 +169,7 @@ def update_filter_and_feedback_states(
         inertial_pva_message.wrapped_message,
         MeasurementPositionVelocityAttitude,
     ):
-        log_func(
+        orch_plugin._log(
             LoggingLevel.ERROR,
             'Did not receive PVA message from inertial. Received '
             + f'{type(inertial_pva_message.wrapped_message)} instead.',
@@ -138,11 +182,11 @@ def update_filter_and_feedback_states(
 
     message = Message(corrected_pva, 'python orchestration')
 
-    inertial.reset_solution(message)
+    orch_plugin.inertial.reset_solution(message)
 
-    imu_errors = inertial.request_sensor_errors(cur_time)
+    imu_errors = orch_plugin.inertial.request_sensor_errors(cur_time)
     if imu_errors is None:
-        log_func(
+        orch_plugin._log(
             LoggingLevel.ERROR,
             f'Unable to obtain sensor errors from inertial at time {cur_time}.',
         )
@@ -150,10 +194,10 @@ def update_filter_and_feedback_states(
 
     imu_errors.accel_biases -= estimate[9:12, 0]
     imu_errors.gyro_biases -= estimate[12:15, 0]
-    inertial.correct_sensor_errors(cur_time, imu_errors)
+    orch_plugin.inertial.correct_sensor_errors(cur_time, imu_errors)
 
     # Assume zero error in states after applying feedback
-    fusion_engine.set_state_block_estimate(sb_label, zeros((15, 1)))
+    orch_plugin.fusion_engine.set_state_block_estimate(sb_label, zeros((15, 1)))
 
 
 def apply_error_states(
