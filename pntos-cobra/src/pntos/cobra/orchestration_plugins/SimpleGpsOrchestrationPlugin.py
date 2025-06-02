@@ -43,14 +43,12 @@ from pntos.cobra.utils import (
     north_to_delta_lat,
     quat_to_dcm,
 )
-from scipy.linalg import block_diag
 
 from .orchestration_utils import (
     apply_error_states,
     dispatch_to_fusion_engine,
+    generate_initial_inertial_solution,
     initialization_ready,
-    send_inertial_aux_to_measurement_processor,
-    send_inertial_aux_to_pinson,
     set_up_initializer,
     sort_and_validate_plugins,
 )
@@ -174,7 +172,7 @@ class SimpleGpsOrchestrationPlugin(OrchestrationPlugin):
         set_up_initializer(self, ALIGNMENT_CONFIG_GROUP)
 
         if initialization_ready(self):
-            self._generate_initial_inertial_solution()
+            generate_initial_inertial_solution(self, STATE_BLOCK_LABEL, INERTIAL_GROUP)
 
     def _sort_and_validate_plugins(self, plugin_list: list[CommonPlugin]) -> None:
         """
@@ -323,147 +321,6 @@ class SimpleGpsOrchestrationPlugin(OrchestrationPlugin):
         imu.meas_accel = self.C_inertial_to_platform @ imu.meas_accel
         imu.meas_gyro = self.C_inertial_to_platform @ imu.meas_gyro
 
-    def _dispatch_to_fusion_engine(self, message: Message) -> None:
-        """Send message to the fusion engine to update the filter.
-
-        Applies feedback to inertial solution and biases, and resets pinson error states
-        afterward."""
-        meas_time = message.wrapped_message.time_of_validity  # type: ignore[attr-defined]
-        # Make sure measurement processor has most current aux data before update
-        mp_label = self.measurement_channels[message.source_identifier]
-        send_inertial_aux_to_measurement_processor(self, meas_time, mp_label)
-        send_inertial_aux_to_pinson(self, STATE_BLOCK_LABEL)
-
-        # Propagate to measurement time
-        self.fusion_engine.propagate(meas_time)
-
-        # Update filter.
-        self.fusion_engine.update(mp_label, message)
-
-        # Feedback states to inertial.
-        estimate = self.fusion_engine.get_state_block_estimate(STATE_BLOCK_LABEL)
-        if estimate is None:
-            self._log(
-                LoggingLevel.ERROR,
-                'Unable to obtain estimate from fusion engine.',
-            )
-            return
-
-        cur_time = self.fusion_engine.time
-        inertial_pva_message = self.inertial.request_solution(cur_time)
-
-        if inertial_pva_message is None:
-            self._log(
-                LoggingLevel.ERROR,
-                f'Unable to obtain solution from inertial at time {cur_time}.',
-            )
-            return
-
-        if not isinstance(
-            inertial_pva_message.wrapped_message,
-            MeasurementPositionVelocityAttitude,
-        ):
-            self._log(
-                LoggingLevel.ERROR,
-                'Did not receive PVA message from inertial. Received '
-                + f'{type(inertial_pva_message.wrapped_message)} instead.',
-            )
-            return
-
-        inertial_pva = inertial_pva_message.wrapped_message
-
-        corrected_pva = apply_error_states(inertial_pva, estimate)
-
-        message = Message(corrected_pva, 'python orchestration')
-
-        self.inertial.reset_solution(message)
-
-        imu_errors = self.inertial.request_sensor_errors(cur_time)
-        if imu_errors is None:
-            self._log(
-                LoggingLevel.ERROR,
-                f'Unable to obtain sensor errors from inertial at time {cur_time}.',
-            )
-            return
-
-        imu_errors.accel_biases -= estimate[9:12, 0]
-        imu_errors.gyro_biases -= estimate[12:15, 0]
-        self.inertial.correct_sensor_errors(cur_time, imu_errors)
-
-        # Assume zero error in states after applying feedback
-        self.fusion_engine.set_state_block_estimate(
-            STATE_BLOCK_LABEL, np.zeros((15, 1))
-        )
-
-    def _generate_initial_inertial_solution(self) -> None:
-        """Get initial inertial solution and use it to set up the inertial."""
-        self.init_solution = self.initializer.request_solution()
-
-        if (
-            self.init_solution.solution is None
-            or self.init_solution.inertial_errors is None
-            or self.init_solution.inertial_error_covariance is None
-        ):
-            self._log(
-                LoggingLevel.ERROR,
-                'Invalid InitialInertialSolution returned from init strategy - unable to proceed.',
-            )
-            return
-
-        if not isinstance(
-            self.init_solution.solution.wrapped_message,
-            MeasurementPositionVelocityAttitude,
-        ):
-            self._log(
-                LoggingLevel.ERROR,
-                'Expected PVA solution from init strategy - unable to proceed.',
-            )
-            return
-
-        inertial_init_message = Message(
-            self.init_solution.solution.wrapped_message, 'python orchestration'
-        )
-
-        inertial: StandardInertialMechanization | None = (
-            self.inertial_plugin.new_inertial(
-                StandardInertialMechanization,
-                inertial_init_message,
-                INERTIAL_GROUP,
-            )
-        )
-        if inertial is None:
-            self._log(
-                LoggingLevel.ERROR,
-                'StandardInertialMechanization not supported by inertial '
-                + f'({self.inertial_plugin.identifier})',
-            )
-            return
-
-        self.inertial = inertial
-
-        self.inertial.correct_sensor_errors(
-            self.init_solution.solution.wrapped_message.time_of_validity,
-            self.init_solution.inertial_errors,
-        )
-
-        pva_cov = self.init_solution.solution.wrapped_message.covariance  # 9x9
-        bias_cov = self.init_solution.inertial_error_covariance  # 6x6
-        init_pinson_cov = block_diag(pva_cov, bias_cov)
-        self.fusion_engine.set_state_block_covariance(
-            STATE_BLOCK_LABEL,
-            init_pinson_cov,
-        )
-
-        init_time = self.init_solution.solution.wrapped_message.time_of_validity
-        self.fusion_engine.time = init_time
-
-        self._send_inertial_aux_to_pinson()
-
-        self._log(
-            LoggingLevel.INFO,
-            f'Aligned filter at {init_time}.',
-        )
-
     def _has_valid_time(self, message: Message) -> bool:
         """
         Utility function which returns true if the message's time of validity is greater
@@ -538,7 +395,9 @@ class SimpleGpsOrchestrationPlugin(OrchestrationPlugin):
 
             self.initializer.process_pntos_message(message)
             if not initialization_ready(self):
-                self._generate_initial_inertial_solution()
+                generate_initial_inertial_solution(
+                    self, STATE_BLOCK_LABEL, INERTIAL_GROUP
+                )
             else:
                 return
 

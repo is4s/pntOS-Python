@@ -13,6 +13,7 @@ from pntos.api import (
     LoggingLevel,
     Message,
     OrchestrationPlugin,
+    StandardInertialMechanization,
 )
 from pntos.cobra.utils import (
     SortedPlugins,
@@ -23,6 +24,7 @@ from pntos.cobra.utils import (
     quat_to_dcm,
     sort_plugins_dataclass,
 )
+from scipy.linalg import block_diag
 
 
 def sort_and_validate_plugins(
@@ -159,6 +161,78 @@ def send_inertial_aux_to_pinson(
 
     orch_plugin.fusion_engine.give_state_block_aux_data(
         sb_label, [pva_message, imu_message]
+    )
+
+
+def generate_initial_inertial_solution(
+    orch_plugin: OrchestrationPlugin, sb_label: str, inertial_group: str
+) -> None:
+    """Get initial inertial solution and use it to set up the inertial."""
+    orch_plugin.init_solution = orch_plugin.initializer.request_solution()
+
+    if (
+        orch_plugin.init_solution.solution is None
+        or orch_plugin.init_solution.inertial_errors is None
+        or orch_plugin.init_solution.inertial_error_covariance is None
+    ):
+        orch_plugin._log(
+            LoggingLevel.ERROR,
+            'Invalid InitialInertialSolution returned from init strategy - unable to proceed.',
+        )
+        return
+
+    if not isinstance(
+        orch_plugin.init_solution.solution.wrapped_message,
+        MeasurementPositionVelocityAttitude,
+    ):
+        orch_plugin._log(
+            LoggingLevel.ERROR,
+            'Expected PVA solution from init strategy - unable to proceed.',
+        )
+        return
+
+    inertial_init_message = Message(
+        orch_plugin.init_solution.solution.wrapped_message, 'python orchestration'
+    )
+
+    inertial: StandardInertialMechanization | None = (
+        orch_plugin.inertial_plugin.new_inertial(
+            StandardInertialMechanization,
+            inertial_init_message,
+            inertial_group,
+        )
+    )
+    if inertial is None:
+        orch_plugin._log(
+            LoggingLevel.ERROR,
+            'StandardInertialMechanization not supported by inertial '
+            + f'({orch_plugin.inertial_plugin.identifier})',
+        )
+        return
+
+    orch_plugin.inertial = inertial
+
+    orch_plugin.inertial.correct_sensor_errors(
+        orch_plugin.init_solution.solution.wrapped_message.time_of_validity,
+        orch_plugin.init_solution.inertial_errors,
+    )
+
+    pva_cov = orch_plugin.init_solution.solution.wrapped_message.covariance  # 9x9
+    bias_cov = orch_plugin.init_solution.inertial_error_covariance  # 6x6
+    init_pinson_cov = block_diag(pva_cov, bias_cov)
+    orch_plugin.fusion_engine.set_state_block_covariance(
+        sb_label,
+        init_pinson_cov,
+    )
+
+    init_time = orch_plugin.init_solution.solution.wrapped_message.time_of_validity
+    orch_plugin.fusion_engine.time = init_time
+
+    orch_plugin._send_inertial_aux_to_pinson()
+
+    orch_plugin._log(
+        LoggingLevel.INFO,
+        f'Aligned filter at {init_time}.',
     )
 
 
