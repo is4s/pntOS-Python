@@ -47,7 +47,11 @@ from scipy.linalg import block_diag
 
 from .orchestration_utils import (
     dispatch_to_fusion_engine,
+    send_inertial_aux_to_measurement_processor,
+    send_inertial_aux_to_pinson,
+    apply_error_states,
     sort_and_validate_plugins,
+    set_up_initializer,
 )
 
 # Solution Channels
@@ -166,7 +170,7 @@ class SimpleGpsOrchestrationPlugin(OrchestrationPlugin):
         sort_and_validate_plugins(self, plugins)
 
         self._set_up_fusion_engine()
-        self._set_up_initializer()
+        set_up_initializer(self, ALIGNMENT_CONFIG_GROUP)
 
         if self._initialization_ready():
             self._generate_initial_inertial_solution()
@@ -317,6 +321,78 @@ class SimpleGpsOrchestrationPlugin(OrchestrationPlugin):
         """
         imu.meas_accel = self.C_inertial_to_platform @ imu.meas_accel
         imu.meas_gyro = self.C_inertial_to_platform @ imu.meas_gyro
+
+    def _dispatch_to_fusion_engine(self, message: Message) -> None:
+        """Send message to the fusion engine to update the filter.
+
+        Applies feedback to inertial solution and biases, and resets pinson error states
+        afterward."""
+        meas_time = message.wrapped_message.time_of_validity  # type: ignore[attr-defined]
+        # Make sure measurement processor has most current aux data before update
+        mp_label = self.measurement_channels[message.source_identifier]
+        send_inertial_aux_to_measurement_processor(self, meas_time, mp_label)
+        send_inertial_aux_to_pinson(self, STATE_BLOCK_LABEL)
+
+        # Propagate to measurement time
+        self.fusion_engine.propagate(meas_time)
+
+        # Update filter.
+        self.fusion_engine.update(mp_label, message)
+
+        # Feedback states to inertial.
+        estimate = self.fusion_engine.get_state_block_estimate(STATE_BLOCK_LABEL)
+        if estimate is None:
+            self._log(
+                LoggingLevel.ERROR,
+                'Unable to obtain estimate from fusion engine.',
+            )
+            return
+
+        cur_time = self.fusion_engine.time
+        inertial_pva_message = self.inertial.request_solution(cur_time)
+
+        if inertial_pva_message is None:
+            self._log(
+                LoggingLevel.ERROR,
+                f'Unable to obtain solution from inertial at time {cur_time}.',
+            )
+            return
+
+        if not isinstance(
+            inertial_pva_message.wrapped_message,
+            MeasurementPositionVelocityAttitude,
+        ):
+            self._log(
+                LoggingLevel.ERROR,
+                'Did not receive PVA message from inertial. Received '
+                + f'{type(inertial_pva_message.wrapped_message)} instead.',
+            )
+            return
+
+        inertial_pva = inertial_pva_message.wrapped_message
+
+        corrected_pva = apply_error_states(inertial_pva, estimate)
+
+        message = Message(corrected_pva, 'python orchestration')
+
+        self.inertial.reset_solution(message)
+
+        imu_errors = self.inertial.request_sensor_errors(cur_time)
+        if imu_errors is None:
+            self._log(
+                LoggingLevel.ERROR,
+                f'Unable to obtain sensor errors from inertial at time {cur_time}.',
+            )
+            return
+
+        imu_errors.accel_biases -= estimate[9:12, 0]
+        imu_errors.gyro_biases -= estimate[12:15, 0]
+        self.inertial.correct_sensor_errors(cur_time, imu_errors)
+
+        # Assume zero error in states after applying feedback
+        self.fusion_engine.set_state_block_estimate(
+            STATE_BLOCK_LABEL, np.zeros((15, 1))
+        )
 
     def _generate_initial_inertial_solution(self) -> None:
         """Get initial inertial solution and use it to set up the inertial."""
@@ -478,7 +554,8 @@ class SimpleGpsOrchestrationPlugin(OrchestrationPlugin):
         if message.source_identifier == self.inertial_channel:
             self.inertial.process_pntos_message(message)
         elif message.source_identifier in self.measurement_channels:
-            dispatch_to_fusion_engine(self, message, STATE_BLOCK_LABEL)
+            # dispatch_to_fusion_engine(self, message, STATE_BLOCK_LABEL)
+            self._dispatch_to_fusion_engine(message)
 
     def get_filter_description_list(self) -> list[str]:
         descriptions = []
@@ -540,7 +617,10 @@ class SimpleGpsOrchestrationPlugin(OrchestrationPlugin):
             )
             return None
 
-        corrected_pva = self._apply_error_states(
+        # corrected_pva = self._apply_error_states(
+        #     inertial_solution.wrapped_message, x_and_p.estimate
+        # )
+        corrected_pva = apply_error_states(
             inertial_solution.wrapped_message, x_and_p.estimate
         )
 

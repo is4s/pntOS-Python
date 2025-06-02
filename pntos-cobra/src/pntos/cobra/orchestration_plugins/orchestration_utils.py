@@ -8,18 +8,19 @@ from numpy import array, float64, zeros
 from numpy.typing import NDArray
 from pntos.api import (
     CommonPlugin,
+    InertialInitializationStrategy,
     LoggingLevel,
     Message,
     OrchestrationPlugin,
 )
 from pntos.cobra.utils import (
     SortedPlugins,
-    sort_plugins_dataclass,
     correct_dcm_with_tilt,
     dcm_to_quat,
     east_to_delta_lon,
     north_to_delta_lat,
     quat_to_dcm,
+    sort_plugins_dataclass,
 )
 
 
@@ -85,6 +86,26 @@ def sort_and_validate_plugins(
         )
         return
     orch_plugin.state_modeling_plugins = sorted_plugins.state_modeling_plugins
+
+
+def set_up_initializer(
+    orch_plugin: OrchestrationPlugin, alignment_config_group: str
+) -> None:
+    """Set up inertial initialization strategy, and initialize filter solution if initializer is immediately ready."""
+    # Set up initializer
+    init_strategy: InertialInitializationStrategy | None = (
+        orch_plugin.initialization_plugin.new_initialization_strategy(
+            InertialInitializationStrategy, config_group=alignment_config_group
+        )
+    )
+    if init_strategy is None:
+        orch_plugin._log(
+            LoggingLevel.ERROR,
+            'InertialInitializationStrategy not supported by '
+            + f'{orch_plugin.initialization_plugin}. Unable to continue.',
+        )
+        return None
+    orch_plugin.initializer = init_strategy
 
 
 def send_inertial_aux_to_measurement_processor(
