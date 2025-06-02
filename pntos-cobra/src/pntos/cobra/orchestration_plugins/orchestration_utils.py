@@ -9,6 +9,7 @@ from numpy.typing import NDArray
 from pntos.api import (
     CommonPlugin,
     InertialInitializationStrategy,
+    InitializationStatus,
     LoggingLevel,
     Message,
     OrchestrationPlugin,
@@ -106,6 +107,16 @@ def set_up_initializer(
         )
         return None
     orch_plugin.initializer = init_strategy
+
+
+def initialization_ready(orch_plugin: OrchestrationPlugin) -> bool:
+    """
+    Utility function to poll the state of the init strategy plugin.
+
+    Populates orch_plugin.initialization_state with the relevant :class:`InitializationStatus`.
+    """
+    orch_plugin.initialization_state = orch_plugin.initializer.request_current_status()
+    return orch_plugin.initialization_state is InitializationStatus.INITIALIZED_GOOD
 
 
 def send_inertial_aux_to_measurement_processor(

@@ -46,12 +46,13 @@ from pntos.cobra.utils import (
 from scipy.linalg import block_diag
 
 from .orchestration_utils import (
+    apply_error_states,
     dispatch_to_fusion_engine,
+    initialization_ready,
     send_inertial_aux_to_measurement_processor,
     send_inertial_aux_to_pinson,
-    apply_error_states,
-    sort_and_validate_plugins,
     set_up_initializer,
+    sort_and_validate_plugins,
 )
 
 # Solution Channels
@@ -172,7 +173,7 @@ class SimpleGpsOrchestrationPlugin(OrchestrationPlugin):
         self._set_up_fusion_engine()
         set_up_initializer(self, ALIGNMENT_CONFIG_GROUP)
 
-        if self._initialization_ready():
+        if initialization_ready(self):
             self._generate_initial_inertial_solution()
 
     def _sort_and_validate_plugins(self, plugin_list: list[CommonPlugin]) -> None:
@@ -494,15 +495,6 @@ class SimpleGpsOrchestrationPlugin(OrchestrationPlugin):
             )
             return False
 
-    def _initialization_ready(self) -> bool:
-        """
-        Utility function to poll the state of the init strategy plugin.
-
-        Populates self.initialization_state with the relevant :class:`pntos.api.InitializationStatus`.
-        """
-        self.initialization_state = self.initializer.request_current_status()
-        return self.initialization_state is InitializationStatus.INITIALIZED_GOOD
-
     def _preprocess_message(self, message: Message) -> Message | None:
         """Process the given message by the full chain of preprocessors.
 
@@ -540,12 +532,12 @@ class SimpleGpsOrchestrationPlugin(OrchestrationPlugin):
             return
 
         # If filter solution is not initialized, send messages to the initializer.
-        if not self._initialization_ready():
+        if not initialization_ready(self):
             if message.source_identifier not in self.alignment_channels:
                 return
 
             self.initializer.process_pntos_message(message)
-            if not self._initialization_ready():
+            if not initialization_ready(self):
                 self._generate_initial_inertial_solution()
             else:
                 return
@@ -554,8 +546,7 @@ class SimpleGpsOrchestrationPlugin(OrchestrationPlugin):
         if message.source_identifier == self.inertial_channel:
             self.inertial.process_pntos_message(message)
         elif message.source_identifier in self.measurement_channels:
-            # dispatch_to_fusion_engine(self, message, STATE_BLOCK_LABEL)
-            self._dispatch_to_fusion_engine(message)
+            dispatch_to_fusion_engine(self, message, STATE_BLOCK_LABEL)
 
     def get_filter_description_list(self) -> list[str]:
         descriptions = []
@@ -634,7 +625,7 @@ class SimpleGpsOrchestrationPlugin(OrchestrationPlugin):
         solution_times: list[TypeTimestamp],
         filter_description: str | None = None,
     ) -> list[Message] | None:
-        if not self._initialization_ready() or self.init_solution is None:
+        if not initialization_ready(self) or self.init_solution is None:
             self._log(
                 LoggingLevel.DEBUG,
                 'Unable to provide a solution - initialization not ready.',
