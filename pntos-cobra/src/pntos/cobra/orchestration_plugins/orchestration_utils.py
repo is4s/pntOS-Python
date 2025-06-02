@@ -7,12 +7,14 @@ from aspn23 import (
 from numpy import array, float64, zeros
 from numpy.typing import NDArray
 from pntos.api import (
+    CommonPlugin,
     LoggingLevel,
     Message,
     OrchestrationPlugin,
 )
 from pntos.cobra.utils import (
     SortedPlugins,
+    sort_plugins_dataclass,
     correct_dcm_with_tilt,
     dcm_to_quat,
     east_to_delta_lon,
@@ -21,17 +23,20 @@ from pntos.cobra.utils import (
 )
 
 
-def validate_plugins(
+def sort_and_validate_plugins(
     orch_plugin: OrchestrationPlugin,
-    sorted_plugins: SortedPlugins,
+    plugin_list: list[CommonPlugin],
 ) -> None:
     """
-    Utility function that verifies the number of plugins within ``sorted_plugins`` match
-    the respetive expected amount.
-
-    For example, the current ``pntos.src.cobra.SimpleOrchestrationPlugin`` expects 1 inertial.
-    This function then validates there is 1 inertial.
+    Utility function to sort plugins_list and make sure there is only one of the
+    following plugins:
+    - FusionPlugin
+    - FusionStrategyPlugin
+    - InertialPlugin
+    - InitializationPlugin
+    - StateModelingPlugin
     """
+    sorted_plugins: SortedPlugins = sort_plugins_dataclass(plugin_list)
     # Fusion Plugin
     if len(sorted_plugins.fusion_plugins) != 1:
         orch_plugin._log(

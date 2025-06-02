@@ -43,15 +43,11 @@ from pntos.cobra.utils import (
     north_to_delta_lat,
     quat_to_dcm,
 )
-from pntos.cobra.utils.plugins import (
-    SortedPlugins,
-    sort_plugins_dataclass,
-)
 from scipy.linalg import block_diag
 
 from .orchestration_utils import (
     dispatch_to_fusion_engine,
-    validate_plugins,
+    sort_and_validate_plugins,
 )
 
 # Solution Channels
@@ -167,7 +163,7 @@ class SimpleGpsOrchestrationPlugin(OrchestrationPlugin):
         ]
         self.inertial_channel = inertial_config.channel
 
-        self._sort_and_validate_plugins(plugins)
+        sort_and_validate_plugins(self, plugins)
 
         self._set_up_fusion_engine()
         self._set_up_initializer()
