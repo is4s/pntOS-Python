@@ -11,8 +11,6 @@ from aspn23 import (
 )
 from numpy import float64
 from numpy.typing import NDArray
-from scipy.linalg import block_diag
-
 from pntos.api import (
     CommonPlugin,
     EstimateWithCovariance,
@@ -30,6 +28,7 @@ from pntos.api import (
     MessageStreamConfig,
     OrchestrationPlugin,
     Preprocessor,
+    PreprocessorPlugin,
     StandardFusionEngine,
     StandardFusionStrategy,
     StandardInertialMechanization,
@@ -44,7 +43,15 @@ from pntos.cobra.utils import (
     north_to_delta_lat,
     quat_to_dcm,
 )
-from pntos.cobra.utils.plugins import SortedPlugins, sort_plugins_dataclass
+from pntos.cobra.utils.plugins import (
+    SortedPlugins,
+    sort_plugins_dataclass,
+)
+from scipy.linalg import block_diag
+from .orchestration_utils import (
+    update_filter_and_feedback_states,
+    validate_plugins,
+)
 
 # Solution Channels
 BEST_SOL_CHANNEL = '/solution/pntos/best'
@@ -63,10 +70,6 @@ GPS_MEASUREMENT_PROCESSOR_ID = 'pinson_with_ned_fogm_position'
 GPS_MEASUREMENT_PROCESSOR_LABEL = 'gps'
 GPS_MEASUREMENT_PROCESSOR_CONFIG_GROUP = 'config/gp3d_state_modeling'
 GPS_MP_STATE_BLOCK_LABELS = [STATE_BLOCK_LABEL, FOGM_STATE_BLOCK_LABEL]
-VEL_MEASUREMENT_PROCESSOR_ID = 'pinson_velocity'
-VEL_MEASUREMENT_PROCESSOR_LABEL = 'vel'
-VEL_MEASUREMENT_PROCESSOR_CONFIG_GROUP = 'config/gp3d_state_modeling'
-VEL_MP_STATE_BLOCK_LABELS = [STATE_BLOCK_LABEL]
 
 # Inertial parameters
 INERTIAL_GROUP = 'config/inertial'
@@ -77,7 +80,7 @@ PREPROCESSOR_IDS = ['imu_rotator']
 PREPROCESSOR_GROUPS = [INERTIAL_GROUP]
 
 
-class SimpleGpsVelOrchestrationPlugin(OrchestrationPlugin):
+class SimpleGpsOrchestrationPlugin(OrchestrationPlugin):
     mediator: Mediator
     init_solution: InitialInertialSolution | None
     fusion_plugin: FusionPlugin
@@ -156,7 +159,6 @@ class SimpleGpsVelOrchestrationPlugin(OrchestrationPlugin):
 
         self.measurement_channels: dict[str, str] = {
             orch_config.gps_channel: GPS_MEASUREMENT_PROCESSOR_LABEL,
-            orch_config.velocity_channel: VEL_MEASUREMENT_PROCESSOR_LABEL,
         }
         self.alignment_channels: list[str] = [
             orch_config.gps_channel,
@@ -184,54 +186,7 @@ class SimpleGpsVelOrchestrationPlugin(OrchestrationPlugin):
         """
         sorted_plugins: SortedPlugins = sort_plugins_dataclass(plugin_list)
 
-        # Fusion Plugin
-        if len(sorted_plugins.fusion_plugins) != 1:
-            self._log(
-                LoggingLevel.ERROR,
-                f'Expected one FusionPlugin - received {len(sorted_plugins.fusion_plugins)}'
-                + f': {[p.identifier for p in sorted_plugins.fusion_plugins]}',
-            )
-            return
-        self.fusion_plugin = sorted_plugins.fusion_plugins[0]
-
-        # Fusion Strategy Plugin
-        if len(sorted_plugins.fusion_strategy_plugins) != 1:
-            self._log(
-                LoggingLevel.ERROR,
-                'Expected one FusionStrategyPlugin - received '
-                + f'{len(sorted_plugins.fusion_strategy_plugins)}',
-            )
-            return
-        self.fusion_strategy_plugin = sorted_plugins.fusion_strategy_plugins[0]
-
-        # Inertial Plugin
-        if len(sorted_plugins.inertial_plugins) != 1:
-            self._log(
-                LoggingLevel.ERROR,
-                f'Expected one InertialPlugin - received '
-                + f'{len(sorted_plugins.inertial_plugins)}',
-            )
-            return
-        self.inertial_plugin = sorted_plugins.inertial_plugins[0]
-
-        # Initialization Plugin
-        if len(sorted_plugins.initialization_plugins) != 1:
-            self._log(
-                LoggingLevel.ERROR,
-                'Expected one InitializationPlugin - received '
-                + f'{len(sorted_plugins.initialization_plugins)}',
-            )
-            return
-        self.initialization_plugin = sorted_plugins.initialization_plugins[0]
-
-        # State Modeling Plugin
-        if len(sorted_plugins.state_modeling_plugins) == 0:
-            self._log(
-                LoggingLevel.ERROR,
-                f'Expected at least one StateModelingPlugin - received none.',
-            )
-            return
-        self.state_modeling_plugins = sorted_plugins.state_modeling_plugins
+        validate_plugins(self, sorted_plugins, self._log)
 
         # Find and store preprocessors
         for identifier, config_group in zip(PREPROCESSOR_IDS, PREPROCESSOR_GROUPS):
@@ -287,7 +242,6 @@ class SimpleGpsVelOrchestrationPlugin(OrchestrationPlugin):
         pinson_block = None
         fogm_block = None
         gps_processor = None
-        vel_processor = None
         for plugin in self.state_modeling_plugins:
             provider: StandardStateModelProvider | None = (
                 plugin.new_state_model_provider(StandardStateModelProvider)
@@ -316,16 +270,6 @@ class SimpleGpsVelOrchestrationPlugin(OrchestrationPlugin):
                         GPS_MEASUREMENT_PROCESSOR_LABEL,
                         GPS_MP_STATE_BLOCK_LABELS,
                         GPS_MEASUREMENT_PROCESSOR_CONFIG_GROUP,
-                    )
-                if VEL_MEASUREMENT_PROCESSOR_ID in provider.processor_identifiers:
-                    vel_processor = provider.new_processor(
-                        provider.processor_identifiers.index(
-                            VEL_MEASUREMENT_PROCESSOR_ID
-                        ),
-                        fusion_engine,
-                        VEL_MEASUREMENT_PROCESSOR_LABEL,
-                        VEL_MP_STATE_BLOCK_LABELS,
-                        VEL_MEASUREMENT_PROCESSOR_CONFIG_GROUP,
                     )
 
         # Make state blocks
@@ -366,16 +310,6 @@ class SimpleGpsVelOrchestrationPlugin(OrchestrationPlugin):
             return
         fusion_engine.add_measurement_processor(gps_processor)
 
-        if vel_processor is None:
-            assert provider is not None
-            self._log(
-                LoggingLevel.ERROR,
-                f'Unable to find measurement processor "{VEL_MEASUREMENT_PROCESSOR_ID}" -'
-                + f' cannot initialize filter. Available measurement processors: {provider.processor_identifiers}',
-            )
-            return
-        fusion_engine.add_measurement_processor(vel_processor)
-
         self.fusion_engine = fusion_engine
 
     def _dispatch_to_fusion_engine(self, message: Message) -> None:
@@ -389,65 +323,13 @@ class SimpleGpsVelOrchestrationPlugin(OrchestrationPlugin):
         self._send_inertial_aux_to_measurement_processor(meas_time, mp_label)
         self._send_inertial_aux_to_pinson()
 
-        # Propagate to measurement time
-        self.fusion_engine.propagate(meas_time)
-
-        # Update filter.
-        self.fusion_engine.update(mp_label, message)
-
-        # Feedback states to inertial.
-        estimate = self.fusion_engine.get_state_block_estimate(STATE_BLOCK_LABEL)
-        if estimate is None:
-            self._log(
-                LoggingLevel.ERROR,
-                'Unable to obtain estimate from fusion engine.',
-            )
-            return
-
-        cur_time = self.fusion_engine.time
-        inertial_pva_message = self.inertial.request_solution(cur_time)
-
-        if inertial_pva_message is None:
-            self._log(
-                LoggingLevel.ERROR,
-                f'Unable to obtain solution from inertial at time {cur_time}.',
-            )
-            return
-
-        if not isinstance(
-            inertial_pva_message.wrapped_message,
-            MeasurementPositionVelocityAttitude,
-        ):
-            self._log(
-                LoggingLevel.ERROR,
-                'Did not receive PVA message from inertial. Received '
-                + f'{type(inertial_pva_message.wrapped_message)} instead.',
-            )
-            return
-
-        inertial_pva = inertial_pva_message.wrapped_message
-
-        corrected_pva = self._apply_error_states(inertial_pva, estimate)
-
-        message = Message(corrected_pva, 'python orchestration')
-
-        self.inertial.reset_solution(message)
-
-        imu_errors = self.inertial.request_sensor_errors(cur_time)
-        if imu_errors is None:
-            self._log(
-                LoggingLevel.ERROR,
-                f'Unable to obtain sensor errors from inertial at time {cur_time}.',
-            )
-            return
-
-        imu_errors.accel_biases -= estimate[9:12, 0]
-        imu_errors.gyro_biases -= estimate[12:15, 0]
-        self.inertial.correct_sensor_errors(cur_time, imu_errors)
-
-        # Assume zero error in states after applying feedback
-        self.fusion_engine.set_state_block_estimate(
-            STATE_BLOCK_LABEL, np.zeros((15, 1))
+        update_filter_and_feedback_states(
+            self.fusion_engine,
+            self.inertial,
+            message,
+            mp_label,
+            STATE_BLOCK_LABEL,
+            self._log,
         )
 
     def _generate_initial_inertial_solution(self) -> None:
