@@ -48,6 +48,7 @@ from pntos.cobra.utils import (
 from pntos.cobra.utils.plugins import (
     SortedPlugins,
     sort_plugins_dataclass,
+    update_filter_and_feedback_states,
     validate_plugins,
 )
 
@@ -321,65 +322,13 @@ class SimpleGpsOrchestrationPlugin(OrchestrationPlugin):
         self._send_inertial_aux_to_measurement_processor(meas_time, mp_label)
         self._send_inertial_aux_to_pinson()
 
-        # Propagate to measurement time
-        self.fusion_engine.propagate(meas_time)
-
-        # Update filter.
-        self.fusion_engine.update(mp_label, message)
-
-        # Feedback states to inertial.
-        estimate = self.fusion_engine.get_state_block_estimate(STATE_BLOCK_LABEL)
-        if estimate is None:
-            self._log(
-                LoggingLevel.ERROR,
-                'Unable to obtain estimate from fusion engine.',
-            )
-            return
-
-        cur_time = self.fusion_engine.time
-        inertial_pva_message = self.inertial.request_solution(cur_time)
-
-        if inertial_pva_message is None:
-            self._log(
-                LoggingLevel.ERROR,
-                f'Unable to obtain solution from inertial at time {cur_time}.',
-            )
-            return
-
-        if not isinstance(
-            inertial_pva_message.wrapped_message,
-            MeasurementPositionVelocityAttitude,
-        ):
-            self._log(
-                LoggingLevel.ERROR,
-                'Did not receive PVA message from inertial. Received '
-                + f'{type(inertial_pva_message.wrapped_message)} instead.',
-            )
-            return
-
-        inertial_pva = inertial_pva_message.wrapped_message
-
-        corrected_pva = self._apply_error_states(inertial_pva, estimate)
-
-        message = Message(corrected_pva, 'python orchestration')
-
-        self.inertial.reset_solution(message)
-
-        imu_errors = self.inertial.request_sensor_errors(cur_time)
-        if imu_errors is None:
-            self._log(
-                LoggingLevel.ERROR,
-                f'Unable to obtain sensor errors from inertial at time {cur_time}.',
-            )
-            return
-
-        imu_errors.accel_biases -= estimate[9:12, 0]
-        imu_errors.gyro_biases -= estimate[12:15, 0]
-        self.inertial.correct_sensor_errors(cur_time, imu_errors)
-
-        # Assume zero error in states after applying feedback
-        self.fusion_engine.set_state_block_estimate(
-            STATE_BLOCK_LABEL, np.zeros((15, 1))
+        update_filter_and_feedback_states(
+            self.fusion_engine,
+            self.inertial,
+            message,
+            mp_label,
+            STATE_BLOCK_LABEL,
+            self._log,
         )
 
     def _generate_initial_inertial_solution(self) -> None:
