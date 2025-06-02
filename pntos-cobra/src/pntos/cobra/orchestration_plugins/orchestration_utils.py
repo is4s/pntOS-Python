@@ -1,4 +1,5 @@
 from aspn23 import (
+    MeasurementImu,
     MeasurementPositionVelocityAttitude,
     MeasurementPositionVelocityAttitudeErrorModel,
     TypeHeader,
@@ -162,6 +163,16 @@ def send_inertial_aux_to_pinson(
     orch_plugin.fusion_engine.give_state_block_aux_data(
         sb_label, [pva_message, imu_message]
     )
+
+
+def rotate_imu_meas(orch_plugin: OrchestrationPlugin, imu: MeasurementImu) -> None:
+    """Rotate IMU measurement into platform frame.
+
+    Args:
+        message (MeasurementImu): IMU ASPN message to rotate.
+    """
+    imu.meas_accel = orch_plugin.C_inertial_to_platform @ imu.meas_accel
+    imu.meas_gyro = orch_plugin.C_inertial_to_platform @ imu.meas_gyro
 
 
 def generate_initial_inertial_solution(
