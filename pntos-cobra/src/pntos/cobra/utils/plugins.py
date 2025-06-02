@@ -8,6 +8,7 @@ from pntos.api import (
     FusionStrategyPlugin,
     InertialPlugin,
     InitializationPlugin,
+    LoggingLevel,
     LoggingPlugin,
     OrchestrationPlugin,
     PlatformIntegrationPlugin,
@@ -19,6 +20,8 @@ from pntos.api import (
     UiPlugin,
     UtilityPlugin,
 )
+
+from typing import Callable
 
 
 @dataclass
@@ -136,3 +139,66 @@ def camel_to_snake(name: str) -> str:
 
     """
     return re.sub(r'(?<!^)(?=[A-Z])', '_', name).lower()
+
+
+def validate_plugins(
+    orch_plugin: OrchestrationPlugin,
+    sorted_plugins: SortedPlugins,
+    log_func: Callable[[LoggingLevel, str], None],
+) -> None:
+    """
+    Utility function that verifies the number of plugins within ``sorted_plugins`` match
+    the respetive expected amount.
+
+    For example, the current ``pntos.src.cobra.SimpleOrchestrationPlugin`` expects 1 inertial.
+    This function then validates there is 1 inertial.
+    """
+    _log = log_func
+    # Fusion Plugin
+    if len(sorted_plugins.fusion_plugins) != 1:
+        _log(
+            LoggingLevel.ERROR,
+            f'Expected one FusionPlugin - received {len(sorted_plugins.fusion_plugins)}'
+            + f': {[p.identifier for p in sorted_plugins.fusion_plugins]}',
+        )
+        return
+    orch_plugin.fusion_plugin = sorted_plugins.fusion_plugins[0]
+
+    # Fusion Strategy Plugin
+    if len(sorted_plugins.fusion_strategy_plugins) != 1:
+        _log(
+            LoggingLevel.ERROR,
+            'Expected one FusionStrategyPlugin - received '
+            + f'{len(sorted_plugins.fusion_strategy_plugins)}',
+        )
+        return
+    orch_plugin.fusion_strategy_plugin = sorted_plugins.fusion_strategy_plugins[0]
+
+    # Inertial Plugin
+    if len(sorted_plugins.inertial_plugins) != 1:
+        _log(
+            LoggingLevel.ERROR,
+            f'Expected one InertialPlugin - received '
+            + f'{len(sorted_plugins.inertial_plugins)}',
+        )
+        return
+    orch_plugin.inertial_plugin = sorted_plugins.inertial_plugins[0]
+
+    # Initialization Plugin
+    if len(sorted_plugins.initialization_plugins) != 1:
+        _log(
+            LoggingLevel.ERROR,
+            'Expected one InitializationPlugin - received '
+            + f'{len(sorted_plugins.initialization_plugins)}',
+        )
+        return
+    orch_plugin.initialization_plugin = sorted_plugins.initialization_plugins[0]
+
+    # State Modeling Plugin
+    if len(sorted_plugins.state_modeling_plugins) == 0:
+        _log(
+            LoggingLevel.ERROR,
+            f'Expected at least one StateModelingPlugin - received none.',
+        )
+        return
+    orch_plugin.state_modeling_plugins = sorted_plugins.state_modeling_plugins

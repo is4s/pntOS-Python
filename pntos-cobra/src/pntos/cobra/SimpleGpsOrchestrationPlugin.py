@@ -45,7 +45,11 @@ from pntos.cobra.utils import (
     north_to_delta_lat,
     quat_to_dcm,
 )
-from pntos.cobra.utils.plugins import SortedPlugins, sort_plugins_dataclass
+from pntos.cobra.utils.plugins import (
+    SortedPlugins,
+    sort_plugins_dataclass,
+    validate_plugins,
+)
 
 # Solution Channels
 BEST_SOL_CHANNEL = '/solution/pntos/best'
@@ -180,54 +184,7 @@ class SimpleGpsOrchestrationPlugin(OrchestrationPlugin):
         """
         sorted_plugins: SortedPlugins = sort_plugins_dataclass(plugin_list)
 
-        # Fusion Plugin
-        if len(sorted_plugins.fusion_plugins) != 1:
-            self._log(
-                LoggingLevel.ERROR,
-                f'Expected one FusionPlugin - received {len(sorted_plugins.fusion_plugins)}'
-                + f': {[p.identifier for p in sorted_plugins.fusion_plugins]}',
-            )
-            return
-        self.fusion_plugin = sorted_plugins.fusion_plugins[0]
-
-        # Fusion Strategy Plugin
-        if len(sorted_plugins.fusion_strategy_plugins) != 1:
-            self._log(
-                LoggingLevel.ERROR,
-                'Expected one FusionStrategyPlugin - received '
-                + f'{len(sorted_plugins.fusion_strategy_plugins)}',
-            )
-            return
-        self.fusion_strategy_plugin = sorted_plugins.fusion_strategy_plugins[0]
-
-        # Inertial Plugin
-        if len(sorted_plugins.inertial_plugins) != 1:
-            self._log(
-                LoggingLevel.ERROR,
-                f'Expected one InertialPlugin - received '
-                + f'{len(sorted_plugins.inertial_plugins)}',
-            )
-            return
-        self.inertial_plugin = sorted_plugins.inertial_plugins[0]
-
-        # Initialization Plugin
-        if len(sorted_plugins.initialization_plugins) != 1:
-            self._log(
-                LoggingLevel.ERROR,
-                'Expected one InitializationPlugin - received '
-                + f'{len(sorted_plugins.initialization_plugins)}',
-            )
-            return
-        self.initialization_plugin = sorted_plugins.initialization_plugins[0]
-
-        # State Modeling Plugin
-        if len(sorted_plugins.state_modeling_plugins) == 0:
-            self._log(
-                LoggingLevel.ERROR,
-                f'Expected at least one StateModelingPlugin - received none.',
-            )
-            return
-        self.state_modeling_plugins = sorted_plugins.state_modeling_plugins
+        validate_plugins(self, sorted_plugins, self._log)
 
         # Find and store preprocessors
         for identifier, config_group in zip(PREPROCESSOR_IDS, PREPROCESSOR_GROUPS):
