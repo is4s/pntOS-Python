@@ -90,8 +90,13 @@ class SimpleGpsOrchestrationPlugin(OrchestrationPlugin):
     state_modeling_plugins: list[StateModelingPlugin]
     preprocessors: list[Preprocessor]
     initialization_plugin: InitializationPlugin
+    initialization_state: InitializationStatus
     initializer: InertialInitializationStrategy
     inertial: StandardInertialMechanization
+    fusion_engine: StandardFusionEngine
+    measurement_channels: dict[str, str]
+    alignment_channels: list[str]
+    C_inertial_to_platform: NDArray[float64]
 
     def __init__(self, identifier: str) -> None:
         """
@@ -108,7 +113,7 @@ class SimpleGpsOrchestrationPlugin(OrchestrationPlugin):
             LoggingLevel.ERROR: 'ERROR:',
             LoggingLevel.WARN: 'WARNING:',
         }
-        self.initialization_state: InitializationStatus = InitializationStatus.WAITING
+        self.initialization_state = InitializationStatus.WAITING
         self.init_solution = None
         self.preprocessors = []
 
@@ -161,10 +166,10 @@ class SimpleGpsOrchestrationPlugin(OrchestrationPlugin):
             )
             return
 
-        self.measurement_channels: dict[str, str] = {
+        self.measurement_channels = {
             orch_config.gps_channel: GPS_MEASUREMENT_PROCESSOR_LABEL,
         }
-        self.alignment_channels: list[str] = [
+        self.alignment_channels = [
             orch_config.gps_channel,
             inertial_config.channel,
         ]

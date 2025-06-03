@@ -14,6 +14,14 @@ from pntos.api import (
     LoggingLevel,
     Message,
     StandardInertialMechanization,
+    FusionPlugin,
+    FusionStrategyPlugin,
+    StandardFusionEngine,
+    InertialPlugin,
+    InitialInertialSolution,
+    InitializationPlugin,
+    Mediator,
+    StateModelingPlugin,
 )
 from pntos.cobra.utils import (
     SortedPlugins,
@@ -26,12 +34,34 @@ from pntos.cobra.utils import (
 )
 from scipy.linalg import block_diag
 
-from .SimpleGpsOrchestrationPlugin import SimpleGpsOrchestrationPlugin
-from .SimpleGpsVelOrchestrationPlugin import SimpleGpsVelOrchestrationPlugin
+from typing import Protocol, TypeVar
+
+
+class SimpleOrchestrationProtocol(Protocol):
+    mediator: Mediator
+    init_solution: InitialInertialSolution | None
+    fusion_plugin: FusionPlugin
+    fusion_strategy_plugin: FusionStrategyPlugin
+    inertial_plugin: InertialPlugin
+    state_modeling_plugins: list[StateModelingPlugin]
+    initialization_plugin: InitializationPlugin
+    initialization_state: InitializationStatus
+    initializer: InertialInitializationStrategy
+    inertial: StandardInertialMechanization
+    fusion_engine: StandardFusionEngine
+    measurement_channels: dict[str, str]
+    alignment_channels: list[str]
+    C_inertial_to_platform: NDArray[float64]
+
+    def _log(self, level: LoggingLevel, message: str) -> None:
+        pass
+
+
+SimpleOrchestration = TypeVar("SimpleOrchestration", bound=SimpleOrchestrationProtocol)
 
 
 def sort_and_validate_plugins(
-    orch_plugin: SimpleGpsOrchestrationPlugin | SimpleGpsVelOrchestrationPlugin,
+    orch_plugin: SimpleOrchestration,
     plugin_list: list[CommonPlugin],
 ) -> None:
     """
@@ -95,7 +125,7 @@ def sort_and_validate_plugins(
 
 
 def set_up_initializer(
-    orch_plugin: SimpleGpsOrchestrationPlugin | SimpleGpsVelOrchestrationPlugin,
+    orch_plugin: SimpleOrchestration,
     alignment_config_group: str,
 ) -> None:
     """Set up inertial initialization strategy, and initialize filter solution if initializer is immediately ready."""
@@ -116,7 +146,7 @@ def set_up_initializer(
 
 
 def initialization_ready(
-    orch_plugin: SimpleGpsOrchestrationPlugin | SimpleGpsVelOrchestrationPlugin,
+    orch_plugin: SimpleOrchestration,
 ) -> bool:
     """
     Utility function to poll the state of the init strategy plugin.
@@ -128,7 +158,7 @@ def initialization_ready(
 
 
 def send_inertial_aux_to_measurement_processor(
-    orch_plugin: SimpleGpsOrchestrationPlugin | SimpleGpsVelOrchestrationPlugin,
+    orch_plugin: SimpleOrchestration,
     time: TypeTimestamp,
     mp_label: str,
 ) -> None:
@@ -146,7 +176,7 @@ def send_inertial_aux_to_measurement_processor(
 
 
 def send_inertial_aux_to_pinson(
-    orch_plugin: SimpleGpsOrchestrationPlugin | SimpleGpsVelOrchestrationPlugin,
+    orch_plugin: SimpleOrchestration,
     sb_label: str,
 ) -> None:
     """Send the current inertial solution and forces to the Pinson15 state-block."""
@@ -174,7 +204,7 @@ def send_inertial_aux_to_pinson(
 
 
 def rotate_imu_meas(
-    orch_plugin: SimpleGpsOrchestrationPlugin | SimpleGpsVelOrchestrationPlugin,
+    orch_plugin: SimpleOrchestration,
     imu: MeasurementImu,
 ) -> None:
     """Rotate IMU measurement into platform frame.
@@ -187,7 +217,7 @@ def rotate_imu_meas(
 
 
 def generate_initial_inertial_solution(
-    orch_plugin: SimpleGpsOrchestrationPlugin | SimpleGpsVelOrchestrationPlugin,
+    orch_plugin: SimpleOrchestration,
     sb_label: str,
     inertial_group: str,
 ) -> None:
@@ -252,7 +282,7 @@ def generate_initial_inertial_solution(
     init_time = orch_plugin.init_solution.solution.wrapped_message.time_of_validity
     orch_plugin.fusion_engine.time = init_time
 
-    orch_plugin._send_inertial_aux_to_pinson()
+    send_inertial_aux_to_pinson(orch_plugin, sb_label)
 
     orch_plugin._log(
         LoggingLevel.INFO,
@@ -261,7 +291,7 @@ def generate_initial_inertial_solution(
 
 
 def dispatch_to_fusion_engine(
-    orch_plugin: SimpleGpsOrchestrationPlugin | SimpleGpsVelOrchestrationPlugin,
+    orch_plugin: SimpleOrchestration,
     message: Message,
     sb_label: str,
 ) -> None:
