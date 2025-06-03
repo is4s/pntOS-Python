@@ -13,7 +13,6 @@ from pntos.api import (
     InitializationStatus,
     LoggingLevel,
     Message,
-    OrchestrationPlugin,
     StandardInertialMechanization,
 )
 from pntos.cobra.utils import (
@@ -27,9 +26,12 @@ from pntos.cobra.utils import (
 )
 from scipy.linalg import block_diag
 
+from .SimpleGpsOrchestrationPlugin import SimpleGpsOrchestrationPlugin
+from .SimpleGpsVelOrchestrationPlugin import SimpleGpsVelOrchestrationPlugin
+
 
 def sort_and_validate_plugins(
-    orch_plugin: OrchestrationPlugin,
+    orch_plugin: SimpleGpsOrchestrationPlugin | SimpleGpsVelOrchestrationPlugin,
     plugin_list: list[CommonPlugin],
 ) -> None:
     """
@@ -93,7 +95,8 @@ def sort_and_validate_plugins(
 
 
 def set_up_initializer(
-    orch_plugin: OrchestrationPlugin, alignment_config_group: str
+    orch_plugin: SimpleGpsOrchestrationPlugin | SimpleGpsVelOrchestrationPlugin,
+    alignment_config_group: str,
 ) -> None:
     """Set up inertial initialization strategy, and initialize filter solution if initializer is immediately ready."""
     # Set up initializer
@@ -112,7 +115,9 @@ def set_up_initializer(
     orch_plugin.initializer = init_strategy
 
 
-def initialization_ready(orch_plugin: OrchestrationPlugin) -> bool:
+def initialization_ready(
+    orch_plugin: SimpleGpsOrchestrationPlugin | SimpleGpsVelOrchestrationPlugin,
+) -> bool:
     """
     Utility function to poll the state of the init strategy plugin.
 
@@ -123,7 +128,9 @@ def initialization_ready(orch_plugin: OrchestrationPlugin) -> bool:
 
 
 def send_inertial_aux_to_measurement_processor(
-    orch_plugin: OrchestrationPlugin, time: TypeTimestamp, mp_label: str
+    orch_plugin: SimpleGpsOrchestrationPlugin | SimpleGpsVelOrchestrationPlugin,
+    time: TypeTimestamp,
+    mp_label: str,
 ) -> None:
     """Send the current inertial solution to the specified measurement processor."""
     pva_message = orch_plugin.inertial.request_solution(time)
@@ -139,7 +146,8 @@ def send_inertial_aux_to_measurement_processor(
 
 
 def send_inertial_aux_to_pinson(
-    orch_plugin: OrchestrationPlugin, sb_label: str
+    orch_plugin: SimpleGpsOrchestrationPlugin | SimpleGpsVelOrchestrationPlugin,
+    sb_label: str,
 ) -> None:
     """Send the current inertial solution and forces to the Pinson15 state-block."""
     time = orch_plugin.fusion_engine.time
@@ -165,7 +173,10 @@ def send_inertial_aux_to_pinson(
     )
 
 
-def rotate_imu_meas(orch_plugin: OrchestrationPlugin, imu: MeasurementImu) -> None:
+def rotate_imu_meas(
+    orch_plugin: SimpleGpsOrchestrationPlugin | SimpleGpsVelOrchestrationPlugin,
+    imu: MeasurementImu,
+) -> None:
     """Rotate IMU measurement into platform frame.
 
     Args:
@@ -176,7 +187,9 @@ def rotate_imu_meas(orch_plugin: OrchestrationPlugin, imu: MeasurementImu) -> No
 
 
 def generate_initial_inertial_solution(
-    orch_plugin: OrchestrationPlugin, sb_label: str, inertial_group: str
+    orch_plugin: SimpleGpsOrchestrationPlugin | SimpleGpsVelOrchestrationPlugin,
+    sb_label: str,
+    inertial_group: str,
 ) -> None:
     """Get initial inertial solution and use it to set up the inertial."""
     orch_plugin.init_solution = orch_plugin.initializer.request_solution()
@@ -248,7 +261,7 @@ def generate_initial_inertial_solution(
 
 
 def dispatch_to_fusion_engine(
-    orch_plugin: OrchestrationPlugin,
+    orch_plugin: SimpleGpsOrchestrationPlugin | SimpleGpsVelOrchestrationPlugin,
     message: Message,
     sb_label: str,
 ) -> None:

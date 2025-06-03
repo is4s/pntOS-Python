@@ -89,6 +89,9 @@ class SimpleGpsOrchestrationPlugin(OrchestrationPlugin):
     inertial_plugin: InertialPlugin
     state_modeling_plugins: list[StateModelingPlugin]
     preprocessors: list[Preprocessor]
+    initialization_plugin: InitializationPlugin
+    initializer: InertialInitializationStrategy
+    inertial: StandardInertialMechanization
 
     def __init__(self, identifier: str) -> None:
         """
