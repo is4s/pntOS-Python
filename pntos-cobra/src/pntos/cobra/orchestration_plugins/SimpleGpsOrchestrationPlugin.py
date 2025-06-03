@@ -45,9 +45,9 @@ from pntos.cobra.utils import (
 )
 
 from .orchestration_utils import (
-    apply_error_states,
     dispatch_to_fusion_engine,
     generate_initial_inertial_solution,
+    get_best_solution,
     get_dead_reckoning_solution,
     has_valid_time,
     initialization_ready,
@@ -387,53 +387,6 @@ class SimpleGpsOrchestrationPlugin(OrchestrationPlugin):
 
         return descriptions
 
-    def _get_best_solution(self, time: TypeTimestamp) -> Message | None:
-        """
-        Utility function to request the best fusion strategy solution. Returns
-        ``None`` if the fusion engine is unable to provide a solution for the requested time.
-        """
-
-        x_and_p: EstimateWithCovariance | None = self.fusion_engine.peek_ahead(
-            time, [STATE_BLOCK_LABEL]
-        )
-        if x_and_p is None:
-            self._log(
-                LoggingLevel.WARN,
-                f'Cannot get filter solution at time {time}. Filter is already at time {self.fusion_engine.time}.',
-            )
-            return None
-
-        inertial_solution: Message | None = self.inertial.request_solution(time)
-
-        if inertial_solution is None:
-            self._log(
-                LoggingLevel.ERROR,
-                f'Unable to obtain solution from inertial at time {time}. Cannot generate BEST solution.',
-            )
-            return None
-
-        if not isinstance(
-            inertial_solution.wrapped_message,
-            MeasurementPositionVelocityAttitude,
-        ):
-            self._log(
-                LoggingLevel.ERROR,
-                f'Expected PVA solution from inertial, but got type {type(inertial_solution.wrapped_message)}. Cannot generate BEST solution.',
-            )
-            return None
-
-        # corrected_pva = self._apply_error_states(
-        #     inertial_solution.wrapped_message, x_and_p.estimate
-        # )
-        corrected_pva = apply_error_states(
-            inertial_solution.wrapped_message, x_and_p.estimate
-        )
-
-        covariance = x_and_p.covariance
-        corrected_pva.covariance = covariance[:9, :9]
-
-        return Message(corrected_pva, BEST_SOL_CHANNEL)
-
     def request_solutions(
         self,
         solution_times: list[TypeTimestamp],
@@ -469,7 +422,9 @@ class SimpleGpsOrchestrationPlugin(OrchestrationPlugin):
             time = latest_time
 
         if filter_description is None or 'BEST' in filter_description:
-            solution_out = self._get_best_solution(time)
+            solution_out = get_best_solution(
+                self, time, STATE_BLOCK_LABEL, BEST_SOL_CHANNEL
+            )
 
         elif 'DEAD_RECKONING' in filter_description:
             solution_out = get_dead_reckoning_solution(self, time, IMU_SOL_CHANNEL)

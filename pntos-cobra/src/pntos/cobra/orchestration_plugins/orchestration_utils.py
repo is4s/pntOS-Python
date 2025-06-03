@@ -1,3 +1,5 @@
+from typing import Protocol, TypeVar
+
 from aspn23 import (
     MeasurementImu,
     MeasurementPositionVelocityAttitude,
@@ -9,18 +11,19 @@ from numpy import array, float64, zeros
 from numpy.typing import NDArray
 from pntos.api import (
     CommonPlugin,
-    InertialInitializationStrategy,
-    InitializationStatus,
-    LoggingLevel,
-    Message,
-    StandardInertialMechanization,
+    EstimateWithCovariance,
     FusionPlugin,
     FusionStrategyPlugin,
-    StandardFusionEngine,
+    InertialInitializationStrategy,
     InertialPlugin,
     InitialInertialSolution,
     InitializationPlugin,
+    InitializationStatus,
+    LoggingLevel,
     Mediator,
+    Message,
+    StandardFusionEngine,
+    StandardInertialMechanization,
     StateModelingPlugin,
 )
 from pntos.cobra.utils import (
@@ -33,8 +36,6 @@ from pntos.cobra.utils import (
     sort_plugins_dataclass,
 )
 from scipy.linalg import block_diag
-
-from typing import Protocol, TypeVar
 
 
 class SimpleOrchestrationProtocol(Protocol):
@@ -57,7 +58,7 @@ class SimpleOrchestrationProtocol(Protocol):
         pass
 
 
-SimpleOrchestration = TypeVar("SimpleOrchestration", bound=SimpleOrchestrationProtocol)
+SimpleOrchestration = TypeVar('SimpleOrchestration', bound=SimpleOrchestrationProtocol)
 
 
 def sort_and_validate_plugins(
@@ -248,7 +249,9 @@ def has_valid_time(orch_plugin: SimpleOrchestration, message: Message) -> bool:
         return False
 
 
-def get_dead_reckoning_solution(orch_plugin: SimpleOrchestration, time: TypeTimestamp, imu_sol_chan: str) -> Message | None:
+def get_dead_reckoning_solution(
+    orch_plugin: SimpleOrchestration, time: TypeTimestamp, imu_sol_chan: str
+) -> Message | None:
     """
     Utility function to request the IMU-only dead-reckoning solution. Returns
     ``None`` if the inertial is unable to provide a solution for the requested time.
@@ -263,6 +266,56 @@ def get_dead_reckoning_solution(orch_plugin: SimpleOrchestration, time: TypeTime
             + ' Cannot generate DEAD_RECKONING solution.',
         )
         return None
+
+
+def get_best_solution(
+    orch_plugin: SimpleOrchestration,
+    time: TypeTimestamp,
+    sb_label: str,
+    best_sol_chan: str,
+) -> Message | None:
+    """
+    Utility function to request the best fusion strategy solution. Returns
+    ``None`` if the fusion engine is unable to provide a solution for the requested time.
+    """
+
+    x_and_p: EstimateWithCovariance | None = orch_plugin.fusion_engine.peek_ahead(
+        time, [sb_label]
+    )
+    if x_and_p is None:
+        orch_plugin._log(
+            LoggingLevel.WARN,
+            f'Cannot get filter solution at time {time}. Filter is already at time {orch_plugin.fusion_engine.time}.',
+        )
+        return None
+
+    inertial_solution: Message | None = orch_plugin.inertial.request_solution(time)
+
+    if inertial_solution is None:
+        orch_plugin._log(
+            LoggingLevel.ERROR,
+            f'Unable to obtain solution from inertial at time {time}. Cannot generate BEST solution.',
+        )
+        return None
+
+    if not isinstance(
+        inertial_solution.wrapped_message,
+        MeasurementPositionVelocityAttitude,
+    ):
+        orch_plugin._log(
+            LoggingLevel.ERROR,
+            f'Expected PVA solution from inertial, but got type {type(inertial_solution.wrapped_message)}. Cannot generate BEST solution.',
+        )
+        return None
+
+    corrected_pva = apply_error_states(
+        inertial_solution.wrapped_message, x_and_p.estimate
+    )
+
+    covariance = x_and_p.covariance
+    corrected_pva.covariance = covariance[:9, :9]
+
+    return Message(corrected_pva, best_sol_chan)
 
 
 def generate_initial_inertial_solution(
