@@ -63,9 +63,9 @@ class SimpleGpsInsStateModelProvider(StandardStateModelProvider):
             label (str): A string which will be used to populate the ``label`` field
                 of the newly created processor. This ``label`` will be the unique
                 name for the returned instance of a processor, and used to
-                track the processor throughout its lifecycle. Note that it
-                differs from :attr:`processor_identifiers` which is the model's mechanism
-                for selecting the *type* of processor to create.
+                track the processor throughout its lifecycle. Note that it differs from
+                :attr:`pntos.api.StandardStateModelProvider.processor_identifiers` which is the
+                model's mechanism for selecting the *type* of processor to create.
             config_group (str): Indicates which (if any) parameter group in the
                 registry may be used to obtain additional configuration values to
                 generate the new processor. If the processor requires no
@@ -142,10 +142,10 @@ class SimpleGpsInsStateModelProvider(StandardStateModelProvider):
                 ``None`` when no engine is available for the block to use.
             label (str): A string which will be used to populate the ``label`` field
                 of the newly created state block. This ``label`` will be the unique
-                name for the returned instance of a state block, and used to
-                track the state block throughout its lifecycle. Note that it
-                differs from :attr:`block_identifiers` which is the model's mechanism
-                for selecting the *kind* of state block to create.
+                name for the returned instance of a state block, and used to track the state block
+                throughout its lifecycle. Note that it differs from
+                :attr:`pntos.api.StandardStateModelProvider.block_identifiers` which is the model's
+                mechanism for selecting the *kind* of state block to create.
             config_group (str): Indicates which (if any) parameter group in the
                 registry may be used to obtain additional configuration values to
                 generate the new state block. If the state block requires no

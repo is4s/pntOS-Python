@@ -24,7 +24,7 @@ class Preprocessor(ABC):
             message (Message): A message to be processed.
 
         Returns:
-            list[Message] | None: A list of :class:`Message` s. Usually this will be a single message, a
+            list[Message] | None: A list of :class:`pntos.api.Message` s. Usually this will be a single message, a
             modified version of ``message``. It could be ``None`` if ``message`` is rejected or
             dropped. The preprocessor could also accumulate several messages, returning ``None`` for
             each one then returning an array with multiple processed messages.
@@ -36,7 +36,7 @@ class PreprocessorPlugin(CommonPlugin, ABC):
     """
     An implementation of a preprocessor plugin.
 
-    This plugin generates :class:`Preprocessor` instances which may be used to process incoming
+    This plugin generates :class:`pntos.api.Preprocessor` instances which may be used to process incoming
     messages before being distributed to other plugins.
 
     Caution:
@@ -46,25 +46,27 @@ class PreprocessorPlugin(CommonPlugin, ABC):
 
     Attributes:
         preprocessor_identifiers (list[str]): A list of identifying strings for each kind of
-            :class:`Preprocessor` that this :class:`PreprocessorPlugin` can create instances of. The
+            :class:`pntos.api.Preprocessor` that this :class:`pntos.api.PreprocessorPlugin` can create instances of. The
             ``preprocessor_index`` parameter of :meth:`new_preprocessor` is an index into this
             array.
     """
 
     preprocessor_identifiers: list[str]
+    """Strings describing the preprocessors the provider can create.
+    """
 
     @abstractmethod
     def new_preprocessor(
         self, preprocessor_index: int, config_group: str | None = None
     ) -> Preprocessor | None:
         """
-        Get a newly created :class:`Preprocessor`.
+        Get a newly created :class:`pntos.api.Preprocessor`.
 
         Args:
-            preprocessor_index (int): Since the :class:`PreprocessorPlugin` can create a different
+            preprocessor_index (int): Since the :class:`pntos.api.PreprocessorPlugin` can create a different
                 preprocessor for each element in ``preprocessor_identifiers``, the
                 ``preprocessor_index`` parameter is used to select which kind of preprocessor to
-                create a new instance of. The :attr:`PreprocessorPlugin.preprocessor_identifiers`
+                create a new instance of. The :attr:`pntos.api.PreprocessorPlugin.preprocessor_identifiers`
                 field contains identifying strings for the kinds of preprocessors.
 
         Example:
@@ -79,8 +81,8 @@ class PreprocessorPlugin(CommonPlugin, ABC):
                 ``config_group`` may be ``None``.
 
         Returns:
-            Preprocessor: A newly created :class:`Preprocessor`. Returns ``None`` if
+            Preprocessor: A newly created :class:`pntos.api.Preprocessor`. Returns ``None`` if
             ``preprocessor_index`` is greater than or equal to the length of
-            :attr:`PreprocessorPlugin.preprocessor_identifiers` or if ``config_group`` is invalid.
+            :attr:`pntos.api.PreprocessorPlugin.preprocessor_identifiers` or if ``config_group`` is invalid.
         """
         pass

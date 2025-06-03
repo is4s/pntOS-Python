@@ -136,6 +136,8 @@ class SimpleKeyValueStore(KeyValueStore):
             },
         }
         """
+        A store of type conversion functions.
+
         Usage: ``type_conversion[type_in_store][requested_return_type] ->
         requested_return_type | None``
 

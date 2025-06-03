@@ -224,7 +224,7 @@ class TestRegistry(unittest.TestCase):
         return 'generic_test_group'
 
     def set_up_store_with_all_types(self, group: str | None = None) -> KeyValueStore:
-        """NOTE: Assumes :meth:`KeyValueStore.clear()` works."""
+        """NOTE: Assumes :meth:`pntos.api.KeyValueStore.clear()` works."""
         if group is None:
             group = self.test_group
         test_kv = self.reg.batch_start(group)

@@ -34,8 +34,8 @@ def save_to_hdf5_file(
     Args:
         file (str): Path to ``.hdf5`` file.
         store (dict[str, list[RegistryValueTypeUnion]]): The dictionary to write to the
-        HDF5 file, subject to the above assumptions.
-        mediator (Mediator): :class:`Mediator` object for log messages.
+            HDF5 file, subject to the above assumptions.
+        mediator (Mediator): :class:`pntos.api.Mediator` object for log messages.
     """
     with h5py.File(file, 'w') as hdf5_file:
         for key, val_list in store.items():
@@ -87,12 +87,12 @@ def load_from_hdf5_file(
     Utility function for loading data from an HDF5 file into python.
 
     This function is intended to unpack an HDF5 file that was packed by
-    :class:`save_to_hdf5_file` into a dictionary of keys and lists of logged values.
-    See :class:`save_to_hdf5_file` for more information.
+    :func:`save_to_hdf5_file` into a dictionary of keys and lists of logged values.
+    See :func:`save_to_hdf5_file` for more information.
 
     Args:
         file (str): Path to ``.hdf5`` file.
-        mediator (Mediator): :class:`Mediator` object for log messages.
+        mediator (Mediator): :class:`pntos.api.Mediator` object for log messages.
 
     Returns:
        dict[str, list[RegistryValueTypeUnion]]

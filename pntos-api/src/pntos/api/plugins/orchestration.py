@@ -12,7 +12,7 @@ class MessageStreamConfig(ABC):
     Message stream configuration.
 
     This class configures the buffering, delay, and sorting characteristics of
-    messages that are streamed into the :class:`OrchestrationPlugin`. The pntOS system
+    messages that are streamed into the :class:`pntos.api.OrchestrationPlugin`. The pntOS system
     will deliver messages to the orchestration plugin as it receives them.
     However, there is a fundamental tradeoff between latency and those messages
     being in-order. In particular, to guarantee that messages are sorted by
@@ -61,7 +61,7 @@ class MessageStreamConfig(ABC):
         Request all messages are streamed in sorted timestamp ordering.
 
         Note that the ability to do this reliably will depend on the length of the buffer used by
-        the :class:`Mediator`.
+        the :class:`pntos.api.Mediator`.
 
         Args:
             enable (bool)
@@ -119,7 +119,7 @@ class OrchestrationPlugin(CommonPlugin, ABC):
 
     The pntOS orchestration plugin is responsible for orchestrating one or more fusion engines,
     state model providers and other plugins in order to perform sensor fusion. The orchestration
-    plugin is sent (sorted, buffered) ASPN messages from the :class:`ControllerPlugin`, and is
+    plugin is sent (sorted, buffered) ASPN messages from the :class:`pntos.api.ControllerPlugin`, and is
     responsible for computing a solution for the system, as well as estimating any other quantities
     of interest.
 
@@ -131,8 +131,8 @@ class OrchestrationPlugin(CommonPlugin, ABC):
     Example:
         For example, the orchestration plugin may set up a fusion engine it received in the call to
         :meth:`~OrchestrationPlugin.init_orchestration_plugin`, then add state blocks or measurement
-        processors to that fusion engine from a :class:`StateModelingPlugin` it also received, and
-        process inertial data from an :class:`InertialPlugin` it received. The
+        processors to that fusion engine from a :class:`pntos.api.StateModelingPlugin` it also received, and
+        process inertial data from an :class:`pntos.api.InertialPlugin` it received. The
         :meth:`~OrchestrationPlugin.request_solutions` function will be called by the system when
         pntOS needs to know the current filtering solutions. Other quantities which need to be
         estimated by the orchestration engine can be returned to the system by registry updates.
@@ -145,23 +145,23 @@ class OrchestrationPlugin(CommonPlugin, ABC):
         """
         Initial data structures needed by the orchestration plugin.
 
-        This function will be called by the system after the :meth:`CommonPlugin.init_plugin` but before
-        any other call to an :class:`OrchestrationPlugin` function.
+        This function will be called by the system after the :meth:`pntos.api.CommonPlugin.init_plugin` but before
+        any other call to an :class:`pntos.api.OrchestrationPlugin` function.
 
         Args:
             plugins (list[CommonPlugin]): A set of plugins which should be used by the orchestration
-                plugin. For example, the plugins list may include a :class:`StandardFusionEngine`,
+                plugin. For example, the plugins list may include a :class:`pntos.api.StandardFusionEngine`,
                 which the orchestration plugin can use to perform fusion of sensor data received.
-                The list may also include a :class:`StateModelingPlugin`, which the orchestration
+                The list may also include a :class:`pntos.api.StateModelingPlugin`, which the orchestration
                 plugin can use to extract the algorithms needed for parsing sensor data into the
                 data model a fusion engine needs. If the orchestration plugin does not require any
                 plugins, ``None`` may be passed.
             stream_config (MessageStreamConfig): A set of configuration options that the
-                orchestration plugin can use to indicate to the :class:`ControllerPlugin` how it
+                orchestration plugin can use to indicate to the :class:`pntos.api.ControllerPlugin` how it
                 would prefer delivery of messages. When the orchestration plugin receives the
                 ``stream_config`` struct, it should call the functions on it to set up how messages
                 will be delivered to it. If it does not, the order of messages' arrival will be
-                unspecified and at the discretion of the :class:`ControllerPlugin`.
+                unspecified and at the discretion of the :class:`pntos.api.ControllerPlugin`.
         """
         pass
 
@@ -174,13 +174,13 @@ class OrchestrationPlugin(CommonPlugin, ABC):
         engine.
 
         Args:
-            message (Message): The :class:`Message` to be delivered to the
-                :class:`OrchestrationPlugin` from the :class:`ControllerPlugin`. From here the
-                :class:`OrchestrationPlugin` may use it directly or route it to other plugins (like
-                the :class:`FusionPlugin`, :class:`InertialPlugin`, or
-                :class:`InitializationPlugin`).
-            sequenced (bool): ``False`` if ``message`` was the last received :class:`Message`
-                or ``True`` if it was delayed by buffering. See :class:`MessageStreamConfig` for
+            message (Message): The :class:`pntos.api.Message` to be delivered to the
+                :class:`pntos.api.OrchestrationPlugin` from the :class:`pntos.api.ControllerPlugin`. From here the
+                :class:`pntos.api.OrchestrationPlugin` may use it directly or route it to other plugins (like
+                the :class:`pntos.api.FusionPlugin`, :class:`pntos.api.InertialPlugin`, or
+                :class:`pntos.api.InitializationPlugin`).
+            sequenced (bool): ``False`` if ``message`` was the last received :class:`pntos.api.Message`
+                or ``True`` if it was delayed by buffering. See :class:`pntos.api.MessageStreamConfig` for
                 more details.
         """
         pass
@@ -188,7 +188,7 @@ class OrchestrationPlugin(CommonPlugin, ABC):
     @abstractmethod
     def get_filter_description_list(self) -> list[str]:
         """
-        Get a list of strings describing the filters available in this :class:`OrchestrationPlugin`.
+        Get a list of strings describing the filters available in this :class:`pntos.api.OrchestrationPlugin`.
 
         One of these description strings may be used when calling :meth:`request_solutions`. For
         consistency, these strings should adhere to the following conventions:
@@ -219,7 +219,7 @@ class OrchestrationPlugin(CommonPlugin, ABC):
 
         Returns:
             list[str]: A list of strings describing the filters available in this
-            :class:`OrchestrationPlugin`.
+            :class:`pntos.api.OrchestrationPlugin`.
         """
         pass
 
@@ -234,11 +234,11 @@ class OrchestrationPlugin(CommonPlugin, ABC):
 
         Args:
             solution_times (list[TypeTimestamp]): The solution times.
-            filter_description (str | None, optional): An :class:`OrchestrationPlugin` may run
+            filter_description (str | None, optional): An :class:`pntos.api.OrchestrationPlugin` may run
                 multiple filters. To select which filter(s) to request solutions from, enter a valid
                 filter description string in ``filter_description``. Valid filter description
                 strings can be obtained by calling :meth:`get_filter_description_list`. Passing in
-                ``None`` will provide a result specific to a particular :class:`OrchestrationPlugin`
+                ``None`` will provide a result specific to a particular :class:`pntos.api.OrchestrationPlugin`
                 implementation. When ``filter_description`` is ``None``, the implementation should
                 endeavor to return its best solution.
 
@@ -246,7 +246,7 @@ class OrchestrationPlugin(CommonPlugin, ABC):
             list[Message] | None: An array of messages containing the filter solutions for the requested
             ``solution_times``. The number of solutions should equal the number of times in
             ``solution_times``, although some entries may be ``None`` if they are unavailable at the
-            corresponding time in ``solution_times``. The returned :class:`Message` list may be
+            corresponding time in ``solution_times``. The returned :class:`pntos.api.Message` list may be
             ``None`` if ``filter_description`` is invalid.
         """
         pass

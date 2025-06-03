@@ -45,13 +45,13 @@ class PinsonPositionMeasurementProcessor(StandardMeasurementProcessor):
         Args:
             label (str): Name of processor.
             state_block_labels (list[str]): A 1-element list of labels of state blocks this
-            processor can update. The single entry should refer to a Pinson-style
-            state block of at least size 9, with NED position errors in meters as
-            the first three states and NED tilt errors, in radians, as states 6:9.
+                processor can update. The single entry should refer to a Pinson-style
+                state block of at least size 9, with NED position errors in meters as
+                the first three states and NED tilt errors, in radians, as states 6:9.
             mediator (Mediator): a Mediator instance.
             l_ps_p (NDArray[float64]): A 3-element array representing the lever arm from the
-            platform frame origin to the position sensor origin, in the platform frame, in
-            units of meters.
+                platform frame origin to the position sensor origin, in the platform frame, in
+                units of meters.
         """
         self.label = label
         self.state_block_labels = state_block_labels

@@ -87,6 +87,35 @@ html_theme_options = {
 }
 html_favicon = f'{branding_dir}/favicon.ico'
 
+nitpicky = True
+nitpick_ignore = [
+    # Core Python classes which automodule automatically tries to link to.
+    ('py:class', 'abc.ABC'),
+    ('py:class', 'optional'),
+    ('py:class', 'enum.Enum'),
+    # numpy classes which automodule automatically tries to link to.
+    ('py:class', 'float64'),
+    ('py:class', 'NDArray'),
+    # A ASPN-Python classes which automodule automatically tries to link to.
+    ('py:class', 'MeasurementImu'),
+    ('py:class', 'TypeTimestamp'),
+    ('py:class', 'AspnBase'),
+    # A NavToolkit class which automodule automatically tries to link to.
+    ('py:class', 'ImuModel'),
+    # Potentially caused by #49.
+    ('py:class', 'PluginType'),
+    ('py:class', 'ConfigType'),
+    ('py:class', 'InertialType'),
+    ('py:class', 'InitializationType'),
+    ('py:class', 'StateModelProviderType'),
+    ('py:class', 'FusionStrategyType'),
+    ('py:class', 'FusionEngineType'),
+    ('py:class', 'pntos.api.RegistryValueTypeUnion'),
+    ('py:obj', 'pntos.api.RegistryValueTypeUnion'),
+    ('py:class', 'RegistryValueType'),
+    ('py:class', 'RegistryValueTypeUnion'),
+]
+
 
 def setup(app):
     app.add_css_file('pntos.css')

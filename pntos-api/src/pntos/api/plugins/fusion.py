@@ -28,14 +28,19 @@ class CrossCovariances:
     ``A`` and ``B`` and the cross-covariance matrix of ``A`` and ``C``.
 
     Attributes:
-        block_labels (list[str]): A list of labels of the :class:`StandardStateBlock` this structure
+        block_labels (list[str]): A list of labels of the :class:`pntos.api.StandardStateBlock` this structure
             contains the cross-covariances for.
         cross_covariances (list[NDArray[float64]]): A list of cross-covariance matrices between a single
             StateBlock and the set of StateBlocks listed in :attr:`block_labels`.
     """
 
     block_labels: list[str]
+    """The labels of the two state blocks which ``cross_covariances`` is valid for.
+    """
+
     cross_covariances: list[NDArray[float64]]
+    """The correlations between the state blocks.
+    """
 
 
 class StandardStateBlock(ABC):
@@ -63,7 +68,7 @@ class StandardStateBlock(ABC):
         Receive and use an arbitrary collection of aux data.
 
         This method will be called by the fusion engine when its
-        :meth:`StandardFusionEngine.give_state_block_aux_data` is called with a label
+        :meth:`pntos.api.StandardFusionEngine.give_state_block_aux_data` is called with a label
         corresponding to this state block's ``label``.
 
         Args:
@@ -79,7 +84,7 @@ class StandardStateBlock(ABC):
         time_to: TypeTimestamp,
     ) -> StandardDynamicsModel | None:
         """
-        Generate a :class:`StandardDynamicsModel`.
+        Generate a :class:`pntos.api.StandardDynamicsModel`.
 
         The generated model contains a complete description of how to propagate
         this state block forward in time. For simple models, this can simply
@@ -106,11 +111,11 @@ class StandardMeasurementProcessor(ABC):
 
     The measurements are used to calculate estimated states suitable for a linear or linearized
     filter to use. Each type of measurement should correspond to a
-    :class:`StandardMeasurementProcessor` that is supplied to the fusion engine. Incoming
+    :class:`pntos.api.StandardMeasurementProcessor` that is supplied to the fusion engine. Incoming
     measurements received by the fusion engine will be routed to the corresponding measurement
     processor (by label) and call :meth:`generate_model` to process the measurement. The resulting
-    :class:`StandardMeasurementModel` will be used by the fusion engine to call the underlying
-    :meth:`StandardFusionStrategy.update` method to update the filter estimate/error covariance.
+    :class:`pntos.api.StandardMeasurementModel` will be used by the fusion engine to call the underlying
+    :meth:`pntos.api.StandardFusionStrategy.update` method to update the filter estimate/error covariance.
 
     Attributes:
         label (str): A unique name for this measurement processor. This value will be used to
@@ -140,7 +145,7 @@ class StandardMeasurementProcessor(ABC):
         Receive and use an arbitrary collection of aux data.
 
         This method will be called by the fusion engine when its
-        :meth:`StandardFusionEngine.give_measurement_processor_aux_data` is called with
+        :meth:`pntos.api.StandardFusionEngine.give_measurement_processor_aux_data` is called with
         a label corresponding to this measurement processor's ``label``.
 
         Args:
@@ -153,7 +158,7 @@ class StandardMeasurementProcessor(ABC):
         self, message: Message, x_and_p: EstimateWithCovariance
     ) -> StandardMeasurementModel | None:
         """
-        Generate a :class:`StandardMeasurementModel`.
+        Generate a :class:`pntos.api.StandardMeasurementModel`.
 
         Args:
             message (Message): The measurement/observation to process.
@@ -184,9 +189,9 @@ class VirtualStateBlock(ABC):
     the same). Each instance is associated with two labels, ``source`` and
     ``target``, where ``source`` is the label attached to the quantity to be
     transformed, and ``target`` is the label attached to the result. Typically used
-    with a :class:`StandardFusionEngine` where ``source`` refers to a *real*
-    :class:`StandardStateBlock` and ``target`` refers to some representation that is
-    advantageous for some other element, such as a :class:`StandardMeasurementProcessor`, to use.
+    with a :class:`pntos.api.StandardFusionEngine` where ``source`` refers to a *real*
+    :class:`pntos.api.StandardStateBlock` and ``target`` refers to some representation that is
+    advantageous for some other element, such as a :class:`pntos.api.StandardMeasurementProcessor`, to use.
 
     Attributes:
         source (str): The label associated with the representation this instance can transform
@@ -210,8 +215,8 @@ class VirtualStateBlock(ABC):
         Receive and use an arbitrary collection of aux data.
 
         This method will be called by the fusion engine when its
-        :meth:`StandardFusionEngine.give_virtual_state_block_aux_data` is called with a
-        label corresponding to this :class:`VirtualStateBlock` 's ``target``.
+        :meth:`pntos.api.StandardFusionEngine.give_virtual_state_block_aux_data` is called with a
+        label corresponding to this :class:`pntos.api.VirtualStateBlock` 's ``target``.
 
         Args:
             aux (list[Message])
@@ -281,7 +286,7 @@ class StandardFusionEngine(ABC):
     Gaussian. In addition, all covariance matrices / mean vectors are descriptions of
     jointly-Gaussian multivariate distributions. All noise sources are jointly-Gaussian distributed.
 
-    This object requires a :class:`StandardFusionStrategy` to work. Some implementations may be able
+    This object requires a :class:`pntos.api.StandardFusionStrategy` to work. Some implementations may be able
     to provide their own. Others will require a strategy to be provided by setting the
     :attr:`StandardFusionEngine.strategy` field. It is possible to check whether a fusion
     engine needs to be provided a fusion strategy by checking the
@@ -316,7 +321,7 @@ class StandardFusionEngine(ABC):
     @time.setter
     @abstractmethod
     def time(self, time: TypeTimestamp) -> None:
-        """Setter for the :meth:`StandardFusionEngine.time` property."""
+        """Setter for the :meth:`pntos.api.StandardFusionEngine.time` property."""
         pass
 
     @property
@@ -334,7 +339,7 @@ class StandardFusionEngine(ABC):
     @strategy.setter
     @abstractmethod
     def strategy(self, strategy: StandardFusionStrategy) -> None:
-        """The setter for the :meth:`strategy` property on :class:`StandardFusionEngine`."""
+        """The setter for the :meth:`strategy` property on :class:`pntos.api.StandardFusionEngine`."""
         pass
 
     @abstractmethod
@@ -352,10 +357,10 @@ class StandardFusionEngine(ABC):
     @abstractmethod
     def get_state_block_labels(self) -> list[str] | None:
         """
-        Get a list of :class:`StandardStateBlock` labels that have been added to this fusion engine.
+        Get a list of :class:`pntos.api.StandardStateBlock` labels that have been added to this fusion engine.
 
         Returns:
-            list[str] | None: A list of the :class:`StandardStateBlock` labels that have been added
+            list[str] | None: A list of the :class:`pntos.api.StandardStateBlock` labels that have been added
             to this fusion engine. Returns ``None`` if no state blocks have been added. Guaranteed
             to not return ``None`` if :meth:`get_num_states` returns a value other than 0.
         """
@@ -369,12 +374,12 @@ class StandardFusionEngine(ABC):
         cross_covariances: CrossCovariances | None = None,
     ) -> None:
         """
-        Add the given :class:`StandardStateBlock` to the fusion engine.
+        Add the given :class:`pntos.api.StandardStateBlock` to the fusion engine.
 
         This will expand the state vector being estimated by the value of :meth:`get_num_states`.
 
         Args:
-            block (StandardStateBlock): The :class:`StandardStateBlock` to be added to the fusion
+            block (StandardStateBlock): The :class:`pntos.api.StandardStateBlock` to be added to the fusion
                 engine.
             initial_estimate_covariance (EstimateWithCovariance): Contains the initial conditions of
                 the states, with ``initial_estimate_covariance.estimate`` being an Nx1 matrix and
@@ -394,7 +399,7 @@ class StandardFusionEngine(ABC):
         """
         Get the estimate associated with a state block.
 
-        Find a :class:`StandardStateBlock` or :class:`VirtualStateBlock` within the fusion engine
+        Find a :class:`pntos.api.StandardStateBlock` or :class:`pntos.api.VirtualStateBlock` within the fusion engine
         matching ``block_label``, and return a copy of its current estimate vector.
 
         Args:
@@ -415,7 +420,7 @@ class StandardFusionEngine(ABC):
         """
         Get the covariance associated with a state block.
 
-        Find a :class:`StandardStateBlock` or :class:`VirtualStateBlock` within the fusion engine
+        Find a :class:`pntos.api.StandardStateBlock` or :class:`pntos.api.VirtualStateBlock` within the fusion engine
         matching ``block_label``, and return a copy of its current covariance matrix.
 
         Args:
@@ -438,7 +443,7 @@ class StandardFusionEngine(ABC):
         """
         Get the cross covariance between the states associated with two state blocks.
 
-        Find the :class:`StandardStateBlock` s within the fusion engine matching ``block_label1``
+        Find the :class:`pntos.api.StandardStateBlock` s within the fusion engine matching ``block_label1``
         and ``block_label2``, and return the cross-covariance matrix between them.
 
         Args:
@@ -461,7 +466,7 @@ class StandardFusionEngine(ABC):
         """
         Update the estimate associated with a given state block.
 
-        Find a :class:`StandardStateBlock` within the fusion engine matching ``block_label``, and
+        Find a :class:`pntos.api.StandardStateBlock` within the fusion engine matching ``block_label``, and
         change its current estimate vector.
 
         Note:
@@ -481,7 +486,7 @@ class StandardFusionEngine(ABC):
         """
         Update the covariance associated with a given state block.
 
-        Find a :class:`StandardStateBlock` within the fusion engine matching ``block_label``, and
+        Find a :class:`pntos.api.StandardStateBlock` within the fusion engine matching ``block_label``, and
         change its current covariance matrix.
 
         Note:
@@ -501,7 +506,7 @@ class StandardFusionEngine(ABC):
         """
         Update the covariance between two state blocks.
 
-        Find the :class:`StandardStateBlock` s within the fusion engine matching ``block_label1``
+        Find the :class:`pntos.api.StandardStateBlock` s within the fusion engine matching ``block_label1``
         and ``block_label2``, and change the current covariance matrix between them.
 
         Note:
@@ -518,7 +523,7 @@ class StandardFusionEngine(ABC):
     @abstractmethod
     def remove_state_block(self, block_label: str) -> None:
         """
-        Remove the :class:`StandardStateBlock` matching ``block_label``.
+        Remove the :class:`pntos.api.StandardStateBlock` matching ``block_label``.
 
         This will reduce the state vector being estimated by the number of states that the block
         represents.
@@ -546,13 +551,13 @@ class StandardFusionEngine(ABC):
     @abstractmethod
     def has_virtual_state_block(self, vsb_target_label: str) -> bool:
         """
-        Checks if the fusion engine has a :class:`VirtualStateBlock` with a matching target label.
+        Checks if the fusion engine has a :class:`pntos.api.VirtualStateBlock` with a matching target label.
 
         Args:
             vsb_target_label (str)
 
         Returns:
-            bool: ``True`` if the fusion engine has a :class:`VirtualStateBlock` with a matching
+            bool: ``True`` if the fusion engine has a :class:`pntos.api.VirtualStateBlock` with a matching
             target label, ``False`` if no virtual state block with matching target label exists or
             if one exists but is not capable of generating an estimate. That is, the VSB's source
             must exist and be in a continuous chain to a concrete state block which also exists in
@@ -563,7 +568,7 @@ class StandardFusionEngine(ABC):
     @abstractmethod
     def add_virtual_state_block(self, virtual_state_block: VirtualStateBlock) -> None:
         """
-        Add the given :class:`VirtualStateBlock` to the fusion engine.
+        Add the given :class:`pntos.api.VirtualStateBlock` to the fusion engine.
 
         A virtual state block (VSB) convert from an underlying block coordinate frame into the VSB
         coordinate frame.
@@ -576,7 +581,7 @@ class StandardFusionEngine(ABC):
     @abstractmethod
     def remove_virtual_state_block(self, vsb_target_label: str) -> None:
         """
-        Remove the :class:`VirtualStateBlock` matching ``vsb_target_label``.
+        Remove the :class:`pntos.api.VirtualStateBlock` matching ``vsb_target_label``.
 
         Args:
             vsb_target_label (str)
@@ -599,7 +604,7 @@ class StandardFusionEngine(ABC):
         self, processor: StandardMeasurementProcessor
     ) -> None:
         """
-        Add a :class:`StandardMeasurementProcessor`.
+        Add a :class:`pntos.api.StandardMeasurementProcessor`.
 
         This can be used to process future measurements that correspond to ``processor.label``.
 
@@ -611,7 +616,7 @@ class StandardFusionEngine(ABC):
     @abstractmethod
     def remove_measurement_processor(self, processor_label: str) -> None:
         """
-        Remove a :class:`StandardMeasurementProcessor` previously added to the fusion engine.
+        Remove a :class:`pntos.api.StandardMeasurementProcessor` previously added to the fusion engine.
 
         Assumes a measurement processor was previously added via :meth:`add_measurement_processor`
         with the label ``processor_label``.
@@ -706,7 +711,7 @@ class StandardFusionEngine(ABC):
     @abstractmethod
     def give_state_block_aux_data(self, block_label: str, aux: list[Message]) -> None:
         """
-        Route a list of messages of aux data to a :class:`StandardStateBlock`.
+        Route a list of messages of aux data to a :class:`pntos.api.StandardStateBlock`.
 
         Args:
             block_label (str)
@@ -719,7 +724,7 @@ class StandardFusionEngine(ABC):
         self, processor_label: str, aux: list[Message]
     ) -> None:
         """
-        Route a list of messages of aux data to a :class:`StandardMeasurementProcessor`.
+        Route a list of messages of aux data to a :class:`pntos.api.StandardMeasurementProcessor`.
 
         Args:
             processor_label (str)
@@ -732,7 +737,7 @@ class StandardFusionEngine(ABC):
         self, target_label: str, aux: list[Message]
     ) -> None:
         """
-        Route a list of messages of aux data to a :class:`VirtualStateBlock`.
+        Route a list of messages of aux data to a :class:`pntos.api.VirtualStateBlock`.
 
         Args:
             target_label (str)
@@ -774,12 +779,12 @@ class FusionPlugin(CommonPlugin, ABC):
 
         Args:
             type (type[FusionEngineType]): This parameter specifies the type of fusion engine that
-            will be returned.
+                will be returned.
 
         Returns:
             FusionEngineType | None: The ``type`` parameter specifies the type of fusion engine
-            that will be returned. For example, if the user passes in :class:`StandardFusionEngine`,
-            then an implementation of :class:`StandardFusionEngine` will be returned. Returns
+            that will be returned. For example, if the user passes in :class:`pntos.api.StandardFusionEngine`,
+            then an implementation of :class:`pntos.api.StandardFusionEngine` will be returned. Returns
             ``None`` if ``type`` is not supported by this fusion plugin
             (:meth:`is_fusion_type_supported` can be used to check the type before calling this
             method). Otherwise the return is guaranteed to not be ``None``.

@@ -18,56 +18,62 @@ class StandardStateModelProvider(ABC):
 
     These tools are used to model the propagation and innovation of state
     spaces using pntOS' standard fusion model. Specifically, a
-    :class:`StandardStateModelProvider` provides three types of tools:
+    :class:`pntos.api.StandardStateModelProvider` provides three types of tools:
 
     1. State Blocks - Define a set of states and a model for propagating those states.
     2. Virtual State Blocks - Relate two statespaces to each other.
     3. Measurement Processors - Relate measurements to a statespace.
 
-    A :class:`StandardStateModelProvider` conceptually models a set of zero or more
-    :class:`StandardStateBlock` s and a set of zero or more
-    :class:`StandardMeasurementProcessor` s which together model the phenomenology of
+    A :class:`pntos.api.StandardStateModelProvider` conceptually models a set of zero or more
+    :class:`pntos.api.StandardStateBlock` s and a set of zero or more
+    :class:`pntos.api.StandardMeasurementProcessor` s which together model the phenomenology of
     sensor data that is being brought into a fusion engine. The first type,
     state blocks, describe how a set of states propagates forward through time.
     The second type, measurement processors, describe how a measurement relates
     to a set of state blocks.
 
-    Each :class:`StandardStateModelProvider` consists of factory methods which generate
+    Each :class:`pntos.api.StandardStateModelProvider` consists of factory methods which generate
     instances of the state blocks and measurement processors it provides. The
-    :meth:`StandardStateModelProvider.new_block` method is a factory method that
+    :meth:`pntos.api.StandardStateModelProvider.new_block` method is a factory method that
     returns a newly created state block on each invocation. Because the
-    :class:`StandardStateModelProvider` can provide more than one kind of state block,
-    the :meth:`StandardStateModelProvider.new_block` method takes a ``block_index``
+    :class:`pntos.api.StandardStateModelProvider` can provide more than one kind of state block,
+    the :meth:`pntos.api.StandardStateModelProvider.new_block` method takes a ``block_index``
     parameter which allows the user to request which kind of state block is
     created by the factory. ``block_identifiers[i]`` gives a description of the
     ``i`` th kind of state block returned when ``block_index=i``.
 
-    Similarly, :meth:`StandardStateModelProvider.new_processor` is a factory method for
+    Similarly, :meth:`pntos.api.StandardStateModelProvider.new_processor` is a factory method for
     returning new measurement processors and ``processor_identifiers`` is a set
     of identifiers for each available kind of measurement processor that can be
     returned by the factory.
 
     Attributes:
         processor_identifiers (list[str]): A list of identifying strings for each kind of
-            measurement processor that this :class:`StandardStateModelProvider` can create instances
+            measurement processor that this :class:`pntos.api.StandardStateModelProvider` can create instances
             of. The ``processor_index`` parameter of :meth:`new_processor` is an index into this
             array. This field will be an empty list when this state model provider does not provide
             any measurement processors.
         block_identifiers (list[str]): A list of identifying strings for each kind of state block
-            that this :class:`StandardStateModelProvider` can create instances of.
+            that this :class:`pntos.api.StandardStateModelProvider` can create instances of.
             The ``block_index`` parameter of :meth:`new_block` is an index into this array.
             This field will be an empty list when this state model provider does not
             provide any state blocks.
         virtual_block_identifiers (list[str]): A list of identifying strings for each kind of
-            virtual state block that this :class:`StandardStateModelProvider` can create instances
+            virtual state block that this :class:`pntos.api.StandardStateModelProvider` can create instances
             of. The ``virtual_block_index`` parameter of :meth:`new_virtual_block` is an index into
             this array. This field will be an empty list when this state model provider does not
             provide any virtual state blocks.
     """
 
     processor_identifiers: list[str]
+    """Strings describing the measurement processors the provider can create.
+    """
     block_identifiers: list[str]
+    """Strings describing the state blocks the provider can create.
+    """
     virtual_block_identifiers: list[str]
+    """Strings describing the virtual state blocks the provider can create.
+    """
 
     @abstractmethod
     def new_processor(
@@ -79,13 +85,13 @@ class StandardStateModelProvider(ABC):
         config_group: str,
     ) -> StandardMeasurementProcessor | None:
         """
-        Generate a newly created :class:`StandardMeasurementProcessor`.
+        Generate a newly created :class:`pntos.api.StandardMeasurementProcessor`.
 
         This measurement processor describes the relationship between a
         measurement and a set of state blocks.
 
         Args:
-            processor_index (int): Since the :class:`StandardStateModelProvider` can create
+            processor_index (int): Since the :class:`pntos.api.StandardStateModelProvider` can create
                 different kinds of measurement processors, the ``processor_index``
                 parameter is used to select which kind of measurement processor
                 to create a new instance of. The :attr:`processor_identifiers` field
@@ -115,7 +121,7 @@ class StandardStateModelProvider(ABC):
 
         Returns:
             StandardMeasurementProcessor | None: The newly created
-            :class:`StandardMeasurementProcessor` or ``None`` when no measurement processor can be
+            :class:`pntos.api.StandardMeasurementProcessor` or ``None`` when no measurement processor can be
             produced with the given ``processor_index``, ``engine``, and ``config_group``.
         """
         pass
@@ -129,13 +135,13 @@ class StandardStateModelProvider(ABC):
         config_group: str,
     ) -> StandardStateBlock | None:
         """
-        Generate a newly created :class:`StandardStateBlock`.
+        Generate a newly created :class:`pntos.api.StandardStateBlock`.
 
         This state block describes a set of states and how they propagate over
         time.
 
         Args:
-            block_index (int): Since the :class:`StandardStateModelProvider` can create
+            block_index (int): Since the :class:`pntos.api.StandardStateModelProvider` can create
                 different kinds of state blocks, the ``block_index`` parameter is
                 used to select which kind of state block to create a new instance
                 of. The :attr:`block_identifiers` field contains identifying strings for
@@ -162,7 +168,7 @@ class StandardStateModelProvider(ABC):
 
         Returns:
             StandardStateBlock | None: The newly created
-            :class:`StandardStateBlock` or ``None`` when no state block can be produced
+            :class:`pntos.api.StandardStateBlock` or ``None`` when no state block can be produced
             with the given ``block_index``, ``engine``, and ``config_group``.
         """
         pass
@@ -176,13 +182,13 @@ class StandardStateModelProvider(ABC):
         config_group: str,
     ) -> VirtualStateBlock | None:
         """
-        Generate a newly created :class:`VirtualStateBlock`.
+        Generate a newly created :class:`pntos.api.VirtualStateBlock`.
 
         This virtual state block is used to convert a set of states from one
         representation to another.
 
         Args:
-            virtual_block_index (int): Since the :class:`StandardStateModelProvider` can
+            virtual_block_index (int): Since the :class:`pntos.api.StandardStateModelProvider` can
                 create different kinds of virtual state blocks, the
                 ``virtual_block_index parameter`` is used to select which kind of
                 virtual state block to create a new instance of. The
@@ -203,7 +209,7 @@ class StandardStateModelProvider(ABC):
                 requires no outside configuration, ``config_group`` may be ``None``.
 
         Returns:
-            VirtualStateBlock | None: The newly created :class:`VirtualStateBlock`or ``None`` when
+            VirtualStateBlock | None: The newly created :class:`pntos.api.VirtualStateBlock` or ``None`` when
             no virtual state block can be produced with the given ``virtual_block_index`` and
             ``config_group``.
         """
@@ -216,7 +222,7 @@ StateModelProviderType = TypeVar(
 
 
 class StateModelingPlugin(CommonPlugin, ABC):
-    """A :class:`CommonPlugin` subclass that generates state model providers."""
+    """A :class:`pntos.api.CommonPlugin` subclass that generates state model providers."""
 
     @abstractmethod
     def is_fusion_type_supported(self, type: type[StateModelProviderType]) -> bool:
@@ -224,7 +230,7 @@ class StateModelingPlugin(CommonPlugin, ABC):
         Check if the plugin supports a given type of fusion. See ``StateModelProviderType``.
 
         Args:
-            type (FusionType)
+            type (StateModelProviderType)
 
         Returns:
             bool
@@ -239,9 +245,9 @@ class StateModelingPlugin(CommonPlugin, ABC):
         Generate a state model provider.
 
         Args:
-            type (FusionType): Specifies the type of fusion that the returned value will
+            type (StateModelProviderType): Specifies the type of fusion that the returned value will
                 support. For example, if the user passes in ``STANDARD_MODEL``, then the returned
-                value will be an implementation of :class:`StandardStateModelProvider`.
+                value will be an implementation of :class:`pntos.api.StandardStateModelProvider`.
 
         Returns:
             StateModelProviderType | None: A state model provider which implements the specified

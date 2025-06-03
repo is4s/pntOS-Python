@@ -132,6 +132,14 @@ def llh_to_ecef(llh: NDArray[float64]) -> NDArray[float64]:
 
 
 def ecef_to_llh(ecef: NDArray[float64]) -> NDArray[float64]:
+    """Converts from ECEF to LLH.
+
+    Args:
+        ecef (NDArray[float64]): A vector in the ECEF frame.
+
+    Returns:
+        NDArray[float64]: The equivalent vector in the LLH frame.
+    """
     a = RAD_E
     e2 = ECC_SQUARE
     pm0 = sqrt(pow(ecef[0], 2) + pow(ecef[1], 2))
