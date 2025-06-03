@@ -1,12 +1,6 @@
-from typing import Callable
-
 import numpy as np
 from aspn23 import (
-    AspnBase,
     MeasurementImu,
-    MeasurementPositionVelocityAttitude,
-    MeasurementPositionVelocityAttitudeErrorModel,
-    TypeHeader,
     TypeTimestamp,
 )
 from numpy import float64
@@ -36,13 +30,7 @@ from pntos.api import (
     StateModelingPlugin,
 )
 from pntos.cobra.config import InertialConfig, OrchestrationConfig, config_from_registry
-from pntos.cobra.utils import (
-    correct_dcm_with_tilt,
-    dcm_to_quat,
-    east_to_delta_lon,
-    north_to_delta_lat,
-    quat_to_dcm,
-)
+from pntos.cobra.config import OrchestrationConfig, config_from_registry
 
 from .orchestration_utils import (
     dispatch_to_fusion_engine,
@@ -441,78 +429,3 @@ class SimpleGpsOrchestrationPlugin(OrchestrationPlugin):
         if solution_out is None:
             return None
         return [solution_out]
-
-    def _send_inertial_aux_to_pinson(self) -> None:
-        """Send the current inertial solution and forces to the Pinson15 state-block."""
-        time = self.fusion_engine.time
-
-        pva_message = self.inertial.request_solution(time)
-        if pva_message is None:
-            self._log(
-                LoggingLevel.ERROR,
-                f'Cannot send inertial aux to pinson block. Solution not available at time {time}',
-            )
-            return
-        imu = self.inertial.request_forces_and_rates(time)
-        if imu is None:
-            self._log(
-                LoggingLevel.ERROR,
-                f'Cannot send inertial aux to pinson block. Forces not available at time {time}',
-            )
-            return
-        imu_message = Message(imu.forces_and_rates, 'Orchestration forces and rates')
-
-        self.fusion_engine.give_state_block_aux_data(
-            STATE_BLOCK_LABEL, [pva_message, imu_message]
-        )
-
-    def _send_inertial_aux_to_measurement_processor(
-        self, time: TypeTimestamp, mp_label: str
-    ) -> None:
-        """Send the current inertial solution to the specified measurement processor."""
-        pva_message = self.inertial.request_solution(time)
-        if pva_message is None:
-            self._log(
-                LoggingLevel.ERROR,
-                f'Cannot send inertial aux to measurement processor. Solution not available at time {time}',
-            )
-            return
-        self.fusion_engine.give_measurement_processor_aux_data(mp_label, [pva_message])
-
-    def _apply_error_states(
-        self, pva: MeasurementPositionVelocityAttitude, x: NDArray[float64]
-    ) -> MeasurementPositionVelocityAttitude:
-        """Correct PVA using inertial PVA error states."""
-        # These fields should never be None unless we already encountered a different
-        # error, so assert instead of log
-        assert (
-            pva.p1 is not None
-            and pva.p2 is not None
-            and pva.p3 is not None
-            and pva.v1 is not None
-            and pva.v2 is not None
-            and pva.v3 is not None
-            and pva.quaternion is not None
-        )
-
-        return MeasurementPositionVelocityAttitude(
-            TypeHeader(
-                pva.header.vendor_id,
-                pva.header.device_id,
-                pva.header.context_id,
-                pva.header.sequence_id,
-            ),
-            TypeTimestamp(pva.time_of_validity.elapsed_nsec),
-            pva.reference_frame,
-            pva.p1 + north_to_delta_lat(x[0, 0], pva.p1, pva.p3),
-            pva.p2 + east_to_delta_lon(x[1, 0], pva.p1, pva.p3),
-            pva.p3 - x[2, 0],
-            pva.v1 + x[3, 0],
-            pva.v2 + x[4, 0],
-            pva.v3 + x[5, 0],
-            dcm_to_quat(correct_dcm_with_tilt(quat_to_dcm(pva.quaternion), x[6:9, 0])),
-            pva.covariance.copy(),
-            MeasurementPositionVelocityAttitudeErrorModel.NONE,
-            np.array([]),
-            [],
-        )
