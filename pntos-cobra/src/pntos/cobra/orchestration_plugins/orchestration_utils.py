@@ -248,6 +248,23 @@ def has_valid_time(orch_plugin: SimpleOrchestration, message: Message) -> bool:
         return False
 
 
+def get_dead_reckoning_solution(orch_plugin: SimpleOrchestration, time: TypeTimestamp, imu_sol_chan: str) -> Message | None:
+    """
+    Utility function to request the IMU-only dead-reckoning solution. Returns
+    ``None`` if the inertial is unable to provide a solution for the requested time.
+    """
+    message = orch_plugin.inertial.request_solution(time)
+    if message is not None:
+        return Message(message.wrapped_message, imu_sol_chan)
+    else:
+        orch_plugin._log(
+            LoggingLevel.ERROR,
+            'Unable to get PVA message from inertial.'
+            + ' Cannot generate DEAD_RECKONING solution.',
+        )
+        return None
+
+
 def generate_initial_inertial_solution(
     orch_plugin: SimpleOrchestration,
     sb_label: str,

@@ -48,6 +48,7 @@ from .orchestration_utils import (
     apply_error_states,
     dispatch_to_fusion_engine,
     generate_initial_inertial_solution,
+    get_dead_reckoning_solution,
     has_valid_time,
     initialization_ready,
     rotate_imu_meas,
@@ -386,22 +387,6 @@ class SimpleGpsOrchestrationPlugin(OrchestrationPlugin):
 
         return descriptions
 
-    def _get_dead_reckoning_solution(self, time: TypeTimestamp) -> Message | None:
-        """
-        Utility function to request the IMU-only dead-reckoning solution. Returns
-        ``None`` if the inertial is unable to provide a solution for the requested time.
-        """
-        message = self.inertial.request_solution(time)
-        if message is not None:
-            return Message(message.wrapped_message, IMU_SOL_CHANNEL)
-        else:
-            self._log(
-                LoggingLevel.ERROR,
-                'Unable to get PVA message from inertial.'
-                + ' Cannot generate DEAD_RECKONING solution.',
-            )
-            return None
-
     def _get_best_solution(self, time: TypeTimestamp) -> Message | None:
         """
         Utility function to request the best fusion strategy solution. Returns
@@ -487,7 +472,7 @@ class SimpleGpsOrchestrationPlugin(OrchestrationPlugin):
             solution_out = self._get_best_solution(time)
 
         elif 'DEAD_RECKONING' in filter_description:
-            solution_out = self._get_dead_reckoning_solution(time)
+            solution_out = get_dead_reckoning_solution(self, time, IMU_SOL_CHANNEL)
 
         else:
             descriptions = ', '.join(self.get_filter_description_list())
