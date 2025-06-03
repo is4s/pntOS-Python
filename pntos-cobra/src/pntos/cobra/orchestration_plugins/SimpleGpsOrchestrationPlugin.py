@@ -48,6 +48,7 @@ from .orchestration_utils import (
     apply_error_states,
     dispatch_to_fusion_engine,
     generate_initial_inertial_solution,
+    has_valid_time,
     initialization_ready,
     rotate_imu_meas,
     set_up_initializer,
@@ -321,46 +322,6 @@ class SimpleGpsOrchestrationPlugin(OrchestrationPlugin):
 
         self.fusion_engine = fusion_engine
 
-    def _rotate_imu_meas(self, imu: MeasurementImu) -> None:
-        """Rotate IMU measurement into platform frame.
-
-        Args:
-            message (MeasurementImu): IMU ASPN message to rotate.
-        """
-        imu.meas_accel = self.C_inertial_to_platform @ imu.meas_accel
-        imu.meas_gyro = self.C_inertial_to_platform @ imu.meas_gyro
-
-    def _has_valid_time(self, message: Message) -> bool:
-        """
-        Utility function which returns true if the message's time of validity is greater
-        than the current fusion engine time.
-        """
-        # If we haven't received an initial solution, then any time counts:
-        if self.init_solution is None:
-            return True
-
-        measurement = message.wrapped_message
-        # get time - check for old messages
-        if hasattr(measurement, 'time_of_validity'):
-            message_time = measurement.time_of_validity.elapsed_nsec
-            if self.fusion_engine.time.elapsed_nsec <= message_time:
-                return True
-            else:  # Discard old messages
-                self._log(
-                    LoggingLevel.DEBUG,
-                    f'Received old message at time {message_time * 1e-9:.9f}s on channel'
-                    + f' {message.source_identifier}. Filter is at time '
-                    + f'{self.fusion_engine.time.elapsed_nsec * 1e-9:.9f}s. Discarding message',
-                )
-                return False
-        else:
-            self._log(
-                LoggingLevel.ERROR,
-                f'Measurement of type {type(measurement)} does not contain '
-                + '"time_of_validity" field.',
-            )
-            return False
-
     def _preprocess_message(self, message: Message) -> Message | None:
         """Process the given message by the full chain of preprocessors.
 
@@ -394,7 +355,7 @@ class SimpleGpsOrchestrationPlugin(OrchestrationPlugin):
 
         message = preprocessed_message
 
-        if not self._has_valid_time(message):
+        if not has_valid_time(self, message):
             return
 
         # If filter solution is not initialized, send messages to the initializer.

@@ -216,6 +216,38 @@ def rotate_imu_meas(
     imu.meas_gyro = orch_plugin.C_inertial_to_platform @ imu.meas_gyro
 
 
+def has_valid_time(orch_plugin: SimpleOrchestration, message: Message) -> bool:
+    """
+    Utility function which returns true if the message's time of validity is greater
+    than the current fusion engine time.
+    """
+    # If we haven't received an initial solution, then any time counts:
+    if orch_plugin.init_solution is None:
+        return True
+
+    measurement = message.wrapped_message
+    # get time - check for old messages
+    if hasattr(measurement, 'time_of_validity'):
+        message_time = measurement.time_of_validity.elapsed_nsec
+        if orch_plugin.fusion_engine.time.elapsed_nsec <= message_time:
+            return True
+        else:  # Discard old messages
+            orch_plugin._log(
+                LoggingLevel.DEBUG,
+                f'Received old message at time {message_time * 1e-9:.9f}s on channel'
+                + f' {message.source_identifier}. Filter is at time '
+                + f'{orch_plugin.fusion_engine.time.elapsed_nsec * 1e-9:.9f}s. Discarding message',
+            )
+            return False
+    else:
+        orch_plugin._log(
+            LoggingLevel.ERROR,
+            f'Measurement of type {type(measurement)} does not contain '
+            + '"time_of_validity" field.',
+        )
+        return False
+
+
 def generate_initial_inertial_solution(
     orch_plugin: SimpleOrchestration,
     sb_label: str,
