@@ -30,7 +30,6 @@ from pntos.api import (
     StateModelingPlugin,
 )
 from pntos.cobra.config import InertialConfig, OrchestrationConfig, config_from_registry
-from pntos.cobra.config import OrchestrationConfig, config_from_registry
 
 from .orchestration_utils import (
     dispatch_to_fusion_engine,
