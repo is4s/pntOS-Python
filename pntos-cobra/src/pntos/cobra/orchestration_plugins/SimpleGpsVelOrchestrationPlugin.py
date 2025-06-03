@@ -358,13 +358,19 @@ class SimpleGpsVelOrchestrationPlugin(OrchestrationPlugin):
             return
 
         # If filter solution is not initialized, send messages to the initializer.
-        if not initialization_ready(self, ):
+        if not initialization_ready(
+            self,
+        ):
             if message.source_identifier not in self.alignment_channels:
                 return
 
             self.initializer.process_pntos_message(message)
-            if not initialization_ready(self, ):
-                generate_initial_inertial_solution(self, STATE_BLOCK_LABEL, INERTIAL_GROUP)
+            if not initialization_ready(
+                self,
+            ):
+                generate_initial_inertial_solution(
+                    self, STATE_BLOCK_LABEL, INERTIAL_GROUP
+                )
             else:
                 return
 
@@ -418,7 +424,9 @@ class SimpleGpsVelOrchestrationPlugin(OrchestrationPlugin):
             time = latest_time
 
         if filter_description is None or 'BEST' in filter_description:
-            solution_out = get_best_solution(self, time, STATE_BLOCK_LABEL, BEST_SOL_CHANNEL)
+            solution_out = get_best_solution(
+                self, time, STATE_BLOCK_LABEL, BEST_SOL_CHANNEL
+            )
 
         elif 'DEAD_RECKONING' in filter_description:
             solution_out = get_dead_reckoning_solution(self, time, IMU_SOL_CHANNEL)
