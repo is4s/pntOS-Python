@@ -185,23 +185,6 @@ class SimpleGpsVelOrchestrationPlugin(OrchestrationPlugin):
                         if preprocessor is not None:
                             self.preprocessors.append(preprocessor)
 
-    def _set_up_initializer(self) -> None:
-        """Set up inertial initialization strategy, and initialize filter solution if initializer is immediately ready."""
-        # Set up initializer
-        init_strategy: InertialInitializationStrategy | None = (
-            self.initialization_plugin.new_initialization_strategy(
-                InertialInitializationStrategy, config_group=ALIGNMENT_CONFIG_GROUP
-            )
-        )
-        if init_strategy is None:
-            self._log(
-                LoggingLevel.ERROR,
-                'InertialInitializationStrategy not supported by '
-                + f'{self.initialization_plugin}. Unable to continue.',
-            )
-            return None
-        self.initializer = init_strategy
-
     def _set_up_fusion_engine(self) -> None:
         """
         Utility function to put together the components of the fusion engine.
