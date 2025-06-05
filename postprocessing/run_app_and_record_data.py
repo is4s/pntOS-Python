@@ -69,13 +69,13 @@ def run_pntos(app_to_run: str = 'fusion_gps_ins'):
     # Wait until there is some network traffic reported.
     while True:
         line = relay_process.stdout.readline().decode()
-        if not line or not '0.0 kB/s' in line:
+        if not line or not ' 0.0 kB/s' in line:
             break
 
     # Wait until no more network traffic is reported.
     while True:
         line = relay_process.stdout.readline().decode()
-        if not line or '0.0 kB/s' in line:
+        if not line or ' 0.0 kB/s' in line:
             break
 
     # Shut it all down
