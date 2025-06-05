@@ -29,17 +29,20 @@ from pntos.api import (
     StateModelingPlugin,
 )
 from pntos.cobra.config import InertialConfig, OrchestrationConfig, config_from_registry
+from pntos.cobra.utils.plugins import sort_plugins_dataclass
 
 from .orchestration_utils import (
     dispatch_to_fusion_engine,
-    generate_initial_inertial_solution,
+    extract_plugins,
     get_best_solution,
     get_dead_reckoning_solution,
     has_valid_time,
     initialization_ready,
+    initialize_filter,
     rotate_imu_meas,
+    send_inertial_aux_to_pinson,
+    set_up_inertial_mechanization,
     set_up_initializer,
-    sort_and_validate_plugins,
 )
 
 # Solution Channels
@@ -168,13 +171,41 @@ class SimpleGpsVelOrchestrationPlugin(OrchestrationPlugin):
         ]
         self.inertial_channel = inertial_config.channel
 
-        sort_and_validate_plugins(self, plugins)
+        sorted_plugins = sort_plugins_dataclass(plugins)
+        extracted_plugins = extract_plugins(sorted_plugins, self._log)
+        if len(extracted_plugins) == 0:
+            return
+        self.fusion_plugin = extracted_plugins[0]
+        self.fusion_strategy_plugin = extracted_plugins[1]
+        self.inertial_plugin = extracted_plugins[2]
+        self.initialization_plugin = extracted_plugins[3]
+        self.state_modeling_plugins = extracted_plugins[4]
 
         self._set_up_fusion_engine()
-        set_up_initializer(self, ALIGNMENT_CONFIG_GROUP)
+        initializer = set_up_initializer(
+            self.initialization_plugin, ALIGNMENT_CONFIG_GROUP, self._log
+        )
+        if initializer is None:
+            return
+        self.initializer = initializer
 
-        if initialization_ready(self):
-            generate_initial_inertial_solution(self, STATE_BLOCK_LABEL, INERTIAL_GROUP)
+        if initialization_ready(self.initialization_state, self.initializer):
+            inertial_info = set_up_inertial_mechanization(
+                self.initializer,
+                self.inertial_plugin,
+                INERTIAL_GROUP,
+                self._log,
+            )
+            if inertial_info is None:
+                return
+            self.inertial = inertial_info[0]
+            self.init_solution = inertial_info[1]
+            initialize_filter(
+                self.init_solution, self.fusion_engine, STATE_BLOCK_LABEL, self._log
+            )
+            send_inertial_aux_to_pinson(
+                self.inertial, self.fusion_engine, STATE_BLOCK_LABEL, self._log
+            )
 
         # Find and store preprocessors
         for identifier, config_group in zip(PREPROCESSOR_IDS, PREPROCESSOR_GROUPS):
@@ -337,22 +368,33 @@ class SimpleGpsVelOrchestrationPlugin(OrchestrationPlugin):
 
         message = preprocessed_message
 
-        if not has_valid_time(self, message):
+        if not has_valid_time(
+            self.init_solution, self.fusion_engine, message, self._log
+        ):
             return
 
         # If filter solution is not initialized, send messages to the initializer.
-        if not initialization_ready(
-            self,
-        ):
+        if not initialization_ready(self.initialization_state, self.initializer):
             if message.source_identifier not in self.alignment_channels:
                 return
 
             self.initializer.process_pntos_message(message)
-            if not initialization_ready(
-                self,
-            ):
-                generate_initial_inertial_solution(
-                    self, STATE_BLOCK_LABEL, INERTIAL_GROUP
+            if not initialization_ready(self.initialization_state, self.initializer):
+                inertial_info = set_up_inertial_mechanization(
+                    self.initializer,
+                    self.inertial_plugin,
+                    INERTIAL_GROUP,
+                    self._log,
+                )
+                if inertial_info is None:
+                    return
+                self.inertial = inertial_info[0]
+                self.init_solution = inertial_info[1]
+                initialize_filter(
+                    self.init_solution, self.fusion_engine, STATE_BLOCK_LABEL, self._log
+                )
+                send_inertial_aux_to_pinson(
+                    self.inertial, self.fusion_engine, STATE_BLOCK_LABEL, self._log
                 )
             else:
                 return
@@ -361,7 +403,14 @@ class SimpleGpsVelOrchestrationPlugin(OrchestrationPlugin):
         if message.source_identifier == self.inertial_channel:
             self.inertial.process_pntos_message(message)
         elif message.source_identifier in self.measurement_channels:
-            dispatch_to_fusion_engine(self, message, STATE_BLOCK_LABEL)
+            dispatch_to_fusion_engine(
+                self.inertial,
+                self.fusion_engine,
+                message,
+                STATE_BLOCK_LABEL,
+                self.measurement_channels,
+                self._log,
+            )
 
     def get_filter_description_list(self) -> list[str]:
         descriptions = []
@@ -377,7 +426,10 @@ class SimpleGpsVelOrchestrationPlugin(OrchestrationPlugin):
         solution_times: list[TypeTimestamp],
         filter_description: str | None = None,
     ) -> list[Message] | None:
-        if not initialization_ready(self) or self.init_solution is None:
+        if (
+            not initialization_ready(self.initialization_state, self.initializer)
+            or self.init_solution is None
+        ):
             self._log(
                 LoggingLevel.DEBUG,
                 'Unable to provide a solution - initialization not ready.',
@@ -408,11 +460,18 @@ class SimpleGpsVelOrchestrationPlugin(OrchestrationPlugin):
 
         if filter_description is None or 'BEST' in filter_description:
             solution_out = get_best_solution(
-                self, time, STATE_BLOCK_LABEL, BEST_SOL_CHANNEL
+                self.fusion_engine,
+                self.inertial,
+                time,
+                STATE_BLOCK_LABEL,
+                BEST_SOL_CHANNEL,
+                self._log,
             )
 
         elif 'DEAD_RECKONING' in filter_description:
-            solution_out = get_dead_reckoning_solution(self, time, IMU_SOL_CHANNEL)
+            solution_out = get_dead_reckoning_solution(
+                self.inertial, time, IMU_SOL_CHANNEL, self._log
+            )
 
         else:
             descriptions = ', '.join(self.get_filter_description_list())

@@ -1,4 +1,4 @@
-from typing import Protocol, TypeVar
+from typing import Callable, Tuple, Union
 
 from aspn23 import (
     MeasurementImu,
@@ -38,33 +38,18 @@ from pntos.cobra.utils import (
 from scipy.linalg import block_diag
 
 
-class SimpleOrchestrationProtocol(Protocol):
-    mediator: Mediator
-    init_solution: InitialInertialSolution | None
-    fusion_plugin: FusionPlugin
-    fusion_strategy_plugin: FusionStrategyPlugin
-    inertial_plugin: InertialPlugin
-    state_modeling_plugins: list[StateModelingPlugin]
-    initialization_plugin: InitializationPlugin
-    initialization_state: InitializationStatus
-    initializer: InertialInitializationStrategy
-    inertial: StandardInertialMechanization
-    fusion_engine: StandardFusionEngine
-    measurement_channels: dict[str, str]
-    alignment_channels: list[str]
-    C_inertial_to_platform: NDArray[float64]
-
-    def _log(self, level: LoggingLevel, message: str) -> None:
-        pass
-
-
-SimpleOrchestration = TypeVar('SimpleOrchestration', bound=SimpleOrchestrationProtocol)
-
-
-def sort_and_validate_plugins(
-    orch_plugin: SimpleOrchestration,
-    plugin_list: list[CommonPlugin],
-) -> None:
+def extract_plugins(
+    sorted_plugins: SortedPlugins, log_func: Callable[[LoggingLevel, str], None]
+) -> Union[
+    Tuple[
+        FusionPlugin,
+        FusionStrategyPlugin,
+        InertialPlugin,
+        InitializationPlugin,
+        list[StateModelingPlugin],
+    ]
+    | Tuple[()]
+]:
     """
     Utility function to sort plugins_list and make sure there is only one of the
     following plugins:
@@ -74,138 +59,147 @@ def sort_and_validate_plugins(
     - InitializationPlugin
     - StateModelingPlugin
     """
-    sorted_plugins: SortedPlugins = sort_plugins_dataclass(plugin_list)
     # Fusion Plugin
     if len(sorted_plugins.fusion_plugins) != 1:
-        orch_plugin._log(
+        log_func(
             LoggingLevel.ERROR,
             f'Expected one FusionPlugin - received {len(sorted_plugins.fusion_plugins)}'
             + f': {[p.identifier for p in sorted_plugins.fusion_plugins]}',
         )
-        return
-    orch_plugin.fusion_plugin = sorted_plugins.fusion_plugins[0]
+        return ()
+    fusion_plugin = sorted_plugins.fusion_plugins[0]
 
     # Fusion Strategy Plugin
     if len(sorted_plugins.fusion_strategy_plugins) != 1:
-        orch_plugin._log(
+        log_func(
             LoggingLevel.ERROR,
             'Expected one FusionStrategyPlugin - received '
             + f'{len(sorted_plugins.fusion_strategy_plugins)}',
         )
-        return
-    orch_plugin.fusion_strategy_plugin = sorted_plugins.fusion_strategy_plugins[0]
+        return ()
+    fusion_strategy_plugin = sorted_plugins.fusion_strategy_plugins[0]
 
     # Inertial Plugin
     if len(sorted_plugins.inertial_plugins) != 1:
-        orch_plugin._log(
+        log_func(
             LoggingLevel.ERROR,
             f'Expected one InertialPlugin - received '
             + f'{len(sorted_plugins.inertial_plugins)}',
         )
-        return
-    orch_plugin.inertial_plugin = sorted_plugins.inertial_plugins[0]
+        return ()
+    inertial_plugin = sorted_plugins.inertial_plugins[0]
 
     # Initialization Plugin
     if len(sorted_plugins.initialization_plugins) != 1:
-        orch_plugin._log(
+        log_func(
             LoggingLevel.ERROR,
             'Expected one InitializationPlugin - received '
             + f'{len(sorted_plugins.initialization_plugins)}',
         )
-        return
-    orch_plugin.initialization_plugin = sorted_plugins.initialization_plugins[0]
+        return ()
+    initialization_plugin = sorted_plugins.initialization_plugins[0]
 
     # State Modeling Plugin
     if len(sorted_plugins.state_modeling_plugins) == 0:
-        orch_plugin._log(
+        log_func(
             LoggingLevel.ERROR,
             f'Expected at least one StateModelingPlugin - received none.',
         )
-        return
-    orch_plugin.state_modeling_plugins = sorted_plugins.state_modeling_plugins
+        return ()
+    state_modeling_plugins = sorted_plugins.state_modeling_plugins
+
+    return (
+        fusion_plugin,
+        fusion_strategy_plugin,
+        inertial_plugin,
+        initialization_plugin,
+        state_modeling_plugins,
+    )
 
 
 def set_up_initializer(
-    orch_plugin: SimpleOrchestration,
+    initialization_plugin: InitializationPlugin,
     alignment_config_group: str,
-) -> None:
+    log_func: Callable[[LoggingLevel, str], None],
+) -> InertialInitializationStrategy | None:
     """Set up inertial initialization strategy, and initialize filter solution if initializer is immediately ready."""
     # Set up initializer
     init_strategy: InertialInitializationStrategy | None = (
-        orch_plugin.initialization_plugin.new_initialization_strategy(
+        initialization_plugin.new_initialization_strategy(
             InertialInitializationStrategy, config_group=alignment_config_group
         )
     )
     if init_strategy is None:
-        orch_plugin._log(
+        log_func(
             LoggingLevel.ERROR,
             'InertialInitializationStrategy not supported by '
-            + f'{orch_plugin.initialization_plugin}. Unable to continue.',
+            + f'{initialization_plugin}. Unable to continue.',
         )
         return None
-    orch_plugin.initializer = init_strategy
+    return init_strategy
 
 
 def initialization_ready(
-    orch_plugin: SimpleOrchestration,
+    initialization_state: InitializationStatus,
+    initializer: InertialInitializationStrategy,
 ) -> bool:
     """
     Utility function to poll the state of the init strategy plugin.
 
-    Populates orch_plugin.initialization_state with the relevant :class:`InitializationStatus`.
+    Populates initialization_state with the relevant :class:`InitializationStatus`.
     """
-    orch_plugin.initialization_state = orch_plugin.initializer.request_current_status()
-    return orch_plugin.initialization_state is InitializationStatus.INITIALIZED_GOOD
+    initialization_state = initializer.request_current_status()
+    return initialization_state is InitializationStatus.INITIALIZED_GOOD
 
 
 def send_inertial_aux_to_measurement_processor(
-    orch_plugin: SimpleOrchestration,
+    inertial: StandardInertialMechanization,
+    fusion_engine: StandardFusionEngine,
     time: TypeTimestamp,
     mp_label: str,
+    log_func: Callable[[LoggingLevel, str], None],
 ) -> None:
     """Send the current inertial solution to the specified measurement processor."""
-    pva_message = orch_plugin.inertial.request_solution(time)
+    pva_message = inertial.request_solution(time)
     if pva_message is None:
-        orch_plugin._log(
+        log_func(
             LoggingLevel.ERROR,
             f'Cannot send inertial aux to measurement processor. Solution not available at time {time}',
         )
         return
-    orch_plugin.fusion_engine.give_measurement_processor_aux_data(
-        mp_label, [pva_message]
-    )
+    fusion_engine.give_measurement_processor_aux_data(mp_label, [pva_message])
 
 
 def send_inertial_aux_to_pinson(
-    orch_plugin: SimpleOrchestration,
+    inertial: StandardInertialMechanization,
+    fusion_engine: StandardFusionEngine,
     sb_label: str,
+    log_func: Callable[[LoggingLevel, str], None],
 ) -> None:
     """Send the current inertial solution and forces to the Pinson15 state-block."""
-    time = orch_plugin.fusion_engine.time
+    time = fusion_engine.time
 
-    pva_message = orch_plugin.inertial.request_solution(time)
+    pva_message = inertial.request_solution(time)
     if pva_message is None:
-        orch_plugin._log(
+        log_func(
             LoggingLevel.ERROR,
             f'Cannot send inertial aux to pinson block. Solution not available at time {time}',
         )
         return
-    imu = orch_plugin.inertial.request_forces_and_rates(time)
+    imu = inertial.request_forces_and_rates(time)
     if imu is None:
-        orch_plugin._log(
+        log_func(
             LoggingLevel.ERROR,
             f'Cannot send inertial aux to pinson block. Forces not available at time {time}',
         )
         return
     imu_message = Message(imu.forces_and_rates, 'Orchestration forces and rates')
 
-    orch_plugin.fusion_engine.give_state_block_aux_data(
-        sb_label, [pva_message, imu_message]
-    )
+    fusion_engine.give_state_block_aux_data(sb_label, [pva_message, imu_message])
 
 
 def rotate_imu_meas(
-    orch_plugin: SimpleOrchestration,
+    C_inertial_to_platform: NDArray[float64],
     imu: MeasurementImu,
 ) -> None:
     """Rotate IMU measurement into platform frame.
@@ -213,35 +207,40 @@ def rotate_imu_meas(
     Args:
         message (MeasurementImu): IMU ASPN message to rotate.
     """
-    imu.meas_accel = orch_plugin.C_inertial_to_platform @ imu.meas_accel
-    imu.meas_gyro = orch_plugin.C_inertial_to_platform @ imu.meas_gyro
+    imu.meas_accel = C_inertial_to_platform @ imu.meas_accel
+    imu.meas_gyro = C_inertial_to_platform @ imu.meas_gyro
 
 
-def has_valid_time(orch_plugin: SimpleOrchestration, message: Message) -> bool:
+def has_valid_time(
+    init_solution: InitialInertialSolution | None,
+    fusion_engine: StandardFusionEngine,
+    message: Message,
+    log_func: Callable[[LoggingLevel, str], None],
+) -> bool:
     """
     Utility function which returns true if the message's time of validity is greater
     than the current fusion engine time.
     """
     # If we haven't received an initial solution, then any time counts:
-    if orch_plugin.init_solution is None:
+    if init_solution is None:
         return True
 
     measurement = message.wrapped_message
     # get time - check for old messages
     if hasattr(measurement, 'time_of_validity'):
         message_time = measurement.time_of_validity.elapsed_nsec
-        if orch_plugin.fusion_engine.time.elapsed_nsec <= message_time:
+        if fusion_engine.time.elapsed_nsec <= message_time:
             return True
         else:  # Discard old messages
-            orch_plugin._log(
+            log_func(
                 LoggingLevel.DEBUG,
                 f'Received old message at time {message_time * 1e-9:.9f}s on channel'
                 + f' {message.source_identifier}. Filter is at time '
-                + f'{orch_plugin.fusion_engine.time.elapsed_nsec * 1e-9:.9f}s. Discarding message',
+                + f'{fusion_engine.time.elapsed_nsec * 1e-9:.9f}s. Discarding message',
             )
             return False
     else:
-        orch_plugin._log(
+        log_func(
             LoggingLevel.ERROR,
             f'Measurement of type {type(measurement)} does not contain '
             + '"time_of_validity" field.',
@@ -250,17 +249,20 @@ def has_valid_time(orch_plugin: SimpleOrchestration, message: Message) -> bool:
 
 
 def get_dead_reckoning_solution(
-    orch_plugin: SimpleOrchestration, time: TypeTimestamp, imu_sol_chan: str
+    inertial: StandardInertialMechanization,
+    time: TypeTimestamp,
+    imu_sol_chan: str,
+    log_func: Callable[[LoggingLevel, str], None],
 ) -> Message | None:
     """
     Utility function to request the IMU-only dead-reckoning solution. Returns
     ``None`` if the inertial is unable to provide a solution for the requested time.
     """
-    message = orch_plugin.inertial.request_solution(time)
+    message = inertial.request_solution(time)
     if message is not None:
         return Message(message.wrapped_message, imu_sol_chan)
     else:
-        orch_plugin._log(
+        log_func(
             LoggingLevel.ERROR,
             'Unable to get PVA message from inertial.'
             + ' Cannot generate DEAD_RECKONING solution.',
@@ -269,30 +271,30 @@ def get_dead_reckoning_solution(
 
 
 def get_best_solution(
-    orch_plugin: SimpleOrchestration,
+    fusion_engine: StandardFusionEngine,
+    inertial: StandardInertialMechanization,
     time: TypeTimestamp,
     sb_label: str,
     best_sol_chan: str,
+    log_func: Callable[[LoggingLevel, str], None],
 ) -> Message | None:
     """
     Utility function to request the best fusion strategy solution. Returns
     ``None`` if the fusion engine is unable to provide a solution for the requested time.
     """
 
-    x_and_p: EstimateWithCovariance | None = orch_plugin.fusion_engine.peek_ahead(
-        time, [sb_label]
-    )
+    x_and_p: EstimateWithCovariance | None = fusion_engine.peek_ahead(time, [sb_label])
     if x_and_p is None:
-        orch_plugin._log(
+        log_func(
             LoggingLevel.WARN,
-            f'Cannot get filter solution at time {time}. Filter is already at time {orch_plugin.fusion_engine.time}.',
+            f'Cannot get filter solution at time {time}. Filter is already at time {fusion_engine.time}.',
         )
         return None
 
-    inertial_solution: Message | None = orch_plugin.inertial.request_solution(time)
+    inertial_solution: Message | None = inertial.request_solution(time)
 
     if inertial_solution is None:
-        orch_plugin._log(
+        log_func(
             LoggingLevel.ERROR,
             f'Unable to obtain solution from inertial at time {time}. Cannot generate BEST solution.',
         )
@@ -302,7 +304,7 @@ def get_best_solution(
         inertial_solution.wrapped_message,
         MeasurementPositionVelocityAttitude,
     ):
-        orch_plugin._log(
+        log_func(
             LoggingLevel.ERROR,
             f'Expected PVA solution from inertial, but got type {type(inertial_solution.wrapped_message)}. Cannot generate BEST solution.',
         )
@@ -318,84 +320,96 @@ def get_best_solution(
     return Message(corrected_pva, best_sol_chan)
 
 
-def generate_initial_inertial_solution(
-    orch_plugin: SimpleOrchestration,
-    sb_label: str,
+def set_up_inertial_mechanization(
+    initializer: InertialInitializationStrategy,
+    inertial_plugin: InertialPlugin,
     inertial_group: str,
-) -> None:
+    log_func: Callable[[LoggingLevel, str], None],
+) -> Union[Tuple[StandardInertialMechanization, InitialInertialSolution] | None]:
     """Get initial inertial solution and use it to set up the inertial."""
-    orch_plugin.init_solution = orch_plugin.initializer.request_solution()
+    init_solution = initializer.request_solution()
 
     if (
-        orch_plugin.init_solution.solution is None
-        or orch_plugin.init_solution.inertial_errors is None
-        or orch_plugin.init_solution.inertial_error_covariance is None
+        init_solution.solution is None
+        or init_solution.inertial_errors is None
+        or init_solution.inertial_error_covariance is None
     ):
-        orch_plugin._log(
+        log_func(
             LoggingLevel.ERROR,
             'Invalid InitialInertialSolution returned from init strategy - unable to proceed.',
         )
-        return
+        return None
 
     if not isinstance(
-        orch_plugin.init_solution.solution.wrapped_message,
+        init_solution.solution.wrapped_message,
         MeasurementPositionVelocityAttitude,
     ):
-        orch_plugin._log(
+        log_func(
             LoggingLevel.ERROR,
             'Expected PVA solution from init strategy - unable to proceed.',
         )
-        return
+        return None
 
     inertial_init_message = Message(
-        orch_plugin.init_solution.solution.wrapped_message, 'python orchestration'
+        init_solution.solution.wrapped_message, 'python orchestration'
     )
 
-    inertial: StandardInertialMechanization | None = (
-        orch_plugin.inertial_plugin.new_inertial(
-            StandardInertialMechanization,
-            inertial_init_message,
-            inertial_group,
-        )
+    inertial: StandardInertialMechanization | None = inertial_plugin.new_inertial(
+        StandardInertialMechanization,
+        inertial_init_message,
+        inertial_group,
     )
     if inertial is None:
-        orch_plugin._log(
+        log_func(
             LoggingLevel.ERROR,
             'StandardInertialMechanization not supported by inertial '
-            + f'({orch_plugin.inertial_plugin.identifier})',
+            + f'({inertial_plugin.identifier})',
         )
-        return
+        return None
 
-    orch_plugin.inertial = inertial
-
-    orch_plugin.inertial.correct_sensor_errors(
-        orch_plugin.init_solution.solution.wrapped_message.time_of_validity,
-        orch_plugin.init_solution.inertial_errors,
+    inertial.correct_sensor_errors(
+        init_solution.solution.wrapped_message.time_of_validity,
+        init_solution.inertial_errors,
     )
+    return inertial, init_solution
 
-    pva_cov = orch_plugin.init_solution.solution.wrapped_message.covariance  # 9x9
-    bias_cov = orch_plugin.init_solution.inertial_error_covariance  # 6x6
+
+def initialize_filter(
+    init_solution: InitialInertialSolution,
+    fusion_engine: StandardFusionEngine,
+    sb_label: str,
+    log_func: Callable[[LoggingLevel, str], None],
+) -> None:
+    # asserting because the error is handled in set_up_inertial_mechanization
+    assert isinstance(init_solution.solution, Message)
+    assert isinstance(
+        init_solution.solution.wrapped_message,
+        MeasurementPositionVelocityAttitude,
+    )
+    pva_cov = init_solution.solution.wrapped_message.covariance  # 9x9
+    bias_cov = init_solution.inertial_error_covariance  # 6x6
     init_pinson_cov = block_diag(pva_cov, bias_cov)
-    orch_plugin.fusion_engine.set_state_block_covariance(
+    fusion_engine.set_state_block_covariance(
         sb_label,
         init_pinson_cov,
     )
 
-    init_time = orch_plugin.init_solution.solution.wrapped_message.time_of_validity
-    orch_plugin.fusion_engine.time = init_time
+    init_time = init_solution.solution.wrapped_message.time_of_validity
+    fusion_engine.time = init_time
 
-    send_inertial_aux_to_pinson(orch_plugin, sb_label)
-
-    orch_plugin._log(
+    log_func(
         LoggingLevel.INFO,
         f'Aligned filter at {init_time}.',
     )
 
 
 def dispatch_to_fusion_engine(
-    orch_plugin: SimpleOrchestration,
+    inertial: StandardInertialMechanization,
+    fusion_engine: StandardFusionEngine,
     message: Message,
     sb_label: str,
+    measurement_channels: dict[str, str],
+    log_func: Callable[[LoggingLevel, str], None],
 ) -> None:
     """Send message to the fusion engine to update the filter.
 
@@ -403,30 +417,32 @@ def dispatch_to_fusion_engine(
     afterward."""
     meas_time = message.wrapped_message.time_of_validity  # type: ignore[attr-defined]
     # Make sure measurement processor has most current aux data before update
-    mp_label = orch_plugin.measurement_channels[message.source_identifier]
-    send_inertial_aux_to_measurement_processor(orch_plugin, meas_time, mp_label)
-    send_inertial_aux_to_pinson(orch_plugin, sb_label)
+    mp_label = measurement_channels[message.source_identifier]
+    send_inertial_aux_to_measurement_processor(
+        inertial, fusion_engine, meas_time, mp_label, log_func
+    )
+    send_inertial_aux_to_pinson(inertial, fusion_engine, sb_label, log_func)
 
     # Propagate to measurement time
-    orch_plugin.fusion_engine.propagate(meas_time)
+    fusion_engine.propagate(meas_time)
 
     # Update filter.
-    orch_plugin.fusion_engine.update(mp_label, message)
+    fusion_engine.update(mp_label, message)
 
     # Feedback states to inertial.
-    estimate = orch_plugin.fusion_engine.get_state_block_estimate(sb_label)
+    estimate = fusion_engine.get_state_block_estimate(sb_label)
     if estimate is None:
-        orch_plugin._log(
+        log_func(
             LoggingLevel.ERROR,
             'Unable to obtain estimate from fusion engine.',
         )
         return
 
-    cur_time = orch_plugin.fusion_engine.time
-    inertial_pva_message = orch_plugin.inertial.request_solution(cur_time)
+    cur_time = fusion_engine.time
+    inertial_pva_message = inertial.request_solution(cur_time)
 
     if inertial_pva_message is None:
-        orch_plugin._log(
+        log_func(
             LoggingLevel.ERROR,
             f'Unable to obtain solution from inertial at time {cur_time}.',
         )
@@ -436,7 +452,7 @@ def dispatch_to_fusion_engine(
         inertial_pva_message.wrapped_message,
         MeasurementPositionVelocityAttitude,
     ):
-        orch_plugin._log(
+        log_func(
             LoggingLevel.ERROR,
             'Did not receive PVA message from inertial. Received '
             + f'{type(inertial_pva_message.wrapped_message)} instead.',
@@ -449,11 +465,11 @@ def dispatch_to_fusion_engine(
 
     message = Message(corrected_pva, 'python orchestration')
 
-    orch_plugin.inertial.reset_solution(message)
+    inertial.reset_solution(message)
 
-    imu_errors = orch_plugin.inertial.request_sensor_errors(cur_time)
+    imu_errors = inertial.request_sensor_errors(cur_time)
     if imu_errors is None:
-        orch_plugin._log(
+        log_func(
             LoggingLevel.ERROR,
             f'Unable to obtain sensor errors from inertial at time {cur_time}.',
         )
@@ -461,10 +477,10 @@ def dispatch_to_fusion_engine(
 
     imu_errors.accel_biases -= estimate[9:12, 0]
     imu_errors.gyro_biases -= estimate[12:15, 0]
-    orch_plugin.inertial.correct_sensor_errors(cur_time, imu_errors)
+    inertial.correct_sensor_errors(cur_time, imu_errors)
 
     # Assume zero error in states after applying feedback
-    orch_plugin.fusion_engine.set_state_block_estimate(sb_label, zeros((15, 1)))
+    fusion_engine.set_state_block_estimate(sb_label, zeros((15, 1)))
 
 
 def apply_error_states(
