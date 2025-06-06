@@ -1,4 +1,6 @@
-from numpy import array
+from aspn23 import MeasurementImu
+from numpy import array, float64
+from numpy.typing import NDArray
 
 from pntos.api import (
     LoggingLevel,
@@ -7,7 +9,7 @@ from pntos.api import (
     Preprocessor,
     PreprocessorPlugin,
 )
-from pntos.cobra.config import DownsamplerConfig, config_from_registry
+from pntos.cobra.config import DownsamplerConfig, InertialConfig, config_from_registry
 
 
 class SimplePreprocessorDownsampler(Preprocessor):
@@ -85,20 +87,56 @@ class SimplePreprocessorDownsampler(Preprocessor):
         return [message]
 
 
-class SimplePreprocessorDownsamplerPlugin(PreprocessorPlugin):
+class SimpleImuRotationPreprocessor(Preprocessor):
+    _mediator: Mediator
+    _imu_channel: str
+    _C_imu_to_platform: NDArray[float64]
+
+    def __init__(
+        self,
+        mediator: Mediator,
+        imu_channel: str,
+        C_imu_to_platform: NDArray[float64],
+    ):
+        self._mediator = mediator
+        self._imu_channel = imu_channel
+        self._C_imu_to_platform = C_imu_to_platform
+
+    def process_pntos_message(self, message: Message) -> list[Message]:
+        if message.source_identifier == self._imu_channel:
+            if isinstance(message.wrapped_message, MeasurementImu):
+                imu = message.wrapped_message
+                imu.meas_accel = self._C_imu_to_platform @ imu.meas_accel
+                imu.meas_gyro = self._C_imu_to_platform @ imu.meas_gyro
+            else:
+                self._mediator.log_message(
+                    LoggingLevel.WARN,
+                    f'SimpleImuRotationPreprocessor expected IMU message, but got {type(message.wrapped_message)}. Cannot rotate.',
+                )
+
+        return [message]
+
+
+class SimpleCobraPreprocessorPlugin(PreprocessorPlugin):
+    """A preprocessor plugin that provides a simple set of preprocessors.
+
+    The preprocessors this plugin provides are:
+
+    1. SimplePreprocessorDownsampler - Downsamples messages on a given list of channels.
+    2. SimpleImuRotationPreprocessor - Rotated IMU measurements from IMU to platform frame.
+    """
+
     mediator: Mediator | None
 
     def __init__(self, identifier: str):
-        """
-        A simple downsampler preprocessor plugin that can create
-        new instances of the SimplePreprocessorDownsampler class.
+        """Constructor.
 
         Args:
             identifier (str): The plugin identifier used to set
                 this plugin's :attr:`pntos.api.CommonPlugin.identifier` field.
         """
         self.identifier = identifier
-        self.preprocessor_identifiers = ['preprocessor_downsampler']
+        self.preprocessor_identifiers = ['downsampler', 'imu_rotator']
 
     def init_plugin(
         self,
@@ -119,28 +157,51 @@ class SimplePreprocessorDownsamplerPlugin(PreprocessorPlugin):
     ) -> Preprocessor | None:
         if self.mediator is None:
             print(
-                'Error: mediator is None. '
-                + 'PreprocessorPluginDownsampler.init_plugin '
-                + 'must be called and passed a valid mediator '
-                + 'before new_preprocessor.'
+                'Error: mediator is None. PreprocessorPlugin.init_plugin must be called'
+                + ' and passed a valid mediator before new_preprocessor.'
             )
             return None
 
-        if config_group is None:
-            self.mediator.log_message(
-                LoggingLevel.ERROR,
-                'config_group is a required parameter for the '
-                + 'PreprocessorPluginDownsampler and cannot be None.',
-            )
-            return None
+        match preprocessor_index:
+            case 0:
+                if config_group is None:
+                    preproc_id = self.preprocessor_identifiers[preprocessor_index]
+                    self.mediator.log_message(
+                        LoggingLevel.ERROR,
+                        f'config_group is a required parameter for preprocessor "{preproc_id}" and cannot be None.',
+                    )
+                    return None
 
-        if not 0 <= preprocessor_index < len(self.preprocessor_identifiers):
-            self.mediator.log_message(
-                LoggingLevel.ERROR,
-                f'Invalid preprocessor index of {preprocessor_index}. '
-                'SimplePreprocessorDownsamplerPlugin provides '
-                f'{len(self.preprocessor_identifiers)} preprocessors.',
-            )
-            return None
+                return SimplePreprocessorDownsampler(config_group, self.mediator)
 
-        return SimplePreprocessorDownsampler(config_group, self.mediator)
+            case 1:
+                if config_group is None:
+                    preproc_id = self.preprocessor_identifiers[preprocessor_index]
+                    self.mediator.log_message(
+                        LoggingLevel.ERROR,
+                        f'config_group is a required parameter for preprocessor "{preproc_id}" and cannot be None.',
+                    )
+                    return None
+
+                config = config_from_registry(
+                    InertialConfig, self.mediator, config_group
+                )
+                if config is None:
+                    self.mediator.log_message(
+                        LoggingLevel.ERROR,
+                        f'Failed to populate InertialConfig for preprocessor {self.preprocessor_identifiers[preprocessor_index]}.',
+                    )
+                    return None
+
+                return SimpleImuRotationPreprocessor(
+                    self.mediator, config.channel, array(config.C_imu_to_platform)
+                )
+
+            case _:
+                self.mediator.log_message(
+                    LoggingLevel.ERROR,
+                    f'Invalid preprocessor index of {preprocessor_index}. '
+                    'SimpleCobraPreprocessorPlugin provides '
+                    f'{len(self.preprocessor_identifiers)} preprocessors.',
+                )
+                return None

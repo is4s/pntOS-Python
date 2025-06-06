@@ -119,7 +119,11 @@ my_config = [
         sensor_name='novatel',
     ),
     InertialConfig(
-        group='config/inertial', expected_dt=0.01, inertial_buffer_length=10.0
+        group='config/inertial',
+        expected_dt=0.01,
+        channel='/sensor/vn-100/imu',
+        C_imu_to_platform=((1, 0, 0), (0, 1, 0), (0, 0, 1)),
+        inertial_buffer_length=10.0,
     ),
     FogmConfig(
         group='config/pos_sensor_error',
@@ -127,7 +131,6 @@ my_config = [
         tau=(30.0, 30.0, 300000.0),
     ),
     OrchestrationConfig(
-        imu_channel='/sensor/vn-100/imu',
         gps_channel='/sensor/ublox-ZED-F9T/position',
         group='config/orchestration',
     ),

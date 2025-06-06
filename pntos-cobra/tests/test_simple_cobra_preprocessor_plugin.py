@@ -1,28 +1,42 @@
+from copy import deepcopy
+
 import numpy as np
 import pytest
 from aspn23 import (
     MeasurementAltitude,
     MeasurementAltitudeErrorModel,
     MeasurementAltitudeReference,
+    MeasurementImu,
+    MeasurementImuImuType,
     TypeHeader,
     TypeTimestamp,
 )
 from pntos.api import Message, Preprocessor, RegistryPlugin
 from pntos.api.plugins.preprocessor import Preprocessor
 from pntos.cobra import (
-    SimplePreprocessorDownsamplerPlugin,
+    SimpleCobraPreprocessorPlugin,
     SimpleRegistryPlugin,
 )
-from pntos.cobra.config import BaseConfig, DownsamplerConfig
-from pntos.cobra.internal import SimpleMediator
+from pntos.cobra.config import BaseConfig, DownsamplerConfig, InertialConfig
+from pntos.cobra.internal import SimpleImuRotationPreprocessor, SimpleMediator
 
-config_list: list[BaseConfig] = [
-    DownsamplerConfig(
-        channels_to_downsample=['test1', 'test2', 'test3'],
-        downsampling_factors=[2, 3, -1],
-        group='test',
-    ),
-]
+downsampler_config = DownsamplerConfig(
+    channels_to_downsample=['test1', 'test2', 'test3'],
+    downsampling_factors=[2, 3, -1],
+    group='test',
+)
+inertial_config = InertialConfig(
+    group='/config/default/inertial',
+    expected_dt=0.01,
+    inertial_buffer_length=5.0,
+    channel='/sensor/imu',
+    C_imu_to_platform=((0, 1, 0), (1, 0, 0), (0, 0, -1)),
+)
+
+
+config_list: list[BaseConfig] = [downsampler_config, inertial_config]
+
+########## Preprocessor Plugin Tests ###############
 
 
 @pytest.fixture
@@ -36,19 +50,45 @@ def mediator() -> SimpleMediator:
 
 
 @pytest.fixture
-def preprocessor_downsampler_plugin(
+def preprocessor_plugin(
     mediator: SimpleMediator,
-) -> SimplePreprocessorDownsamplerPlugin:
-    ds_plugin = SimplePreprocessorDownsamplerPlugin('preprocessor_downsampler')
+) -> SimpleCobraPreprocessorPlugin:
+    ds_plugin = SimpleCobraPreprocessorPlugin('preprocessor_plugin')
     ds_plugin.init_plugin(mediator=mediator)
     return ds_plugin
 
 
+def test_plugin_constructor(
+    preprocessor_plugin: SimpleCobraPreprocessorPlugin,
+) -> None:
+    assert preprocessor_plugin.identifier == 'preprocessor_plugin'
+    assert len(preprocessor_plugin.preprocessor_identifiers) == 2
+
+
+def test_invalid_mediator() -> None:
+    ds_plugin = SimpleCobraPreprocessorPlugin('preprocessor_plugin')
+    ds_plugin.init_plugin()
+    assert not ds_plugin.new_preprocessor(0, 'test')
+
+
+def test_invalid_index(
+    preprocessor_plugin: SimpleCobraPreprocessorPlugin,
+) -> None:
+    assert preprocessor_plugin.new_preprocessor(-1, 'test') is None
+    assert (
+        preprocessor_plugin.new_preprocessor(
+            len(preprocessor_plugin.preprocessor_identifiers), 'test'
+        )
+        is None
+    )
+
+
+################## Downsampler Tests #################
 @pytest.fixture
 def downsampler(
-    preprocessor_downsampler_plugin: SimplePreprocessorDownsamplerPlugin,
+    preprocessor_plugin: SimpleCobraPreprocessorPlugin,
 ) -> Preprocessor:
-    ds = preprocessor_downsampler_plugin.new_preprocessor(0, 'test')
+    ds = preprocessor_plugin.new_preprocessor(0, 'test')
     assert ds is not None
     return ds
 
@@ -76,32 +116,16 @@ def assert_aspn_alt_equal(alt1: MeasurementAltitude, alt2: MeasurementAltitude):
     assert alt1.variance == alt2.variance
 
 
-def test_plugin_constructor(
-    preprocessor_downsampler_plugin: SimplePreprocessorDownsamplerPlugin,
-) -> None:
-    assert preprocessor_downsampler_plugin.identifier == 'preprocessor_downsampler'
-    assert len(preprocessor_downsampler_plugin.preprocessor_identifiers) == 1
-
-
-def test_invalid_mediator() -> None:
-    ds_plugin = SimplePreprocessorDownsamplerPlugin('preprocessor_downsampler')
-    ds_plugin.init_plugin()
-    assert not ds_plugin.new_preprocessor(0, 'test')
-
-
-def test_preprocessor_plugin_errors(
-    preprocessor_downsampler_plugin: SimplePreprocessorDownsamplerPlugin,
-) -> None:
-    assert not preprocessor_downsampler_plugin.new_preprocessor(0)
-    assert not preprocessor_downsampler_plugin.new_preprocessor(-1, 'test')
-    assert not preprocessor_downsampler_plugin.new_preprocessor(2, 'test')
-
-
 def test_invalid_config_group(
-    preprocessor_downsampler_plugin: SimplePreprocessorDownsamplerPlugin,
+    preprocessor_plugin: SimpleCobraPreprocessorPlugin,
 ) -> None:
-    ds = preprocessor_downsampler_plugin.new_preprocessor(0, 'invalid')
+    # No config group
+    ds = preprocessor_plugin.new_preprocessor(0)
+    assert ds is None
+    # Wrong config group
+    ds = preprocessor_plugin.new_preprocessor(0, 'invalid')
     assert ds is not None
+
     t1 = create_aspn_altitude('test1')
     t1_alt_meas = t1.wrapped_message
     assert isinstance(t1_alt_meas, MeasurementAltitude)
@@ -117,9 +141,9 @@ def test_invalid_config_group(
 
 
 def test_bad_channel(
-    preprocessor_downsampler_plugin: SimplePreprocessorDownsamplerPlugin,
+    preprocessor_plugin: SimpleCobraPreprocessorPlugin,
 ) -> None:
-    ds = preprocessor_downsampler_plugin.new_preprocessor(0, 'test')
+    ds = preprocessor_plugin.new_preprocessor(0, 'test')
     assert ds is not None
     bad = create_aspn_altitude('bad')
     bad_alt_meas = bad.wrapped_message
@@ -208,3 +232,73 @@ def test_channel_three(
     assert len(msg_list) > 0
     assert isinstance(msg_list[0].wrapped_message, MeasurementAltitude)
     assert_aspn_alt_equal(t3_alt_meas, msg_list[0].wrapped_message)
+
+
+########### IMU Rotator Tests ##############
+
+
+@pytest.fixture
+def imu_rotator_preprocessor(
+    preprocessor_plugin: SimpleCobraPreprocessorPlugin,
+) -> Preprocessor:
+    idx = preprocessor_plugin.preprocessor_identifiers.index('imu_rotator')
+    preprocessor = preprocessor_plugin.new_preprocessor(idx, '/config/default/inertial')
+    assert preprocessor is not None
+    assert isinstance(preprocessor, SimpleImuRotationPreprocessor)
+    return preprocessor
+
+
+@pytest.fixture
+def imu_message() -> Message:
+    return Message(
+        MeasurementImu(
+            TypeHeader(0, 1, 2, 3),
+            TypeTimestamp(1_000_000_000),
+            MeasurementImuImuType.INTEGRATED,
+            np.array([0.01, 0.02, 0.03]),
+            np.array([0.04, 0.05, 0.06]),
+            [],
+        ),
+        '/sensor/imu',
+    )
+
+
+def test_empty_config_group(
+    preprocessor_plugin: SimpleCobraPreprocessorPlugin,
+) -> None:
+    idx = preprocessor_plugin.preprocessor_identifiers.index('imu_rotator')
+    invalid_preprocessor = preprocessor_plugin.new_preprocessor(idx)
+    assert invalid_preprocessor is None
+
+
+def test_imu_rotation(
+    imu_rotator_preprocessor: Preprocessor, imu_message: Message
+) -> None:
+    original_message = deepcopy(imu_message)
+    assert isinstance(imu_message.wrapped_message, MeasurementImu)
+    assert isinstance(original_message.wrapped_message, MeasurementImu)
+
+    out_messages = imu_rotator_preprocessor.process_pntos_message(imu_message)
+    assert out_messages is not None
+    assert len(out_messages) == 1
+    rotated_imu_message = out_messages[0]
+    assert isinstance(rotated_imu_message.wrapped_message, MeasurementImu)
+
+    assert not np.allclose(
+        original_message.wrapped_message.meas_accel,
+        rotated_imu_message.wrapped_message.meas_accel,
+    )
+    assert not np.allclose(
+        original_message.wrapped_message.meas_gyro,
+        rotated_imu_message.wrapped_message.meas_gyro,
+    )
+
+    DCM = np.array(inertial_config.C_imu_to_platform)
+    assert np.allclose(
+        DCM @ original_message.wrapped_message.meas_accel,
+        rotated_imu_message.wrapped_message.meas_accel,
+    )
+    assert np.allclose(
+        DCM @ original_message.wrapped_message.meas_gyro,
+        rotated_imu_message.wrapped_message.meas_gyro,
+    )

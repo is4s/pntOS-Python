@@ -35,7 +35,6 @@ Then update the script so the new Orchestration plugin is created instead of the
 
 ```diff
      OrchestrationConfig(
-         imu_channel='/sensor/vn-100/imu',
          gps_channel='/sensor/ublox-ZED-F9T/position',
          group='config/orchestration',
 +        velocity_channel='/sensor/ublox-ZED-F9T/velocity',
