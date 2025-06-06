@@ -40,10 +40,10 @@ from .orchestration_utils import (
     has_valid_time,
     initialization_ready,
     initialize_filter,
-    rotate_imu_meas,
     send_inertial_aux_to_pinson,
     set_up_inertial_mechanization,
     set_up_initializer,
+    set_up_preprocessors,
 )
 
 # Solution Channels
@@ -177,6 +177,10 @@ class SimpleGpsOrchestrationPlugin(OrchestrationPlugin):
         self.initialization_plugin = extracted_plugins[3]
         self.state_modeling_plugins = extracted_plugins[4]
 
+        self.preprocessors = set_up_preprocessors(
+            sorted_plugins, PREPROCESSOR_IDS, PREPROCESSOR_GROUPS
+        )
+
         self._set_up_fusion_engine()
         initializer = set_up_initializer(
             self.initialization_plugin, ALIGNMENT_CONFIG_GROUP, self._log
@@ -202,29 +206,6 @@ class SimpleGpsOrchestrationPlugin(OrchestrationPlugin):
             send_inertial_aux_to_pinson(
                 self.inertial, self.fusion_engine, STATE_BLOCK_LABEL, self._log
             )
-
-    def _sort_and_validate_plugins(self, plugin_list: list[CommonPlugin]) -> None:
-        """
-        Utility function to sort plugins_list and make sure there is only one of the
-        following plugins:
-        - FusionPlugin
-        - FusionStrategyPlugin
-        - InertialPlugin
-        - InitializationPlugin
-        - StateModelingPlugin
-        """
-        sorted_plugins: SortedPlugins = sort_plugins_dataclass(plugin_list)
-
-        validate_plugins(self, sorted_plugins)
-
-        # Find and store preprocessors
-        for identifier, config_group in zip(PREPROCESSOR_IDS, PREPROCESSOR_GROUPS):
-            for plugin in sorted_plugins.preprocessor_plugins:
-                for idx in range(len(plugin.preprocessor_identifiers)):
-                    if plugin.preprocessor_identifiers[idx] == identifier:
-                        preprocessor = plugin.new_preprocessor(idx, config_group)
-                        if preprocessor is not None:
-                            self.preprocessors.append(preprocessor)
 
     def _set_up_initializer(self) -> None:
         """Set up inertial initialization strategy, and initialize filter solution if initializer is immediately ready."""

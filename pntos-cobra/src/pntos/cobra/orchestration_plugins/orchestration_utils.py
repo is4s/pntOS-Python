@@ -22,6 +22,7 @@ from pntos.api import (
     LoggingLevel,
     Mediator,
     Message,
+    Preprocessor,
     StandardFusionEngine,
     StandardInertialMechanization,
     StateModelingPlugin,
@@ -115,6 +116,23 @@ def extract_plugins(
         initialization_plugin,
         state_modeling_plugins,
     )
+
+
+def set_up_preprocessors(
+    sorted_plugins: SortedPlugins,
+    preprocessor_ids: list[str],
+    preprocessor_groups: list[str],
+) -> list[Preprocessor]:
+    # Find and store preprocessors
+    preprocessors = []
+    for identifier, config_group in zip(preprocessor_ids, preprocessor_groups):
+        for plugin in sorted_plugins.preprocessor_plugins:
+            for idx in range(len(plugin.preprocessor_identifiers)):
+                if plugin.preprocessor_identifiers[idx] == identifier:
+                    preprocessor = plugin.new_preprocessor(idx, config_group)
+                    if preprocessor is not None:
+                        preprocessors.append(preprocessor)
+    return preprocessors
 
 
 def set_up_initializer(
