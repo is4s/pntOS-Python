@@ -332,7 +332,9 @@ class SimpleGpsVelOrchestrationPlugin(OrchestrationPlugin):
         self.fusion_engine = fusion_engine
 
     def process_pntos_message(self, message: Message, sequenced: bool) -> None:
-        preprocessed_message = preprocess_message(message, self.preprocessors, self._log)
+        preprocessed_message = preprocess_message(
+            message, self.preprocessors, self._log
+        )
         if not preprocessed_message:
             # Message dropped in preprocessing
             return
