@@ -1,4 +1,5 @@
 import bisect
+from threading import Event
 
 from aspn23 import MeasurementAccumulatedDistanceTraveled, TypeTimestamp
 from pntos.api import (
@@ -26,6 +27,7 @@ class SimpleMediator(Mediator):
     _orchestration_plugin: OrchestrationPlugin | None = None
     _controller_plugin: ControllerPlugin | None = None
     _stream_config: SimpleMessageStreamConfig
+    _logging_error_event: Event = Event()
     registry: Registry
     _messages: list[Message] = []
     _buffer_time_nsec: int = 2_000_000_000
@@ -123,5 +125,5 @@ class SimpleMediator(Mediator):
             )
         # This implementation shuts down pntos if an error is detected.
         if level is LoggingLevel.ERROR and self._controller_plugin is not None:
-            self._controller_plugin.shutdown_plugin()
+            self._logging_error_event.set()
             exit(1)

@@ -1,3 +1,5 @@
+from threading import Event
+
 from pntos.api import (
     CommonPlugin,
     ControllerPlugin,
@@ -294,11 +296,13 @@ class SimpleControllerPlugin(ControllerPlugin):
                 'Press Ctrl + C at any time to shut down pntOS...',
             )
             try:
-                while True:
-                    input()
+                SimpleMediator._logging_error_event.wait()
             except KeyboardInterrupt:
                 self._log(LoggingLevel.INFO, 'Keyboard Interrupt Detected.')
                 pass
 
         self.shutdown_plugin()
-        exit(0)
+        if SimpleMediator._logging_error_event.is_set():
+            exit(1)
+        else:
+            exit(0)
