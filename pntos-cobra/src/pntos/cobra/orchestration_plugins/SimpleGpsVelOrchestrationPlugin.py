@@ -39,10 +39,11 @@ from .orchestration_utils import (
     has_valid_time,
     initialization_ready,
     initialize_filter,
-    rotate_imu_meas,
+    preprocess_message,
     send_inertial_aux_to_pinson,
     set_up_inertial_mechanization,
     set_up_initializer,
+    set_up_preprocessors,
 )
 
 # Solution Channels
@@ -181,6 +182,10 @@ class SimpleGpsVelOrchestrationPlugin(OrchestrationPlugin):
         self.initialization_plugin = extracted_plugins[3]
         self.state_modeling_plugins = extracted_plugins[4]
 
+        self.preprocessors = set_up_preprocessors(
+            sorted_plugins, PREPROCESSOR_IDS, PREPROCESSOR_GROUPS
+        )
+
         self._set_up_fusion_engine()
         initializer = set_up_initializer(
             self.initialization_plugin, ALIGNMENT_CONFIG_GROUP, self._log
@@ -206,15 +211,6 @@ class SimpleGpsVelOrchestrationPlugin(OrchestrationPlugin):
             send_inertial_aux_to_pinson(
                 self.inertial, self.fusion_engine, STATE_BLOCK_LABEL, self._log
             )
-
-        # Find and store preprocessors
-        for identifier, config_group in zip(PREPROCESSOR_IDS, PREPROCESSOR_GROUPS):
-            for plugin in sorted_plugins.preprocessor_plugins:
-                for idx in range(len(plugin.preprocessor_identifiers)):
-                    if plugin.preprocessor_identifiers[idx] == identifier:
-                        preprocessor = plugin.new_preprocessor(idx, config_group)
-                        if preprocessor is not None:
-                            self.preprocessors.append(preprocessor)
 
     def _set_up_fusion_engine(self) -> None:
         """
@@ -335,33 +331,8 @@ class SimpleGpsVelOrchestrationPlugin(OrchestrationPlugin):
 
         self.fusion_engine = fusion_engine
 
-    def _preprocess_message(self, message: Message) -> Message | None:
-        """Process the given message by the full chain of preprocessors.
-
-        Note: This function assumes all the preprocessors in the chain will either
-        return 0 or 1 messages. Any additional messages will be ignored.
-
-        Args:
-            message (Message): The message to process.
-
-        Returns:
-            Message | None: The output message, or None if one of the preprocessors dropped the input message.
-        """
-        for preprocessor in self.preprocessors:
-            messages = preprocessor.process_pntos_message(message)
-            if not messages:
-                return None
-            elif len(messages) > 1:
-                self._log(
-                    LoggingLevel.WARN,
-                    f'Preprocessor {preprocessor} returned {len(messages)} messages. Ignoring all but the first.',
-                )
-            message = messages[0]
-
-        return message
-
     def process_pntos_message(self, message: Message, sequenced: bool) -> None:
-        preprocessed_message = self._preprocess_message(message)
+        preprocessed_message = preprocess_message(message, self.preprocessors, self._log)
         if not preprocessed_message:
             # Message dropped in preprocessing
             return
