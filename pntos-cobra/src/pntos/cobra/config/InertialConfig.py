@@ -19,4 +19,14 @@ class InertialConfig(BaseConfig):
     The length of the inertial buffer in seconds.
     """
 
+    channel: str
+    """Channel containing IMU measurements."""
+
+    C_imu_to_platform: tuple[
+        tuple[float, float, float],
+        tuple[float, float, float],
+        tuple[float, float, float],
+    ]
+    """DCM used to rotate measurements from IMU sensor frame to platform frame."""
+
     group: str

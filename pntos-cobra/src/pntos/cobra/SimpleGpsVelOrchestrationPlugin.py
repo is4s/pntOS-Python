@@ -29,13 +29,14 @@ from pntos.api import (
     Message,
     MessageStreamConfig,
     OrchestrationPlugin,
+    Preprocessor,
     StandardFusionEngine,
     StandardFusionStrategy,
     StandardInertialMechanization,
     StandardStateModelProvider,
     StateModelingPlugin,
 )
-from pntos.cobra.config import OrchestrationConfig, config_from_registry
+from pntos.cobra.config import InertialConfig, OrchestrationConfig, config_from_registry
 from pntos.cobra.utils import (
     correct_dcm_with_tilt,
     dcm_to_quat,
@@ -72,6 +73,8 @@ INERTIAL_GROUP = 'config/inertial'
 
 # Config groups
 ALIGNMENT_CONFIG_GROUP = 'config/default/alignment'
+PREPROCESSOR_IDS = ['imu_rotator']
+PREPROCESSOR_GROUPS = [INERTIAL_GROUP]
 
 
 class SimpleGpsVelOrchestrationPlugin(OrchestrationPlugin):
@@ -81,6 +84,7 @@ class SimpleGpsVelOrchestrationPlugin(OrchestrationPlugin):
     fusion_strategy_plugin: FusionStrategyPlugin
     inertial_plugin: InertialPlugin
     state_modeling_plugins: list[StateModelingPlugin]
+    preprocessors: list[Preprocessor]
 
     def __init__(self, identifier: str) -> None:
         """
@@ -99,14 +103,7 @@ class SimpleGpsVelOrchestrationPlugin(OrchestrationPlugin):
         }
         self.initialization_state: InitializationStatus = InitializationStatus.WAITING
         self.init_solution = None
-        # Corresponds to an RPY of [0.35, 3.7, -1] in degrees
-        self.C_inertial_to_platform = np.array(
-            [
-                [0.99776363, 0.01784622, 0.06441467],
-                [-0.01741603, 0.99982216, -0.00723391],
-                [-0.06453231, 0.00609588, 0.997897],
-            ]
-        )
+        self.preprocessors = []
 
     def init_plugin(
         self,
@@ -143,12 +140,14 @@ class SimpleGpsVelOrchestrationPlugin(OrchestrationPlugin):
         stream_config.sequenced_stream_all(True)
         stream_config.immediate_stream_add(MeasurementImu)
 
-        orch_config_group = 'config/orchestration'
         orch_config = config_from_registry(
-            OrchestrationConfig, self.mediator, orch_config_group
+            OrchestrationConfig, self.mediator, 'config/orchestration'
+        )
+        inertial_config = config_from_registry(
+            InertialConfig, self.mediator, INERTIAL_GROUP
         )
 
-        if orch_config is None:
+        if orch_config is None or inertial_config is None:
             self._log(
                 LoggingLevel.ERROR,
                 'Unable to grab the orchestration config from the registry. Filter cannot be implemented.',
@@ -161,9 +160,9 @@ class SimpleGpsVelOrchestrationPlugin(OrchestrationPlugin):
         }
         self.alignment_channels: list[str] = [
             orch_config.gps_channel,
-            orch_config.imu_channel,
+            inertial_config.channel,
         ]
-        self.inertial_channel = orch_config.imu_channel
+        self.inertial_channel = inertial_config.channel
 
         self._sort_and_validate_plugins(plugins)
 
@@ -233,6 +232,15 @@ class SimpleGpsVelOrchestrationPlugin(OrchestrationPlugin):
             )
             return
         self.state_modeling_plugins = sorted_plugins.state_modeling_plugins
+
+        # Find and store preprocessors
+        for identifier, config_group in zip(PREPROCESSOR_IDS, PREPROCESSOR_GROUPS):
+            for plugin in sorted_plugins.preprocessor_plugins:
+                for idx in range(len(plugin.preprocessor_identifiers)):
+                    if plugin.preprocessor_identifiers[idx] == identifier:
+                        preprocessor = plugin.new_preprocessor(idx, config_group)
+                        if preprocessor is not None:
+                            self.preprocessors.append(preprocessor)
 
     def _set_up_initializer(self) -> None:
         """Set up inertial initialization strategy, and initialize filter solution if initializer is immediately ready."""
@@ -369,15 +377,6 @@ class SimpleGpsVelOrchestrationPlugin(OrchestrationPlugin):
         fusion_engine.add_measurement_processor(vel_processor)
 
         self.fusion_engine = fusion_engine
-
-    def _rotate_imu_meas(self, imu: MeasurementImu) -> None:
-        """Rotate IMU measurement into platform frame.
-
-        Args:
-            message (MeasurementImu): IMU ASPN message to rotate.
-        """
-        imu.meas_accel = self.C_inertial_to_platform @ imu.meas_accel
-        imu.meas_gyro = self.C_inertial_to_platform @ imu.meas_gyro
 
     def _dispatch_to_fusion_engine(self, message: Message) -> None:
         """Send message to the fusion engine to update the filter.
@@ -560,10 +559,38 @@ class SimpleGpsVelOrchestrationPlugin(OrchestrationPlugin):
         self.initialization_state = self.initializer.request_current_status()
         return self.initialization_state is InitializationStatus.INITIALIZED_GOOD
 
+    def _preprocess_message(self, message: Message) -> Message | None:
+        """Process the given message by the full chain of preprocessors.
+
+        Note: This function assumes all the preprocessors in the chain will either
+        return 0 or 1 messages. Any additional messages will be ignored.
+
+        Args:
+            message (Message): The message to process.
+
+        Returns:
+            Message | None: The output message, or None if one of the preprocessors dropped the input message.
+        """
+        for preprocessor in self.preprocessors:
+            messages = preprocessor.process_pntos_message(message)
+            if not messages:
+                return None
+            elif len(messages) > 1:
+                self._log(
+                    LoggingLevel.WARN,
+                    f'Preprocessor {preprocessor} returned {len(messages)} messages. Ignoring all but the first.',
+                )
+            message = messages[0]
+
+        return message
+
     def process_pntos_message(self, message: Message, sequenced: bool) -> None:
-        # Rotate IMU measurements into platform frame
-        if isinstance(message.wrapped_message, MeasurementImu):
-            self._rotate_imu_meas(message.wrapped_message)
+        preprocessed_message = self._preprocess_message(message)
+        if not preprocessed_message:
+            # Message dropped in preprocessing
+            return
+
+        message = preprocessed_message
 
         if not self._has_valid_time(message):
             return

@@ -6,6 +6,7 @@ from pntos.api import LoggingLevel
 # Import Cobra plugins and config structs
 from pntos.cobra import (
     Aspn23LcmTransportPlugin,
+    SimpleCobraPreprocessorPlugin,
     SimpleControllerPlugin,
     SimpleEkfFusionStrategyPlugin,
     SimpleFusionPlugin,
@@ -62,7 +63,15 @@ my_config = [
         sensor_name='position',
     ),
     InertialConfig(
-        group='config/inertial', expected_dt=0.01, inertial_buffer_length=10.0
+        group='config/inertial',
+        expected_dt=0.01,
+        channel='/sensor/vn-100/imu',
+        C_imu_to_platform=(
+            (0.99776363, 0.01784622, 0.06441467),
+            (-0.01741603, 0.99982216, -0.00723391),
+            (-0.06453231, 0.00609588, 0.997897),
+        ),
+        inertial_buffer_length=10.0,
     ),
     FogmConfig(
         group='config/pos_sensor_error',
@@ -70,7 +79,6 @@ my_config = [
         tau=(300.0, 300.0, 200.0),
     ),
     OrchestrationConfig(
-        imu_channel='/sensor/vn-100/imu',
         gps_channel='/sensor/ublox-ZED-F9T/position',
         group='config/orchestration',
         velocity_channel='/sensor/ublox-ZED-F9T/velocity',
@@ -93,6 +101,7 @@ plugins = [
     ),
     SimpleGpsVelOrchestrationPlugin('Cobra Simple Orchestration Plugin'),
     SimpleRegistryPlugin('Cobra Simple Registry Plugin', config=my_config),
+    SimpleCobraPreprocessorPlugin('Cobra Simple Preprocessor Plugin'),
 ]
 
 # Start the controller, and pass it all of the other plugins to use

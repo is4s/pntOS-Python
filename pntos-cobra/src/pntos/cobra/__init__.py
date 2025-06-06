@@ -4,6 +4,9 @@ from .Aspn23LcmTransportPlugin import (
 from .simple_controller.SimpleControllerPlugin import (
     SimpleControllerPlugin as SimpleControllerPlugin,
 )
+from .SimpleCobraPreprocessorPlugin import (
+    SimpleCobraPreprocessorPlugin as SimpleCobraPreprocessorPlugin,
+)
 from .SimpleDiagnosticLogPlugin import (
     SimpleDiagnosticLogPlugin as SimpleDiagnosticLogPlugin,
 )
@@ -22,9 +25,6 @@ from .SimpleInitializationPlugin import (
     SimpleInitializationPlugin as SimpleInitializationPlugin,
 )
 from .SimpleLoggingPlugin import SimpleLoggingPlugin as SimpleLoggingPlugin
-from .SimplePreprocessorDownsamplerPlugin import (
-    SimplePreprocessorDownsamplerPlugin as SimplePreprocessorDownsamplerPlugin,
-)
 from .SimpleRegistryPlugin import (
     SimpleRegistryPlugin as SimpleRegistryPlugin,
 )
