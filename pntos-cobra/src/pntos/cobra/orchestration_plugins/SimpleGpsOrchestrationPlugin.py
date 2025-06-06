@@ -40,6 +40,7 @@ from .orchestration_utils import (
     has_valid_time,
     initialization_ready,
     initialize_filter,
+    preprocess_message,
     send_inertial_aux_to_pinson,
     set_up_inertial_mechanization,
     set_up_initializer,
@@ -322,33 +323,8 @@ class SimpleGpsOrchestrationPlugin(OrchestrationPlugin):
 
         self.fusion_engine = fusion_engine
 
-    def _preprocess_message(self, message: Message) -> Message | None:
-        """Process the given message by the full chain of preprocessors.
-
-        Note: This function assumes all the preprocessors in the chain will either
-        return 0 or 1 messages. Any additional messages will be ignored.
-
-        Args:
-            message (Message): The message to process.
-
-        Returns:
-            Message | None: The output message, or None if one of the preprocessors dropped the input message.
-        """
-        for preprocessor in self.preprocessors:
-            messages = preprocessor.process_pntos_message(message)
-            if not messages:
-                return None
-            elif len(messages) > 1:
-                self._log(
-                    LoggingLevel.WARN,
-                    f'Preprocessor {preprocessor} returned {len(messages)} messages. Ignoring all but the first.',
-                )
-            message = messages[0]
-
-        return message
-
     def process_pntos_message(self, message: Message, sequenced: bool) -> None:
-        preprocessed_message = self._preprocess_message(message)
+        preprocessed_message = preprocess_message(message, self.preprocessors, self._log)
         if not preprocessed_message:
             # Message dropped in preprocessing
             return

@@ -392,6 +392,32 @@ def set_up_inertial_mechanization(
     return inertial, init_solution
 
 
+def preprocess_message(message: Message, preprocessors: list[Preprocessor], log_func: Callable[[LoggingLevel, str], None],) -> Message | None:
+        """Process the given message by the full chain of preprocessors.
+
+        Note: This function assumes all the preprocessors in the chain will either
+        return 0 or 1 messages. Any additional messages will be ignored.
+
+        Args:
+            message (Message): The message to process.
+
+        Returns:
+            Message | None: The output message, or None if one of the preprocessors dropped the input message.
+        """
+        for preprocessor in preprocessors:
+            messages = preprocessor.process_pntos_message(message)
+            if not messages:
+                return None
+            elif len(messages) > 1:
+                log_func(
+                    LoggingLevel.WARN,
+                    f'Preprocessor {preprocessor} returned {len(messages)} messages. Ignoring all but the first.',
+                )
+            message = messages[0]
+
+        return message
+
+
 def initialize_filter(
     init_solution: InitialInertialSolution,
     fusion_engine: StandardFusionEngine,
