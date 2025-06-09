@@ -22,7 +22,6 @@ from pntos.api import (
     MessageStreamConfig,
     OrchestrationPlugin,
     Preprocessor,
-    PreprocessorPlugin,
     StandardFusionEngine,
     StandardFusionStrategy,
     StandardInertialMechanization,

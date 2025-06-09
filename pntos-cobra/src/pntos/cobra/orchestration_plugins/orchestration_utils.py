@@ -11,8 +11,6 @@ from numpy import array, float64, zeros
 from numpy.typing import NDArray
 from pntos.api import (
     EstimateWithCovariance,
-    FusionPlugin,
-    FusionStrategyPlugin,
     InertialInitializationStrategy,
     InertialPlugin,
     InitialInertialSolution,
@@ -23,9 +21,7 @@ from pntos.api import (
     Preprocessor,
     StandardFusionEngine,
     StandardInertialMechanization,
-    StateModelingPlugin,
 )
-from pntos.api.plugins.fusion_strategy import FusionStrategyPlugin
 from pntos.cobra.utils import (
     SortedPlugins,
     correct_dcm_with_tilt,
@@ -100,85 +96,6 @@ def validate_plugins(
             )
             return False
     return True
-
-
-def extract_plugins(
-    sorted_plugins: SortedPlugins, log_func: Callable[[LoggingLevel, str], None]
-) -> Union[
-    Tuple[
-        FusionPlugin,
-        FusionStrategyPlugin,
-        InertialPlugin,
-        InitializationPlugin,
-        list[StateModelingPlugin],
-    ]
-    | Tuple[()]
-]:
-    """
-    Utility function to sort plugins_list and make sure there is only one of the
-    following plugins:
-    - FusionPlugin
-    - FusionStrategyPlugin
-    - InertialPlugin
-    - InitializationPlugin
-    - StateModelingPlugin
-    """
-    # Fusion Plugin
-    if len(sorted_plugins.fusion_plugins) != 1:
-        log_func(
-            LoggingLevel.ERROR,
-            f'Expected one FusionPlugin - received {len(sorted_plugins.fusion_plugins)}'
-            + f': {[p.identifier for p in sorted_plugins.fusion_plugins]}',
-        )
-        return ()
-    fusion_plugin = sorted_plugins.fusion_plugins[0]
-
-    # Fusion Strategy Plugin
-    if len(sorted_plugins.fusion_strategy_plugins) != 1:
-        log_func(
-            LoggingLevel.ERROR,
-            'Expected one FusionStrategyPlugin - received '
-            + f'{len(sorted_plugins.fusion_strategy_plugins)}',
-        )
-        return ()
-    fusion_strategy_plugin = sorted_plugins.fusion_strategy_plugins[0]
-
-    # Inertial Plugin
-    if len(sorted_plugins.inertial_plugins) != 1:
-        log_func(
-            LoggingLevel.ERROR,
-            f'Expected one InertialPlugin - received '
-            + f'{len(sorted_plugins.inertial_plugins)}',
-        )
-        return ()
-    inertial_plugin = sorted_plugins.inertial_plugins[0]
-
-    # Initialization Plugin
-    if len(sorted_plugins.initialization_plugins) != 1:
-        log_func(
-            LoggingLevel.ERROR,
-            'Expected one InitializationPlugin - received '
-            + f'{len(sorted_plugins.initialization_plugins)}',
-        )
-        return ()
-    initialization_plugin = sorted_plugins.initialization_plugins[0]
-
-    # State Modeling Plugin
-    if len(sorted_plugins.state_modeling_plugins) == 0:
-        log_func(
-            LoggingLevel.ERROR,
-            f'Expected at least one StateModelingPlugin - received none.',
-        )
-        return ()
-    state_modeling_plugins = sorted_plugins.state_modeling_plugins
-
-    return (
-        fusion_plugin,
-        fusion_strategy_plugin,
-        inertial_plugin,
-        initialization_plugin,
-        state_modeling_plugins,
-    )
 
 
 def set_up_preprocessors(
