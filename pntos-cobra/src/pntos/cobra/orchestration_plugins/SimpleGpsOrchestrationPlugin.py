@@ -34,7 +34,6 @@ from pntos.cobra.utils import sort_plugins_dataclass
 
 from .orchestration_utils import (
     dispatch_to_fusion_engine,
-    extract_plugins,
     get_best_solution,
     get_dead_reckoning_solution,
     has_valid_time,
@@ -45,6 +44,7 @@ from .orchestration_utils import (
     set_up_inertial_mechanization,
     set_up_initializer,
     set_up_preprocessors,
+    validate_plugins,
 )
 
 # Solution Channels
@@ -169,14 +169,21 @@ class SimpleGpsOrchestrationPlugin(OrchestrationPlugin):
         self.inertial_channel = inertial_config.channel
 
         sorted_plugins = sort_plugins_dataclass(plugins)
-        extracted_plugins = extract_plugins(sorted_plugins, self._log)
-        if len(extracted_plugins) == 0:
+        if not validate_plugins(
+            sorted_plugins,
+            self._log,
+            expected_fusion_plugins=1,
+            expected_fusion_strategy_plugins=1,
+            expected_inertial_plugins=1,
+            expected_initialization_plugins=1,
+            expected_state_modeling_plugins=-1,
+        ):
             return
-        self.fusion_plugin = extracted_plugins[0]
-        self.fusion_strategy_plugin = extracted_plugins[1]
-        self.inertial_plugin = extracted_plugins[2]
-        self.initialization_plugin = extracted_plugins[3]
-        self.state_modeling_plugins = extracted_plugins[4]
+        self.fusion_plugin = sorted_plugins.fusion_plugins[0]
+        self.fusion_strategy_plugin = sorted_plugins.fusion_strategy_plugins[0]
+        self.inertial_plugin = sorted_plugins.inertial_plugins[0]
+        self.initialization_plugin = sorted_plugins.initialization_plugins[0]
+        self.state_modeling_plugins = sorted_plugins.state_modeling_plugins
 
         self.preprocessors = set_up_preprocessors(
             sorted_plugins, PREPROCESSOR_IDS, PREPROCESSOR_GROUPS

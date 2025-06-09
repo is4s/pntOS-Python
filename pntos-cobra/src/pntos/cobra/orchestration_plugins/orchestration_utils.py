@@ -10,7 +10,6 @@ from aspn23 import (
 from numpy import array, float64, zeros
 from numpy.typing import NDArray
 from pntos.api import (
-    CommonPlugin,
     EstimateWithCovariance,
     FusionPlugin,
     FusionStrategyPlugin,
@@ -20,13 +19,13 @@ from pntos.api import (
     InitializationPlugin,
     InitializationStatus,
     LoggingLevel,
-    Mediator,
     Message,
     Preprocessor,
     StandardFusionEngine,
     StandardInertialMechanization,
     StateModelingPlugin,
 )
+from pntos.api.plugins.fusion_strategy import FusionStrategyPlugin
 from pntos.cobra.utils import (
     SortedPlugins,
     correct_dcm_with_tilt,
@@ -34,9 +33,73 @@ from pntos.cobra.utils import (
     east_to_delta_lon,
     north_to_delta_lat,
     quat_to_dcm,
-    sort_plugins_dataclass,
 )
 from scipy.linalg import block_diag
+
+
+def validate_plugins(
+    sorted_plugins: SortedPlugins,
+    log_func: Callable[[LoggingLevel, str], None],
+    **expected_plugins: int,
+) -> bool:
+    """
+    A utility function that (for each type) verifies the number of expected plugins against the plugin counts in ``sorted_plugins``
+
+    Args:
+        sorted_plugins (SortedPlugins): A ``SortedPlugins`` instance containing fields of plugins to validate.
+        log_func (Callable[[LoggingLevel, str], None]): The logging function to use within this method.
+        **expected_plugins: Keyword arguments mapping plugin type names (as strings) to the expected number of plugins.
+            At least one plugin type must be specified.
+
+    Returns:
+    bool: `True` if all expected plugin counts match the actual counts; `False` otherwise.
+    """
+    accepted_args = {
+        'expected_controller_plugins',
+        'expected_fusion_plugins',
+        'expected_fusion_strategy_plugins',
+        'expected_inertial_plugins',
+        'expected_initialization_plugins',
+        'expected_logging_plugins',
+        'expected_orchestration_plugins',
+        'expected_platform_integration_plugins',
+        'expected_preprocessor_plugins',
+        'expected_registry_plugins',
+        'expected_state_modeling_plugins',
+        'expected_transport_plugins',
+        'expected_ui_plugins',
+        'expected_utility_plugins',
+    }
+    if not expected_plugins:
+        log_func(
+            LoggingLevel.ERROR,
+            'No plugins were given criteria to validate. At least one plugin must be validated',
+        )
+        return False
+
+    for name, value in expected_plugins.items():
+        if name not in accepted_args:
+            log_func(
+                LoggingLevel.ERROR,
+                f'Unknown argument: {name}\nList of accepted args: {list(accepted_args)}',
+            )
+            return False
+
+        plugin_count = len(getattr(sorted_plugins, name[9:]))
+        if value == -1:
+            if plugin_count == 0:
+                log_func(
+                    LoggingLevel.ERROR,
+                    f'Provided argument {name} specifies at least 1 plugin but sorted_plugins has {plugin_count}',
+                )
+                return False
+        elif not plugin_count == value:
+            log_func(
+                LoggingLevel.ERROR,
+                f'Provided argument {name} specifies {value} plugins but sorted_plugins has {plugin_count}',
+            )
+            return False
+    return True
 
 
 def extract_plugins(
@@ -123,7 +186,17 @@ def set_up_preprocessors(
     preprocessor_ids: list[str],
     preprocessor_groups: list[str],
 ) -> list[Preprocessor]:
-    # Find and store preprocessors
+    """
+    Finds and creates a list of preprocessors based on the information in ``preprocessor_ids`` and ``preprocessor_groups``.
+
+    Args:
+        sorted_plugins (SortedPlugins): A `SortedPlugins` instance.
+        preprocessor_ids (list[str]): The identifiers for the desired preprocessors (e.g. imu_rotator).
+        preprocessor_groups (list[str]): Config groups that point to registry locations storing preprocessor information.
+
+    Returns:
+        list[Preprocessor]
+    """
     preprocessors = []
     for identifier, config_group in zip(preprocessor_ids, preprocessor_groups):
         for plugin in sorted_plugins.preprocessor_plugins:
