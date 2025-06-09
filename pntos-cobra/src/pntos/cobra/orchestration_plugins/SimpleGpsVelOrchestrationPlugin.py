@@ -176,11 +176,11 @@ class SimpleGpsVelOrchestrationPlugin(OrchestrationPlugin):
         if not validate_plugins(
             sorted_plugins,
             self._log,
-            expected_fusion_plugins=1,
-            expected_fusion_strategy_plugins=1,
-            expected_inertial_plugins=1,
-            expected_initialization_plugins=1,
-            expected_state_modeling_plugins=-1,
+            num_fusion_plugins=1,
+            num_fusion_strategy_plugins=1,
+            num_inertial_plugins=1,
+            num_initialization_plugins=1,
+            min_state_modeling_plugins=1,
         ):
             return
         self.fusion_plugin = sorted_plugins.fusion_plugins[0]
