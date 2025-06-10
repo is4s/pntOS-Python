@@ -127,7 +127,7 @@ def camel_to_snake(name: str) -> str:
                     plugins_of_type_t = getattr(sorted_plugins, t_snake + 's')
                     n_plugins_of_type_t = len(plugins_of_type_t)
                     if n_plugins_of_type_t != 1:
-                        self._log(
+                        log_func(
                             LoggingLevel.ERROR,
                             f'Expected one {t.__name__}, but received {n_plugins_of_type_t}.',
                         )

@@ -1,6 +1,12 @@
 from .Aspn23LcmTransportPlugin import (
     Aspn23LcmTransportPlugin as Aspn23LcmTransportPlugin,
 )
+from .orchestration_plugins.SimpleGpsOrchestrationPlugin import (
+    SimpleGpsOrchestrationPlugin as SimpleGpsOrchestrationPlugin,
+)
+from .orchestration_plugins.SimpleGpsVelOrchestrationPlugin import (
+    SimpleGpsVelOrchestrationPlugin as SimpleGpsVelOrchestrationPlugin,
+)
 from .simple_controller.SimpleControllerPlugin import (
     SimpleControllerPlugin as SimpleControllerPlugin,
 )
@@ -14,12 +20,6 @@ from .SimpleEkfFusionStrategyPlugin import (
     SimpleEkfFusionStrategyPlugin as SimpleEkfFusionStrategyPlugin,
 )
 from .SimpleFusionPlugin import SimpleFusionPlugin as SimpleFusionPlugin
-from .SimpleGpsOrchestrationPlugin import (
-    SimpleGpsOrchestrationPlugin as SimpleGpsOrchestrationPlugin,
-)
-from .SimpleGpsVelOrchestrationPlugin import (
-    SimpleGpsVelOrchestrationPlugin as SimpleGpsVelOrchestrationPlugin,
-)
 from .SimpleInertialPlugin import SimpleInertialPlugin as SimpleInertialPlugin
 from .SimpleInitializationPlugin import (
     SimpleInitializationPlugin as SimpleInitializationPlugin,
