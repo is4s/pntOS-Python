@@ -155,7 +155,7 @@ plugins, but wanted to implement our own sensor fusion solution in a custom
 ```python
 # Use the off-the-shelf Cobra implementations of these plugins
 from pntos.cobra import (
-    SimpleTransportPlugin,
+    DummyTransportPlugin,
     SimpleRegistryPlugin,
     SimpleLoggingPlugin,
     SimpleControllerPlugin,
@@ -170,7 +170,7 @@ from my.example.project import (
 my_orchestration = MyOrchestrationPlugin("My Orchestration Name")
 
 # Create the other plugins and put them into a list
-my_transport = SimpleTransportPlugin("My Transport Name")
+my_transport = DummyTransportPlugin("My Transport Name")
 my_registry = SimpleRegistryPlugin("My Registry Name")
 my_logging = SimpleLoggingPlugin("My Logger Name")
 my_controller = SimpleControllerPlugin("My Controller Name")
@@ -412,11 +412,11 @@ go back to waiting for data from the wire, for networked {py:obj}`Transport Plug
 ### A Simple Transport Plugin Example
 
 
-The {py:obj}`SimpleTransportPlugin<pntos.cobra.SimpleTransportPlugin>` is designed to be the simplest possible
+The {py:obj}`DummyTransportPlugin<pntos.cobra.DummyTransportPlugin>` is designed to be the simplest possible
 implementation of a {py:obj}`Transport Plugin<pntos.api.TransportPlugin>` possible to demonstrate the concepts
 above, which is why it was chosen as the transport for our [custom app](#implementing-our-own-custom-app).
-The source code of the {py:obj}`SimpleTransportPlugin<pntos.cobra.SimpleTransportPlugin>` can be
-[found here](https://git.aspn.us/pntos/pntos-python/-/blob/main/pntos-cobra/src/pntos/cobra/SimpleTransportPlugin.py).
+The source code of the {py:obj}`DummyTransportPlugin<pntos.cobra.DummyTransportPlugin>` can be
+[found here](https://git.aspn.us/pntos/pntos-python/-/blob/main/pntos-cobra/src/pntos/cobra/DummyTransportPlugin.py).
 We can see from the source that it is very similar to the simple approach we've described above, namely it:
 
 - Saves off its {py:obj}`Mediator<pntos.api.Mediator>` in its
@@ -431,9 +431,9 @@ While this transport is not suitable for navigation (it just sends sensor data f
 it serves as a concrete example of a transport plugin that delivers data into the mediator.
 
 ```{note}
-You'll see in the implementation of `start_listening` in `SimpleTransport` that a new thread is created
+You'll see in the implementation of `start_listening` in `DummyTransport` that a new thread is created
 to send in the zeros. This is because the Python pntOS APIs require that plugins do not block on pntOS system threads.
-Since `start_listening` was called by the Python pntOS system, it is not ours to block, and so the `SimpleTransport`
+Since `start_listening` was called by the Python pntOS system, it is not ours to block, and so the `DummyTransport`
 creates its own thread to spin in a busy loop and call the mediator.
 ```
 

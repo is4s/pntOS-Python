@@ -14,7 +14,7 @@ from pntos.api import Mediator, TransportPlugin
 from pntos.api.plugins.common import Message
 
 
-class SimpleTransportPlugin(TransportPlugin):
+class DummyTransportPlugin(TransportPlugin):
     def __init__(self, identifier: str):
         self.identifier = identifier
 
@@ -46,7 +46,7 @@ class SimpleTransportPlugin(TransportPlugin):
     identifier: str
 
 
-def listen_for_messages(my_plugin: SimpleTransportPlugin) -> None:
+def listen_for_messages(my_plugin: DummyTransportPlugin) -> None:
     while True:
         sleep(0.1)
         if my_plugin.listening:

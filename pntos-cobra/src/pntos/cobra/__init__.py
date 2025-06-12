@@ -1,6 +1,9 @@
 from .Aspn23LcmTransportPlugin import (
     Aspn23LcmTransportPlugin as Aspn23LcmTransportPlugin,
 )
+from .DummyTransportPlugin import (
+    DummyTransportPlugin as DummyTransportPlugin,
+)
 from .orchestration_plugins.SimpleGpsOrchestrationPlugin import (
     SimpleGpsOrchestrationPlugin as SimpleGpsOrchestrationPlugin,
 )
@@ -27,9 +30,6 @@ from .SimpleInitializationPlugin import (
 from .SimpleLoggingPlugin import SimpleLoggingPlugin as SimpleLoggingPlugin
 from .SimpleRegistryPlugin import (
     SimpleRegistryPlugin as SimpleRegistryPlugin,
-)
-from .SimpleTransportPlugin import (
-    SimpleTransportPlugin as SimpleTransportPlugin,
 )
 from .state_modeling_simple_gps_ins.SimpleGpsInsStateModelingPlugin import (
     SimpleGpsInsStateModelingPlugin as SimpleGpsInsStateModelingPlugin,
