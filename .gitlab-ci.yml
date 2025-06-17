@@ -178,6 +178,14 @@ pip workflow check:
         - docker exec pntos-python .venv/bin/pip install -v -r requirements.txt --extra-index-url=${UV_INDEX}
         - docker exec pntos-python postprocessing/run_app_and_record_data.py
 
+copyright year check:
+    stage: check
+    tags:
+        - linux-light-runner
+    allow_failure: true
+    script:
+        - (! grep --color -i "copyright.*$(( $(date +%Y) - 1 ))" $(git ls-files))
+
 pages:
     stage: deploy
     tags: [linux-light-runner]
