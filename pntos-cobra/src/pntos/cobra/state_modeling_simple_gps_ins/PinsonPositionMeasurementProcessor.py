@@ -42,6 +42,8 @@ class PinsonPositionMeasurementProcessor(StandardMeasurementProcessor):
         l_ps_p: NDArray[float64],
     ):
         """
+        A Pinson Position Measurement Processor
+
         Args:
             label (str): Name of processor.
             state_block_labels (list[str]): A 1-element list of labels of state blocks this

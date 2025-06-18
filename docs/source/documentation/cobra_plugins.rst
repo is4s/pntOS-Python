@@ -9,3 +9,4 @@ that can be directly imported from ``pntos.cobra``.
 .. automodule:: pntos.cobra
    :private-members:
    :exclude-members: _abc_impl, shutdown_plugin, init_plugin
+   :undoc-members:

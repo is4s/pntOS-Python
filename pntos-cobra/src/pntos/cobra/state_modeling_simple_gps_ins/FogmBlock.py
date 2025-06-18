@@ -34,7 +34,7 @@ class FogmBlock(StandardStateBlock):
 
         Args:
             label (str): Label for this block.
-            mediator (Mediator): a Mediator instance
+            mediator (Mediator): A :class:`pntos.api.Mediator` instance.
             sigmas (NDArray[float64]): Nx1 array of FOGM noise sigmas; units will vary.
             taus (NDArray[float64]): Nx1 array of FOGM time constants, in seconds. Must be positive.
         """

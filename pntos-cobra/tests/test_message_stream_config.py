@@ -30,7 +30,7 @@ class Test_MessageStreamConfig(unittest.TestCase):
         conf = SimpleMessageStreamConfig()
         conf.immediate_stream_all(True)
         for message_type in self.message_types:
-            assert not conf.is_sequenced(message_type)
+            assert not conf._is_sequenced(message_type)
 
     def test_SimpleMessageStreamConfig_sequenced_stream_all_no_stream_conf(
         self,
@@ -38,7 +38,7 @@ class Test_MessageStreamConfig(unittest.TestCase):
         conf = SimpleMessageStreamConfig()
         conf.sequenced_stream_all(True)
         for message_type in self.message_types:
-            assert conf.is_sequenced(message_type)
+            assert conf._is_sequenced(message_type)
 
     def test_SimpleMessageStreamConfig_immediate_stream_add_no_stream_conf(
         self,
@@ -49,9 +49,9 @@ class Test_MessageStreamConfig(unittest.TestCase):
         for i in range(n):
             conf.immediate_stream_add(self.message_types[i])
         for message_type in self.message_types[:n]:
-            assert not conf.is_sequenced(message_type)
+            assert not conf._is_sequenced(message_type)
         for message_type in self.message_types[n:]:
-            assert conf.is_sequenced(message_type)
+            assert conf._is_sequenced(message_type)
 
     def test_SimpleMessageStreamConfig_sequenced_stream_add_no_stream_conf(
         self,
@@ -62,9 +62,9 @@ class Test_MessageStreamConfig(unittest.TestCase):
         for i in range(n):
             conf.sequenced_stream_add(self.message_types[i])
         for message_type in self.message_types[:n]:
-            assert conf.is_sequenced(message_type)
+            assert conf._is_sequenced(message_type)
         for message_type in self.message_types[n:]:
-            assert not conf.is_sequenced(message_type)
+            assert not conf._is_sequenced(message_type)
 
     def test_SimpleMessageStreamConfig_immediate_stream_remove_no_stream_conf(
         self,
@@ -77,15 +77,15 @@ class Test_MessageStreamConfig(unittest.TestCase):
         for i in range(n):
             conf.immediate_stream_add(self.message_types[i])
         for message_type in self.message_types[:n]:
-            assert not conf.is_sequenced(message_type)
+            assert not conf._is_sequenced(message_type)
         for message_type in self.message_types[n:]:
-            assert conf.is_sequenced(message_type)
+            assert conf._is_sequenced(message_type)
 
         # Remove the ones we added to immediate stream - all should be sequenced
         for i in range(n):
             conf.immediate_stream_remove(self.message_types[i])
         for message_type in self.message_types:
-            assert conf.is_sequenced(message_type)
+            assert conf._is_sequenced(message_type)
 
     def test_SimpleMessageStreamConfig_sequenced_stream_remove_no_stream_conf(
         self,
@@ -98,15 +98,15 @@ class Test_MessageStreamConfig(unittest.TestCase):
         for i in range(n):
             conf.sequenced_stream_add(self.message_types[i])
         for message_type in self.message_types[:n]:
-            assert conf.is_sequenced(message_type)
+            assert conf._is_sequenced(message_type)
         for message_type in self.message_types[n:]:
-            assert not conf.is_sequenced(message_type)
+            assert not conf._is_sequenced(message_type)
 
         # Remove the ones we added to sequenced stream - all should be immediate
         for i in range(n):
             conf.sequenced_stream_remove(self.message_types[i])
         for message_type in self.message_types:
-            assert not conf.is_sequenced(message_type)
+            assert not conf._is_sequenced(message_type)
 
     def test_SimpleMessageStreamConfig_immediate_add_after_sequenced_add(
         self,
@@ -119,15 +119,15 @@ class Test_MessageStreamConfig(unittest.TestCase):
         for i in range(n):
             conf.sequenced_stream_add(self.message_types[i])
         for message_type in self.message_types[:n]:
-            assert conf.is_sequenced(message_type)
+            assert conf._is_sequenced(message_type)
         for message_type in self.message_types[n:]:
-            assert not conf.is_sequenced(message_type)
+            assert not conf._is_sequenced(message_type)
 
         # immediate stream the ones we added to sequenced stream - all should be immediate
         for i in range(n):
             conf.immediate_stream_add(self.message_types[i])
         for message_type in self.message_types:
-            assert not conf.is_sequenced(message_type)
+            assert not conf._is_sequenced(message_type)
 
     def test_SimpleMessageStreamConfig_sequenced_add_after_immediate_add(
         self,
@@ -140,15 +140,15 @@ class Test_MessageStreamConfig(unittest.TestCase):
         for i in range(n):
             conf.immediate_stream_add(self.message_types[i])
         for message_type in self.message_types[:n]:
-            assert not conf.is_sequenced(message_type)
+            assert not conf._is_sequenced(message_type)
         for message_type in self.message_types[n:]:
-            assert conf.is_sequenced(message_type)
+            assert conf._is_sequenced(message_type)
 
         # Sequence stream the ones we added to immediate stream - all should be sequenced
         for i in range(n):
             conf.sequenced_stream_add(self.message_types[i])
         for message_type in self.message_types:
-            assert conf.is_sequenced(message_type)
+            assert conf._is_sequenced(message_type)
 
 
 def suite() -> unittest.TestSuite:

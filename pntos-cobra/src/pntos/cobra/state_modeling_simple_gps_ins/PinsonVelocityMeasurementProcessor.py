@@ -17,6 +17,10 @@ from pntos.api.plugins.fusion_strategy import StandardMeasurementModel
 
 
 class PinsonVelocityMeasurementProcessor(StandardMeasurementProcessor):
+    """
+    Generates a model that maps a velocity measurement to an inertial error state block.
+    """
+
     _mediator: Mediator
     _inertial_pva: MeasurementPositionVelocityAttitude | None
 
@@ -26,6 +30,17 @@ class PinsonVelocityMeasurementProcessor(StandardMeasurementProcessor):
         state_block_labels: list[str],
         mediator: Mediator,
     ):
+        """
+        A Pinson Velocity Measurement Processor
+
+        Args:
+            label (str): Name of processor.
+            state_block_labels (list[str]): A 1-element list of labels of state blocks this
+                processor can update. The single entry should refer to a Pinson-style
+                state block of at least size 9, with NED position errors in meters as
+                the first three states and NED tilt errors, in radians, as states 6:9.
+            mediator (Mediator): A :class:`pntos.api.Mediator` instance.
+        """
         self.label = label
         self.state_block_labels = state_block_labels
         self._mediator = mediator

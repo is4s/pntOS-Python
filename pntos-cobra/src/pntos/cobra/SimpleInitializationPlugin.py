@@ -28,6 +28,11 @@ from pntos.cobra.config.ManualAlignmentConfig import ManualAlignmentConfig
 
 
 class SimpleInitialization(InertialInitializationStrategy):
+    """
+    A simple initialization strategy that generates an initial solution from an alignment config in the registry.
+    This implementation is designed to work with a manual alignment.
+    """
+
     config_group: str
     mediator: Mediator
     status: InitializationStatus
@@ -36,6 +41,13 @@ class SimpleInitialization(InertialInitializationStrategy):
     covariance: NDArray[np.float64] | None
 
     def __init__(self, config_group: str, mediator: Mediator):
+        """
+        A Simple Initialization Strategy
+
+        Args:
+            config_group (str): A :class:`pntos.cobra.config.ManualAlignmentConfig` config group.
+            mediator (Mediator): A :class:`pntos.api.Mediator` instance.
+        """
         self.config_group = config_group
         self.mediator = mediator
         config = config_from_registry(ManualAlignmentConfig, mediator, config_group)
@@ -80,6 +92,7 @@ class SimpleInitialization(InertialInitializationStrategy):
     def _create_pva(
         self, config: ManualAlignmentConfig
     ) -> MeasurementPositionVelocityAttitude:
+        """Creates and returns a PVA message constructed with the data in the ``ManualAlignmentConfig``."""
         header = TypeHeader(
             0,
             0,
@@ -118,6 +131,7 @@ class SimpleInitialization(InertialInitializationStrategy):
     def _create_imu_errors(
         self, config: ManualAlignmentConfig
     ) -> StandardInertialErrors:
+        """Creates and returns the 3-axis gyro and accel bias and scale factors errors from the ``ManualAlignmentConfig``."""
         return StandardInertialErrors(
             accel_biases=np.array(config.initial_accel_bias),
             gyro_biases=np.array(config.initial_gyro_bias),
@@ -127,9 +141,20 @@ class SimpleInitialization(InertialInitializationStrategy):
 
 
 class SimpleInitializationPlugin(InitializationPlugin):
+    """
+    A simple initialization plugin that generates :class:`SimpleInitialization` instances.
+    """
+
     mediator: Mediator
 
     def __init__(self, identifier: str):
+        """
+        Cobra Simple Initialization Plugin
+
+        Args:
+            identifier (str): The plugin identifier passed to the
+                :meth:`pntos.api.CommonPlugin.identifier` field.
+        """
         self.identifier = identifier
 
     def init_plugin(

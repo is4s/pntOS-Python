@@ -97,9 +97,18 @@ nitpick_ignore = [
     ('py:class', 'float64'),
     ('py:class', 'NDArray'),
     # A ASPN-Python classes which automodule automatically tries to link to.
-    ('py:class', 'MeasurementImu'),
-    ('py:class', 'TypeTimestamp'),
     ('py:class', 'AspnBase'),
+    ('py:class', 'MeasurementImu'),
+    ('py:class', 'MeasurementImuImuType'),
+    ('py:class', 'MeasurementPositionVelocityAttitude'),
+    ('py:class', 'TypeHeader'),
+    ('py:class', 'TypeTimestamp'),
+    ('py:class', 'aspn23_xtensor.AspnMeasurementImuImuType'),
+    ('py:class', 'aspn23_xtensor.AspnMessageType'),
+    ('py:class', 'aspn23_xtensor.MeasurementImu'),
+    ('py:class', 'aspn23_xtensor.MeasurementPositionVelocityAttitude'),
+    ('py:class', 'aspn23_xtensor.TypeHeader'),
+    ('py:class', 'aspn23_xtensor.TypeTimestamp'),
     # A NavToolkit class which automodule automatically tries to link to.
     ('py:class', 'ImuModel'),
     # Potentially caused by #49.

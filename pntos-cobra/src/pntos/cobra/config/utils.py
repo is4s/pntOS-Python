@@ -72,8 +72,7 @@ def config_from_registry(
 
     Args:
         config_type (ConfigType): The parameter that specifies which config the user wants to receive.
-        mediator (Mediator): The :class:`pntos.api.Mediator` object which contains the registry the
-                             config will be extracted from.
+        mediator (Mediator): A :class:`pntos.api.Mediator` instance.
         config_group (str): The registry group which contains the config being extracted.
 
     Returns:
@@ -150,7 +149,7 @@ def config_to_registry(config: BaseConfig, mediator: Mediator) -> None:
 
     Args:
         config (BaseConfig): The config to be stored in the registry.
-        mediator (Mediator): :class:`pntos.api.Mediator` object to access the registry and log messages.
+        mediator (Mediator): A :class:`pntos.api.Mediator` instance.
     """
     conf_params = [f for f in fields(config) if f.name != 'group']
     kv = mediator.registry.batch_start(config.group)

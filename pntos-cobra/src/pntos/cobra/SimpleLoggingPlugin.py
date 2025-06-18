@@ -22,6 +22,10 @@ class fmts:
 
 
 class SimpleLoggingPlugin(LoggingPlugin):
+    """
+    A simple logging plugin that dictates the formatting and handles logging to the console.
+    """
+
     def __init__(
         self,
         identifier: str,
@@ -100,8 +104,8 @@ class SimpleLoggingPlugin(LoggingPlugin):
         match level:
             case LoggingLevel.INFO:
                 if self.global_log_level is INFO or self.global_log_level is DEBUG:
-                    self.output_time()
-                    self.output_plugin_id(plugin_id)
+                    self._output_time()
+                    self._output_plugin_id(plugin_id)
                     if self.colorize:
                         print(fmts.OKGREEN + ' [INFO] ' + fmts.ENDC, end='')
                     else:
@@ -113,8 +117,8 @@ class SimpleLoggingPlugin(LoggingPlugin):
                     or self.global_log_level is DEBUG
                     or self.global_log_level is WARN
                 ):
-                    self.output_time()
-                    self.output_plugin_id(plugin_id)
+                    self._output_time()
+                    self._output_plugin_id(plugin_id)
                     if self.colorize:
                         print(fmts.WARNING + ' [WARN] ' + fmts.ENDC, end='')
                     else:
@@ -122,23 +126,24 @@ class SimpleLoggingPlugin(LoggingPlugin):
                     print(message)
             case LoggingLevel.DEBUG:
                 if self.global_log_level is DEBUG:
-                    self.output_time()
-                    self.output_plugin_id(plugin_id)
+                    self._output_time()
+                    self._output_plugin_id(plugin_id)
                     if self.colorize:
                         print(fmts.OKBLUE + ' [DEBUG] ' + fmts.ENDC, end='')
                     else:
                         print(' [DEBUG] ', end='')
                     print(message)
             case LoggingLevel.ERROR:
-                self.output_time()
-                self.output_plugin_id(plugin_id)
+                self._output_time()
+                self._output_plugin_id(plugin_id)
                 if self.colorize:
                     print(fmts.FAIL + ' [ERROR] ' + fmts.ENDC, end='')
                 else:
                     print(' [ERROR] ', end='')
                 print(message)
 
-    def output_time(self) -> None:
+    def _output_time(self) -> None:
+        """Prints out the current system time using the date-time format provided at construction."""
         if self.colorize:
             print(
                 fmts.LTGRAY
@@ -151,7 +156,8 @@ class SimpleLoggingPlugin(LoggingPlugin):
         else:
             print('[' + time.strftime(self.date_time_format) + ']', end='')
 
-    def output_plugin_id(self, plugin_id: str) -> None:
+    def _output_plugin_id(self, plugin_id: str) -> None:
+        """Prints out the name of the plugin from which the message originated (e.g. ORCHESTRATION)."""
         if self.colorize:
             print(fmts.DRKGRAY + ' [' + plugin_id + ']' + fmts.ENDC, end='')
         else:

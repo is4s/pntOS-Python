@@ -14,19 +14,23 @@ OUTPUT_FILE = './OUTPUT.hdf5'
 
 
 class SimpleDiagnosticLogPlugin(UtilityPlugin):
+    """
+    Simple plugin to save any values put into the ``diagnostics`` group in the
+    registry to an output HDF5 file (``OUTPUT_FILE``).
+
+    If any other plugin wants to store values to the output, all the plugin has to
+    do is write the values to any key within the ``diagnostics`` group. However,
+    there are a two constraints:
+    - All values assigned to a given key must be of the same type.
+    - If the value for a given key is ``list[str]`` or ``NDArray[float64]``, the
+    length must not change each update of the value at that key.
+    """
+
     _store: dict[str, list[RegistryValueTypeUnion]] = {}
 
     def __init__(self, identifier: str, output_file: str = './OUTPUT.hdf5') -> None:
         """
-        Simple plugin to save any values put into the ``diagnostics`` group in the
-        registry to an output HDF5 file (``OUTPUT_FILE``).
-
-        If any other plugin wants to store values to the output, all the plugin has to
-        do is write the values to any key within the ``diagnostics`` group. However,
-        there are a two constraints:
-        - All values assigned to a given key must be of the same type.
-        - If the value for a given key is ``list[str]`` or ``NDArray[float64]``, the
-        length must not change each update of the value at that key.
+        Simple Diagnostic-Logging Utility Plugin
 
         Args:
             identifier (str): The plugin identifier passed to the

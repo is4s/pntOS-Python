@@ -25,6 +25,12 @@ class SimpleGpsInsStateModelProvider(StandardStateModelProvider):
     _mediator: Mediator
 
     def __init__(self, mediator: Mediator):
+        """
+        Simple GPS and INS State Model Provider
+
+        Args:
+            mediator (Mediator): A :class:(Mediator) instance.
+        """
         self._mediator = mediator
         self.processor_identifiers = [
             'pinson_position',

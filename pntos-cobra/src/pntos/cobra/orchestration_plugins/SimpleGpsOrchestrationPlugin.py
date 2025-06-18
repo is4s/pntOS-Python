@@ -74,6 +74,11 @@ PREPROCESSOR_GROUPS = [INERTIAL_GROUP]
 
 
 class SimpleGpsOrchestrationPlugin(OrchestrationPlugin):
+    """
+    A simple orchestration plugin that incorporates a position measurement processor and two state blocks.
+    It uses a Pinson15 state block as a model for state estimation and a FOGM state block for position bias states.
+    """
+
     mediator: Mediator
     init_solution: InitialInertialSolution | None
     fusion_plugin: FusionPlugin
@@ -128,9 +133,9 @@ class SimpleGpsOrchestrationPlugin(OrchestrationPlugin):
 
     def _log(self, level: LoggingLevel, message: str) -> None:
         """
-        Send informational log messages to pntOS.
+        Send an informational log message to pntOS.
 
-        If no mediator is provided, manually print the messages. Otherwise, pass
+        If no mediator is provided, manually print the message. Otherwise, pass
         through to the mediator's ``log_message`` method.
         """
         if self.mediator is not None:
@@ -233,11 +238,10 @@ class SimpleGpsOrchestrationPlugin(OrchestrationPlugin):
 
     def _set_up_fusion_engine(self) -> None:
         """
-        Utility function to put together the components of the fusion engine.
+        Utility function to assemble the components of and create a fusion engine.
 
-        Returns:
-            :class:`pntos.api.StandardFusionEngine` | None: Returns a functional fusion engine
-            with all necessary components, or ``None`` if fusion engine setup fails.
+        This function specifically creates a Pinson15 state block (designated by ``STATE_BLOCK_ID``) and a position measurement processor.
+        If either of these components cannot created, an error will be logged and pntOS will shutdown.
         """
         # Make a fusion engine
         fusion_engine: StandardFusionEngine | None = (

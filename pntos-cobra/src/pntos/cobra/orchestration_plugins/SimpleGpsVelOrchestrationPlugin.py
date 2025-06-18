@@ -78,6 +78,11 @@ PREPROCESSOR_GROUPS = [INERTIAL_GROUP]
 
 
 class SimpleGpsVelOrchestrationPlugin(OrchestrationPlugin):
+    """
+    A simple orchestration plugin that incorporates both a position and velocity measurement processor.
+    It uses a Pinson15 state block as a model for state estimation and a FOGM state block for bias states.
+    """
+
     mediator: Mediator
     init_solution: InitialInertialSolution | None
     fusion_plugin: FusionPlugin
@@ -221,11 +226,10 @@ class SimpleGpsVelOrchestrationPlugin(OrchestrationPlugin):
 
     def _set_up_fusion_engine(self) -> None:
         """
-        Utility function to put together the components of the fusion engine.
+        Utility function to assemble the components of and create a fusion engine.
 
-        Returns:
-            :class:`pntos.api.StandardFusionEngine` | None: Returns a functional fusion engine
-            with all necessary components, or ``None`` if fusion engine setup fails.
+        This function specifically creates a Pinson15 state block, FOGM state block, position measurement processor, and a velocity measurement processor.
+        If any of these components cannot created, an error will be logged and pntOS will shutdown.
         """
         # Make a fusion engine
         fusion_engine: StandardFusionEngine | None = (

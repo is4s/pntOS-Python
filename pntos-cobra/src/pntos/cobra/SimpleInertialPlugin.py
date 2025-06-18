@@ -32,11 +32,23 @@ from pntos.cobra.utils import (
 
 
 class SimpleInertial(StandardInertialMechanization):
+    """
+    A simple inertial object responsible for generating an inertial solution on request.
+    """
+
     inertial: BufferedImu
     mediator: Mediator
     identifier: str = 'Cobra simple inertial'
 
     def __init__(self, config_group: str, mediator: Mediator, solution: Message):
+        """
+        A Simple Inertial Mechanization Object
+
+        Args:
+            config_group (str): An :class:`pntos.cobra.config.InertialConfig` config group.
+            mediator (Mediator): A :class:`pntos.api.Mediator` instance.
+            solution (Message): An initial PVA message required for inertial mechanization.
+        """
         self.mediator = mediator
         if not isinstance(
             solution.wrapped_message, MeasurementPositionVelocityAttitude
@@ -177,9 +189,20 @@ class SimpleInertial(StandardInertialMechanization):
 
 
 class SimpleInertialPlugin(InertialPlugin):
+    """
+    A simple inertial plugin that generates instances of the :class:`SimpleInertial` class.
+    """
+
     mediator: Mediator | None
 
     def __init__(self, identifier: str):
+        """
+        A Simple Inertial Plugin
+
+        Args:
+            identifier (str): The plugin identifier passed to the
+                :meth:`pntos.api.CommonPlugin.identifier` field.
+        """
         self.identifier = identifier
 
     def init_plugin(

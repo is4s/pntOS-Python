@@ -18,10 +18,17 @@ from .SimpleMessageStreamConfig import SimpleMessageStreamConfig
 
 
 def _get_time(msg: Message) -> int:
+    """Returns the time of the message in nanoseconds."""
     return msg.wrapped_message.time_of_validity.elapsed_nsec  # type: ignore[attr-defined]
 
 
 class SimpleMediator(Mediator):
+    """
+    This is a simple mediator implementation. It was designed to be used in conjuction with the
+    :class:`pntos.cobra.SimpleControllerPlugin` which is why this controller directly access private members.
+    It has one public member ``registry`` that other plugins are allowed to access.
+    """
+
     _logging_plugin: LoggingPlugin | None = None
     _transport_plugins: list[TransportPlugin] = []
     _orchestration_plugin: OrchestrationPlugin | None = None
@@ -77,7 +84,7 @@ class SimpleMediator(Mediator):
         assert (
             self._orchestration_plugin is not None
         ), 'Orchestration plugin used before initialized and passed to mediator.'
-        if self._stream_config.is_sequenced(type(message.wrapped_message)):
+        if self._stream_config._is_sequenced(type(message.wrapped_message)):
             bisect.insort(self._messages, message, key=_get_time)
         else:
             self._orchestration_plugin.process_pntos_message(message, False)

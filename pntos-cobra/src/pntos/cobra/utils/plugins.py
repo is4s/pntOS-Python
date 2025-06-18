@@ -42,6 +42,14 @@ class SortedPlugins:
 
 
 def sort_plugins_dataclass(plugins: list[CommonPlugin]) -> SortedPlugins:
+    """
+    Utility function to alphabetically sort all of the plugins manually.
+
+    plugins (list[CommonPlugin]): The list of plugins to sort.
+
+    Returns:
+        SortedPlugins
+    """
     sorted_data = SortedPlugins()
 
     for plugin in plugins:
@@ -77,6 +85,13 @@ def sort_plugins_dataclass(plugins: list[CommonPlugin]) -> SortedPlugins:
 
 
 def find_base_plugin_type(plugin: CommonPlugin) -> PluginType:
+    """
+    Utility function to determine the base type of the ``plugin`` parameter.
+    Will raise a ``TypeError`` if the base type cannot be determined.
+
+    Args:
+        plugin (CommonPlugin): Any type of plugin.
+    """
     if isinstance(plugin, ControllerPlugin):
         return ControllerPlugin
     elif isinstance(plugin, FusionPlugin):

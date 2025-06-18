@@ -112,6 +112,14 @@ class Pinson15NedBlock(StandardStateBlock):
     _pre_Q: NDArray[float64]
 
     def __init__(self, label: str, mediator: Mediator, imu_model: ImuConfig):
+        """
+        A Pinson15 NED Standard State Block
+
+        Args:
+            label (str): An identifier for this state block object.
+            mediator (Mediator): A :class:`pntos.api.Mediator` instance.
+            imu_model (ImuConfig): The :class:`pntos.cobra.config.ImuConfig` to use in FOGM bias estimation.
+        """
         self.label = label
         self.num_states = 15
         self._mediator = mediator
