@@ -69,6 +69,15 @@ class SimpleKeyValueStore(KeyValueStore):
         log_func: Callable[[LoggingLevel, str], None],
         plugin_resources_location: str | None = None,
     ) -> None:
+        """
+        Cobra Simple Key-Value Store
+
+        Args:
+            group (str): The name of the key-value store so that it can be easily accessed by plugins.
+            log_func (Callable[[LoggingLevel, str], None]): The function to use for logging.
+            plugin_resources_location (str | None): The path to the directory to save or load permanent keys.
+                If no path is provided, ``DEFAULT_PERMANENCY_DIR`` will be used.
+        """
         super().__init__()
         self._group = group
         self._set_permanent = False
@@ -486,19 +495,28 @@ class SimpleKeyValueStore(KeyValueStore):
 
 
 class SimpleRegistry(Registry):
+    """
+    A simple registry that maps group names to objects storing all the key/values in that group.
+    """
+
     groups: Dict[str, SimpleKeyValueStore]
     callbacks: list[Callable[[str], None]]
     _log: Callable[[LoggingLevel, str], None]
     _plugin_resources_location: str | None
-    """
-    Maps group names to objects storing all the key/values in that group.
-    """
 
     def __init__(
         self,
         log_func: Callable[[LoggingLevel, str], None],
         plugin_resources_location: str | None = None,
     ) -> None:
+        """
+        Cobra Simple Registry
+
+        Args:
+            log_func (Callable[[LoggingLevel, str], None]): The function to use for logging.
+            plugin_resources_location (str | None): The path to the directory to save or load permanent keys.
+                If no path is provided, ``DEFAULT_PERMANENCY_DIR`` will be used.
+        """
         super().__init__()
         self.groups = {}
         self.callbacks = []
@@ -532,6 +550,10 @@ class SimpleRegistry(Registry):
 
 
 class SimpleRegistryPlugin(RegistryPlugin):
+    """
+    A simple registry plugin that creates :class:`SimpleRegistry` instances.
+    """
+
     config: list[BaseConfig]
     registries: list[SimpleRegistry]
     log_levels: Dict[LoggingLevel, str] = {
@@ -544,6 +566,14 @@ class SimpleRegistryPlugin(RegistryPlugin):
     mediator: Mediator
 
     def __init__(self, identifier: str, config: list[BaseConfig] | None = None) -> None:
+        """
+        Cobra Simple Registry Plugin
+
+        Args:
+            identifier (str): The plugin identifier used to set
+                this plugin's :attr:`identifier` field.
+            config (list[BaseConfig], optional): A list of configs to store in the registry off instantiation.
+        """
         self.identifier = identifier
         self.registries = []
         self.config = config if config is not None else []
@@ -553,6 +583,17 @@ class SimpleRegistryPlugin(RegistryPlugin):
         plugin_resources_location: str | None = None,
         mediator: Mediator | None = None,
     ) -> None:
+        """
+        The first plugin method called; initializes the plugin.
+
+        A function that will be called by pntOS once and only once when it first initializes
+        the plugin before any other functions on the plugin are called.
+
+        Args:
+            plugin_resources_location (str | None): The path to the directory to save or load permanent keys.
+                If no path is provided, ``DEFAULT_PERMANENCY_DIR`` will be used.
+            mediator (Mediator | None): A :class:`pntos.api.Mediator` instance.
+        """
         if mediator is None:
             self._log(LoggingLevel.ERROR, 'This registry requires a mediator.')
             return

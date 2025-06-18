@@ -204,7 +204,7 @@ class SimpleControllerPlugin(ControllerPlugin):
     ]:
         """
         Utility function to ensure ``plugins`` contains enough plugins to run pntOS
-        Cobra and then assign then dispatches them to the relevant fields on the
+        Cobra. Then assigns and dispatches them to the relevant fields on the
         controller. Raises a :class:`RuntimeError` if plugins are
         not as expected.
         """

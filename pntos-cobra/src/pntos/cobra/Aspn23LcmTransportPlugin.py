@@ -24,6 +24,13 @@ class Aspn23LcmTransportPlugin(TransportPlugin):
     _channels: list[str]
 
     def __init__(self, identifier: str):
+        """
+        ASPN23-LCM Transport Plugin
+
+        Args:
+            identifier (str): The plugin identifier passed to the
+                :meth:`pntos.api.CommonPlugin.identifier` field.
+        """
         self.identifier = identifier
         self.last_solution_time = None
         self._shutdown_threads = threading.Event()
@@ -58,6 +65,10 @@ class Aspn23LcmTransportPlugin(TransportPlugin):
     def _general_handler(self, channel: str, data: bytes) -> None:
         """
         Generic listener for lcm messages to marshal to the mediator for processing.
+
+        Args:
+            channel (str): The channel name the data originates from.
+            data (bytes): A message represented in binary.
         """
         # Do not process messages sent from pntos.
         if 'pntos' in channel:
@@ -91,7 +102,7 @@ class Aspn23LcmTransportPlugin(TransportPlugin):
         message = Message(aspn_msg, channel)
         self.mediator.process_pntos_message(message)
 
-    def handler_thread(self) -> None:
+    def _handler_thread(self) -> None:
         """Call LCM.handle in a loop, and request a solution approx. every second."""
         while not self._shutdown_threads.is_set():
             # Handle any messages that have come - restart every hundredth of a second
@@ -130,7 +141,6 @@ class Aspn23LcmTransportPlugin(TransportPlugin):
                 self.last_solution_time = self.last_message_time
 
     def start_listening(self) -> None:
-        """Begin listening for lcm messages given input configuration"""
         self.lcm = LCM(LCM_URL)
         self.subscription: LCMSubscription = self.lcm.subscribe(
             '^((?!cobra).)*$', self._general_handler
@@ -140,12 +150,11 @@ class Aspn23LcmTransportPlugin(TransportPlugin):
             LoggingLevel.DEBUG, 'Subscribed to all available channels.'
         )
 
-        self.handler = Thread(target=self.handler_thread, args=[])
+        self.handler = Thread(target=self._handler_thread, args=[])
         self.handler.start()
         self.mediator.log_message(LoggingLevel.INFO, 'LCM message handler is running.')
 
     def stop_listening(self) -> None:
-        """Shut down all processes and threads spun up for LCM message passing"""
         self.lcm.unsubscribe(self.subscription)
 
         # This closes the handler thread
@@ -156,7 +165,6 @@ class Aspn23LcmTransportPlugin(TransportPlugin):
     def broadcast_message(
         self, message: Message, channel_name: str | None = None
     ) -> None:
-        """Send a message over LCM to a specific channel"""
         lcm_msg = marshal_to_lcm(message.wrapped_message)
         # TODO: remove this hack once firehose#50 is resolved
         lcm_msg.num_meas = 9  # type: ignore[union-attr]

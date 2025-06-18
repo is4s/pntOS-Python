@@ -5,6 +5,13 @@ from pntos.api import MessageStreamConfig
 
 
 class SimpleMessageStreamConfig(MessageStreamConfig):
+    """
+    This is a simple message stream config implementation. As with the :class:`SimpleMediator` it
+    is considered as apart of the :class:`pntos.cobra.SimpleControllerPlugin` implementation which allows the controller
+    to access private members and functions when necessary. All other plugins should adhere to API
+    compliant functions.
+    """
+
     # _message_lookup[type(AspnMessage)][source_identifier] -> is_sequenced?
     _override_to_immediate: set[type[AspnBase]] = set([])
     _override_to_sequenced: set[type[AspnBase]] = set([])
@@ -71,7 +78,7 @@ class SimpleMessageStreamConfig(MessageStreamConfig):
         self._override_to_immediate = set([])
         self._default_is_sequenced = False
 
-    def is_sequenced(
+    def _is_sequenced(
         self, type: type[AspnBase], source_identifier: str | None = None
     ) -> bool:
         """

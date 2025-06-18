@@ -15,7 +15,20 @@ from pntos.api.plugins.common import Message
 
 
 class DummyTransportPlugin(TransportPlugin):
+    """
+    A simple transport plugin.
+
+    WARNING: This implementation is for demonstration purposes only, it is not fully functional.
+    """
+
     def __init__(self, identifier: str):
+        """
+        Cobra Simple Transport Plugin
+
+        Args:
+            identifier (str): The plugin identifier used to set
+                this plugin's :attr:`identifier` field.
+        """
         self.identifier = identifier
 
     def init_plugin(
@@ -47,6 +60,12 @@ class DummyTransportPlugin(TransportPlugin):
 
 
 def listen_for_messages(my_plugin: DummyTransportPlugin) -> None:
+    """
+    While the plugin is listening, this function will create position messages and send them to the mediator for processing.
+
+
+    NOTE: This is a dummy implementation of a handler thread. It is meant to demonstrate the general purpose of a handler thread.
+    """
     while True:
         sleep(0.1)
         if my_plugin.listening:

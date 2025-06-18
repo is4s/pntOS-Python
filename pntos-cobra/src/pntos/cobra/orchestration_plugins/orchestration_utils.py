@@ -203,7 +203,11 @@ def send_inertial_aux_to_pinson(
     sb_label: str,
     log_func: Callable[[LoggingLevel, str], None],
 ) -> None:
-    """Send the current inertial solution and forces to the Pinson15 state-block."""
+    """
+    Send the current inertial solution, forces, and rates to the state block with the specified label.
+
+    This aux data is needed by the Pinson15 state block to propagate.
+    """
     time = fusion_engine.time
 
     pva_message = inertial.request_solution(time)
@@ -223,19 +227,6 @@ def send_inertial_aux_to_pinson(
     imu_message = Message(imu.forces_and_rates, 'Orchestration forces and rates')
 
     fusion_engine.give_state_block_aux_data(sb_label, [pva_message, imu_message])
-
-
-def rotate_imu_meas(
-    C_inertial_to_platform: NDArray[float64],
-    imu: MeasurementImu,
-) -> None:
-    """Rotate IMU measurement into platform frame.
-
-    Args:
-        message (MeasurementImu): IMU ASPN message to rotate.
-    """
-    imu.meas_accel = C_inertial_to_platform @ imu.meas_accel
-    imu.meas_gyro = C_inertial_to_platform @ imu.meas_gyro
 
 
 def has_valid_time(
@@ -437,6 +428,7 @@ def initialize_filter(
     sb_label: str,
     log_func: Callable[[LoggingLevel, str], None],
 ) -> None:
+    """Update the fusion engine with inertial information to initialize filter."""
     # asserting because the error is handled in set_up_inertial_mechanization
     assert isinstance(init_solution.solution, Message)
     assert isinstance(
@@ -468,10 +460,12 @@ def dispatch_to_fusion_engine(
     measurement_channels: dict[str, str],
     log_func: Callable[[LoggingLevel, str], None],
 ) -> None:
-    """Send message to the fusion engine to update the filter.
+    """
+    Send message to the fusion engine to update the filter.
 
     Applies feedback to inertial solution and biases, and resets pinson error states
-    afterward."""
+    afterward.
+    """
     meas_time = message.wrapped_message.time_of_validity  # type: ignore[attr-defined]
     # Make sure measurement processor has most current aux data before update
     mp_label = measurement_channels[message.source_identifier]
@@ -543,7 +537,13 @@ def dispatch_to_fusion_engine(
 def apply_error_states(
     pva: MeasurementPositionVelocityAttitude, x: NDArray[float64]
 ) -> MeasurementPositionVelocityAttitude:
-    """Correct PVA using inertial PVA error states."""
+    """
+    Correct the inertial's PVA message with the fusion engine's error estimate.
+
+    Args:
+        pva (MeasurementPositionVelocityAttitude): The PVA message originating from the inertial solution.
+        x (NDArray[float64]): The error estimate originating from the fusion engine's state block.
+    """
     # These fields should never be None unless we already encountered a different
     # error, so assert instead of log
     assert (

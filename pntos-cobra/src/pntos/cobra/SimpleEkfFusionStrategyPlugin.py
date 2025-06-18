@@ -14,7 +14,19 @@ from pntos.cobra.utils import is_symmetric, validate_array
 
 
 class SimpleEkfFusionStrategy(StandardFusionStrategy):
+    """
+    This is a simple Extended Kalman Filter (EKF) sensor fusion strategy.
+
+    It is capable of Bayesian inference on a linearized discrete-time system with Gaussian noise inputs.
+    """
+
     def __init__(self, mediator: Mediator) -> None:
+        """
+        Simple Extended Kalman Filter Fusion Strategy
+
+        Args:
+            mediator (Mediator): A :class:`pntos.api.Mediator` instance.
+        """
         self._x: NDArray[np.float64] = np.zeros(
             [0, 1], dtype=np.float64
         )  # State vector  (num_states x 1)
@@ -140,12 +152,13 @@ class SimpleEkfFusionStrategy(StandardFusionStrategy):
 
         self._P[first_row:last_row, first_col:last_col] = new_covariance
 
-    def _symmetricize_covariance(self, rtol: float = 1e-5, atol: float = 1e-8) -> None:
+    def _symmetrize_covariance(self, rtol: float = 1e-5, atol: float = 1e-8) -> None:
+        """Produces and replaces the covariance matrix with a symmetric one, if it was not already symmetric."""
         if not is_symmetric(self._P, self._mediator, rtol, atol):
             self._P = 0.5 * (self._P + self._P.T)
 
     def propagate(self, dynamics_model: StandardDynamicsModel) -> None:
-        self._symmetricize_covariance()
+        self._symmetrize_covariance()
 
         # Check sizes of Phi and Qd matrices
         validate_array(
@@ -211,9 +224,21 @@ class SimpleEkfFusionStrategy(StandardFusionStrategy):
 
 
 class SimpleEkfFusionStrategyPlugin(FusionStrategyPlugin):
+    """
+    This is a simple fusion strategy plugin. It functions as a factory that produces fusion strategies,
+    although it currently only supports the EKF fusion strategy.
+    """
+
     _mediator: Mediator
 
     def __init__(self, identifier: str):
+        """
+        A Simple Extended Kalman Filter Fusion Strategy Plugin
+
+        Args:
+            identifier (str): The plugin identifier passed to the
+                :meth:`pntos.api.CommonPlugin.identifier` field.
+        """
         self.identifier = identifier
 
     def init_plugin(

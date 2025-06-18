@@ -171,6 +171,16 @@ for aspn23_type in marshaler_from_lcm:
 
 
 def decode_aspn_lcm_msg(data: bytes) -> Aspn23LcmMeasurement | None:
+    """
+    Decodes a set of bytes into an ASPN-LCM message. Uses the first 8 bytes to determine the type of message,
+    if the type cannot be determined this function will return ``None``.
+
+    Args:
+        data (bytes): The set of bytes to decode.
+
+    Returns:
+        Aspn23LcmMeasurement | None
+    """
     fingerprint = data[:8]
 
     if fingerprint not in decoder:
@@ -181,6 +191,16 @@ def decode_aspn_lcm_msg(data: bytes) -> Aspn23LcmMeasurement | None:
 
 
 def marshal_from_lcm(msg: Aspn23LcmMeasurement) -> Aspn23Measurement | None:
+    """
+    Converts from ASPN-LCM message to ASPN23 message. If the input message cannot be converted,
+    this function will return ``None``.
+
+    Args:
+        msg (``Aspn23LcmMeasurement``): The message to convert.
+
+    Returns:
+        Aspn23Measurement | None
+    """
     msg_type = type(msg)
 
     if msg_type not in marshaler_from_lcm:
@@ -191,6 +211,16 @@ def marshal_from_lcm(msg: Aspn23LcmMeasurement) -> Aspn23Measurement | None:
 
 
 def marshal_to_lcm(msg: aspn23.AspnBase) -> Aspn23LcmMeasurement | None:
+    """
+    Convert from ASPN23 message to ASPN-LCM message. If the input message cannot be converted,
+    this function will return ``None``.
+
+    Args:
+        msg (AspnBase): The message to convert.
+
+    Returns:
+        Aspn23LcmMeasurement | None
+    """
     msg_type = type(msg)
 
     if msg_type not in marshaler_to_lcm:

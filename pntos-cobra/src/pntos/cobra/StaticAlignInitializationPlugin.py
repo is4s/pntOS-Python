@@ -28,13 +28,20 @@ class StaticAlign(InertialInitializationStrategy):
     Static alignment for an inertial.
 
     This initialization strategy can be used to produce an initial PVA to initialize an inertial
-    mechanization. It supports two algorithms; see AlignmentStrategy for more info on each.
+    mechanization. It supports two algorithms; see :class:`pntos.cobra.config.AlignmentStrategy` for more info on each.
     """
 
     aligner: AlignBase
     mediator: Mediator
 
     def __init__(self, config_group: str, mediator: Mediator):
+        """
+        Cobra Static Alignment Strategy
+
+        Args:
+            config_group (str): A :class:`pntos.cobra.config.StaticAlignmentConfig` config group.
+            mediator (Mediator): A :class:`pntos.api.Mediator` instance.
+        """
         self.mediator = mediator
         config = config_from_registry(StaticAlignmentConfig, mediator, config_group)
         if config is None:
@@ -105,6 +112,7 @@ class StaticAlign(InertialInitializationStrategy):
     def _convert_status(
         self, status: AlignBase.AlignmentStatus
     ) -> InitializationStatus:
+        """Convert an ``AlignmentStatus`` to its corresponding ``InitializationStatus``."""
         match status:
             case AlignBase.AlignmentStatus.ALIGNING_COARSE:
                 return InitializationStatus.INITIALIZING_COARSE
@@ -120,13 +128,15 @@ class StaticAlign(InertialInitializationStrategy):
 
 class StaticAlignInitializationPlugin(InitializationPlugin):
     """
-    InitializationPlugin that provides a InertialInitializationStrategy.
+    A static alignment initialization plugin that provides the :class:`StaticAlign` strategy.
     """
 
     mediator: Mediator
 
     def __init__(self, identifier: str):
         """
+        Cobra Static Alignment Initialization Plugin
+
         Args:
           identifier: A string identifier uniquely identifying this plugin.
         """

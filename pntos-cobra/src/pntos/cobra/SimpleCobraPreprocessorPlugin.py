@@ -13,22 +13,24 @@ from pntos.cobra.config import DownsamplerConfig, InertialConfig, config_from_re
 
 
 class SimplePreprocessorDownsampler(Preprocessor):
+    """
+    A simple downsampling preprocessor that periodically discards certain messages.
+
+    It collects a list of channels and factors from the registry and allows 1 out of
+    every ``N`` messages to pass through. This is done for every channel ``c`` and factor
+    ``N``. Where ``c = channel[i]`` and ``N = factor[i]``.
+    """
+
     _downsampling_factors: dict[str, int]
     _update_counters: dict[str, int]
 
     def __init__(self, config_group: str, mediator: Mediator):
         """
-        A simple downsampling preprocessor that reduces the amount of data processed.
-
-        It collects a list of channels and factors from the registry and allows 1 out of
-        every ``N`` messages to pass through. This is done for every channel ``c`` and factor
-        ``N``. Where ``c = channel[i]`` and ``N = factor[i]``.
+        Cobra Simple Downsampler Preprocessor
 
         Args:
-            config_group (str): The config group to be extracted from the registry.
-            mediator (Mediator): The mediator that will handle and has access to the
-                registry that contains 'config_group'.
-
+            config_group (str): The :class:`pntos.cobra.config.DownsamplerConfig` config group.
+            mediator (Mediator): A :class:`pntos.api.Mediator` instance.
         """
         self._downsampling_factors = {}
         self._update_counters = {}

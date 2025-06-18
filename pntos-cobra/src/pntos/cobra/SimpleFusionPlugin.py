@@ -37,7 +37,17 @@ class stateblock_info:
 
 
 class SimpleFusionEngine(StandardFusionEngine):
+    """
+    A simple fusion engine designed to use data from multiple sensors and output a unified state estimate.
+    """
+
     def __init__(self, mediator: Mediator) -> None:
+        """
+        A Simple Fusion Engine
+
+        Args:
+            mediator (Mediator): A :class:`pntos.api.Mediator` instance.
+        """
         self._time: TypeTimestamp = TypeTimestamp(0)  # property
         self._sb: dict[
             str, stateblock_info
@@ -669,9 +679,20 @@ class SimpleFusionEngine(StandardFusionEngine):
 
 
 class SimpleFusionPlugin(FusionPlugin):
+    """
+    A simple fusion plugin that provides instances of fusion engines.
+    """
+
     _mediator: Mediator
 
     def __init__(self, identifier: str) -> None:
+        """
+        A Simple Fusion Plugin
+
+        Args:
+            identifier (str): The plugin identifier passed to the
+                :meth:`pntos.api.CommonPlugin.identifier` field.
+        """
         self.identifier = identifier
 
     def init_plugin(
