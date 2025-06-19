@@ -14,8 +14,12 @@ pytest --cov --cov-fail-under=75 --cov-report={term,html} --cov-config=.coverage
 mypy pntos-api
 mypy pntos-cobra
 mypy apps
-
-set +x
+source util/check_app_and_orch_sync.sh
+ret_val=$?
 
 echo
-echo "🐍 All checks passed! 🐍"
+if [ "$ret_val" = 0 ]; then
+    echo "🐍 All checks passed! 🐍"
+else
+    echo "Synchronization check failed, check output".
+fi

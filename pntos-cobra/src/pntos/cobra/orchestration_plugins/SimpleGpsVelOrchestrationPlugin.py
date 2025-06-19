@@ -29,7 +29,7 @@ from pntos.api import (
     StateModelingPlugin,
 )
 from pntos.cobra.config import InertialConfig, OrchestrationConfig, config_from_registry
-from pntos.cobra.utils.plugins import sort_plugins_dataclass
+from pntos.cobra.utils import sort_plugins_dataclass
 
 from .orchestration_utils import (
     dispatch_to_fusion_engine,
