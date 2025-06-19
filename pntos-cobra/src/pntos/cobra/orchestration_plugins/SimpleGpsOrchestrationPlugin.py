@@ -223,7 +223,7 @@ class SimpleGpsOrchestrationPlugin(OrchestrationPlugin):
         """
         Utility function to assemble the components of and create a fusion engine.
 
-        This function specifically creates a Pinson15 state block (designated by ``STATE_BLOCK_ID``) and a position measurement processor.
+        This function specifically creates a Pinson15 state block, a FOGM state block, and a position measurement processor.
         If either of these components cannot created, an error will be logged and pntOS will shutdown.
         """
         # Make a fusion engine
