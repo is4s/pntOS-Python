@@ -7,7 +7,7 @@ activated virtual environment with all of this project's dependencies installed 
 instructions on how to set this up), run:
 
 ```shell
-./run_all_checks.sh
+util/run_all_checks.sh
 ```
 
 You can view a detailed code coverage report from the `index.html` in the `htmlcov` directory.

@@ -1,0 +1,30 @@
+diff --git a/apps/fusion_gps_ins.py b/apps/fusion_gps_vel_ins.py
+index 95a499a..c85d523 100755
+--- a/apps/fusion_gps_ins.py
++++ b/apps/fusion_gps_vel_ins.py
+@@ -11,7 +11,7 @@ from pntos.cobra import (
+     SimpleEkfFusionStrategyPlugin,
+     SimpleFusionPlugin,
+     SimpleGpsInsStateModelingPlugin,
+-    SimpleGpsOrchestrationPlugin,
++    SimpleGpsVelOrchestrationPlugin,
+     SimpleInertialPlugin,
+     SimpleInitializationPlugin,
+     SimpleLoggingPlugin,
+@@ -81,6 +81,7 @@ my_config = [
+     OrchestrationConfig(
+         gps_channel='/sensor/ublox-ZED-F9T/position',
+         group='config/orchestration',
++        velocity_channel='/sensor/ublox-ZED-F9T/velocity',
+     ),
+ ]
+ # End Config
+@@ -98,7 +99,7 @@ plugins = [
+         'Cobra Simple Logging Plugin',
+         global_log_level=LoggingLevel.INFO,  # Switch to `DEBUG` for more informative log output
+     ),
+-    SimpleGpsOrchestrationPlugin('Cobra Simple Orchestration Plugin'),
++    SimpleGpsVelOrchestrationPlugin('Cobra Simple Orchestration Plugin'),
+     SimpleRegistryPlugin('Cobra Simple Registry Plugin', config=my_config),
+     SimpleCobraPreprocessorPlugin('Cobra Simple Preprocessor Plugin'),
+ ]

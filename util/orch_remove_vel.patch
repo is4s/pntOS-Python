@@ -1,0 +1,74 @@
+diff --git a/pntos-cobra/src/pntos/cobra/orchestration_plugins/SimpleGpsVelOrchestrationPlugin.py b/pntos-cobra/src/pntos/cobra/orchestration_plugins/SimpleGpsOrchestrationPlugin.py
+index 783bfc9..f69206e 100644
+--- a/pntos-cobra/src/pntos/cobra/orchestration_plugins/SimpleGpsVelOrchestrationPlugin.py
++++ b/pntos-cobra/src/pntos/cobra/orchestration_plugins/SimpleGpsOrchestrationPlugin.py
+@@ -63,10 +63,6 @@ GPS_MEASUREMENT_PROCESSOR_ID = 'pinson_with_ned_fogm_position'
+ GPS_MEASUREMENT_PROCESSOR_LABEL = 'gps'
+ GPS_MEASUREMENT_PROCESSOR_CONFIG_GROUP = 'config/gp3d_state_modeling'
+ GPS_MP_STATE_BLOCK_LABELS = [STATE_BLOCK_LABEL, FOGM_STATE_BLOCK_LABEL]
+-VEL_MEASUREMENT_PROCESSOR_ID = 'pinson_velocity'
+-VEL_MEASUREMENT_PROCESSOR_LABEL = 'vel'
+-VEL_MEASUREMENT_PROCESSOR_CONFIG_GROUP = 'config/gp3d_state_modeling'
+-VEL_MP_STATE_BLOCK_LABELS = [STATE_BLOCK_LABEL]
+ 
+ # Inertial parameters
+ INERTIAL_GROUP = 'config/inertial'
+@@ -77,7 +73,7 @@ PREPROCESSOR_IDS = ['imu_rotator']
+ PREPROCESSOR_GROUPS = [INERTIAL_GROUP]
+ 
+ 
+-class SimpleGpsVelOrchestrationPlugin(OrchestrationPlugin):
++class SimpleGpsOrchestrationPlugin(OrchestrationPlugin):
+     mediator: Mediator
+     init_solution: InitialInertialSolution | None
+     fusion_plugin: FusionPlugin
+@@ -164,7 +160,6 @@ class SimpleGpsVelOrchestrationPlugin(OrchestrationPlugin):
+ 
+         self.measurement_channels = {
+             orch_config.gps_channel: GPS_MEASUREMENT_PROCESSOR_LABEL,
+-            orch_config.velocity_channel: VEL_MEASUREMENT_PROCESSOR_LABEL,
+         }
+         self.alignment_channels = [
+             orch_config.gps_channel,
+@@ -247,7 +242,6 @@ class SimpleGpsVelOrchestrationPlugin(OrchestrationPlugin):
+         pinson_block = None
+         fogm_block = None
+         gps_processor = None
+-        vel_processor = None
+         for plugin in self.state_modeling_plugins:
+             provider: StandardStateModelProvider | None = (
+                 plugin.new_state_model_provider(StandardStateModelProvider)
+@@ -277,16 +271,6 @@ class SimpleGpsVelOrchestrationPlugin(OrchestrationPlugin):
+                         GPS_MP_STATE_BLOCK_LABELS,
+                         GPS_MEASUREMENT_PROCESSOR_CONFIG_GROUP,
+                     )
+-                if VEL_MEASUREMENT_PROCESSOR_ID in provider.processor_identifiers:
+-                    vel_processor = provider.new_processor(
+-                        provider.processor_identifiers.index(
+-                            VEL_MEASUREMENT_PROCESSOR_ID
+-                        ),
+-                        fusion_engine,
+-                        VEL_MEASUREMENT_PROCESSOR_LABEL,
+-                        VEL_MP_STATE_BLOCK_LABELS,
+-                        VEL_MEASUREMENT_PROCESSOR_CONFIG_GROUP,
+-                    )
+ 
+         # Make state blocks
+         if pinson_block is None:
+@@ -326,16 +310,6 @@ class SimpleGpsVelOrchestrationPlugin(OrchestrationPlugin):
+             return
+         fusion_engine.add_measurement_processor(gps_processor)
+ 
+-        if vel_processor is None:
+-            assert provider is not None
+-            self._log(
+-                LoggingLevel.ERROR,
+-                f'Unable to find measurement processor "{VEL_MEASUREMENT_PROCESSOR_ID}" -'
+-                + f' cannot initialize filter. Available measurement processors: {provider.processor_identifiers}',
+-            )
+-            return
+-        fusion_engine.add_measurement_processor(vel_processor)
+-
+         self.fusion_engine = fusion_engine
+ 
+     def process_pntos_message(self, message: Message, sequenced: bool) -> None:
