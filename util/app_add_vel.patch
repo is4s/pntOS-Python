@@ -1,5 +1,5 @@
 diff --git a/apps/fusion_gps_ins.py b/apps/fusion_gps_vel_ins.py
-index 95a499a..c85d523 100755
+index 95a499ae..c85d5234 100755
 --- a/apps/fusion_gps_ins.py
 +++ b/apps/fusion_gps_vel_ins.py
 @@ -11,7 +11,7 @@ from pntos.cobra import (
