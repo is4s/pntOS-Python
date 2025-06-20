@@ -41,14 +41,10 @@ default:
         # https://gitlab-ci-token:[MASKED]@git.aspn.us/pntos/pntos.git
         - export TOKEN_URL="$(echo $CI_REPOSITORY_URL | sed -E 's/(.*git.aspn.us\/).*/\1/g')"
 
-        # Modify the pyproject.toml and requirements*.txt dependencies to use the CI token URL.
-        - find pntos-* -type f -name "pyproject.toml" -exec sed -i -e "s|git+ssh://git@git.aspn.us/|git+$TOKEN_URL|g" {} \+
-        - find . -type f -name "requirements*.txt" -exec sed -i -e "s|git+ssh://git@git.aspn.us/|git+$TOKEN_URL|g" {} \+
-
         # Build docker container
         - docker pull ubuntu:24.04
         - export DOCKER_IMAGE="$LOCAL_REGISTRY_CACHE/pntos-python"
-        - docker build --cache-from $DOCKER_IMAGE --build-arg BUILDKIT_INLINE_CACHE=1 -t $DOCKER_IMAGE -f Dockerfile .
+        - docker build --cache-from $DOCKER_IMAGE --build-arg BUILDKIT_INLINE_CACHE=1 --build-arg TOKEN_URL=$TOKEN_URL -t $DOCKER_IMAGE -f Dockerfile .
         - docker push $DOCKER_IMAGE
 
 stages:
@@ -103,10 +99,6 @@ requirements up-to-date:
         # Generate requirements*.txt files
         - docker exec pntos-python uv export --frozen --no-dev --all-packages --no-hashes > requirements-minimal.txt
         - docker exec pntos-python uv export --frozen --all-packages --no-hashes > requirements.txt
-        # Revert URL surgery to sources and generated output
-        - find pntos-* -type f -name "pyproject.toml" -exec sed -i -e "s|git+$TOKEN_URL|git+ssh://git@git.aspn.us/|g" {} \+
-        - find . -type f -name "requirements*.txt" -exec sed -i -e "s|git+https://|git+ssh://git@|g" {} \+
-        - sed -i -e "s|https://git.aspn.us/pntos|ssh://git@git.aspn.us/pntos|g" uv.lock
         # If there's still a diff, then there's unsynced changes; fail the job.
         - git diff --exit-code
 

@@ -1,5 +1,8 @@
 FROM ubuntu:24.04
 
+# Optional TOKEN_URL from CI
+ARG TOKEN_URL
+
 # Install dependencies needed to bring in upstream projects via their source
 RUN apt update && apt install git -y
 
@@ -20,6 +23,14 @@ RUN apt update && apt install default-jre-headless -y
 
 # Install make (needed to build docs)
 RUN apt update && apt install make -y
+
+# If in CI, rewrite SSH URLs
+RUN bash -c \ 
+'if [[ -n $TOKEN_URL ]]; then \
+  echo -e \
+  "[url \"$TOKEN_URL\"]\n\tinsteadOf = git@git.aspn.us:\n\tinsteadOf = ssh://git@git.aspn.us/" \
+  > /root/.gitconfig; \
+fi'
 
 WORKDIR /work
 ENTRYPOINT ["/bin/bash", "-c"]
