@@ -65,11 +65,6 @@ ruff format:
     script:
         # Run the formatter to see if it produces a diff.
         - docker run --rm -v $(pwd):/work -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE "uv sync -v && ruff format"
-        # Don't let modification to the pyproject.toml, requirements*.txt, or uv.lock files produce a diff.
-        - git checkout -- $(git ls-files | grep pyproject.toml)
-        - git checkout -- $(git ls-files | grep requirements.txt)
-        - git checkout -- $(git ls-files | grep requirements-minimal.txt)
-        - git checkout -- $(git ls-files | grep uv.lock)
         # If there's a diff, fail the stage.
         - git diff --exit-code
 
@@ -80,11 +75,6 @@ app and orchestration synchronization:
     script:
         - docker run --rm -dit -v $(pwd):/work --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
         - docker exec pntos-python uv sync -v
-        # Don't let modification to the pyproject.toml, requirements*.txt, or uv.lock files produce a diff.
-        - git checkout -- $(git ls-files | grep pyproject.toml)
-        - git checkout -- $(git ls-files | grep requirements.txt)
-        - git checkout -- $(git ls-files | grep requirements-minimal.txt)
-        - git checkout -- $(git ls-files | grep uv.lock)
         # Run sync check script
         - util/check_app_and_orch_sync.sh
 
