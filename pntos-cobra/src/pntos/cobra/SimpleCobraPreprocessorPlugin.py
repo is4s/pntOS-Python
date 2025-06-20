@@ -1,4 +1,4 @@
-from aspn23 import MeasurementImu
+from aspn23 import AspnBase, MeasurementImu, TypeTimestamp
 from numpy import array, float64
 from numpy.typing import NDArray
 
@@ -9,7 +9,12 @@ from pntos.api import (
     Preprocessor,
     PreprocessorPlugin,
 )
-from pntos.cobra.config import DownsamplerConfig, InertialConfig, config_from_registry
+from pntos.cobra.config import (
+    DownsamplerConfig,
+    InertialConfig,
+    TimeAdjusterConfig,
+    config_from_registry,
+)
 
 
 class SimplePreprocessorDownsampler(Preprocessor):
@@ -119,6 +124,62 @@ class SimpleImuRotationPreprocessor(Preprocessor):
         return [message]
 
 
+class SimpleTimeAdjusterPreprocessor(Preprocessor):
+    _mediator: Mediator
+    _channel_to_correct: str
+    _last_nsec: int | None
+    _expected_dt_nsec: int
+    _tolerance_nsec: int
+
+    def __init__(
+        self,
+        config_group: str,
+        mediator: Mediator,
+    ):
+        self._mediator = mediator
+        config = config_from_registry(TimeAdjusterConfig, self._mediator, config_group)
+        if config is None:
+            self._mediator.log_message(
+                LoggingLevel.ERROR,
+                f'Failed to populate TimeAdjusterConfig in SimpleTimeAdjusterPreprocessor.',
+            )
+            return None
+        self._channel_to_correct = config.channel_to_correct
+        self._last_nsec = None
+        self._expected_dt_nsec = config.expected_dt_nsec
+        self._tolerance_nsec = int(0.0001 * 1e9)
+
+    def process_pntos_message(self, message: Message) -> list[Message] | None:
+        if message.source_identifier != self._channel_to_correct:
+            return [message]
+
+        msg: AspnBase = message.wrapped_message
+        if not hasattr(msg, 'time_of_validity'):
+            self._mediator.log_message(
+                LoggingLevel.WARN,
+                f'SimpleTimeAdjusterPreprocessor received a message from channel {message.source_identifier} with no time of validity. Ignoring message.',
+            )
+            return [message]
+
+        curr_nsec: int = msg.time_of_validity.elapsed_nsec
+        if self._last_nsec is None:
+            self._last_nsec = curr_nsec
+            return [message]
+
+        is_valid_time: bool = (
+            abs((curr_nsec - self._last_nsec) - self._expected_dt_nsec)
+            < self._tolerance_nsec
+        )
+        if not is_valid_time:
+            synthetic_time: int = self._last_nsec + self._expected_dt_nsec
+            msg.time_of_validity = TypeTimestamp(synthetic_time)
+            self._last_nsec = synthetic_time
+        else:
+            self._last_nsec = curr_nsec
+
+        return [message]
+
+
 class SimpleCobraPreprocessorPlugin(PreprocessorPlugin):
     """A preprocessor plugin that provides a simple set of preprocessors.
 
@@ -138,7 +199,7 @@ class SimpleCobraPreprocessorPlugin(PreprocessorPlugin):
                 this plugin's :attr:`pntos.api.CommonPlugin.identifier` field.
         """
         self.identifier = identifier
-        self.preprocessor_identifiers = ['downsampler', 'imu_rotator']
+        self.preprocessor_identifiers = ['downsampler', 'imu_rotator', 'time_adjuster']
 
     def init_plugin(
         self,
@@ -198,6 +259,17 @@ class SimpleCobraPreprocessorPlugin(PreprocessorPlugin):
                 return SimpleImuRotationPreprocessor(
                     self.mediator, config.channel, array(config.C_imu_to_platform)
                 )
+
+            case 2:
+                if config_group is None:
+                    preproc_id = self.preprocessor_identifiers[preprocessor_index]
+                    self.mediator.log_message(
+                        LoggingLevel.ERROR,
+                        f'config_group is a required parameter for preprocessor "{preproc_id}" and cannot be None.',
+                    )
+                    return None
+
+                return SimpleTimeAdjusterPreprocessor(config_group, self.mediator)
 
             case _:
                 self.mediator.log_message(

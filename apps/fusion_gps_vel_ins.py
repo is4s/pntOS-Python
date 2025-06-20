@@ -24,6 +24,7 @@ from pntos.cobra.config import (
     ManualAlignmentConfig,
     OrchestrationConfig,
     SensorConfig,
+    TimeAdjusterConfig,
 )
 
 # Config setup
@@ -82,6 +83,11 @@ my_config = [
         gps_channel='/sensor/ublox-ZED-F9T/position',
         group='config/orchestration',
         velocity_channel='/sensor/ublox-ZED-F9T/velocity',
+    ),
+    TimeAdjusterConfig(
+        group='config/time_adjuster',
+        channel_to_correct='/sensor/vn-100/imu',
+        expected_dt_nsec=int(0.01 * 1e9),
     ),
 ]
 # End Config

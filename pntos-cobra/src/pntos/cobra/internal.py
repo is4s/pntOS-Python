@@ -5,6 +5,7 @@ from .simple_controller.SimpleMessageStreamConfig import (
 from .SimpleCobraPreprocessorPlugin import (
     SimpleImuRotationPreprocessor as SimpleImuRotationPreprocessor,
     SimplePreprocessorDownsampler as SimplePreprocessorDownsampler,
+    SimpleTimeAdjusterPreprocessor as SimpleTimeAdjusterPreprocessor,
 )
 from .SimpleEkfFusionStrategyPlugin import (
     SimpleEkfFusionStrategy as SimpleEkfFusionStrategy,

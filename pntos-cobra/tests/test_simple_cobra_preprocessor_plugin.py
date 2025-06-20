@@ -17,8 +17,17 @@ from pntos.cobra import (
     SimpleCobraPreprocessorPlugin,
     SimpleRegistryPlugin,
 )
-from pntos.cobra.config import BaseConfig, DownsamplerConfig, InertialConfig
-from pntos.cobra.internal import SimpleImuRotationPreprocessor, SimpleMediator
+from pntos.cobra.config import (
+    BaseConfig,
+    DownsamplerConfig,
+    InertialConfig,
+    TimeAdjusterConfig,
+)
+from pntos.cobra.internal import (
+    SimpleImuRotationPreprocessor,
+    SimpleMediator,
+    SimpleTimeAdjusterPreprocessor,
+)
 
 downsampler_config = DownsamplerConfig(
     channels_to_downsample=['test1', 'test2', 'test3'],
@@ -32,9 +41,17 @@ inertial_config = InertialConfig(
     channel='/sensor/imu',
     C_imu_to_platform=((0, 1, 0), (1, 0, 0), (0, 0, -1)),
 )
+time_adjuster_config = TimeAdjusterConfig(
+    group='test',
+    channel_to_correct='/sensor/imu',
+    expected_dt_nsec=int(0.01 * 1e9),
+)
 
-
-config_list: list[BaseConfig] = [downsampler_config, inertial_config]
+config_list: list[BaseConfig] = [
+    downsampler_config,
+    inertial_config,
+    time_adjuster_config,
+]
 
 ########## Preprocessor Plugin Tests ###############
 
@@ -62,7 +79,7 @@ def test_plugin_constructor(
     preprocessor_plugin: SimpleCobraPreprocessorPlugin,
 ) -> None:
     assert preprocessor_plugin.identifier == 'preprocessor_plugin'
-    assert len(preprocessor_plugin.preprocessor_identifiers) == 2
+    assert len(preprocessor_plugin.preprocessor_identifiers) == 3
 
 
 def test_invalid_mediator() -> None:
@@ -302,3 +319,100 @@ def test_imu_rotation(
         DCM @ original_message.wrapped_message.meas_gyro,
         rotated_imu_message.wrapped_message.meas_gyro,
     )
+
+
+########### Time Adjuster Tests ##############
+
+
+@pytest.fixture
+def time_adjuster_preprocessor(
+    preprocessor_plugin: SimpleCobraPreprocessorPlugin,
+) -> Preprocessor:
+    idx = preprocessor_plugin.preprocessor_identifiers.index('time_adjuster')
+    preprocessor = preprocessor_plugin.new_preprocessor(idx, 'test')
+    assert preprocessor is not None
+    assert isinstance(preprocessor, SimpleTimeAdjusterPreprocessor)
+    return preprocessor
+
+
+def create_message(time: int):
+    return Message(
+        MeasurementImu(
+            TypeHeader(0, 1, 2, 3),
+            TypeTimestamp(time),
+            MeasurementImuImuType.INTEGRATED,
+            np.array([0.01, 0.02, 0.03]),
+            np.array([0.04, 0.05, 0.06]),
+            [],
+        ),
+        '/sensor/imu',
+    )
+
+
+def test_time_adjuster(time_adjuster_preprocessor: Preprocessor) -> None:
+    first_message = create_message(int(1e9))
+    second_message = create_message(int(1.01 * 1e9))
+    bad_message = create_message(int(1.5 * 1e9))
+    low_dt_message = create_message(int(1.025 * 1e9))
+    within_tolerance_above_dt_message = create_message(int(1.040015 * 1e9))
+    within_tolerance_below_dt_message = create_message(int(1.049978 * 1e9))
+    last_message = create_message(int(1.06 * 1e9))
+
+    out_messages = time_adjuster_preprocessor.process_pntos_message(first_message)
+    assert out_messages is not None
+    assert len(out_messages) == 1
+    out_msg = out_messages[0]
+    assert isinstance(out_msg.wrapped_message, MeasurementImu)
+    assert out_msg.wrapped_message.time_of_validity.elapsed_nsec == 1e9
+
+    out_messages = time_adjuster_preprocessor.process_pntos_message(second_message)
+    assert out_messages is not None
+    assert len(out_messages) == 1
+    out_msg = out_messages[0]
+    assert isinstance(out_msg.wrapped_message, MeasurementImu)
+    assert out_msg.wrapped_message.time_of_validity.elapsed_nsec == 1.01 * 1e9
+
+    out_messages = time_adjuster_preprocessor.process_pntos_message(bad_message)
+    assert out_messages is not None
+    assert len(out_messages) == 1
+    synth_message = out_messages[0]
+    assert isinstance(synth_message.wrapped_message, MeasurementImu)
+    assert synth_message.wrapped_message.time_of_validity.elapsed_nsec == 1.02 * 1e9
+
+    out_messages = time_adjuster_preprocessor.process_pntos_message(low_dt_message)
+    assert out_messages is not None
+    assert len(out_messages) == 1
+    synth_message = out_messages[0]
+    assert isinstance(synth_message.wrapped_message, MeasurementImu)
+    assert synth_message.wrapped_message.time_of_validity.elapsed_nsec == 1.03 * 1e9
+
+    out_messages = time_adjuster_preprocessor.process_pntos_message(
+        within_tolerance_above_dt_message
+    )
+    assert out_messages is not None
+    assert len(out_messages) == 1
+    out_msg = out_messages[0]
+    assert isinstance(out_msg.wrapped_message, MeasurementImu)
+    # account for floating point precision errors
+    assert np.allclose(
+        out_msg.wrapped_message.time_of_validity.elapsed_nsec, 1.040015 * 1e9
+    )
+
+    out_messages = time_adjuster_preprocessor.process_pntos_message(
+        within_tolerance_below_dt_message
+    )
+    assert out_messages is not None
+    assert len(out_messages) == 1
+    out_msg = out_messages[0]
+    assert isinstance(out_msg.wrapped_message, MeasurementImu)
+    # account for floating point precision errors
+    assert np.allclose(
+        out_msg.wrapped_message.time_of_validity.elapsed_nsec, 1.049978 * 1e9
+    )
+
+    out_messages = time_adjuster_preprocessor.process_pntos_message(last_message)
+    assert out_messages is not None
+    assert len(out_messages) == 1
+    out_msg = out_messages[0]
+    assert isinstance(out_msg.wrapped_message, MeasurementImu)
+    assert out_msg.wrapped_message.time_of_validity.elapsed_nsec == 1.06 * 1e9
