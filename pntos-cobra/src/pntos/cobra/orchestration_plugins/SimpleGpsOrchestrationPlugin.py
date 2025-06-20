@@ -69,8 +69,8 @@ INERTIAL_GROUP = 'config/inertial'
 
 # Config groups
 ALIGNMENT_CONFIG_GROUP = 'config/default/alignment'
-PREPROCESSOR_IDS = ['imu_rotator']
-PREPROCESSOR_GROUPS = [INERTIAL_GROUP]
+PREPROCESSOR_IDS = ['imu_rotator', 'time_adjuster']
+PREPROCESSOR_GROUPS = [INERTIAL_GROUP, 'config/time_adjuster']
 
 
 class SimpleGpsOrchestrationPlugin(OrchestrationPlugin):
