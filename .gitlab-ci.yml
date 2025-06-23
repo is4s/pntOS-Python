@@ -139,6 +139,16 @@ documentation check:
         - docs/build/html/index.html  # must be first, expose_as links to the first entry
         - docs/build/html # ..but all the other files *also* need to be in the archive
 
+link check:
+    stage: check
+    tags:
+        - linux-light-runner
+    script:
+        - docker run --rm -dit -v $(pwd):/work --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
+        - docker exec pntos-python uv sync -v
+        # Check external links in the documentation
+        - docker exec -e TZ=UTC pntos-python sphinx-build -b linkcheck --exception-on-warning docs/source/ docs/build/
+
 GPS INS App:
     stage: check
     tags:
