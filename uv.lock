@@ -1080,7 +1080,7 @@ wheels = [
 
 [[package]]
 name = "pntos-api"
-version = "0.1.0"
+version = "0.1.0.dev0"
 source = { editable = "pntos-api" }
 dependencies = [
     { name = "aspn23" },
@@ -1091,7 +1091,7 @@ requires-dist = [{ name = "aspn23", git = "ssh://git@git.aspn.us/pntos/firehose-
 
 [[package]]
 name = "pntos-cobra"
-version = "0.1.0"
+version = "0.1.0.dev0"
 source = { editable = "pntos-cobra" }
 dependencies = [
     { name = "aspn-lcm" },
@@ -1122,7 +1122,7 @@ requires-dist = [
 
 [[package]]
 name = "pntos-python"
-version = "0.1.0"
+version = "0.1.0.dev0"
 source = { virtual = "." }
 
 [package.dev-dependencies]
