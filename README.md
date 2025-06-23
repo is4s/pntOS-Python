@@ -34,10 +34,10 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md).
 This section assumes you have a Python environment with the necessary dependencies installed. Please
 see [Environment Setup](https://pntos.pages.aspn.us/pntos-python/installation.html#environment-setup) for more information on how to do so.
 
-From the `docs/` directory, you can build the docs with:
+From the project directory, you can build the docs with:
 
 ```shell
-make html
+sphinx-build --exception-on-warning docs/source/ docs/build/
 ```
 
 Then, in a web browser, open the outputted `docs/build/index.html` file to view the documentation

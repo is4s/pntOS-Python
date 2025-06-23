@@ -131,10 +131,10 @@ documentation check:
     tags:
         - linux-light-runner
     script:
-        - docker run --workdir /work/docs --rm -dit -v $(pwd):/work --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
+        - docker run --rm -dit -v $(pwd):/work --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
         - docker exec pntos-python uv sync -v
         # Build the documentation
-        - docker exec -e TZ=UTC pntos-python make html SPHINXOPTS="-W"
+        - docker exec -e TZ=UTC pntos-python sphinx-build --exception-on-warning docs/source/ docs/build/
     artifacts:
         expose_as: "documentation"
         paths:
