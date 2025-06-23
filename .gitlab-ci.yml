@@ -125,8 +125,6 @@ mypy:
         - docker exec pntos-python mypy apps --no-implicit-reexport
 
 documentation check:
-    variables:
-        GIT_SUBMODULE_STRATEGY: recursive
     stage: check
     tags:
         - linux-light-runner
