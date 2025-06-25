@@ -1,8 +1,5 @@
 FROM ubuntu:24.04
 
-# Optional TOKEN_URL from CI
-ARG TOKEN_URL
-
 # Install dependencies needed to bring in upstream projects via their source
 RUN apt update && apt install git -y
 
@@ -20,6 +17,9 @@ RUN curl -LsSf https://astral.sh/uv/install.sh | UV_UNMANAGED_INSTALL="/usr/loca
 
 # Install java (needed to run app)
 RUN apt update && apt install default-jre-headless -y
+
+# Optional TOKEN_URL from CI
+ARG TOKEN_URL
 
 # If in CI, rewrite SSH URLs
 RUN bash -c \
