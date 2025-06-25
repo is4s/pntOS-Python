@@ -21,11 +21,8 @@ RUN curl -LsSf https://astral.sh/uv/install.sh | UV_UNMANAGED_INSTALL="/usr/loca
 # Install java (needed to run app)
 RUN apt update && apt install default-jre-headless -y
 
-# Install make (needed to build docs)
-RUN apt update && apt install make -y
-
 # If in CI, rewrite SSH URLs
-RUN bash -c \ 
+RUN bash -c \
 'if [[ -n $TOKEN_URL ]]; then \
   echo -e \
   "[url \"$TOKEN_URL\"]\n\tinsteadOf = git@git.aspn.us:\n\tinsteadOf = ssh://git@git.aspn.us/" \
