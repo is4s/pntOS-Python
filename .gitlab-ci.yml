@@ -125,21 +125,29 @@ mypy:
         - docker exec pntos-python mypy apps --no-implicit-reexport
 
 documentation check:
-    variables:
-        GIT_SUBMODULE_STRATEGY: recursive
     stage: check
     tags:
         - linux-light-runner
     script:
-        - docker run --workdir /work/docs --rm -dit -v $(pwd):/work --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
+        - docker run --rm -dit -v $(pwd):/work --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
         - docker exec pntos-python uv sync -v
         # Build the documentation
-        - docker exec -e TZ=UTC pntos-python make html SPHINXOPTS="-W"
+        - docker exec -e TZ=UTC pntos-python sphinx-build --exception-on-warning docs/source/ docs/build/
     artifacts:
         expose_as: "documentation"
         paths:
         - docs/build/html/index.html  # must be first, expose_as links to the first entry
         - docs/build/html # ..but all the other files *also* need to be in the archive
+
+link check:
+    stage: check
+    tags:
+        - linux-light-runner
+    script:
+        - docker run --rm -dit -v $(pwd):/work --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
+        - docker exec pntos-python uv sync -v
+        # Check external links in the documentation
+        - docker exec -e TZ=UTC pntos-python sphinx-build -b linkcheck --exception-on-warning docs/source/ docs/build/
 
 GPS INS App:
     stage: check
