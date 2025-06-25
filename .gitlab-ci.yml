@@ -44,7 +44,7 @@ default:
         # Build docker container
         - docker pull ubuntu:24.04
         - export DOCKER_IMAGE="$LOCAL_REGISTRY_CACHE/pntos-python"
-        - docker build --cache-from $DOCKER_IMAGE --build-arg BUILDKIT_INLINE_CACHE=1 --build-arg TOKEN_URL=$TOKEN_URL -t $DOCKER_IMAGE -f Dockerfile .
+        - docker build --cache-from $DOCKER_IMAGE --build-arg BUILDKIT_INLINE_CACHE=1 --build-arg TOKEN_URL=$TOKEN_URL -t $DOCKER_IMAGE - < Dockerfile
         - docker push $DOCKER_IMAGE
 
 stages:
