@@ -136,8 +136,8 @@ documentation check:
     artifacts:
         expose_as: "documentation"
         paths:
-        - docs/build/html/index.html  # must be first, expose_as links to the first entry
-        - docs/build/html # ..but all the other files *also* need to be in the archive
+        - docs/build/index.html  # must be first, expose_as links to the first entry
+        - docs/build # ..but all the other files *also* need to be in the archive
 
 link check:
     stage: check
@@ -198,7 +198,7 @@ pages:
     script:
         - rm -rf public
         - mkdir -p public
-        - cp -r docs/build/html/* public
+        - cp -r docs/build/* public
     needs:
         - documentation check
     only:
