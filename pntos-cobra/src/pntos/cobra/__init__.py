@@ -1,5 +1,5 @@
-from .Aspn23LcmTransportPlugin import (
-    Aspn23LcmTransportPlugin as Aspn23LcmTransportPlugin,
+from .AspnLcmTransportPlugin import (
+    AspnLcmTransportPlugin as AspnLcmTransportPlugin,
 )
 from .DummyTransportPlugin import (
     DummyTransportPlugin as DummyTransportPlugin,

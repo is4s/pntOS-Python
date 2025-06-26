@@ -135,7 +135,7 @@ def config_from_registry(
     kv.batch_end()
     if fail:
         return None
-    return config_type(**out, group=config_group)  # type: ignore[arg-type]
+    return config_type(**out, group=config_group)
 
 
 def config_to_registry(config: BaseConfig, mediator: Mediator) -> None:
