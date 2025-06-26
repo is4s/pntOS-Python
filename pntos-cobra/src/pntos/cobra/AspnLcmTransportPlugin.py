@@ -5,12 +5,23 @@ from aspn23 import TypeTimestamp
 from lcm import LCM, LCMSubscription
 
 from pntos.api import LoggingLevel, Mediator, Message, TransportPlugin
-from pntos.cobra.utils import decode_aspn_lcm_msg, marshal_from_lcm, marshal_to_lcm
+from pntos.cobra.config import config_from_registry
+from pntos.cobra.config.AspnLcmTransportConfig import (
+    AspnLcmTransportConfig,
+    AspnVersion,
+)
+from pntos.cobra.utils import (
+    decode_aspn_lcm_msg,
+    marshal_from_lcm,
+    marshal_to_aspn2_lcm,
+    marshal_to_aspn23_lcm,
+)
+from pntos.cobra.utils.lcm_marshaling import Aspn2LcmMeasurement, Aspn23LcmMeasurement
 
 LCM_URL = 'tcpq://localhost:7700'
 
 
-class Aspn23LcmTransportPlugin(TransportPlugin):
+class AspnLcmTransportPlugin(TransportPlugin):
     """An example LCM Transport Plugin for ASPN23 implemented in Python"""
 
     identifier: str
@@ -25,7 +36,7 @@ class Aspn23LcmTransportPlugin(TransportPlugin):
 
     def __init__(self, identifier: str):
         """
-        ASPN23-LCM Transport Plugin
+        ASPN-LCM Transport Plugin
 
         Args:
             identifier (str): The plugin identifier passed to the
@@ -50,6 +61,19 @@ class Aspn23LcmTransportPlugin(TransportPlugin):
         """
         if mediator is not None:
             self.mediator = mediator
+
+        config_group = 'config/aspn_lcm_transport'
+        config = config_from_registry(
+            AspnLcmTransportConfig, self.mediator, config_group
+        )
+        if config is None:
+            self.mediator.log_message(
+                LoggingLevel.ERROR,
+                'Unable to retrieve config from registry.',
+            )
+            return
+
+        self._output_version = config.output_version
 
     def shutdown_plugin(self) -> None:
         """
@@ -165,13 +189,15 @@ class Aspn23LcmTransportPlugin(TransportPlugin):
     def broadcast_message(
         self, message: Message, channel_name: str | None = None
     ) -> None:
-        lcm_msg = marshal_to_lcm(message.wrapped_message)
-        # TODO: remove this hack once firehose#50 is resolved
-        lcm_msg.num_meas = 9  # type: ignore[union-attr]
-
+        """Send a message over LCM to a specific channel"""
+        lcm_msg: Aspn2LcmMeasurement | Aspn23LcmMeasurement | None
+        if self._output_version == AspnVersion.V2:
+            lcm_msg = marshal_to_aspn2_lcm(message.wrapped_message)
+        else:
+            lcm_msg = marshal_to_aspn23_lcm(message.wrapped_message)
         if lcm_msg is None:
             self.mediator.log_message(
-                LoggingLevel.ERROR,
+                LoggingLevel.WARN,
                 f'Cannot marshal message on channel {channel_name} of type {type(message.wrapped_message)}. Ignoring message.',
             )
         elif channel_name is None:

@@ -22,7 +22,8 @@ from .hdf5 import (
 from .lcm_marshaling import (
     decode_aspn_lcm_msg as decode_aspn_lcm_msg,
     marshal_from_lcm as marshal_from_lcm,
-    marshal_to_lcm as marshal_to_lcm,
+    marshal_to_aspn2_lcm as marshal_to_aspn2_lcm,
+    marshal_to_aspn23_lcm as marshal_to_aspn23_lcm,
 )
 from .navigation import *
 from .plugins import (

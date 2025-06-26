@@ -1,3 +1,4 @@
+from .AspnLcmTransportConfig import AspnLcmTransportConfig as AspnLcmTransportConfig
 from .BaseConfig import BaseConfig as BaseConfig
 from .DownsamplerConfig import DownsamplerConfig as DownsamplerConfig
 from .FogmConfig import FogmConfig as FogmConfig

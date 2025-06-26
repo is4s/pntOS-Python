@@ -5,13 +5,18 @@
 -e ./pntos-cobra
 alabaster==1.0.0
     # via sphinx
-aspn-lcm @ git+ssh://git@git.aspn.us/pntos/lcm-generated.git@21e03f8765605dcd3c8d8d6bb7091ebeef24ee23#subdirectory=python
-    # via pntos-cobra
-aspn23 @ git+ssh://git@git.aspn.us/pntos/firehose-outputs.git@f5f5b2b4637517bb10299fb6be7248a2215fbb74#subdirectory=aspn-py
+aspn-lcm @ git+ssh://git@git.aspn.us/pntos/lcm-generated.git@14045fe000e4395bf81708e963aea09948e52949#subdirectory=python
     # via
+    #   aspn2-translations
+    #   pntos-cobra
+aspn2-translations @ git+ssh://git@git.aspn.us/pntos/firehose-outputs.git@50b596d2c349ceb98b60ab6aecc91961424bcec8#subdirectory=aspn2_to_aspn_py_translations
+    # via pntos-cobra
+aspn23 @ git+ssh://git@git.aspn.us/pntos/firehose-outputs.git@d425e26330e62371038f14ad12a8d8b4374698a6#subdirectory=aspn-py
+    # via
+    #   aspn2-translations
     #   pntos-api
     #   pntos-cobra
-aspn23-lcm @ git+ssh://git@git.aspn.us/pntos/firehose-outputs.git@f5f5b2b4637517bb10299fb6be7248a2215fbb74#subdirectory=lcm/python
+aspn23-lcm @ git+ssh://git@git.aspn.us/pntos/firehose-outputs.git@50b596d2c349ceb98b60ab6aecc91961424bcec8#subdirectory=lcm/python
     # via pntos-cobra
 asttokens==3.0.0
     # via stack-data
@@ -28,7 +33,7 @@ colorama==0.4.6 ; sys_platform == 'win32'
     #   sphinx
 contourpy==1.3.2
     # via matplotlib
-coverage==7.8.1
+coverage==7.8.2
     # via pytest-cov
 cycler==0.12.1
     # via matplotlib
@@ -45,9 +50,9 @@ exceptiongroup==1.3.0 ; python_full_version < '3.11'
     #   pytest
 executing==2.2.0
     # via stack-data
-fonttools==4.58.0
+fonttools==4.58.2
     # via matplotlib
-h5py==3.13.0
+h5py==3.14.0
     # via pntos-cobra
 idna==3.10
     # via requests
@@ -55,8 +60,8 @@ imagesize==1.4.1
     # via sphinx
 iniconfig==2.1.0
     # via pytest
-ipython==8.36.0 ; python_full_version < '3.11'
-ipython==9.2.0 ; python_full_version >= '3.11'
+ipython==8.37.0 ; python_full_version < '3.11'
+ipython==9.3.0 ; python_full_version >= '3.11'
 ipython-pygments-lexers==1.1.1 ; python_full_version >= '3.11'
     # via ipython
 jedi==0.19.2
@@ -70,6 +75,7 @@ kiwisolver==1.4.8
 lcm==1.5.1
     # via
     #   aspn-lcm
+    #   aspn2-translations
     #   aspn23-lcm
     #   pntos-cobra
 markdown-it-py==3.0.0
@@ -93,6 +99,7 @@ navtk==2.1.0.post2.dev0
     # via pntos-cobra
 numpy==2.1.3
     # via
+    #   aspn2-translations
     #   aspn23
     #   contourpy
     #   h5py
@@ -127,10 +134,11 @@ pygments==2.19.1
     # via
     #   ipython
     #   ipython-pygments-lexers
+    #   pytest
     #   sphinx
 pyparsing==3.2.3
     # via matplotlib
-pytest==8.3.5
+pytest==8.4.0
     # via pytest-cov
 pytest-cov==6.1.1
 python-dateutil==2.9.0.post0
@@ -191,7 +199,7 @@ traitlets==5.14.3
     # via
     #   ipython
     #   matplotlib-inline
-typing-extensions==4.13.2
+typing-extensions==4.14.0
     # via
     #   exceptiongroup
     #   ipython

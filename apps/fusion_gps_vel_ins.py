@@ -5,7 +5,7 @@ from pntos.api import LoggingLevel
 
 # Import Cobra plugins and config structs
 from pntos.cobra import (
-    Aspn23LcmTransportPlugin,
+    AspnLcmTransportPlugin,
     SimpleCobraPreprocessorPlugin,
     SimpleControllerPlugin,
     SimpleEkfFusionStrategyPlugin,
@@ -18,6 +18,7 @@ from pntos.cobra import (
     SimpleRegistryPlugin,
 )
 from pntos.cobra.config import (
+    AspnLcmTransportConfig,
     FogmConfig,
     ImuConfig,
     InertialConfig,
@@ -26,9 +27,13 @@ from pntos.cobra.config import (
     SensorConfig,
     TimeAdjusterConfig,
 )
+from pntos.cobra.config.AspnLcmTransportConfig import AspnVersion
 
 # Config setup
 my_config = [
+    AspnLcmTransportConfig(
+        output_version=AspnVersion.V23, group='config/aspn_lcm_transport'
+    ),
     ImuConfig(
         group='config/inertial_state',
         accel_bias_sigma=(2.4e-3, 2.4e-3, 2.4e-3),
@@ -95,7 +100,7 @@ my_config = [
 # Instantiate all of our plugins
 controller = SimpleControllerPlugin('Cobra Simple Controller Plugin')
 plugins = [
-    Aspn23LcmTransportPlugin('Cobra Aspn23-lcm Transport Plugin'),
+    AspnLcmTransportPlugin('Cobra Aspn-lcm Transport Plugin'),
     SimpleEkfFusionStrategyPlugin('Cobra Simple Fusion Strategy Plugin'),
     SimpleFusionPlugin('Cobra Simple Fusion Plugin'),
     SimpleGpsInsStateModelingPlugin('Cobra Simple State Modeling Plugin'),

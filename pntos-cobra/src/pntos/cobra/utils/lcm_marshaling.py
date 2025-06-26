@@ -1,7 +1,9 @@
 from typing import Callable
 
+import aspn2_translations
 import aspn23
 import aspn23_lcm
+import datasources.lcm.messages.aspn as aspn2_lcm
 from aspn23_xtensor import TypeTimestamp
 
 Aspn23LcmMeasurement = (
@@ -44,6 +46,54 @@ Aspn23LcmMeasurement = (
     | aspn23_lcm.measurement_velocity
 )
 
+Aspn2LcmMeasurement = (
+    aspn2_lcm.accumulateddistancetraveled
+    | aspn2_lcm.altitude
+    | aspn2_lcm.attitude1d
+    | aspn2_lcm.attitude2d
+    | aspn2_lcm.attitude3d
+    | aspn2_lcm.barometricpressure
+    | aspn2_lcm.bearingtoknownfeature
+    | aspn2_lcm.bearingtounknownfeature
+    | aspn2_lcm.correspondedopticalcamerafeatures
+    | aspn2_lcm.deltaposition1d
+    | aspn2_lcm.deltaposition2d
+    | aspn2_lcm.deltaposition3d
+    | aspn2_lcm.deltarange
+    | aspn2_lcm.deltarangetoknownfeature
+    | aspn2_lcm.deltarotation1d
+    | aspn2_lcm.deltarotation2d
+    | aspn2_lcm.deltarotation3d
+    | aspn2_lcm.directionofmotion2d
+    | aspn2_lcm.directionofmotion3d
+    | aspn2_lcm.directiontoknownfeature2d
+    | aspn2_lcm.directiontoknownfeature3d
+    | aspn2_lcm.geodeticposition2d
+    | aspn2_lcm.geodeticposition3d
+    | aspn2_lcm.gnss
+    | aspn2_lcm.gpsephemeris
+    | aspn2_lcm.imu
+    | aspn2_lcm.ins
+    | aspn2_lcm.opticalcameraimage
+    | aspn2_lcm.overhausermagnetometer
+    | aspn2_lcm.positionattitude
+    | aspn2_lcm.positionvelocity
+    | aspn2_lcm.positionvelocityattitude
+    | aspn2_lcm.rangeratetoknownfeature
+    | aspn2_lcm.rangeratetounknownfeature
+    | aspn2_lcm.rangetoknownfeature
+    | aspn2_lcm.rangetounknownfeature
+    | aspn2_lcm.speed
+    | aspn2_lcm.tdoatoknownfeature
+    | aspn2_lcm.tdoatounknownfeature
+    | aspn2_lcm.temperature
+    | aspn2_lcm.threeaxismagnetometer
+    | aspn2_lcm.uncorrespondedopticalcamerafeatures
+    | aspn2_lcm.velocity1d
+    | aspn2_lcm.velocity2d
+    | aspn2_lcm.velocity3d
+)
+
 Aspn23Measurement = (
     aspn23.MeasurementAngularVelocity1D
     | aspn23.MeasurementAngularVelocity
@@ -84,8 +134,8 @@ Aspn23Measurement = (
     | aspn23.MeasurementVelocity
 )
 
-# dictionary mapping LCM message type to ASPN23 marshaling functions
-marshaler_to_lcm: dict[type[Aspn23Measurement], Callable] = {
+# dictionary mapping ASPN23 message type to ASPN23 LCM marshaling functions
+marshaler_to_aspn23_lcm: dict[type[Aspn23Measurement], Callable] = {
     aspn23.MeasurementAngularVelocity1D: aspn23_lcm.measurement_angular_velocity_1d_to_lcm,
     aspn23.MeasurementAngularVelocity: aspn23_lcm.measurement_angular_velocity_to_lcm,
     aspn23.MeasurementAccumulatedDistanceTraveled: aspn23_lcm.measurement_accumulated_distance_traveled_to_lcm,
@@ -124,7 +174,19 @@ marshaler_to_lcm: dict[type[Aspn23Measurement], Callable] = {
     aspn23.MeasurementTimeFrequencyDifference: aspn23_lcm.measurement_time_frequency_difference_to_lcm,
     aspn23.MeasurementVelocity: aspn23_lcm.measurement_velocity_to_lcm,
 }
-marshaler_from_lcm: dict[type[Aspn23LcmMeasurement], Callable] = {
+
+# dictionary mapping ASPN23 message type to ASPN2 LCM marshaling functions
+marshaler_to_aspn2_lcm: dict[type[Aspn23Measurement], Callable] = {
+    aspn23.MeasurementImu: aspn2_translations.translate_from_aspn23_imu_to_aspn2,
+    aspn23.MeasurementPosition: aspn2_translations.translate_from_aspn23_position_to_aspn2_geodeticposition3d,
+    aspn23.MeasurementPositionVelocityAttitude: aspn2_translations.translate_from_aspn23_positionvelocityattitude_to_aspn2,
+}
+
+# dictionary mapping ASPN LCM message type to ASPN23 marshaling functions
+marshaler_from_lcm: dict[
+    type[Aspn23LcmMeasurement] | type[Aspn2LcmMeasurement], Callable
+] = {
+    # aspn23_lcm to aspn23
     aspn23_lcm.measurement_angular_velocity_1d: aspn23_lcm.lcm_to_measurement_angular_velocity_1d,
     aspn23_lcm.measurement_angular_velocity: aspn23_lcm.lcm_to_measurement_angular_velocity,
     aspn23_lcm.measurement_accumulated_distance_traveled: aspn23_lcm.lcm_to_measurement_accumulated_distance_traveled,
@@ -162,15 +224,63 @@ marshaler_from_lcm: dict[type[Aspn23LcmMeasurement], Callable] = {
     aspn23_lcm.measurement_time_difference: aspn23_lcm.lcm_to_measurement_time_difference,
     aspn23_lcm.measurement_time_frequency_difference: aspn23_lcm.lcm_to_measurement_time_frequency_difference,
     aspn23_lcm.measurement_velocity: aspn23_lcm.lcm_to_measurement_velocity,
+    # aspn2_lcm to aspn23
+    aspn2_lcm.accumulateddistancetraveled: aspn2_translations.translate_from_aspn2_accumulateddistancetraveled_to_aspn23,
+    aspn2_lcm.altitude: aspn2_translations.translate_from_aspn2_altitude_to_aspn23,
+    aspn2_lcm.attitude1d: aspn2_translations.translate_from_aspn2_attitude1d_to_aspn23,
+    aspn2_lcm.attitude2d: aspn2_translations.translate_from_aspn2_attitude2d_to_aspn23,
+    aspn2_lcm.attitude3d: aspn2_translations.translate_from_aspn2_attitude3d_to_aspn23,
+    aspn2_lcm.barometricpressure: aspn2_translations.translate_from_aspn2_barometricpressure_to_aspn23,
+    aspn2_lcm.bearingtoknownfeature: aspn2_translations.translate_from_aspn2_bearingtoknownfeature_to_aspn23,
+    aspn2_lcm.bearingtounknownfeature: aspn2_translations.translate_from_aspn2_bearingtounknownfeature_to_aspn23,
+    aspn2_lcm.correspondedopticalcamerafeatures: aspn2_translations.translate_from_aspn2_correspondedopticalcamerafeatures_to_aspn23,
+    aspn2_lcm.deltaposition1d: aspn2_translations.translate_from_aspn2_deltaposition1d_to_aspn23,
+    aspn2_lcm.deltaposition2d: aspn2_translations.translate_from_aspn2_deltaposition2d_to_aspn23,
+    aspn2_lcm.deltaposition3d: aspn2_translations.translate_from_aspn2_deltaposition3d_to_aspn23,
+    aspn2_lcm.deltarange: aspn2_translations.translate_from_aspn2_deltarange_to_aspn23,
+    aspn2_lcm.deltarangetoknownfeature: aspn2_translations.translate_from_aspn2_deltarangetoknownfeature_to_aspn23,
+    aspn2_lcm.deltarotation1d: aspn2_translations.translate_from_aspn2_deltarotation1d_to_aspn23,
+    aspn2_lcm.deltarotation2d: aspn2_translations.translate_from_aspn2_deltarotation2d_to_aspn23,
+    aspn2_lcm.deltarotation3d: aspn2_translations.translate_from_aspn2_deltarotation3d_to_aspn23,
+    aspn2_lcm.directionofmotion2d: aspn2_translations.translate_from_aspn2_directionofmotion2d_to_aspn23,
+    aspn2_lcm.directionofmotion3d: aspn2_translations.translate_from_aspn2_directionofmotion3d_to_aspn23,
+    aspn2_lcm.directiontoknownfeature2d: aspn2_translations.translate_from_aspn2_directiontoknownfeature2d_to_aspn23,
+    aspn2_lcm.directiontoknownfeature3d: aspn2_translations.translate_from_aspn2_directiontoknownfeature3d_to_aspn23,
+    aspn2_lcm.geodeticposition2d: aspn2_translations.translate_from_aspn2_geodeticposition2d_to_aspn23,
+    aspn2_lcm.geodeticposition3d: aspn2_translations.translate_from_aspn2_geodeticposition3d_to_aspn23,
+    aspn2_lcm.gnss: aspn2_translations.translate_from_aspn2_satnav_to_aspn23,
+    aspn2_lcm.gpsephemeris: aspn2_translations.translate_from_aspn2_gpsephemeris_to_aspn23,
+    aspn2_lcm.imu: aspn2_translations.translate_from_aspn2_imu_to_aspn23,
+    aspn2_lcm.ins: aspn2_translations.translate_from_aspn2_ins_to_aspn23_imu,
+    aspn2_lcm.opticalcameraimage: aspn2_translations.translate_from_aspn2_opticalcameraimage_to_aspn23,
+    aspn2_lcm.overhausermagnetometer: aspn2_translations.translate_from_aspn2_overhausermagnetometer_to_aspn23,
+    aspn2_lcm.positionattitude: aspn2_translations.translate_from_aspn2_positionattitude_to_aspn23,
+    aspn2_lcm.positionvelocity: aspn2_translations.translate_from_aspn2_positionvelocity_to_aspn23,
+    aspn2_lcm.positionvelocityattitude: aspn2_translations.translate_from_aspn2_positionvelocityattitude_to_aspn23,
+    aspn2_lcm.rangeratetoknownfeature: aspn2_translations.translate_from_aspn2_rangeratetoknownfeature_to_aspn23,
+    aspn2_lcm.rangeratetounknownfeature: aspn2_translations.translate_from_aspn2_rangeratetounknownfeature_to_aspn23,
+    aspn2_lcm.rangetoknownfeature: aspn2_translations.translate_from_aspn2_rangetoknownfeature_to_aspn23,
+    aspn2_lcm.rangetounknownfeature: aspn2_translations.translate_from_aspn2_rangetounknownfeature_to_aspn23,
+    aspn2_lcm.speed: aspn2_translations.translate_from_aspn2_speed_to_aspn23,
+    aspn2_lcm.tdoatoknownfeature: aspn2_translations.translate_from_aspn2_tdoatoknownfeature_to_aspn23,
+    aspn2_lcm.tdoatounknownfeature: aspn2_translations.translate_from_aspn2_tdoatounknownfeature_to_aspn23,
+    aspn2_lcm.temperature: aspn2_translations.translate_from_aspn2_temperature_to_aspn23,
+    aspn2_lcm.threeaxismagnetometer: aspn2_translations.translate_from_aspn2_threeaxismagnetometer_to_aspn23,
+    aspn2_lcm.uncorrespondedopticalcamerafeatures: aspn2_translations.translate_from_aspn2_uncorrespondedopticalcamerafeatures_to_aspn23,
+    aspn2_lcm.velocity1d: aspn2_translations.translate_from_aspn2_velocity1d_to_aspn23,
+    aspn2_lcm.velocity2d: aspn2_translations.translate_from_aspn2_velocity2d_to_aspn23,
+    aspn2_lcm.velocity3d: aspn2_translations.translate_from_aspn2_velocity3d_to_aspn23,
 }
 
 # dictionary mapping LCM message fingerprint to message decode function
-decoder: dict[bytes, Callable[[bytes], Aspn23LcmMeasurement]] = {}
-for aspn23_type in marshaler_from_lcm:
-    decoder[aspn23_type._get_packed_fingerprint()] = aspn23_type.decode
+decoder: dict[bytes, Callable[[bytes], Aspn23LcmMeasurement | Aspn2LcmMeasurement]] = {}
+for aspn_type in marshaler_from_lcm:
+    decoder[aspn_type._get_packed_fingerprint()] = aspn_type.decode  # type: ignore[assignment]
 
 
-def decode_aspn_lcm_msg(data: bytes) -> Aspn23LcmMeasurement | None:
+def decode_aspn_lcm_msg(
+    data: bytes,
+) -> Aspn23LcmMeasurement | Aspn2LcmMeasurement | None:
     """
     Decodes a set of bytes into an ASPN-LCM message. Uses the first 8 bytes to determine the type of message,
     if the type cannot be determined this function will return ``None``.
@@ -190,7 +300,9 @@ def decode_aspn_lcm_msg(data: bytes) -> Aspn23LcmMeasurement | None:
     return decode_func(data)
 
 
-def marshal_from_lcm(msg: Aspn23LcmMeasurement) -> Aspn23Measurement | None:
+def marshal_from_lcm(
+    msg: Aspn23LcmMeasurement | Aspn2LcmMeasurement,
+) -> Aspn23Measurement | None:
     """
     Converts from ASPN-LCM message to ASPN23 message. If the input message cannot be converted,
     this function will return ``None``.
@@ -210,9 +322,9 @@ def marshal_from_lcm(msg: Aspn23LcmMeasurement) -> Aspn23Measurement | None:
     return marshal_func(msg)
 
 
-def marshal_to_lcm(msg: aspn23.AspnBase) -> Aspn23LcmMeasurement | None:
+def marshal_to_aspn23_lcm(msg: aspn23.AspnBase) -> Aspn23LcmMeasurement | None:
     """
-    Convert from ASPN23 message to ASPN-LCM message. If the input message cannot be converted,
+    Convert from ASPN23 message to ASPN23-LCM message. If the input message cannot be converted,
     this function will return ``None``.
 
     Args:
@@ -223,8 +335,32 @@ def marshal_to_lcm(msg: aspn23.AspnBase) -> Aspn23LcmMeasurement | None:
     """
     msg_type = type(msg)
 
-    if msg_type not in marshaler_to_lcm:
+    if msg_type not in marshaler_to_aspn23_lcm:
         return None
 
-    marshal_func = marshaler_to_lcm[msg_type]  # type: ignore[index]
+    marshal_func = marshaler_to_aspn23_lcm[msg_type]  # type: ignore[index]
     return marshal_func(msg)
+
+
+def marshal_to_aspn2_lcm(msg: aspn23.AspnBase) -> Aspn2LcmMeasurement | None:
+    """
+    Convert from ASPN23 message to ASPN2-LCM message. If the input message cannot be converted,
+    this function will return ``None``.
+
+    Args:
+        msg (AspnBase): The message to convert.
+
+    Returns:
+        Aspn2LcmMeasurement | None
+    """
+    msg_type = type(msg)
+
+    if msg_type not in marshaler_to_aspn2_lcm:
+        return None
+
+    marshal_func = marshaler_to_aspn2_lcm[msg_type]  # type: ignore[index]
+    try:
+        return marshal_func(msg)
+    except Exception as e:
+        print(e)
+        return None
