@@ -33,3 +33,15 @@ footer {
        font-size: 0.9em;
        padding: 0.05em 1px;
 }
+
+blockquote {
+    background-color: #f3f4f5;
+    border-left: .25em solid #677384;
+    border-radius: .25rem;
+    color: #48566b;
+    padding: 1em;
+}
+
+blockquote p:last-child {
+  margin-bottom: 0;
+}
