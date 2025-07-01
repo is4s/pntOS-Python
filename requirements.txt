@@ -9,7 +9,7 @@ aspn-lcm @ git+ssh://git@git.aspn.us/pntos/lcm-generated.git@14045fe000e4395bf81
     # via
     #   aspn2-translations
     #   pntos-cobra
-aspn2-translations @ git+ssh://git@git.aspn.us/pntos/firehose-outputs.git@50b596d2c349ceb98b60ab6aecc91961424bcec8#subdirectory=aspn2_to_aspn_py_translations
+aspn2-translations @ git+ssh://git@git.aspn.us/pntos/firehose-outputs.git@eb44c5700bc2df30d9eb16be2ab0fd0b522f647c#subdirectory=aspn2_to_aspn_py_translations
     # via pntos-cobra
 aspn23 @ git+ssh://git@git.aspn.us/pntos/firehose-outputs.git@d425e26330e62371038f14ad12a8d8b4374698a6#subdirectory=aspn-py
     # via

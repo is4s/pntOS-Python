@@ -14,8 +14,8 @@ dependencies = [
     "aspn23 @ git+ssh://git@git.aspn.us/pntos/firehose-outputs.git@d425e26330e62371038f14ad12a8d8b4374698a6#subdirectory=aspn-py",
     # firehose-outputs main branch - committed 26 June 2025
     "aspn23_lcm @ git+ssh://git@git.aspn.us/pntos/firehose-outputs.git@50b596d2c349ceb98b60ab6aecc91961424bcec8#subdirectory=lcm/python",
-    # firehose-outputs main branch - committed 26 June 2025
-    "aspn2_translations @ git+ssh://git@git.aspn.us/pntos/firehose-outputs.git@50b596d2c349ceb98b60ab6aecc91961424bcec8#subdirectory=aspn2_to_aspn_py_translations",
+    # firehose-outputs main branch - committed 2 July 2025
+    "aspn2_translations @ git+ssh://git@git.aspn.us/pntos/firehose-outputs.git@eb44c5700bc2df30d9eb16be2ab0fd0b522f647c#subdirectory=aspn2_to_aspn_py_translations",
     # lcm-generated master branch - committed 19 June 2025
     "aspn_lcm @ git+ssh://git@git.aspn.us/pntos/lcm-generated.git@14045fe000e4395bf81708e963aea09948e52949#subdirectory=python",
     # Generated from commit 2d65da3693e7087a0e9ae56db6eba900c9e7ea91 on 8 May 2025
