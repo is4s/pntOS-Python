@@ -108,7 +108,7 @@ class PinsonVelocityMeasurementProcessor(StandardMeasurementProcessor):
         if vel.reference_frame is not MeasurementVelocityReferenceFrame.NED:
             self._mediator.log_message(
                 LoggingLevel.ERROR,
-                f'PinsonVelocityMeasurementProcessor expected MeasurementVelocity with a reference from of NED, but got measurement at time {time.elapsed_nsec / 1e9}s with a reference frame of {vel.reference_frame}. Cannot process message.',
+                f'PinsonVelocityMeasurementProcessor expected MeasurementVelocity with a reference frame of NED, but got measurement at time {time.elapsed_nsec / 1e9}s with a reference frame of {vel.reference_frame}. Cannot process message.',
             )
             return None
 
