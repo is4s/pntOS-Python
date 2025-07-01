@@ -1,6 +1,6 @@
 [project]
 name = "pntos-api"
-version = "0.1.0"
+version = "0.1.0.dev0"
 description = "The API specification for pntOS, ported into pure Python."
 authors = [{ name = "IS4S", email = "pntos@is4s.com" }]
 dependencies = [

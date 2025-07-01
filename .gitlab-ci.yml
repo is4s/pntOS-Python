@@ -191,6 +191,19 @@ copyright year check:
     script:
         - (! grep --color -i "copyright.*$(( $(date +%Y) - 1 ))" $(git ls-files))
 
+build wheels:
+    stage: check
+    tags:
+        - linux-light-runner
+    script:
+        - docker run --rm -dit -v $(pwd):/work --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
+        - docker exec pntos-python uv sync -v
+        - docker exec pntos-python uv build pntos-api
+        - docker exec pntos-python uv build pntos-cobra
+    artifacts:
+        paths:
+            - dist/pntos*.whl
+
 pages:
     stage: deploy
     tags: [linux-light-runner]
@@ -206,3 +219,26 @@ pages:
     artifacts:
         paths:
             - public
+
+deploy wheels:
+    stage: deploy
+    tags:
+        - linux-light-runner
+    only:
+        - main
+    needs:
+        - build wheels
+    variables:
+        # Don't clean artifacts from previous job
+        GIT_CLEAN_FLAGS: -f
+    script:
+        - docker run --rm -dit -v $(pwd):/work --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
+        - docker exec pntos-python python3 -m venv /work/.venv
+        - docker exec pntos-python .venv/bin/pip install twine
+        - export REPO_URL=${CI_API_V4_URL}/projects/94/packages/pypi
+        - docker exec pntos-python twine upload
+            --repository-url ${REPO_URL}
+            --username gitlab-ci-token
+            --password ${CI_JOB_TOKEN}
+            --skip-existing
+            dist/pntos*.whl
