@@ -63,4 +63,9 @@ INS
 
 PNT
     Positioning, Navigation, and Timing    
+
+ROS
+    [Robot Operating System](https://www.ros.org/), an open-source robotics
+    software framework. In our case, it serves as an alternative transport
+    mechanism to LCM.
 ```
