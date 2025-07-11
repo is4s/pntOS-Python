@@ -61,3 +61,6 @@ quote-style = "single"
 [tool.mypy]
 strict = true
 warn_unreachable = true
+
+[tool.pytest.ini_options]
+addopts = "-p no:launch_ros -p no:launch_testing"
