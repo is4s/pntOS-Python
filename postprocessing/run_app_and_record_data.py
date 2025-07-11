@@ -95,4 +95,4 @@ if __name__ == '__main__':
         run_pntos()
     elif len(argv) == 2:
         run_pntos(argv[1])
-    plot_results(OUTPUT_LOG_FILENAME)
+    plot_results(OUTPUT_LOG_FILENAME, '/solution/cobra/pva', '/sensor/ins-d/pva')
