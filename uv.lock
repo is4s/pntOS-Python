@@ -33,7 +33,7 @@ dependencies = [
 [[package]]
 name = "aspn2-translations"
 version = "0.1.0"
-source = { git = "ssh://git@git.aspn.us/pntos/firehose-outputs.git?subdirectory=aspn2_to_aspn_py_translations&rev=eb44c5700bc2df30d9eb16be2ab0fd0b522f647c#eb44c5700bc2df30d9eb16be2ab0fd0b522f647c" }
+source = { git = "ssh://git@git.aspn.us/pntos/firehose-outputs.git?subdirectory=aspn2_to_aspn_py_translations&rev=9e2a4f463ff4288bd40098ebf775304966a76393#9e2a4f463ff4288bd40098ebf775304966a76393" }
 dependencies = [
     { name = "aspn-lcm" },
     { name = "aspn23" },
@@ -1125,7 +1125,7 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "aspn-lcm", git = "ssh://git@git.aspn.us/pntos/lcm-generated.git?subdirectory=python&rev=14045fe000e4395bf81708e963aea09948e52949" },
-    { name = "aspn2-translations", git = "ssh://git@git.aspn.us/pntos/firehose-outputs.git?subdirectory=aspn2_to_aspn_py_translations&rev=eb44c5700bc2df30d9eb16be2ab0fd0b522f647c" },
+    { name = "aspn2-translations", git = "ssh://git@git.aspn.us/pntos/firehose-outputs.git?subdirectory=aspn2_to_aspn_py_translations&rev=9e2a4f463ff4288bd40098ebf775304966a76393" },
     { name = "aspn23", git = "ssh://git@git.aspn.us/pntos/firehose-outputs.git?subdirectory=aspn-py&rev=d425e26330e62371038f14ad12a8d8b4374698a6" },
     { name = "aspn23-lcm", git = "ssh://git@git.aspn.us/pntos/firehose-outputs.git?subdirectory=lcm%2Fpython&rev=50b596d2c349ceb98b60ab6aecc91961424bcec8" },
     { name = "h5py", specifier = ">1.0.0" },
