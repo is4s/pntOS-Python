@@ -1,5 +1,5 @@
 diff --git a/pntos-cobra/src/pntos/cobra/orchestration_plugins/SimpleGpsOrchestrationPlugin.py b/pntos-cobra/src/pntos/cobra/orchestration_plugins/SimpleGpsVelOrchestrationPlugin.py
-index dccc94b3..a3177a6d 100644
+index dccc94b..a3177a6 100644
 --- a/pntos-cobra/src/pntos/cobra/orchestration_plugins/SimpleGpsOrchestrationPlugin.py
 +++ b/pntos-cobra/src/pntos/cobra/orchestration_plugins/SimpleGpsVelOrchestrationPlugin.py
 @@ -63,6 +63,10 @@ GPS_MEASUREMENT_PROCESSOR_ID = 'pinson_with_ned_fogm_position'
