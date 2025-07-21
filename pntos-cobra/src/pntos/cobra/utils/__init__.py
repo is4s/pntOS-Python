@@ -31,4 +31,5 @@ from .plugins import (
     camel_to_snake as camel_to_snake,
     find_base_plugin_type as find_base_plugin_type,
     sort_plugins_dataclass as sort_plugins_dataclass,
+    validate_plugins as validate_plugins,
 )

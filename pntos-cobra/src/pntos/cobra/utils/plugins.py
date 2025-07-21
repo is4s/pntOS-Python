@@ -1,5 +1,6 @@
 import re
 from dataclasses import dataclass, field
+from typing import Callable
 
 from pntos.api import (
     CommonPlugin,
@@ -8,6 +9,7 @@ from pntos.api import (
     FusionStrategyPlugin,
     InertialPlugin,
     InitializationPlugin,
+    LoggingLevel,
     LoggingPlugin,
     OrchestrationPlugin,
     PlatformIntegrationPlugin,
@@ -82,6 +84,73 @@ def sort_plugins_dataclass(plugins: list[CommonPlugin]) -> SortedPlugins:
         elif isinstance(plugin, UtilityPlugin):
             sorted_data.utility_plugins.append(plugin)
     return sorted_data
+
+
+def validate_plugins(
+    sorted_plugins: SortedPlugins,
+    log_func: Callable[[LoggingLevel, str], None],
+    **kwargs: tuple[int, int],
+) -> bool:
+    """
+    A utility function that (for each type) verifies the number of expected plugins against the plugin counts in ``sorted_plugins``.
+    Accepted keyword arguments are in the formatting `[num|min]_[plugin_type]` (e.g. `num_fusion_plugins`, `min_fusion_plugins`). The
+    `num_*` parameters specify an exact match, whereas the `min_*` specify a minimum number of plugins. Only one should be used for any
+    given plugin type.
+
+    Args:
+        sorted_plugins (SortedPlugins): A ``SortedPlugins`` instance containing fields of plugins to validate.
+        log_func (Callable[[LoggingLevel, str], None]): The logging function to use within this method.
+        **kwargs: Keyword arguments mapping plugin type names (as strings) to an expected number of plugins.
+            At least one plugin type must be specified.
+
+    Returns:
+    bool: `True` if all expected plugin counts match the actual counts; `False` otherwise.
+    """
+    accepted_args = {
+        'controller_plugins',
+        'fusion_plugins',
+        'fusion_strategy_plugins',
+        'inertial_plugins',
+        'initialization_plugins',
+        'logging_plugins',
+        'orchestration_plugins',
+        'platform_integration_plugins',
+        'preprocessor_plugins',
+        'registry_plugins',
+        'state_modeling_plugins',
+        'transport_plugins',
+        'ui_plugins',
+        'utility_plugins',
+    }
+    if not kwargs:
+        log_func(
+            LoggingLevel.ERROR,
+            'No plugins were given criteria to validate. At least one plugin must be validated',
+        )
+        return False
+
+    for name, (min, max) in kwargs.items():
+        if name not in accepted_args:
+            log_func(
+                LoggingLevel.ERROR,
+                f'Unknown argument: {name}\nList of accepted args: {list(accepted_args)}',
+            )
+            return False
+
+        plugin_count = len(getattr(sorted_plugins, name))
+        if plugin_count < min or plugin_count > max:
+            if min == max:
+                log_func(
+                    LoggingLevel.ERROR,
+                    f'Expected {min} {name} but received {plugin_count}',
+                )
+            else:
+                log_func(
+                    LoggingLevel.ERROR,
+                    f'Expected between {min} to {max} {name} but received {plugin_count}',
+                )
+            return False
+    return True
 
 
 def find_base_plugin_type(plugin: CommonPlugin) -> PluginType:

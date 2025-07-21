@@ -15,6 +15,7 @@ from pntos.cobra.utils import (
     SortedPlugins,
     find_base_plugin_type,
     sort_plugins_dataclass,
+    validate_plugins,
 )
 
 from .SimpleMediator import SimpleMediator
@@ -211,27 +212,16 @@ class SimpleControllerPlugin(ControllerPlugin):
         sorted_plugins: SortedPlugins = sort_plugins_dataclass(plugins)
         plugins_for_orchestration: list[CommonPlugin] = []
 
-        # Registry Plugin
-        if len(sorted_plugins.registry_plugins) != 1:
-            raise RuntimeError(
-                f'Expected one RegistryPlugin but received {len(sorted_plugins.registry_plugins)}.'
-            )
-
-        # Logging Plugin
-        if len(sorted_plugins.logging_plugins) != 1:
-            raise RuntimeError(
-                f'Expected one LoggingPlugin but received {len(sorted_plugins.logging_plugins)}.'
-            )
-
-        # Transport Plugins
-        if len(sorted_plugins.transport_plugins) < 1:
-            raise RuntimeError(f'Expected at least one TransportPlugin.')
-
-        # Orchestration plugin
-        if len(sorted_plugins.orchestration_plugins) != 1:
-            raise RuntimeError(
-                f'Expected one OrchestrationPlugin but received {len(sorted_plugins.orchestration_plugins)}.'
-            )
+        if not validate_plugins(
+            sorted_plugins,
+            self._log,
+            registry_plugins=(1, 1),
+            logging_plugins=(1, 1),
+            orchestration_plugins=(1, 1),
+            transport_plugins=(1, 1000),
+            fusion_plugins=(1, 1000),
+        ):
+            raise RuntimeError('Not enough plugins to run pntOS.')
 
         # UI Plugin
         if len(sorted_plugins.ui_plugins) != 1:
@@ -239,12 +229,6 @@ class SimpleControllerPlugin(ControllerPlugin):
                 LoggingLevel.WARN,
                 f'Expected one UiPlugin but received {len(sorted_plugins.ui_plugins)}.'
                 + ' Running without a UI plugin.',
-            )
-
-        # Fusion Plugin
-        if len(sorted_plugins.fusion_plugins) < 1:
-            raise RuntimeError(
-                f'Expected at least one FusionPlugin but received {len(sorted_plugins.fusion_plugins)}.'
             )
 
         # Collect plugins to pass to orchestration

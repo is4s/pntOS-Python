@@ -29,7 +29,7 @@ from pntos.api import (
     StateModelingPlugin,
 )
 from pntos.cobra.config import InertialConfig, OrchestrationConfig, config_from_registry
-from pntos.cobra.utils import sort_plugins_dataclass
+from pntos.cobra.utils import sort_plugins_dataclass, validate_plugins
 
 from .orchestration_utils import (
     dispatch_to_fusion_engine,
@@ -43,7 +43,6 @@ from .orchestration_utils import (
     set_up_inertial_mechanization,
     set_up_initializer,
     set_up_preprocessors,
-    validate_plugins,
 )
 
 # Solution Channels
@@ -176,11 +175,11 @@ class SimpleGpsOrchestrationPlugin(OrchestrationPlugin):
         if not validate_plugins(
             sorted_plugins,
             self._log,
-            num_fusion_plugins=1,
-            num_fusion_strategy_plugins=1,
-            num_inertial_plugins=1,
-            num_initialization_plugins=1,
-            min_state_modeling_plugins=1,
+            fusion_plugins=(1, 1),
+            fusion_strategy_plugins=(1, 1),
+            inertial_plugins=(1, 1),
+            initialization_plugins=(1, 1),
+            state_modeling_plugins=(1, 1000),
         ):
             return
         self.fusion_plugin = sorted_plugins.fusion_plugins[0]
