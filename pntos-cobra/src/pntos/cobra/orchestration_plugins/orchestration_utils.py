@@ -1,7 +1,6 @@
 from typing import Callable, Tuple, Union
 
 from aspn23 import (
-    MeasurementImu,
     MeasurementPositionVelocityAttitude,
     MeasurementPositionVelocityAttitudeErrorModel,
     TypeHeader,
@@ -31,90 +30,6 @@ from pntos.cobra.utils import (
     quat_to_dcm,
 )
 from scipy.linalg import block_diag
-
-
-def validate_plugins(
-    sorted_plugins: SortedPlugins,
-    log_func: Callable[[LoggingLevel, str], None],
-    **kwargs: int,
-) -> bool:
-    """
-    A utility function that (for each type) verifies the number of expected plugins against the plugin counts in ``sorted_plugins``.
-    Accepted keyword arguments are in the formatting `[num|min]_[plugin_type]` (e.g. `num_fusion_plugins`, `min_fusion_plugins`). The
-    `num_*` parameters specify an exact match, whereas the `min_*` specify a minimum number of plugins. Only one should be used for any
-    given plugin type.
-
-    Args:
-        sorted_plugins (SortedPlugins): A ``SortedPlugins`` instance containing fields of plugins to validate.
-        log_func (Callable[[LoggingLevel, str], None]): The logging function to use within this method.
-        **kwargs: Keyword arguments mapping plugin type names (as strings) to an expected number of plugins.
-            At least one plugin type must be specified.
-
-    Returns:
-    bool: `True` if all expected plugin counts match the actual counts; `False` otherwise.
-    """
-    accepted_args = {
-        'num_controller_plugins',
-        'num_fusion_plugins',
-        'num_fusion_strategy_plugins',
-        'num_inertial_plugins',
-        'num_initialization_plugins',
-        'num_logging_plugins',
-        'num_orchestration_plugins',
-        'num_platform_integration_plugins',
-        'num_preprocessor_plugins',
-        'num_registry_plugins',
-        'num_state_modeling_plugins',
-        'num_transport_plugins',
-        'num_ui_plugins',
-        'num_utility_plugins',
-        'min_controller_plugins',
-        'min_fusion_plugins',
-        'min_fusion_strategy_plugins',
-        'min_inertial_plugins',
-        'min_initialization_plugins',
-        'min_logging_plugins',
-        'min_orchestration_plugins',
-        'min_platform_integration_plugins',
-        'min_preprocessor_plugins',
-        'min_registry_plugins',
-        'min_state_modeling_plugins',
-        'min_transport_plugins',
-        'min_ui_plugins',
-        'min_utility_plugins',
-    }
-    if not kwargs:
-        log_func(
-            LoggingLevel.ERROR,
-            'No plugins were given criteria to validate. At least one plugin must be validated',
-        )
-        return False
-
-    for name, value in kwargs.items():
-        if name not in accepted_args:
-            log_func(
-                LoggingLevel.ERROR,
-                f'Unknown argument: {name}\nList of accepted args: {list(accepted_args)}',
-            )
-            return False
-
-        plugin_count = len(getattr(sorted_plugins, name[4:]))
-
-        if name[0] == 'm':
-            if plugin_count < value:
-                log_func(
-                    LoggingLevel.ERROR,
-                    f'Provided argument {name} specifies at least {value} plugins but sorted_plugins has {plugin_count}',
-                )
-                return False
-        else:
-            if not plugin_count == value:
-                log_func(
-                    LoggingLevel.ERROR,
-                    f'Provided argument {name} specifies {value} plugins but sorted_plugins has {plugin_count}',
-                )
-                return False
-    return True
 
 
 def set_up_preprocessors(
