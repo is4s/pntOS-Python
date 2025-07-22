@@ -1,4 +1,10 @@
-    # .coveragerc
-    [run]
-    omit =
-        pntos-api/*
+# .coveragerc
+[run]
+omit =
+    pntos-api/*
+
+    # upstream ROS
+    /opt/ros/*
+
+    # ASPN-ROS
+    */ros_devel/*
