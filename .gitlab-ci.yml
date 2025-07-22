@@ -113,6 +113,18 @@ Python 3.13 Test:
         - echo 3.13 > .python-version
         - docker run --rm -v $(pwd):/work -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE "uv sync -v && pytest --cov --cov-fail-under=75 --cov-report={term,html}  --cov-config=.coveragerc"
 
+ASPN-ROS Test:
+    stage: check
+    tags:
+        - linux-light-runner
+    script:
+        # Switch the Python version to 3.12 (for Jazzy compatibility)
+        - echo 3.12 > .python-version
+        - docker run --rm -dit -v $(pwd):/work --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
+        - docker exec pntos-python uv sync -v
+        - docker exec pntos-python git clone git@git.aspn.us:pntos/firehose-outputs.git
+        - docker exec pntos-python bash -c ". firehose-outputs/ros_devel/jazzy/setup.bash && pytest pntos-cobra/tests/test_aspn_ros.py"
+
 mypy:
     stage: check
     tags:
