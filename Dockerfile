@@ -1,4 +1,4 @@
-FROM ubuntu:24.04
+FROM ros:jazzy-ros-base
 
 # Install container dependencies
 RUN apt update && apt install -y \
