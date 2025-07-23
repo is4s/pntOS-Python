@@ -122,7 +122,7 @@ ASPN-ROS Test:
         - echo 3.12 > .python-version
         - docker run --rm -dit -v $(pwd):/work --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
         - docker exec pntos-python uv sync -v
-        - docker exec pntos-python git clone git@git.aspn.us:pntos/firehose-outputs.git
+        - docker exec pntos-python git clone --depth 1 git@git.aspn.us:pntos/firehose-outputs.git
         - docker exec pntos-python bash -c ". firehose-outputs/ros_devel/jazzy/setup.bash && pytest pntos-cobra/tests/test_aspn_ros.py"
 
 mypy:
@@ -181,6 +181,21 @@ GPS INS Velocity App:
         - docker run --rm -dit -v $(pwd):/work --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
         - docker exec pntos-python uv sync -v
         - docker exec pntos-python postprocessing/run_app_and_record_data.py fusion_gps_vel_ins
+    artifacts:
+        paths:
+            - pntos_output/
+
+GPS INS ROS App:
+    stage: check
+    tags:
+        - linux-light-runner
+    script:
+        # Switch the Python version to 3.12 (for Jazzy compatibility)
+        - echo 3.12 > .python-version
+        - docker run --rm -dit -v $(pwd):/work --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
+        - docker exec pntos-python uv sync -v
+        - docker exec pntos-python git clone --depth 1 git@git.aspn.us:pntos/firehose-outputs.git
+        - docker exec pntos-python bash -c ". firehose-outputs/ros_devel/jazzy/setup.bash && postprocessing/run_app_and_record_data_ros.py"
     artifacts:
         paths:
             - pntos_output/
