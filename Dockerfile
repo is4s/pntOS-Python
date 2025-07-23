@@ -1,22 +1,22 @@
 FROM ubuntu:24.04
 
-# Install dependencies needed to bring in upstream projects via their source
-RUN apt update && apt install git -y
-
-# Install python, and everything it needs to create a virtual environment.
-RUN apt update && apt install python3 python3-venv -y
-
-# Install dependencies needed to run LCM.
-RUN apt update && apt install libglib2.0-dev -y
-
-# Install dependencies needed to install uv.
-RUN apt update && apt install curl -y
+# Install container dependencies
+RUN apt update && apt install -y \
+    # For cloning upstream projects
+    git \
+    # For installing uv
+    curl \
+    # For running cobra
+    python3 \
+    python3-venv \
+    # For running LCM
+    libglib2.0-dev \
+    # Java, for running LCM
+    default-jre-headless \
+    && rm -rf /var/lib/apt/lists/*
 
 # Install uv
 RUN curl -LsSf https://astral.sh/uv/install.sh | UV_UNMANAGED_INSTALL="/usr/local/bin" bash
-
-# Install java (needed to run app)
-RUN apt update && apt install default-jre-headless -y
 
 # Optional TOKEN_URL from CI
 ARG TOKEN_URL
