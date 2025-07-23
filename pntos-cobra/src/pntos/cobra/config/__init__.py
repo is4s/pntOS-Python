@@ -1,6 +1,5 @@
 from .AspnLcmTransportConfig import AspnLcmTransportConfig as AspnLcmTransportConfig
 from .BaseConfig import BaseConfig as BaseConfig
-from .DownsamplerConfig import DownsamplerConfig as DownsamplerConfig
 from .FogmConfig import FogmConfig as FogmConfig
 from .ImuConfig import ImuConfig as ImuConfig
 from .InertialConfig import InertialConfig as InertialConfig
@@ -9,12 +8,16 @@ from .ManualHeadingAlignmentConfig import (
     ManualHeadingAlignmentConfig as ManualHeadingAlignmentConfig,
 )
 from .OrchestrationConfig import OrchestrationConfig as OrchestrationConfig
+from .PreprocessorConfigs import (
+    BarometerToAltitudeConfig as BarometerToAltitudeConfig,
+    DownsamplerConfig as DownsamplerConfig,
+    TimeAdjusterConfig as TimeAdjusterConfig,
+)
 from .SensorConfig import SensorConfig as SensorConfig
 from .StaticAlignmentConfig import (
     AlignmentStrategy as AlignmentStrategy,
     StaticAlignmentConfig as StaticAlignmentConfig,
 )
-from .TimeAdjusterConfig import TimeAdjusterConfig as TimeAdjusterConfig
 from .utils import (
     config_from_registry as config_from_registry,
     config_to_registry as config_to_registry,
