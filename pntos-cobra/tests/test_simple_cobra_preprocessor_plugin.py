@@ -6,6 +6,8 @@ from aspn23 import (
     MeasurementAltitude,
     MeasurementAltitudeErrorModel,
     MeasurementAltitudeReference,
+    MeasurementBarometer,
+    MeasurementBarometerErrorModel,
     MeasurementImu,
     MeasurementImuImuType,
     TypeHeader,
@@ -18,12 +20,14 @@ from pntos.cobra import (
     SimpleRegistryPlugin,
 )
 from pntos.cobra.config import (
+    BarometerToAltitudeConfig,
     BaseConfig,
     DownsamplerConfig,
     InertialConfig,
     TimeAdjusterConfig,
 )
 from pntos.cobra.internal import (
+    BarometerToAltitudePreprocessor,
     SimpleImuRotationPreprocessor,
     SimpleMediator,
     SimpleTimeAdjusterPreprocessor,
@@ -46,11 +50,15 @@ time_adjuster_config = TimeAdjusterConfig(
     channel_to_correct='/sensor/imu',
     expected_dt_nsec=int(0.01 * 1e9),
 )
+baro_to_alt_config = BarometerToAltitudeConfig(
+    group='baro_test', channel='/sensor/barometer'
+)
 
 config_list: list[BaseConfig] = [
     downsampler_config,
     inertial_config,
     time_adjuster_config,
+    baro_to_alt_config,
 ]
 
 ########## Preprocessor Plugin Tests ###############
@@ -79,7 +87,7 @@ def test_plugin_constructor(
     preprocessor_plugin: SimpleCobraPreprocessorPlugin,
 ) -> None:
     assert preprocessor_plugin.identifier == 'preprocessor_plugin'
-    assert len(preprocessor_plugin.preprocessor_identifiers) == 3
+    assert len(preprocessor_plugin.preprocessor_identifiers) == 4
 
 
 def test_invalid_mediator() -> None:
@@ -335,7 +343,7 @@ def time_adjuster_preprocessor(
     return preprocessor
 
 
-def create_message(time: int):
+def create_imu_message(time: int):
     return Message(
         MeasurementImu(
             TypeHeader(0, 1, 2, 3),
@@ -350,13 +358,13 @@ def create_message(time: int):
 
 
 def test_time_adjuster(time_adjuster_preprocessor: Preprocessor) -> None:
-    first_message = create_message(int(1e9))
-    second_message = create_message(int(1.01 * 1e9))
-    bad_message = create_message(int(1.5 * 1e9))
-    low_dt_message = create_message(int(1.025 * 1e9))
-    within_tolerance_above_dt_message = create_message(int(1.040015 * 1e9))
-    within_tolerance_below_dt_message = create_message(int(1.049978 * 1e9))
-    last_message = create_message(int(1.06 * 1e9))
+    first_message = create_imu_message(int(1e9))
+    second_message = create_imu_message(int(1.01 * 1e9))
+    bad_message = create_imu_message(int(1.5 * 1e9))
+    low_dt_message = create_imu_message(int(1.025 * 1e9))
+    within_tolerance_above_dt_message = create_imu_message(int(1.040015 * 1e9))
+    within_tolerance_below_dt_message = create_imu_message(int(1.049978 * 1e9))
+    last_message = create_imu_message(int(1.06 * 1e9))
 
     out_messages = time_adjuster_preprocessor.process_pntos_message(first_message)
     assert out_messages is not None
@@ -416,3 +424,65 @@ def test_time_adjuster(time_adjuster_preprocessor: Preprocessor) -> None:
     out_msg = out_messages[0]
     assert isinstance(out_msg.wrapped_message, MeasurementImu)
     assert out_msg.wrapped_message.time_of_validity.elapsed_nsec == 1.06 * 1e9
+
+
+########### Barometer to Altitude Converter Tests ##############
+
+
+@pytest.fixture
+def baro_message() -> Message:
+    header = TypeHeader(4, 5, 6, 7)
+    time = TypeTimestamp(0)
+    baro = MeasurementBarometer(
+        header,
+        time,
+        90000.0,
+        10,
+        MeasurementBarometerErrorModel.NONE,
+        error_model_params=np.array([]),
+        integrity=[],
+    )
+
+    return Message(baro, '/sensor/barometer')
+
+
+@pytest.fixture
+def baro_to_alt(
+    preprocessor_plugin: SimpleCobraPreprocessorPlugin,
+) -> Preprocessor:
+    idx = preprocessor_plugin.preprocessor_identifiers.index('baro_converter')
+    preprocessor = preprocessor_plugin.new_preprocessor(idx, 'baro_test')
+    assert preprocessor is not None
+    assert isinstance(preprocessor, BarometerToAltitudePreprocessor)
+    return preprocessor
+
+
+def test_bad_config_group(preprocessor_plugin: SimpleCobraPreprocessorPlugin) -> None:
+    idx = preprocessor_plugin.preprocessor_identifiers.index('baro_converter')
+    preprocessor = preprocessor_plugin.new_preprocessor(idx, 'wrong_group')
+    assert preprocessor is None
+
+
+def test_no_config_group(preprocessor_plugin: SimpleCobraPreprocessorPlugin) -> None:
+    idx = preprocessor_plugin.preprocessor_identifiers.index('baro_converter')
+    preprocessor = preprocessor_plugin.new_preprocessor(idx, None)
+    assert preprocessor is None
+
+
+def test_baro_conversion(baro_message: Message, baro_to_alt: Preprocessor) -> None:
+    msg_list = baro_to_alt.process_pntos_message(baro_message)
+    assert msg_list is not None
+    out_msg = msg_list[0]
+    assert isinstance(out_msg.wrapped_message, MeasurementAltitude)
+    assert np.isclose(out_msg.wrapped_message.altitude, 988.50)
+    expected_var = (988.50 / 90000) ** 2 * 10
+    assert np.isclose(out_msg.wrapped_message.variance, expected_var)
+
+
+def test_wrong_aspn_type(baro_to_alt: Preprocessor) -> None:
+    imu_msg = create_imu_message(int(1e9))
+    msg_list = baro_to_alt.process_pntos_message(imu_msg)
+    assert msg_list is not None
+    out_msg = msg_list[0]
+    assert isinstance(out_msg.wrapped_message, MeasurementImu)
+    assert imu_msg == out_msg

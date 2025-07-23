@@ -1,4 +1,12 @@
-from aspn23 import AspnBase, MeasurementImu, TypeTimestamp
+from aspn23 import (
+    AspnBase,
+    MeasurementAltitude,
+    MeasurementAltitudeErrorModel,
+    MeasurementAltitudeReference,
+    MeasurementBarometer,
+    MeasurementImu,
+    TypeTimestamp,
+)
 from numpy import array, float64
 from numpy.typing import NDArray
 
@@ -10,11 +18,64 @@ from pntos.api import (
     PreprocessorPlugin,
 )
 from pntos.cobra.config import (
+    BarometerToAltitudeConfig,
     DownsamplerConfig,
     InertialConfig,
     TimeAdjusterConfig,
     config_from_registry,
 )
+
+
+class BarometerToAltitudePreprocessor(Preprocessor):
+    """
+    A preprocessor that converts barometer measurements to altitude measurements.
+    """
+
+    _deg_k: float
+    _channel: str
+    _mediator: Mediator
+
+    def __init__(self, channel: str, mediator: Mediator):
+        """
+        Cobra Barometer to Altitude Preprocessor
+        """
+        self._deg_k = 288.15
+        self._channel = channel
+        self._mediator = mediator
+
+    def _convert_pressure(self, pressure: float) -> float:
+        return -(self._deg_k / 0.0065) * (
+            pow(pressure / 101325, 8314.32 * 0.0065 / (9.80665 * 28.9644)) - 1
+        )
+
+    def process_pntos_message(self, message) -> list[Message]:
+        if message.source_identifier == self._channel:
+            msg = message.wrapped_message
+            if isinstance(msg, MeasurementBarometer):
+                altitude = self._convert_pressure(msg.pressure)
+                sf = altitude / msg.pressure
+                altitude_variance = msg.variance * (sf**2)
+                return [
+                    Message(
+                        MeasurementAltitude(
+                            msg.header,
+                            msg.time_of_validity,
+                            MeasurementAltitudeReference.MSL,
+                            altitude,
+                            altitude_variance,
+                            MeasurementAltitudeErrorModel.NONE,
+                            msg.error_model_params,
+                            msg.integrity,
+                        ),
+                        message.source_identifier,
+                    )
+                ]
+            else:
+                self._mediator.log_message(
+                    LoggingLevel.WARN,
+                    f'BarometerToAltitudePreprocessor expected barometer message, but got {type(message.wrapped_message)}. Cannot convert.',
+                )
+        return [message]
 
 
 class SimplePreprocessorDownsampler(Preprocessor):
@@ -199,7 +260,12 @@ class SimpleCobraPreprocessorPlugin(PreprocessorPlugin):
                 this plugin's :attr:`pntos.api.CommonPlugin.identifier` field.
         """
         self.identifier = identifier
-        self.preprocessor_identifiers = ['downsampler', 'imu_rotator', 'time_adjuster']
+        self.preprocessor_identifiers = [
+            'downsampler',
+            'imu_rotator',
+            'time_adjuster',
+            'baro_converter',
+        ]
 
     def init_plugin(
         self,
@@ -246,10 +312,10 @@ class SimpleCobraPreprocessorPlugin(PreprocessorPlugin):
                     )
                     return None
 
-                config = config_from_registry(
+                inert_config = config_from_registry(
                     InertialConfig, self.mediator, config_group
                 )
-                if config is None:
+                if inert_config is None:
                     self.mediator.log_message(
                         LoggingLevel.ERROR,
                         f'Failed to populate InertialConfig for preprocessor {self.preprocessor_identifiers[preprocessor_index]}.',
@@ -257,7 +323,9 @@ class SimpleCobraPreprocessorPlugin(PreprocessorPlugin):
                     return None
 
                 return SimpleImuRotationPreprocessor(
-                    self.mediator, config.channel, array(config.C_imu_to_platform)
+                    self.mediator,
+                    inert_config.channel,
+                    array(inert_config.C_imu_to_platform),
                 )
 
             case 2:
@@ -270,6 +338,27 @@ class SimpleCobraPreprocessorPlugin(PreprocessorPlugin):
                     return None
 
                 return SimpleTimeAdjusterPreprocessor(config_group, self.mediator)
+
+            case 3:
+                if config_group is None:
+                    preproc_id = self.preprocessor_identifiers[preprocessor_index]
+                    self.mediator.log_message(
+                        LoggingLevel.ERROR,
+                        f'config_group is a required parameter for preprocessor "{preproc_id}" and cannot be None.',
+                    )
+                    return None
+                bta_config = config_from_registry(
+                    BarometerToAltitudeConfig, self.mediator, config_group
+                )
+                if bta_config is None:
+                    self.mediator.log_message(
+                        LoggingLevel.ERROR,
+                        f'Failed to populate BarometerToAltitudeConfig for preprocessor {self.preprocessor_identifiers[preprocessor_index]}.',
+                    )
+                    return None
+                return BarometerToAltitudePreprocessor(
+                    bta_config.channel, self.mediator
+                )
 
             case _:
                 self.mediator.log_message(

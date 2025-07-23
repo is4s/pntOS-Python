@@ -3,6 +3,7 @@ from .simple_controller.SimpleMessageStreamConfig import (
     SimpleMessageStreamConfig as SimpleMessageStreamConfig,
 )
 from .SimpleCobraPreprocessorPlugin import (
+    BarometerToAltitudePreprocessor as BarometerToAltitudePreprocessor,
     SimpleImuRotationPreprocessor as SimpleImuRotationPreprocessor,
     SimplePreprocessorDownsampler as SimplePreprocessorDownsampler,
     SimpleTimeAdjusterPreprocessor as SimpleTimeAdjusterPreprocessor,
