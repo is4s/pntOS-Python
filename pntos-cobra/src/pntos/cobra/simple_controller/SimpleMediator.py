@@ -38,6 +38,7 @@ class SimpleMediator(Mediator):
     registry: Registry
     _messages: list[Message] = []
     _buffer_time_nsec: int = 2_000_000_000
+    _last_solution_time: TypeTimestamp | None
     _log_levels: dict[LoggingLevel, str] = {
         LoggingLevel.DEBUG: 'DEBUG: ',
         LoggingLevel.ERROR: 'ERROR: ',
@@ -61,6 +62,7 @@ class SimpleMediator(Mediator):
         """
         self._attached_plugin_type: PluginType = attached_plugin_type
         self._attached_plugin_identifier: str = attached_plugin_identifier
+        self._last_solution_time = None
 
     def get_filter_description_list(self) -> list[str]:
         assert (
@@ -89,9 +91,10 @@ class SimpleMediator(Mediator):
         else:
             self._orchestration_plugin.process_pntos_message(message, False)
 
+        cur_time = message.wrapped_message.time_of_validity  # type: ignore[attr-defined]
+
         process_until_time = (
-            message.wrapped_message.time_of_validity.elapsed_nsec  # type: ignore[attr-defined]
-            - self._buffer_time_nsec
+            cur_time.elapsed_nsec - self._buffer_time_nsec  # type: ignore[operator]
         )
         process_until_index = bisect.bisect_left(
             self._messages, process_until_time, key=_get_time
@@ -99,6 +102,33 @@ class SimpleMediator(Mediator):
         for m in self._messages[:process_until_index]:
             self._orchestration_plugin.process_pntos_message(m, True)
         self._messages = self._messages[process_until_index:]
+
+        # Need to make sure the orchestration has received some messages before we
+        # start requesting solutions.
+        if self._last_solution_time is None:
+            self._last_solution_time = cur_time
+            return
+
+        # Print the current solution every second in message time
+        if (
+            cur_time.elapsed_nsec - self._last_solution_time.elapsed_nsec
+            > 1_000_000_000
+        ):
+            solution = self.request_solutions([cur_time])
+            if solution is not None:
+                self.log_message(LoggingLevel.DEBUG, f'Got a solution! {solution}')
+                for transport in self._transport_plugins:
+                    self.broadcast_aspn_message(
+                        solution[0],
+                        transport=transport.identifier,
+                        destination_identifier='/solution/cobra/pva',
+                    )
+            else:
+                self.log_message(
+                    LoggingLevel.WARN,
+                    'Could not receive solution from orchestration.',
+                )
+            self._last_solution_time = cur_time
 
     def broadcast_aspn_message(
         self,

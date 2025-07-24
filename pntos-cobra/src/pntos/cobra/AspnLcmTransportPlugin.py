@@ -1,7 +1,6 @@
 import threading
 from threading import Thread
 
-from aspn23 import TypeTimestamp
 from lcm import LCM, LCMSubscription
 
 from pntos.api import LoggingLevel, Mediator, Message, TransportPlugin
@@ -28,8 +27,6 @@ class AspnLcmTransportPlugin(TransportPlugin):
     lcm: LCM
     mediator: Mediator
     subscription: LCMSubscription
-    last_solution_time: TypeTimestamp | None
-    last_message_time: TypeTimestamp | None
     handler: Thread | None
     _shutdown_threads: threading.Event
     _channels: list[str]
@@ -43,9 +40,7 @@ class AspnLcmTransportPlugin(TransportPlugin):
                 :meth:`pntos.api.CommonPlugin.identifier` field.
         """
         self.identifier = identifier
-        self.last_solution_time = None
         self._shutdown_threads = threading.Event()
-        self.last_message_time = None
         self.handler = None
         self._channels = []
 
@@ -122,47 +117,14 @@ class AspnLcmTransportPlugin(TransportPlugin):
                 f'Found new channel {channel}\t with a timestamp of {aspn_msg.time_of_validity.elapsed_nsec / 1e9}s',
             )
             self._channels.append(channel)
-        self.last_message_time = aspn_msg.time_of_validity
         message = Message(aspn_msg, channel)
         self.mediator.process_pntos_message(message)
 
     def _handler_thread(self) -> None:
-        """Call LCM.handle in a loop, and request a solution approx. every second."""
+        """Call LCM.handle in a loop."""
         while not self._shutdown_threads.is_set():
             # Handle any messages that have come - restart every hundredth of a second
             self.lcm.handle_timeout(10)
-
-            # Need to make sure the orchestration has received some messages before we
-            # start requesting solutions.
-            if self.last_message_time is None:
-                continue
-
-            if self.last_solution_time is None:
-                self.last_solution_time = self.last_message_time
-                continue
-
-            # Print the current solution every second in message time
-            if (
-                self.last_message_time.elapsed_nsec
-                - self.last_solution_time.elapsed_nsec
-                > 1_000_000_000
-            ):
-                solution = self.mediator.request_solutions([self.last_message_time])
-                if solution is not None:
-                    self.mediator.log_message(
-                        LoggingLevel.DEBUG, f'Got a solution! {solution}'
-                    )
-                    self.mediator.broadcast_aspn_message(
-                        solution[0],
-                        transport=self.identifier,
-                        destination_identifier='/solution/cobra/pva',
-                    )
-                else:
-                    self.mediator.log_message(
-                        LoggingLevel.WARN,
-                        'Could not receive solution from orchestration.',
-                    )
-                self.last_solution_time = self.last_message_time
 
     def start_listening(self) -> None:
         self.lcm = LCM(LCM_URL)

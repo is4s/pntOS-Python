@@ -514,18 +514,6 @@ is similar to the approach we've described above, namely:
   [passes messages received from the transport plugin into the orchestration plugin's process_pntos_message](https://git.aspn.us/pntos/pntos-python/-/blob/main/pntos-cobra/src/pntos/cobra/simple_controller/SimpleMediator.py#L91),
   which is our Step 2 above.
 
-One notable difference in {py:obj}`SimpleControllerPlugin<pntos.cobra.SimpleControllerPlugin>` compared to the approach
-we discussed in this tour is in Step 3. Earlier, we envisioned that the controller might decide to call the
-{py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>`'s {py:obj}`request_solutions()<pntos.api.OrchestrationPlugin.request_solutions()>`,
-however the {py:obj}`SimpleControllerPlugin<pntos.cobra.SimpleControllerPlugin>` does not do so. The
-{py:obj}`SimpleControllerPlugin<pntos.cobra.SimpleControllerPlugin>` forwards sensor data to the
-{py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` but does not force the
-{py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` to produce a solution. Instead, it allows other plugins to
-request a solution from the {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>`. For an example of where
-another plugin requests a solution and sends it out onto the network bus as Python pntOS's solution, see
-[the AspnLcmTransportPlugin](https://git.aspn.us/pntos/pntos-python/-/blob/main/pntos-cobra/src/pntos/cobra/AspnLcmTransportPlugin.py?ref_type=heads#L135).
-
-<!-- TODO: Fix the fact that step3 in our example doesn't actually do what our walkthrough expects -->
 <!-- TODO: Break out TutorialXPlugin plugins, and dont use the Simple plugins here, which don't track what we're trying to do -->
 ```{note}
 
