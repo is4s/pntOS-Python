@@ -54,7 +54,7 @@ their operating system's package manager.
 
 ```{note}
 While Cobra has been tested and is known to work on many different operating systems, currently only Ubuntu 22.04
-and 24.04 is officially supported. We anticipate adding support for many more operating systems before our 1.0 release.
+and 24.04 are officially supported. We anticipate adding support for many more operating systems before our 1.0 release.
 ```
 
 You are now ready to set up your Python environment in the next section.
