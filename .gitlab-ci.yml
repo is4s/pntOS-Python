@@ -76,7 +76,7 @@ app and orchestration synchronization:
         - docker run --rm -dit -v $(pwd):/work --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
         - docker exec pntos-python uv sync -v
         # Run sync check script
-        - util/check_app_and_orch_sync.sh
+        - util/check_sync.sh
 
 requirements up-to-date:
     stage: check
