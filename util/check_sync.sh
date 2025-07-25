@@ -30,10 +30,20 @@ if [ -s $DIFF_FILE ]; then
     git commit -m "trash commit"
 fi
 
+check_diff() {
+    # Check diff
+    git diff --exit-code --diff-filter=M
+    if [ $? -ne 0 ]; then
+        echo "Patch $1 did not account for all differences!"
+        ret_val=1
+    fi
+    # Reset test environment
+    git restore .
+}
+
 ### Synchronization Check
 check_sync() {
     local patch_file=$1
-    local file_to_restore=$2
     # Test patch
     echo "Testing $patch_file"
     git apply "$patch_file"
@@ -41,27 +51,23 @@ check_sync() {
         echo "Patch $patch_file could not be applied cleanly. Please update the patch!"
         ret_val=1
     fi
-    # Restore deleted file
-    git restore "$file_to_restore"
-    # Check diff
-    git diff --exit-code
+
+    check_diff $patch_file
+
+    # Test patch in reverse
+    git apply --reverse "$patch_file"
     if [ $? -ne 0 ]; then
-        echo "Patch $patch_file did not account for all differences!"
+        echo "Patch $patch_file could not be applied cleanly in reverse. Please update the patch!"
         ret_val=1
     fi
-    # Reset test environment
-    git restore .
+
+    check_diff $patch_file
 }
 
-orch_path="pntos-cobra/src/pntos/cobra/orchestration_plugins/"
 # Apply orchestration add velocity patch
-check_sync $orig_dir"/util/orch_add_vel.patch" $orch_path"SimpleGpsOrchestrationPlugin.py"
-# Apply orchestration remove velocity patch
-check_sync $orig_dir"/util/orch_remove_vel.patch" $orch_path"SimpleGpsVelOrchestrationPlugin.py"
+check_sync $orig_dir"/util/orch_gps_vel.patch"
 # Apply app add velocity patch
-check_sync $orig_dir"/util/app_add_vel.patch" "apps/fusion_gps_ins.py"
-# Apply app remove velocity patch
-check_sync $orig_dir"/util/app_remove_vel.patch" "apps/fusion_gps_vel_ins.py"
+check_sync $orig_dir"/util/app_gps_vel.patch"
 
 # Cleanup and return
 popd > /dev/null
