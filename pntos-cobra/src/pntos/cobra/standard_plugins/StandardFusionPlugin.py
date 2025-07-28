@@ -7,7 +7,6 @@ import numpy as np
 from aspn23 import TypeTimestamp
 from numpy import float64
 from numpy.typing import NDArray
-
 from pntos.api import (
     CrossCovariances,
     EstimateWithCovariance,

@@ -1,6 +1,5 @@
 from navtk.inertial import AlignBase, ManualHeadingAlignment, StaticAlignment
 from navtk.utils import to_positionvelocityattitude
-
 from pntos.api import (
     InertialInitializationStrategy,
     InitialInertialSolution,

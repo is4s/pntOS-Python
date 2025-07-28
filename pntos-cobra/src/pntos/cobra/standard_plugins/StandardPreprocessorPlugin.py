@@ -9,7 +9,6 @@ from aspn23 import (
 )
 from numpy import array, float64
 from numpy.typing import NDArray
-
 from pntos.api import (
     LoggingLevel,
     Mediator,

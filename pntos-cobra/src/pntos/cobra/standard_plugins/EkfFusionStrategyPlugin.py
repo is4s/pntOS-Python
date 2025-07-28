@@ -1,6 +1,5 @@
 import numpy as np
 from numpy.typing import NDArray
-
 from pntos.api import (
     FusionStrategyPlugin,
     FusionStrategyType,

@@ -5,7 +5,6 @@ from aspn23 import (
     TypeTimestamp,
 )
 from navtk.inertial import BufferedImu, ImuErrors
-
 from pntos.api import (
     InertialForcesRates,
     InertialFrame,
