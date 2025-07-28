@@ -223,17 +223,17 @@ class SimpleEkfFusionStrategy(StandardFusionStrategy):
         self._P = (np.eye(self._P.shape[0]) - K @ measurement_model.H) @ self._P
 
 
-class SimpleEkfFusionStrategyPlugin(FusionStrategyPlugin):
+class EkfFusionStrategyPlugin(FusionStrategyPlugin):
     """
-    This is a simple fusion strategy plugin. It functions as a factory that produces fusion strategies,
-    although it currently only supports the EKF fusion strategy.
+    This is an EKF fusion strategy plugin. It functions as a factory that produces EKF fusion
+    strategies.
     """
 
     _mediator: Mediator
 
     def __init__(self, identifier: str):
         """
-        A Simple Extended Kalman Filter Fusion Strategy Plugin
+        An Extended Kalman Filter Fusion Strategy Plugin
 
         Args:
             identifier (str): The plugin identifier passed to the

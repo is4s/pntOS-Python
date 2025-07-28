@@ -34,7 +34,7 @@ from pntos.api import (
 )
 from pntos.api.plugins.registry import RegistryPlugin
 from pntos.cobra import (
-    SimpleEkfFusionStrategyPlugin,
+    EkfFusionStrategyPlugin,
     SimpleFusionPlugin,
     SimpleGpsInsStateModelingPlugin,
     SimpleGpsOrchestrationPlugin,
@@ -162,8 +162,8 @@ class Test_Orchestration(unittest.TestCase):
         self.fusion_plugin: FusionPlugin = SimpleFusionPlugin(
             'Cobra Simple Fusion Plugin'
         )
-        self.fusion_strategy_plugin: FusionStrategyPlugin = (
-            SimpleEkfFusionStrategyPlugin('Cobra Simple Fusion Strategy Plugin')
+        self.fusion_strategy_plugin: FusionStrategyPlugin = EkfFusionStrategyPlugin(
+            'Cobra Simple Fusion Strategy Plugin'
         )
         self.state_modeling_plugin: StateModelingPlugin = (
             SimpleGpsInsStateModelingPlugin('Cobra Simple State Modeling Plugin')

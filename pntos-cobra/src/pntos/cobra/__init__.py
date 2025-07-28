@@ -4,6 +4,9 @@ from .DiagnosticLogPlugin import (
 from .dummy_plugins.DummyTransportPlugin import (
     DummyTransportPlugin as DummyTransportPlugin,
 )
+from .EkfFusionStrategyPlugin import (
+    EkfFusionStrategyPlugin as EkfFusionStrategyPlugin,
+)
 from .LcmTransportPlugin import (
     LcmTransportPlugin as LcmTransportPlugin,
 )
@@ -15,9 +18,6 @@ from .orchestration_plugins.SimpleGpsVelOrchestrationPlugin import (
 )
 from .simple_controller.SimpleControllerPlugin import (
     SimpleControllerPlugin as SimpleControllerPlugin,
-)
-from .SimpleEkfFusionStrategyPlugin import (
-    SimpleEkfFusionStrategyPlugin as SimpleEkfFusionStrategyPlugin,
 )
 from .SimpleFusionPlugin import SimpleFusionPlugin as SimpleFusionPlugin
 from .SimpleInertialPlugin import SimpleInertialPlugin as SimpleInertialPlugin

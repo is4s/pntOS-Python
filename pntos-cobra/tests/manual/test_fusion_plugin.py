@@ -21,7 +21,7 @@ from pntos.api import (
     StandardStateBlock,
 )
 from pntos.cobra import (
-    SimpleEkfFusionStrategyPlugin,
+    EkfFusionStrategyPlugin,
     SimpleFusionPlugin,
 )
 from pntos.cobra.internal import SimpleMediator, SimpleRegistry
@@ -126,9 +126,7 @@ def test_manual():
     fusion_plugin = SimpleFusionPlugin(identifier='test_fusion_plugin')
     fusion_plugin.init_plugin('test', mediator=mediator)
     fusion_engine = fusion_plugin.new_fusion_engine(StandardFusionEngine)
-    fusion_strategy_plugin = SimpleEkfFusionStrategyPlugin(
-        identifier='test_strategy_plugin'
-    )
+    fusion_strategy_plugin = EkfFusionStrategyPlugin(identifier='test_strategy_plugin')
     fusion_strategy_plugin.init_plugin('test_strategy', mediator=mediator)
     fusion_strategy = fusion_strategy_plugin.new_fusion_strategy(StandardFusionStrategy)
 

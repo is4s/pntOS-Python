@@ -3,7 +3,7 @@ index f7feac3..9e88c8f 100755
 --- a/apps/fusion_gps_ins.py
 +++ b/apps/fusion_gps_vel_ins.py
 @@ -11,7 +11,7 @@ from pntos.cobra import (
-     SimpleEkfFusionStrategyPlugin,
+     SimpleControllerPlugin,
      SimpleFusionPlugin,
      SimpleGpsInsStateModelingPlugin,
 -    SimpleGpsOrchestrationPlugin,

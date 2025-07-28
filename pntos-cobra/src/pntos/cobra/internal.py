@@ -1,9 +1,9 @@
+from .EkfFusionStrategyPlugin import (
+    SimpleEkfFusionStrategy as SimpleEkfFusionStrategy,
+)
 from .simple_controller.SimpleMediator import SimpleMediator as SimpleMediator
 from .simple_controller.SimpleMessageStreamConfig import (
     SimpleMessageStreamConfig as SimpleMessageStreamConfig,
-)
-from .SimpleEkfFusionStrategyPlugin import (
-    SimpleEkfFusionStrategy as SimpleEkfFusionStrategy,
 )
 from .SimpleFusionPlugin import SimpleFusionEngine as SimpleFusionEngine
 from .SimpleInertialPlugin import SimpleInertial as SimpleInertial

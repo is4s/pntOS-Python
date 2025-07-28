@@ -9,7 +9,7 @@ Changes to the `fusion_gps_ins.py` script will actually be fairly minimal. Curre
 Begin by updating the import to bring in the new Orchestration plugin:
 
 ```diff
-     SimpleEkfFusionStrategyPlugin,
+     EkfFusionStrategyPlugin,
      SimpleFusionPlugin,
      SimpleGpsInsStateModelingPlugin,
 -    SimpleGpsOrchestrationPlugin,

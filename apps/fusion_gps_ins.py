@@ -5,9 +5,9 @@ from pntos.api import LoggingLevel
 
 # Import Cobra plugins and config structs
 from pntos.cobra import (
+    EkfFusionStrategyPlugin,
     LcmTransportPlugin,
     SimpleControllerPlugin,
-    SimpleEkfFusionStrategyPlugin,
     SimpleFusionPlugin,
     SimpleGpsInsStateModelingPlugin,
     SimpleGpsOrchestrationPlugin,
@@ -98,7 +98,7 @@ my_config = [
 controller = SimpleControllerPlugin('Cobra Simple Controller Plugin')
 plugins = [
     LcmTransportPlugin('Cobra LCM Transport Plugin'),
-    SimpleEkfFusionStrategyPlugin('Cobra Simple Fusion Strategy Plugin'),
+    EkfFusionStrategyPlugin('Cobra EKF Fusion Strategy Plugin'),
     SimpleFusionPlugin('Cobra Simple Fusion Plugin'),
     SimpleGpsInsStateModelingPlugin('Cobra Simple State Modeling Plugin'),
     SimpleInertialPlugin('Cobra Simple Inertial Plugin'),
