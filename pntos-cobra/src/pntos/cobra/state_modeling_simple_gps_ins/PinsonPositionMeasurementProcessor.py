@@ -138,7 +138,7 @@ class PinsonPositionMeasurementProcessor(StandardMeasurementProcessor):
         if pos.reference_frame is not MeasurementPositionReferenceFrame.GEODETIC:
             self._mediator.log_message(
                 LoggingLevel.ERROR,
-                f'PinsonPositionMeasurementProcessor expected MeasurementPosition with a reference from of GEODETIC, but got measurement at time {time.elapsed_nsec / 1e9}s with a reference frame of {pos.reference_frame}. Cannot process message.',
+                f'PinsonPositionMeasurementProcessor expected MeasurementPosition with a reference frame of f{MeasurementPositionReferenceFrame.GEODETIC}, but got measurement at time {time.elapsed_nsec / 1e9}s with a reference frame of {pos.reference_frame}. Cannot process message.',
             )
             return None
 
