@@ -21,7 +21,9 @@ LCM_URL = 'tcpq://localhost:7700'
 
 
 class LcmTransportPlugin(TransportPlugin):
-    """An example LCM Transport Plugin for ASPN23 implemented in Python"""
+    """A transport plugin which listens for LCM messages.
+
+    Capable of marshalling both ASPN2-LCM and ASPN23-LCM to ASPN23-Python."""
 
     identifier: str
     lcm: LCM
