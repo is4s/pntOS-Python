@@ -1,3 +1,6 @@
+from .DiagnosticLogPlugin import (
+    DiagnosticLogPlugin as DiagnosticLogPlugin,
+)
 from .dummy_plugins.DummyTransportPlugin import (
     DummyTransportPlugin as DummyTransportPlugin,
 )
@@ -12,9 +15,6 @@ from .orchestration_plugins.SimpleGpsVelOrchestrationPlugin import (
 )
 from .simple_controller.SimpleControllerPlugin import (
     SimpleControllerPlugin as SimpleControllerPlugin,
-)
-from .SimpleDiagnosticLogPlugin import (
-    SimpleDiagnosticLogPlugin as SimpleDiagnosticLogPlugin,
 )
 from .SimpleEkfFusionStrategyPlugin import (
     SimpleEkfFusionStrategyPlugin as SimpleEkfFusionStrategyPlugin,

@@ -13,9 +13,9 @@ GROUP_TO_WATCH = 'diagnostics'
 OUTPUT_FILE = './OUTPUT.hdf5'
 
 
-class SimpleDiagnosticLogPlugin(UtilityPlugin):
+class DiagnosticLogPlugin(UtilityPlugin):
     """
-    Simple plugin to save any values put into the ``diagnostics`` group in the
+    A plugin to save any values put into the ``diagnostics`` group in the
     registry to an output HDF5 file (``OUTPUT_FILE``).
 
     If any other plugin wants to store values to the output, all the plugin has to
@@ -30,7 +30,7 @@ class SimpleDiagnosticLogPlugin(UtilityPlugin):
 
     def __init__(self, identifier: str, output_file: str = './OUTPUT.hdf5') -> None:
         """
-        Simple Diagnostic-Logging Utility Plugin
+        Diagnostic-Logging Utility Plugin
 
         Args:
             identifier (str): The plugin identifier passed to the
@@ -45,7 +45,7 @@ class SimpleDiagnosticLogPlugin(UtilityPlugin):
         mediator: Mediator | None = None,
     ) -> None:
         if mediator is None:
-            print('ERROR: SimpleDiagnosticLogPlugin requires a mediator.')
+            print('ERROR: DiagnosticLogPlugin requires a mediator.')
             return
         self.mediator: Mediator = mediator
 

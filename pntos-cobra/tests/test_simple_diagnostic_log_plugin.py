@@ -16,7 +16,7 @@ from pntos.api import (
     UtilityPlugin,
 )
 from pntos.cobra import (
-    SimpleDiagnosticLogPlugin,
+    DiagnosticLogPlugin,
     SimpleLoggingPlugin,
     SimpleRegistryPlugin,
 )
@@ -75,10 +75,8 @@ def compare_messages(m1: object, m2: object, depth: int = 0) -> bool:
         return m1 == m2
 
 
-def test_simple_diagnostic_log_plugin() -> None:
-    plugin = SimpleDiagnosticLogPlugin(
-        'Simple Diagnostic Log Plugin', output_file=TEST_FILE
-    )
+def test_diagnostic_log_plugin() -> None:
+    plugin = DiagnosticLogPlugin('Diagnostic Log Plugin', output_file=TEST_FILE)
     mediator = SimpleMediator(plugin.identifier, UtilityPlugin)
 
     registry_plugin = SimpleRegistryPlugin('Registry Plugin')
