@@ -4,13 +4,9 @@ import numpy as np
 import pytest
 from aspn23 import TypeTimestamp
 from aspn23_lcm import measurement_position_velocity_attitude
-from lcm import LCM
 from pntos.api import LoggingLevel, Mediator, Message, Registry
-from pntos.cobra import LcmTransportPlugin, StandardRegistryPlugin
+from pntos.cobra import LcmTransportPlugin
 from pntos.cobra.internal import SimpleMediator, StandardRegistry
-from pntos.cobra.LcmTransportPlugin import LCM_URL
-
-LCM_URL = ''
 
 
 def dummy_log(level: LoggingLevel, message: str) -> None:
