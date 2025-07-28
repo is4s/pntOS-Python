@@ -11,9 +11,9 @@ set -xe
 ruff check --fix
 ruff format
 pytest --cov --cov-fail-under=75 --cov-report={term,html} --cov-config=.coveragerc
-mypy pntos-api
-mypy pntos-cobra
-mypy apps
+mypy pntos-api --no-implicit-reexport
+mypy pntos-cobra --no-implicit-reexport
+mypy apps --no-implicit-reexport
 source util/check_sync.sh
 ret_val=$?
 
