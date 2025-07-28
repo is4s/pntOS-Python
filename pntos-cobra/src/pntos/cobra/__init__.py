@@ -19,12 +19,12 @@ from .orchestration_plugins.SimpleGpsVelOrchestrationPlugin import (
 from .simple_controller.SimpleControllerPlugin import (
     SimpleControllerPlugin as SimpleControllerPlugin,
 )
-from .SimpleInertialPlugin import SimpleInertialPlugin as SimpleInertialPlugin
 from .SimpleLoggingPlugin import SimpleLoggingPlugin as SimpleLoggingPlugin
 from .SimpleRegistryPlugin import (
     SimpleRegistryPlugin as SimpleRegistryPlugin,
 )
 from .StandardFusionPlugin import StandardFusionPlugin as StandardFusionPlugin
+from .StandardInertialPlugin import StandardInertialPlugin as StandardInertialPlugin
 from .StandardPreprocessorPlugin import (
     StandardPreprocessorPlugin as StandardPreprocessorPlugin,
 )

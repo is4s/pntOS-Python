@@ -188,16 +188,16 @@ class SimpleInertial(StandardInertialMechanization):
         )
 
 
-class SimpleInertialPlugin(InertialPlugin):
+class StandardInertialPlugin(InertialPlugin):
     """
-    A simple inertial plugin that generates instances of the :class:`SimpleInertial` class.
+    An inertial plugin that generates instances of the :class:`SimpleInertial` class.
     """
 
     mediator: Mediator | None
 
     def __init__(self, identifier: str):
         """
-        A Simple Inertial Plugin
+        An Inertial Plugin
 
         Args:
             identifier (str): The plugin identifier passed to the
@@ -231,7 +231,7 @@ class SimpleInertialPlugin(InertialPlugin):
         if self.mediator is None:
             print(
                 'Error: mediator is None. '
-                + 'SimpleInertialPlugin.init_plugin '
+                + 'StandardInertialPlugin.init_plugin '
                 + 'must be called and passed a valid mediator '
                 + 'before new_preprocessor.'
             )

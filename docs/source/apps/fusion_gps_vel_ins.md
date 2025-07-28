@@ -14,7 +14,7 @@ Begin by updating the import to bring in the new Orchestration plugin:
      SimpleGpsInsStateModelingPlugin,
 -    SimpleGpsOrchestrationPlugin,
 +    SimpleGpsVelOrchestrationPlugin,
-     SimpleInertialPlugin,
+     StandardInertialPlugin,
      TutorialInitializationPlugin,
      SimpleLoggingPlugin,
 ```

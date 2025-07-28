@@ -5,12 +5,12 @@ from .simple_controller.SimpleMediator import SimpleMediator as SimpleMediator
 from .simple_controller.SimpleMessageStreamConfig import (
     SimpleMessageStreamConfig as SimpleMessageStreamConfig,
 )
-from .SimpleInertialPlugin import SimpleInertial as SimpleInertial
 from .SimpleRegistryPlugin import (
     SimpleKeyValueStore as SimpleKeyValueStore,
     SimpleRegistry as SimpleRegistry,
 )
 from .StandardFusionPlugin import SimpleFusionEngine as SimpleFusionEngine
+from .StandardInertialPlugin import SimpleInertial as SimpleInertial
 from .StandardPreprocessorPlugin import (
     BarometerToAltitudePreprocessor as BarometerToAltitudePreprocessor,
     ImuRotationPreprocessor as ImuRotationPreprocessor,
