@@ -13,16 +13,16 @@ from pntos.api import (
 from pntos.cobra.utils import is_symmetric, validate_array
 
 
-class SimpleEkfFusionStrategy(StandardFusionStrategy):
+class EkfFusionStrategy(StandardFusionStrategy):
     """
-    This is a simple Extended Kalman Filter (EKF) sensor fusion strategy.
+    This is an Extended Kalman Filter (EKF) sensor fusion strategy.
 
     It is capable of Bayesian inference on a linearized discrete-time system with Gaussian noise inputs.
     """
 
     def __init__(self, mediator: Mediator) -> None:
         """
-        Simple Extended Kalman Filter Fusion Strategy
+        An Extended Kalman Filter Fusion Strategy
 
         Args:
             mediator (Mediator): A :class:`pntos.api.Mediator` instance.
@@ -259,7 +259,7 @@ class EkfFusionStrategyPlugin(FusionStrategyPlugin):
         self, fusion_type: type[FusionStrategyType]
     ) -> FusionStrategyType | None:
         if self.is_fusion_type_supported(fusion_type):
-            return SimpleEkfFusionStrategy(self._mediator)
+            return EkfFusionStrategy(self._mediator)
         else:
             self._mediator.log_message(
                 LoggingLevel.ERROR,

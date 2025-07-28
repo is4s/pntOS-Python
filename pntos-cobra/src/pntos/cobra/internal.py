@@ -1,5 +1,5 @@
 from .EkfFusionStrategyPlugin import (
-    SimpleEkfFusionStrategy as SimpleEkfFusionStrategy,
+    EkfFusionStrategy as EkfFusionStrategy,
 )
 from .simple_controller.SimpleMediator import SimpleMediator as SimpleMediator
 from .simple_controller.SimpleMessageStreamConfig import (
