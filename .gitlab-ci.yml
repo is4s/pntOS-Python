@@ -97,7 +97,9 @@ Python 3.10 Test:
     tags:
         - linux-light-runner
     script:
-        - docker run --rm -v $(pwd):/work -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE "uv sync -v && pytest --cov --cov-fail-under=75 --cov-report={term,html}  --cov-config=.coveragerc"
+        - docker run --rm -dit -v $(pwd):/work --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
+        - docker exec pntos-python uv sync -v
+        - docker exec pntos-python pytest --cov --cov-fail-under=75 --cov-report={term,html}  --cov-config=.coveragerc
     coverage:
         '/TOTAL.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
     artifacts:
@@ -109,7 +111,9 @@ Python 3.13 Test:
     tags:
         - linux-light-runner
     script:
-        - docker run --rm -v $(pwd):/work -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE "uv sync -v --python 3.13 && pytest --cov --cov-fail-under=75 --cov-report={term,html}  --cov-config=.coveragerc"
+        - docker run --rm -dit -v $(pwd):/work --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
+        - docker exec pntos-python uv sync -v --python 3.13
+        - docker exec pntos-python pytest --cov --cov-fail-under=75 --cov-report={term,html}  --cov-config=.coveragerc
 
 ASPN-ROS Test:
     stage: check
