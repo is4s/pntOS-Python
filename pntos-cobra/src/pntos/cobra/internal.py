@@ -10,7 +10,7 @@ from .SimpleRegistryPlugin import (
     SimpleRegistry as SimpleRegistry,
 )
 from .StandardFusionPlugin import SimpleFusionEngine as SimpleFusionEngine
-from .StandardInertialPlugin import SimpleInertial as SimpleInertial
+from .StandardInertialPlugin import StandardInertial as StandardInertial
 from .StandardPreprocessorPlugin import (
     BarometerToAltitudePreprocessor as BarometerToAltitudePreprocessor,
     ImuRotationPreprocessor as ImuRotationPreprocessor,
