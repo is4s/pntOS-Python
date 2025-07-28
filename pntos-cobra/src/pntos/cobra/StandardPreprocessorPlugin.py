@@ -248,6 +248,8 @@ class StandardPreprocessorPlugin(PreprocessorPlugin):
 
     1. PreprocessorDownsampler - Downsamples messages on a given list of channels.
     2. ImuRotationPreprocessor - Rotated IMU measurements from IMU to platform frame.
+    3. TimeAdjusterPreprocessor - Synthesizes timestamps to compensate for erroneous hardware.
+    4. BarometerToAltitudePreprocessor - Converts pressure measurements to altitude measurements.
     """
 
     mediator: Mediator | None
