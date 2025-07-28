@@ -33,4 +33,6 @@ from .state_modeling_simple_gps_ins.PinsonWithNedFogmPositionMeasurementProcesso
     PinsonWithNedFogmPositionMeasurementProcessor as PinsonWithNedFogmPositionMeasurementProcessor,
 )
 from .StaticAlignInitializationPlugin import StaticAlign as StaticAlign
-from .TutorialInitializationPlugin import ManualInitialization as ManualInitialization
+from .tutorial_plugins.TutorialInitializationPlugin import (
+    ManualInitialization as ManualInitialization,
+)

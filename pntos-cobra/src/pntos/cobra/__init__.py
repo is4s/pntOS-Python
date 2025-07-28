@@ -34,6 +34,6 @@ from .state_modeling_simple_gps_ins.SimpleGpsInsStateModelingPlugin import (
 from .StaticAlignInitializationPlugin import (
     StaticAlignInitializationPlugin as StaticAlignInitializationPlugin,
 )
-from .TutorialInitializationPlugin import (
+from .tutorial_plugins.TutorialInitializationPlugin import (
     TutorialInitializationPlugin as TutorialInitializationPlugin,
 )

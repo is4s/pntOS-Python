@@ -8,7 +8,6 @@ from aspn23 import (
 )
 from navtk.navutils import rpy_to_quat
 from numpy.typing import NDArray
-
 from pntos.api import (
     InertialInitializationStrategy,
     InitialInertialSolution,
