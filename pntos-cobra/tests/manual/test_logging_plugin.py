@@ -9,7 +9,7 @@ from pntos.api import (
     Mediator,
 )
 from pntos.cobra import StandardLoggingPlugin
-from pntos.cobra.internal import SimpleMediator, SimpleRegistry
+from pntos.cobra.internal import SimpleMediator, StandardRegistry
 
 expected_results: dict[ll, str] = {
     ll.DEBUG: '',
@@ -83,7 +83,7 @@ def test_manual() -> None:
     """This is for user tests of the logger plugin, not for the pytest suite."""
     # Initialize registry through mediator to have config values for logger
     dummy_plugin = DummyPlugin('dummy plugin')
-    registry = SimpleRegistry(dummy_log)
+    registry = StandardRegistry(dummy_log)
     mediator = SimpleMediator(dummy_plugin.identifier, LoggingPlugin)
     SimpleMediator.registry = registry
     config_group = 'config/logging/all'
@@ -130,7 +130,7 @@ def remove_decimal_numbers(input_string: str) -> str:
 def test(capsys: Any) -> None:
     # Initialize registry through mediator to have config values for logger
     dummy_plugin = DummyPlugin('dummy plugin')
-    registry = SimpleRegistry(dummy_log)
+    registry = StandardRegistry(dummy_log)
     mediator = SimpleMediator(dummy_plugin.identifier, LoggingPlugin)
     SimpleMediator.registry = registry
 

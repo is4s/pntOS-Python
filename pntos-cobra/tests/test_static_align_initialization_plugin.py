@@ -32,7 +32,7 @@ from pntos.cobra.config.StaticAlignmentConfig import (
     AlignmentStrategy,
     StaticAlignmentConfig,
 )
-from pntos.cobra.internal import SimpleMediator, SimpleRegistry
+from pntos.cobra.internal import SimpleMediator, StandardRegistry
 
 
 def generate_header() -> TypeHeader:
@@ -158,7 +158,7 @@ def test() -> None:
     # Set up registry and mediator
     plugin = StaticAlignInitializationPlugin('Cobra static align initialization plugin')
 
-    registry = SimpleRegistry(dummy_log)
+    registry = StandardRegistry(dummy_log)
     mediator = SimpleMediator(plugin.identifier, InitializationPlugin)
     SimpleMediator.registry = registry
 

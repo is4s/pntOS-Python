@@ -24,7 +24,7 @@ from pntos.cobra import (
     EkfFusionStrategyPlugin,
     StandardFusionPlugin,
 )
-from pntos.cobra.internal import SimpleMediator, SimpleRegistry
+from pntos.cobra.internal import SimpleMediator, StandardRegistry
 
 
 # Test Sensor plugin
@@ -118,7 +118,7 @@ def dummy_log(level: LoggingLevel, message: str) -> None:
 
 def test_manual():
     """User test for the Fusion Plugin."""
-    registry = SimpleRegistry(dummy_log)
+    registry = StandardRegistry(dummy_log)
     mediator = SimpleMediator(FusionPlugin, 'Fusion Plugin')
     SimpleMediator.registry = registry
 

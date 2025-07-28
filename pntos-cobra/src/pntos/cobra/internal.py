@@ -15,7 +15,7 @@ from .StandardPreprocessorPlugin import (
 )
 from .StandardRegistryPlugin import (
     SimpleKeyValueStore as SimpleKeyValueStore,
-    SimpleRegistry as SimpleRegistry,
+    StandardRegistry as StandardRegistry,
 )
 from .state_modeling_simple_gps_ins.FogmBlock import (
     FogmBlock as FogmBlock,

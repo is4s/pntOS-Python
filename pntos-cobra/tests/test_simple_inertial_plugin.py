@@ -22,7 +22,7 @@ from pntos.api import (
 )
 from pntos.cobra import StandardInertialPlugin
 from pntos.cobra.config import InertialConfig, config_to_registry
-from pntos.cobra.internal import SimpleMediator, SimpleRegistry
+from pntos.cobra.internal import SimpleMediator, StandardRegistry
 
 
 def generate_header() -> TypeHeader:
@@ -147,7 +147,7 @@ def test() -> None:
 
     # Setup
     plugin = StandardInertialPlugin('Cobra inertial plugin')
-    registry = SimpleRegistry(dummy_log)
+    registry = StandardRegistry(dummy_log)
     mediator = SimpleMediator(plugin.identifier, InertialPlugin)
     SimpleMediator.registry = registry
 
