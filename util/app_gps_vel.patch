@@ -8,9 +8,9 @@ index f7feac3..9e88c8f 100755
      SimpleGpsInsStateModelingPlugin,
 -    SimpleGpsOrchestrationPlugin,
 +    SimpleGpsVelOrchestrationPlugin,
-     SimpleRegistryPlugin,
      StandardFusionPlugin,
      StandardInertialPlugin,
+     StandardLoggingPlugin,
 @@ -85,6 +85,7 @@ my_config = [
      OrchestrationConfig(
          gps_channel='/sensor/ublox-ZED-F9T/position',
@@ -25,6 +25,6 @@ index f7feac3..9e88c8f 100755
      ),
 -    SimpleGpsOrchestrationPlugin('Cobra Simple Orchestration Plugin'),
 +    SimpleGpsVelOrchestrationPlugin('Cobra Simple Orchestration Plugin'),
-     SimpleRegistryPlugin('Cobra Simple Registry Plugin', config=my_config),
+     StandardRegistryPlugin('Cobra Standard Registry Plugin', config=my_config),
      StandardPreprocessorPlugin('Cobra Standard Preprocessor Plugin'),
  ]

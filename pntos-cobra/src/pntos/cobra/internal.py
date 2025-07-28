@@ -5,10 +5,6 @@ from .simple_controller.SimpleMediator import SimpleMediator as SimpleMediator
 from .simple_controller.SimpleMessageStreamConfig import (
     SimpleMessageStreamConfig as SimpleMessageStreamConfig,
 )
-from .SimpleRegistryPlugin import (
-    SimpleKeyValueStore as SimpleKeyValueStore,
-    SimpleRegistry as SimpleRegistry,
-)
 from .StandardFusionPlugin import SimpleFusionEngine as SimpleFusionEngine
 from .StandardInertialPlugin import StandardInertial as StandardInertial
 from .StandardPreprocessorPlugin import (
@@ -16,6 +12,10 @@ from .StandardPreprocessorPlugin import (
     ImuRotationPreprocessor as ImuRotationPreprocessor,
     PreprocessorDownsampler as PreprocessorDownsampler,
     TimeAdjusterPreprocessor as TimeAdjusterPreprocessor,
+)
+from .StandardRegistryPlugin import (
+    SimpleKeyValueStore as SimpleKeyValueStore,
+    SimpleRegistry as SimpleRegistry,
 )
 from .state_modeling_simple_gps_ins.FogmBlock import (
     FogmBlock as FogmBlock,

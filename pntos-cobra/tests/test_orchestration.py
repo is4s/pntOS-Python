@@ -37,9 +37,9 @@ from pntos.cobra import (
     EkfFusionStrategyPlugin,
     SimpleGpsInsStateModelingPlugin,
     SimpleGpsOrchestrationPlugin,
-    SimpleRegistryPlugin,
     StandardFusionPlugin,
     StandardInertialPlugin,
+    StandardRegistryPlugin,
     TutorialInitializationPlugin,
 )
 from pntos.cobra.config import (
@@ -168,8 +168,8 @@ class Test_Orchestration(unittest.TestCase):
         self.state_modeling_plugin: StateModelingPlugin = (
             SimpleGpsInsStateModelingPlugin('Cobra Simple State Modeling Plugin')
         )
-        self.registry_plugin: SimpleRegistryPlugin = SimpleRegistryPlugin(
-            'SimpleRegistryPlugin'
+        self.registry_plugin: StandardRegistryPlugin = StandardRegistryPlugin(
+            'StandardRegistryPlugin'
         )
 
         plugins = [
@@ -182,7 +182,7 @@ class Test_Orchestration(unittest.TestCase):
             self.registry_plugin,
         ]
 
-        registry_plugin = SimpleRegistryPlugin('Simple registry', config=my_config)
+        registry_plugin = StandardRegistryPlugin('Simple registry', config=my_config)
         mediator = SimpleMediator(registry_plugin.identifier, RegistryPlugin)
         registry_plugin.init_plugin(mediator=mediator)
         registry = registry_plugin.new_registry()

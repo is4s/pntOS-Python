@@ -16,8 +16,8 @@ from aspn23 import (
 from pntos.api import Message, Preprocessor, RegistryPlugin
 from pntos.api.plugins.preprocessor import Preprocessor
 from pntos.cobra import (
-    SimpleRegistryPlugin,
     StandardPreprocessorPlugin,
+    StandardRegistryPlugin,
 )
 from pntos.cobra.config import (
     BarometerToAltitudeConfig,
@@ -66,7 +66,7 @@ config_list: list[BaseConfig] = [
 
 @pytest.fixture
 def mediator() -> SimpleMediator:
-    registry_plugin = SimpleRegistryPlugin('Simple registry', config=config_list)
+    registry_plugin = StandardRegistryPlugin('Simple registry', config=config_list)
     mediator = SimpleMediator(registry_plugin.identifier, RegistryPlugin)
     registry_plugin.init_plugin(mediator=mediator)
     registry = registry_plugin.new_registry()

@@ -19,14 +19,14 @@ from .orchestration_plugins.SimpleGpsVelOrchestrationPlugin import (
 from .simple_controller.SimpleControllerPlugin import (
     SimpleControllerPlugin as SimpleControllerPlugin,
 )
-from .SimpleRegistryPlugin import (
-    SimpleRegistryPlugin as SimpleRegistryPlugin,
-)
 from .StandardFusionPlugin import StandardFusionPlugin as StandardFusionPlugin
 from .StandardInertialPlugin import StandardInertialPlugin as StandardInertialPlugin
 from .StandardLoggingPlugin import StandardLoggingPlugin as StandardLoggingPlugin
 from .StandardPreprocessorPlugin import (
     StandardPreprocessorPlugin as StandardPreprocessorPlugin,
+)
+from .StandardRegistryPlugin import (
+    StandardRegistryPlugin as StandardRegistryPlugin,
 )
 from .state_modeling_simple_gps_ins.SimpleGpsInsStateModelingPlugin import (
     SimpleGpsInsStateModelingPlugin as SimpleGpsInsStateModelingPlugin,

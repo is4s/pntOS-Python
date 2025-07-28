@@ -6,7 +6,7 @@ from aspn23 import TypeTimestamp
 from aspn23_lcm import measurement_position_velocity_attitude
 from lcm import LCM
 from pntos.api import LoggingLevel, Mediator, Message, Registry
-from pntos.cobra import LcmTransportPlugin, SimpleRegistryPlugin
+from pntos.cobra import LcmTransportPlugin, StandardRegistryPlugin
 from pntos.cobra.internal import SimpleMediator, SimpleRegistry
 from pntos.cobra.LcmTransportPlugin import LCM_URL
 

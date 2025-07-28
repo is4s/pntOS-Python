@@ -29,7 +29,7 @@ from pntos.api import (
 )
 from pntos.cobra import (
     SimpleGpsInsStateModelingPlugin,
-    SimpleRegistryPlugin,
+    StandardRegistryPlugin,
 )
 from pntos.cobra.config import (
     BaseConfig,
@@ -76,7 +76,7 @@ my_config: list[BaseConfig] = [
 
 @pytest.fixture
 def mediator() -> SimpleMediator:
-    registry_plugin = SimpleRegistryPlugin('Simple registry', config=my_config)
+    registry_plugin = StandardRegistryPlugin('Simple registry', config=my_config)
     mediator = SimpleMediator(registry_plugin.identifier, RegistryPlugin)
     registry_plugin.init_plugin(mediator=mediator)
     registry = registry_plugin.new_registry()

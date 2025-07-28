@@ -549,9 +549,9 @@ class SimpleRegistry(Registry):
         return True
 
 
-class SimpleRegistryPlugin(RegistryPlugin):
+class StandardRegistryPlugin(RegistryPlugin):
     """
-    A simple registry plugin that creates :class:`SimpleRegistry` instances.
+    A registry plugin that creates :class:`SimpleRegistry` instances.
     """
 
     config: list[BaseConfig]
@@ -567,7 +567,7 @@ class SimpleRegistryPlugin(RegistryPlugin):
 
     def __init__(self, identifier: str, config: list[BaseConfig] | None = None) -> None:
         """
-        Cobra Simple Registry Plugin
+        Cobra Standard Registry Plugin
 
         Args:
             identifier (str): The plugin identifier used to set

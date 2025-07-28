@@ -45,8 +45,8 @@ from pntos.api import (
 )
 from pntos.cobra import (
     SimpleControllerPlugin,
-    SimpleRegistryPlugin,
     StandardLoggingPlugin,
+    StandardRegistryPlugin,
 )
 from pntos.cobra.internal import SimpleMediator
 
@@ -527,8 +527,8 @@ class Test_SimpleControllerPlugin(unittest.TestCase):
         self.state_modeling_plugin: StateModelingPlugin = DummyStateModelingPlugin(
             'DummyStateModelingPlugin'
         )
-        self.registry_plugin: SimpleRegistryPlugin = SimpleRegistryPlugin(
-            'SimpleRegistryPlugin'
+        self.registry_plugin: StandardRegistryPlugin = StandardRegistryPlugin(
+            'StandardRegistryPlugin'
         )
         self.logging_plugin: LoggingPlugin = StandardLoggingPlugin(
             'StandardLoggingPlugin'

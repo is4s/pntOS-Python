@@ -27,7 +27,7 @@ Then update the script so the new Orchestration plugin is created instead of the
      ),
 -    SimpleGpsOrchestrationPlugin('Cobra Simple Orchestration Plugin'),
 +    SimpleGpsVelOrchestrationPlugin('Cobra Simple Orchestration Plugin'),
-     SimpleRegistryPlugin('Cobra Simple Registry Plugin', config=my_config),
+     StandardRegistryPlugin('Cobra Simple Registry Plugin', config=my_config),
  ]
  ```
 
