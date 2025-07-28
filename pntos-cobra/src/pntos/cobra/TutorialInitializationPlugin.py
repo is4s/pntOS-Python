@@ -27,7 +27,7 @@ from pntos.cobra.config import (
 from pntos.cobra.config.ManualAlignmentConfig import ManualAlignmentConfig
 
 
-class SimpleInitialization(InertialInitializationStrategy):
+class ManualInitialization(InertialInitializationStrategy):
     """
     A simple initialization strategy that generates an initial solution from an alignment config in the registry.
     This implementation is designed to work with a manual alignment.
@@ -142,7 +142,7 @@ class SimpleInitialization(InertialInitializationStrategy):
 
 class TutorialInitializationPlugin(InitializationPlugin):
     """
-    A simple initialization plugin that generates :class:`SimpleInitialization` instances.
+    A simple initialization plugin that generates :class:`internal.ManualInitialization` instances.
     """
 
     mediator: Mediator
@@ -183,7 +183,7 @@ class TutorialInitializationPlugin(InitializationPlugin):
             )
             return None
         if issubclass(type, InertialInitializationStrategy):
-            return SimpleInitialization(config_group, self.mediator)
+            return ManualInitialization(config_group, self.mediator)
         else:
             self.mediator.log_message(LoggingLevel.ERROR, 'Unsupported type requested.')
             return None
