@@ -1,8 +1,8 @@
-from .AspnLcmTransportPlugin import (
-    AspnLcmTransportPlugin as AspnLcmTransportPlugin,
-)
 from .DummyTransportPlugin import (
     DummyTransportPlugin as DummyTransportPlugin,
+)
+from .LcmTransportPlugin import (
+    LcmTransportPlugin as LcmTransportPlugin,
 )
 from .orchestration_plugins.SimpleGpsOrchestrationPlugin import (
     SimpleGpsOrchestrationPlugin as SimpleGpsOrchestrationPlugin,
