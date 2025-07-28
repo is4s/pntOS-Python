@@ -140,7 +140,7 @@ class SimpleInitialization(InertialInitializationStrategy):
         )
 
 
-class SimpleInitializationPlugin(InitializationPlugin):
+class TutorialInitializationPlugin(InitializationPlugin):
     """
     A simple initialization plugin that generates :class:`SimpleInitialization` instances.
     """

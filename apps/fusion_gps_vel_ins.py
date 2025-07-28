@@ -13,9 +13,9 @@ from pntos.cobra import (
     SimpleGpsInsStateModelingPlugin,
     SimpleGpsVelOrchestrationPlugin,
     SimpleInertialPlugin,
-    SimpleInitializationPlugin,
     SimpleLoggingPlugin,
     SimpleRegistryPlugin,
+    TutorialInitializationPlugin,
 )
 from pntos.cobra.config import (
     FogmConfig,
@@ -103,7 +103,7 @@ plugins = [
     SimpleFusionPlugin('Cobra Simple Fusion Plugin'),
     SimpleGpsInsStateModelingPlugin('Cobra Simple State Modeling Plugin'),
     SimpleInertialPlugin('Cobra Simple Inertial Plugin'),
-    SimpleInitializationPlugin('Cobra Simple Initialization Plugin'),
+    TutorialInitializationPlugin('Cobra Manual Initialization Plugin'),
     SimpleLoggingPlugin(
         'Cobra Simple Logging Plugin',
         global_log_level=LoggingLevel.INFO,  # Switch to `DEBUG` for more informative log output

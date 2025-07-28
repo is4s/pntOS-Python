@@ -9,8 +9,8 @@ index f7feac3..9e88c8f 100755
 -    SimpleGpsOrchestrationPlugin,
 +    SimpleGpsVelOrchestrationPlugin,
      SimpleInertialPlugin,
-     SimpleInitializationPlugin,
      SimpleLoggingPlugin,
+     SimpleRegistryPlugin,
 @@ -87,6 +87,7 @@ my_config = [
      OrchestrationConfig(
          gps_channel='/sensor/ublox-ZED-F9T/position',

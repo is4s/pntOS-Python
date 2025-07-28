@@ -39,8 +39,8 @@ from pntos.cobra import (
     SimpleGpsInsStateModelingPlugin,
     SimpleGpsOrchestrationPlugin,
     SimpleInertialPlugin,
-    SimpleInitializationPlugin,
     SimpleRegistryPlugin,
+    TutorialInitializationPlugin,
 )
 from pntos.cobra.config import (
     FogmConfig,
@@ -153,7 +153,7 @@ class Test_Orchestration(unittest.TestCase):
         self.orchestration_plugin: OrchestrationPlugin = SimpleGpsOrchestrationPlugin(
             'SimpleGpsOrchestrationPlugin'
         )
-        self.initialization_plugin: InitializationPlugin = SimpleInitializationPlugin(
+        self.initialization_plugin: InitializationPlugin = TutorialInitializationPlugin(
             'Cobra Simple Initialization Plugin'
         )
         self.inertial_plugin: InertialPlugin = SimpleInertialPlugin(

@@ -24,9 +24,6 @@ from .SimpleEkfFusionStrategyPlugin import (
 )
 from .SimpleFusionPlugin import SimpleFusionPlugin as SimpleFusionPlugin
 from .SimpleInertialPlugin import SimpleInertialPlugin as SimpleInertialPlugin
-from .SimpleInitializationPlugin import (
-    SimpleInitializationPlugin as SimpleInitializationPlugin,
-)
 from .SimpleLoggingPlugin import SimpleLoggingPlugin as SimpleLoggingPlugin
 from .SimpleRegistryPlugin import (
     SimpleRegistryPlugin as SimpleRegistryPlugin,
@@ -36,4 +33,7 @@ from .state_modeling_simple_gps_ins.SimpleGpsInsStateModelingPlugin import (
 )
 from .StaticAlignInitializationPlugin import (
     StaticAlignInitializationPlugin as StaticAlignInitializationPlugin,
+)
+from .TutorialInitializationPlugin import (
+    TutorialInitializationPlugin as TutorialInitializationPlugin,
 )

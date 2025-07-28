@@ -13,7 +13,6 @@ from .SimpleEkfFusionStrategyPlugin import (
 )
 from .SimpleFusionPlugin import SimpleFusionEngine as SimpleFusionEngine
 from .SimpleInertialPlugin import SimpleInertial as SimpleInertial
-from .SimpleInitializationPlugin import SimpleInitialization as SimpleInitialization
 from .SimpleRegistryPlugin import (
     SimpleKeyValueStore as SimpleKeyValueStore,
     SimpleRegistry as SimpleRegistry,
@@ -34,3 +33,4 @@ from .state_modeling_simple_gps_ins.PinsonWithNedFogmPositionMeasurementProcesso
     PinsonWithNedFogmPositionMeasurementProcessor as PinsonWithNedFogmPositionMeasurementProcessor,
 )
 from .StaticAlignInitializationPlugin import StaticAlign as StaticAlign
+from .TutorialInitializationPlugin import SimpleInitialization as SimpleInitialization

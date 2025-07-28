@@ -13,7 +13,7 @@ from pntos.api import (
     LoggingPlugin,
     Mediator,
 )
-from pntos.cobra import SimpleInitializationPlugin
+from pntos.cobra import TutorialInitializationPlugin
 from pntos.cobra.config import ManualAlignmentConfig, config_to_registry
 from pntos.cobra.internal import SimpleMediator, SimpleRegistry
 
@@ -43,7 +43,7 @@ def test() -> None:
     registry = SimpleRegistry(dummy_log)
     mediator = SimpleMediator(dummy_plugin.identifier, LoggingPlugin)
     SimpleMediator.registry = registry
-    plugin = SimpleInitializationPlugin('Cobra simple initialization plugin')
+    plugin = TutorialInitializationPlugin('Cobra simple initialization plugin')
 
     pos = (1, 2, 3)
     vel = (4, 5, 6)
