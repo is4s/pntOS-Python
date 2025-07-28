@@ -16,7 +16,7 @@ Begin by updating the import to bring in the new Orchestration plugin:
 +    SimpleGpsVelOrchestrationPlugin,
      StandardInertialPlugin,
      TutorialInitializationPlugin,
-     SimpleLoggingPlugin,
+     StandardLoggingPlugin,
 ```
 
 Then update the script so the new Orchestration plugin is created instead of the old:

@@ -10,10 +10,10 @@ from pntos.cobra import (
     SimpleControllerPlugin,
     SimpleGpsInsStateModelingPlugin,
     SimpleGpsOrchestrationPlugin,
-    SimpleLoggingPlugin,
     SimpleRegistryPlugin,
     StandardFusionPlugin,
     StandardInertialPlugin,
+    StandardLoggingPlugin,
     StandardPreprocessorPlugin,
     TutorialInitializationPlugin,
 )
@@ -103,8 +103,8 @@ plugins = [
     SimpleGpsInsStateModelingPlugin('Cobra Simple State Modeling Plugin'),
     StandardInertialPlugin('Cobra Standard Inertial Plugin'),
     TutorialInitializationPlugin('Cobra Manual Initialization Plugin'),
-    SimpleLoggingPlugin(
-        'Cobra Simple Logging Plugin',
+    StandardLoggingPlugin(
+        'Cobra Standard Logging Plugin',
         global_log_level=LoggingLevel.INFO,  # Switch to `DEBUG` for more informative log output
     ),
     SimpleGpsOrchestrationPlugin('Cobra Simple Orchestration Plugin'),

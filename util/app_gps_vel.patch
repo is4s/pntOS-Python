@@ -8,9 +8,9 @@ index f7feac3..9e88c8f 100755
      SimpleGpsInsStateModelingPlugin,
 -    SimpleGpsOrchestrationPlugin,
 +    SimpleGpsVelOrchestrationPlugin,
-     SimpleLoggingPlugin,
      SimpleRegistryPlugin,
      StandardFusionPlugin,
+     StandardInertialPlugin,
 @@ -85,6 +85,7 @@ my_config = [
      OrchestrationConfig(
          gps_channel='/sensor/ublox-ZED-F9T/position',
@@ -19,8 +19,8 @@ index f7feac3..9e88c8f 100755
      ),
      TimeAdjusterConfig(
          group='config/time_adjuster',
-@@ -109,7 +110,7 @@ plugins = [
-         'Cobra Simple Logging Plugin',
+@@ -107,7 +108,7 @@ plugins = [
+         'Cobra Standard Logging Plugin',
          global_log_level=LoggingLevel.INFO,  # Switch to `DEBUG` for more informative log output
      ),
 -    SimpleGpsOrchestrationPlugin('Cobra Simple Orchestration Plugin'),

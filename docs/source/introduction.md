@@ -157,7 +157,7 @@ plugins, but wanted to implement our own sensor fusion solution in a custom
 from pntos.cobra import (
     DummyTransportPlugin,
     SimpleRegistryPlugin,
-    SimpleLoggingPlugin,
+    StandardLoggingPlugin,
     SimpleControllerPlugin,
 )
 
@@ -172,7 +172,7 @@ my_orchestration = MyOrchestrationPlugin("My Orchestration Name")
 # Create the other plugins and put them into a list
 my_transport = DummyTransportPlugin("My Transport Name")
 my_registry = SimpleRegistryPlugin("My Registry Name")
-my_logging = SimpleLoggingPlugin("My Logger Name")
+my_logging = StandardLoggingPlugin("My Logger Name")
 my_controller = SimpleControllerPlugin("My Controller Name")
 other_plugin_list = [my_orchestration, my_transport, my_registry, my_logging]
 
