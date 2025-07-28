@@ -1133,7 +1133,7 @@ requires-dist = [
     { name = "navtk", specifier = "==2.1.0.post2.dev0" },
     { name = "numpy", specifier = "==2.1.3" },
     { name = "pntos-api", editable = "pntos-api" },
-    { name = "pntos-python-datasets", specifier = "==0.2.0" },
+    { name = "pntos-python-datasets", specifier = "==0.3.0" },
     { name = "scipy", specifier = ">=1.15.2" },
 ]
 
@@ -1186,10 +1186,10 @@ dev = [
 
 [[package]]
 name = "pntos-python-datasets"
-version = "0.2.0"
+version = "0.3.0"
 source = { registry = "https://git.aspn.us/api/v4/projects/94/packages/pypi/simple" }
 wheels = [
-    { url = "https://git.aspn.us/api/v4/projects/94/packages/pypi/files/096ffe1ca0ccf609604cfbcf7c458ce49afa387a1dd064cdaaa1b01aa87e0077/pntos_python_datasets-0.2.0-py2.py3-none-any.whl", hash = "sha256:096ffe1ca0ccf609604cfbcf7c458ce49afa387a1dd064cdaaa1b01aa87e0077" },
+    { url = "https://git.aspn.us/api/v4/projects/94/packages/pypi/files/c428b4fe65c71b1f193191a7d336d97c3fb6d203473f6da3f9c2b359678d3002/pntos_python_datasets-0.3.0-py2.py3-none-any.whl", hash = "sha256:c428b4fe65c71b1f193191a7d336d97c3fb6d203473f6da3f9c2b359678d3002" },
 ]
 
 [[package]]

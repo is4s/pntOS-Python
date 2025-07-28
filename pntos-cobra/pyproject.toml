@@ -20,8 +20,8 @@ dependencies = [
     "aspn_lcm @ git+ssh://git@git.aspn.us/pntos/lcm-generated.git@14045fe000e4395bf81708e963aea09948e52949#subdirectory=python",
     # Generated from commit 2d65da3693e7087a0e9ae56db6eba900c9e7ea91 on 8 May 2025
     "navtk==2.1.0.post2.dev0",
-    # Generated from branch v2 on 21 May 2025
-    "pntos-python-datasets==0.2.0",
+    # Generated from branch v3 on 11 July 2025
+    "pntos-python-datasets==0.3.0",
 ]
 readme = "README.md"
 requires-python = ">= 3.10"
