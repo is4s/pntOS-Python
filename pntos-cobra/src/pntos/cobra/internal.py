@@ -2,12 +2,6 @@ from .simple_controller.SimpleMediator import SimpleMediator as SimpleMediator
 from .simple_controller.SimpleMessageStreamConfig import (
     SimpleMessageStreamConfig as SimpleMessageStreamConfig,
 )
-from .SimpleCobraPreprocessorPlugin import (
-    BarometerToAltitudePreprocessor as BarometerToAltitudePreprocessor,
-    SimpleImuRotationPreprocessor as SimpleImuRotationPreprocessor,
-    SimplePreprocessorDownsampler as SimplePreprocessorDownsampler,
-    SimpleTimeAdjusterPreprocessor as SimpleTimeAdjusterPreprocessor,
-)
 from .SimpleEkfFusionStrategyPlugin import (
     SimpleEkfFusionStrategy as SimpleEkfFusionStrategy,
 )
@@ -16,6 +10,12 @@ from .SimpleInertialPlugin import SimpleInertial as SimpleInertial
 from .SimpleRegistryPlugin import (
     SimpleKeyValueStore as SimpleKeyValueStore,
     SimpleRegistry as SimpleRegistry,
+)
+from .StandardPreprocessorPlugin import (
+    BarometerToAltitudePreprocessor as BarometerToAltitudePreprocessor,
+    SimpleImuRotationPreprocessor as SimpleImuRotationPreprocessor,
+    SimplePreprocessorDownsampler as SimplePreprocessorDownsampler,
+    SimpleTimeAdjusterPreprocessor as SimpleTimeAdjusterPreprocessor,
 )
 from .state_modeling_simple_gps_ins.FogmBlock import (
     FogmBlock as FogmBlock,

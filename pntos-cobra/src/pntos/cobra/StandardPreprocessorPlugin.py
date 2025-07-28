@@ -241,8 +241,8 @@ class SimpleTimeAdjusterPreprocessor(Preprocessor):
         return [message]
 
 
-class SimpleCobraPreprocessorPlugin(PreprocessorPlugin):
-    """A preprocessor plugin that provides a simple set of preprocessors.
+class StandardPreprocessorPlugin(PreprocessorPlugin):
+    """A preprocessor plugin that provides the standard-level set of preprocessors.
 
     The preprocessors this plugin provides are:
 
@@ -364,7 +364,7 @@ class SimpleCobraPreprocessorPlugin(PreprocessorPlugin):
                 self.mediator.log_message(
                     LoggingLevel.ERROR,
                     f'Invalid preprocessor index of {preprocessor_index}. '
-                    'SimpleCobraPreprocessorPlugin provides '
+                    'StandardPreprocessorPlugin provides '
                     f'{len(self.preprocessor_identifiers)} preprocessors.',
                 )
                 return None

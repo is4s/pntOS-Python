@@ -26,5 +26,5 @@ index f7feac3..9e88c8f 100755
 -    SimpleGpsOrchestrationPlugin('Cobra Simple Orchestration Plugin'),
 +    SimpleGpsVelOrchestrationPlugin('Cobra Simple Orchestration Plugin'),
      SimpleRegistryPlugin('Cobra Simple Registry Plugin', config=my_config),
-     SimpleCobraPreprocessorPlugin('Cobra Simple Preprocessor Plugin'),
+     StandardPreprocessorPlugin('Cobra Standard Preprocessor Plugin'),
  ]

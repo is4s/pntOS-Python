@@ -6,7 +6,6 @@ from pntos.api import LoggingLevel
 # Import Cobra plugins and config structs
 from pntos.cobra import (
     LcmTransportPlugin,
-    SimpleCobraPreprocessorPlugin,
     SimpleControllerPlugin,
     SimpleEkfFusionStrategyPlugin,
     SimpleFusionPlugin,
@@ -15,6 +14,7 @@ from pntos.cobra import (
     SimpleInertialPlugin,
     SimpleLoggingPlugin,
     SimpleRegistryPlugin,
+    StandardPreprocessorPlugin,
     TutorialInitializationPlugin,
 )
 from pntos.cobra.config import (
@@ -110,7 +110,7 @@ plugins = [
     ),
     SimpleGpsVelOrchestrationPlugin('Cobra Simple Orchestration Plugin'),
     SimpleRegistryPlugin('Cobra Simple Registry Plugin', config=my_config),
-    SimpleCobraPreprocessorPlugin('Cobra Simple Preprocessor Plugin'),
+    StandardPreprocessorPlugin('Cobra Standard Preprocessor Plugin'),
 ]
 
 # Start the controller, and pass it all of the other plugins to use

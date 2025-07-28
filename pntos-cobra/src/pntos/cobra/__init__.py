@@ -13,9 +13,6 @@ from .orchestration_plugins.SimpleGpsVelOrchestrationPlugin import (
 from .simple_controller.SimpleControllerPlugin import (
     SimpleControllerPlugin as SimpleControllerPlugin,
 )
-from .SimpleCobraPreprocessorPlugin import (
-    SimpleCobraPreprocessorPlugin as SimpleCobraPreprocessorPlugin,
-)
 from .SimpleDiagnosticLogPlugin import (
     SimpleDiagnosticLogPlugin as SimpleDiagnosticLogPlugin,
 )
@@ -27,6 +24,9 @@ from .SimpleInertialPlugin import SimpleInertialPlugin as SimpleInertialPlugin
 from .SimpleLoggingPlugin import SimpleLoggingPlugin as SimpleLoggingPlugin
 from .SimpleRegistryPlugin import (
     SimpleRegistryPlugin as SimpleRegistryPlugin,
+)
+from .StandardPreprocessorPlugin import (
+    StandardPreprocessorPlugin as StandardPreprocessorPlugin,
 )
 from .state_modeling_simple_gps_ins.SimpleGpsInsStateModelingPlugin import (
     SimpleGpsInsStateModelingPlugin as SimpleGpsInsStateModelingPlugin,
