@@ -21,14 +21,14 @@ class AspnVersion(Enum):
 
 
 @dataclass
-class AspnLcmTransportConfig(BaseConfig):
+class LcmTransportConfig(BaseConfig):
     """
-    Configuration that dictates the version of ASPN messages broadcasted by the AspnLcmTransportPlugin.
+    Configuration that dictates the version of ASPN messages broadcasted by the LcmTransportPlugin.
     """
 
     output_version: AspnVersion
     """
-    The version of ASPN messages broadcasted by the AspnLcmTransportPlugin.
+    The version of ASPN messages broadcasted by the LcmTransportPlugin.
     """
 
     group: str

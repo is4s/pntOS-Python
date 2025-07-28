@@ -5,9 +5,9 @@ from lcm import LCM, LCMSubscription
 
 from pntos.api import LoggingLevel, Mediator, Message, TransportPlugin
 from pntos.cobra.config import config_from_registry
-from pntos.cobra.config.AspnLcmTransportConfig import (
-    AspnLcmTransportConfig,
+from pntos.cobra.config.LcmTransportConfig import (
     AspnVersion,
+    LcmTransportConfig,
 )
 from pntos.cobra.utils import (
     decode_aspn_lcm_msg,
@@ -20,8 +20,10 @@ from pntos.cobra.utils.lcm_marshaling import Aspn2LcmMeasurement, Aspn23LcmMeasu
 LCM_URL = 'tcpq://localhost:7700'
 
 
-class AspnLcmTransportPlugin(TransportPlugin):
-    """An example LCM Transport Plugin for ASPN23 implemented in Python"""
+class LcmTransportPlugin(TransportPlugin):
+    """A transport plugin which listens for LCM messages.
+
+    Capable of marshalling both ASPN2-LCM and ASPN23-LCM to ASPN23-Python."""
 
     identifier: str
     lcm: LCM
@@ -57,10 +59,8 @@ class AspnLcmTransportPlugin(TransportPlugin):
         if mediator is not None:
             self.mediator = mediator
 
-        config_group = 'config/aspn_lcm_transport'
-        config = config_from_registry(
-            AspnLcmTransportConfig, self.mediator, config_group
-        )
+        config_group = 'config/lcm_transport'
+        config = config_from_registry(LcmTransportConfig, self.mediator, config_group)
         if config is None:
             self.mediator.log_message(
                 LoggingLevel.ERROR,

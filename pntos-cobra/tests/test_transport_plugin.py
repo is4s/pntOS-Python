@@ -6,9 +6,9 @@ from aspn23 import TypeTimestamp
 from aspn23_lcm import measurement_position_velocity_attitude
 from lcm import LCM
 from pntos.api import LoggingLevel, Mediator, Message, Registry
-from pntos.cobra import AspnLcmTransportPlugin, SimpleRegistryPlugin
-from pntos.cobra.AspnLcmTransportPlugin import LCM_URL
+from pntos.cobra import LcmTransportPlugin, SimpleRegistryPlugin
 from pntos.cobra.internal import SimpleMediator, SimpleRegistry
+from pntos.cobra.LcmTransportPlugin import LCM_URL
 
 LCM_URL = ''
 
@@ -54,13 +54,13 @@ def mediator():
 
 
 @pytest.fixture
-def transport_plugin() -> AspnLcmTransportPlugin:
-    plugin = AspnLcmTransportPlugin('python-transport-lcm23-plugin')
+def transport_plugin() -> LcmTransportPlugin:
+    plugin = LcmTransportPlugin('python-transport-lcm23-plugin')
     return plugin
 
 
 def test_initialize_plugin(
-    transport_plugin: AspnLcmTransportPlugin, mediator: SimpleMediator
+    transport_plugin: LcmTransportPlugin, mediator: SimpleMediator
 ) -> None:
     transport_plugin.init_plugin('plugin_path', mediator)
     assert transport_plugin.identifier == 'python-transport-lcm23-plugin'
@@ -68,7 +68,7 @@ def test_initialize_plugin(
 
 
 def _test_handler(
-    transport_plugin: AspnLcmTransportPlugin, mediator: SimpleMediator
+    transport_plugin: LcmTransportPlugin, mediator: SimpleMediator
 ) -> None:
     transport_plugin.init_plugin('plugin_path', mediator)
     transport_plugin.start_listening()
