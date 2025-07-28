@@ -127,7 +127,7 @@ class StaticAlign(InertialInitializationStrategy):
 
 class StaticAlignInitializationPlugin(InitializationPlugin):
     """
-    A static alignment initialization plugin that provides the :class:`StaticAlign` strategy.
+    A static alignment initialization plugin that provides the :class:`internal.StaticAlign` strategy.
     """
 
     mediator: Mediator

@@ -550,7 +550,7 @@ class StandardRegistry(Registry):
 
 class StandardRegistryPlugin(RegistryPlugin):
     """
-    A registry plugin that creates :class:`StandardRegistry` instances.
+    A registry plugin that creates :class:`internal.StandardRegistry` instances.
     """
 
     config: list[BaseConfig]

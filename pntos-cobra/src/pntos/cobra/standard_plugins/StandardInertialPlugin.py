@@ -189,7 +189,7 @@ class StandardInertial(StandardInertialMechanization):
 
 class StandardInertialPlugin(InertialPlugin):
     """
-    An inertial plugin that generates instances of the :class:`StandardInertial` class.
+    An inertial plugin that generates instances of the :class:`internal.StandardInertial` class.
     """
 
     mediator: Mediator | None
