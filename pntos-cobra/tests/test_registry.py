@@ -33,9 +33,7 @@ from pntos.cobra.config import (
     SensorConfig,
     config_from_registry,
 )
-from pntos.cobra.StandardRegistryPlugin import (
-    StandardKeyValueStore,
-)
+from pntos.cobra.internal import StandardKeyValueStore
 
 my_config: list[BaseConfig] = [
     ImuConfig(
