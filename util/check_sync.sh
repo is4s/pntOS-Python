@@ -68,6 +68,8 @@ check_sync() {
 check_sync $orig_dir"/util/orch_gps_vel.patch"
 # Apply app add velocity patch
 check_sync $orig_dir"/util/app_gps_vel.patch"
+# Apply app add ROS patch
+check_sync $orig_dir"/util/app_gps_ros.patch"
 
 # Cleanup and return
 popd > /dev/null
