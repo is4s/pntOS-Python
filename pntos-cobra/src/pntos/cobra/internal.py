@@ -14,7 +14,7 @@ from .StandardPreprocessorPlugin import (
     TimeAdjusterPreprocessor as TimeAdjusterPreprocessor,
 )
 from .StandardRegistryPlugin import (
-    SimpleKeyValueStore as SimpleKeyValueStore,
+    StandardKeyValueStore as StandardKeyValueStore,
     StandardRegistry as StandardRegistry,
 )
 from .state_modeling_simple_gps_ins.FogmBlock import (

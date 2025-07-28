@@ -34,7 +34,7 @@ from pntos.cobra.config import (
     config_from_registry,
 )
 from pntos.cobra.StandardRegistryPlugin import (
-    SimpleKeyValueStore,
+    StandardKeyValueStore,
 )
 
 my_config: list[BaseConfig] = [
@@ -544,7 +544,7 @@ class TestRegistry(unittest.TestCase):
 
         callbacked_group: str = ''
         callbacked_keys: list[str] = []
-        callbacked_kv: KeyValueStore = SimpleKeyValueStore('', dummy_log)
+        callbacked_kv: KeyValueStore = StandardKeyValueStore('', dummy_log)
 
         def test_callback(group: str, keys: list[str], kv: KeyValueStore) -> None:
             nonlocal callbacked_group
@@ -578,7 +578,7 @@ class TestRegistry(unittest.TestCase):
 
         callbacked_group: str = ''
         callbacked_keys: list[str] = []
-        callbacked_kv: KeyValueStore = SimpleKeyValueStore('', dummy_log)
+        callbacked_kv: KeyValueStore = StandardKeyValueStore('', dummy_log)
 
         def test_callback(group: str, keys: list[str], kv: KeyValueStore) -> None:
             nonlocal callbacked_group
@@ -608,7 +608,7 @@ class TestRegistry(unittest.TestCase):
 
         callbacked_group = ''
         callbacked_keys = []
-        callbacked_kv = SimpleKeyValueStore('', dummy_log)
+        callbacked_kv = StandardKeyValueStore('', dummy_log)
 
         for k in test_keys:
             test_kv.set_value(k, 2)
@@ -626,7 +626,7 @@ class TestRegistry(unittest.TestCase):
 
         callbacked_group: str = ''
         callbacked_keys: list[str] = []
-        callbacked_kv: KeyValueStore = SimpleKeyValueStore('', dummy_log)
+        callbacked_kv: KeyValueStore = StandardKeyValueStore('', dummy_log)
 
         def test_callback(group: str, keys: list[str], kv: KeyValueStore) -> None:
             nonlocal callbacked_group
@@ -658,7 +658,7 @@ class TestRegistry(unittest.TestCase):
 
         callbacked_group = ''
         callbacked_keys = []
-        callbacked_kv = SimpleKeyValueStore('', dummy_log)
+        callbacked_kv = StandardKeyValueStore('', dummy_log)
 
         for k in test_keys:
             test_kv.set_value(k, 2)

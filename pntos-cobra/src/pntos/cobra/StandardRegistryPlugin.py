@@ -34,13 +34,13 @@ REGISTRY_SEPARATOR = ', '
 DEFAULT_PERMANENCY_DIR = './registry_permanency_files/'
 
 
-class SimpleKeyValueStore(KeyValueStore):
+class StandardKeyValueStore(KeyValueStore):
     """
     Implementation note: This implementation deviates from the python dictionary
     in that it heavily favors logging out errors and continuing on over raising
     exceptions. Exceptions are reserved only for truly fatal and unrecoverable
     errors. For example, instead of raising a ``KeyValue`` error for a key that
-    does not exist in the store, the ``SimpleKeyValueStore`` just logs out an
+    does not exist in the store, the ``StandardKeyValueStore`` just logs out an
     error message and returns None.
     """
 
@@ -70,7 +70,7 @@ class SimpleKeyValueStore(KeyValueStore):
         plugin_resources_location: str | None = None,
     ) -> None:
         """
-        Cobra Simple Key-Value Store
+        Cobra Standard Key-Value Store
 
         Args:
             group (str): The name of the key-value store so that it can be easily accessed by plugins.
@@ -191,7 +191,7 @@ class SimpleKeyValueStore(KeyValueStore):
             return self._store[key]
         self._log(
             LoggingLevel.WARN,
-            f"The key '{key}' is not found in the SimpleKeyValueStore.",
+            f"The key '{key}' is not found in the StandardKeyValueStore.",
         )
         return None
 
@@ -499,7 +499,7 @@ class StandardRegistry(Registry):
     A registry that maps group names to objects storing all the key/values in that group.
     """
 
-    groups: Dict[str, SimpleKeyValueStore]
+    groups: Dict[str, StandardKeyValueStore]
     callbacks: list[Callable[[str], None]]
     _log: Callable[[LoggingLevel, str], None]
     _plugin_resources_location: str | None
@@ -525,7 +525,7 @@ class StandardRegistry(Registry):
 
     def batch_start(self, group: str) -> KeyValueStore:
         if group not in self.groups:
-            self.groups[group] = SimpleKeyValueStore(
+            self.groups[group] = StandardKeyValueStore(
                 group, self._log, self._plugin_resources_location
             )
             for callback in self.callbacks:
