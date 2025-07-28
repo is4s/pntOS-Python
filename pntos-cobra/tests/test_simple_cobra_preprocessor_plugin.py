@@ -28,9 +28,9 @@ from pntos.cobra.config import (
 )
 from pntos.cobra.internal import (
     BarometerToAltitudePreprocessor,
-    SimpleImuRotationPreprocessor,
+    ImuRotationPreprocessor,
     SimpleMediator,
-    SimpleTimeAdjusterPreprocessor,
+    TimeAdjusterPreprocessor,
 )
 
 downsampler_config = DownsamplerConfig(
@@ -269,7 +269,7 @@ def imu_rotator_preprocessor(
     idx = preprocessor_plugin.preprocessor_identifiers.index('imu_rotator')
     preprocessor = preprocessor_plugin.new_preprocessor(idx, '/config/default/inertial')
     assert preprocessor is not None
-    assert isinstance(preprocessor, SimpleImuRotationPreprocessor)
+    assert isinstance(preprocessor, ImuRotationPreprocessor)
     return preprocessor
 
 
@@ -339,7 +339,7 @@ def time_adjuster_preprocessor(
     idx = preprocessor_plugin.preprocessor_identifiers.index('time_adjuster')
     preprocessor = preprocessor_plugin.new_preprocessor(idx, 'test')
     assert preprocessor is not None
-    assert isinstance(preprocessor, SimpleTimeAdjusterPreprocessor)
+    assert isinstance(preprocessor, TimeAdjusterPreprocessor)
     return preprocessor
 
 

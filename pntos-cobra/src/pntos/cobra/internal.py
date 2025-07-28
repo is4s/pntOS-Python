@@ -13,9 +13,9 @@ from .SimpleRegistryPlugin import (
 )
 from .StandardPreprocessorPlugin import (
     BarometerToAltitudePreprocessor as BarometerToAltitudePreprocessor,
-    SimpleImuRotationPreprocessor as SimpleImuRotationPreprocessor,
-    SimplePreprocessorDownsampler as SimplePreprocessorDownsampler,
-    SimpleTimeAdjusterPreprocessor as SimpleTimeAdjusterPreprocessor,
+    ImuRotationPreprocessor as ImuRotationPreprocessor,
+    PreprocessorDownsampler as PreprocessorDownsampler,
+    TimeAdjusterPreprocessor as TimeAdjusterPreprocessor,
 )
 from .state_modeling_simple_gps_ins.FogmBlock import (
     FogmBlock as FogmBlock,

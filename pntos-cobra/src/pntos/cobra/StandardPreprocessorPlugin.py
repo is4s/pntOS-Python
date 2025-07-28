@@ -78,9 +78,9 @@ class BarometerToAltitudePreprocessor(Preprocessor):
         return [message]
 
 
-class SimplePreprocessorDownsampler(Preprocessor):
+class PreprocessorDownsampler(Preprocessor):
     """
-    A simple downsampling preprocessor that periodically discards certain messages.
+    A downsampling preprocessor that periodically discards certain messages.
 
     It collects a list of channels and factors from the registry and allows 1 out of
     every ``N`` messages to pass through. This is done for every channel ``c`` and factor
@@ -92,7 +92,7 @@ class SimplePreprocessorDownsampler(Preprocessor):
 
     def __init__(self, config_group: str, mediator: Mediator):
         """
-        Cobra Simple Downsampler Preprocessor
+        Cobra Downsampler Preprocessor
 
         Args:
             config_group (str): The :class:`pntos.cobra.config.DownsamplerConfig` config group.
@@ -155,7 +155,7 @@ class SimplePreprocessorDownsampler(Preprocessor):
         return [message]
 
 
-class SimpleImuRotationPreprocessor(Preprocessor):
+class ImuRotationPreprocessor(Preprocessor):
     _mediator: Mediator
     _imu_channel: str
     _C_imu_to_platform: NDArray[float64]
@@ -179,13 +179,13 @@ class SimpleImuRotationPreprocessor(Preprocessor):
             else:
                 self._mediator.log_message(
                     LoggingLevel.WARN,
-                    f'SimpleImuRotationPreprocessor expected IMU message, but got {type(message.wrapped_message)}. Cannot rotate.',
+                    f'ImuRotationPreprocessor expected IMU message, but got {type(message.wrapped_message)}. Cannot rotate.',
                 )
 
         return [message]
 
 
-class SimpleTimeAdjusterPreprocessor(Preprocessor):
+class TimeAdjusterPreprocessor(Preprocessor):
     _mediator: Mediator
     _channel_to_correct: str
     _last_nsec: int | None
@@ -202,7 +202,7 @@ class SimpleTimeAdjusterPreprocessor(Preprocessor):
         if config is None:
             self._mediator.log_message(
                 LoggingLevel.ERROR,
-                f'Failed to populate TimeAdjusterConfig in SimpleTimeAdjusterPreprocessor.',
+                f'Failed to populate TimeAdjusterConfig in TimeAdjusterPreprocessor.',
             )
             return None
         self._channel_to_correct = config.channel_to_correct
@@ -218,7 +218,7 @@ class SimpleTimeAdjusterPreprocessor(Preprocessor):
         if not hasattr(msg, 'time_of_validity'):
             self._mediator.log_message(
                 LoggingLevel.WARN,
-                f'SimpleTimeAdjusterPreprocessor received a message from channel {message.source_identifier} with no time of validity. Ignoring message.',
+                f'TimeAdjusterPreprocessor received a message from channel {message.source_identifier} with no time of validity. Ignoring message.',
             )
             return [message]
 
@@ -246,8 +246,8 @@ class StandardPreprocessorPlugin(PreprocessorPlugin):
 
     The preprocessors this plugin provides are:
 
-    1. SimplePreprocessorDownsampler - Downsamples messages on a given list of channels.
-    2. SimpleImuRotationPreprocessor - Rotated IMU measurements from IMU to platform frame.
+    1. PreprocessorDownsampler - Downsamples messages on a given list of channels.
+    2. ImuRotationPreprocessor - Rotated IMU measurements from IMU to platform frame.
     """
 
     mediator: Mediator | None
@@ -301,7 +301,7 @@ class StandardPreprocessorPlugin(PreprocessorPlugin):
                     )
                     return None
 
-                return SimplePreprocessorDownsampler(config_group, self.mediator)
+                return PreprocessorDownsampler(config_group, self.mediator)
 
             case 1:
                 if config_group is None:
@@ -322,7 +322,7 @@ class StandardPreprocessorPlugin(PreprocessorPlugin):
                     )
                     return None
 
-                return SimpleImuRotationPreprocessor(
+                return ImuRotationPreprocessor(
                     self.mediator,
                     inert_config.channel,
                     array(inert_config.C_imu_to_platform),
@@ -337,7 +337,7 @@ class StandardPreprocessorPlugin(PreprocessorPlugin):
                     )
                     return None
 
-                return SimpleTimeAdjusterPreprocessor(config_group, self.mediator)
+                return TimeAdjusterPreprocessor(config_group, self.mediator)
 
             case 3:
                 if config_group is None:
