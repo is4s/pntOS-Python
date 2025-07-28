@@ -9,7 +9,6 @@ from aspn23 import (
     TypeHeader,
     TypeTimestamp,
 )
-
 from pntos.api import Mediator, TransportPlugin
 from pntos.api.plugins.common import Message
 

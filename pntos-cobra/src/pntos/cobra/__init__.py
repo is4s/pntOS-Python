@@ -1,4 +1,4 @@
-from .DummyTransportPlugin import (
+from .dummy_plugins.DummyTransportPlugin import (
     DummyTransportPlugin as DummyTransportPlugin,
 )
 from .LcmTransportPlugin import (
