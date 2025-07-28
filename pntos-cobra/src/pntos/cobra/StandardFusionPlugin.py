@@ -678,16 +678,16 @@ class SimpleFusionEngine(StandardFusionEngine):
         pass
 
 
-class SimpleFusionPlugin(FusionPlugin):
+class StandardFusionPlugin(FusionPlugin):
     """
-    A simple fusion plugin that provides instances of fusion engines.
+    A fusion plugin that provides instances of fusion engines.
     """
 
     _mediator: Mediator
 
     def __init__(self, identifier: str) -> None:
         """
-        A Simple Fusion Plugin
+        A Fusion Plugin
 
         Args:
             identifier (str): The plugin identifier passed to the

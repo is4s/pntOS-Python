@@ -8,12 +8,12 @@ from pntos.cobra import (
     EkfFusionStrategyPlugin,
     LcmTransportPlugin,
     SimpleControllerPlugin,
-    SimpleFusionPlugin,
     SimpleGpsInsStateModelingPlugin,
     SimpleGpsOrchestrationPlugin,
     SimpleInertialPlugin,
     SimpleLoggingPlugin,
     SimpleRegistryPlugin,
+    StandardFusionPlugin,
     StandardPreprocessorPlugin,
     TutorialInitializationPlugin,
 )
@@ -99,7 +99,7 @@ controller = SimpleControllerPlugin('Cobra Simple Controller Plugin')
 plugins = [
     LcmTransportPlugin('Cobra LCM Transport Plugin'),
     EkfFusionStrategyPlugin('Cobra EKF Fusion Strategy Plugin'),
-    SimpleFusionPlugin('Cobra Simple Fusion Plugin'),
+    StandardFusionPlugin('Cobra Standard Fusion Plugin'),
     SimpleGpsInsStateModelingPlugin('Cobra Simple State Modeling Plugin'),
     SimpleInertialPlugin('Cobra Simple Inertial Plugin'),
     TutorialInitializationPlugin('Cobra Manual Initialization Plugin'),

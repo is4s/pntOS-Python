@@ -35,11 +35,11 @@ from pntos.api import (
 from pntos.api.plugins.registry import RegistryPlugin
 from pntos.cobra import (
     EkfFusionStrategyPlugin,
-    SimpleFusionPlugin,
     SimpleGpsInsStateModelingPlugin,
     SimpleGpsOrchestrationPlugin,
     SimpleInertialPlugin,
     SimpleRegistryPlugin,
+    StandardFusionPlugin,
     TutorialInitializationPlugin,
 )
 from pntos.cobra.config import (
@@ -159,7 +159,7 @@ class Test_Orchestration(unittest.TestCase):
         self.inertial_plugin: InertialPlugin = SimpleInertialPlugin(
             'Cobra Simple Inertial Plugin'
         )
-        self.fusion_plugin: FusionPlugin = SimpleFusionPlugin(
+        self.fusion_plugin: FusionPlugin = StandardFusionPlugin(
             'Cobra Simple Fusion Plugin'
         )
         self.fusion_strategy_plugin: FusionStrategyPlugin = EkfFusionStrategyPlugin(

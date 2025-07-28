@@ -22,7 +22,7 @@ from pntos.api import (
 )
 from pntos.cobra import (
     EkfFusionStrategyPlugin,
-    SimpleFusionPlugin,
+    StandardFusionPlugin,
 )
 from pntos.cobra.internal import SimpleMediator, SimpleRegistry
 
@@ -123,7 +123,7 @@ def test_manual():
     SimpleMediator.registry = registry
 
     # initialize the fusion plugin
-    fusion_plugin = SimpleFusionPlugin(identifier='test_fusion_plugin')
+    fusion_plugin = StandardFusionPlugin(identifier='test_fusion_plugin')
     fusion_plugin.init_plugin('test', mediator=mediator)
     fusion_engine = fusion_plugin.new_fusion_engine(StandardFusionEngine)
     fusion_strategy_plugin = EkfFusionStrategyPlugin(identifier='test_strategy_plugin')

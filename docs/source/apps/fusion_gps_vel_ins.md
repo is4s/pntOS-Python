@@ -10,7 +10,7 @@ Begin by updating the import to bring in the new Orchestration plugin:
 
 ```diff
      EkfFusionStrategyPlugin,
-     SimpleFusionPlugin,
+     StandardFusionPlugin,
      SimpleGpsInsStateModelingPlugin,
 -    SimpleGpsOrchestrationPlugin,
 +    SimpleGpsVelOrchestrationPlugin,
