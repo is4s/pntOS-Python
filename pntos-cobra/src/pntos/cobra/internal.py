@@ -6,7 +6,7 @@ from .standard_plugins.EkfFusionStrategyPlugin import (
     EkfFusionStrategy as EkfFusionStrategy,
 )
 from .standard_plugins.StandardFusionPlugin import (
-    SimpleFusionEngine as SimpleFusionEngine,
+    StandardFusionEngine as StandardFusionEngine,
 )
 from .standard_plugins.StandardInertialPlugin import (
     StandardInertial as StandardInertial,

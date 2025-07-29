@@ -4,6 +4,7 @@ import copy
 from dataclasses import dataclass
 
 import numpy as np
+import pntos.api as api
 from aspn23 import TypeTimestamp
 from numpy import float64
 from numpy.typing import NDArray
@@ -17,7 +18,6 @@ from pntos.api import (
     Mediator,
     Message,
     StandardDynamicsModel,
-    StandardFusionEngine,
     StandardFusionStrategy,
     StandardMeasurementModel,
     StandardMeasurementProcessor,
@@ -35,7 +35,7 @@ class stateblock_info:
     block: StandardStateBlock
 
 
-class SimpleFusionEngine(StandardFusionEngine):
+class StandardFusionEngine(api.StandardFusionEngine):
     """
     A simple fusion engine designed to use data from multiple sensors and output a unified state estimate.
     """
@@ -706,13 +706,13 @@ class StandardFusionPlugin(FusionPlugin):
         pass
 
     def is_fusion_type_supported(self, type: type[FusionEngineType]) -> bool:
-        return type == StandardFusionEngine
+        return type == api.StandardFusionEngine
 
     def new_fusion_engine(
         self, type: type[FusionEngineType]
     ) -> FusionEngineType | None:
         if self.is_fusion_type_supported(type):
-            return SimpleFusionEngine(mediator=self._mediator)
+            return StandardFusionEngine(mediator=self._mediator)
         else:
             self._mediator.log_message(
                 LoggingLevel.ERROR,
