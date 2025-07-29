@@ -51,7 +51,7 @@ class DummyMediator(Mediator):
 class TestConfigUtils(unittest.TestCase):
     def __init__(self, name: str) -> None:
         # Set up registry and mediator
-        registry_plugin = StandardRegistryPlugin('Simple Registry Plugin')
+        registry_plugin = StandardRegistryPlugin('Standard Registry Plugin')
         registry_plugin.init_plugin(mediator=DummyMediator())
         DummyMediator.registry = registry_plugin.new_registry()
         self.mediator = DummyMediator()

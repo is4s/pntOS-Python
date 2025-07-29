@@ -154,16 +154,16 @@ class Test_Orchestration(unittest.TestCase):
             'SimpleGpsOrchestrationPlugin'
         )
         self.initialization_plugin: InitializationPlugin = TutorialInitializationPlugin(
-            'Cobra Simple Initialization Plugin'
+            'Cobra Tutorial Initialization Plugin'
         )
         self.inertial_plugin: InertialPlugin = StandardInertialPlugin(
-            'Cobra Simple Inertial Plugin'
+            'Cobra Standard Inertial Plugin'
         )
         self.fusion_plugin: FusionPlugin = StandardFusionPlugin(
-            'Cobra Simple Fusion Plugin'
+            'Cobra Standard Fusion Plugin'
         )
         self.fusion_strategy_plugin: FusionStrategyPlugin = EkfFusionStrategyPlugin(
-            'Cobra Simple Fusion Strategy Plugin'
+            'Cobra EKF Fusion Strategy Plugin'
         )
         self.state_modeling_plugin: StateModelingPlugin = (
             SimpleGpsInsStateModelingPlugin('Cobra Simple State Modeling Plugin')
@@ -182,7 +182,7 @@ class Test_Orchestration(unittest.TestCase):
             self.registry_plugin,
         ]
 
-        registry_plugin = StandardRegistryPlugin('Simple registry', config=my_config)
+        registry_plugin = StandardRegistryPlugin('Standard registry', config=my_config)
         mediator = SimpleMediator(registry_plugin.identifier, RegistryPlugin)
         registry_plugin.init_plugin(mediator=mediator)
         registry = registry_plugin.new_registry()

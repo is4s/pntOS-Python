@@ -66,7 +66,7 @@ config_list: list[BaseConfig] = [
 
 @pytest.fixture
 def mediator() -> SimpleMediator:
-    registry_plugin = StandardRegistryPlugin('Simple registry', config=config_list)
+    registry_plugin = StandardRegistryPlugin('Standard registry', config=config_list)
     mediator = SimpleMediator(registry_plugin.identifier, RegistryPlugin)
     registry_plugin.init_plugin(mediator=mediator)
     registry = registry_plugin.new_registry()

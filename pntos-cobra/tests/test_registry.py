@@ -146,7 +146,7 @@ class TestRegistry(unittest.TestCase):
     test_message: Message
 
     def __init__(self, name: str):
-        self.registry = StandardRegistryPlugin('Simple registry 1')
+        self.registry = StandardRegistryPlugin('Standard registry 1')
         self.registry.init_plugin(mediator=DummyMediator())
         self.reg = self.registry.new_registry(None)
         DummyMediator.registry = self.reg
@@ -249,7 +249,7 @@ class TestRegistry(unittest.TestCase):
     def test_initial_config(self) -> None:
         global EXPECTED_LOG_OUTPUT
         EXPECTED_LOG_OUTPUT = ''
-        registry = StandardRegistryPlugin('Simple registry', config=my_config)
+        registry = StandardRegistryPlugin('Standard registry', config=my_config)
         registry.init_plugin(mediator=DummyMediator())
         reg = registry.new_registry(None)
         for expected in my_config:
@@ -837,7 +837,7 @@ class TestRegistry(unittest.TestCase):
 
         # Start up this instance
         controller = DummyControllerPlugin('Dummy Controller 1')
-        registry = StandardRegistryPlugin('Simple registry 1')
+        registry = StandardRegistryPlugin('Standard registry 1')
         controller.take_control(
             [registry],
             [None],
@@ -873,7 +873,7 @@ class TestRegistry(unittest.TestCase):
 
         # Set up the instance
         controller = DummyControllerPlugin('Dummy Controller 2')
-        registry = StandardRegistryPlugin('Simple registry 2')
+        registry = StandardRegistryPlugin('Standard registry 2')
         controller.take_control(
             [registry],
             [None],
@@ -933,7 +933,7 @@ class TestRegistry(unittest.TestCase):
     def test_batch_start_error_where_kv_is_already_set_to_batch_live(self) -> None:
         global EXPECTED_LOG_OUTPUT, ERROR_DETECTED, DUMMY_LOG_OUT
         EXPECTED_LOG_OUTPUT = ''
-        registry = StandardRegistryPlugin('Simple registry 2')
+        registry = StandardRegistryPlugin('Standard registry 2')
         mediator = DummyMediator()
         registry.init_plugin(mediator=mediator)
         reg = registry.new_registry(None)
