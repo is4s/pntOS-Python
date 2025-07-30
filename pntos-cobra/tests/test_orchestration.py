@@ -34,13 +34,13 @@ from pntos.api import (
 )
 from pntos.api.plugins.registry import RegistryPlugin
 from pntos.cobra import (
-    SimpleEkfFusionStrategyPlugin,
-    SimpleFusionPlugin,
+    EkfFusionStrategyPlugin,
     SimpleGpsInsStateModelingPlugin,
     SimpleGpsOrchestrationPlugin,
-    SimpleInertialPlugin,
-    SimpleInitializationPlugin,
-    SimpleRegistryPlugin,
+    StandardFusionPlugin,
+    StandardInertialPlugin,
+    StandardRegistryPlugin,
+    TutorialInitializationPlugin,
 )
 from pntos.cobra.config import (
     FogmConfig,
@@ -153,23 +153,23 @@ class Test_Orchestration(unittest.TestCase):
         self.orchestration_plugin: OrchestrationPlugin = SimpleGpsOrchestrationPlugin(
             'SimpleGpsOrchestrationPlugin'
         )
-        self.initialization_plugin: InitializationPlugin = SimpleInitializationPlugin(
-            'Cobra Simple Initialization Plugin'
+        self.initialization_plugin: InitializationPlugin = TutorialInitializationPlugin(
+            'Cobra Tutorial Initialization Plugin'
         )
-        self.inertial_plugin: InertialPlugin = SimpleInertialPlugin(
-            'Cobra Simple Inertial Plugin'
+        self.inertial_plugin: InertialPlugin = StandardInertialPlugin(
+            'Cobra Standard Inertial Plugin'
         )
-        self.fusion_plugin: FusionPlugin = SimpleFusionPlugin(
-            'Cobra Simple Fusion Plugin'
+        self.fusion_plugin: FusionPlugin = StandardFusionPlugin(
+            'Cobra Standard Fusion Plugin'
         )
-        self.fusion_strategy_plugin: FusionStrategyPlugin = (
-            SimpleEkfFusionStrategyPlugin('Cobra Simple Fusion Strategy Plugin')
+        self.fusion_strategy_plugin: FusionStrategyPlugin = EkfFusionStrategyPlugin(
+            'Cobra EKF Fusion Strategy Plugin'
         )
         self.state_modeling_plugin: StateModelingPlugin = (
             SimpleGpsInsStateModelingPlugin('Cobra Simple State Modeling Plugin')
         )
-        self.registry_plugin: SimpleRegistryPlugin = SimpleRegistryPlugin(
-            'SimpleRegistryPlugin'
+        self.registry_plugin: StandardRegistryPlugin = StandardRegistryPlugin(
+            'StandardRegistryPlugin'
         )
 
         plugins = [
@@ -182,7 +182,7 @@ class Test_Orchestration(unittest.TestCase):
             self.registry_plugin,
         ]
 
-        registry_plugin = SimpleRegistryPlugin('Simple registry', config=my_config)
+        registry_plugin = StandardRegistryPlugin('Standard registry', config=my_config)
         mediator = SimpleMediator(registry_plugin.identifier, RegistryPlugin)
         registry_plugin.init_plugin(mediator=mediator)
         registry = registry_plugin.new_registry()

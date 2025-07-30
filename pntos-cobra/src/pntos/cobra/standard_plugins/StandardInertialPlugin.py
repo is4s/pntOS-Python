@@ -5,7 +5,6 @@ from aspn23 import (
     TypeTimestamp,
 )
 from navtk.inertial import BufferedImu, ImuErrors
-
 from pntos.api import (
     InertialForcesRates,
     InertialFrame,
@@ -31,18 +30,18 @@ from pntos.cobra.utils import (
 )
 
 
-class SimpleInertial(StandardInertialMechanization):
+class StandardInertial(StandardInertialMechanization):
     """
-    A simple inertial object responsible for generating an inertial solution on request.
+    An inertial object which mechanizes IMU data to generate a series of inertial solutions.
     """
 
     inertial: BufferedImu
     mediator: Mediator
-    identifier: str = 'Cobra simple inertial'
+    identifier: str = 'Cobra standard inertial'
 
     def __init__(self, config_group: str, mediator: Mediator, solution: Message):
         """
-        A Simple Inertial Mechanization Object
+        An Inertial Mechanization Object
 
         Args:
             config_group (str): An :class:`pntos.cobra.config.InertialConfig` config group.
@@ -188,16 +187,16 @@ class SimpleInertial(StandardInertialMechanization):
         )
 
 
-class SimpleInertialPlugin(InertialPlugin):
+class StandardInertialPlugin(InertialPlugin):
     """
-    A simple inertial plugin that generates instances of the :class:`SimpleInertial` class.
+    An inertial plugin that generates instances of the :class:`internal.StandardInertial` class.
     """
 
     mediator: Mediator | None
 
     def __init__(self, identifier: str):
         """
-        A Simple Inertial Plugin
+        An Inertial Plugin
 
         Args:
             identifier (str): The plugin identifier passed to the
@@ -231,7 +230,7 @@ class SimpleInertialPlugin(InertialPlugin):
         if self.mediator is None:
             print(
                 'Error: mediator is None. '
-                + 'SimpleInertialPlugin.init_plugin '
+                + 'StandardInertialPlugin.init_plugin '
                 + 'must be called and passed a valid mediator '
                 + 'before new_preprocessor.'
             )
@@ -243,7 +242,7 @@ class SimpleInertialPlugin(InertialPlugin):
             )
             return None
         if self.is_inertial_type_supported(inertial_type):
-            return SimpleInertial(config_group, self.mediator, solution)
+            return StandardInertial(config_group, self.mediator, solution)
         else:
             self.mediator.log_message(LoggingLevel.ERROR, 'Unsupported type requested.')
             return None

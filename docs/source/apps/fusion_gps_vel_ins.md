@@ -9,25 +9,26 @@ Changes to the `fusion_gps_ins.py` script will actually be fairly minimal. Curre
 Begin by updating the import to bring in the new Orchestration plugin:
 
 ```diff
-     SimpleEkfFusionStrategyPlugin,
-     SimpleFusionPlugin,
+     LcmTransportPlugin,
+     SimpleControllerPlugin,
      SimpleGpsInsStateModelingPlugin,
 -    SimpleGpsOrchestrationPlugin,
 +    SimpleGpsVelOrchestrationPlugin,
-     SimpleInertialPlugin,
-     SimpleInitializationPlugin,
-     SimpleLoggingPlugin,
+     StandardFusionPlugin,
+     StandardInertialPlugin,
+     StandardLoggingPlugin,
 ```
 
 Then update the script so the new Orchestration plugin is created instead of the old:
 
 ```diff
-         'Cobra Simple Logging Plugin',
+         'Cobra Standard Logging Plugin',
          global_log_level=LoggingLevel.INFO,  # Switch to `DEBUG` for more informative log output
      ),
 -    SimpleGpsOrchestrationPlugin('Cobra Simple Orchestration Plugin'),
 +    SimpleGpsVelOrchestrationPlugin('Cobra Simple Orchestration Plugin'),
-     SimpleRegistryPlugin('Cobra Simple Registry Plugin', config=my_config),
+     StandardRegistryPlugin('Cobra Standard Registry Plugin', config=my_config),
+     StandardPreprocessorPlugin('Cobra Standard Preprocessor Plugin'),
  ]
  ```
 

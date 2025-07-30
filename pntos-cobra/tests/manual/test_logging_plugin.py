@@ -8,8 +8,8 @@ from pntos.api import (
     LoggingPlugin,
     Mediator,
 )
-from pntos.cobra import SimpleLoggingPlugin
-from pntos.cobra.internal import SimpleMediator, SimpleRegistry
+from pntos.cobra import StandardLoggingPlugin
+from pntos.cobra.internal import SimpleMediator, StandardRegistry
 
 expected_results: dict[ll, str] = {
     ll.DEBUG: '',
@@ -24,7 +24,7 @@ def remove_color_codes(input_string: str) -> str:
     return ansi_escape.sub('', input_string)
 
 
-def call(logging_plugin: SimpleLoggingPlugin) -> None:
+def call(logging_plugin: StandardLoggingPlugin) -> None:
     logging_plugin.log(
         logging_plugin.__class__,
         logging_plugin.identifier,
@@ -51,7 +51,7 @@ def call(logging_plugin: SimpleLoggingPlugin) -> None:
     )
 
 
-def call_color_and_not(logging_plugin: SimpleLoggingPlugin) -> None:
+def call_color_and_not(logging_plugin: StandardLoggingPlugin) -> None:
     logging_plugin.colorize = False
     print('Without color:')
     call(logging_plugin)
@@ -83,7 +83,7 @@ def test_manual() -> None:
     """This is for user tests of the logger plugin, not for the pytest suite."""
     # Initialize registry through mediator to have config values for logger
     dummy_plugin = DummyPlugin('dummy plugin')
-    registry = SimpleRegistry(dummy_log)
+    registry = StandardRegistry(dummy_log)
     mediator = SimpleMediator(dummy_plugin.identifier, LoggingPlugin)
     SimpleMediator.registry = registry
     config_group = 'config/logging/all'
@@ -95,8 +95,8 @@ def test_manual() -> None:
     kv_store.set_value(global_log_level_key, 'warn')
     kv_store.batch_end()
 
-    # Initialize SimpleLoggingPlugin and hand it the ready-made registry
-    logging_plugin = SimpleLoggingPlugin(identifier='my_logger')
+    # Initialize StandardLoggingPlugin and hand it the ready-made registry
+    logging_plugin = StandardLoggingPlugin(identifier='my_logger')
     logging_plugin.init_plugin('', mediator)
 
     # Prove that it read the config file - expecting only WARN and ERROR with color
@@ -130,12 +130,12 @@ def remove_decimal_numbers(input_string: str) -> str:
 def test(capsys: Any) -> None:
     # Initialize registry through mediator to have config values for logger
     dummy_plugin = DummyPlugin('dummy plugin')
-    registry = SimpleRegistry(dummy_log)
+    registry = StandardRegistry(dummy_log)
     mediator = SimpleMediator(dummy_plugin.identifier, LoggingPlugin)
     SimpleMediator.registry = registry
 
-    # Initialize SimpleLoggingPlugin and hand it the ready-made registry
-    logging_plugin = SimpleLoggingPlugin(identifier='my_logger')
+    # Initialize StandardLoggingPlugin and hand it the ready-made registry
+    logging_plugin = StandardLoggingPlugin(identifier='my_logger')
     logging_plugin.init_plugin('', mediator)
 
     ### Set up expected results
@@ -143,22 +143,22 @@ def test(capsys: Any) -> None:
     date_time_str = re.sub(r'\d', '', time.strftime(logging_plugin.date_time_format))
 
     info_str = (
-        f'\033[37m[{date_time_str}]\033[0m\033[90m [SimpleLoggingPlugin]'
+        f'\033[37m[{date_time_str}]\033[0m\033[90m [StandardLoggingPlugin]'
         + '\033[0m\033[92m [INFO] \033[0mThis is an INFO message\n'
     )
     warn_str = (
         f'\033[37m[{date_time_str}]\033[0m\033[90m '
-        + '[SimpleLoggingPlugin]\033[0m\033[93m [WARN] \033[0mThis is an '
+        + '[StandardLoggingPlugin]\033[0m\033[93m [WARN] \033[0mThis is an '
         + 'WARNING message\n'
     )
     error_str = (
         f'\033[37m[{date_time_str}]\033[0m\033[90m '
-        + '[SimpleLoggingPlugin]\033[0m\033[91m [ERROR] \033[0mThis is an '
+        + '[StandardLoggingPlugin]\033[0m\033[91m [ERROR] \033[0mThis is an '
         + 'ERROR message\n'
     )
     debug_str = (
         f'\033[37m[{date_time_str}]\033[0m\033[90m '
-        + '[SimpleLoggingPlugin]\033[0m\033[94m [DEBUG] \033[0mThis is a '
+        + '[StandardLoggingPlugin]\033[0m\033[94m [DEBUG] \033[0mThis is a '
         + 'DEBUG message\n'
     )
 

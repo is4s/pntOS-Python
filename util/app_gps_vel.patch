@@ -3,15 +3,15 @@ index f7feac3..9e88c8f 100755
 --- a/apps/fusion_gps_ins.py
 +++ b/apps/fusion_gps_vel_ins.py
 @@ -11,7 +11,7 @@ from pntos.cobra import (
-     SimpleEkfFusionStrategyPlugin,
-     SimpleFusionPlugin,
+     LcmTransportPlugin,
+     SimpleControllerPlugin,
      SimpleGpsInsStateModelingPlugin,
 -    SimpleGpsOrchestrationPlugin,
 +    SimpleGpsVelOrchestrationPlugin,
-     SimpleInertialPlugin,
-     SimpleInitializationPlugin,
-     SimpleLoggingPlugin,
-@@ -87,6 +87,7 @@ my_config = [
+     StandardFusionPlugin,
+     StandardInertialPlugin,
+     StandardLoggingPlugin,
+@@ -85,6 +85,7 @@ my_config = [
      OrchestrationConfig(
          gps_channel='/sensor/ublox-ZED-F9T/position',
          group='config/orchestration',
@@ -19,12 +19,12 @@ index f7feac3..9e88c8f 100755
      ),
      TimeAdjusterConfig(
          group='config/time_adjuster',
-@@ -109,7 +110,7 @@ plugins = [
-         'Cobra Simple Logging Plugin',
+@@ -107,7 +108,7 @@ plugins = [
+         'Cobra Standard Logging Plugin',
          global_log_level=LoggingLevel.INFO,  # Switch to `DEBUG` for more informative log output
      ),
 -    SimpleGpsOrchestrationPlugin('Cobra Simple Orchestration Plugin'),
 +    SimpleGpsVelOrchestrationPlugin('Cobra Simple Orchestration Plugin'),
-     SimpleRegistryPlugin('Cobra Simple Registry Plugin', config=my_config),
-     SimpleCobraPreprocessorPlugin('Cobra Simple Preprocessor Plugin'),
+     StandardRegistryPlugin('Cobra Standard Registry Plugin', config=my_config),
+     StandardPreprocessorPlugin('Cobra Standard Preprocessor Plugin'),
  ]

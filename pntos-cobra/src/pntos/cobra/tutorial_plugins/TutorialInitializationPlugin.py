@@ -8,7 +8,6 @@ from aspn23 import (
 )
 from navtk.navutils import rpy_to_quat
 from numpy.typing import NDArray
-
 from pntos.api import (
     InertialInitializationStrategy,
     InitialInertialSolution,
@@ -27,7 +26,7 @@ from pntos.cobra.config import (
 from pntos.cobra.config.ManualAlignmentConfig import ManualAlignmentConfig
 
 
-class SimpleInitialization(InertialInitializationStrategy):
+class ManualInitialization(InertialInitializationStrategy):
     """
     A simple initialization strategy that generates an initial solution from an alignment config in the registry.
     This implementation is designed to work with a manual alignment.
@@ -50,13 +49,9 @@ class SimpleInitialization(InertialInitializationStrategy):
         """
         self.config_group = config_group
         self.mediator = mediator
-        config = config_from_registry(ManualAlignmentConfig, mediator, config_group)
-        if config is None:
-            self.mediator.log_message(
-                LoggingLevel.ERROR,
-                f'Failed to populate config from registry to config type AlignmentConfig and group {config_group}.',
-            )
-            return
+        config: ManualAlignmentConfig = config_from_registry(
+            ManualAlignmentConfig, mediator, config_group
+        )  # type: ignore
         self.solution = Message(self._create_pva(config), 'Cobra simple initialization')
         self.imu_errors = self._create_imu_errors(config)
         self.covariance = np.diag(
@@ -77,9 +72,7 @@ class SimpleInitialization(InertialInitializationStrategy):
         return self.status
 
     def process_pntos_message(self, message: Message) -> None:
-        self.mediator.log_message(
-            LoggingLevel.WARN, 'process_pntos_message is unused, discarding message.'
-        )
+        pass
 
     def request_solution(self) -> InitialInertialSolution:
         return InitialInertialSolution(
@@ -140,9 +133,9 @@ class SimpleInitialization(InertialInitializationStrategy):
         )
 
 
-class SimpleInitializationPlugin(InitializationPlugin):
+class TutorialInitializationPlugin(InitializationPlugin):
     """
-    A simple initialization plugin that generates :class:`SimpleInitialization` instances.
+    A simple initialization plugin that generates :class:`internal.ManualInitialization` instances.
     """
 
     mediator: Mediator
@@ -162,10 +155,7 @@ class SimpleInitializationPlugin(InitializationPlugin):
         plugin_resources_location: str | None = None,
         mediator: Mediator | None = None,
     ) -> None:
-        if mediator is not None:
-            self.mediator = mediator
-        else:
-            print('Error: mediator cannot be None.')
+        self.mediator = mediator  # type: ignore
 
     def shutdown_plugin(self) -> None:
         return
@@ -176,14 +166,8 @@ class SimpleInitializationPlugin(InitializationPlugin):
     def new_initialization_strategy(
         self, type: type[InitializationType], config_group: str | None = None
     ) -> InitializationType | None:
-        if config_group is None:
-            self.mediator.log_message(
-                LoggingLevel.ERROR,
-                'config_group is a required parameter for this plugin and cannot be None.',
-            )
-            return None
         if issubclass(type, InertialInitializationStrategy):
-            return SimpleInitialization(config_group, self.mediator)
+            return ManualInitialization(config_group, self.mediator)  # type: ignore[arg-type]
         else:
             self.mediator.log_message(LoggingLevel.ERROR, 'Unsupported type requested.')
             return None

@@ -21,9 +21,9 @@ class fmts:
     WHITE = '\033[97m'
 
 
-class SimpleLoggingPlugin(LoggingPlugin):
+class StandardLoggingPlugin(LoggingPlugin):
     """
-    A simple logging plugin that dictates the formatting and handles logging to the console.
+    A logging plugin that dictates the formatting and handles logging to the console.
     """
 
     def __init__(
@@ -34,7 +34,7 @@ class SimpleLoggingPlugin(LoggingPlugin):
         date_time_format: str = '%d/%m/%Y %H:%M:%S',
     ) -> None:
         """
-        Cobra Simple Logging Plugin
+        Cobra Logging Plugin
 
         Args:
             identifier (str): Populates the ``CommonPlugin.identifier`` field.

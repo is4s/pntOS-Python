@@ -16,8 +16,8 @@ from aspn23 import (
 from pntos.api import Message, Preprocessor, RegistryPlugin
 from pntos.api.plugins.preprocessor import Preprocessor
 from pntos.cobra import (
-    SimpleCobraPreprocessorPlugin,
-    SimpleRegistryPlugin,
+    StandardPreprocessorPlugin,
+    StandardRegistryPlugin,
 )
 from pntos.cobra.config import (
     BarometerToAltitudeConfig,
@@ -28,9 +28,9 @@ from pntos.cobra.config import (
 )
 from pntos.cobra.internal import (
     BarometerToAltitudePreprocessor,
-    SimpleImuRotationPreprocessor,
+    ImuRotationPreprocessor,
     SimpleMediator,
-    SimpleTimeAdjusterPreprocessor,
+    TimeAdjusterPreprocessor,
 )
 
 downsampler_config = DownsamplerConfig(
@@ -66,7 +66,7 @@ config_list: list[BaseConfig] = [
 
 @pytest.fixture
 def mediator() -> SimpleMediator:
-    registry_plugin = SimpleRegistryPlugin('Simple registry', config=config_list)
+    registry_plugin = StandardRegistryPlugin('Standard registry', config=config_list)
     mediator = SimpleMediator(registry_plugin.identifier, RegistryPlugin)
     registry_plugin.init_plugin(mediator=mediator)
     registry = registry_plugin.new_registry()
@@ -77,27 +77,27 @@ def mediator() -> SimpleMediator:
 @pytest.fixture
 def preprocessor_plugin(
     mediator: SimpleMediator,
-) -> SimpleCobraPreprocessorPlugin:
-    ds_plugin = SimpleCobraPreprocessorPlugin('preprocessor_plugin')
+) -> StandardPreprocessorPlugin:
+    ds_plugin = StandardPreprocessorPlugin('preprocessor_plugin')
     ds_plugin.init_plugin(mediator=mediator)
     return ds_plugin
 
 
 def test_plugin_constructor(
-    preprocessor_plugin: SimpleCobraPreprocessorPlugin,
+    preprocessor_plugin: StandardPreprocessorPlugin,
 ) -> None:
     assert preprocessor_plugin.identifier == 'preprocessor_plugin'
     assert len(preprocessor_plugin.preprocessor_identifiers) == 4
 
 
 def test_invalid_mediator() -> None:
-    ds_plugin = SimpleCobraPreprocessorPlugin('preprocessor_plugin')
+    ds_plugin = StandardPreprocessorPlugin('preprocessor_plugin')
     ds_plugin.init_plugin()
     assert not ds_plugin.new_preprocessor(0, 'test')
 
 
 def test_invalid_index(
-    preprocessor_plugin: SimpleCobraPreprocessorPlugin,
+    preprocessor_plugin: StandardPreprocessorPlugin,
 ) -> None:
     assert preprocessor_plugin.new_preprocessor(-1, 'test') is None
     assert (
@@ -111,7 +111,7 @@ def test_invalid_index(
 ################## Downsampler Tests #################
 @pytest.fixture
 def downsampler(
-    preprocessor_plugin: SimpleCobraPreprocessorPlugin,
+    preprocessor_plugin: StandardPreprocessorPlugin,
 ) -> Preprocessor:
     ds = preprocessor_plugin.new_preprocessor(0, 'test')
     assert ds is not None
@@ -142,7 +142,7 @@ def assert_aspn_alt_equal(alt1: MeasurementAltitude, alt2: MeasurementAltitude):
 
 
 def test_invalid_config_group(
-    preprocessor_plugin: SimpleCobraPreprocessorPlugin,
+    preprocessor_plugin: StandardPreprocessorPlugin,
 ) -> None:
     # No config group
     ds = preprocessor_plugin.new_preprocessor(0)
@@ -166,7 +166,7 @@ def test_invalid_config_group(
 
 
 def test_bad_channel(
-    preprocessor_plugin: SimpleCobraPreprocessorPlugin,
+    preprocessor_plugin: StandardPreprocessorPlugin,
 ) -> None:
     ds = preprocessor_plugin.new_preprocessor(0, 'test')
     assert ds is not None
@@ -264,12 +264,12 @@ def test_channel_three(
 
 @pytest.fixture
 def imu_rotator_preprocessor(
-    preprocessor_plugin: SimpleCobraPreprocessorPlugin,
+    preprocessor_plugin: StandardPreprocessorPlugin,
 ) -> Preprocessor:
     idx = preprocessor_plugin.preprocessor_identifiers.index('imu_rotator')
     preprocessor = preprocessor_plugin.new_preprocessor(idx, '/config/default/inertial')
     assert preprocessor is not None
-    assert isinstance(preprocessor, SimpleImuRotationPreprocessor)
+    assert isinstance(preprocessor, ImuRotationPreprocessor)
     return preprocessor
 
 
@@ -289,7 +289,7 @@ def imu_message() -> Message:
 
 
 def test_empty_config_group(
-    preprocessor_plugin: SimpleCobraPreprocessorPlugin,
+    preprocessor_plugin: StandardPreprocessorPlugin,
 ) -> None:
     idx = preprocessor_plugin.preprocessor_identifiers.index('imu_rotator')
     invalid_preprocessor = preprocessor_plugin.new_preprocessor(idx)
@@ -334,12 +334,12 @@ def test_imu_rotation(
 
 @pytest.fixture
 def time_adjuster_preprocessor(
-    preprocessor_plugin: SimpleCobraPreprocessorPlugin,
+    preprocessor_plugin: StandardPreprocessorPlugin,
 ) -> Preprocessor:
     idx = preprocessor_plugin.preprocessor_identifiers.index('time_adjuster')
     preprocessor = preprocessor_plugin.new_preprocessor(idx, 'test')
     assert preprocessor is not None
-    assert isinstance(preprocessor, SimpleTimeAdjusterPreprocessor)
+    assert isinstance(preprocessor, TimeAdjusterPreprocessor)
     return preprocessor
 
 
@@ -448,7 +448,7 @@ def baro_message() -> Message:
 
 @pytest.fixture
 def baro_to_alt(
-    preprocessor_plugin: SimpleCobraPreprocessorPlugin,
+    preprocessor_plugin: StandardPreprocessorPlugin,
 ) -> Preprocessor:
     idx = preprocessor_plugin.preprocessor_identifiers.index('baro_converter')
     preprocessor = preprocessor_plugin.new_preprocessor(idx, 'baro_test')
@@ -457,13 +457,13 @@ def baro_to_alt(
     return preprocessor
 
 
-def test_bad_config_group(preprocessor_plugin: SimpleCobraPreprocessorPlugin) -> None:
+def test_bad_config_group(preprocessor_plugin: StandardPreprocessorPlugin) -> None:
     idx = preprocessor_plugin.preprocessor_identifiers.index('baro_converter')
     preprocessor = preprocessor_plugin.new_preprocessor(idx, 'wrong_group')
     assert preprocessor is None
 
 
-def test_no_config_group(preprocessor_plugin: SimpleCobraPreprocessorPlugin) -> None:
+def test_no_config_group(preprocessor_plugin: StandardPreprocessorPlugin) -> None:
     idx = preprocessor_plugin.preprocessor_identifiers.index('baro_converter')
     preprocessor = preprocessor_plugin.new_preprocessor(idx, None)
     assert preprocessor is None

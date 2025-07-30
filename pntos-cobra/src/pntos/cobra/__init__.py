@@ -1,8 +1,5 @@
-from .DummyTransportPlugin import (
+from .dummy_plugins.DummyTransportPlugin import (
     DummyTransportPlugin as DummyTransportPlugin,
-)
-from .LcmTransportPlugin import (
-    LcmTransportPlugin as LcmTransportPlugin,
 )
 from .orchestration_plugins.SimpleGpsOrchestrationPlugin import (
     SimpleGpsOrchestrationPlugin as SimpleGpsOrchestrationPlugin,
@@ -13,27 +10,36 @@ from .orchestration_plugins.SimpleGpsVelOrchestrationPlugin import (
 from .simple_controller.SimpleControllerPlugin import (
     SimpleControllerPlugin as SimpleControllerPlugin,
 )
-from .SimpleCobraPreprocessorPlugin import (
-    SimpleCobraPreprocessorPlugin as SimpleCobraPreprocessorPlugin,
+from .standard_plugins.DiagnosticLogPlugin import (
+    DiagnosticLogPlugin as DiagnosticLogPlugin,
 )
-from .SimpleDiagnosticLogPlugin import (
-    SimpleDiagnosticLogPlugin as SimpleDiagnosticLogPlugin,
+from .standard_plugins.EkfFusionStrategyPlugin import (
+    EkfFusionStrategyPlugin as EkfFusionStrategyPlugin,
 )
-from .SimpleEkfFusionStrategyPlugin import (
-    SimpleEkfFusionStrategyPlugin as SimpleEkfFusionStrategyPlugin,
+from .standard_plugins.LcmTransportPlugin import (
+    LcmTransportPlugin as LcmTransportPlugin,
 )
-from .SimpleFusionPlugin import SimpleFusionPlugin as SimpleFusionPlugin
-from .SimpleInertialPlugin import SimpleInertialPlugin as SimpleInertialPlugin
-from .SimpleInitializationPlugin import (
-    SimpleInitializationPlugin as SimpleInitializationPlugin,
+from .standard_plugins.StandardFusionPlugin import (
+    StandardFusionPlugin as StandardFusionPlugin,
 )
-from .SimpleLoggingPlugin import SimpleLoggingPlugin as SimpleLoggingPlugin
-from .SimpleRegistryPlugin import (
-    SimpleRegistryPlugin as SimpleRegistryPlugin,
+from .standard_plugins.StandardInertialPlugin import (
+    StandardInertialPlugin as StandardInertialPlugin,
+)
+from .standard_plugins.StandardLoggingPlugin import (
+    StandardLoggingPlugin as StandardLoggingPlugin,
+)
+from .standard_plugins.StandardPreprocessorPlugin import (
+    StandardPreprocessorPlugin as StandardPreprocessorPlugin,
+)
+from .standard_plugins.StandardRegistryPlugin import (
+    StandardRegistryPlugin as StandardRegistryPlugin,
+)
+from .standard_plugins.StaticAlignInitializationPlugin import (
+    StaticAlignInitializationPlugin as StaticAlignInitializationPlugin,
 )
 from .state_modeling_simple_gps_ins.SimpleGpsInsStateModelingPlugin import (
     SimpleGpsInsStateModelingPlugin as SimpleGpsInsStateModelingPlugin,
 )
-from .StaticAlignInitializationPlugin import (
-    StaticAlignInitializationPlugin as StaticAlignInitializationPlugin,
+from .tutorial_plugins.TutorialInitializationPlugin import (
+    TutorialInitializationPlugin as TutorialInitializationPlugin,
 )

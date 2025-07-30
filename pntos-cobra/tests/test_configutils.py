@@ -5,7 +5,7 @@ from enum import Enum
 import numpy as np
 from aspn23 import TypeTimestamp
 from pntos.api import LoggingLevel, Mediator, Message, RegistryValueTypeUnion
-from pntos.cobra import SimpleRegistryPlugin
+from pntos.cobra import StandardRegistryPlugin
 from pntos.cobra.config import (
     AlignmentStrategy,
     BaseConfig,
@@ -51,7 +51,7 @@ class DummyMediator(Mediator):
 class TestConfigUtils(unittest.TestCase):
     def __init__(self, name: str) -> None:
         # Set up registry and mediator
-        registry_plugin = SimpleRegistryPlugin('Simple Registry Plugin')
+        registry_plugin = StandardRegistryPlugin('Standard Registry Plugin')
         registry_plugin.init_plugin(mediator=DummyMediator())
         DummyMediator.registry = registry_plugin.new_registry()
         self.mediator = DummyMediator()

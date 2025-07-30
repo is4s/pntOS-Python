@@ -5,17 +5,17 @@ from pntos.api import LoggingLevel
 
 # Import Cobra plugins and config structs
 from pntos.cobra import (
+    EkfFusionStrategyPlugin,
     LcmTransportPlugin,
-    SimpleCobraPreprocessorPlugin,
     SimpleControllerPlugin,
-    SimpleEkfFusionStrategyPlugin,
-    SimpleFusionPlugin,
     SimpleGpsInsStateModelingPlugin,
     SimpleGpsVelOrchestrationPlugin,
-    SimpleInertialPlugin,
-    SimpleInitializationPlugin,
-    SimpleLoggingPlugin,
-    SimpleRegistryPlugin,
+    StandardFusionPlugin,
+    StandardInertialPlugin,
+    StandardLoggingPlugin,
+    StandardPreprocessorPlugin,
+    StandardRegistryPlugin,
+    TutorialInitializationPlugin,
 )
 from pntos.cobra.config import (
     FogmConfig,
@@ -99,18 +99,18 @@ my_config = [
 controller = SimpleControllerPlugin('Cobra Simple Controller Plugin')
 plugins = [
     LcmTransportPlugin('Cobra LCM Transport Plugin'),
-    SimpleEkfFusionStrategyPlugin('Cobra Simple Fusion Strategy Plugin'),
-    SimpleFusionPlugin('Cobra Simple Fusion Plugin'),
+    EkfFusionStrategyPlugin('Cobra EKF Fusion Strategy Plugin'),
+    StandardFusionPlugin('Cobra Standard Fusion Plugin'),
     SimpleGpsInsStateModelingPlugin('Cobra Simple State Modeling Plugin'),
-    SimpleInertialPlugin('Cobra Simple Inertial Plugin'),
-    SimpleInitializationPlugin('Cobra Simple Initialization Plugin'),
-    SimpleLoggingPlugin(
-        'Cobra Simple Logging Plugin',
+    StandardInertialPlugin('Cobra Standard Inertial Plugin'),
+    TutorialInitializationPlugin('Cobra Manual Initialization Plugin'),
+    StandardLoggingPlugin(
+        'Cobra Standard Logging Plugin',
         global_log_level=LoggingLevel.INFO,  # Switch to `DEBUG` for more informative log output
     ),
     SimpleGpsVelOrchestrationPlugin('Cobra Simple Orchestration Plugin'),
-    SimpleRegistryPlugin('Cobra Simple Registry Plugin', config=my_config),
-    SimpleCobraPreprocessorPlugin('Cobra Simple Preprocessor Plugin'),
+    StandardRegistryPlugin('Cobra Standard Registry Plugin', config=my_config),
+    StandardPreprocessorPlugin('Cobra Standard Preprocessor Plugin'),
 ]
 
 # Start the controller, and pass it all of the other plugins to use

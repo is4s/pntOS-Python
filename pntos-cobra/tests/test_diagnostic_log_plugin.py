@@ -16,9 +16,9 @@ from pntos.api import (
     UtilityPlugin,
 )
 from pntos.cobra import (
-    SimpleDiagnosticLogPlugin,
-    SimpleLoggingPlugin,
-    SimpleRegistryPlugin,
+    DiagnosticLogPlugin,
+    StandardLoggingPlugin,
+    StandardRegistryPlugin,
 )
 from pntos.cobra.internal import SimpleMediator
 from pntos.cobra.utils import load_from_hdf5_file
@@ -75,19 +75,17 @@ def compare_messages(m1: object, m2: object, depth: int = 0) -> bool:
         return m1 == m2
 
 
-def test_simple_diagnostic_log_plugin() -> None:
-    plugin = SimpleDiagnosticLogPlugin(
-        'Simple Diagnostic Log Plugin', output_file=TEST_FILE
-    )
+def test_diagnostic_log_plugin() -> None:
+    plugin = DiagnosticLogPlugin('Diagnostic Log Plugin', output_file=TEST_FILE)
     mediator = SimpleMediator(plugin.identifier, UtilityPlugin)
 
-    registry_plugin = SimpleRegistryPlugin('Registry Plugin')
+    registry_plugin = StandardRegistryPlugin('Registry Plugin')
     registry_mediator = SimpleMediator(registry_plugin.identifier, RegistryPlugin)
     registry_plugin.init_plugin(mediator=registry_mediator)
 
     SimpleMediator.registry = registry_plugin.new_registry()
 
-    logging_plugin = SimpleLoggingPlugin('Logging Plugin')
+    logging_plugin = StandardLoggingPlugin('Logging Plugin')
     logging_mediator = SimpleMediator(logging_plugin.identifier, LoggingPlugin)
     logging_plugin.init_plugin(mediator=logging_mediator)
 

@@ -10,14 +10,14 @@ from pntos.api import (
 from pntos.cobra import (
     SimpleControllerPlugin,
     SimpleGpsOrchestrationPlugin,
-    SimpleRegistryPlugin,
+    StandardRegistryPlugin,
 )
 
 
 def test_completeness() -> None:
     if TYPE_CHECKING:
         _cnt_plug: ControllerPlugin = SimpleControllerPlugin('my_controller')
-        _reg_plug: RegistryPlugin = SimpleRegistryPlugin('my_registry')
+        _reg_plug: RegistryPlugin = StandardRegistryPlugin('my_registry')
         _orc_plug: OrchestrationPlugin = SimpleGpsOrchestrationPlugin(
             'my_orchestration'
         )

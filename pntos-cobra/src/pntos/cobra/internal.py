@@ -2,22 +2,26 @@ from .simple_controller.SimpleMediator import SimpleMediator as SimpleMediator
 from .simple_controller.SimpleMessageStreamConfig import (
     SimpleMessageStreamConfig as SimpleMessageStreamConfig,
 )
-from .SimpleCobraPreprocessorPlugin import (
+from .standard_plugins.EkfFusionStrategyPlugin import (
+    EkfFusionStrategy as EkfFusionStrategy,
+)
+from .standard_plugins.StandardFusionPlugin import (
+    StandardFusionEngine as StandardFusionEngine,
+)
+from .standard_plugins.StandardInertialPlugin import (
+    StandardInertial as StandardInertial,
+)
+from .standard_plugins.StandardPreprocessorPlugin import (
     BarometerToAltitudePreprocessor as BarometerToAltitudePreprocessor,
-    SimpleImuRotationPreprocessor as SimpleImuRotationPreprocessor,
-    SimplePreprocessorDownsampler as SimplePreprocessorDownsampler,
-    SimpleTimeAdjusterPreprocessor as SimpleTimeAdjusterPreprocessor,
+    ImuRotationPreprocessor as ImuRotationPreprocessor,
+    PreprocessorDownsampler as PreprocessorDownsampler,
+    TimeAdjusterPreprocessor as TimeAdjusterPreprocessor,
 )
-from .SimpleEkfFusionStrategyPlugin import (
-    SimpleEkfFusionStrategy as SimpleEkfFusionStrategy,
+from .standard_plugins.StandardRegistryPlugin import (
+    StandardKeyValueStore as StandardKeyValueStore,
+    StandardRegistry as StandardRegistry,
 )
-from .SimpleFusionPlugin import SimpleFusionEngine as SimpleFusionEngine
-from .SimpleInertialPlugin import SimpleInertial as SimpleInertial
-from .SimpleInitializationPlugin import SimpleInitialization as SimpleInitialization
-from .SimpleRegistryPlugin import (
-    SimpleKeyValueStore as SimpleKeyValueStore,
-    SimpleRegistry as SimpleRegistry,
-)
+from .standard_plugins.StaticAlignInitializationPlugin import StaticAlign as StaticAlign
 from .state_modeling_simple_gps_ins.FogmBlock import (
     FogmBlock as FogmBlock,
 )
@@ -33,4 +37,6 @@ from .state_modeling_simple_gps_ins.PinsonVelocityMeasurementProcessor import (
 from .state_modeling_simple_gps_ins.PinsonWithNedFogmPositionMeasurementProcessor import (
     PinsonWithNedFogmPositionMeasurementProcessor as PinsonWithNedFogmPositionMeasurementProcessor,
 )
-from .StaticAlignInitializationPlugin import StaticAlign as StaticAlign
+from .tutorial_plugins.TutorialInitializationPlugin import (
+    ManualInitialization as ManualInitialization,
+)

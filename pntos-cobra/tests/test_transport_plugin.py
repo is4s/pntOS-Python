@@ -4,13 +4,9 @@ import numpy as np
 import pytest
 from aspn23 import TypeTimestamp
 from aspn23_lcm import measurement_position_velocity_attitude
-from lcm import LCM
 from pntos.api import LoggingLevel, Mediator, Message, Registry
-from pntos.cobra import LcmTransportPlugin, SimpleRegistryPlugin
-from pntos.cobra.internal import SimpleMediator, SimpleRegistry
-from pntos.cobra.LcmTransportPlugin import LCM_URL
-
-LCM_URL = ''
+from pntos.cobra import LcmTransportPlugin
+from pntos.cobra.internal import SimpleMediator, StandardRegistry
 
 
 def dummy_log(level: LoggingLevel, message: str) -> None:
@@ -47,7 +43,7 @@ class DummyMediator(Mediator):
 
 @pytest.fixture
 def mediator():
-    registry = SimpleRegistry(dummy_log)
+    registry = StandardRegistry(dummy_log)
     DummyMediator.registry = registry
     mediator = DummyMediator()
     return mediator

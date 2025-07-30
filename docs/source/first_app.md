@@ -31,7 +31,7 @@ If you have not yet created a Python virtual environment for the [`pntos-python`
 repository](https://git.aspn.us/pntos/pntos-python), follow the instructions in [](./installation.md) then go
 to [](#start-a-local-tcp-server).
 
-If you have created the virtual environment but it is not currently activated, run the below command 
+If you have created the virtual environment but it is not currently activated, run the below command
 from the root directory to enter the virtual environment. The command varies depending on your shell:
 
 `````{tab-set}
@@ -92,7 +92,7 @@ lcm-logger --lcm-url=tcpq:// pntos_output.log
 This process will listen to any messages transmitted over LCM and record them to `pntos_output.log`.
 
 Alternatively, to just see the solution printed to the terminal, set the logging level
-to `DEBUG` when initializing the {py:obj}`pntos.cobra.SimpleLoggingPlugin`.
+to `DEBUG` when initializing the {py:obj}`pntos.cobra.StandardLoggingPlugin`.
 
 ### Select an App
 

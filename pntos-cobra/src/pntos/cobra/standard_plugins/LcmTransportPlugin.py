@@ -2,7 +2,6 @@ import threading
 from threading import Thread
 
 from lcm import LCM, LCMSubscription
-
 from pntos.api import LoggingLevel, Mediator, Message, TransportPlugin
 from pntos.cobra.config import config_from_registry
 from pntos.cobra.config.LcmTransportConfig import (

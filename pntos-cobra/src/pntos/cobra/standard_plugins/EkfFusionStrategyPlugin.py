@@ -1,6 +1,5 @@
 import numpy as np
 from numpy.typing import NDArray
-
 from pntos.api import (
     FusionStrategyPlugin,
     FusionStrategyType,
@@ -13,16 +12,16 @@ from pntos.api import (
 from pntos.cobra.utils import is_symmetric, validate_array
 
 
-class SimpleEkfFusionStrategy(StandardFusionStrategy):
+class EkfFusionStrategy(StandardFusionStrategy):
     """
-    This is a simple Extended Kalman Filter (EKF) sensor fusion strategy.
+    This is an Extended Kalman Filter (EKF) sensor fusion strategy.
 
     It is capable of Bayesian inference on a linearized discrete-time system with Gaussian noise inputs.
     """
 
     def __init__(self, mediator: Mediator) -> None:
         """
-        Simple Extended Kalman Filter Fusion Strategy
+        An Extended Kalman Filter Fusion Strategy
 
         Args:
             mediator (Mediator): A :class:`pntos.api.Mediator` instance.
@@ -223,17 +222,17 @@ class SimpleEkfFusionStrategy(StandardFusionStrategy):
         self._P = (np.eye(self._P.shape[0]) - K @ measurement_model.H) @ self._P
 
 
-class SimpleEkfFusionStrategyPlugin(FusionStrategyPlugin):
+class EkfFusionStrategyPlugin(FusionStrategyPlugin):
     """
-    This is a simple fusion strategy plugin. It functions as a factory that produces fusion strategies,
-    although it currently only supports the EKF fusion strategy.
+    This is an EKF fusion strategy plugin. It functions as a factory that produces EKF fusion
+    strategies.
     """
 
     _mediator: Mediator
 
     def __init__(self, identifier: str):
         """
-        A Simple Extended Kalman Filter Fusion Strategy Plugin
+        An Extended Kalman Filter Fusion Strategy Plugin
 
         Args:
             identifier (str): The plugin identifier passed to the
@@ -259,7 +258,7 @@ class SimpleEkfFusionStrategyPlugin(FusionStrategyPlugin):
         self, fusion_type: type[FusionStrategyType]
     ) -> FusionStrategyType | None:
         if self.is_fusion_type_supported(fusion_type):
-            return SimpleEkfFusionStrategy(self._mediator)
+            return EkfFusionStrategy(self._mediator)
         else:
             self._mediator.log_message(
                 LoggingLevel.ERROR,

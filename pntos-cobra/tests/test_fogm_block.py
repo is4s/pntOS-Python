@@ -13,7 +13,7 @@ from pntos.api import (
     Message,
     RegistryPlugin,
 )
-from pntos.cobra import SimpleRegistryPlugin
+from pntos.cobra import StandardRegistryPlugin
 from pntos.cobra.config import BaseConfig
 from pntos.cobra.internal import SimpleMediator
 from pntos.cobra.state_modeling_simple_gps_ins.FogmBlock import (
@@ -25,7 +25,7 @@ my_config: list[BaseConfig] = []
 
 @pytest.fixture
 def mediator() -> SimpleMediator:
-    registry_plugin = SimpleRegistryPlugin('Simple registry', config=my_config)
+    registry_plugin = StandardRegistryPlugin('Standard registry', config=my_config)
     mediator = SimpleMediator(registry_plugin.identifier, RegistryPlugin)
     registry_plugin.init_plugin(mediator=mediator)
     registry = registry_plugin.new_registry()

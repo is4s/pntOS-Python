@@ -1,6 +1,5 @@
 from navtk.inertial import AlignBase, ManualHeadingAlignment, StaticAlignment
 from navtk.utils import to_positionvelocityattitude
-
 from pntos.api import (
     InertialInitializationStrategy,
     InitialInertialSolution,
@@ -128,7 +127,7 @@ class StaticAlign(InertialInitializationStrategy):
 
 class StaticAlignInitializationPlugin(InitializationPlugin):
     """
-    A static alignment initialization plugin that provides the :class:`StaticAlign` strategy.
+    A static alignment initialization plugin that provides the :class:`internal.StaticAlign` strategy.
     """
 
     mediator: Mediator
