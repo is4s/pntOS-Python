@@ -10,6 +10,7 @@ workflow:
 variables:
   GIT_CLEAN_FLAGS: -xdff
   UV_INDEX: https://gitlab-ci-token:${CI_JOB_TOKEN}@git.aspn.us/api/v4/projects/94/packages/pypi/simple
+  FIREHOSE_OUTPUTS_VERSION: d051b108d4c68e648ed551356ad7ddc1b76b99e1  # main, July 28, 2025
 
 default:
     retry:
@@ -123,6 +124,7 @@ ASPN-ROS Test:
         - docker run --rm -dit -v $(pwd):/work --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
         - docker exec pntos-python uv sync -v --python 3.12  # 3.12 for Jazzy compatibility
         - docker exec pntos-python git clone --depth 1 git@git.aspn.us:pntos/firehose-outputs.git
+        - docker exec pntos-python bash -c "cd firehose-outputs && git checkout $FIREHOSE_OUTPUTS_VERSION"
         - docker exec pntos-python bash -c ". firehose-outputs/ros_devel/jazzy/setup.bash && pytest pntos-cobra/tests/test_aspn_ros.py"
 
 mypy:
@@ -193,6 +195,7 @@ GPS INS ROS App:
         - docker run --rm -dit -v $(pwd):/work --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
         - docker exec pntos-python uv sync -v --python 3.12  # 3.12 for Jazzy compatibility
         - docker exec pntos-python git clone --depth 1 git@git.aspn.us:pntos/firehose-outputs.git
+        - docker exec pntos-python bash -c "cd firehose-outputs && git checkout $FIREHOSE_OUTPUTS_VERSION"
         - docker exec pntos-python bash -c ". firehose-outputs/ros_devel/jazzy/setup.bash && postprocessing/run_app_and_record_data_ros.py"
     artifacts:
         paths:
