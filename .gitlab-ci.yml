@@ -123,9 +123,12 @@ ASPN-ROS Test:
     script:
         - docker run --rm -dit -v $(pwd):/work --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
         - docker exec pntos-python uv sync -v --python 3.12  # 3.12 for Jazzy compatibility
-        - docker exec pntos-python git clone --depth 1 git@git.aspn.us:pntos/firehose-outputs.git
-        - docker exec pntos-python bash -c "cd firehose-outputs && git checkout $FIREHOSE_OUTPUTS_VERSION"
-        - docker exec pntos-python bash -c ". firehose-outputs/ros_devel/jazzy/setup.bash && pytest pntos-cobra/tests/test_aspn_ros.py"
+        - docker exec pntos-python git clone --depth 1 -b main git@git.aspn.us:pntos/firehose-outputs.git
+        - docker exec pntos-python bash -c "cd firehose-outputs &&
+                                            git fetch --depth 1 origin $FIREHOSE_OUTPUTS_VERSION &&
+                                            git checkout $FIREHOSE_OUTPUTS_VERSION"
+        - docker exec pntos-python bash -c ". firehose-outputs/ros_devel/jazzy/setup.bash &&
+                                            pytest pntos-cobra/tests/test_aspn_ros.py"
 
 mypy:
     stage: check
@@ -194,9 +197,12 @@ GPS INS ROS App:
     script:
         - docker run --rm -dit -v $(pwd):/work --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
         - docker exec pntos-python uv sync -v --python 3.12  # 3.12 for Jazzy compatibility
-        - docker exec pntos-python git clone --depth 1 git@git.aspn.us:pntos/firehose-outputs.git
-        - docker exec pntos-python bash -c "cd firehose-outputs && git checkout $FIREHOSE_OUTPUTS_VERSION"
-        - docker exec pntos-python bash -c ". firehose-outputs/ros_devel/jazzy/setup.bash && postprocessing/run_app_and_record_data_ros.py"
+        - docker exec pntos-python git clone --depth 1 -b main git@git.aspn.us:pntos/firehose-outputs.git
+        - docker exec pntos-python bash -c "cd firehose-outputs &&
+                                            git fetch --depth 1 origin $FIREHOSE_OUTPUTS_VERSION &&
+                                            git checkout $FIREHOSE_OUTPUTS_VERSION"
+        - docker exec pntos-python bash -c ". firehose-outputs/ros_devel/jazzy/setup.bash &&
+                                            postprocessing/run_app_and_record_data_ros.py"
     artifacts:
         paths:
             - pntos_output/
