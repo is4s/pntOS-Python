@@ -10,6 +10,7 @@ workflow:
 variables:
   GIT_CLEAN_FLAGS: -xdff
   UV_INDEX: https://gitlab-ci-token:${CI_JOB_TOKEN}@git.aspn.us/api/v4/projects/94/packages/pypi/simple
+  FIREHOSE_OUTPUTS_VERSION: d051b108d4c68e648ed551356ad7ddc1b76b99e1  # main, July 28, 2025
 
 default:
     retry:
@@ -42,7 +43,7 @@ default:
         - export TOKEN_URL="$(echo $CI_REPOSITORY_URL | sed -E 's/(.*git.aspn.us\/).*/\1/g')"
 
         # Build docker container
-        - docker pull ubuntu:24.04
+        - docker pull ros:jazzy-ros-base
         - export DOCKER_IMAGE="$LOCAL_REGISTRY_CACHE/pntos-python"
         - docker build --cache-from $DOCKER_IMAGE --build-arg BUILDKIT_INLINE_CACHE=1 --build-arg TOKEN_URL=$TOKEN_URL -t $DOCKER_IMAGE - < Dockerfile
         - docker push $DOCKER_IMAGE
@@ -97,7 +98,9 @@ Python 3.10 Test:
     tags:
         - linux-light-runner
     script:
-        - docker run --rm -v $(pwd):/work -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE "uv sync -v && pytest --cov --cov-fail-under=75 --cov-report={term,html}  --cov-config=.coveragerc"
+        - docker run --rm -dit -v $(pwd):/work --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
+        - docker exec pntos-python uv sync -v
+        - docker exec pntos-python pytest --cov --cov-fail-under=75 --cov-report={term,html}  --cov-config=.coveragerc
     coverage:
         '/TOTAL.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
     artifacts:
@@ -109,9 +112,20 @@ Python 3.13 Test:
     tags:
         - linux-light-runner
     script:
-        # Switch the Python version to 3.13
-        - echo 3.13 > .python-version
-        - docker run --rm -v $(pwd):/work -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE "uv sync -v && pytest --cov --cov-fail-under=75 --cov-report={term,html}  --cov-config=.coveragerc"
+        - docker run --rm -dit -v $(pwd):/work --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
+        - docker exec pntos-python uv sync -v --python 3.13
+        - docker exec pntos-python pytest --cov --cov-fail-under=75 --cov-report={term,html}  --cov-config=.coveragerc
+
+ASPN-ROS Test:
+    stage: check
+    tags:
+        - linux-light-runner
+    script:
+        - docker run --rm -dit -v $(pwd):/work --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
+        - docker exec pntos-python uv sync -v --python 3.12  # 3.12 for Jazzy compatibility
+        - docker exec pntos-python git clone --depth 1 git@git.aspn.us:pntos/firehose-outputs.git
+        - docker exec pntos-python bash -c "cd firehose-outputs && git checkout $FIREHOSE_OUTPUTS_VERSION"
+        - docker exec pntos-python bash -c ". firehose-outputs/ros_devel/jazzy/setup.bash && pytest pntos-cobra/tests/test_aspn_ros.py"
 
 mypy:
     stage: check
@@ -169,6 +183,20 @@ GPS INS Velocity App:
         - docker run --rm -dit -v $(pwd):/work --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
         - docker exec pntos-python uv sync -v
         - docker exec pntos-python postprocessing/run_app_and_record_data.py fusion_gps_vel_ins
+    artifacts:
+        paths:
+            - pntos_output/
+
+GPS INS ROS App:
+    stage: check
+    tags:
+        - linux-light-runner
+    script:
+        - docker run --rm -dit -v $(pwd):/work --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
+        - docker exec pntos-python uv sync -v --python 3.12  # 3.12 for Jazzy compatibility
+        - docker exec pntos-python git clone --depth 1 git@git.aspn.us:pntos/firehose-outputs.git
+        - docker exec pntos-python bash -c "cd firehose-outputs && git checkout $FIREHOSE_OUTPUTS_VERSION"
+        - docker exec pntos-python bash -c ". firehose-outputs/ros_devel/jazzy/setup.bash && postprocessing/run_app_and_record_data_ros.py"
     artifacts:
         paths:
             - pntos_output/

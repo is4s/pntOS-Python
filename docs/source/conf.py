@@ -31,6 +31,7 @@ myst_enable_extensions = [
     'dollarmath',  # For inline and block math using $...$
     'amsmath',  # For LaTeX dmath
     'attrs_inline',  # For inline attributes on things like images
+    'colon_fence',  # Allow :::{note} syntax, making it easier to have code in notes
 ]
 myst_heading_anchors = 3
 

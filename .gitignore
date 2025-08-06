@@ -18,6 +18,9 @@ wheels/
 # Plotting artifacts
 *.pickle
 *.png
+metadata.yaml
+*.db3
+*.mcap
 
 # Artifacts from building the docs
 docs/source/images/

@@ -1,38 +1,65 @@
 #!/usr/bin/env python3
 
+import argparse
 from os import mkdir, path
-from sys import argv
+from typing import Any
 
-from lcm_stripper import harvest_by_channel
 from plots import plot_solution
 
 
-def plot_results(lcmlog):
-    pntos_solution_channel = '/solution/cobra/pva'
-    truth_channel = '/sensor/ins-d/pva'
-    channels_to_harvest = [truth_channel, pntos_solution_channel]
+def harvest_data(logfile: str, channels: list[str]) -> dict[str, Any]:
+    # ROS bagfile
+    if logfile.endswith('.db3') or logfile.endswith('.mcap'):
+        from ros_bag_reader import RosBagReader
 
-    # Generate plots from LCM output
-    data = harvest_by_channel(lcmlog, channels_to_harvest)
+        return RosBagReader(logfile).harvest_topics(channels)
 
-    log_dir = path.dirname(lcmlog)
-    filt = path.basename(lcmlog).split('.')[0]
+    # LCM logfile
+    with open(logfile, 'rb') as f:
+        if f.read(4) != b'\xed\xa1\xda\x01':  # LCM logfile magic bytes
+            raise ValueError(f'Invalid ROS/LCM log file: {logfile}')
+    from lcm_stripper import harvest_by_channel
+
+    return harvest_by_channel(logfile, channels)
+
+
+def plot_results(logfile: str, solution_channel: str, truth_channel: str):
+    data = harvest_data(logfile, [solution_channel, truth_channel])
+
+    log_dir = path.dirname(logfile)
+    filt = path.basename(logfile).split('.')[0]
     filt_dir = path.join(log_dir, filt)
     if not path.exists(filt_dir):
         mkdir(filt_dir)
 
     print(f'Plotting results...')
-    plot_solution(
-        [pntos_solution_channel, data[pntos_solution_channel]],  # solution
-        [truth_channel, data[truth_channel]],  # truth
-        filt_dir,
-        True,
-    )
+    try:
+        plot_solution(
+            [solution_channel, data[solution_channel]],
+            [truth_channel, data[truth_channel]],
+            filt_dir,
+            True,
+        )
+    except IndexError as e:
+        print(
+            '*' * 16,
+            'Hint: are the solution and truth channels set correctly?',
+            '*' * 16,
+        )
+        raise e
     print(f'Plots have been saved to {filt_dir}')
 
 
 if __name__ == '__main__':
-    if len(argv) > 1:
-        plot_results(argv[1])
-    else:
-        raise Exception('Must provide path to LCM log file as first argument')
+    parser = argparse.ArgumentParser(
+        description='Generates plots from LCM or ROS log file.'
+    )
+    parser.add_argument('filename', help='Path to LCM or ROS log file')
+    parser.add_argument(
+        '-s', '--solution', default='/solution/cobra/pva', help='Solution channel name'
+    )
+    parser.add_argument(
+        '-t', '--truth', default='/sensor/ins-d/pva', help='Truth channel name'
+    )
+    args = parser.parse_args()
+    plot_results(args.filename, args.solution, args.truth)

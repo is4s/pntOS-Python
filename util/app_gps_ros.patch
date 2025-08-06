@@ -1,0 +1,68 @@
+diff --git a/apps/fusion_gps_ins.py b/apps/fusion_gps_ins_ros.py
+index d5b17e83..003671f9 100755
+--- a/apps/fusion_gps_ins.py
++++ b/apps/fusion_gps_ins_ros.py
+@@ -6,7 +6,6 @@ from pntos.api import LoggingLevel
+ # Import Cobra plugins and config structs
+ from pntos.cobra import (
+     EkfFusionStrategyPlugin,
+-    LcmTransportPlugin,
+     SimpleControllerPlugin,
+     SimpleGpsInsStateModelingPlugin,
+     SimpleGpsOrchestrationPlugin,
+@@ -17,21 +16,19 @@ from pntos.cobra import (
+     StandardRegistryPlugin,
+     TutorialInitializationPlugin,
+ )
++from pntos.cobra.advanced import Aspn23RosTransportPlugin
+ from pntos.cobra.config import (
+     FogmConfig,
+     ImuConfig,
+     InertialConfig,
+-    LcmTransportConfig,
+     ManualAlignmentConfig,
+     OrchestrationConfig,
+     SensorConfig,
+     TimeAdjusterConfig,
+ )
+-from pntos.cobra.config.LcmTransportConfig import AspnVersion
+ 
+ # Config setup
+ my_config = [
+-    LcmTransportConfig(output_version=AspnVersion.V23, group='config/lcm_transport'),
+     ImuConfig(
+         group='config/inertial_state',
+         accel_bias_sigma=(2.4e-3, 2.4e-3, 2.4e-3),
+@@ -69,7 +66,7 @@ my_config = [
+     InertialConfig(
+         group='config/inertial',
+         expected_dt=0.01,
+-        channel='/sensor/vn-100/imu',
++        channel='/sensor/vn_100/imu',
+         C_imu_to_platform=(
+             (0.99776363, 0.01784622, 0.06441467),
+             (-0.01741603, 0.99982216, -0.00723391),
+@@ -83,12 +80,12 @@ my_config = [
+         tau=(300.0, 300.0, 200.0),
+     ),
+     OrchestrationConfig(
+-        gps_channel='/sensor/ublox-ZED-F9T/position',
++        gps_channel='/sensor/ublox_ZED_F9T/position',
+         group='config/orchestration',
+     ),
+     TimeAdjusterConfig(
+         group='config/time_adjuster',
+-        channel_to_correct='/sensor/vn-100/imu',
++        channel_to_correct='/sensor/vn_100/imu',
+         expected_dt_nsec=int(0.01 * 1e9),
+     ),
+ ]
+@@ -97,7 +94,7 @@ my_config = [
+ # Instantiate all of our plugins
+ controller = SimpleControllerPlugin('Cobra Simple Controller Plugin')
+ plugins = [
+-    LcmTransportPlugin('Cobra LCM Transport Plugin'),
++    Aspn23RosTransportPlugin('Cobra ASPN23-ROS Transport Plugin'),
+     EkfFusionStrategyPlugin('Cobra EKF Fusion Strategy Plugin'),
+     StandardFusionPlugin('Cobra Standard Fusion Plugin'),
+     SimpleGpsInsStateModelingPlugin('Cobra Simple State Modeling Plugin'),

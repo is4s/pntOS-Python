@@ -34,6 +34,11 @@ apps/fusion_gps_ins
 apps/fusion_gps_vel_ins
 ```
 
+```{toctree}
+:caption: Advanced Usage
+advanced/using_ros
+```
+
 <!-- TODO #114: add `navtk` back in to this index -->
 <!-- TODO: add `troubleshooting` back in to this index -->
 ```{toctree}
