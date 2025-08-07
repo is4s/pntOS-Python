@@ -32,6 +32,7 @@ def run_pntos(app_to_run: str = 'fusion_gps_ins_ros'):
         processes.append(
             subprocess.Popen(f'apps/{app_to_run}.py', start_new_session=True)
         )
+        time.sleep(5)
 
         # Note: using ros2 bag play --delay N does not work because the ROS
         # clock still starts immediately, which breaks Cobra.

@@ -43,7 +43,7 @@ def run_pntos(app_to_run: str = 'fusion_gps_ins'):
 
     # Start the app
     cobra_process = Popen(f'apps/{app_to_run}.py')
-    sleep(1)  # Give the relay some time to start
+    sleep(5)  # Give the relay some time to start
 
     log_filename = None
     for site in getsitepackages():
