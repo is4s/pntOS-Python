@@ -20,14 +20,14 @@ Block<pntos.api.VirtualStateBlock>`s.
 responsible for providing the model that the Filter Strategy uses to update its states
 given a sensor measurement.
 
-![image](../images/measurement_processor.svg)
+![image](../images/measurement_processor.png)
 
 ## State Block
 
 {py:obj}`State Block<pntos.api.StandardStateBlock>`s provide the Filter Strategy with
 states and a model to propagate those states.
 
-![image](../images/state_block.svg)
+![image](../images/state_block.png)
 
 ## Virtual State Block
 

@@ -3,7 +3,7 @@
 In this section we will explore each type of plugin with greater resolution. As a point
 of reference, let's walk through this graphic:
 
-![Overview Image](./images/pntos_yet_another_view.svg)
+![Overview Image](./images/pntos_yet_another_view.png)
 
 Notice that the {term}`App` starts the [Controller
 Plugin](./plugins/controller_plugin.md), which then hands a
