@@ -8,6 +8,7 @@ plt.rcParams['figure.figsize'] = (10, 6)
 import os
 
 import numpy as np
+from matplotlib.colors import LinearSegmentedColormap
 from navtk.navutils import (
     dcm_to_rpy,
     delta_lat_to_north,
@@ -19,11 +20,14 @@ from navtk.navutils import (
 )
 from numpy import array, diagonal, diff, dot, mean, rad2deg, sqrt, transpose, zeros
 from pylab import (
+    axis,
+    colorbar,
     figure,
     gca,
     legend,
     plot,
     savefig,
+    scatter,
     show,
     subplot,
     subplots_adjust,
@@ -52,9 +56,9 @@ def common_interp(x: np.ndarray, y: np.ndarray, x_interp: np.ndarray):
     Returns:
         - y interpolated along the 0th axis
     """
-    return interp1d(
-        x, y, bounds_error=False, fill_value=(y[0, :], y[-1, :]), axis=0, kind='cubic'
-    )(x_interp)
+    return interp1d(x, y, bounds_error=False, fill_value=np.nan, axis=0, kind='cubic')(
+        x_interp
+    )
 
 
 def get_statistics(arr: np.ndarray):
@@ -73,7 +77,7 @@ def get_statistics(arr: np.ndarray):
     """
     m = np.nanmean(arr)
     std = np.nanstd(arr)
-    rms = np.sqrt(np.nansum(np.square(arr)) / arr.size)
+    rms = np.sqrt(np.nansum(np.square(arr)) / np.count_nonzero(np.isfinite(arr)))
     abs_max = np.nanmax(np.abs(arr))
 
     statistics_str = (
@@ -84,6 +88,13 @@ def get_statistics(arr: np.ndarray):
     )
 
     return statistics_str
+
+
+def get_drms(x_err: np.ndarray, y_err: np.ndarray) -> float:
+    squared_errors = x_err**2 + y_err**2
+    N = np.count_nonzero(np.isfinite(squared_errors))
+    mean_squared_error = np.nansum(squared_errors) / N
+    return sqrt(mean_squared_error)
 
 
 def show_stats(fig, y):
@@ -268,17 +279,16 @@ def sort_solution(solution):
 
 
 def trim_identical_points(solution):
-    # Crop off first few points, since we have duplicate solutions at
-    # alignment. This is because we align at the IMU time, and don't get more
-    # solutions until filter time catches up.
-    start_time = solution[1].data[0].time_of_validity.elapsed_nsec
-    time = start_time
-    idx = 0
-    while time == start_time:
-        idx += 1
-        time = solution[1].data[idx].time_of_validity.elapsed_nsec
+    # Crop off any consecutive points with identical timestamps, to avoid divide by 0 errors during interpolation.
+    idx = 1
+    while idx < len(solution[1].data):
+        t0 = solution[1].data[idx - 1].time_of_validity.elapsed_nsec
+        t1 = solution[1].data[idx].time_of_validity.elapsed_nsec
 
-    solution[1].data = solution[1].data[idx - 1 :]
+        if t0 == t1:
+            solution[1].data.pop(idx)
+        else:
+            idx += 1
 
 
 def plot_biases(data):
@@ -370,6 +380,7 @@ def plot_solution(solution, truth, plot_dir, show_plots):
 
     leg = [solution[0], truth[0]]
     leg_w_sigma = [solution[0], truth[0], '+/- 1 sigma']
+    error_leg = ['Error', '+/- 1 sigma']
 
     # Extract truth solution
     tt = TimeData(truth[1].data)
@@ -446,13 +457,50 @@ def plot_solution(solution, truth, plot_dir, show_plots):
     rel_time = t.raw_time - t0
     truth_rel_time = tt.raw_time - t0
 
+    # Calculate error metrics to display on plot
+    north_pos_err = tned[:, 0] - ned[:, 0]
+    east_pos_err = tned[:, 1] - ned[:, 1]
+    down_pos_err = tned[:, 2] - ned[:, 2]
+    drms = get_drms(north_pos_err, east_pos_err)
+    drms_str = f'DRMS: {drms:.2f} m'
+
     # Northing vs .Easting
     fig = figure(f'Trajectory {title}')
     suptitle('Northing vs. Easting')
-    plot(ned[:, 1], ned[:, 0], 'o', tned[:, 1], tned[:, 0], 'o')
+    # Get subset of Blues and Oranges colormaps, so that the last points aren't
+    # too light-colored to be seen.
+    blues = plt.get_cmap('Blues_r')
+    cmap_colors = blues(np.linspace(0.0, 0.80, 256))
+    blues = LinearSegmentedColormap.from_list('NewBlues_r', cmap_colors)
+    oranges = plt.get_cmap('Oranges_r')
+    cmap_colors = oranges(np.linspace(0.0, 0.80, 256))
+    oranges = LinearSegmentedColormap.from_list('NewOranges_r', cmap_colors)
+    scatter(ned[:, 1], ned[:, 0], marker='o', cmap=blues, c=rel_time)
+    scatter(tned[:, 1], tned[:, 0], marker='o', cmap=oranges, c=truth_rel_time)
+    axis('equal')
     ylabel('Northing (m)')
-    xlabel('Easting (s)')
+    xlabel('Easting (m)')
     legend(leg)
+    cb = colorbar()
+    cb.set_label('Time (s)')
+    # Shrink colorbar vertically so we can insert DRMS above it
+    cb.ax.set_position(
+        [
+            cb.ax.get_position().x0,
+            cb.ax.get_position().y0,
+            cb.ax.get_position().width,
+            cb.ax.get_position().height * 0.9,
+        ]
+    )
+    # Add error metrics above the colorbar
+    fig.text(
+        cb.ax.get_position().x0 + cb.ax.get_position().width / 2 + 0.02,
+        cb.ax.get_position().y0 + cb.ax.get_position().height + 0.02,
+        drms_str,
+        ha='center',
+        va='bottom',
+        fontsize=10,
+    )
     filename = os.path.join(plot_dir, 'ne_trajectory')
     savefig(f'{filename}.png', dpi=300)
 
@@ -462,21 +510,21 @@ def plot_solution(solution, truth, plot_dir, show_plots):
     subplot(3, 1, 1)
     plot(rel_time, lla[:, 0])
     plot(truth_rel_time, tlla[:, 0], 'g')
-    plot(rel_time, lla[:, 0] + sig[:, 0], 'black')
-    plot(rel_time, lla[:, 0] - sig[:, 0], 'black')
+    plot(rel_time, lla[:, 0] + sig[:, 0], 'black', linestyle='--')
+    plot(rel_time, lla[:, 0] - sig[:, 0], 'black', linestyle='--')
     ylabel('Latitude (rad)')
     subplot(3, 1, 2)
     plot(rel_time, lla[:, 1])
     plot(truth_rel_time, tlla[:, 1], 'g')
-    plot(rel_time, lla[:, 1] + sig[:, 1], 'black')
-    plot(rel_time, lla[:, 1] - sig[:, 1], 'black')
+    plot(rel_time, lla[:, 1] + sig[:, 1], 'black', linestyle='--')
+    plot(rel_time, lla[:, 1] - sig[:, 1], 'black', linestyle='--')
     ylabel('Longitude (rad)')
     subplot(3, 1, 3)
     plot(rel_time, lla[:, 2])
     plot(truth_rel_time, tlla[:, 2], 'g')
     # TODO: is alt sigma 0?
-    plot(rel_time, lla[:, 2] + sig[:, 2], 'black')
-    plot(rel_time, lla[:, 2] - sig[:, 2], 'black')
+    plot(rel_time, lla[:, 2] + sig[:, 2], 'black', linestyle='--')
+    plot(rel_time, lla[:, 2] - sig[:, 2], 'black', linestyle='--')
     ylabel('Altitude (m)')
     xlabel(f'Relative time (sec), t0 = {t0}')
     legend(leg_w_sigma)
@@ -488,15 +536,21 @@ def plot_solution(solution, truth, plot_dir, show_plots):
     suptitle('NED Position vs. Time')
     subplot(3, 1, 1)
     plot(rel_time, ned[:, 0])
-    plot(truth_rel_time, tned[:, 0])
+    plot(truth_rel_time, tned[:, 0], 'g')
+    plot(rel_time, ned[:, 0] + pos_sig[:, 0], 'black', linestyle='--')
+    plot(rel_time, ned[:, 0] - pos_sig[:, 0], 'black', linestyle='--')
     ylabel('Northing (m)')
     subplot(3, 1, 2)
     plot(rel_time, ned[:, 1])
-    plot(truth_rel_time, tned[:, 1])
+    plot(truth_rel_time, tned[:, 1], 'g')
+    plot(rel_time, ned[:, 1] + pos_sig[:, 1], 'black', linestyle='--')
+    plot(rel_time, ned[:, 1] - pos_sig[:, 1], 'black', linestyle='--')
     ylabel('Easting (m)')
     subplot(3, 1, 3)
     plot(rel_time, ned[:, 2])
-    plot(truth_rel_time, tned[:, 2])
+    plot(truth_rel_time, tned[:, 2], 'g')
+    plot(rel_time, ned[:, 2] + pos_sig[:, 2], 'black', linestyle='--')
+    plot(rel_time, ned[:, 2] - pos_sig[:, 2], 'black', linestyle='--')
     ylabel('Down (m)')
     xlabel(f'Relative time (sec), t0 = {t0}')
     legend(leg)
@@ -504,29 +558,27 @@ def plot_solution(solution, truth, plot_dir, show_plots):
     savefig(f'{filename}.png', dpi=300)
 
     fig = figure(f'NED Pos Error {title}')
-    north_pos_err = tned[:, 0] - ned[:, 0]
-    east_pos_err = tned[:, 1] - ned[:, 1]
-    down_pos_error = tned[:, 2] - ned[:, 2]
     suptitle(f'{solution[0]} NED Position Error vs. Time')
     subplot(3, 1, 1)
     plot(truth_rel_time, north_pos_err)
-    plot(truth_rel_time, pos_sig[:, 0], 'black')
-    plot(truth_rel_time, -pos_sig[:, 0], 'black')
+    plot(truth_rel_time, pos_sig[:, 0], 'black', linestyle='--')
+    plot(truth_rel_time, -pos_sig[:, 0], 'black', linestyle='--')
     show_stats(fig, north_pos_err)
     ylabel('North Error (m)')
     subplot(3, 1, 2)
     plot(truth_rel_time, east_pos_err)
-    plot(truth_rel_time, pos_sig[:, 1], 'black')
-    plot(truth_rel_time, -pos_sig[:, 1], 'black')
+    plot(truth_rel_time, pos_sig[:, 1], 'black', linestyle='--')
+    plot(truth_rel_time, -pos_sig[:, 1], 'black', linestyle='--')
     show_stats(fig, east_pos_err)
     ylabel('East Error (m)')
     subplot(3, 1, 3)
-    plot(truth_rel_time, down_pos_error)
-    plot(truth_rel_time, pos_sig[:, 2], 'black')
-    plot(truth_rel_time, -pos_sig[:, 2], 'black')
-    show_stats(fig, down_pos_error)
+    plot(truth_rel_time, down_pos_err)
+    plot(truth_rel_time, pos_sig[:, 2], 'black', linestyle='--')
+    plot(truth_rel_time, -pos_sig[:, 2], 'black', linestyle='--')
+    show_stats(fig, down_pos_err)
     ylabel('Down Error (m)')
     xlabel(f'Relative time (sec), t0 = {t0}')
+    legend(error_leg)
     filename = os.path.join(plot_dir, 'ned_position_error')
     savefig(f'{filename}.png', dpi=300)
 
@@ -536,20 +588,20 @@ def plot_solution(solution, truth, plot_dir, show_plots):
     subplot(3, 1, 1)
     plot(rel_time, vel[:, 0])
     plot(truth_rel_time, tvel[:, 0], 'g')
-    plot(rel_time, vel[:, 0] + vel_sig[:, 0], 'black')
-    plot(rel_time, vel[:, 0] - vel_sig[:, 0], 'black')
+    plot(rel_time, vel[:, 0] + vel_sig[:, 0], 'black', linestyle='--')
+    plot(rel_time, vel[:, 0] - vel_sig[:, 0], 'black', linestyle='--')
     ylabel('North vel (m/s)')
     subplot(3, 1, 2)
     plot(rel_time, vel[:, 1])
     plot(truth_rel_time, tvel[:, 1], 'g')
-    plot(rel_time, vel[:, 1] + vel_sig[:, 1], 'black')
-    plot(rel_time, vel[:, 1] - vel_sig[:, 1], 'black')
+    plot(rel_time, vel[:, 1] + vel_sig[:, 1], 'black', linestyle='--')
+    plot(rel_time, vel[:, 1] - vel_sig[:, 1], 'black', linestyle='--')
     ylabel('East vel (m/s)')
     subplot(3, 1, 3)
     plot(rel_time, vel[:, 2])
     plot(truth_rel_time, tvel[:, 2], 'g')
-    plot(rel_time, vel[:, 2] + vel_sig[:, 2], 'black')
-    plot(rel_time, vel[:, 2] - vel_sig[:, 2], 'black')
+    plot(rel_time, vel[:, 2] + vel_sig[:, 2], 'black', linestyle='--')
+    plot(rel_time, vel[:, 2] - vel_sig[:, 2], 'black', linestyle='--')
     ylabel('Down vel (m/s)')
     xlabel(f'Relative time (sec), t0 = {t0}')
     legend(leg_w_sigma)
@@ -563,23 +615,24 @@ def plot_solution(solution, truth, plot_dir, show_plots):
     suptitle(f'{solution[0]} NED Velocity Error vs. Time')
     subplot(3, 1, 1)
     plot(truth_rel_time, north_vel_error)
-    plot(truth_rel_time, vel_sig[:, 0], 'black')
-    plot(truth_rel_time, -vel_sig[:, 0], 'black')
+    plot(truth_rel_time, vel_sig[:, 0], 'black', linestyle='--')
+    plot(truth_rel_time, -vel_sig[:, 0], 'black', linestyle='--')
     show_stats(fig, north_vel_error)
     ylabel('North Error (m/s)')
     subplot(3, 1, 2)
     plot(truth_rel_time, east_vel_error)
-    plot(truth_rel_time, vel_sig[:, 1], 'black')
-    plot(truth_rel_time, -vel_sig[:, 1], 'black')
+    plot(truth_rel_time, vel_sig[:, 1], 'black', linestyle='--')
+    plot(truth_rel_time, -vel_sig[:, 1], 'black', linestyle='--')
     show_stats(fig, east_vel_error)
     ylabel('East Error (m/s)')
     subplot(3, 1, 3)
     plot(truth_rel_time, down_vel_error)
-    plot(truth_rel_time, vel_sig[:, 2], 'black')
-    plot(truth_rel_time, -vel_sig[:, 2], 'black')
+    plot(truth_rel_time, vel_sig[:, 2], 'black', linestyle='--')
+    plot(truth_rel_time, -vel_sig[:, 2], 'black', linestyle='--')
     show_stats(fig, down_vel_error)
     ylabel('Down Error (m/s)')
     xlabel(f'Relative time (sec), t0 = {t0}')
+    legend(error_leg)
     filename = os.path.join(plot_dir, 'ned_velocity_error')
     savefig(f'{filename}.png', dpi=300)
 
@@ -593,20 +646,20 @@ def plot_solution(solution, truth, plot_dir, show_plots):
         subplot(3, 1, 1)
         plot(rel_time, rpy_deg[:, 0])
         plot(truth_rel_time, trpy_deg[:, 0], 'g')
-        plot(rel_time, (rpy_deg[:, 0] + rpy_sig_deg[:, 0]), 'black')
-        plot(rel_time, (rpy_deg[:, 0] - rpy_sig_deg[:, 0]), 'black')
+        plot(rel_time, (rpy_deg[:, 0] + rpy_sig_deg[:, 0]), 'black', linestyle='--')
+        plot(rel_time, (rpy_deg[:, 0] - rpy_sig_deg[:, 0]), 'black', linestyle='--')
         ylabel('Roll (deg)')
         subplot(3, 1, 2)
         plot(rel_time, rpy_deg[:, 1])
         plot(truth_rel_time, trpy_deg[:, 1], 'g')
-        plot(rel_time, rpy_deg[:, 1] + (rpy_sig_deg[:, 1]), 'black')
-        plot(rel_time, rpy_deg[:, 1] - (rpy_sig_deg[:, 1]), 'black')
+        plot(rel_time, rpy_deg[:, 1] + (rpy_sig_deg[:, 1]), 'black', linestyle='--')
+        plot(rel_time, rpy_deg[:, 1] - (rpy_sig_deg[:, 1]), 'black', linestyle='--')
         ylabel('Pitch (deg)')
         subplot(3, 1, 3)
         plot(rel_time, rpy_deg[:, 2])
         plot(truth_rel_time, trpy_deg[:, 2], 'g')
-        plot(rel_time, rpy_deg[:, 2] + (rpy_sig_deg[:, 2]), 'black')
-        plot(rel_time, rpy_deg[:, 2] - (rpy_sig_deg[:, 2]), 'black')
+        plot(rel_time, rpy_deg[:, 2] + (rpy_sig_deg[:, 2]), 'black', linestyle='--')
+        plot(rel_time, rpy_deg[:, 2] - (rpy_sig_deg[:, 2]), 'black', linestyle='--')
         ylabel('Yaw (deg)')
         xlabel(f'Relative time (sec), t0 = {t0}')
         legend(leg_w_sigma)
@@ -619,23 +672,24 @@ def plot_solution(solution, truth, plot_dir, show_plots):
         suptitle(f'{solution[0]} NED Tilt Error vs. Time')
         subplot(3, 1, 1)
         plot(truth_rel_time, tilts[:, 0])
-        plot(truth_rel_time, rpy_sig_deg[:, 0], 'black')
-        plot(truth_rel_time, -rpy_sig_deg[:, 0], 'black')
+        plot(truth_rel_time, rpy_sig_deg[:, 0], 'black', linestyle='--')
+        plot(truth_rel_time, -rpy_sig_deg[:, 0], 'black', linestyle='--')
         show_stats(fig, tilts[:, 0])
         ylabel('North tilt (deg)')
         subplot(3, 1, 2)
         plot(truth_rel_time, tilts[:, 1])
-        plot(truth_rel_time, rpy_sig_deg[:, 1], 'black')
-        plot(truth_rel_time, -rpy_sig_deg[:, 1], 'black')
+        plot(truth_rel_time, rpy_sig_deg[:, 1], 'black', linestyle='--')
+        plot(truth_rel_time, -rpy_sig_deg[:, 1], 'black', linestyle='--')
         show_stats(fig, tilts[:, 1])
         ylabel('East tilt (deg)')
         subplot(3, 1, 3)
         plot(truth_rel_time, tilts[:, 2])
-        plot(truth_rel_time, rpy_sig_deg[:, 2], 'black')
-        plot(truth_rel_time, -rpy_sig_deg[:, 2], 'black')
+        plot(truth_rel_time, rpy_sig_deg[:, 2], 'black', linestyle='--')
+        plot(truth_rel_time, -rpy_sig_deg[:, 2], 'black', linestyle='--')
         show_stats(fig, tilts[:, 2])
         ylabel('Down tilt (deg)')
         xlabel(f'Relative time (sec), t0 = {t0}')
+        legend(error_leg)
         filename = os.path.join(plot_dir, 'ned_tilt_error')
         savefig(f'{filename}.png', dpi=300)
 

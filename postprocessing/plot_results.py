@@ -35,8 +35,8 @@ def plot_results(logfile: str, solution_channel: str, truth_channel: str):
     print(f'Plotting results...')
     try:
         plot_solution(
-            [solution_channel, data[solution_channel]],
-            [truth_channel, data[truth_channel]],
+            [f'Cobra Solution ({solution_channel})', data[solution_channel]],
+            [f'Truth ({truth_channel})', data[truth_channel]],
             filt_dir,
             True,
         )
