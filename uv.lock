@@ -1,5 +1,5 @@
 version = 1
-revision = 2
+revision = 3
 requires-python = ">=3.10"
 resolution-markers = [
     "python_full_version >= '3.11'",
@@ -1174,7 +1174,7 @@ dev = [
     { name = "pip", specifier = ">=24.0" },
     { name = "pntos-api", editable = "pntos-api" },
     { name = "pntos-cobra", editable = "pntos-cobra" },
-    { name = "pntos-python-docs-data", specifier = "==0.1.3" },
+    { name = "pntos-python-docs-data", specifier = "==0.1.4" },
     { name = "pytest", specifier = ">=8.2.0" },
     { name = "pytest-cov", specifier = ">=6.0.0" },
     { name = "ruff", specifier = "==0.7.0" },
@@ -1194,10 +1194,10 @@ wheels = [
 
 [[package]]
 name = "pntos-python-docs-data"
-version = "0.1.3"
+version = "0.1.4"
 source = { registry = "https://git.aspn.us/api/v4/projects/94/packages/pypi/simple" }
 wheels = [
-    { url = "https://git.aspn.us/api/v4/projects/94/packages/pypi/files/c34c09fdf5b94b0353ba7bf015269033f42cac8bc1a790a43c897f457f071602/pntos_python_docs_data-0.1.3-py2.py3-none-any.whl", hash = "sha256:c34c09fdf5b94b0353ba7bf015269033f42cac8bc1a790a43c897f457f071602" },
+    { url = "https://git.aspn.us/api/v4/projects/94/packages/pypi/files/da1af5b4e4125a8804d5dc0c6994a6d7fe2d12ccb47a6f744508ed8bf6407db6/pntos_python_docs_data-0.1.4-py2.py3-none-any.whl", hash = "sha256:da1af5b4e4125a8804d5dc0c6994a6d7fe2d12ccb47a6f744508ed8bf6407db6" },
 ]
 
 [[package]]
