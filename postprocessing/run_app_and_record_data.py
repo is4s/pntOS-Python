@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 
+import sys
+import io
+
 from os import environ, path, remove
 from site import getsitepackages
 from subprocess import PIPE, Popen
@@ -42,8 +45,11 @@ def run_pntos(app_to_run: str = 'fusion_gps_ins'):
     )
 
     # Start the app
-    cobra_process = Popen(f'apps/{app_to_run}.py')
-    sleep(5)  # Give the relay some time to start
+    cobra_process = Popen(['python3', '-u', f'apps/{app_to_run}.py'], stdout=PIPE, text=True, bufsize=1)
+    for line in cobra_process.stdout:
+        if 'Ctrl + C' in line:
+            print('Cobra Started Successfully')
+            break
 
     log_filename = None
     for site in getsitepackages():
