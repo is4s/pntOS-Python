@@ -7,6 +7,7 @@ import signal
 import subprocess
 import sys
 import time
+from subprocess import PIPE, Popen
 
 from plot_results import plot_results
 
@@ -24,22 +25,30 @@ def run_pntos(app_to_run: str = 'fusion_gps_ins_ros'):
         # Note: start_new_session=True makes processes interruptable.
         print('Starting recording...')
         processes.append(
-            subprocess.Popen(
+            Popen(
                 ['ros2', 'bag', 'record', '-a', '-o', BAG_PATH], start_new_session=True
             )
         )
         print('Starting Cobra...')
-        processes.append(
-            subprocess.Popen(f'apps/{app_to_run}.py', start_new_session=True)
+        cobra_process = Popen(
+            ['python3', '-u', f'apps/{app_to_run}.py'],
+            stdout=PIPE,
+            text=True,
+            bufsize=1,
+            start_new_session=True,
         )
-        time.sleep(5)
+        processes.append(cobra_process)
+        for line in cobra_process.stdout:
+            if 'Ctrl + C' in line:
+                print('Cobra Started Successfully')
+                break
 
         # Note: using ros2 bag play --delay N does not work because the ROS
         # clock still starts immediately, which breaks Cobra.
         print('Starting playback...')
         master_fd, slave_fd = pty.openpty()
         processes.append(
-            subprocess.Popen(
+            Popen(
                 # Rate must be slow enough for fastest topics to be published
                 # at full speed in the CI. See "Using ROS" docs.
                 ['play-dataset', '-t', 'ros', '-r', '20'],
