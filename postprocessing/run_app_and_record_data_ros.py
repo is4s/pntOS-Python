@@ -30,6 +30,7 @@ def run_pntos(app_to_run: str = 'fusion_gps_ins_ros'):
             )
         )
         print('Starting Cobra...')
+        # Set unbuffered flag so the subprocess standard output can be read in real time
         cobra_process = Popen(
             ['python3', '-u', f'apps/{app_to_run}.py'],
             stdout=PIPE,
@@ -38,6 +39,8 @@ def run_pntos(app_to_run: str = 'fusion_gps_ins_ros'):
             start_new_session=True,
         )
         processes.append(cobra_process)
+        # Read standard output until 'Ctrl + C' is found which is only printed out when
+        # `init_plugin` has been called on all plugins (e.g. Cobra is fully intialized)
         for line in cobra_process.stdout:
             if 'Ctrl + C' in line:
                 print('Cobra Started Successfully')
