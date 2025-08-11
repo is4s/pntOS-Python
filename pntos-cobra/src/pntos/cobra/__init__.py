@@ -16,6 +16,9 @@ from .standard_plugins.DiagnosticLogPlugin import (
 from .standard_plugins.EkfFusionStrategyPlugin import (
     EkfFusionStrategyPlugin as EkfFusionStrategyPlugin,
 )
+from .standard_plugins.LcmLogTransportPlugin import (
+    LcmLogTransportPlugin as LcmLogTransportPlugin,
+)
 from .standard_plugins.LcmTransportPlugin import (
     LcmTransportPlugin as LcmTransportPlugin,
 )

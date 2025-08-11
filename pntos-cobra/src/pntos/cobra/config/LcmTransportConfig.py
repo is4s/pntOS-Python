@@ -32,3 +32,29 @@ class LcmTransportConfig(BaseConfig):
     """
 
     group: str
+
+
+@dataclass
+class LcmLogTransportConfig(BaseConfig):
+    """
+    Configuration for LcmLogTransportPlugin, which processes messages from an LCM log.
+    """
+
+    input_file: str
+    """
+    The path of the LCM log to be processed.
+    """
+
+    output_file: str
+    """
+    The path of the LCM log to which the transport should record messages.
+
+    NOTE: This must be different from input_file.
+    """
+
+    output_version: AspnVersion
+    """
+    The version of ASPN messages broadcasted by the LcmLogTransportPlugin.
+    """
+
+    group: str
