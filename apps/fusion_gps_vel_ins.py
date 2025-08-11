@@ -1,12 +1,16 @@
 #!/usr/bin/env python3
 
+# System imports
+from os import path
+from site import getsitepackages
+
 # API imports
 from pntos.api import LoggingLevel
 
 # Import Cobra plugins and config structs
 from pntos.cobra import (
     EkfFusionStrategyPlugin,
-    LcmTransportPlugin,
+    LcmLogTransportPlugin,
     SimpleControllerPlugin,
     SimpleGpsInsStateModelingPlugin,
     SimpleGpsVelOrchestrationPlugin,
@@ -21,7 +25,7 @@ from pntos.cobra.config import (
     FogmConfig,
     ImuConfig,
     InertialConfig,
-    LcmTransportConfig,
+    LcmLogTransportConfig,
     ManualAlignmentConfig,
     OrchestrationConfig,
     SensorConfig,
@@ -29,9 +33,25 @@ from pntos.cobra.config import (
 )
 from pntos.cobra.config.LcmTransportConfig import AspnVersion
 
+INPUT_LOG_FILENAME = ''
+for site in getsitepackages():
+    candidate = f'{site}/pntos_python_datasets/cobra_gps_ins_example_data.log'
+    if path.exists(candidate):
+        INPUT_LOG_FILENAME = candidate
+        break
+if not INPUT_LOG_FILENAME:
+    raise Exception('Could not find log file.')
+
+OUTPUT_LOG_FILENAME = 'pntos_output.log'
+
 # Config setup
 my_config = [
-    LcmTransportConfig(output_version=AspnVersion.V23, group='config/lcm_transport'),
+    LcmLogTransportConfig(
+        input_file=INPUT_LOG_FILENAME,
+        output_file=OUTPUT_LOG_FILENAME,
+        output_version=AspnVersion.V23,
+        group='config/lcm_log_transport',
+    ),
     ImuConfig(
         group='config/inertial_state',
         accel_bias_sigma=(2.4e-3, 2.4e-3, 2.4e-3),
@@ -98,7 +118,7 @@ my_config = [
 # Instantiate all of our plugins
 controller = SimpleControllerPlugin('Cobra Simple Controller Plugin')
 plugins = [
-    LcmTransportPlugin('Cobra LCM Transport Plugin'),
+    LcmLogTransportPlugin('Cobra LCM Log Transport Plugin'),
     EkfFusionStrategyPlugin('Cobra EKF Fusion Strategy Plugin'),
     StandardFusionPlugin('Cobra Standard Fusion Plugin'),
     SimpleGpsInsStateModelingPlugin('Cobra Simple State Modeling Plugin'),

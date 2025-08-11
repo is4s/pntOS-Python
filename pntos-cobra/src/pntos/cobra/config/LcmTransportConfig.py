@@ -49,7 +49,7 @@ class LcmLogTransportConfig(BaseConfig):
     """
     The path of the LCM log to which the transport should record messages.
 
-    NOTE: This must be different from input_file.
+    NOTE: If output_file already exists, it will be overwritten. Thus, it must be different from input_file.
     """
 
     output_version: AspnVersion
