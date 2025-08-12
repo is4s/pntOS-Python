@@ -41,7 +41,6 @@ from pntos.api import (
 from pntos.api.plugins.registry import RegistryPlugin
 from pntos.cobra import (
     EkfFusionStrategyPlugin,
-    SimpleGpsInsStateModelingPlugin,
     StandardFusionPlugin,
     StandardGpsInsStateModelingPlugin,
     StandardInertialPlugin,
@@ -49,6 +48,7 @@ from pntos.cobra import (
     StandardPreprocessorPlugin,
     StandardRegistryPlugin,
     StaticAlignInitializationPlugin,
+    TutorialGpsInsStateModelingPlugin,
     TutorialGpsOrchestrationPlugin,
     TutorialInitializationPlugin,
 )
@@ -284,7 +284,7 @@ class Test_Orchestration(unittest.TestCase):
             'TutorialGpsOrchestrationPlugin'
         )
         self.state_modeling_plugin: StateModelingPlugin = (
-            SimpleGpsInsStateModelingPlugin('Cobra Simple State Modeling Plugin')
+            TutorialGpsInsStateModelingPlugin('Cobra Simple State Modeling Plugin')
         )
         plugins.append(self.orchestration_plugin)
         plugins.append(self.state_modeling_plugin)

@@ -1,8 +1,8 @@
 diff --git a/apps/tutorial/gps_ins.py b/apps/standard/gps_ins.py
-index e2e410f8..9be4a11e 100755
+index 9de1307f..9be4a11e 100755
 --- a/apps/tutorial/gps_ins.py
 +++ b/apps/standard/gps_ins.py
-@@ -2,36 +2,39 @@
+@@ -2,8 +2,10 @@
  
  import sys
  
@@ -14,10 +14,9 @@ index e2e410f8..9be4a11e 100755
  
  # Import Cobra plugins and config structs
  from pntos.cobra import (
-     EkfFusionStrategyPlugin,
+@@ -11,27 +13,28 @@ from pntos.cobra import (
      LcmLogTransportPlugin,
      SimpleControllerPlugin,
--    SimpleGpsInsStateModelingPlugin,
      StandardFusionPlugin,
 +    StandardGpsInsStateModelingPlugin,
      StandardInertialPlugin,
@@ -25,6 +24,7 @@ index e2e410f8..9be4a11e 100755
 +    StandardOrchestrationPlugin,
      StandardPreprocessorPlugin,
      StandardRegistryPlugin,
+-    TutorialGpsInsStateModelingPlugin,
 -    TutorialGpsOrchestrationPlugin,
      TutorialInitializationPlugin,
 -    UiLogPlottingPlugin,
@@ -219,7 +219,7 @@ index e2e410f8..9be4a11e 100755
      LcmLogTransportPlugin('Cobra LCM Log Transport Plugin'),
      EkfFusionStrategyPlugin('Cobra EKF Fusion Strategy Plugin'),
      StandardFusionPlugin('Cobra Standard Fusion Plugin'),
--    SimpleGpsInsStateModelingPlugin('Cobra Simple State Modeling Plugin'),
+-    TutorialGpsInsStateModelingPlugin('Cobra Simple State Modeling Plugin'),
 +    StandardGpsInsStateModelingPlugin('Cobra Standard State Modeling Plugin'),
      StandardInertialPlugin('Cobra Standard Inertial Plugin'),
      TutorialInitializationPlugin('Cobra Manual Initialization Plugin'),

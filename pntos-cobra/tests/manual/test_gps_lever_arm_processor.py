@@ -24,12 +24,12 @@ from pntos.api import (
 )
 from pntos.cobra import (
     EkfFusionStrategyPlugin,
-    SimpleGpsInsStateModelingPlugin,
     StandardFusionPlugin,
+    StandardGpsInsStateModelingPlugin,
     StandardRegistryPlugin,
 )
 from pntos.cobra.config import BaseConfig, FogmConfig, ImuConfig, SensorConfig
-from pntos.cobra.internal import SimpleGpsInsStateModelProvider, SimpleMediator
+from pntos.cobra.internal import SimpleMediator, StandardGpsInsStateModelProvider
 from pntos.cobra.utils import decode_aspn_lcm_msg, marshal_from_lcm
 from pntos.cobra.utils.navigation import (
     calculate_gravity_schwartz,
@@ -156,10 +156,10 @@ def fusion(la_guess: NDArray[float64]) -> StandardFusionEngine:
     fusion_strategy = fusion_strategy_plugin.new_fusion_strategy(StandardFusionStrategy)
     fusion_engine.strategy = fusion_strategy
 
-    gps_model_plug = SimpleGpsInsStateModelingPlugin('gps_ins_state_modeling')
+    gps_model_plug = StandardGpsInsStateModelingPlugin('gps_ins_state_modeling')
     gps_model_plug.init_plugin(mediator=mediator)
     mod_prov = gps_model_plug.new_state_model_provider(StandardStateModelProvider)
-    assert isinstance(mod_prov, SimpleGpsInsStateModelProvider)
+    assert isinstance(mod_prov, StandardGpsInsStateModelProvider)
     pins = mod_prov.new_block(0, None, 'pinson', '/config/cobra/imu')
     sb1 = mod_prov.new_block(1, None, 'fogm1', '/config/fogm1')
     sb2 = mod_prov.new_block(1, None, 'fogm2', '/config/fogm2')

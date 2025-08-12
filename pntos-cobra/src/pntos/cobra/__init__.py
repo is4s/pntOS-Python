@@ -34,14 +34,14 @@ from .standard_plugins.StandardPreprocessorPlugin import (
 from .standard_plugins.StandardRegistryPlugin import (
     StandardRegistryPlugin as StandardRegistryPlugin,
 )
+from .standard_plugins.state_modeling.StandardGpsInsStateModelingPlugin import (
+    StandardGpsInsStateModelingPlugin as StandardGpsInsStateModelingPlugin,
+)
 from .standard_plugins.StaticAlignInitializationPlugin import (
     StaticAlignInitializationPlugin as StaticAlignInitializationPlugin,
 )
-from .state_modeling_simple_gps_ins.SimpleGpsInsStateModelingPlugin import (
-    SimpleGpsInsStateModelingPlugin as SimpleGpsInsStateModelingPlugin,
-)
-from .state_modeling_simple_gps_ins.StandardGpsInsStateModelingPlugin import (
-    StandardGpsInsStateModelingPlugin as StandardGpsInsStateModelingPlugin,
+from .tutorial_plugins.state_modeling.TutorialGpsInsStateModelingPlugin import (
+    TutorialGpsInsStateModelingPlugin as TutorialGpsInsStateModelingPlugin,
 )
 from .tutorial_plugins.TutorialGpsOrchestrationPlugin import (
     TutorialGpsOrchestrationPlugin as TutorialGpsOrchestrationPlugin,

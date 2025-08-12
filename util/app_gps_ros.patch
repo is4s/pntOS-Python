@@ -1,5 +1,5 @@
 diff --git a/apps/standard/gps_ins.py b/apps/advanced/gps_ins_ros.py
-index 9be4a11e..ceaf759c 100755
+index 9be4a11e..bc466a25 100755
 --- a/apps/standard/gps_ins.py
 +++ b/apps/advanced/gps_ins_ros.py
 @@ -1,7 +1,5 @@
@@ -105,15 +105,12 @@ index 9be4a11e..ceaf759c 100755
      EkfFusionStrategyPlugin('Cobra EKF Fusion Strategy Plugin'),
      StandardFusionPlugin('Cobra Standard Fusion Plugin'),
      StandardGpsInsStateModelingPlugin('Cobra Standard State Modeling Plugin'),
-@@ -164,9 +151,9 @@ plugins = [
+@@ -164,7 +151,7 @@ plugins = [
          'Cobra Standard Logging Plugin',
          global_log_level=LoggingLevel.INFO,  # Switch to `DEBUG` for more informative log output
      ),
 -    StandardRegistryPlugin('Cobra Standard Registry Plugin', config=my_config),
-+    StandardOrchestrationPlugin('Cobra Simple Orchestration Plugin'),
 +    StandardRegistryPlugin('Cobra Standard Registry Plugin', config=my_config),  # type: ignore[arg-type]
      StandardPreprocessorPlugin('Cobra Standard Preprocessor Plugin'),
--    StandardOrchestrationPlugin('Cobra Standard Orchestration Plugin'),
+     StandardOrchestrationPlugin('Cobra Standard Orchestration Plugin'),
  ]
- 
- # Start the controller, and pass it all of the other plugins to use

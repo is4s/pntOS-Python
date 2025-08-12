@@ -1,11 +1,11 @@
 diff --git a/apps/tutorial/gps_ins.py b/apps/tutorial/gps_vel_ins.py
-index e2e410f8..460d98c5 100755
+index 9de1307f..7b05fa08 100755
 --- a/apps/tutorial/gps_ins.py
 +++ b/apps/tutorial/gps_vel_ins.py
 @@ -16,7 +16,7 @@ from pntos.cobra import (
-     StandardLoggingPlugin,
      StandardPreprocessorPlugin,
      StandardRegistryPlugin,
+     TutorialGpsInsStateModelingPlugin,
 -    TutorialGpsOrchestrationPlugin,
 +    TutorialGpsVelOrchestrationPlugin,
      TutorialInitializationPlugin,

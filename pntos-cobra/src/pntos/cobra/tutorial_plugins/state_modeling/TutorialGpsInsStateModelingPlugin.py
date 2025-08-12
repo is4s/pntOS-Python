@@ -1,7 +1,8 @@
 import numpy as np
-from pntos.api.plugins.common import LoggingLevel, Mediator
-from pntos.api.plugins.fusion import StandardFusionEngine
-from pntos.api.plugins.state_modeling import (
+from pntos.api import (
+    LoggingLevel,
+    Mediator,
+    StandardFusionEngine,
     StandardStateModelProvider,
     StateModelingPlugin,
     StateModelProviderType,
@@ -9,20 +10,20 @@ from pntos.api.plugins.state_modeling import (
 )
 from pntos.cobra.config import FogmConfig, ImuConfig, SensorConfig, config_from_registry
 
-from .AltitudeMeasurementProcessor import AltitudeMeasurementProcessor
-from .FogmBlock import FogmBlock
-from .Pinson15NedBlock import Pinson15NedBlock
-from .PinsonPositionMeasurementProcessor import PinsonPositionMeasurementProcessor
-from .PinsonVelocityMeasurementProcessor import PinsonVelocityMeasurementProcessor
-from .PinsonWithLeverArmPositionMeasurementProcessor import (
-    PinsonWithLeverArmPositionMeasurementProcessor,
+from .TutorialFogmBlock import TutorialFogmBlock
+from .TutorialPinson15NedBlock import TutorialPinson15NedBlock
+from .TutorialPinsonPositionMeasurementProcessor import (
+    TutorialPinsonPositionMeasurementProcessor,
 )
-from .PinsonWithNedFogmPositionMeasurementProcessor import (
-    PinsonWithNedFogmPositionMeasurementProcessor,
+from .TutorialPinsonVelocityMeasurementProcessor import (
+    TutorialPinsonVelocityMeasurementProcessor,
+)
+from .TutorialPinsonWithNedFogmPositionMeasurementProcessor import (
+    TutorialPinsonWithNedFogmPositionMeasurementProcessor,
 )
 
 
-class SimpleGpsInsStateModelProvider(StandardStateModelProvider):
+class TutorialGpsInsStateModelProvider(StandardStateModelProvider):
     """StandardStateModelProvider that offers a 15-state pinson state block, variable-size
     Fogm Block and various position and velocity measurement processors.
     """
@@ -31,7 +32,7 @@ class SimpleGpsInsStateModelProvider(StandardStateModelProvider):
 
     def __init__(self, mediator: Mediator):
         """
-        Simple GPS and INS State Model Provider
+        Tutorial GPS and INS State Model Provider
 
         Args:
             mediator (Mediator): A :class:(Mediator) instance.
@@ -56,11 +57,9 @@ class SimpleGpsInsStateModelProvider(StandardStateModelProvider):
         state_block_labels: list[str],
         config_group: str | None,
     ) -> (
-        PinsonPositionMeasurementProcessor
-        | PinsonWithNedFogmPositionMeasurementProcessor
-        | PinsonVelocityMeasurementProcessor
-        | AltitudeMeasurementProcessor
-        | PinsonWithLeverArmPositionMeasurementProcessor
+        TutorialPinsonPositionMeasurementProcessor
+        | TutorialPinsonWithNedFogmPositionMeasurementProcessor
+        | TutorialPinsonVelocityMeasurementProcessor
         | None
     ):
         """
@@ -111,14 +110,14 @@ class SimpleGpsInsStateModelProvider(StandardStateModelProvider):
                         f'Could not get position sensor config from registry.',
                     )
                     return None
-                return PinsonPositionMeasurementProcessor(
+                return TutorialPinsonPositionMeasurementProcessor(
                     label,
                     state_block_labels,
                     self._mediator,
                     np.array(sensor_config.lever_arm),
                 )
             case 1:
-                return PinsonVelocityMeasurementProcessor(
+                return TutorialPinsonVelocityMeasurementProcessor(
                     label,
                     state_block_labels,
                     self._mediator,
@@ -139,35 +138,7 @@ class SimpleGpsInsStateModelProvider(StandardStateModelProvider):
                         f'Could not get position sensor config from registry.',
                     )
                     return None
-                return PinsonWithNedFogmPositionMeasurementProcessor(
-                    label,
-                    state_block_labels,
-                    self._mediator,
-                    np.array(sensor_config.lever_arm),
-                )
-            case 3:
-                return AltitudeMeasurementProcessor(
-                    label,
-                    state_block_labels,
-                    self._mediator,
-                )
-            case 4:
-                if config_group is None:
-                    self._mediator.log_message(
-                        LoggingLevel.ERROR,
-                        f'A config group is required for processor type {self.processor_identifiers[processor_index]}',
-                    )
-                    return None
-                sensor_config = config_from_registry(
-                    SensorConfig, self._mediator, config_group
-                )
-                if sensor_config is None:
-                    self._mediator.log_message(
-                        LoggingLevel.ERROR,
-                        f'Could not get position sensor config from registry.',
-                    )
-                    return None
-                return PinsonWithLeverArmPositionMeasurementProcessor(
+                return TutorialPinsonWithNedFogmPositionMeasurementProcessor(
                     label,
                     state_block_labels,
                     self._mediator,
@@ -176,7 +147,7 @@ class SimpleGpsInsStateModelProvider(StandardStateModelProvider):
 
         self._mediator.log_message(
             LoggingLevel.ERROR,
-            f'Invalid processor index of {processor_index}. SimpleGpsInsStateModelProvider provides {len(self.processor_identifiers)} processors.',
+            f'Invalid processor index of {processor_index}. TutorialGpsInsStateModelingProvider provides {len(self.processor_identifiers)} processors.',
         )
         return None
 
@@ -186,7 +157,7 @@ class SimpleGpsInsStateModelProvider(StandardStateModelProvider):
         engine: StandardFusionEngine | None,
         label: str,
         config_group: str | None,
-    ) -> Pinson15NedBlock | FogmBlock | None:
+    ) -> TutorialPinson15NedBlock | TutorialFogmBlock | None:
         """
         Generate a new StandardStateBlock that describes a set of states and how they propagate over time.
 
@@ -230,7 +201,7 @@ class SimpleGpsInsStateModelProvider(StandardStateModelProvider):
                 )
                 return None
 
-            return Pinson15NedBlock(label, self._mediator, imu_config)
+            return TutorialPinson15NedBlock(label, self._mediator, imu_config)
 
         if block_index == 1:
             if config_group is None:
@@ -247,7 +218,7 @@ class SimpleGpsInsStateModelProvider(StandardStateModelProvider):
                 )
                 return None
 
-            return FogmBlock(
+            return TutorialFogmBlock(
                 label,
                 self._mediator,
                 np.array(fogm_config.sigma),
@@ -256,7 +227,7 @@ class SimpleGpsInsStateModelProvider(StandardStateModelProvider):
 
         self._mediator.log_message(
             LoggingLevel.ERROR,
-            f'Invalid block index of {block_index}. SimpleGpsInsStateModelProvider provides {len(self.block_identifiers)} state blocks.',
+            f'Invalid block index of {block_index}. TutorialGpsInsStateModelingProvider provides {len(self.block_identifiers)} state blocks.',
         )
         return None
 
@@ -269,13 +240,13 @@ class SimpleGpsInsStateModelProvider(StandardStateModelProvider):
     ) -> VirtualStateBlock | None:
         self._mediator.log_message(
             LoggingLevel.ERROR,
-            f'Invalid virtual block index of {virtual_block_index}. SimpleGpsInsStateModelProvider provides {len(self.virtual_block_identifiers)} virtual state blocks.',
+            f'Invalid virtual block index of {virtual_block_index}. TutorialGpsInsStateModelingProvider provides {len(self.virtual_block_identifiers)} virtual state blocks.',
         )
         return None
 
 
-class SimpleGpsInsStateModelingPlugin(StateModelingPlugin):
-    """StateModelingPlugin that generates a :class:`pntos.cobra.internal.SimpleGpsInsStateModelProvider`."""
+class TutorialGpsInsStateModelingPlugin(StateModelingPlugin):
+    """StateModelingPlugin that generates a :class:`pntos.cobra.internal.TutorialGpsInsStateModelProvider`."""
 
     _mediator: Mediator
 
@@ -299,7 +270,7 @@ class SimpleGpsInsStateModelingPlugin(StateModelingPlugin):
         if not self.is_fusion_type_supported(fusion_type):
             return None
 
-        return SimpleGpsInsStateModelProvider(self._mediator)
+        return TutorialGpsInsStateModelProvider(self._mediator)
 
     def is_fusion_type_supported(self, fusion_type: StateModelProviderType) -> bool:
         return fusion_type is StandardStateModelProvider

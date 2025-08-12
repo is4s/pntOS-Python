@@ -151,9 +151,9 @@ plugins = [
         'Cobra Standard Logging Plugin',
         global_log_level=LoggingLevel.INFO,  # Switch to `DEBUG` for more informative log output
     ),
-    StandardOrchestrationPlugin('Cobra Simple Orchestration Plugin'),
     StandardRegistryPlugin('Cobra Standard Registry Plugin', config=my_config),  # type: ignore[arg-type]
     StandardPreprocessorPlugin('Cobra Standard Preprocessor Plugin'),
+    StandardOrchestrationPlugin('Cobra Standard Orchestration Plugin'),
 ]
 
 # Start the controller, and pass it all of the other plugins to use

@@ -32,13 +32,15 @@ from pntos.api import (
     StateModelProviderType,
 )
 from pntos.cobra import (
-    SimpleGpsInsStateModelingPlugin,
+    StandardGpsInsStateModelingPlugin,
     StandardRegistryPlugin,
 )
 from pntos.cobra.config import (
     BaseConfig,
     ImuConfig,
+    PinsonStateBlockConfig,
     SensorConfig,
+    SensorMeasurementProcessorConfig,
 )
 from pntos.cobra.internal import (
     AltitudeMeasurementProcessor,
@@ -47,7 +49,6 @@ from pntos.cobra.internal import (
     PinsonVelocityMeasurementProcessor,
     PinsonWithLeverArmPositionMeasurementProcessor,
     PinsonWithNedFogmPositionMeasurementProcessor,
-    SimpleGpsInsStateModelProvider,
     SimpleMediator,
 )
 from pntos.cobra.utils.navigation import (
@@ -60,29 +61,41 @@ from pntos.cobra.utils.navigation import (
 _lever_arm = (-2.0, 3.0, 5.0)
 
 my_config: list[BaseConfig] = [
-    ImuConfig(
-        group='/config/cobra/imu',
-        # HG9900 model
-        accel_bias_sigma=(25 * 9.81e-6, 25 * 9.81e-6, 25 * 9.81e-6),
-        accel_bias_tau=(3600.0, 3600.0, 3600.0),
-        accel_random_walk_sigma=(1e-12, 1e-12, 1e-12),
-        gyro_bias_sigma=(
-            0.003 * np.pi / 180 / 3600,
-            0.003 * np.pi / 180 / 3600,
-            0.003 * np.pi / 180 / 3600,
-        ),
-        gyro_bias_tau=(3600.0, 3600.0, 3600.0),
-        gyro_random_walk_sigma=(
-            0.002 * np.pi / 180 / 60,
-            0.002 * np.pi / 180 / 60,
-            0.002 * np.pi / 180 / 60,
+    PinsonStateBlockConfig(
+        group='config/pinson_block',
+        identifier='pinson15',
+        label='pinson15',
+        imu_model=ImuConfig(
+            group='config/pinson_block',
+            # HG9900 model
+            accel_bias_sigma=(25 * 9.81e-6, 25 * 9.81e-6, 25 * 9.81e-6),
+            accel_bias_tau=(3600.0, 3600.0, 3600.0),
+            accel_random_walk_sigma=(1e-12, 1e-12, 1e-12),
+            gyro_bias_sigma=(
+                0.003 * np.pi / 180 / 3600,
+                0.003 * np.pi / 180 / 3600,
+                0.003 * np.pi / 180 / 3600,
+            ),
+            gyro_bias_tau=(3600.0, 3600.0, 3600.0),
+            gyro_random_walk_sigma=(
+                0.002 * np.pi / 180 / 60,
+                0.002 * np.pi / 180 / 60,
+                0.002 * np.pi / 180 / 60,
+            ),
         ),
     ),
-    SensorConfig(
-        group='/config/cobra/sensor',
-        lever_arm=_lever_arm,
-        orientation=(1.0, 0.0, 0.0, 0.0),
-        sensor_name='novatel',
+    SensorMeasurementProcessorConfig(
+        group='config/test',
+        identifier='NA',
+        label='NA',
+        channel='NA',
+        state_block_labels=['NA'],
+        sensor_config=SensorConfig(
+            group='config/gp3d_state_modeling',
+            lever_arm=_lever_arm,
+            orientation=(1.0, 0.0, 0.0, 0.0),
+            sensor_name='NA',
+        ),
     ),
 ]
 
@@ -101,15 +114,15 @@ def mediator() -> SimpleMediator:
 @pytest.fixture
 def state_modeling_plugin(
     mediator: SimpleMediator,
-) -> SimpleGpsInsStateModelingPlugin:
-    sm_plugin = SimpleGpsInsStateModelingPlugin('gps_ins_state_modeling')
+) -> StandardGpsInsStateModelingPlugin:
+    sm_plugin = StandardGpsInsStateModelingPlugin('gps_ins_state_modeling')
     sm_plugin.init_plugin(mediator=mediator)
     return sm_plugin
 
 
 @pytest.fixture
 def state_model_provider(
-    state_modeling_plugin: SimpleGpsInsStateModelingPlugin,
+    state_modeling_plugin: StandardGpsInsStateModelingPlugin,
 ) -> StateModelProviderType | None:
     return state_modeling_plugin.new_state_model_provider(StandardStateModelProvider)
 
@@ -118,7 +131,7 @@ def state_model_provider(
 def pinson_block(
     state_model_provider: StateModelProviderType,
 ) -> StandardStateBlock | None:
-    out = state_model_provider.new_block(0, None, 'pinson', '/config/cobra/imu')
+    out = state_model_provider.new_block(0, None, 'pinson15', 'config/pinson_block')
     if isinstance(out, StandardStateBlock):
         return out
     return None
@@ -129,7 +142,7 @@ def position_mp(
     state_model_provider: StateModelProviderType,
 ) -> StandardMeasurementProcessor:
     out = state_model_provider.new_processor(
-        0, None, 'position', ['pinson'], '/config/cobra/sensor'
+        0, None, 'position', ['pinson'], 'config/test'
     )
     assert isinstance(out, StandardMeasurementProcessor)
     return out
@@ -140,7 +153,7 @@ def position_mp2(
     state_model_provider: StateModelProviderType,
 ) -> StandardMeasurementProcessor:
     out = state_model_provider.new_processor(
-        2, None, 'position', ['pinson', 'fogm'], '/config/cobra/sensor'
+        2, None, 'position', ['pinson', 'fogm'], 'config/test'
     )
     assert isinstance(out, StandardMeasurementProcessor)
     return out
@@ -151,7 +164,7 @@ def position_mp3(
     state_model_provider: StateModelProviderType,
 ) -> StandardMeasurementProcessor:
     out = state_model_provider.new_processor(
-        4, None, 'position', ['pinson', 'fogm', 'fogm2'], '/config/cobra/sensor'
+        4, None, 'position', ['pinson', 'fogm', 'fogm2'], 'config/test'
     )
     assert isinstance(out, StandardMeasurementProcessor)
     return out
@@ -184,7 +197,7 @@ def velocity_mp(
     state_model_provider: StateModelProviderType,
 ) -> StandardMeasurementProcessor | None:
     out = state_model_provider.new_processor(
-        1, None, 'velocity', ['pinson'], '/config/cobra/sensor'
+        1, None, 'velocity', ['pinson'], 'config/test'
     )
     if isinstance(out, StandardMeasurementProcessor):
         return out
@@ -327,7 +340,7 @@ def gxp(num: int) -> EstimateWithCovariance:
 
 
 def test_invalid_fusion_type(
-    state_modeling_plugin: SimpleGpsInsStateModelingPlugin,
+    state_modeling_plugin: StandardGpsInsStateModelingPlugin,
 ) -> None:
     invalid_sm_provider = state_modeling_plugin.new_state_model_provider(
         EstimateWithCovarianceType
@@ -335,19 +348,21 @@ def test_invalid_fusion_type(
     assert invalid_sm_provider is None
 
 
-def test_enough_labels(state_modeling_plugin: SimpleGpsInsStateModelingPlugin) -> None:
+def test_enough_labels(
+    state_modeling_plugin: StandardGpsInsStateModelingPlugin,
+) -> None:
     model_provider = state_modeling_plugin.new_state_model_provider(
         StandardStateModelProvider
     )
-    assert isinstance(model_provider, SimpleGpsInsStateModelProvider)
-    mod_plus = model_provider.new_processor(
-        len(model_provider.processor_identifiers), None, 'l', ['s'], ''
-    )
+    assert isinstance(model_provider, StandardStateModelProvider)
+    proc_ids = model_provider.processor_identifiers
+    assert proc_ids is not None
+    mod_plus = model_provider.new_processor(len(proc_ids), None, 'l', ['s'], '')
     assert mod_plus is None
 
 
 def test_invalid_index(state_model_provider: StateModelProviderType) -> None:
-    good_sb = state_model_provider.new_block(0, None, 'label', '/config/cobra/imu')
+    good_sb = state_model_provider.new_block(0, None, 'label', 'config/pinson_block')
     assert good_sb is not None
 
     block_ids = state_model_provider.block_identifiers
@@ -356,7 +371,7 @@ def test_invalid_index(state_model_provider: StateModelProviderType) -> None:
         len(block_ids) + 1,
         None,
         'label',
-        '/config/cobra/imu',
+        'config/pinson_block',
     )
     assert invalid_sb is None
 
@@ -367,19 +382,19 @@ def test_invalid_index(state_model_provider: StateModelProviderType) -> None:
         None,
         'label',
         ['state_block_labels'],
-        '/config/cobra/sensor',
+        'config/test',
     )
     assert invalid_mp is None
 
     vblock_ids = state_model_provider.virtual_block_identifiers
-    assert vblock_ids is not None
-    invalid_vsb = state_model_provider.new_virtual_block(
-        len(vblock_ids) + 1,
-        'source',
-        'target',
-        'config/vsb',
-    )
-    assert invalid_vsb is None
+    if vblock_ids is not None:
+        invalid_vsb = state_model_provider.new_virtual_block(
+            len(vblock_ids) + 1,
+            'source',
+            'target',
+            'config/vsb',
+        )
+        assert invalid_vsb is None
 
 
 def test_wrong_number_blocks(
@@ -398,7 +413,7 @@ def test_wrong_number_blocks(
         x_and_p = gxp(m[1])
 
         invalid_mp = state_model_provider.new_processor(
-            m[3], None, 'label', [], '/config/cobra/sensor'
+            m[3], None, 'label', [], 'config/test'
         )
         assert invalid_mp is not None
         assert isinstance(invalid_mp, type(m[0]))
@@ -407,7 +422,7 @@ def test_wrong_number_blocks(
         assert mod is None
 
         invalid_mp = state_model_provider.new_processor(
-            m[3], None, 'label', labs[: (m[2] + 1)], '/config/cobra/sensor'
+            m[3], None, 'label', labs[: (m[2] + 1)], 'config/test'
         )
         assert invalid_mp is not None
         assert isinstance(invalid_mp, type(m[0]))
@@ -418,6 +433,7 @@ def test_wrong_number_blocks(
 
 def test_bad_meas_inputs(
     all_pos_processors: all_pos_proc_type,
+    state_model_provider: StateModelProviderType,
     pva_aux_data: Message,
     pos_meas: Message,
 ) -> None:
@@ -426,6 +442,11 @@ def test_bad_meas_inputs(
     pos = pos_meas.wrapped_message
     assert isinstance(pos, MeasurementPosition)
 
+    mp = state_model_provider.new_processor(0, None, 'l', ['p'], 'config/test')
+    assert isinstance(mp, PinsonPositionMeasurementProcessor)
+    mp2 = state_model_provider.new_processor(2, None, 'l', ['p', 'f'], 'config/test')
+    assert isinstance(mp2, PinsonWithNedFogmPositionMeasurementProcessor)
+    ms = [mp, mp2]
     pv2 = deepcopy(pva_aux_data)
     assert isinstance(pv2.wrapped_message, MeasurementPositionVelocityAttitude)
     pv2.wrapped_message.quaternion = None
