@@ -10,7 +10,6 @@ from numpy import float64
 from numpy.typing import NDArray
 from pntos.api import (
     EstimateWithCovariance,
-    LoggingLevel,
     Mediator,
     Message,
     StandardDynamicsModel,
@@ -153,21 +152,10 @@ class TutorialPinson15NedBlock(StandardStateBlock):
         for message in aux:
             if isinstance(message.wrapped_message, MeasurementPVA):
                 pva = message.wrapped_message
-                if pva.quaternion is None:
-                    self._mediator.log_message(
-                        LoggingLevel.WARN,
-                        f'Pinson15NedBlock received PVA aux data with no quaternion at time {pva.time_of_validity.elapsed_nsec / 1e9}s. Ignoring.',
-                    )
-                    continue
                 self._old_pva_aux = self._new_pva_aux
                 self._new_pva_aux = pva
             elif isinstance(message.wrapped_message, MeasurementImu):
                 self._force_and_rate_aux = message.wrapped_message
-            else:
-                self._mediator.log_message(
-                    LoggingLevel.ERROR,
-                    f'Pinson15NedBlock expected aux data of type MeasurementPositionVelocityAttitude or MeasurementImu, but got message of type {type(message.wrapped_message)}.',
-                )
 
     def generate_dynamics(
         self,
@@ -175,13 +163,6 @@ class TutorialPinson15NedBlock(StandardStateBlock):
         time_from: TypeTimestamp,
         time_to: TypeTimestamp,
     ) -> StandardDynamicsModel | None:
-        if not self._new_pva_aux or not self._force_and_rate_aux:
-            self._mediator.log_message(
-                LoggingLevel.ERROR,
-                f'Pinson15NedBlock cannot propagate from time {time_from.elapsed_nsec / 1e9}s to {time_to.elapsed_nsec / 1e9}s as it has not received PVA and force aux data.',
-            )
-            return None
-
         dt = (time_to.elapsed_nsec - time_from.elapsed_nsec) / 1e9
         F = self.generate_f_pinson15()
         Q = self.generate_q_pinson15()
@@ -229,16 +210,10 @@ class TutorialPinson15NedBlock(StandardStateBlock):
         Returns:
             NDArray[float64]: The F Matrix.
         """
-        # Already validated aux data at top of generate_model. These assertions are just
-        # to satisfy mypy.
-        assert self._new_pva_aux is not None
-        assert self._new_pva_aux.quaternion is not None
-        assert self._force_and_rate_aux is not None
-
-        pos = extract_pos(self._new_pva_aux)
-        vel = extract_vel(self._new_pva_aux)
-        force = self._force_and_rate_aux.meas_accel
-        C_sensor_to_ned = quat_to_dcm(self._new_pva_aux.quaternion)
+        pos = extract_pos(self._new_pva_aux)  # type: ignore[arg-type]
+        vel = extract_vel(self._new_pva_aux)  # type: ignore[arg-type]
+        force = self._force_and_rate_aux.meas_accel  # type: ignore[union-attr]
+        C_sensor_to_ned = quat_to_dcm(self._new_pva_aux.quaternion)  # type: ignore[union-attr,arg-type]
 
         earth = EarthModel(pos, vel)
         omega = OMEGA_E
@@ -383,12 +358,8 @@ class TutorialPinson15NedBlock(StandardStateBlock):
         Returns:
             NDArray[float64]: The Q Matrix.
         """
-        # Already validated PVA aux at top of generate_model. These assertions are just
-        # to satisfy mypy.
-        assert self._new_pva_aux is not None
-        assert self._new_pva_aux.quaternion is not None
         Q = self._pre_Q
-        C_sensor_to_ned = quat_to_dcm(self._new_pva_aux.quaternion)
+        C_sensor_to_ned = quat_to_dcm(self._new_pva_aux.quaternion)  # type: ignore[union-attr,arg-type]
 
         Q[3:6, 3:6] = C_sensor_to_ned @ Q[3:6, 3:6] @ C_sensor_to_ned.T
         Q[6:9, 6:9] = C_sensor_to_ned @ Q[6:9, 6:9] @ C_sensor_to_ned.T

@@ -5,7 +5,6 @@ from numpy import diagflat, eye, float64
 from numpy.typing import NDArray
 from pntos.api import (
     EstimateWithCovariance,
-    LoggingLevel,
     Mediator,
     Message,
     StandardDynamicsModel,
@@ -38,31 +37,6 @@ class TutorialFogmBlock(StandardStateBlock):
             sigmas (NDArray[float64]): Nx1 array of FOGM noise sigmas; units will vary.
             taus (NDArray[float64]): Nx1 array of FOGM time constants, in seconds. Must be positive.
         """
-        if sigmas.size == 0 or taus.size == 0:
-            mediator.log_message(
-                LoggingLevel.ERROR,
-                'FogmBlock sigmas (shape {}) or taus (shape {}) arguments are empty.'.format(
-                    sigmas.shape, taus.shape
-                ),
-            )
-            raise RuntimeError()
-
-        if sigmas.shape != taus.shape:
-            mediator.log_message(
-                LoggingLevel.ERROR,
-                'FogmBlock sigmas {} and taus {} arguments have a size mismatch.'.format(
-                    sigmas.shape, taus.shape
-                ),
-            )
-            raise RuntimeError()
-
-        if any(taus <= 0):
-            mediator.log_message(
-                LoggingLevel.ERROR,
-                'FogmBlock taus arguments must be positive, got {}.'.format(taus),
-            )
-            raise RuntimeError()
-
         self.label = label
         self.num_states = taus.size
         self._mediator = mediator
@@ -76,10 +50,7 @@ class TutorialFogmBlock(StandardStateBlock):
         Args:
             aux (list[Message]): List of messages.
         """
-
-        self._mediator.log_message(
-            LoggingLevel.WARN, f'FogmBlock does not require aux data.'
-        )
+        return None
 
     def generate_dynamics(
         self,

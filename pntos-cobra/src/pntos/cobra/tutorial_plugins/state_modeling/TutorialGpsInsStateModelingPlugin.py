@@ -1,6 +1,5 @@
 import numpy as np
 from pntos.api import (
-    LoggingLevel,
     Mediator,
     StandardFusionEngine,
     StandardStateModelProvider,
@@ -91,25 +90,16 @@ class TutorialGpsInsStateModelProvider(StandardStateModelProvider):
                 )
             case 1:
                 sensor_config: SensorConfig = config_from_registry(
-                    SensorConfig, self._mediator, config_group
+                    SensorConfig,
+                    self._mediator,
+                    config_group,  # type: ignore
                 )
-                if sensor_config is None:
-                    self._mediator.log_message(
-                        LoggingLevel.ERROR,
-                        f'Could not get position sensor config from registry.',
-                    )
-                    return None
                 return TutorialPinsonWithNedFogmPositionMeasurementProcessor(
                     label,
                     state_block_labels,
                     self._mediator,
                     np.array(sensor_config.lever_arm),
                 )
-
-        self._mediator.log_message(
-            LoggingLevel.ERROR,
-            f'Invalid processor index of {processor_index}. TutorialGpsInsStateModelingProvider provides {len(self.processor_identifiers)} processors.',
-        )
         return None
 
     def new_block(
@@ -147,49 +137,26 @@ class TutorialGpsInsStateModelProvider(StandardStateModelProvider):
             StandardStateBlock | None: The newly created StandardStateBlock or ``None`` when no state block can be produced
             with the given ``block_index``, ``engine``, and ``config_group``.
         """
-        if block_index == 0:
-            if config_group is None:
-                self._mediator.log_message(
-                    LoggingLevel.ERROR,
-                    f'A config group is required for state block type {self.block_identifiers[block_index]}',
+        match block_index:
+            case 0:
+                imu_config: ImuConfig = config_from_registry(
+                    ImuConfig,
+                    self._mediator,
+                    config_group,  # type: ignore
                 )
-                return None
-            imu_config = config_from_registry(ImuConfig, self._mediator, config_group)
-            if imu_config is None:
-                self._mediator.log_message(
-                    LoggingLevel.ERROR,
-                    f'Could not get IMU config from registry.',
+                return TutorialPinson15NedBlock(label, self._mediator, imu_config)
+            case 1:
+                fogm_config: FogmConfig = config_from_registry(
+                    FogmConfig,
+                    self._mediator,
+                    config_group,  # type: ignore
                 )
-                return None
-
-            return TutorialPinson15NedBlock(label, self._mediator, imu_config)
-
-        if block_index == 1:
-            if config_group is None:
-                self._mediator.log_message(
-                    LoggingLevel.ERROR,
-                    f'A config group is required for state block type {self.block_identifiers[block_index]}',
+                return TutorialFogmBlock(
+                    label,
+                    self._mediator,
+                    np.array(fogm_config.sigma),
+                    np.array(fogm_config.tau),
                 )
-                return None
-            fogm_config = config_from_registry(FogmConfig, self._mediator, config_group)
-            if fogm_config is None:
-                self._mediator.log_message(
-                    LoggingLevel.ERROR,
-                    f'Could not get fogm config from registry.',
-                )
-                return None
-
-            return TutorialFogmBlock(
-                label,
-                self._mediator,
-                np.array(fogm_config.sigma),
-                np.array(fogm_config.tau),
-            )
-
-        self._mediator.log_message(
-            LoggingLevel.ERROR,
-            f'Invalid block index of {block_index}. TutorialGpsInsStateModelingProvider provides {len(self.block_identifiers)} state blocks.',
-        )
         return None
 
     def new_virtual_block(
@@ -199,10 +166,6 @@ class TutorialGpsInsStateModelProvider(StandardStateModelProvider):
         target_label: str,
         config_group: str | None,
     ) -> VirtualStateBlock | None:
-        self._mediator.log_message(
-            LoggingLevel.ERROR,
-            f'Invalid virtual block index of {virtual_block_index}. TutorialGpsInsStateModelingProvider provides {len(self.virtual_block_identifiers)} virtual state blocks.',
-        )
         return None
 
 
@@ -219,8 +182,7 @@ class TutorialGpsInsStateModelingPlugin(StateModelingPlugin):
         plugin_resources_location: str | None = None,
         mediator: Mediator | None = None,
     ) -> None:
-        if mediator is not None:
-            self._mediator = mediator
+        self._mediator = mediator  # type: ignore
 
     def shutdown_plugin(self) -> None:
         pass
