@@ -45,6 +45,7 @@ def run_pntos(app_to_run: str = 'fusion_gps_ins_ros'):
             if 'Ctrl + C' in line:
                 print('Cobra Started Successfully')
                 break
+        time.sleep(1)  # give LCM process more time to spin up
 
         # Note: using ros2 bag play --delay N does not work because the ROS
         # clock still starts immediately, which breaks Cobra.
