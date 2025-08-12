@@ -22,6 +22,7 @@ from pntos.cobra import (
     TutorialInitializationPlugin,
 )
 from pntos.cobra.config import (
+    AspnVersion,
     FogmConfig,
     ImuConfig,
     InertialConfig,
@@ -31,7 +32,6 @@ from pntos.cobra.config import (
     SensorConfig,
     TimeAdjusterConfig,
 )
-from pntos.cobra.config.LcmTransportConfig import AspnVersion
 
 INPUT_LOG_FILENAME = ''
 for site in getsitepackages():

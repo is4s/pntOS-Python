@@ -3,11 +3,7 @@ from threading import Thread
 
 from lcm import LCM, LCMSubscription
 from pntos.api import LoggingLevel, Mediator, Message, TransportPlugin
-from pntos.cobra.config import config_from_registry
-from pntos.cobra.config.LcmTransportConfig import (
-    AspnVersion,
-    LcmTransportConfig,
-)
+from pntos.cobra.config import AspnVersion, LcmTransportConfig, config_from_registry
 from pntos.cobra.utils import (
     decode_aspn_lcm_msg,
     marshal_from_lcm,
