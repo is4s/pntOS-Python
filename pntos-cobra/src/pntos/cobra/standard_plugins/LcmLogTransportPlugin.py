@@ -83,11 +83,10 @@ class LcmLogTransportPlugin(TransportPlugin):
         log_size = self._input_log.size()
         progressbar = tqdm(total=log_size)
         fpos = self._input_log.tell()
-        for msg in self._input_log:  # type: ignore[attr-defined]
-            # check for shutdown
-            if self._shutdown_threads.is_set():
-                break
 
+        # Read until end of log or until pntOS is shut down
+        msg = self._input_log.read_next_event()
+        while msg is not None and not self._shutdown_threads.is_set():
             # update progressbar
             new_fpos = self._input_log.tell()
             progressbar.update(new_fpos - fpos)
@@ -101,13 +100,18 @@ class LcmLogTransportPlugin(TransportPlugin):
             time_microsec = int(time() * 1e6)
             self._output_log.write_event(time_microsec, msg.channel, msg.data)
 
+            msg = self._input_log.read_next_event()
+
         progressbar.close()
         self._input_log.close()
         self._output_log.close()
-        self.mediator.log_message(
-            LoggingLevel.INFO,
-            'Done processing LCM log. Press Ctrl + C to shut down pntOS.',
-        )
+
+        if msg is None:
+            # Reached end of log and pntOS has not been shut down yet
+            self.mediator.log_message(
+                LoggingLevel.INFO,
+                'Done processing LCM log. Press Ctrl + C to shut down pntOS.',
+            )
 
     def start_listening(self) -> None:
         self._log_reader_thread = Thread(target=self.read_log, args=[])
