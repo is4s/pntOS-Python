@@ -5,7 +5,7 @@ from time import time
 from lcm import LCM, Event, EventLog
 from pntos.api import LoggingLevel, Mediator, Message, TransportPlugin
 from pntos.cobra.config import LcmLogTransportConfig, config_from_registry
-from pntos.cobra.standard_plugins.LcmTransportPlugin import (
+from pntos.cobra.utils import (
     create_lcm_message,
     process_lcm_message,
 )

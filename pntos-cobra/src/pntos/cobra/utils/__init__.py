@@ -20,10 +20,12 @@ from .hdf5 import (
     save_to_hdf5_file as save_to_hdf5_file,
 )
 from .lcm import (
+    create_lcm_message as create_lcm_message,
     decode_aspn_lcm_msg as decode_aspn_lcm_msg,
     marshal_from_lcm as marshal_from_lcm,
     marshal_to_aspn2_lcm as marshal_to_aspn2_lcm,
     marshal_to_aspn23_lcm as marshal_to_aspn23_lcm,
+    process_lcm_message as process_lcm_message,
 )
 from .navigation import *
 from .plugins import (

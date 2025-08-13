@@ -4,7 +4,9 @@ import aspn2_translations
 import aspn23
 import aspn23_lcm
 import datasources.lcm.messages.aspn as aspn2_lcm
-from aspn23_xtensor import TypeTimestamp
+
+from pntos.api import LoggingLevel, Mediator, Message
+from pntos.cobra.config import AspnVersion
 
 Aspn23LcmMeasurement = (
     aspn23_lcm.measurement_angular_velocity_1d
@@ -364,3 +366,60 @@ def marshal_to_aspn2_lcm(msg: aspn23.AspnBase) -> Aspn2LcmMeasurement | None:
     except Exception as e:
         print(e)
         return None
+
+
+def process_lcm_message(
+    mediator: Mediator, channel: str, data: bytes, channels: set[str]
+) -> None:
+    """
+    Marshal LCM message to ASPN-Python and send to the mediator for processing.
+
+    Args:
+        mediator (Mediator): Mediator instance used for logging and processing message.
+        channel (str): The channel name the data originates from.
+        data (bytes): A message represented in binary.
+        channels (set[str]): Set of channels found so far.
+    """
+    # Do not process messages sent from pntos.
+    if 'pntos' in channel:
+        mediator.log_message(
+            LoggingLevel.DEBUG,
+            'pntOS channel message, not processing in ASPN handler.',
+        )
+        return
+
+    lcm_aspn_msg = decode_aspn_lcm_msg(data)
+    if lcm_aspn_msg is None:
+        mediator.log_message(
+            LoggingLevel.WARN,
+            f'Cannot decode message on channel {channel}. Ignoring message.',
+        )
+        return
+    aspn_msg = marshal_from_lcm(lcm_aspn_msg)
+    if aspn_msg is None:
+        mediator.log_message(
+            LoggingLevel.WARN,
+            f'Cannot marshal message on channel {channel} of type {type(aspn_msg)}. Ignoring message.',
+        )
+        return
+    if channel not in channels:
+        mediator.log_message(
+            LoggingLevel.INFO,
+            f'Found new channel {channel}\t with a timestamp of {aspn_msg.time_of_validity.elapsed_nsec / 1e9}s',
+        )
+        channels.add(channel)
+    message = Message(aspn_msg, channel)
+    mediator.process_pntos_message(message)
+
+
+def create_lcm_message(
+    message: Message,
+    output_version: AspnVersion,
+):
+    lcm_msg: Aspn2LcmMeasurement | Aspn23LcmMeasurement | None = None
+    if output_version == AspnVersion.V2:
+        lcm_msg = marshal_to_aspn2_lcm(message.wrapped_message)
+    else:
+        lcm_msg = marshal_to_aspn23_lcm(message.wrapped_message)
+
+    return lcm_msg
