@@ -10,7 +10,7 @@ from pntos.cobra.utils import (
     marshal_to_aspn2_lcm,
     marshal_to_aspn23_lcm,
 )
-from pntos.cobra.utils.lcm_marshaling import Aspn2LcmMeasurement, Aspn23LcmMeasurement
+from pntos.cobra.utils.lcm import Aspn2LcmMeasurement, Aspn23LcmMeasurement
 
 LCM_URL = 'tcpq://localhost:7700'
 
