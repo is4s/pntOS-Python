@@ -12,9 +12,6 @@ from pntos.cobra.config import FogmConfig, ImuConfig, SensorConfig, config_from_
 
 from .TutorialFogmBlock import TutorialFogmBlock
 from .TutorialPinson15NedBlock import TutorialPinson15NedBlock
-from .TutorialPinsonPositionMeasurementProcessor import (
-    TutorialPinsonPositionMeasurementProcessor,
-)
 from .TutorialPinsonVelocityMeasurementProcessor import (
     TutorialPinsonVelocityMeasurementProcessor,
 )
@@ -39,11 +36,8 @@ class TutorialGpsInsStateModelProvider(StandardStateModelProvider):
         """
         self._mediator = mediator
         self.processor_identifiers: list[str] = [
-            'pinson_position',
             'pinson_velocity',
             'pinson_with_ned_fogm_position',
-            'pinson_altitude',
-            'pinson_with_lever_arm_position',
         ]
         self.block_identifiers: list[str] = ['pinson15', 'fogm']
         self.virtual_block_identifiers: list[str] = []
@@ -57,8 +51,7 @@ class TutorialGpsInsStateModelProvider(StandardStateModelProvider):
         state_block_labels: list[str],
         config_group: str | None,
     ) -> (
-        TutorialPinsonPositionMeasurementProcessor
-        | TutorialPinsonWithNedFogmPositionMeasurementProcessor
+        TutorialPinsonWithNedFogmPositionMeasurementProcessor
         | TutorialPinsonVelocityMeasurementProcessor
         | None
     ):
@@ -67,12 +60,8 @@ class TutorialGpsInsStateModelProvider(StandardStateModelProvider):
 
         Args:
             processor_index (int): Index into self.processor_identifiers used to select the desired type of measurement processor.
-
-                - Index 0 corresponds to a :class:`PinsonPositionMeasurementProcessor`.
-                - Index 1 corresponds to a :class:`PinsonVelocityMeasurementProcessor`.
-                - Index 2 corresponds to a :class:`PinsonWithNedFogmPositionMeasurementProcessor`.
-                - Index 3 corresponds to a :class:`AltitudeMeasurementProcessor`.
-                - Index 4 corresponds to a :class:`PinsonWithLeverArmPositionMeasurementProcessor`.
+                - Index 1 corresponds to a PinsonVelocityMeasurementProcessor.
+                - Index 2 corresponds to a PinsonWithNedFogmPositionMeasurementProcessor.
                 - All other indices will result in a return value of None.
             engine (pntos.api.plugins.fusion.StandardFusionEngine | None): An optional parameter that may be provided to the
                 new processor, such that the processor may interact with the fusion engine it
@@ -95,41 +84,13 @@ class TutorialGpsInsStateModelProvider(StandardStateModelProvider):
         """
         match processor_index:
             case 0:
-                if config_group is None:
-                    self._mediator.log_message(
-                        LoggingLevel.ERROR,
-                        f'A config group is required for processor type {self.processor_identifiers[processor_index]}',
-                    )
-                    return None
-                sensor_config = config_from_registry(
-                    SensorConfig, self._mediator, config_group
-                )
-                if sensor_config is None:
-                    self._mediator.log_message(
-                        LoggingLevel.ERROR,
-                        f'Could not get position sensor config from registry.',
-                    )
-                    return None
-                return TutorialPinsonPositionMeasurementProcessor(
-                    label,
-                    state_block_labels,
-                    self._mediator,
-                    np.array(sensor_config.lever_arm),
-                )
-            case 1:
                 return TutorialPinsonVelocityMeasurementProcessor(
                     label,
                     state_block_labels,
                     self._mediator,
                 )
-            case 2:
-                if config_group is None:
-                    self._mediator.log_message(
-                        LoggingLevel.ERROR,
-                        f'A config group is required for processor type {self.processor_identifiers[processor_index]}',
-                    )
-                    return None
-                sensor_config = config_from_registry(
+            case 1:
+                sensor_config: SensorConfig = config_from_registry(
                     SensorConfig, self._mediator, config_group
                 )
                 if sensor_config is None:
