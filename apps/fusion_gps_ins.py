@@ -1,9 +1,5 @@
 #!/usr/bin/env python3
 
-# System imports
-from os import path
-from site import getsitepackages
-
 # API imports
 from pntos.api import LoggingLevel
 
@@ -33,22 +29,14 @@ from pntos.cobra.config import (
     TimeAdjusterConfig,
 )
 
-INPUT_LOG_FILENAME = ''
-for site in getsitepackages():
-    candidate = f'{site}/pntos_python_datasets/cobra_gps_ins_example_data.log'
-    if path.exists(candidate):
-        INPUT_LOG_FILENAME = candidate
-        break
-if not INPUT_LOG_FILENAME:
-    raise Exception('Could not find log file.')
-
-OUTPUT_LOG_FILENAME = 'pntos_output.log'
+# External library imports
+from pntos_python_datasets import EXAMPLE_LCM_LOG
 
 # Config setup
 my_config = [
     LcmLogTransportConfig(
-        input_file=INPUT_LOG_FILENAME,
-        output_file=OUTPUT_LOG_FILENAME,
+        input_file=EXAMPLE_LCM_LOG,
+        output_file='pntos_output.log',
         output_version=AspnVersion.V23,
         group='config/lcm_log_transport',
     ),
