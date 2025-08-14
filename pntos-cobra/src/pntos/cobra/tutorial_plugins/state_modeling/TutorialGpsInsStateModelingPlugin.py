@@ -72,6 +72,9 @@ class TutorialGpsInsStateModelProvider(StandardStateModelProvider):
                 track the processor throughout its lifecycle. Note that it differs from
                 :attr:`pntos.api.StandardStateModelProvider.processor_identifiers` which is the
                 model's mechanism for selecting the *type* of processor to create.
+            state_block_labels (list[str]): A list of strings which will be used to
+                populate the ``state_block_labels`` field of the newly created
+                processor.
             config_group (str): Indicates which (if any) parameter group in the
                 registry may be used to obtain additional configuration values to
                 generate the new processor. If the processor requires no
