@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
+import signal
 from subprocess import PIPE, Popen
 from sys import argv
-from time import sleep
 
 from plot_results import plot_results
 
@@ -21,13 +21,9 @@ def run_pntos(app_to_run: str = 'fusion_gps_ins'):
     done_msg = 'Done processing LCM log. Press Ctrl + C to shut down pntOS.'
     for line in cobra_process.stdout:
         if done_msg in line:
-            break
+            # Send interrupt signal to shut down pntOS cleanly
+            cobra_process.send_signal(signal.SIGINT)
 
-    # Shut down
-    cobra_process.terminate()
-
-    # I don't like it when output comes through after the program finishes.
-    sleep(0.5)
     print('pntOS Finished')
 
 

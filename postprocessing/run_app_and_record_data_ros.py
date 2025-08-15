@@ -4,7 +4,6 @@ import os
 import pty
 import shutil
 import signal
-import subprocess
 import sys
 import time
 from subprocess import PIPE, Popen
@@ -20,7 +19,7 @@ def run_pntos(app_to_run: str = 'fusion_gps_ins_ros'):
     # Remove any pre-existing output
     if os.path.exists(BAG_PATH):
         shutil.rmtree(BAG_PATH)
-    processes = []
+    processes: list[Popen] = []
     try:
         # Note: start_new_session=True makes processes interruptable.
         print('Starting recording...')
@@ -74,11 +73,9 @@ def run_pntos(app_to_run: str = 'fusion_gps_ins_ros'):
     finally:
         print('Stopping all processes...')
         for process in processes:
-            # Note: os.killpg is used because process.terminate() or
-            # process.kill() don't work for the processes that use Popen again
-            # under the hood (i.e. play-dataset)
+            # Send interrupt signal to shut down each process cleanly
             try:
-                os.killpg(os.getpgid(process.pid), signal.SIGINT)
+                process.send_signal(signal.SIGINT)
             except ProcessLookupError:
                 pass  # Process already stopped
             process.wait()
