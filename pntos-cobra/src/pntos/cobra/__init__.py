@@ -46,3 +46,6 @@ from .state_modeling_simple_gps_ins.SimpleGpsInsStateModelingPlugin import (
 from .tutorial_plugins.TutorialInitializationPlugin import (
     TutorialInitializationPlugin as TutorialInitializationPlugin,
 )
+from .tutorial_plugins.TutorialLcmTransportPlugin import (
+    TutorialLcmTransportPlugin as TutorialLcmTransportPlugin,
+)
