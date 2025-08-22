@@ -254,8 +254,7 @@ class InitializationPlugin(CommonPlugin, ABC):
 
         Args:
             initialization_type (type[InitializationType]): Specifies the type of initializer that the returned
-            value
-                will support. For example, if the user passes in
+                value will support. For example, if the user passes in
                 ``INERTIAL_INITIALIZATION_STRATEGY``, then the returned value will be an
                 implementation of :class:`pntos.api.InertialInitializationStrategy`. If ``initialization_type`` is
                 unsupported by the plugin, then ``None`` will be returned. Please use
