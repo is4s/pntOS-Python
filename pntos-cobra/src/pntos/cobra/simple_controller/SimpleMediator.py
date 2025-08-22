@@ -1,7 +1,7 @@
 import bisect
 from threading import Event
 
-from aspn23 import MeasurementAccumulatedDistanceTraveled, TypeTimestamp
+from aspn23 import TypeTimestamp
 from pntos.api import (
     ControllerPlugin,
     LoggingLevel,
