@@ -149,18 +149,18 @@ class CommonInertial(ABC):
 
     @abstractmethod
     def request_solutions(
-        self, time: list[TypeTimestamp], type: InertialSolutionRangeType
+        self, times: list[TypeTimestamp], solution_type: InertialSolutionRangeType
     ) -> list[Message] | None:
         """
         Request solutions at multiple specific times.
 
         Args:
-            time (list[TypeTimestamp]): An array of times at which solutions are requested.
-            type (InertialSolutionRangeType): The type of solution requested.
+            times (list[TypeTimestamp]): An array of times at which solutions are requested.
+            solution_type (InertialSolutionRangeType): The type of solution requested.
 
         Returns:
-            list[Message] | None: An array of solutions. Returns ``None`` if ``type`` is unsupported
-            by this inertial or every instance of ``time`` is outside the valid range. Otherwise
+            list[Message] | None: An array of solutions. Returns ``None`` if ``solution_type`` is unsupported
+            by this inertial or every instance of ``times`` is outside the valid range. Otherwise
             guaranteed to not be ``None``.
         """
         pass
@@ -366,12 +366,12 @@ class InertialPlugin(CommonPlugin, ABC):
     """
 
     @abstractmethod
-    def is_inertial_type_supported(self, type: type[InertialType]) -> bool:
+    def is_inertial_type_supported(self, inertial_type: type[InertialType]) -> bool:
         """
         Check if the plugin supports a given type of inertial.
 
         Args:
-            type (type[InertialType])
+            inertial_type (type[InertialType])
 
         Returns:
             bool: ``True`` if inertial type is supported, ``False`` otherwise.
@@ -381,7 +381,7 @@ class InertialPlugin(CommonPlugin, ABC):
     @abstractmethod
     def new_inertial(
         self,
-        type: type[InertialType],
+        inertial_type: type[InertialType],
         solution: Message,
         config_group: str | None = None,
     ) -> InertialType | None:
@@ -389,10 +389,10 @@ class InertialPlugin(CommonPlugin, ABC):
         Create an instance of an implementation of :class:`pntos.api.CommonInertial`.
 
         Args:
-            type (type[InertialType]): Specifies the type of inertial that the returned value will
+            inertial_type (type[InertialType]): Specifies the type of inertial that the returned value will
                 support. For example, if the user passes in ``STANDARD_INERTIAL_MECHANIZATION``,
                 then the returned value will be an implementation of
-                :class:`pntos.api.StandardInertialMechanization`. If ``type`` is unsupported by the plugin,
+                :class:`pntos.api.StandardInertialMechanization`. If ``inertial_type`` is unsupported by the plugin,
                 then ``None`` will be returned. Please use :meth:`is_inertial_type_supported` to
                 check if the type is supported by the plugin.
             solution (Message): The initial solution (i.e. the alignment) to mechanize from.
@@ -401,9 +401,9 @@ class InertialPlugin(CommonPlugin, ABC):
                 for multiple inertial instances to exist with unique settings.
 
         Returns:
-            InertialType | None: A new inertial object. Returns ``None`` if ``type`` is
+            InertialType | None: A new inertial object. Returns ``None`` if ``inertial_type`` is
             unsupported, ``solution`` is invalid, or ``config_group`` is invalid.
-            :meth:`is_inertial_type_supported` can be called to verify ``type`` before calling this
+            :meth:`is_inertial_type_supported` can be called to verify ``inertial_type`` before calling this
             method.
         """
         pass

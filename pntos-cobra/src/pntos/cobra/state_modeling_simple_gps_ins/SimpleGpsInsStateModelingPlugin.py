@@ -1,10 +1,11 @@
 import numpy as np
 from pntos.api.plugins.common import LoggingLevel, Mediator
-from pntos.api.plugins.fusion import StandardFusionEngine, VirtualStateBlock
+from pntos.api.plugins.fusion import StandardFusionEngine
 from pntos.api.plugins.state_modeling import (
     StandardStateModelProvider,
     StateModelingPlugin,
     StateModelProviderType,
+    VirtualStateBlock,
 )
 from pntos.cobra.config import FogmConfig, ImuConfig, SensorConfig, config_from_registry
 
@@ -32,13 +33,13 @@ class SimpleGpsInsStateModelProvider(StandardStateModelProvider):
             mediator (Mediator): A :class:(Mediator) instance.
         """
         self._mediator = mediator
-        self.processor_identifiers = [
+        self.processor_identifiers: list[str] = [
             'pinson_position',
             'pinson_velocity',
             'pinson_with_ned_fogm_position',
         ]
-        self.block_identifiers = ['pinson15', 'fogm']
-        self.virtual_block_identifiers = []
+        self.block_identifiers: list[str] = ['pinson15', 'fogm']
+        self.virtual_block_identifiers: list[str] = []
 
     def new_processor(
         self,
@@ -46,7 +47,7 @@ class SimpleGpsInsStateModelProvider(StandardStateModelProvider):
         engine: StandardFusionEngine | None,
         label: str,
         state_block_labels: list[str],
-        config_group: str,
+        config_group: str | None,
     ) -> (
         PinsonPositionMeasurementProcessor
         | PinsonWithNedFogmPositionMeasurementProcessor
@@ -83,6 +84,12 @@ class SimpleGpsInsStateModelProvider(StandardStateModelProvider):
         """
         match processor_index:
             case 0:
+                if config_group is None:
+                    self._mediator.log_message(
+                        LoggingLevel.ERROR,
+                        f'A config group is required for processor type {self.processor_identifiers[processor_index]}',
+                    )
+                    return None
                 sensor_config = config_from_registry(
                     SensorConfig, self._mediator, config_group
                 )
@@ -105,6 +112,12 @@ class SimpleGpsInsStateModelProvider(StandardStateModelProvider):
                     self._mediator,
                 )
             case 2:
+                if config_group is None:
+                    self._mediator.log_message(
+                        LoggingLevel.ERROR,
+                        f'A config group is required for processor type {self.processor_identifiers[processor_index]}',
+                    )
+                    return None
                 sensor_config = config_from_registry(
                     SensorConfig, self._mediator, config_group
                 )
@@ -132,7 +145,7 @@ class SimpleGpsInsStateModelProvider(StandardStateModelProvider):
         block_index: int,
         engine: StandardFusionEngine | None,
         label: str,
-        config_group: str,
+        config_group: str | None,
     ) -> Pinson15NedBlock | FogmBlock | None:
         """
         Generate a new StandardStateBlock that describes a set of states and how they propagate over time.
@@ -162,6 +175,12 @@ class SimpleGpsInsStateModelProvider(StandardStateModelProvider):
             with the given ``block_index``, ``engine``, and ``config_group``.
         """
         if block_index == 0:
+            if config_group is None:
+                self._mediator.log_message(
+                    LoggingLevel.ERROR,
+                    f'A config group is required for state block type {self.block_identifiers[block_index]}',
+                )
+                return None
             imu_config = config_from_registry(ImuConfig, self._mediator, config_group)
             if imu_config is None:
                 self._mediator.log_message(
@@ -173,6 +192,12 @@ class SimpleGpsInsStateModelProvider(StandardStateModelProvider):
             return Pinson15NedBlock(label, self._mediator, imu_config)
 
         if block_index == 1:
+            if config_group is None:
+                self._mediator.log_message(
+                    LoggingLevel.ERROR,
+                    f'A config group is required for state block type {self.block_identifiers[block_index]}',
+                )
+                return None
             fogm_config = config_from_registry(FogmConfig, self._mediator, config_group)
             if fogm_config is None:
                 self._mediator.log_message(
@@ -199,7 +224,7 @@ class SimpleGpsInsStateModelProvider(StandardStateModelProvider):
         virtual_block_index: int,
         source_label: str,
         target_label: str,
-        config_group: str,
+        config_group: str | None,
     ) -> VirtualStateBlock | None:
         self._mediator.log_message(
             LoggingLevel.ERROR,
@@ -228,12 +253,12 @@ class SimpleGpsInsStateModelingPlugin(StateModelingPlugin):
         pass
 
     def new_state_model_provider(
-        self, type: type[StateModelProviderType]
+        self, fusion_type: type[StateModelProviderType]
     ) -> StateModelProviderType | None:
-        if not self.is_fusion_type_supported(type):
+        if not self.is_fusion_type_supported(fusion_type):
             return None
 
         return SimpleGpsInsStateModelProvider(self._mediator)
 
-    def is_fusion_type_supported(self, type: StateModelProviderType) -> bool:
-        return type is StandardStateModelProvider
+    def is_fusion_type_supported(self, fusion_type: StateModelProviderType) -> bool:
+        return fusion_type is StandardStateModelProvider

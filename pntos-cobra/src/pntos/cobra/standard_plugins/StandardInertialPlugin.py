@@ -95,7 +95,7 @@ class StandardInertial(StandardInertialMechanization):
         return None
 
     def request_solutions(
-        self, times: list[TypeTimestamp], type: InertialSolutionRangeType
+        self, times: list[TypeTimestamp], solution_type: InertialSolutionRangeType
     ) -> list[Message] | None:
         if len(times) == 0:
             return None
@@ -103,9 +103,12 @@ class StandardInertial(StandardInertialMechanization):
         first_time = convert_timestamp_to_cpp(times[0])
         for time in times:
             cpp_time = convert_timestamp_to_cpp(time)
-            if type == InertialSolutionRangeType.INERTIAL_BEST_KNOWN_SOLUTION:
+            if solution_type == InertialSolutionRangeType.INERTIAL_BEST_KNOWN_SOLUTION:
                 pva = self.inertial.calc_pva(cpp_time)
-            elif type == InertialSolutionRangeType.INERTIAL_NO_UPDATES_WITHIN_RANGE:
+            elif (
+                solution_type
+                == InertialSolutionRangeType.INERTIAL_NO_UPDATES_WITHIN_RANGE
+            ):
                 pva = self.inertial.calc_pva_no_reset_since(cpp_time, first_time)
             solutions.append(Message(convert_pva_from_cpp(pva), self.identifier))
         return solutions

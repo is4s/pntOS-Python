@@ -10,9 +10,12 @@ from numpy.typing import NDArray
 
 from .common import CommonPlugin, EstimateWithCovariance, Message
 from .fusion_strategy import (
-    StandardDynamicsModel,
     StandardFusionStrategy,
-    StandardMeasurementModel,
+)
+from .state_modeling import (
+    StandardMeasurementProcessor,
+    StandardStateBlock,
+    VirtualStateBlock,
 )
 
 
@@ -41,241 +44,6 @@ class CrossCovariances:
     cross_covariances: list[NDArray[float64]]
     """The correlations between the state blocks.
     """
-
-
-class StandardStateBlock(ABC):
-    """
-    A description of a set of states and their dynamics.
-
-    Attributes:
-        label (str): The unique name for this state block.
-        num_states (int): The number of states represented by this state block.
-
-    Note:
-        This class must have an operational ``__deepcopy__`` method. For most classes, the default
-        ``__deepcopy__`` method provided by Python will be sufficient. However, if the class has a
-        field which does not properly implement its own ``__deepcopy__`` (such as a C object wrapped
-        to Python), then the class will need to implement a custom ``__deepcopy__`` which properly
-        copies all fields.
-    """
-
-    label: str
-    num_states: int
-
-    @abstractmethod
-    def receive_aux_data(self, aux: list[Message]) -> None:
-        """
-        Receive and use an arbitrary collection of aux data.
-
-        This method will be called by the fusion engine when its
-        :meth:`pntos.api.StandardFusionEngine.give_state_block_aux_data` is called with a label
-        corresponding to this state block's ``label``.
-
-        Args:
-            aux (list[Message])
-        """
-        pass
-
-    @abstractmethod
-    def generate_dynamics(
-        self,
-        x_and_p: EstimateWithCovariance,
-        time_from: TypeTimestamp,
-        time_to: TypeTimestamp,
-    ) -> StandardDynamicsModel | None:
-        """
-        Generate a :class:`pntos.api.StandardDynamicsModel`.
-
-        The generated model contains a complete description of how to propagate
-        this state block forward in time. For simple models, this can simply
-        return a set of static matrices that are pre-defined.
-
-        Args:
-            x_and_p (EstimateWithCovariance): The current estimate and covariance for this
-                state block. Note that this is only valid for the duration of this function, and
-                users are strongly discouraged from saving it off for later use.
-            time_from (TypeTimestamp): The time to propagate from.
-            time_to (TypeTimestamp): The time to propagate to.
-
-        Returns:
-            StandardDynamicsModel | None: The description of how to propagate this state block over
-            the given time interval, or ``None`` if ``time_from`` is later than ``time_to``.
-            Otherwise guaranteed to not return ``None``.
-        """
-        pass
-
-
-class StandardMeasurementProcessor(ABC):
-    """
-    A class that processes raw measurements/observations.
-
-    The measurements are used to calculate estimated states suitable for a linear or linearized
-    filter to use. Each type of measurement should correspond to a
-    :class:`pntos.api.StandardMeasurementProcessor` that is supplied to the fusion engine. Incoming
-    measurements received by the fusion engine will be routed to the corresponding measurement
-    processor (by label) and call :meth:`generate_model` to process the measurement. The resulting
-    :class:`pntos.api.StandardMeasurementModel` will be used by the fusion engine to call the underlying
-    :meth:`pntos.api.StandardFusionStrategy.update` method to update the filter estimate/error covariance.
-
-    Attributes:
-        label (str): A unique name for this measurement processor. This value will be used to
-            select a measurement processor to handle new measurements that the strategy
-            receives.
-        state_block_labels (list[str]): A list of unique state block labels associated with
-            measurements received by this processor. The estimate and covariance matrices passed
-            into :meth:`generate_model` will be composed of the states associated with these state
-            blocks, and the returned StandardMeasurementModel.h and StandardMeasurementModel.H must
-            respect these states. Note: ``state_block_labels[i]`` is the identifier for the ``i`` th
-            state block this processor relates to.
-
-    Note:
-        This class must have an operational ``__deepcopy__`` method. For most classes, the default
-        ``__deepcopy__`` method provided by Python will be sufficient. However, if the class has a
-        field which does not properly implement its own ``__deepcopy__`` (such as a C object wrapped
-        to Python), then the class will need to implement a custom ``__deepcopy__`` which properly
-        copies all fields.
-    """
-
-    label: str
-    state_block_labels: list[str]
-
-    @abstractmethod
-    def receive_aux_data(self, aux: list[Message]) -> None:
-        """
-        Receive and use an arbitrary collection of aux data.
-
-        This method will be called by the fusion engine when its
-        :meth:`pntos.api.StandardFusionEngine.give_measurement_processor_aux_data` is called with
-        a label corresponding to this measurement processor's ``label``.
-
-        Args:
-            aux (list[Message])
-        """
-        pass
-
-    @abstractmethod
-    def generate_model(
-        self, message: Message, x_and_p: EstimateWithCovariance
-    ) -> StandardMeasurementModel | None:
-        """
-        Generate a :class:`pntos.api.StandardMeasurementModel`.
-
-        Args:
-            message (Message): The measurement/observation to process.
-            x_and_p (EstimateWithCovariance): The current estimate and covariance for the state
-                blocks this measurement processor targets. Note that this is only valid for the
-                duration of this function, and users are strongly discouraged from saving it off for
-                later use. Similarly, the estimate and covariance are invalidated if this function
-                adds or removes any state blocks from the fusion engine.
-
-        Returns:
-            StandardMeasurementModel | None: A generated model containing the
-            parameters required for a filter update. Will be ``None`` when a
-            measurement cannot be produced from ``message`` (for example, this
-            could happen if the measurement type is unsupported by the
-            measurement processor or if it is rejected due to residual
-            monitoring).
-        """
-        pass
-
-
-class VirtualStateBlock(ABC):
-    """
-    A class used to convert a set of states from one representation to another.
-
-    States are converted using a mapping function :math:`f` to convert estimates,
-    and the Jacobian of :math:`f()` to map covariances (note that this implies that
-    the order/units of terms in the estimate vector and covariance matrix are
-    the same). Each instance is associated with two labels, ``source`` and
-    ``target``, where ``source`` is the label attached to the quantity to be
-    transformed, and ``target`` is the label attached to the result. Typically used
-    with a :class:`pntos.api.StandardFusionEngine` where ``source`` refers to a *real*
-    :class:`pntos.api.StandardStateBlock` and ``target`` refers to some representation that is
-    advantageous for some other element, such as a :class:`pntos.api.StandardMeasurementProcessor`, to use.
-
-    Attributes:
-        source (str): The label associated with the representation this instance can transform
-            *from*.
-        target (str): The label associated with the representation this instance can transform *to*.
-
-    Note:
-        This class must have an operational ``__deepcopy__`` method. For most classes, the default
-        ``__deepcopy__`` method provided by Python will be sufficient. However, if the class has a
-        field which does not properly implement its own ``__deepcopy__`` (such as a C object wrapped
-        to Python), then the class will need to implement a custom ``__deepcopy__`` which properly
-        copies all fields.
-    """
-
-    source: str
-    target: str
-
-    @abstractmethod
-    def receive_aux_data(self, aux: list[Message]) -> None:
-        """
-        Receive and use an arbitrary collection of aux data.
-
-        This method will be called by the fusion engine when its
-        :meth:`pntos.api.StandardFusionEngine.give_virtual_state_block_aux_data` is called with a
-        label corresponding to this :class:`pntos.api.VirtualStateBlock` 's ``target``.
-
-        Args:
-            aux (list[Message])
-        """
-        pass
-
-    @abstractmethod
-    def convert(
-        self,
-        estimate_with_covariance: EstimateWithCovariance,
-        time: TypeTimestamp,
-    ) -> EstimateWithCovariance:
-        """
-        Convert a full estimate/covariance pair.
-
-        Args:
-            estimate_with_covariance (EstimateWithCovariance): Estimate and covariance to convert.
-            time (TypeTimestamp): Time that ``estimate_with_covariance`` is valid at.
-
-        Returns:
-            EstimateWithCovariance: The converted value.
-        """
-        pass
-
-    @abstractmethod
-    def convert_estimate(
-        self, estimate: NDArray[float64], time: TypeTimestamp
-    ) -> NDArray[float64]:
-        """
-        Convert just an estimate vector.
-
-        Args:
-            estimate (NDArray[float64]): Estimate vector to convert, Nx1.
-            time (TypeTimestamp): Time that ``estimate`` is valid at.
-
-        Returns:
-            NDArray[float64]: The converted vector, Mx1.
-        """
-        pass
-
-    @abstractmethod
-    def jacobian(
-        self, estimate: NDArray[float64], time: TypeTimestamp
-    ) -> NDArray[float64]:
-        """
-        Obtain the Jacobian of the transform performed by this instance.
-
-        The Jacobian is calculated at an instance in time, given an estimate to
-        differentiate with respect to.
-
-        Args:
-            estimate (NDArray[float64]): Estimate vector associated with the return value of ``source``, Nx1.
-            time (TypeTimestamp): Time that ``estimate`` is valid at.
-
-        Returns:
-            NDArray[float64]: An MxN matrix that may be used to pre-multiply ``estimate`` to obtain an M
-            length vector in ``target`` representation (to first order).
-        """
-        pass
 
 
 class StandardFusionEngine(ABC):
@@ -758,12 +526,12 @@ class FusionPlugin(CommonPlugin, ABC):
     """
 
     @abstractmethod
-    def is_fusion_type_supported(self, type: type[FusionEngineType]) -> bool:
+    def is_fusion_type_supported(self, fusion_type: type[FusionEngineType]) -> bool:
         """
         Check if the plugin supports a given type of fusion.
 
         Args:
-            type (type[FusionEngineType])
+            fusion_type (type[FusionEngineType])
 
         Returns:
             bool
@@ -772,20 +540,20 @@ class FusionPlugin(CommonPlugin, ABC):
 
     @abstractmethod
     def new_fusion_engine(
-        self, type: type[FusionEngineType]
+        self, fusion_type: type[FusionEngineType]
     ) -> FusionEngineType | None:
         """
         Create a fusion engine.
 
         Args:
-            type (type[FusionEngineType]): This parameter specifies the type of fusion engine that
+            fusion_type (type[FusionEngineType]): This parameter specifies the type of fusion engine that
                 will be returned.
 
         Returns:
-            FusionEngineType | None: The ``type`` parameter specifies the type of fusion engine
+            FusionEngineType | None: The ``fusion_type`` parameter specifies the type of fusion engine
             that will be returned. For example, if the user passes in :class:`pntos.api.StandardFusionEngine`,
             then an implementation of :class:`pntos.api.StandardFusionEngine` will be returned. Returns
-            ``None`` if ``type`` is not supported by this fusion plugin
+            ``None`` if ``fusion_type`` is not supported by this fusion plugin
             (:meth:`is_fusion_type_supported` can be used to check the type before calling this
             method). Otherwise the return is guaranteed to not be ``None``.
         """

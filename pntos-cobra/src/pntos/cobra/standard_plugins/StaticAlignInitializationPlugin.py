@@ -154,11 +154,15 @@ class StaticAlignInitializationPlugin(InitializationPlugin):
     def shutdown_plugin(self):
         self.mediator = None
 
-    def is_initialization_type_supported(self, type: InitializationType) -> bool:
-        return type == InertialInitializationStrategy
+    def is_initialization_type_supported(
+        self, initialization_type: InitializationType
+    ) -> bool:
+        return initialization_type == InertialInitializationStrategy
 
     def new_initialization_strategy(
-        self, type: type[InitializationType], config_group: str | None = None
+        self,
+        initialization_type: type[InitializationType],
+        config_group: str | None = None,
     ) -> InitializationType | None:
         if config_group is None:
             self.mediator.log_message(
@@ -166,7 +170,7 @@ class StaticAlignInitializationPlugin(InitializationPlugin):
                 'config_group is a required parameter for this plugin and cannot be None',
             )
             return None
-        if issubclass(type, InertialInitializationStrategy):
+        if issubclass(initialization_type, InertialInitializationStrategy):
             return StaticAlign(config_group, self.mediator)
         else:
             self.mediator.log_message(LoggingLevel.ERROR, 'Unsupported type requested')

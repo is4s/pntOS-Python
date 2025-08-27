@@ -160,13 +160,17 @@ class TutorialInitializationPlugin(InitializationPlugin):
     def shutdown_plugin(self) -> None:
         return
 
-    def is_initialization_type_supported(self, type: InitializationType) -> bool:
-        return type == InertialInitializationStrategy  # type: ignore[no-any-return]
+    def is_initialization_type_supported(
+        self, initialization_type: InitializationType
+    ) -> bool:
+        return initialization_type == InertialInitializationStrategy  # type: ignore[no-any-return]
 
     def new_initialization_strategy(
-        self, type: type[InitializationType], config_group: str | None = None
+        self,
+        initialization_type: type[InitializationType],
+        config_group: str | None = None,
     ) -> InitializationType | None:
-        if issubclass(type, InertialInitializationStrategy):
+        if issubclass(initialization_type, InertialInitializationStrategy):
             return ManualInitialization(config_group, self.mediator)  # type: ignore[arg-type]
         else:
             self.mediator.log_message(LoggingLevel.ERROR, 'Unsupported type requested.')

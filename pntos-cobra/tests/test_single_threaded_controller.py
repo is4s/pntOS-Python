@@ -308,7 +308,7 @@ class DummyStandardStateModelProvider(StandardStateModelProvider):
         engine: StandardFusionEngine | None,
         label: str,
         state_block_labels: list[str],
-        config_group: str,
+        config_group: str | None,
     ) -> StandardMeasurementProcessor | None:
         return None
 
@@ -317,7 +317,7 @@ class DummyStandardStateModelProvider(StandardStateModelProvider):
         block_index: int,
         engine: StandardFusionEngine | None,
         label: str,
-        config_group: str,
+        config_group: str | None,
     ) -> StandardStateBlock | None:
         return None
 
@@ -326,7 +326,7 @@ class DummyStandardStateModelProvider(StandardStateModelProvider):
         virtual_block_index: int,
         source_label: str,
         target_label: str,
-        config_group: str,
+        config_group: str | None,
     ) -> VirtualStateBlock | None:
         return None
 
@@ -358,7 +358,10 @@ class DummyStandardFusionStrategy(StandardFusionStrategy):
         pass
 
     def set_covariance_slice(
-        self, new_covariance: NDArray[float64], first_row: int, first_col: int
+        self,
+        new_covariance: NDArray[float64],
+        first_row: int,
+        first_col: int | None = None,
     ) -> None:
         pass
 
@@ -487,7 +490,7 @@ class DummyOrchestrationPlugin(OrchestrationPlugin):
         return
 
     def init_orchestration_plugin(
-        self, plugins: List[CommonPlugin], stream_config: MessageStreamConfig
+        self, plugins: List[CommonPlugin] | None, stream_config: MessageStreamConfig
     ) -> None:
         pass
 

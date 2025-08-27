@@ -1,66 +1,17 @@
 """Python API of pntOS."""
 
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
-from typing import Any, Callable, TypeVar
+from typing import Any, TypeVar
 
 from numpy import float64
 from numpy.typing import NDArray
 
 from pntos.api import CommonPlugin
 
-
-@dataclass
-class StandardDynamicsModel:
-    """
-    A description of the propagation dynamics for a set of states.
-
-    This model assumes that the state space :math:`x` can be propagated forward in time by the
-    equation:
-
-    .. math::
-        x_k = g(x_{k-1}) + w_k
-
-    where :math:`x_k` is the set of states at time :math:`k`, :math:`g` is an arbitrary function,
-    and :math:`w_k` is additive white Gaussian noise.
-
-    Attributes:
-        g (Callable[[NDArray[float64]], NDArray[float64]]): A function that propagates forward in time a set of
-            states.
-        Phi (NDArray[float64]): The first-order Taylor series expansion (Jacobian) of the function :math:`g`.
-        Qd (NDArray[float64]): The covariance matrix of :math:`w_k`.
-    """
-
-    g: Callable[[NDArray[float64]], NDArray[float64]]
-    Phi: NDArray[float64]
-    Qd: NDArray[float64]
-
-
-@dataclass
-class StandardMeasurementModel:
-    """
-    A description of how a measurement relates to a state space.
-
-    This model assumes that the relationship between the measurement and state vector is well
-    modeled by the equation:
-
-    .. math::
-        z=h(x) + v
-
-    where :math:`z` is the measurement itself, :math:`x` is the set of states being estimated,
-    :math:`h` is an arbitrary function, and :math:`v` is additive white Gaussian noise.
-
-    Attributes:
-        z (NDArray[float64]): A column vector containing the measurement itself.
-        h (Callable[[NDArray[float64]], NDArray[float64]]): A function that maps the state space to measurement space.
-        H (NDArray[float64]): The first-order Taylor series expansion (i.e. Jacobian) of the function h.
-        R (NDArray[float64]): The covariance matrix of :math:`v`.
-    """
-
-    z: NDArray[float64]
-    h: Callable[[NDArray[float64]], NDArray[float64]]
-    H: NDArray[float64]
-    R: NDArray[float64]
+from .state_modeling import (
+    StandardDynamicsModel,
+    StandardMeasurementModel,
+)
 
 
 class StandardFusionStrategy(ABC):
@@ -208,7 +159,10 @@ class StandardFusionStrategy(ABC):
 
     @abstractmethod
     def set_covariance_slice(
-        self, new_covariance: NDArray[float64], first_row: int, first_col: int
+        self,
+        new_covariance: NDArray[float64],
+        first_row: int,
+        first_col: int | None = None,
     ) -> None:
         """
         Set a slice of the covariance matrix to a given set of values.
@@ -220,13 +174,14 @@ class StandardFusionStrategy(ABC):
         Allows for manually overriding the current covariance matrix. Sets a block of the covariance
         matrix to new values. The overwritten values are those in a rectangular area defined by the
         upper left corner at ``first_row``, ``first_col`` and extending down and right to cover an
-        area equal to the size of ``new_covariance``.
+        area equal to the size of ``new_covariance``. If ``first_col`` is not set or set to ``None``, the value of
+        ``first_row`` will be used as a column index as well.
 
         Args:
             new_covariance (NDArray[float64]): The new covariance values that will overwrite a slice of the
                 previous covariance matrix.
             first_row (int): The row of the first value to overwrite.
-            first_col (int): The column of the first value to overwrite.
+            first_col (int | None, optional): The column of the first value to overwrite.
         """
         ...
 

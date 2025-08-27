@@ -9,8 +9,7 @@ from pntos.api.plugins.common import (
     Mediator,
     Message,
 )
-from pntos.api.plugins.fusion import StandardStateBlock
-from pntos.api.plugins.fusion_strategy import StandardDynamicsModel
+from pntos.api.plugins.state_modeling import StandardDynamicsModel, StandardStateBlock
 from scipy.linalg import expm
 
 

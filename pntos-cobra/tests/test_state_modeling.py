@@ -259,16 +259,20 @@ def test_invalid_index(state_model_provider: StateModelProviderType) -> None:
     good_sb = state_model_provider.new_block(0, None, 'label', '/config/cobra/imu')
     assert good_sb is not None
 
+    block_ids = state_model_provider.block_identifiers
+    assert block_ids is not None
     invalid_sb = state_model_provider.new_block(
-        len(state_model_provider.block_identifiers) + 1,
+        len(block_ids) + 1,
         None,
         'label',
         '/config/cobra/imu',
     )
     assert invalid_sb is None
 
+    proc_ids = state_model_provider.processor_identifiers
+    assert proc_ids is not None
     invalid_mp = state_model_provider.new_processor(
-        len(state_model_provider.processor_identifiers) + 1,
+        len(proc_ids) + 1,
         None,
         'label',
         ['state_block_labels'],
@@ -276,8 +280,10 @@ def test_invalid_index(state_model_provider: StateModelProviderType) -> None:
     )
     assert invalid_mp is None
 
+    vblock_ids = state_model_provider.virtual_block_identifiers
+    assert vblock_ids is not None
     invalid_vsb = state_model_provider.new_virtual_block(
-        len(state_model_provider.virtual_block_identifiers) + 1,
+        len(vblock_ids) + 1,
         'source',
         'target',
         'config/vsb',

@@ -299,7 +299,6 @@ class StandardFusionEngine(api.StandardFusionEngine):
         self._strategy.set_covariance_slice(
             new_covariance=covariance,
             first_row=this_sb.start_index,
-            first_col=this_sb.start_index,
         )
 
     def set_state_block_cross_covariance(
@@ -705,18 +704,18 @@ class StandardFusionPlugin(FusionPlugin):
     def shutdown_plugin(self) -> None:
         pass
 
-    def is_fusion_type_supported(self, type: type[FusionEngineType]) -> bool:
-        return type == api.StandardFusionEngine
+    def is_fusion_type_supported(self, fusion_type: type[FusionEngineType]) -> bool:
+        return fusion_type == api.StandardFusionEngine
 
     def new_fusion_engine(
-        self, type: type[FusionEngineType]
+        self, fusion_type: type[FusionEngineType]
     ) -> FusionEngineType | None:
-        if self.is_fusion_type_supported(type):
+        if self.is_fusion_type_supported(fusion_type):
             return StandardFusionEngine(mediator=self._mediator)
         else:
             self._mediator.log_message(
                 LoggingLevel.ERROR,
-                f'Fusion strategy type {type.__name__} not currently supported. '
+                f'Fusion strategy type {fusion_type.__name__} not currently supported. '
                 + 'Make sure to call FusionPlugin.is_fusion_type_supported before '
                 + 'requesting a new fusion strategy.',
             )

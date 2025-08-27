@@ -1,5 +1,5 @@
 diff --git a/pntos-cobra/src/pntos/cobra/orchestration_plugins/SimpleGpsOrchestrationPlugin.py b/pntos-cobra/src/pntos/cobra/orchestration_plugins/SimpleGpsVelOrchestrationPlugin.py
-index 49e3ddc4..a3ac43b9 100644
+index 5acc94fa..fc50d727 100644
 --- a/pntos-cobra/src/pntos/cobra/orchestration_plugins/SimpleGpsOrchestrationPlugin.py
 +++ b/pntos-cobra/src/pntos/cobra/orchestration_plugins/SimpleGpsVelOrchestrationPlugin.py
 @@ -62,6 +62,10 @@ GPS_MEASUREMENT_PROCESSOR_ID = 'pinson_with_ned_fogm_position'
@@ -47,7 +47,7 @@ index 49e3ddc4..a3ac43b9 100644
          }
          self.alignment_channels = [
              orch_config.gps_channel,
-@@ -222,8 +227,8 @@ class SimpleGpsOrchestrationPlugin(OrchestrationPlugin):
+@@ -229,8 +234,8 @@ class SimpleGpsOrchestrationPlugin(OrchestrationPlugin):
          """
          Utility function to assemble the components of and create a fusion engine.
  
@@ -58,7 +58,7 @@ index 49e3ddc4..a3ac43b9 100644
          """
          # Make a fusion engine
          fusion_engine: StandardFusionEngine | None = (
-@@ -245,6 +250,7 @@ class SimpleGpsOrchestrationPlugin(OrchestrationPlugin):
+@@ -252,6 +257,7 @@ class SimpleGpsOrchestrationPlugin(OrchestrationPlugin):
          pinson_block = None
          fogm_block = None
          gps_processor = None
@@ -66,24 +66,24 @@ index 49e3ddc4..a3ac43b9 100644
          for plugin in self.state_modeling_plugins:
              provider: StandardStateModelProvider | None = (
                  plugin.new_state_model_provider(StandardStateModelProvider)
-@@ -274,6 +280,16 @@ class SimpleGpsOrchestrationPlugin(OrchestrationPlugin):
-                         GPS_MP_STATE_BLOCK_LABELS,
-                         GPS_MEASUREMENT_PROCESSOR_CONFIG_GROUP,
-                     )
-+                if VEL_MEASUREMENT_PROCESSOR_ID in provider.processor_identifiers:
-+                    vel_processor = provider.new_processor(
-+                        provider.processor_identifiers.index(
-+                            VEL_MEASUREMENT_PROCESSOR_ID
-+                        ),
-+                        fusion_engine,
-+                        VEL_MEASUREMENT_PROCESSOR_LABEL,
-+                        VEL_MP_STATE_BLOCK_LABELS,
-+                        VEL_MEASUREMENT_PROCESSOR_CONFIG_GROUP,
-+                    )
+@@ -285,6 +291,16 @@ class SimpleGpsOrchestrationPlugin(OrchestrationPlugin):
+                             GPS_MP_STATE_BLOCK_LABELS,
+                             GPS_MEASUREMENT_PROCESSOR_CONFIG_GROUP,
+                         )
++                    if VEL_MEASUREMENT_PROCESSOR_ID in provider.processor_identifiers:
++                        vel_processor = provider.new_processor(
++                            provider.processor_identifiers.index(
++                                VEL_MEASUREMENT_PROCESSOR_ID
++                            ),
++                            fusion_engine,
++                            VEL_MEASUREMENT_PROCESSOR_LABEL,
++                            VEL_MP_STATE_BLOCK_LABELS,
++                            VEL_MEASUREMENT_PROCESSOR_CONFIG_GROUP,
++                        )
  
          # Make state blocks
          if pinson_block is None:
-@@ -313,6 +329,16 @@ class SimpleGpsOrchestrationPlugin(OrchestrationPlugin):
+@@ -324,6 +340,16 @@ class SimpleGpsOrchestrationPlugin(OrchestrationPlugin):
              return
          fusion_engine.add_measurement_processor(gps_processor)
  

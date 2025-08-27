@@ -228,12 +228,14 @@ class InitializationPlugin(CommonPlugin, ABC):
     """
 
     @abstractmethod
-    def is_initialization_type_supported(self, type: type[InitializationType]) -> bool:
+    def is_initialization_type_supported(
+        self, initialization_type: type[InitializationType]
+    ) -> bool:
         """
         Check if given ``InitializationType`` is supported.
 
         Args:
-            type (type[InitializationType])
+            initialization_type (type[InitializationType])
 
         Returns:
             bool: ``True`` if the plugin supports a given type of mechanization, ``False``
@@ -243,17 +245,19 @@ class InitializationPlugin(CommonPlugin, ABC):
 
     @abstractmethod
     def new_initialization_strategy(
-        self, type: type[InitializationType], config_group: str | None = None
+        self,
+        initialization_type: type[InitializationType],
+        config_group: str | None = None,
     ) -> InitializationType | None:
         """
         Create an instance of :class:`pntos.api.CommonInitializationStrategy`.
 
         Args:
-            type (type[InitializationType]): Specifies the type of initializer that the returned
+            initialization_type (type[InitializationType]): Specifies the type of initializer that the returned
             value
                 will support. For example, if the user passes in
                 ``INERTIAL_INITIALIZATION_STRATEGY``, then the returned value will be an
-                implementation of :class:`pntos.api.InertialInitializationStrategy`. If ``type`` is
+                implementation of :class:`pntos.api.InertialInitializationStrategy`. If ``initialization_type`` is
                 unsupported by the plugin, then ``None`` will be returned. Please use
                 :meth:`is_initialization_type_supported` to check if the type is supported by the
                 plugin.
@@ -264,7 +268,7 @@ class InitializationPlugin(CommonPlugin, ABC):
 
         Returns:
             InitializationType | None: The new initialization strategy object. Returns ``None``
-            if ``type`` is unsupported by this plugin (this can be checked using
+            if ``initialization_type`` is unsupported by this plugin (this can be checked using
             :meth:`is_initialization_type_supported`) or if ``config_group`` is invalid.
         """
         pass

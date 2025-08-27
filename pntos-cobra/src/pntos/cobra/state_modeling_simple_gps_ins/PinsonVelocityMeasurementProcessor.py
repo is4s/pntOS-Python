@@ -12,8 +12,10 @@ from pntos.api.plugins.common import (
     Mediator,
     Message,
 )
-from pntos.api.plugins.fusion import StandardMeasurementProcessor
-from pntos.api.plugins.fusion_strategy import StandardMeasurementModel
+from pntos.api.plugins.state_modeling import (
+    StandardMeasurementModel,
+    StandardMeasurementProcessor,
+)
 
 
 class PinsonVelocityMeasurementProcessor(StandardMeasurementProcessor):
