@@ -147,7 +147,7 @@ class SimpleGpsVelOrchestrationPlugin(OrchestrationPlugin):
             print(f'[{self.identifier}] {self.log_level_strings[level]} {message}')  # type: ignore[unreachable]
 
     def init_orchestration_plugin(
-        self, plugins: list[CommonPlugin], stream_config: MessageStreamConfig
+        self, plugins: list[CommonPlugin] | None, stream_config: MessageStreamConfig
     ) -> None:
         stream_config.sequenced_stream_all(True)
         stream_config.immediate_stream_add(MeasurementImu)
@@ -175,6 +175,13 @@ class SimpleGpsVelOrchestrationPlugin(OrchestrationPlugin):
             inertial_config.channel,
         ]
         self.inertial_channel = inertial_config.channel
+
+        if plugins is None:
+            self._log(
+                LoggingLevel.ERROR,
+                'No plugins were provided. Filter cannot be implemented.',
+            )
+            return
 
         sorted_plugins = sort_plugins_dataclass(plugins)
         if not validate_plugins(
@@ -256,40 +263,44 @@ class SimpleGpsVelOrchestrationPlugin(OrchestrationPlugin):
                 plugin.new_state_model_provider(StandardStateModelProvider)
             )
             if provider is not None:
-                if STATE_BLOCK_ID in provider.block_identifiers:
-                    pinson_block = provider.new_block(
-                        provider.block_identifiers.index(STATE_BLOCK_ID),
-                        fusion_engine,
-                        STATE_BLOCK_LABEL,
-                        STATE_BLOCK_CONFIG_GROUP,
-                    )
-                if FOGM_STATE_BLOCK_ID in provider.block_identifiers:
-                    fogm_block = provider.new_block(
-                        provider.block_identifiers.index(FOGM_STATE_BLOCK_ID),
-                        fusion_engine,
-                        FOGM_STATE_BLOCK_LABEL,
-                        FOGM_STATE_BLOCK_CONFIG_GROUP,
-                    )
-                if GPS_MEASUREMENT_PROCESSOR_ID in provider.processor_identifiers:
-                    gps_processor = provider.new_processor(
-                        provider.processor_identifiers.index(
-                            GPS_MEASUREMENT_PROCESSOR_ID
-                        ),
-                        fusion_engine,
-                        GPS_MEASUREMENT_PROCESSOR_LABEL,
-                        GPS_MP_STATE_BLOCK_LABELS,
-                        GPS_MEASUREMENT_PROCESSOR_CONFIG_GROUP,
-                    )
-                if VEL_MEASUREMENT_PROCESSOR_ID in provider.processor_identifiers:
-                    vel_processor = provider.new_processor(
-                        provider.processor_identifiers.index(
-                            VEL_MEASUREMENT_PROCESSOR_ID
-                        ),
-                        fusion_engine,
-                        VEL_MEASUREMENT_PROCESSOR_LABEL,
-                        VEL_MP_STATE_BLOCK_LABELS,
-                        VEL_MEASUREMENT_PROCESSOR_CONFIG_GROUP,
-                    )
+                if (
+                    provider.block_identifiers is not None
+                    and provider.processor_identifiers is not None
+                ):
+                    if STATE_BLOCK_ID in provider.block_identifiers:
+                        pinson_block = provider.new_block(
+                            provider.block_identifiers.index(STATE_BLOCK_ID),
+                            fusion_engine,
+                            STATE_BLOCK_LABEL,
+                            STATE_BLOCK_CONFIG_GROUP,
+                        )
+                    if FOGM_STATE_BLOCK_ID in provider.block_identifiers:
+                        fogm_block = provider.new_block(
+                            provider.block_identifiers.index(FOGM_STATE_BLOCK_ID),
+                            fusion_engine,
+                            FOGM_STATE_BLOCK_LABEL,
+                            FOGM_STATE_BLOCK_CONFIG_GROUP,
+                        )
+                    if GPS_MEASUREMENT_PROCESSOR_ID in provider.processor_identifiers:
+                        gps_processor = provider.new_processor(
+                            provider.processor_identifiers.index(
+                                GPS_MEASUREMENT_PROCESSOR_ID
+                            ),
+                            fusion_engine,
+                            GPS_MEASUREMENT_PROCESSOR_LABEL,
+                            GPS_MP_STATE_BLOCK_LABELS,
+                            GPS_MEASUREMENT_PROCESSOR_CONFIG_GROUP,
+                        )
+                    if VEL_MEASUREMENT_PROCESSOR_ID in provider.processor_identifiers:
+                        vel_processor = provider.new_processor(
+                            provider.processor_identifiers.index(
+                                VEL_MEASUREMENT_PROCESSOR_ID
+                            ),
+                            fusion_engine,
+                            VEL_MEASUREMENT_PROCESSOR_LABEL,
+                            VEL_MP_STATE_BLOCK_LABELS,
+                            VEL_MEASUREMENT_PROCESSOR_CONFIG_GROUP,
+                        )
 
         # Make state blocks
         if pinson_block is None:

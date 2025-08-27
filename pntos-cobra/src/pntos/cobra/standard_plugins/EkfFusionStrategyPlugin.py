@@ -135,8 +135,10 @@ class EkfFusionStrategy(StandardFusionStrategy):
             return self._P
 
     def set_covariance_slice(
-        self, new_covariance: NDArray, first_row: int, first_col: int
+        self, new_covariance: NDArray, first_row: int, first_col: int | None = None
     ) -> None:
+        if first_col is None:
+            first_col = first_row
         validate_array(new_covariance, self._mediator, dims=2)
 
         last_row = first_row + new_covariance.shape[0]

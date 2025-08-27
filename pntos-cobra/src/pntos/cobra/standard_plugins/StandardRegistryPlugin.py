@@ -170,9 +170,13 @@ class StandardKeyValueStore(KeyValueStore):
         else:
             self._store = {}
 
-    def keys(self) -> KeysView[str]:
+    def keys(self) -> list[str] | None:
         self._check_batch_operation()
-        return self._store.keys()
+        keys = self._store.keys()
+        if len(keys) == 0:
+            return None
+        else:
+            return list(keys)
 
     def __contains__(self, key: str) -> bool:
         """Wrapper function for dictionary-like kvstore."""
@@ -214,31 +218,31 @@ class StandardKeyValueStore(KeyValueStore):
         return len(self._store)
 
     def get_value(
-        self, key: str, type: type[RegistryValueType]
+        self, key: str, value_type: type[RegistryValueType]
     ) -> RegistryValueType | None:
         self._check_batch_operation()
         if key in self._store:
             val = self._store[key]
-            if isinstance(val, type):  # Conversion not necessary - just return
+            if isinstance(val, value_type):  # Conversion not necessary - just return
                 return val
             else:  # Conversion necessary
-                convert = self.type_conversion[builtins.type(val)][type]
+                convert = self.type_conversion[builtins.type(val)][value_type]
                 if convert is not None:
                     out = convert(val)
-                    if isinstance(out, type):
+                    if isinstance(out, value_type):
                         return out
                     else:
                         self._log(
                             LoggingLevel.WARN,
                             'Unable to convert from type '
                             + f'{builtins.type(val)}'
-                            + f' to type {type}.',
+                            + f' to type {value_type}.',
                         )
                 else:
                     self._log(
                         LoggingLevel.WARN,
                         f'Conversion from type {builtins.type(val)}'
-                        + f' to type {type} unsupported.',
+                        + f' to type {value_type} unsupported.',
                     )
 
             return None

@@ -23,34 +23,34 @@ class MessageStreamConfig(ABC):
 
     @abstractmethod
     def sequenced_stream_add(
-        self, type: type[AspnBase], source_identifier: str | None = None
+        self, message_type: type[AspnBase], source_identifier: str | None = None
     ) -> None:
         """
         Request messages are streamed in sorted timestamp ordering.
 
-        Request messages of the given ``type`` and optional ``source_identifier`` are
+        Request messages of the given ``message_type`` and optional ``source_identifier`` are
         streamed in sorted timestamp ordering.
 
         Args:
-            type (type[AspnBase])
+            message_type (type[AspnBase])
             source_identifier (str | None, optional)
         """
         pass
 
     @abstractmethod
     def sequenced_stream_remove(
-        self, type: type[AspnBase], source_identifier: str | None = None
+        self, message_type: type[AspnBase], source_identifier: str | None = None
     ) -> None:
         """
         Request messages are no longer streamed in sorted timestamp ordering.
 
-        Request messages of the given ``type`` and optional ``source_identifier`` are no
+        Request messages of the given ``message_type`` and optional ``source_identifier`` are no
         longer streamed in sorted timestamp ordering. This will remove a type that was previously
         added in a call to :meth:`sequenced_stream_add`, or remove individual messages from the
         entire list of messages that was added with a previous call to :meth:`sequenced_stream_all`.
 
         Args:
-            type (type[AspnBase])
+            message_type (type[AspnBase])
             source_identifier (str | None, optional)
         """
         pass
@@ -70,34 +70,34 @@ class MessageStreamConfig(ABC):
 
     @abstractmethod
     def immediate_stream_add(
-        self, type: type[AspnBase], source_identifier: str | None = None
+        self, message_type: type[AspnBase], source_identifier: str | None = None
     ) -> None:
         """
         Request messages are streamed immediately.
 
-        Request messages of the given ``type`` and optional ``source_identifier`` are
+        Request messages of the given ``message_type`` and optional ``source_identifier`` are
         streamed immediately without delay, buffering, or sorting.
 
         Args:
-            type (type[AspnBase])
+            message_type (type[AspnBase])
             source_identifier (str | None, optional)
         """
         pass
 
     @abstractmethod
     def immediate_stream_remove(
-        self, type: type[AspnBase], source_identifier: str | None = None
+        self, message_type: type[AspnBase], source_identifier: str | None = None
     ) -> None:
         """
         Request messages are no longer streamed immediately.
 
-        Request messages of the given ``type`` and optional ``source_identifier`` are no
+        Request messages of the given ``message_type`` and optional ``source_identifier`` are no
         longer streamed immediately. This will remove a type that was previously added in a call to
         :meth:`immediate_stream_add`, or remove individual messages from the entire list of messages
         that was added with a previous call to :meth:`immediate_stream_all`.
 
         Args:
-            type (type[AspnBase])
+            message_type (type[AspnBase])
             source_identifier (str | None, optional)
         """
         pass
@@ -140,7 +140,7 @@ class OrchestrationPlugin(CommonPlugin, ABC):
 
     @abstractmethod
     def init_orchestration_plugin(
-        self, plugins: list[CommonPlugin], stream_config: MessageStreamConfig
+        self, plugins: list[CommonPlugin] | None, stream_config: MessageStreamConfig
     ) -> None:
         """
         Initial data structures needed by the orchestration plugin.
@@ -149,7 +149,7 @@ class OrchestrationPlugin(CommonPlugin, ABC):
         any other call to an :class:`pntos.api.OrchestrationPlugin` function.
 
         Args:
-            plugins (list[CommonPlugin]): A set of plugins which should be used by the orchestration
+            plugins (list[CommonPlugin] | None): A set of plugins which should be used by the orchestration
                 plugin. For example, the plugins list may include a :class:`pntos.api.StandardFusionEngine`,
                 which the orchestration plugin can use to perform fusion of sensor data received.
                 The list may also include a :class:`pntos.api.StateModelingPlugin`, which the orchestration

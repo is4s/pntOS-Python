@@ -153,7 +153,7 @@ Example:
     be a good place to use ``RegistryValueType`` in the type description::
 
         def get_value(
-            self, key: str, type: type[RegistryValueType]
+            self, key: str, value_type: type[RegistryValueType]
         ) -> RegistryValueType | None
 """
 
@@ -222,12 +222,12 @@ class KeyValueStore(ABC):
     """
 
     @abstractmethod
-    def keys(self) -> KeysView[str]:
+    def keys(self) -> list[str] | None:
         """
         Get the array of keys which currently exist in this store.
 
         Returns:
-            KeysView[str]: Returns the keys in the store.
+            list[str] | None: Returns the keys in the store or ``None`` if no keys are present.
         """
         pass
 
@@ -252,10 +252,10 @@ class KeyValueStore(ABC):
 
     @abstractmethod
     def get_value(
-        self, key: str, type: type[RegistryValueType]
+        self, key: str, value_type: type[RegistryValueType]
     ) -> RegistryValueType | None:
         """
-        Get the value stored at ``key`` with return type ``type``.
+        Get the value stored at ``key`` with return type ``value_type``.
 
         Example:
             For example, to access altitude in a :class:`pntos.api.KeyValueStore` named ``kv_store`` as an
@@ -265,7 +265,7 @@ class KeyValueStore(ABC):
 
         Args:
             key (str)
-            type (type[RegistryValueType])
+            value_type (type[RegistryValueType])
 
         Returns:
             RegistryValueType | None: Returns ``None`` if the key is not available. The return is
