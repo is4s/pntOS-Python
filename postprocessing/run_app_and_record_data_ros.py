@@ -93,7 +93,7 @@ def plot():
     if not os.path.exists(bagfile):
         bagfile = f'{BAG_PATH}/{BAG_PATH}_0.mcap'
         assert os.path.exists(bagfile)
-    plot_results(bagfile, '/solution/cobra/pva', '/sensor/ins_d/pva')
+    plot_results(bagfile, '/solution/pntos/pva', '/sensor/ins_d/pva')
 
 
 if __name__ == '__main__':

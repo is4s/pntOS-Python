@@ -56,7 +56,7 @@ if __name__ == '__main__':
     )
     parser.add_argument('filename', help='Path to LCM or ROS log file')
     parser.add_argument(
-        '-s', '--solution', default='/solution/cobra/pva', help='Solution channel name'
+        '-s', '--solution', default='/solution/pntos/pva', help='Solution channel name'
     )
     parser.add_argument(
         '-t', '--truth', default='/sensor/ins-d/pva', help='Truth channel name'
