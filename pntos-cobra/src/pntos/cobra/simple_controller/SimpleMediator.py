@@ -121,7 +121,7 @@ class SimpleMediator(Mediator):
                     self.broadcast_aspn_message(
                         solution[0],
                         transport=transport.identifier,
-                        destination_identifier='/solution/cobra/pva',
+                        destination_identifier=solution[0].source_identifier,
                     )
             else:
                 self.log_message(

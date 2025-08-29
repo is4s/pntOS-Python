@@ -59,8 +59,8 @@ EXPECTED_ERROR_MESSAGE = ''
 ALIGNMENT_STATE = InitializationStatus.INITIALIZED_GOOD
 
 # Solution Channels
-BEST_SOL_CHANNEL = '/solution/pntos/best'
-IMU_SOL_CHANNEL = '/solution/pntos/imu'
+BEST_SOL_CHANNEL = '/solution/pntos/pva'
+IMU_SOL_CHANNEL = '/solution/pntos-imu/pva'
 
 # Sensor input channels
 IMU_CHANNEL = '/sensor/sagem/imu'

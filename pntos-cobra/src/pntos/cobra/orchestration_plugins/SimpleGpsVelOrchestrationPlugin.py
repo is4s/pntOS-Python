@@ -46,8 +46,8 @@ from .orchestration_utils import (
 )
 
 # Solution Channels
-BEST_SOL_CHANNEL = '/solution/pntos/best'
-IMU_SOL_CHANNEL = '/solution/pntos/imu'
+BEST_SOL_CHANNEL = '/solution/pntos/pva'
+IMU_SOL_CHANNEL = '/solution/pntos-imu/pva'
 
 # State block parameters
 FOGM_STATE_BLOCK_ID = 'fogm'
