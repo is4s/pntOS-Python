@@ -91,7 +91,7 @@ class LcmTransportPlugin(TransportPlugin):
         # Do not process messages sent from pntos.
         if 'pntos' in channel:
             self.mediator.log_message(
-                LoggingLevel.INFO,
+                LoggingLevel.DEBUG,
                 'pntOS channel message, not processing in ASPN handler.',
             )
             return
