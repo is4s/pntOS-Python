@@ -128,7 +128,7 @@ class LcmTransportPlugin(TransportPlugin):
     def start_listening(self) -> None:
         self.lcm = LCM(LCM_URL)
         self.subscription: LCMSubscription = self.lcm.subscribe(
-            '^((?!cobra).)*$', self._general_handler
+            '^((?!pntos).)*$', self._general_handler
         )
         self.mediator.log_message(LoggingLevel.DEBUG, 'LCM tcpq connected.')
         self.mediator.log_message(
