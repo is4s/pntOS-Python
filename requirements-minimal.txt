@@ -24,7 +24,7 @@ lcm==1.5.1
     #   aspn2-translations
     #   aspn23-lcm
     #   pntos-cobra
-navtk==2.1.0.post2.dev0
+navtk==2.1.0.post3.dev0
     # via pntos-cobra
 numpy==2.1.3
     # via
@@ -36,5 +36,7 @@ numpy==2.1.3
     #   scipy
 pntos-python-datasets==0.3.0
     # via pntos-cobra
-scipy==1.15.3
+scipy==1.15.3 ; python_full_version < '3.11'
+    # via pntos-cobra
+scipy==1.16.1 ; python_full_version >= '3.11'
     # via pntos-cobra

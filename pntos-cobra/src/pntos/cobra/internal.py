@@ -22,6 +22,9 @@ from .standard_plugins.StandardRegistryPlugin import (
     StandardRegistry as StandardRegistry,
 )
 from .standard_plugins.StaticAlignInitializationPlugin import StaticAlign as StaticAlign
+from .state_modeling_simple_gps_ins.AltitudeMeasurementProcessor import (
+    AltitudeMeasurementProcessor as AltitudeMeasurementProcessor,
+)
 from .state_modeling_simple_gps_ins.FogmBlock import (
     FogmBlock as FogmBlock,
 )
