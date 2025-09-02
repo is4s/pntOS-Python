@@ -9,6 +9,7 @@ from pntos.api.plugins.state_modeling import (
 )
 from pntos.cobra.config import FogmConfig, ImuConfig, SensorConfig, config_from_registry
 
+from .AltitudeMeasurementProcessor import AltitudeMeasurementProcessor
 from .FogmBlock import FogmBlock
 from .Pinson15NedBlock import Pinson15NedBlock
 from .PinsonPositionMeasurementProcessor import PinsonPositionMeasurementProcessor
@@ -52,6 +53,7 @@ class SimpleGpsInsStateModelProvider(StandardStateModelProvider):
         PinsonPositionMeasurementProcessor
         | PinsonWithNedFogmPositionMeasurementProcessor
         | PinsonVelocityMeasurementProcessor
+        | AltitudeMeasurementProcessor
         | None
     ):
         """
@@ -62,6 +64,7 @@ class SimpleGpsInsStateModelProvider(StandardStateModelProvider):
                 - Index 0 corresponds to a PinsonPositionMeasurementProcessor.
                 - Index 1 corresponds to a PinsonVelocityMeasurementProcessor.
                 - Index 2 corresponds to a PinsonWithNedFogmPositionMeasurementProcessor.
+                - Index 3 corresponds to a AltitudeMeasurementProcessor.
                 - All other indices will result in a return value of None.
             engine (StandardFusionEngine | None): An optional parameter that may be provided to the
                 new processor, such that the processor may interact with the fusion engine it
@@ -132,6 +135,12 @@ class SimpleGpsInsStateModelProvider(StandardStateModelProvider):
                     state_block_labels,
                     self._mediator,
                     np.array(sensor_config.lever_arm),
+                )
+            case 3:
+                return AltitudeMeasurementProcessor(
+                    label,
+                    state_block_labels,
+                    self._mediator,
                 )
 
         self._mediator.log_message(

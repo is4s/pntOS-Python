@@ -3,6 +3,9 @@ from copy import deepcopy
 import numpy as np
 import pytest
 from aspn23 import (
+    MeasurementAltitude,
+    MeasurementAltitudeErrorModel,
+    MeasurementAltitudeReference,
     MeasurementImu,
     MeasurementImuImuType,
     MeasurementPosition,
@@ -17,6 +20,7 @@ from aspn23 import (
     TypeHeader,
     TypeTimestamp,
 )
+from navtk.navutils import hae_to_msl
 from pntos.api import (
     EstimateWithCovariance,
     EstimateWithCovarianceType,
@@ -37,6 +41,7 @@ from pntos.cobra.config import (
     SensorConfig,
 )
 from pntos.cobra.internal import (
+    AltitudeMeasurementProcessor,
     Pinson15NedBlock,
     PinsonPositionMeasurementProcessor,
     PinsonVelocityMeasurementProcessor,
@@ -148,6 +153,19 @@ def position_mp2(
 
 
 @pytest.fixture
+def altitude_mp(
+    state_model_provider: StateModelProviderType,
+) -> StandardMeasurementProcessor:
+    out = state_model_provider.new_processor(
+        3, None, 'altitude', ['pinson', 'fogm'], '/config/cobra/sensor'
+    )
+    assert isinstance(out, StandardMeasurementProcessor)
+    assert isinstance(out, AltitudeMeasurementProcessor)
+
+    return out
+
+
+@pytest.fixture
 def pva_aux_data() -> Message:
     return Message(
         MeasurementPositionVelocityAttitude(
@@ -228,6 +246,23 @@ def vel_meas() -> Message:
             [],
         ),
         'gps_velocity',
+    )
+
+
+@pytest.fixture
+def alt_meas() -> Message:
+    return Message(
+        MeasurementAltitude(
+            TypeHeader(0, 0, 0, 0),
+            TypeTimestamp(1_000_000_000),
+            MeasurementAltitudeReference.HAE,
+            1005,
+            100,
+            MeasurementAltitudeErrorModel.NONE,
+            np.array([]),
+            [],
+        ),
+        'alt',
     )
 
 
@@ -588,6 +623,108 @@ def test_generate_model_vel(
     assert np.array_equal(mm.H, exp_H)
     assert np.array_equal(mm.R, exp_R)
     assert np.array_equal(mm.h(x_and_p.estimate), np.zeros(3))
+    assert np.allclose(mm.z, exp_z)
+
+
+def test_generate_model_alt(
+    altitude_mp: AltitudeMeasurementProcessor,
+    pva_aux_data: Message,
+    alt_meas: Message,
+) -> None:
+    inertial_pva = pva_aux_data.wrapped_message
+    assert isinstance(inertial_pva, MeasurementPositionVelocityAttitude)
+    assert inertial_pva.p3 is not None
+    alt = alt_meas.wrapped_message
+    assert isinstance(alt, MeasurementAltitude)
+
+    altitude_mp.receive_aux_data([pva_aux_data])
+    assert altitude_mp._inertial_solution_time_nsec is not None
+
+    x_and_p = EstimateWithCovariance(
+        EstimateWithCovarianceType.EWC_GENERIC, np.zeros((16, 1)), np.eye(16)
+    )
+    mm = altitude_mp.generate_model(alt_meas, x_and_p)
+
+    assert mm is not None
+    exp_H = np.zeros((1, 16))
+    exp_H[0, 2] = 1
+    exp_H[0, 15] = 1
+    exp_R = np.array([[alt.variance]])
+    exp_z = alt.altitude - inertial_pva.p3
+    assert np.array_equal(mm.H, exp_H)
+    assert np.array_equal(mm.R, exp_R)
+    assert np.array_equal(mm.h(x_and_p.estimate).flatten(), np.zeros(1))
+    assert np.allclose(mm.z, exp_z)
+
+
+def test_generate_model_alt_msl(
+    altitude_mp: AltitudeMeasurementProcessor,
+    pva_aux_data: Message,
+    alt_meas: Message,
+) -> None:
+    inertial_pva = pva_aux_data.wrapped_message
+    assert isinstance(inertial_pva, MeasurementPositionVelocityAttitude)
+    assert inertial_pva.p1 is not None
+    assert inertial_pva.p2 is not None
+    assert inertial_pva.p3 is not None
+    alt = alt_meas.wrapped_message
+    assert isinstance(alt, MeasurementAltitude)
+    altitude_mp.receive_aux_data([pva_aux_data])
+    assert altitude_mp._inertial_solution_time_nsec is not None
+
+    # Convert alt from HAE to MSL
+    hae_alt = alt.altitude
+    msl_alt = hae_to_msl(hae_alt, inertial_pva.p1, inertial_pva.p2)[1]
+    assert msl_alt != hae_alt
+    alt.altitude = msl_alt
+
+    x_and_p = EstimateWithCovariance(
+        EstimateWithCovarianceType.EWC_GENERIC, np.zeros((16, 1)), np.eye(16)
+    )
+    alt.reference = MeasurementAltitudeReference.MSL
+    mm = altitude_mp.generate_model(alt_meas, x_and_p)
+
+    assert mm is not None
+    exp_H = np.zeros((1, 16))
+    exp_H[0, 2] = 1
+    exp_H[0, 15] = 1
+    exp_R = np.array([[alt.variance]])
+    exp_z = hae_alt - inertial_pva.p3
+    assert np.array_equal(mm.H, exp_H)
+    assert np.array_equal(mm.R, exp_R)
+    assert np.array_equal(mm.h(x_and_p.estimate).flatten(), np.zeros(1))
+    assert np.allclose(mm.z, exp_z)
+
+
+def test_generate_model_pos_alt(
+    altitude_mp: AltitudeMeasurementProcessor,
+    pva_aux_data: Message,
+    pos_meas: Message,
+) -> None:
+    inertial_pva = pva_aux_data.wrapped_message
+    assert isinstance(inertial_pva, MeasurementPositionVelocityAttitude)
+    assert inertial_pva.p3 is not None
+    pos = pos_meas.wrapped_message
+    assert isinstance(pos, MeasurementPosition)
+    assert pos.term3 is not None
+
+    altitude_mp.receive_aux_data([pva_aux_data])
+    assert altitude_mp._inertial_solution_time_nsec is not None
+
+    x_and_p = EstimateWithCovariance(
+        EstimateWithCovarianceType.EWC_GENERIC, np.zeros((16, 1)), np.eye(16)
+    )
+    mm = altitude_mp.generate_model(pos_meas, x_and_p)
+
+    assert mm is not None
+    exp_H = np.zeros((1, 16))
+    exp_H[0, 2] = 1
+    exp_H[0, 15] = 1
+    exp_R = np.array([[pos.covariance[2, 2]]])
+    exp_z = pos.term3 - inertial_pva.p3
+    assert np.array_equal(mm.H, exp_H)
+    assert np.array_equal(mm.R, exp_R)
+    assert np.array_equal(mm.h(x_and_p.estimate).flatten(), np.zeros(1))
     assert np.allclose(mm.z, exp_z)
 
 
