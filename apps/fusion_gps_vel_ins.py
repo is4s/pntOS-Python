@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+import sys
+
 # API imports
 from pntos.api import LoggingLevel
 
@@ -28,15 +30,15 @@ from pntos.cobra.config import (
     SensorConfig,
     TimeAdjusterConfig,
 )
-
-# External library imports
 from pntos_python_datasets import EXAMPLE_LCM_LOG
+
+OUTPUT_LOG = sys.argv[1] if len(sys.argv) > 1 else 'pntos_output.log'
 
 # Config setup
 my_config = [
     LcmLogTransportConfig(
         input_file=EXAMPLE_LCM_LOG,
-        output_file='pntos_output.log',
+        output_file=OUTPUT_LOG,
         output_version=AspnVersion.V23,
         group='config/lcm_log_transport',
     ),

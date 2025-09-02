@@ -6,7 +6,7 @@ from sys import argv
 
 from plot_results import plot_results
 
-OUTPUT_LOG_FILENAME = 'pntos_output.log'  # TODO: import from app file?
+OUTPUT_LOG_FILENAME = 'pntos_output.log'
 
 
 def run_pntos(app_to_run: str = 'fusion_gps_ins'):
@@ -14,7 +14,10 @@ def run_pntos(app_to_run: str = 'fusion_gps_ins'):
     # Start the app
     # Set unbuffered flag so the subprocess standard output can be read in real time
     cobra_process = Popen(
-        ['python3', '-u', f'apps/{app_to_run}.py'], stdout=PIPE, text=True, bufsize=1
+        ['python3', '-u', f'apps/{app_to_run}.py', OUTPUT_LOG_FILENAME],
+        stdout=PIPE,
+        text=True,
+        bufsize=1,
     )
 
     # Wait until pntOS is done processing the LCM log
