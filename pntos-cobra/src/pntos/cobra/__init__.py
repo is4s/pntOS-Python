@@ -16,6 +16,9 @@ from .standard_plugins.DiagnosticLogPlugin import (
 from .standard_plugins.EkfFusionStrategyPlugin import (
     EkfFusionStrategyPlugin as EkfFusionStrategyPlugin,
 )
+from .standard_plugins.LcmLogTransportPlugin import (
+    LcmLogTransportPlugin as LcmLogTransportPlugin,
+)
 from .standard_plugins.LcmTransportPlugin import (
     LcmTransportPlugin as LcmTransportPlugin,
 )
@@ -42,4 +45,7 @@ from .state_modeling_simple_gps_ins.SimpleGpsInsStateModelingPlugin import (
 )
 from .tutorial_plugins.TutorialInitializationPlugin import (
     TutorialInitializationPlugin as TutorialInitializationPlugin,
+)
+from .tutorial_plugins.TutorialLcmTransportPlugin import (
+    TutorialLcmTransportPlugin as TutorialLcmTransportPlugin,
 )

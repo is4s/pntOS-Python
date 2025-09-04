@@ -3,18 +3,8 @@ from threading import Thread
 
 from lcm import LCM, LCMSubscription
 from pntos.api import LoggingLevel, Mediator, Message, TransportPlugin
-from pntos.cobra.config import config_from_registry
-from pntos.cobra.config.LcmTransportConfig import (
-    AspnVersion,
-    LcmTransportConfig,
-)
-from pntos.cobra.utils import (
-    decode_aspn_lcm_msg,
-    marshal_from_lcm,
-    marshal_to_aspn2_lcm,
-    marshal_to_aspn23_lcm,
-)
-from pntos.cobra.utils.lcm_marshaling import Aspn2LcmMeasurement, Aspn23LcmMeasurement
+from pntos.cobra.config import LcmTransportConfig, config_from_registry
+from pntos.cobra.utils import create_lcm_message, process_lcm_message
 
 LCM_URL = 'tcpq://localhost:7700'
 
@@ -30,7 +20,7 @@ class LcmTransportPlugin(TransportPlugin):
     subscription: LCMSubscription
     handler: Thread | None
     _shutdown_threads: threading.Event
-    _channels: list[str]
+    _channels: set[str]
 
     def __init__(self, identifier: str):
         """
@@ -43,7 +33,7 @@ class LcmTransportPlugin(TransportPlugin):
         self.identifier = identifier
         self._shutdown_threads = threading.Event()
         self.handler = None
-        self._channels = []
+        self._channels = set()
 
     def init_plugin(
         self,
@@ -81,43 +71,7 @@ class LcmTransportPlugin(TransportPlugin):
         )
 
     def _general_handler(self, channel: str, data: bytes) -> None:
-        """
-        Generic listener for lcm messages to marshal to the mediator for processing.
-
-        Args:
-            channel (str): The channel name the data originates from.
-            data (bytes): A message represented in binary.
-        """
-        # Do not process messages sent from pntos.
-        if 'pntos' in channel:
-            self.mediator.log_message(
-                LoggingLevel.DEBUG,
-                'pntOS channel message, not processing in ASPN handler.',
-            )
-            return
-
-        lcm_aspn_msg = decode_aspn_lcm_msg(data)
-        if lcm_aspn_msg is None:
-            self.mediator.log_message(
-                LoggingLevel.WARN,
-                f'Cannot decode message on channel {channel}. Ignoring message.',
-            )
-            return
-        aspn_msg = marshal_from_lcm(lcm_aspn_msg)
-        if aspn_msg is None:
-            self.mediator.log_message(
-                LoggingLevel.WARN,
-                f'Cannot marshal message on channel {channel} of type {type(aspn_msg)}. Ignoring message.',
-            )
-            return
-        if channel not in self._channels:
-            self.mediator.log_message(
-                LoggingLevel.INFO,
-                f'Found new channel {channel}\t with a timestamp of {aspn_msg.time_of_validity.elapsed_nsec / 1e9}s',
-            )
-            self._channels.append(channel)
-        message = Message(aspn_msg, channel)
-        self.mediator.process_pntos_message(message)
+        process_lcm_message(self.mediator, channel, data, self._channels)
 
     def _handler_thread(self) -> None:
         """Call LCM.handle in a loop."""
@@ -151,20 +105,19 @@ class LcmTransportPlugin(TransportPlugin):
         self, message: Message, channel_name: str | None = None
     ) -> None:
         """Send a message over LCM to a specific channel"""
-        lcm_msg: Aspn2LcmMeasurement | Aspn23LcmMeasurement | None
-        if self._output_version == AspnVersion.V2:
-            lcm_msg = marshal_to_aspn2_lcm(message.wrapped_message)
-        else:
-            lcm_msg = marshal_to_aspn23_lcm(message.wrapped_message)
+        if channel_name is None:
+            self.mediator.log_message(
+                LoggingLevel.WARN,
+                'No channel name specified. This implementation requires a channel name.',
+            )
+            return
+
+        lcm_msg = create_lcm_message(message, self._output_version)
         if lcm_msg is None:
             self.mediator.log_message(
                 LoggingLevel.WARN,
                 f'Cannot marshal message on channel {channel_name} of type {type(message.wrapped_message)}. Ignoring message.',
             )
-        elif channel_name is None:
-            self.mediator.log_message(
-                LoggingLevel.WARN,
-                'No channel name specified. This implementation requires a channel name.',
-            )
-        else:
-            self.lcm.publish(channel_name, lcm_msg.encode())
+            return
+
+        self.lcm.publish(channel_name, lcm_msg.data.encode())

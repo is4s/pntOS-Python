@@ -2,7 +2,11 @@ from .BaseConfig import BaseConfig as BaseConfig
 from .FogmConfig import FogmConfig as FogmConfig
 from .ImuConfig import ImuConfig as ImuConfig
 from .InertialConfig import InertialConfig as InertialConfig
-from .LcmTransportConfig import LcmTransportConfig as LcmTransportConfig
+from .LcmTransportConfig import (
+    AspnVersion as AspnVersion,
+    LcmLogTransportConfig as LcmLogTransportConfig,
+    LcmTransportConfig as LcmTransportConfig,
+)
 from .ManualAlignmentConfig import ManualAlignmentConfig as ManualAlignmentConfig
 from .ManualHeadingAlignmentConfig import (
     ManualHeadingAlignmentConfig as ManualHeadingAlignmentConfig,

@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 
+import sys
+
 # API imports
 from pntos.api import LoggingLevel
 
 # Import Cobra plugins and config structs
 from pntos.cobra import (
     EkfFusionStrategyPlugin,
-    LcmTransportPlugin,
+    LcmLogTransportPlugin,
     SimpleControllerPlugin,
     SimpleGpsInsStateModelingPlugin,
     SimpleGpsOrchestrationPlugin,
@@ -18,20 +20,28 @@ from pntos.cobra import (
     TutorialInitializationPlugin,
 )
 from pntos.cobra.config import (
+    AspnVersion,
     FogmConfig,
     ImuConfig,
     InertialConfig,
-    LcmTransportConfig,
+    LcmLogTransportConfig,
     ManualAlignmentConfig,
     OrchestrationConfig,
     SensorConfig,
     TimeAdjusterConfig,
 )
-from pntos.cobra.config.LcmTransportConfig import AspnVersion
+from pntos_python_datasets import EXAMPLE_LCM_LOG
+
+OUTPUT_LOG = sys.argv[1] if len(sys.argv) > 1 else 'pntos_output.log'
 
 # Config setup
 my_config = [
-    LcmTransportConfig(output_version=AspnVersion.V23, group='config/lcm_transport'),
+    LcmLogTransportConfig(
+        input_file=EXAMPLE_LCM_LOG,
+        output_file=OUTPUT_LOG,
+        output_version=AspnVersion.V23,
+        group='config/lcm_log_transport',
+    ),
     ImuConfig(
         group='config/inertial_state',
         accel_bias_sigma=(2.4e-3, 2.4e-3, 2.4e-3),
@@ -97,7 +107,7 @@ my_config = [
 # Instantiate all of our plugins
 controller = SimpleControllerPlugin('Cobra Simple Controller Plugin')
 plugins = [
-    LcmTransportPlugin('Cobra LCM Transport Plugin'),
+    LcmLogTransportPlugin('Cobra LCM Log Transport Plugin'),
     EkfFusionStrategyPlugin('Cobra EKF Fusion Strategy Plugin'),
     StandardFusionPlugin('Cobra Standard Fusion Plugin'),
     SimpleGpsInsStateModelingPlugin('Cobra Simple State Modeling Plugin'),

@@ -1,39 +1,54 @@
 diff --git a/apps/fusion_gps_ins.py b/apps/fusion_gps_ins_ros.py
-index d5b17e83..003671f9 100755
+index 4f04b9c1..003671f9 100755
 --- a/apps/fusion_gps_ins.py
 +++ b/apps/fusion_gps_ins_ros.py
-@@ -6,7 +6,6 @@ from pntos.api import LoggingLevel
+@@ -1,14 +1,11 @@
+ #!/usr/bin/env python3
+ 
+-import sys
+-
+ # API imports
+ from pntos.api import LoggingLevel
+ 
  # Import Cobra plugins and config structs
  from pntos.cobra import (
      EkfFusionStrategyPlugin,
--    LcmTransportPlugin,
+-    LcmLogTransportPlugin,
      SimpleControllerPlugin,
      SimpleGpsInsStateModelingPlugin,
      SimpleGpsOrchestrationPlugin,
-@@ -17,21 +16,19 @@ from pntos.cobra import (
+@@ -19,29 +16,19 @@ from pntos.cobra import (
      StandardRegistryPlugin,
      TutorialInitializationPlugin,
  )
 +from pntos.cobra.advanced import Aspn23RosTransportPlugin
  from pntos.cobra.config import (
+-    AspnVersion,
      FogmConfig,
      ImuConfig,
      InertialConfig,
--    LcmTransportConfig,
+-    LcmLogTransportConfig,
      ManualAlignmentConfig,
      OrchestrationConfig,
      SensorConfig,
      TimeAdjusterConfig,
  )
--from pntos.cobra.config.LcmTransportConfig import AspnVersion
+-from pntos_python_datasets import EXAMPLE_LCM_LOG
+-
+-OUTPUT_LOG = sys.argv[1] if len(sys.argv) > 1 else 'pntos_output.log'
  
  # Config setup
  my_config = [
--    LcmTransportConfig(output_version=AspnVersion.V23, group='config/lcm_transport'),
+-    LcmLogTransportConfig(
+-        input_file=EXAMPLE_LCM_LOG,
+-        output_file=OUTPUT_LOG,
+-        output_version=AspnVersion.V23,
+-        group='config/lcm_log_transport',
+-    ),
      ImuConfig(
          group='config/inertial_state',
          accel_bias_sigma=(2.4e-3, 2.4e-3, 2.4e-3),
-@@ -69,7 +66,7 @@ my_config = [
+@@ -79,7 +66,7 @@ my_config = [
      InertialConfig(
          group='config/inertial',
          expected_dt=0.01,
@@ -42,7 +57,7 @@ index d5b17e83..003671f9 100755
          C_imu_to_platform=(
              (0.99776363, 0.01784622, 0.06441467),
              (-0.01741603, 0.99982216, -0.00723391),
-@@ -83,12 +80,12 @@ my_config = [
+@@ -93,12 +80,12 @@ my_config = [
          tau=(300.0, 300.0, 200.0),
      ),
      OrchestrationConfig(
@@ -57,11 +72,11 @@ index d5b17e83..003671f9 100755
          expected_dt_nsec=int(0.01 * 1e9),
      ),
  ]
-@@ -97,7 +94,7 @@ my_config = [
+@@ -107,7 +94,7 @@ my_config = [
  # Instantiate all of our plugins
  controller = SimpleControllerPlugin('Cobra Simple Controller Plugin')
  plugins = [
--    LcmTransportPlugin('Cobra LCM Transport Plugin'),
+-    LcmLogTransportPlugin('Cobra LCM Log Transport Plugin'),
 +    Aspn23RosTransportPlugin('Cobra ASPN23-ROS Transport Plugin'),
      EkfFusionStrategyPlugin('Cobra EKF Fusion Strategy Plugin'),
      StandardFusionPlugin('Cobra Standard Fusion Plugin'),
