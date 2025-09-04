@@ -194,6 +194,7 @@ GPS INS ROS App:
     stage: check
     tags:
         - linux-light-runner
+    retry: 1
     script:
         - docker run --rm -dit -v $(pwd):/work --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
         - docker exec pntos-python uv sync -v --python 3.12  # 3.12 for Jazzy compatibility
