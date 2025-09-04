@@ -38,6 +38,7 @@ class SimpleGpsInsStateModelProvider(StandardStateModelProvider):
             'pinson_position',
             'pinson_velocity',
             'pinson_with_ned_fogm_position',
+            'pinson_altitude',
         ]
         self.block_identifiers: list[str] = ['pinson15', 'fogm']
         self.virtual_block_identifiers: list[str] = []
