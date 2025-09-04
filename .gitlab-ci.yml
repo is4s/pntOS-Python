@@ -269,7 +269,7 @@ deploy wheels:
     script:
         - docker run --rm -dit -v $(pwd):/work --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
         - docker exec pntos-python python3 -m venv /work/.venv
-        - docker exec pntos-python .venv/bin/pip install twine
+        - docker exec pntos-python .venv/bin/pip install twine==6.1.0
         - export REPO_URL=${CI_API_V4_URL}/projects/94/packages/pypi
         - docker exec pntos-python twine upload
             --repository-url ${REPO_URL}
