@@ -48,6 +48,9 @@ from pntos.cobra.internal import (
     PinsonWithNedFogmPositionMeasurementProcessor,
     SimpleMediator,
 )
+from pntos.cobra.state_modeling_simple_gps_ins.SimpleGpsInsStateModelingPlugin import (
+    SimpleGpsInsStateModelProvider,
+)
 from pntos.cobra.utils.navigation import delta_lat_to_north, delta_lon_to_east
 
 my_config: list[BaseConfig] = [
@@ -288,6 +291,17 @@ def test_invalid_fusion_type(
         EstimateWithCovarianceType
     )
     assert invalid_sm_provider is None
+
+
+def test_enough_labels(state_modeling_plugin: SimpleGpsInsStateModelingPlugin) -> None:
+    model_provider = state_modeling_plugin.new_state_model_provider(
+        StandardStateModelProvider
+    )
+    assert isinstance(model_provider, SimpleGpsInsStateModelProvider)
+    mod_plus = model_provider.new_processor(
+        len(model_provider.processor_identifiers), None, 'l', ['s'], ''
+    )
+    assert mod_plus is None
 
 
 def test_invalid_index(state_model_provider: StateModelProviderType) -> None:
