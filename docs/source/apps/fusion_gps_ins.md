@@ -88,6 +88,23 @@ for now we need the following config objects for this GPS INS fusion app:
 :lineno-match:
 ```
 
+#### Example Dataset
+
+The `pntos_python_datasets` package provides the example LCM log used in this app, along with a
+variable, `EXAMPLE_LCM_LOG`, which specifies the path to this log file. This input log contains the
+ASPN measurements to be processed by the filter.
+
+In contrast, `OUTPUT_LOG` specifies the filename of the LCM log to which the filter solution will be
+recorded, along with all input measurements. This log can then be used to analyze the accuracy of
+the solution. If this filename is not provided as a command-line argument, it defaults to
+`pntos_output.log`.
+
+```{literalinclude} ../../../apps/fusion_gps_ins.py
+:start-at: "from pntos_python_datasets"
+:end-at: "OUTPUT_LOG"
+:lineno-match:
+```
+
 Lets dive a little more into these config objects as we initialize them next.
 
 ### Config Setup
@@ -146,11 +163,14 @@ Here's a brief description of what each config object is used for in this app:
 
 | Cobra Config Object                                                        | Description                                                                                                                                               |
 | -------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| {py:obj}`LcmLogTransportConfig <pntos.cobra.config.LcmLogTransportConfig>` | Configuration for the LCM transport plugin, which reads messages from the configured input file and writes messages to the configured output file. |
 | {py:obj}`ImuConfig <pntos.cobra.config.ImuConfig>`                         | The error model of the inertial unit, including white noise (random walk) and a bias modeled as a First-Order Gauss-Markov (FOGM) process for each sensor. |
 | {py:obj}`ManualAlignmentConfig <pntos.cobra.config.ManualAlignmentConfig>` | Configuration to manually align the inertial unit to the platform frame.                                                                                  |
 | {py:obj}`SensorConfig <pntos.cobra.config.SensorConfig>`                   | Information about the GPS antenna's relationship to the platform frame.                                                                                   |
 | {py:obj}`InertialConfig <pntos.cobra.config.InertialConfig>`               | Configuration for the inertial mechanization and buffering.                                                                                               |
+| {py:obj}`FogmConfig <pntos.cobra.config.FogmConfig>`                       | Parameters used to model the FOGM error of the GPS position measurements.                                                                                               |
 | {py:obj}`OrchestrationConfig <pntos.cobra.config.OrchestrationConfig>`     | Configuration that defines the channels to use for alignment, mechanization, and fusion.                                                                  |
+| {py:obj}`TimeAdjusterConfig <pntos.cobra.config.TimeAdjusterConfig>`       | Configuration for a preprocessor that corrects the timestamps of the example IMU measurements, ensuring a consistent delta-time between measurements.                                                                  |
 
 Now that we have our config set up in `my_config`, let's look at instantiating our plugins.
 
@@ -240,7 +260,7 @@ this app:
 | {py:obj}`StandardFusionPlugin <pntos.cobra.StandardFusionPlugin>`                           | Provides the fusion engine to the {py:obj}`SimpleGpsOrchestrationPlugin <pntos.cobra.SimpleGpsOrchestrationPlugin>`.                                                                                                                                                                                                                                                                                                                                           | [](../plugins/fusion_plugin.md)          |
 | {py:obj}`EkfFusionStrategyPlugin <pntos.cobra.EkfFusionStrategyPlugin>`                 | Provides the fusion engine (from the {py:obj}`StandardFusionPlugin <pntos.cobra.StandardFusionPlugin>`) with a fusion strategy - in this case an [Extended Kalman Filter](https://en.wikipedia.org/wiki/Extended_Kalman_filter) (EKF).                                                                                                                                                                                                                       | [](../plugins/fusion_strategy_plugin.md) |
 | {py:obj}`SimpleGpsInsStateModelingPlugin <pntos.cobra.SimpleGpsInsStateModelingPlugin>` | Models the state of the filter with Pinson15 states by providing a {py:obj}`PinsonPositionMeasurementProcessor <pntos.cobra.internal.PinsonPositionMeasurementProcessor>` and a {py:obj}`Pinson15NedBlock <pntos.cobra.internal.Pinson15NedBlock>` to the fusion engine.                                                                                                                                                                                 | [](../plugins/state_modeling_plugin.md)  |
-| {py:obj}`LcmTransportPlugin <pntos.cobra.LcmTransportPlugin>`                           | Listens to a TCP relay for {term}`ASPN` messages from a {term}`LCM` log file and feeds these {term}`ASPN` messages into the app as pntOS {py:obj}`Message <pntos.api.Message>`s.                                                                                                                                                                                                                                                                                                              | [](../plugins/transport_plugin.md)       |
+| {py:obj}`LcmLogTransportPlugin <pntos.cobra.LcmLogTransportPlugin>`                           | Reads {term}`ASPN` messages from an {term}`LCM` log file and feeds these {term}`ASPN` messages into the app as pntOS {py:obj}`Message <pntos.api.Message>`s.                                                                                                                                                                                                                                                                                                              | [](../plugins/transport_plugin.md)       |
 
 ## Expected Results
 

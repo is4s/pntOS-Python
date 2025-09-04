@@ -25,11 +25,11 @@ relay, and playing back a log file to feed data into pntOS.
 
 These instructions assume an active virtual environment as outlined in the
 [](./installation.md). If you currently have that virtual environment activated, skip to
-[](#start-a-local-tcp-server).
+[](#select-an-app).
 
 If you have not yet created a Python virtual environment for the [`pntos-python`
 repository](https://git.aspn.us/pntos/pntos-python), follow the instructions in [](./installation.md) then go
-to [](#start-a-local-tcp-server).
+to [](#select-an-app).
 
 If you have created the virtual environment but it is not currently activated, run the below command
 from the root directory to enter the virtual environment. The command varies depending on your shell:
@@ -46,53 +46,6 @@ source .venv/bin/activate.fish
 ```
 ````
 `````
-
-### Start a Local TCP Server
-
-In order to feed messages into the transport plugin from an LCM log file, we need to first start
-a local TCP server (located in the virtual environment) in a new terminal:
-
-```shell
-java -classpath $VIRTUAL_ENV/lib/python3.*/site-packages/share/java/lcm.jar lcm.lcm.TCPService
-```
-
-### Play LCM Log File
-
-The `pntos-python-datasets` package installs a script to find the installed data and start playing
-it back:
-
-```shell
-play-dataset
-```
-
-```{note}
-If you would like to see what the above command is doing or would like to know where the dataset
-exists on the disk, you can run the command with a `-v` verbose flag:
-
-    play-dataset -v
-
-Running the above will print out the exact command the script executes before executing it.
-```
-
-This should open the LCM LogPlayer GUI with a play button. You should see the following channels:
-
-- `/sensor/ins-d/pva`
-- `/sensor/ublox-ZED-F9T/position`
-- `/sensor/ublox-ZED-F9T/velocity`
-- `/sensor/vn-100/imu`
-
-### Record Output
-
-In order to save off the solutions produced by pntOS and sent over the wire, start lcm-logger:
-
-```shell
-lcm-logger --lcm-url=tcpq:// pntos_output.log
-```
-
-This process will listen to any messages transmitted over LCM and record them to `pntos_output.log`.
-
-Alternatively, to just see the solution printed to the terminal, set the logging level
-to `DEBUG` when initializing the {py:obj}`pntos.cobra.StandardLoggingPlugin`.
 
 ### Select an App
 
@@ -119,41 +72,9 @@ environment activated):
 ```shell
 apps/fusion_gps_ins.py
 ```
-
-You should see something like the following:
-
-```shell
-WARNING:  [Controller] Expected one UiPlugin but received 0. Running without a UI plugin.
-[31/03/2025 11:55:06] [LoggingPlugin] [INFO] using hard-coded global logging level INFO
-[31/03/2025 11:55:06] [OrchestrationPlugin] [INFO] Aligned filter at TypeTimestamp(elapsed_nsec=1743621678330456320).
-LCM tcpq: connecting...
-[31/03/2025 11:55:06] [TransportPlugin] [INFO] LCM message handler is running.
-[31/03/2025 11:55:06] [ControllerPlugin] [INFO] Press Ctrl + C at any time to shut down pntOS...
-```
-
-Then push the `play` button in the LogPlayer.
-
-```{note}
-This app uses real data. There is some jitter present in the IMU sensor timestamps which will
-produce a few warnings in the output. They are of the form:
-
-    [warning] Suspicious dt of 0.015978679000000003 compared against nominal of 0.010000062688925596 detected at time 1747683329.241135205s
-
-A more complex app might, for example, use a Preprocessor plugin to correct the incoming data.
-```
-
-### Validate Results
-
-To plot the saved results run:
-
-```shell
-postprocessing/plot_results.py pntos_output.log
-```
-
-For more information on the expected results for this app, see [](./apps/fusion_gps_ins.md#expected-results).
 ````
 
-````{tab-item} GPS INS Velocity Fusion App
+````{tab-item} GPS INS Velocity App
 :sync: vel-app
 For documentation specifically explaining the this app, see
 [](./apps/fusion_gps_vel_ins.md).
@@ -166,8 +87,10 @@ environment activated):
 ```shell
 apps/fusion_gps_vel_ins.py
 ```
+````
+`````
 
-You should see something like the following:
+Once the app is started, you should see something like the following:
 
 ```shell
 WARNING:  [Controller] Expected one UiPlugin but received 0. Running without a UI plugin.
@@ -178,28 +101,12 @@ LCM tcpq: connecting...
 [31/03/2025 11:55:06] [ControllerPlugin] [INFO] Press Ctrl + C at any time to shut down pntOS...
 ```
 
-Then push the `play` button in the LogPlayer.
+The app will immediately start processing messages from the input log, with a progress bar tracking the percentage of messages that have been processed.
 
-```{note}
-This app uses real data. There is some jitter present in the IMU sensor timestamps which will
-produce a few warnings in the output. They are of the form:
+### View Results
 
-    [warning] Suspicious dt of 0.015978679000000003 compared against nominal of 0.010000062688925596 detected at time 1747683329.241135205s
-
-A more complex app might, for example, use a Preprocessor plugin to correct the incoming data.
-```
-
-### Validate Results
-
-To plot the saved results run:
+The app records the filter PVA solution to `pntos_output.log`. To plot the recorded results, run:
 
 ```shell
 postprocessing/plot_results.py pntos_output.log
 ```
-
-These plots should look fairly similar to the first app's plots, since the position update will be
-the dominating update. To be able to see a bigger difference, try inducing a position measurement
-outage to see the velocity update constrain the solution's drift.
-````
-
-`````
