@@ -266,7 +266,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
                 LoggingLevel.WARN,
                 f'Size mismatch: The number of states in the stateblock with label \
                     ({block_label}) is {this_sb.num_states}, but the provided new \
-                    esimtate is of length {this_sb.num_states}. No action taken.',
+                    estimate is of length {this_sb.num_states}. No action taken.',
             )
             return None
 
