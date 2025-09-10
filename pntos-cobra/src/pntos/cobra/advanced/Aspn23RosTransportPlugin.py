@@ -2,7 +2,7 @@ from threading import Thread
 from typing import List
 
 try:
-    import rclpy  # type: ignore[import]
+    import rclpy  # type: ignore[import-not-found]
 except ImportError as e:
     raise ImportError(
         'Is ROS installed and is its environment sourced? See the ROS usage '
@@ -10,19 +10,19 @@ except ImportError as e:
     ) from e
 
 try:
-    from aspn23_ros_utils import AspnMsg, AspnRosNode  # type: ignore[import]
+    from aspn23_ros_utils import AspnMsg, AspnRosNode  # type: ignore[import-not-found]
 except ImportError as e:
     raise ImportError(
         'Is the ASPN-ROS environment sourced? See the ROS usage tutorial in '
         'the documentation.'
     ) from e
 
-from rclpy.executors import (  # type: ignore[import]
+from rclpy.executors import (  # type: ignore[import-not-found]
     ExternalShutdownException,
     SingleThreadedExecutor,
 )
-from rclpy.node import Subscription  # type: ignore[import]
-from rclpy.timer import Timer  # type: ignore[import]
+from rclpy.node import Subscription  # type: ignore[import-not-found]
+from rclpy.timer import Timer  # type: ignore[import-not-found]
 
 from pntos.api import LoggingLevel, Mediator, Message, TransportPlugin
 
@@ -65,7 +65,7 @@ class Aspn23RosTransportPlugin(TransportPlugin):
             self.aspn_ros_node = AspnRosNode('aspn23_ros_transport')
             self.executor.add_node(self.aspn_ros_node)
 
-            def execute():
+            def execute() -> None:
                 try:
                     self.executor.spin()
                 except ExternalShutdownException:
@@ -90,7 +90,7 @@ class Aspn23RosTransportPlugin(TransportPlugin):
             LoggingLevel.INFO, f'Shutdown plugin for {self.identifier}.'
         )
 
-    def _scan_for_topics(self):
+    def _scan_for_topics(self) -> None:
         topic_info = self.aspn_ros_node.get_topic_names_and_types()
         topics = [
             topic

@@ -43,11 +43,10 @@ class BarometerToAltitudePreprocessor(Preprocessor):
         self._mediator = mediator
 
     def _convert_pressure(self, pressure: float) -> float:
-        return -(self._deg_k / 0.0065) * (
-            pow(pressure / 101325, 8314.32 * 0.0065 / (9.80665 * 28.9644)) - 1
-        )
+        pwm1: float = pow(pressure / 101325, 8314.32 * 0.0065 / (9.80665 * 28.9644)) - 1
+        return -(self._deg_k / 0.0065) * pwm1
 
-    def process_pntos_message(self, message) -> list[Message]:
+    def process_pntos_message(self, message: Message) -> list[Message]:
         if message.source_identifier == self._channel:
             msg = message.wrapped_message
             if isinstance(msg, MeasurementBarometer):
@@ -277,7 +276,7 @@ class StandardPreprocessorPlugin(PreprocessorPlugin):
             print('Error: mediator cannot be None')
         self.mediator = mediator
 
-    def shutdown_plugin(self):
+    def shutdown_plugin(self) -> None:
         pass
 
     def new_preprocessor(

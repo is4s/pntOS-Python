@@ -90,7 +90,7 @@ class FogmBlock(StandardStateBlock):
         # Under most typical circumstances a first-order integration of Phi would be sufficient
         # but can be in serious error for dt >> tau; second order suffers from same problem
         # Q is constant over the interval
-        Phi = expm(self._F * dt)
+        Phi: NDArray[float64] = expm(self._F * dt)
         Qd = 0.5 * (Phi @ self._Q @ Phi.T + self._Q) * dt
 
         def g(x: NDArray[float64]) -> NDArray[float64]:

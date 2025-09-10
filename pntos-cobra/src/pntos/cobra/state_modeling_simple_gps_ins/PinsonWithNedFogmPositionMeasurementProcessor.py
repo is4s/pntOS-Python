@@ -185,11 +185,12 @@ class PinsonWithNedFogmPositionMeasurementProcessor(StandardMeasurementProcessor
         H[:, -3:] = -np.eye(3)
 
         def h(x: NDArray[float64]) -> NDArray[float64]:
-            return (
+            res: NDArray[float64] = (
                 x[0:3, 0]
                 + (np.eye(3) - skew(x[6:9, 0])) @ C_platform_to_nav @ self._l_ps_p
                 - x[-3:, 0]
             ).reshape(3, 1)
+            return res
 
         R = pos.covariance
 

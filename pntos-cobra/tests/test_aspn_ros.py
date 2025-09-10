@@ -8,17 +8,17 @@ import pytest
 @pytest.mark.skipif(
     'ROS_VERSION' not in os.environ, reason='Skip in non-ROS environments.'
 )
-def test_aspn_ros():
+def test_aspn_ros() -> None:
     # ROS and ASPN-ROS imports should work here
-    import rclpy  # type: ignore[import]
-    from aspn23 import (  # type: ignore[import]
+    import rclpy  # type: ignore[import-not-found]
+    from aspn23 import (
         MeasurementPositionVelocityAttitude,
         MeasurementPositionVelocityAttitudeErrorModel,
         MeasurementPositionVelocityAttitudeReferenceFrame,
         TypeHeader,
         TypeTimestamp,
     )
-    from aspn23_ros_utils import AspnMsg, AspnRosNode  # type: ignore[import]
+    from aspn23_ros_utils import AspnMsg, AspnRosNode  # type: ignore[import-not-found]
 
     rclpy.init()
     node = AspnRosNode('test_aspn_ros')
@@ -41,7 +41,7 @@ def test_aspn_ros():
     )
     received = None
 
-    def aspn_cb(msg: AspnMsg):
+    def aspn_cb(msg: AspnMsg) -> None:
         nonlocal received
         received = msg
 

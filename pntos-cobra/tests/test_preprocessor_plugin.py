@@ -135,7 +135,7 @@ def create_aspn_altitude(identifier: str) -> Message:
     return Message(alt, identifier)
 
 
-def assert_aspn_alt_equal(alt1: MeasurementAltitude, alt2: MeasurementAltitude):
+def assert_aspn_alt_equal(alt1: MeasurementAltitude, alt2: MeasurementAltitude) -> None:
     assert alt1.time_of_validity.elapsed_nsec == alt2.time_of_validity.elapsed_nsec
     assert alt1.altitude == alt2.altitude
     assert alt1.variance == alt2.variance
@@ -343,7 +343,7 @@ def time_adjuster_preprocessor(
     return preprocessor
 
 
-def create_imu_message(time: int):
+def create_imu_message(time: int) -> Message:
     return Message(
         MeasurementImu(
             TypeHeader(0, 1, 2, 3),

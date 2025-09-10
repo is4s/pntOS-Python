@@ -56,6 +56,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
         ] = {}  # Dictionary of measurement processors
         self._num_states = 0
         self._mediator = mediator
+        self._strategy: StandardFusionStrategy | None = None
 
     @property
     def time(self) -> TypeTimestamp:
@@ -63,7 +64,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
         return self._time
 
     @time.setter
-    def time(self, timestamp: TypeTimestamp):
+    def time(self, timestamp: TypeTimestamp) -> None:
         self._time = timestamp
 
     @property
@@ -71,13 +72,8 @@ class StandardFusionEngine(api.StandardFusionEngine):
         return self._strategy
 
     @strategy.setter
-    def strategy(self, strategy: StandardFusionStrategy) -> None:
+    def strategy(self, strategy: StandardFusionStrategy | None) -> None:
         self._strategy = strategy
-
-    @strategy.deleter
-    def strategy(self):
-        del self._strategy
-        self._strategy = None
 
     def _re_index_stateblocks(self) -> None:
         """
@@ -112,6 +108,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
         initial_estimate_covariance: EstimateWithCovariance,
         cross_covariances: CrossCovariances | None = None,
     ) -> None:
+        assert self._strategy is not None, 'FusionStrategy has not been set'
         # Verify that the initial estimate and covariance are generic (standard),
         # because that's the only one currently supported
         if initial_estimate_covariance.type != EstimateWithCovarianceType.EWC_GENERIC:
@@ -192,6 +189,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
         )
 
     def get_state_block_estimate(self, block_label: str) -> NDArray[float64] | None:
+        assert self._strategy is not None, 'FusionStrategy has not been set'
         if not block_label in self._sb.keys():
             return None
 
@@ -208,6 +206,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
         return full_estimate[this_sb.start_index : this_sb.stop_index]
 
     def get_state_block_covariance(self, block_label: str) -> NDArray[float64] | None:
+        assert self._strategy is not None, 'FusionStrategy has not been set'
         if block_label not in self._sb.keys():
             return None
 
@@ -228,6 +227,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
     def get_state_block_cross_covariance(
         self, block_label1: str, block_label2: str
     ) -> NDArray[float64] | None:
+        assert self._strategy is not None, 'FusionStrategy has not been set'
         if not (block_label1 in self._sb.keys() and block_label2 in self._sb.keys()):
             return None
 
@@ -248,6 +248,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
     def set_state_block_estimate(
         self, block_label: str, estimate: NDArray[float64]
     ) -> None:
+        assert self._strategy is not None, 'FusionStrategy has not been set'
         validate_array(estimate, self._mediator, dims=2, cols=1)
 
         if block_label not in self._sb.keys():
@@ -276,6 +277,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
     def set_state_block_covariance(
         self, block_label: str, covariance: NDArray[float64]
     ) -> None:
+        assert self._strategy is not None, 'FusionStrategy has not been set'
         if block_label not in self._sb.keys():
             self._mediator.log_message(
                 LoggingLevel.WARN,
@@ -304,6 +306,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
     def set_state_block_cross_covariance(
         self, block_label1: str, block_label2: str, covariance: NDArray[float64]
     ) -> None:
+        assert self._strategy is not None, 'FusionStrategy has not been set'
         if block_label1 not in self._sb.keys():
             self._mediator.log_message(
                 LoggingLevel.WARN,
@@ -345,6 +348,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
         )
 
     def remove_state_block(self, block_label: str) -> None:
+        assert self._strategy is not None, 'FusionStrategy has not been set'
         if block_label not in self._sb.keys():
             self._mediator.log_message(
                 LoggingLevel.WARN,
@@ -408,6 +412,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
         del self._mp[processor_label]
 
     def propagate(self, time: TypeTimestamp) -> None:
+        assert self._strategy is not None, 'FusionStrategy has not been set'
         if time.elapsed_nsec < self.time.elapsed_nsec:
             self._mediator.log_message(
                 LoggingLevel.WARN,
@@ -484,6 +489,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
         self.time = time
 
     def update(self, processor_label: str, message: Message) -> None:
+        assert self._strategy is not None, 'FusionStrategy has not been set'
         # Verify processor exists
         if processor_label not in self._mp.keys():
             self._mediator.log_message(
@@ -603,6 +609,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
     def generate_x_and_p(
         self, block_labels: list[str]
     ) -> EstimateWithCovariance | None:
+        assert self._strategy is not None, 'FusionStrategy has not been set'
         # Make sure there is at least one block_label
         if len(block_labels) == 0:
             self._mediator.log_message(

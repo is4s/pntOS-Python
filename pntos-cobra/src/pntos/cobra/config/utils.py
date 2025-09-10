@@ -83,7 +83,9 @@ def config_from_registry(
     out: dict[str, RegistryValueTypeUnion | tuple[float, ...] | Enum | BaseConfig] = {}
     fail = False
     for param in conf_params:
-        val: RegistryValueTypeUnion | tuple | Enum | BaseConfig | None = kv[param.name]
+        val: RegistryValueTypeUnion | tuple[float, ...] | Enum | BaseConfig | None = kv[
+            param.name
+        ]
         # Special case: nested config. Identifiable by the first field, which is called `group` and
         # is a str.
         if val is None:

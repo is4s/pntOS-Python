@@ -106,15 +106,15 @@ def load_from_hdf5_file(
                 elif isinstance(val[0], np.bytes_):
                     output[key] = [i.decode('ascii') for i in val]
                 elif isinstance(val[0], np.bool_):
-                    output[key] = [bool(i) for i in val]  # type: ignore[misc]
+                    output[key] = [bool(i) for i in val]
                 elif isinstance(val[0], int64):  # type: ignore[misc]
-                    output[key] = [int(i) for i in val]  # type: ignore[misc]
+                    output[key] = [int(i) for i in val]
                 elif isinstance(val[0], float64):  # type: ignore[misc]
-                    output[key] = [float(i) for i in val]  # type: ignore[misc]
+                    output[key] = [float(i) for i in val]
                 elif isinstance(val[0], np.ndarray) and isinstance(
                     val[0][0], np.bytes_
                 ):
-                    output[key] = [[i.decode() for i in v] for v in val]  # type: ignore[misc]
+                    output[key] = [[i.decode() for i in v] for v in val]
                 elif isinstance(val[0], np.ndarray):
                     output[key] = [i for i in val]
                 else:

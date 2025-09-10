@@ -48,7 +48,7 @@ class _TestStateBlock(StandardStateBlock):
 
         Qd = Q * dt
 
-        def g(x: NDArray):
+        def g(x: NDArray[np.float64]) -> NDArray[np.float64]:
             return Phi @ x
 
         return StandardDynamicsModel(g, Phi, Qd)
@@ -79,7 +79,7 @@ class _TestMeasurementProcessor(StandardMeasurementProcessor):
         H[0, 2] = 1
         H[1, 3] = 1
 
-        def h(x: NDArray):
+        def h(x: NDArray[np.float64]) -> NDArray[np.float64]:
             return H @ x
 
         R = delta_pos.covariance
@@ -88,12 +88,12 @@ class _TestMeasurementProcessor(StandardMeasurementProcessor):
 
 
 class GenerateDeltaPosMeasurement:
-    def __init__(self, init_time=TypeTimestamp(0.0)):
+    def __init__(self, init_time: TypeTimestamp = TypeTimestamp(0)) -> None:
         self.init_time = init_time
         self.x_vel = 2.0
         self.y_vel = 2.0
 
-    def generate_measurement(self, time: TypeTimestamp):
+    def generate_measurement(self, time: TypeTimestamp) -> MeasurementDeltaPosition:
         header = TypeHeader(vendor_id=0, device_id=0, context_id=0, sequence_id=0)
         delta_time = (time.elapsed_nsec - self.init_time.elapsed_nsec) / 1e9
         measurement = MeasurementDeltaPosition(
@@ -116,16 +116,17 @@ def dummy_log(level: LoggingLevel, message: str) -> None:
     pass
 
 
-def test_manual():
+def test_manual() -> None:
     """User test for the Fusion Plugin."""
     registry = StandardRegistry(dummy_log)
-    mediator = SimpleMediator(FusionPlugin, 'Fusion Plugin')
+    mediator = SimpleMediator('Fusion Plugin', FusionPlugin)
     SimpleMediator.registry = registry
 
     # initialize the fusion plugin
     fusion_plugin = StandardFusionPlugin(identifier='test_fusion_plugin')
     fusion_plugin.init_plugin('test', mediator=mediator)
     fusion_engine = fusion_plugin.new_fusion_engine(StandardFusionEngine)
+    assert fusion_engine is not None
     fusion_strategy_plugin = EkfFusionStrategyPlugin(identifier='test_strategy_plugin')
     fusion_strategy_plugin.init_plugin('test_strategy', mediator=mediator)
     fusion_strategy = fusion_strategy_plugin.new_fusion_strategy(StandardFusionStrategy)

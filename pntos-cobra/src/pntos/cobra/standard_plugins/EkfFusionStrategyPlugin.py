@@ -40,9 +40,9 @@ class EkfFusionStrategy(StandardFusionStrategy):
 
     def add_states(
         self,
-        initial_estimate: NDArray,
-        initial_covariance: NDArray,
-        cross_covariance: NDArray | None = None,
+        initial_estimate: NDArray[np.float64],
+        initial_covariance: NDArray[np.float64],
+        cross_covariance: NDArray[np.float64] | None = None,
     ) -> int:
         validate_array(initial_estimate, self._mediator, dims=2, cols=1)
 
@@ -110,13 +110,15 @@ class EkfFusionStrategy(StandardFusionStrategy):
         # Update num_states
         self._num_states -= count
 
-    def get_estimate(self) -> NDArray | None:
+    def get_estimate(self) -> NDArray[np.float64] | None:
         if self._num_states == 0:
             return None
         else:
             return self._x
 
-    def set_estimate_slice(self, new_estimate: NDArray, first_index: int) -> None:
+    def set_estimate_slice(
+        self, new_estimate: NDArray[np.float64], first_index: int
+    ) -> None:
         validate_array(new_estimate, self._mediator, dims=2, cols=1)
 
         n = new_estimate.shape[0]
@@ -128,14 +130,17 @@ class EkfFusionStrategy(StandardFusionStrategy):
 
         self._x[first_index : first_index + n] = new_estimate
 
-    def get_covariance(self) -> NDArray | None:
+    def get_covariance(self) -> NDArray[np.float64] | None:
         if self._num_states == 0:
             return None
         else:
             return self._P
 
     def set_covariance_slice(
-        self, new_covariance: NDArray, first_row: int, first_col: int | None = None
+        self,
+        new_covariance: NDArray[np.float64],
+        first_row: int,
+        first_col: int | None = None,
     ) -> None:
         if first_col is None:
             first_col = first_row

@@ -42,7 +42,7 @@ class DummyMediator(Mediator):
 
 
 @pytest.fixture
-def mediator():
+def mediator() -> DummyMediator:
     registry = StandardRegistry(dummy_log)
     DummyMediator.registry = registry
     mediator = DummyMediator()
@@ -72,9 +72,10 @@ def _test_handler(
     # Flag to capture the response
     received_response = None
 
-    def on_response(channel, data):
+    def on_response(channel: str, data: bytes) -> None:
         nonlocal received_response
         pva = measurement_position_velocity_attitude()
+
         received_response = pva.decode(data)
 
     # Subscribe to the response channel
@@ -94,14 +95,14 @@ def _test_handler(
     test_msg.v1 = 2
     test_msg.v2 = 3
     test_msg.v3 = 4
-    test_msg.quaternion = np.array([1, 0, 0, 0])
+    test_msg.quaternion = [1, 0, 0, 0]
     test_msg.num_meas = 1
-    test_msg.covariance = np.zeros((9, 9))
+    test_msg.covariance = [0] * 81
     test_msg.error_model = 0
     test_msg.num_error_model_params = 0
-    test_msg.error_model_params = np.zeros(1)
+    test_msg.error_model_params = []
     test_msg.num_integrity = 0
-    test_msg.integrity = None
+    test_msg.integrity = []
     encoded_data = test_msg.encode()
 
     # Publish the test message to the channel
