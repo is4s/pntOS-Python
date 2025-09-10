@@ -136,8 +136,21 @@ Aspn23Measurement = (
     | aspn23.MeasurementVelocity
 )
 
+# It is possible aspn2 lcm->aspn23 conversions to return non-Measurement types to get around
+# non-standard conversions, see for instance translate_from_aspn2_rangeratetoknownfeature_to_aspn23
+Aspn23MeasurementExtended = (
+    Aspn23Measurement
+    | list[aspn23.MeasurementDeltaRangeToPoint]
+    | aspn23.MetadataGpsLnavEphemeris
+    | list[aspn23.MeasurementRangeRateToPoint]
+    | list[aspn23.MeasurementRangeToPoint]
+    | list[aspn23.MeasurementTdoa1Tx2Rx]
+)
+
 # dictionary mapping ASPN23 message type to ASPN23 LCM marshaling functions
-marshaler_to_aspn23_lcm: dict[type[Aspn23Measurement], Callable] = {
+marshaler_to_aspn23_lcm: dict[
+    type[Aspn23Measurement], Callable[..., Aspn23LcmMeasurement]
+] = {
     aspn23.MeasurementAngularVelocity1D: aspn23_lcm.measurement_angular_velocity_1d_to_lcm,
     aspn23.MeasurementAngularVelocity: aspn23_lcm.measurement_angular_velocity_to_lcm,
     aspn23.MeasurementAccumulatedDistanceTraveled: aspn23_lcm.measurement_accumulated_distance_traveled_to_lcm,
@@ -178,7 +191,9 @@ marshaler_to_aspn23_lcm: dict[type[Aspn23Measurement], Callable] = {
 }
 
 # dictionary mapping ASPN23 message type to ASPN2 LCM marshaling functions
-marshaler_to_aspn2_lcm: dict[type[Aspn23Measurement], Callable] = {
+marshaler_to_aspn2_lcm: dict[
+    type[Aspn23Measurement], Callable[..., Aspn2LcmMeasurement]
+] = {
     aspn23.MeasurementImu: aspn2_translations.translate_from_aspn23_imu_to_aspn2,
     aspn23.MeasurementPosition: aspn2_translations.translate_from_aspn23_position_to_aspn2_geodeticposition3d,
     aspn23.MeasurementPositionVelocityAttitude: aspn2_translations.translate_from_aspn23_positionvelocityattitude_to_aspn2,
@@ -186,7 +201,8 @@ marshaler_to_aspn2_lcm: dict[type[Aspn23Measurement], Callable] = {
 
 # dictionary mapping ASPN LCM message type to ASPN23 marshaling functions
 marshaler_from_lcm: dict[
-    type[Aspn23LcmMeasurement] | type[Aspn2LcmMeasurement], Callable
+    type[Aspn23LcmMeasurement] | type[Aspn2LcmMeasurement],
+    Callable[..., Aspn23MeasurementExtended],
 ] = {
     # aspn23_lcm to aspn23
     aspn23_lcm.measurement_angular_velocity_1d: aspn23_lcm.lcm_to_measurement_angular_velocity_1d,
@@ -304,7 +320,7 @@ def decode_aspn_lcm_msg(
 
 def marshal_from_lcm(
     msg: Aspn23LcmMeasurement | Aspn2LcmMeasurement,
-) -> Aspn23Measurement | None:
+) -> Aspn23MeasurementExtended | None:
     """
     Converts from ASPN-LCM message to ASPN23 message. If the input message cannot be converted,
     this function will return ``None``.
@@ -403,19 +419,31 @@ def process_lcm_message(
         )
         return
     if channel not in channels:
+        # It is possible for conversions to return a list of Measurements to cover the case
+        # where ASPN23 dropped support for multiple obs in 1 message
+        ts = (
+            aspn_msg[0].time_of_validity.elapsed_nsec / 1e9
+            if isinstance(aspn_msg, list)
+            else aspn_msg.time_of_validity.elapsed_nsec / 1e9
+        )
         mediator.log_message(
             LoggingLevel.INFO,
-            f'Found new channel {channel}\t with a timestamp of {aspn_msg.time_of_validity.elapsed_nsec / 1e9}s',
+            f'Found new channel {channel}\t with a timestamp of {ts}s',
         )
         channels.add(channel)
-    message = Message(aspn_msg, channel)
-    mediator.process_pntos_message(message)
+    if isinstance(aspn_msg, list):
+        for am in aspn_msg:
+            message = Message(am, channel)
+            mediator.process_pntos_message(message)
+    else:
+        message = Message(aspn_msg, channel)
+        mediator.process_pntos_message(message)
 
 
 def create_lcm_message(
     message: Message,
     output_version: AspnVersion,
-):
+) -> Aspn2LcmMeasurement | Aspn23LcmMeasurement | None:
     lcm_msg: Aspn2LcmMeasurement | Aspn23LcmMeasurement | None = None
     if output_version == AspnVersion.V2:
         lcm_msg = marshal_to_aspn2_lcm(message.wrapped_message)

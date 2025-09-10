@@ -79,13 +79,12 @@ class LcmLogTransportPlugin(TransportPlugin):
 
     def read_log(self) -> None:
         """Process messages from LCM log"""
-        msg: Event
         log_size = self._input_log.size()
         progressbar = tqdm(total=log_size)
         fpos = self._input_log.tell()
 
         # Read until end of log or until pntOS is shut down
-        msg = self._input_log.read_next_event()
+        msg: Event | None = self._input_log.read_next_event()
         while msg is not None and not self._shutdown_threads.is_set():
             # update progressbar
             new_fpos = self._input_log.tell()

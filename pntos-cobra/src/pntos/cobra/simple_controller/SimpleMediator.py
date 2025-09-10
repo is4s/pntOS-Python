@@ -19,7 +19,7 @@ from .SimpleMessageStreamConfig import SimpleMessageStreamConfig
 
 def _get_time(msg: Message) -> int:
     """Returns the time of the message in nanoseconds."""
-    return msg.wrapped_message.time_of_validity.elapsed_nsec  # type: ignore[attr-defined]
+    return int(msg.wrapped_message.time_of_validity.elapsed_nsec)  # type: ignore[attr-defined]
 
 
 class SimpleMediator(Mediator):
@@ -93,9 +93,7 @@ class SimpleMediator(Mediator):
 
         cur_time = message.wrapped_message.time_of_validity  # type: ignore[attr-defined]
 
-        process_until_time = (
-            cur_time.elapsed_nsec - self._buffer_time_nsec  # type: ignore[operator]
-        )
+        process_until_time = cur_time.elapsed_nsec - self._buffer_time_nsec
         process_until_index = bisect.bisect_left(
             self._messages, process_until_time, key=_get_time
         )

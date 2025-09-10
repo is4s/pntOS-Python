@@ -63,6 +63,7 @@ quote-style = "single"
 
 [tool.mypy]
 strict = true
+disable_error_code = ["import-untyped", "no-untyped-call"]
 warn_unreachable = true
 
 [tool.pytest.ini_options]

@@ -35,7 +35,9 @@ def delta_lon_to_east(delta_lon: float, approx_lat: float, altitude: float) -> f
     return (transverse_radius(approx_lat) + altitude) * delta_lon * cos(approx_lat)
 
 
-def east_to_delta_lon(east_distance, approx_lat, altitude):
+def east_to_delta_lon(
+    east_distance: float, approx_lat: float, altitude: float
+) -> float:
     return east_distance / (
         (transverse_radius(approx_lat) + altitude) * cos(approx_lat)
     )
@@ -68,7 +70,7 @@ def quat_to_dcm(quat: NDArray[float64]) -> NDArray[float64]:
     )
 
 
-def dcm_to_quat(dcm: NDArray[float64]):
+def dcm_to_quat(dcm: NDArray[float64]) -> NDArray[float64]:
     d0 = dcm[0, 0]
     d1 = dcm[1, 1]
     d2 = dcm[2, 2]
@@ -203,9 +205,9 @@ def correct_dcm_with_tilt(
         I = np.eye(3)
         s = skew(tilt)
         # Below is equivalent to I - sin(m) * s / m + dot((1 - cos(m)) * s, s) / pow(m, 2)
-        B = (1 - cos(m)) / sum_squares * np.linalg.matrix_power(s, 2) + (
-            -sin(m) / m * s + I
-        )
+        B: NDArray[float64] = (1 - cos(m)) / sum_squares * np.linalg.matrix_power(
+            s, 2
+        ) + (-sin(m) / m * s + I)
         return B @ dcm
     return dcm
 

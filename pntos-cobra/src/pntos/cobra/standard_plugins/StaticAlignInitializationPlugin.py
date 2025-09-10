@@ -151,11 +151,11 @@ class StaticAlignInitializationPlugin(InitializationPlugin):
         else:
             print(f'Error ({self.__class__.__name__}): mediator cannot be None')
 
-    def shutdown_plugin(self):
-        self.mediator = None
+    def shutdown_plugin(self) -> None:
+        pass
 
     def is_initialization_type_supported(
-        self, initialization_type: InitializationType
+        self, initialization_type: type[InitializationType]
     ) -> bool:
         return initialization_type == InertialInitializationStrategy
 

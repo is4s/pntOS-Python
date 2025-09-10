@@ -53,141 +53,146 @@ def pos_meas() -> Message:
     )
 
 
-def test_empty_init(mediator):
+def test_empty_init(mediator: SimpleMediator) -> None:
     with pytest.raises(RuntimeError) as excinfo:
         FogmBlock('bk', mediator, array([]), array([]))
     assert excinfo.type is RuntimeError
 
 
-def test_single_init(mediator):
+def test_single_init(mediator: SimpleMediator) -> None:
     blk = FogmBlock('bk', mediator, array([1.0]), array([2.0]))
     x_and_p = EstimateWithCovariance(
         EstimateWithCovarianceType.EWC_GENERIC, ones(1), eye(1)
     )
     dyn = blk.generate_dynamics(
-        x_and_p, time_from=TypeTimestamp(0), time_to=TypeTimestamp(1e9)
+        x_and_p, time_from=TypeTimestamp(0), time_to=TypeTimestamp(int(1e9))
     )
+    assert dyn is not None
     assert dyn.Phi.shape == (1, 1)
     assert dyn.Qd.shape == (1, 1)
 
 
-def test_double_flat_init(mediator):
+def test_double_flat_init(mediator: SimpleMediator) -> None:
     blk = FogmBlock('bk', mediator, array([1.0, 2.0]), array([3.0, 4.0]))
     x_and_p = EstimateWithCovariance(
         EstimateWithCovarianceType.EWC_GENERIC, ones(2), eye(2)
     )
     dyn = blk.generate_dynamics(
-        x_and_p, time_from=TypeTimestamp(0), time_to=TypeTimestamp(1e9)
+        x_and_p, time_from=TypeTimestamp(0), time_to=TypeTimestamp(int(1e9))
     )
+    assert dyn is not None
     assert dyn.Phi.shape == (2, 2)
     assert dyn.Qd.shape == (2, 2)
 
 
-def test_double_trans_init(mediator):
+def test_double_trans_init(mediator: SimpleMediator) -> None:
     blk = FogmBlock('bk', mediator, array([[1.0], [2.0]]), array([[3.0], [4.0]]))
     x_and_p = EstimateWithCovariance(
         EstimateWithCovarianceType.EWC_GENERIC, ones(2), eye(2)
     )
     dyn = blk.generate_dynamics(
-        x_and_p, time_from=TypeTimestamp(0), time_to=TypeTimestamp(1e9)
+        x_and_p, time_from=TypeTimestamp(0), time_to=TypeTimestamp(int(1e9))
     )
+    assert dyn is not None
     assert dyn.Phi.shape == (2, 2)
     assert dyn.Qd.shape == (2, 2)
 
 
 # Fail to create on all size mismatches
-def test_bad_size1(mediator):
+def test_bad_size1(mediator: SimpleMediator) -> None:
     with pytest.raises(RuntimeError) as excinfo:
         FogmBlock('bk', mediator, array([1.0]), array([[3.0], [4.0]]))
     assert excinfo.type is RuntimeError
 
 
-def test_bad_size2(mediator):
+def test_bad_size2(mediator: SimpleMediator) -> None:
     with pytest.raises(RuntimeError) as excinfo:
         FogmBlock('bk', mediator, array([1.0, 2.0, 3.0]), array([[3.0], [4.0]]))
     assert excinfo.type is RuntimeError
 
 
-def test_bad_size3(mediator):
+def test_bad_size3(mediator: SimpleMediator) -> None:
     with pytest.raises(RuntimeError) as excinfo:
         FogmBlock('bk', mediator, array([1.0, 2.0]), array([3.0]))
     assert excinfo.type is RuntimeError
 
 
-def test_bad_size4(mediator):
+def test_bad_size4(mediator: SimpleMediator) -> None:
     with pytest.raises(RuntimeError) as excinfo:
         FogmBlock('bk', mediator, array([1.0, 2.0]), array([3.0, 4.0, 5.0]))
     assert excinfo.type is RuntimeError
 
 
 # tau must be positive
-def test_neg_tau(mediator):
+def test_neg_tau(mediator: SimpleMediator) -> None:
     with pytest.raises(RuntimeError) as excinfo:
         FogmBlock('bk', mediator, array([1.0, 2.0]), array([-3.0, 4.0]))
     assert excinfo.type is RuntimeError
 
 
-def test_neg_tau2(mediator):
+def test_neg_tau2(mediator: SimpleMediator) -> None:
     with pytest.raises(RuntimeError) as excinfo:
         FogmBlock('bk', mediator, array([1.0, 2.0]), array([-3.0, -4.0]))
     assert excinfo.type is RuntimeError
 
 
-def test_0_tau(mediator):
+def test_0_tau(mediator: SimpleMediator) -> None:
     with pytest.raises(RuntimeError) as excinfo:
         FogmBlock('bk', mediator, array([1.0, 2.0]), array([0, 4.0]))
     assert excinfo.type is RuntimeError
 
 
-def test_0_tau2(mediator):
+def test_0_tau2(mediator: SimpleMediator) -> None:
     with pytest.raises(RuntimeError) as excinfo:
         FogmBlock('bk', mediator, array([1.0, 2.0]), array([0, 0]))
     assert excinfo.type is RuntimeError
 
 
 # Negative sigmas weird, but they get squared anyway, just log warning
-def test_neg_sig(mediator):
+def test_neg_sig(mediator: SimpleMediator) -> None:
     FogmBlock('bk', mediator, array([-1.0, 2.0]), array([3.0, 4.0]))
 
 
-def test_neg_sig2(mediator):
+def test_neg_sig2(mediator: SimpleMediator) -> None:
     blk = FogmBlock('bk', mediator, array([-1.0, -2.0]), array([3.0, 4.0]))
 
 
 # Aux data does nothing in this class
-def test_empty_aux(mediator):
+def test_empty_aux(mediator: SimpleMediator) -> None:
     blk = FogmBlock('bk', mediator, array([1.0]), array([3.0]))
     blk.receive_aux_data([])
 
 
-def test_some_aux(mediator, pos_meas):
+def test_some_aux(mediator: SimpleMediator, pos_meas: Message) -> None:
     blk = FogmBlock('bk', mediator, array([1.0]), array([3.0]))
     blk.receive_aux_data([Message(pos_meas, 'garbage')])
 
 
 # An actual model
-def test_gen_dyn(mediator):
+def test_gen_dyn(mediator: SimpleMediator) -> None:
     blk = FogmBlock('bk', mediator, array([3.0]), array([1.0]))
     x_and_p = EstimateWithCovariance(
         EstimateWithCovarianceType.EWC_GENERIC, zeros(1), eye(1)
     )
     dyn = blk.generate_dynamics(
-        x_and_p, time_from=TypeTimestamp(0), time_to=TypeTimestamp(1e9)
+        x_and_p, time_from=TypeTimestamp(0), time_to=TypeTimestamp(int(1e9))
     )
+    assert dyn is not None
     res = dyn.g(array([1.0]))
     assert res.shape == (1,)
     assert res[0] == pytest.approx(0.36787944)
 
 
 # Should be a no-op
-def test_gen_dyn_eq(mediator):
+def test_gen_dyn_eq(mediator: SimpleMediator) -> None:
     blk = FogmBlock('bk', mediator, array([3.0]), array([1.0]))
     x_and_p = EstimateWithCovariance(
         EstimateWithCovarianceType.EWC_GENERIC, array([3.0]), eye(1) * 9.0
     )
     dyn = blk.generate_dynamics(
-        x_and_p, time_from=TypeTimestamp(1e9), time_to=TypeTimestamp(1e9)
+        x_and_p, time_from=TypeTimestamp(int(1e9)), time_to=TypeTimestamp(int(1e9))
     )
+    assert dyn is not None
     res = dyn.g(x_and_p.estimate)
     assert res[0] == pytest.approx(x_and_p.estimate)
     assert dyn.Phi.shape == (1, 1)
@@ -196,18 +201,19 @@ def test_gen_dyn_eq(mediator):
 
 
 # A negative dt likely incorrect but maybe allowable depending on context? No err here.
-def test_gen_dyn_neg(mediator):
+def test_gen_dyn_neg(mediator: SimpleMediator) -> None:
     blk = FogmBlock('bk', mediator, array([1.0]), array([3.0]))
     x_and_p = EstimateWithCovariance(
         EstimateWithCovarianceType.EWC_GENERIC, zeros(1), eye(1)
     )
     dyn = blk.generate_dynamics(
-        x_and_p, time_from=TypeTimestamp(1e9), time_to=TypeTimestamp(0)
+        x_and_p, time_from=TypeTimestamp(int(1e9)), time_to=TypeTimestamp(0)
     )
+    assert dyn is not None
     dyn.g(x_and_p.estimate)
 
 
-def test_gen_dyn_multi(mediator):
+def test_gen_dyn_multi(mediator: SimpleMediator) -> None:
     sigmas = array([1.0, 1.0, 1.0])
     taus = array([1.0, 1.0, 1.0])
     blk = FogmBlock('bk', mediator, sigmas, taus)
@@ -215,8 +221,9 @@ def test_gen_dyn_multi(mediator):
         EstimateWithCovarianceType.EWC_GENERIC, array([0.5, 1.5, -2.5]), eye(3) * 3.0
     )
     dyn = blk.generate_dynamics(
-        x_and_p, time_from=TypeTimestamp(0), time_to=TypeTimestamp(1e9)
+        x_and_p, time_from=TypeTimestamp(0), time_to=TypeTimestamp(int(1e9))
     )
+    assert dyn is not None
     res = dyn.g(x_and_p.estimate)
     assert res.shape == (3,)
     assert allclose(res, x_and_p.estimate * exp(-1 / taus))

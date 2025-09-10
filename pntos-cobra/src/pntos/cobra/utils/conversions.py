@@ -112,7 +112,7 @@ def convert_pva_to_cpp(
 
 def convert_pva_from_cpp(
     pva: aspn23_xtensor.MeasurementPositionVelocityAttitude,
-    covariance: NDArray | None = None,
+    covariance: NDArray[np.float64] | None = None,
 ) -> MeasurementPositionVelocityAttitude:
     """
     Convert from ASPN-C++ PVA measurement to ASPN-Python PVA measurement. If ``covariance`` is ``None``,

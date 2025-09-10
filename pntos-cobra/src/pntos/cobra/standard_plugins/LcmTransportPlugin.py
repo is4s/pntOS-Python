@@ -120,4 +120,4 @@ class LcmTransportPlugin(TransportPlugin):
             )
             return
 
-        self.lcm.publish(channel_name, lcm_msg.data.encode())
+        self.lcm.publish(channel_name, lcm_msg.encode())
