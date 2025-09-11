@@ -38,6 +38,8 @@ dev = [
     "pntos-python-docs-data==0.1.5",
     "GitPython>=3.1.44",
     "libclang>=18.1.1",
+    "analysis-lcm @ git+ssh://git@git.aspn.us/pntos/analysis-scripts.git@e8e1b2c03709ed5c4d42d7728b359c3a1bd87a0e#subdirectory=analysis-lcm",
+    "analysis-ros @ git+ssh://git@git.aspn.us/pntos/analysis-scripts.git@e8e1b2c03709ed5c4d42d7728b359c3a1bd87a0e#subdirectory=analysis-ros",
 ]
 
 [tool.ruff.lint]

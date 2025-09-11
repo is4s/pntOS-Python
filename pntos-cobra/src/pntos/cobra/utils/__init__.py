@@ -43,6 +43,17 @@ from .orchestration_utils import (
     set_up_initializer as set_up_initializer,
     set_up_preprocessors as set_up_preprocessors,
 )
+from .plots import (
+    plot_llh as plot_llh,
+    plot_ned as plot_ned,
+    plot_ned_err as plot_ned_err,
+    plot_pva as plot_pva,
+    plot_rpy as plot_rpy,
+    plot_tilt_err as plot_tilt_err,
+    plot_trajectory as plot_trajectory,
+    plot_vel as plot_vel,
+    plot_vel_err as plot_vel_err,
+)
 from .plugins import (
     SortedPlugins as SortedPlugins,
     camel_to_snake as camel_to_snake,

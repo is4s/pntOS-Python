@@ -54,7 +54,7 @@ def run_pntos(app_to_run: str = 'advanced/gps_ins_ros'):
             Popen(
                 # Rate must be slow enough for fastest topics to be published
                 # at full speed in the CI. See "Using ROS" docs.
-                ['play-dataset', '-t', 'ros', '-r', '20'],
+                ['play-dataset', '-t', 'ros', '-r', '10'],
                 stdin=slave_fd,
                 start_new_session=True,
             )
