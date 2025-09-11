@@ -19,7 +19,7 @@ from pntos.api import (
 from pntos.cobra.config import (
     BarometerToAltitudeConfig,
     DownsamplerConfig,
-    InertialConfig,
+    ImuRotatorConfig,
     TimeAdjusterConfig,
     config_from_registry,
 )
@@ -313,7 +313,7 @@ class StandardPreprocessorPlugin(PreprocessorPlugin):
                     return None
 
                 inert_config = config_from_registry(
-                    InertialConfig, self.mediator, config_group
+                    ImuRotatorConfig, self.mediator, config_group
                 )
                 if inert_config is None:
                     self.mediator.log_message(

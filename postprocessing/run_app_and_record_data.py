@@ -9,7 +9,7 @@ from plot_results import plot_results
 OUTPUT_LOG_FILENAME = 'pntos_output.log'
 
 
-def run_pntos(app_to_run: str = 'fusion_gps_ins'):
+def run_pntos(app_to_run: str = 'tutorial/gps_ins'):
     """Spin up pntOS, process log, then shut down."""
     # Start the app
     # Set unbuffered flag so the subprocess standard output can be read in real time

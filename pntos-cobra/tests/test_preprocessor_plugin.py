@@ -23,7 +23,7 @@ from pntos.cobra.config import (
     BarometerToAltitudeConfig,
     BaseConfig,
     DownsamplerConfig,
-    InertialConfig,
+    ImuRotatorConfig,
     TimeAdjusterConfig,
 )
 from pntos.cobra.internal import (
@@ -35,23 +35,24 @@ from pntos.cobra.internal import (
 
 downsampler_config = DownsamplerConfig(
     channels_to_downsample=['test1', 'test2', 'test3'],
+    identifier='downsampler',
     downsampling_factors=[2, 3, -1],
     group='test',
 )
-inertial_config = InertialConfig(
-    group='/config/default/inertial',
-    expected_dt=0.01,
-    inertial_buffer_length=5.0,
+inertial_config = ImuRotatorConfig(
+    group='/config/imu_rotator',
+    identifier='imu_rotator',
     channel='/sensor/imu',
     C_imu_to_platform=((0, 1, 0), (1, 0, 0), (0, 0, -1)),
 )
 time_adjuster_config = TimeAdjusterConfig(
     group='test',
+    identifier='time_adjuster',
     channel_to_correct='/sensor/imu',
     expected_dt_nsec=int(0.01 * 1e9),
 )
 baro_to_alt_config = BarometerToAltitudeConfig(
-    group='baro_test', channel='/sensor/barometer'
+    group='baro_test', identifier='baro_converter', channel='/sensor/barometer'
 )
 
 config_list: list[BaseConfig] = [
@@ -267,7 +268,7 @@ def imu_rotator_preprocessor(
     preprocessor_plugin: StandardPreprocessorPlugin,
 ) -> Preprocessor:
     idx = preprocessor_plugin.preprocessor_identifiers.index('imu_rotator')
-    preprocessor = preprocessor_plugin.new_preprocessor(idx, '/config/default/inertial')
+    preprocessor = preprocessor_plugin.new_preprocessor(idx, '/config/imu_rotator')
     assert preprocessor is not None
     assert isinstance(preprocessor, ImuRotationPreprocessor)
     return preprocessor

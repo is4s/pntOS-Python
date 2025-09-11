@@ -57,8 +57,8 @@ Or create a `.python-version` file, and `uv` will use it.
 
 ### ROS App
 
-See `apps/fusion_gps_ins_ros.py` for an example of using Cobra with ROS. This
-app is very similar to `apps/fusion_gps_ins.py`, but the
+See `apps/advanced/gps_ins_ros.py` for an example of using Cobra with ROS. This
+app is very similar to `apps/tutorial/gps_ins.py`, but the
 `AspnLcmTransportPlugin` has been swapped for an `Aspn23RosTransportPlugin`.
 Also, the channel names have been changed to use underscores instead of dashes
 since ROS topics cannot have dashes. Make sure the channels in your app reflect

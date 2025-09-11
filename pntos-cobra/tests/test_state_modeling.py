@@ -76,7 +76,6 @@ my_config: list[BaseConfig] = [
         group='/config/cobra/sensor',
         lever_arm=(0.0, 0.0, 0.0),
         orientation=(1.0, 0.0, 0.0, 0.0),
-        use_for_alignment=True,
         sensor_name='novatel',
     ),
 ]

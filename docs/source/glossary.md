@@ -14,7 +14,7 @@ Cobra
     |:----------------------------------------------------- |:------------------------------------- | ---------------------- |:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
     | [Cobra Plugins](./plugins.md)                         | `pntos-cobra/src/pntos/cobra/`        | `pntos.cobra`          | Implementation of API - functional Python plugins.                                                                                                                                                                                     |
     | [Cobra Apps](./first_app.md)                          | `apps/`                               | **                     | Each app loads a set of Cobra plugins, defines any config values, and starts pntOS with the given apps.                                                                                                                                |
-    | [Cobra Config](./apps/fusion_gps_ins.md#config-setup) | `pntos-cobra/src/pntos/cobra/config/` | `pntos.cobra.config`   | Contains the Cobra config dataclasses along with two important utility functions: {py:obj}`config_to_registry()<pntos.cobra.config.config_to_registry>` and {py:obj}`config_from_registry()<pntos.cobra.config.config_from_registry>`. |
+    | [Cobra Config](./apps/gps_ins.md#config-setup) | `pntos-cobra/src/pntos/cobra/config/` | `pntos.cobra.config`   | Contains the Cobra config dataclasses along with two important utility functions: {py:obj}`config_to_registry()<pntos.cobra.config.config_to_registry>` and {py:obj}`config_from_registry()<pntos.cobra.config.config_from_registry>`. |
     | [Cobra Utilities](./documentation/cobra_utils.rst)    | `pntos-cobra/src/pntos/cobra/utils`   | `pntos.cobra.utils`    | Utility objects and functions for other Cobra components (e.g. navigation functions like {py:func}`ecef_to_llh()<pntos.cobra.utils.ecef_to_llh>`)                                                                                       |
     | Cobra Internal Objects                                | `pntos-cobra/src/pntos/cobra/`        | `pntos.cobra.internal` | Any Cobra objects that are not plugins, config, or utilities. These objects should not be needed in an {term}`app<App>`.                                                                                                               |
     ```
@@ -29,7 +29,7 @@ Cobra
 
 App
     A single Python script that the user may run and produces a working Python pntOS system.
-    For more details on apps, see [the reference tutorial apps](./apps/fusion_gps_ins.md).
+    For more details on apps, see [the reference tutorial apps](./apps/gps_ins.md).
 
 ASPN
     A data standard that describes what {term}`PNT` data should be exchanged for consistent 

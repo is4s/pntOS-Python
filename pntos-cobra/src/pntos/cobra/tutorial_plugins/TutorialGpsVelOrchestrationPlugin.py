@@ -28,10 +28,12 @@ from pntos.api import (
     StandardStateModelProvider,
     StateModelingPlugin,
 )
-from pntos.cobra.config import InertialConfig, OrchestrationConfig, config_from_registry
-from pntos.cobra.utils import sort_plugins_dataclass, validate_plugins
-
-from .orchestration_utils import (
+from pntos.cobra.config import (
+    InertialConfig,
+    TutorialOrchestrationConfig,
+    config_from_registry,
+)
+from pntos.cobra.utils import (
     dispatch_to_fusion_engine,
     get_best_solution,
     get_dead_reckoning_solution,
@@ -43,6 +45,8 @@ from .orchestration_utils import (
     set_up_inertial_mechanization,
     set_up_initializer,
     set_up_preprocessors,
+    sort_plugins_dataclass,
+    validate_plugins,
 )
 
 # Solution Channels
@@ -62,6 +66,10 @@ GPS_MEASUREMENT_PROCESSOR_ID = 'pinson_with_ned_fogm_position'
 GPS_MEASUREMENT_PROCESSOR_LABEL = 'gps'
 GPS_MEASUREMENT_PROCESSOR_CONFIG_GROUP = 'config/gp3d_state_modeling'
 GPS_MP_STATE_BLOCK_LABELS = [STATE_BLOCK_LABEL, FOGM_STATE_BLOCK_LABEL]
+VEL_MEASUREMENT_PROCESSOR_ID = 'pinson_velocity'
+VEL_MEASUREMENT_PROCESSOR_LABEL = 'vel'
+VEL_MEASUREMENT_PROCESSOR_CONFIG_GROUP = 'config/gp3d_state_modeling'
+VEL_MP_STATE_BLOCK_LABELS = [STATE_BLOCK_LABEL]
 
 # Inertial parameters
 INERTIAL_GROUP = 'config/inertial'
@@ -69,13 +77,13 @@ INERTIAL_GROUP = 'config/inertial'
 # Config groups
 ALIGNMENT_CONFIG_GROUP = 'config/default/alignment'
 PREPROCESSOR_IDS = ['imu_rotator', 'time_adjuster']
-PREPROCESSOR_GROUPS = [INERTIAL_GROUP, 'config/time_adjuster']
+PREPROCESSOR_GROUPS = ['config/imu_rotator', 'config/time_adjuster']
 
 
-class SimpleGpsOrchestrationPlugin(OrchestrationPlugin):
+class TutorialGpsVelOrchestrationPlugin(OrchestrationPlugin):
     """
-    A simple orchestration plugin that incorporates a position measurement processor and two state blocks.
-    It uses a Pinson15 state block as a model for state estimation and a FOGM state block for position bias states.
+    A simple orchestration plugin that incorporates both a position and velocity measurement processor.
+    It uses a Pinson15 state block as a model for state estimation and a FOGM state block for bias states.
     """
 
     mediator: Mediator
@@ -132,9 +140,9 @@ class SimpleGpsOrchestrationPlugin(OrchestrationPlugin):
 
     def _log(self, level: LoggingLevel, message: str) -> None:
         """
-        Send an informational log message to pntOS.
+        Send informational log messages to pntOS.
 
-        If no mediator is provided, manually print the message. Otherwise, pass
+        If no mediator is provided, manually print the messages. Otherwise, pass
         through to the mediator's ``log_message`` method.
         """
         if self.mediator is not None:
@@ -149,7 +157,7 @@ class SimpleGpsOrchestrationPlugin(OrchestrationPlugin):
         stream_config.immediate_stream_add(MeasurementImu)
 
         orch_config = config_from_registry(
-            OrchestrationConfig, self.mediator, 'config/orchestration'
+            TutorialOrchestrationConfig, self.mediator, 'config/orchestration'
         )
         inertial_config = config_from_registry(
             InertialConfig, self.mediator, INERTIAL_GROUP
@@ -162,21 +170,22 @@ class SimpleGpsOrchestrationPlugin(OrchestrationPlugin):
             )
             return
 
-        self.measurement_channels = {
-            orch_config.gps_channel: GPS_MEASUREMENT_PROCESSOR_LABEL,
-        }
-        self.alignment_channels = [
-            orch_config.gps_channel,
-            inertial_config.channel,
-        ]
-        self.inertial_channel = inertial_config.channel
-
         if plugins is None:
             self._log(
                 LoggingLevel.ERROR,
                 'No plugins were provided. Filter cannot be implemented.',
             )
             return
+
+        self.measurement_channels = {
+            orch_config.gps_channel: GPS_MEASUREMENT_PROCESSOR_LABEL,
+            orch_config.velocity_channel: VEL_MEASUREMENT_PROCESSOR_LABEL,
+        }
+        self.alignment_channels = [
+            orch_config.gps_channel,
+            inertial_config.channel,
+        ]
+        self.inertial_channel = inertial_config.channel
 
         sorted_plugins = sort_plugins_dataclass(plugins)
         if not validate_plugins(
@@ -229,8 +238,8 @@ class SimpleGpsOrchestrationPlugin(OrchestrationPlugin):
         """
         Utility function to assemble the components of and create a fusion engine.
 
-        This function specifically creates a Pinson15 state block, a FOGM state block, and a position measurement processor.
-        If either of these components cannot created, an error will be logged and pntOS will shutdown.
+        This function specifically creates a Pinson15 state block, FOGM state block, position measurement processor, and a velocity measurement processor.
+        If any of these components cannot created, an error will be logged and pntOS will shutdown.
         """
         # Make a fusion engine
         fusion_engine: StandardFusionEngine | None = (
@@ -252,6 +261,7 @@ class SimpleGpsOrchestrationPlugin(OrchestrationPlugin):
         pinson_block = None
         fogm_block = None
         gps_processor = None
+        vel_processor = None
         for plugin in self.state_modeling_plugins:
             provider: StandardStateModelProvider | None = (
                 plugin.new_state_model_provider(StandardStateModelProvider)
@@ -284,6 +294,16 @@ class SimpleGpsOrchestrationPlugin(OrchestrationPlugin):
                             GPS_MEASUREMENT_PROCESSOR_LABEL,
                             GPS_MP_STATE_BLOCK_LABELS,
                             GPS_MEASUREMENT_PROCESSOR_CONFIG_GROUP,
+                        )
+                    if VEL_MEASUREMENT_PROCESSOR_ID in provider.processor_identifiers:
+                        vel_processor = provider.new_processor(
+                            provider.processor_identifiers.index(
+                                VEL_MEASUREMENT_PROCESSOR_ID
+                            ),
+                            fusion_engine,
+                            VEL_MEASUREMENT_PROCESSOR_LABEL,
+                            VEL_MP_STATE_BLOCK_LABELS,
+                            VEL_MEASUREMENT_PROCESSOR_CONFIG_GROUP,
                         )
 
         # Make state blocks
@@ -323,6 +343,16 @@ class SimpleGpsOrchestrationPlugin(OrchestrationPlugin):
             )
             return
         fusion_engine.add_measurement_processor(gps_processor)
+
+        if vel_processor is None:
+            assert provider is not None
+            self._log(
+                LoggingLevel.ERROR,
+                f'Unable to find measurement processor "{VEL_MEASUREMENT_PROCESSOR_ID}" -'
+                + f' cannot initialize filter. Available measurement processors: {provider.processor_identifiers}',
+            )
+            return
+        fusion_engine.add_measurement_processor(vel_processor)
 
         self.fusion_engine = fusion_engine
 

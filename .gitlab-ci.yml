@@ -139,7 +139,9 @@ mypy:
         - docker exec pntos-python uv sync -v
         - docker exec pntos-python mypy pntos-api --no-implicit-reexport
         - docker exec pntos-python mypy pntos-cobra --no-implicit-reexport
-        - docker exec pntos-python mypy apps --no-implicit-reexport
+        - docker exec pntos-python mypy apps/advanced/ --no-implicit-reexport
+        - docker exec pntos-python mypy apps/standard/ --no-implicit-reexport
+        - docker exec pntos-python mypy apps/tutorial/ --no-implicit-reexport
 
 documentation check:
     stage: check
@@ -166,7 +168,7 @@ link check:
         # Check external links in the documentation
         - docker exec -e TZ=UTC pntos-python sphinx-build -b linkcheck --exception-on-warning docs/source/ docs/build/
 
-GPS INS App:
+GPS INS Tutorial App:
     stage: check
     tags:
         - linux-light-runner
@@ -185,7 +187,19 @@ GPS INS Velocity App:
     script:
         - docker run --rm -dit -v $(pwd):/work --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
         - docker exec pntos-python uv sync -v
-        - docker exec pntos-python postprocessing/run_app_and_record_data.py fusion_gps_vel_ins
+        - docker exec pntos-python postprocessing/run_app_and_record_data.py tutorial/gps_vel_ins
+    artifacts:
+        paths:
+            - pntos_output/
+
+GPS INS Standard App:
+    stage: check
+    tags:
+        - linux-light-runner
+    script:
+        - docker run --rm -dit -v $(pwd):/work --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
+        - docker exec pntos-python uv sync -v
+        - docker exec pntos-python postprocessing/run_app_and_record_data.py standard/gps_ins
     artifacts:
         paths:
             - pntos_output/

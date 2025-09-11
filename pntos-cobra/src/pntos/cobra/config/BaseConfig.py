@@ -1,10 +1,9 @@
+from abc import ABC
 from dataclasses import dataclass
-from typing import Protocol, runtime_checkable
 
 
-@runtime_checkable
 @dataclass
-class BaseConfig(Protocol):
+class BaseConfig(ABC):
     """
     A basic config that all other configs should inherit from.
     """

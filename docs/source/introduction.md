@@ -133,7 +133,7 @@ wired up to talk to each other, told to start listening and processing data, and
 Most apps will look very similar to each other, with the only changes being which plugins the {term}`App` has
 decided to use and what config stanzas it needs. You can find an example of a full-fledged {term}`App` that performs
 GPS/INS sensor fusion from sensor data it receives from an LCM network bus
-[here](https://git.aspn.us/pntos/pntos-python/-/blob/main/apps/fusion_gps_ins/fusion_gps_ins.py?ref_type=heads).
+[here](https://git.aspn.us/pntos/pntos-python/-/blob/main/apps/tutorial/gps_ins/gps_ins.py?ref_type=heads).
 For instructions on how to run this example app, see [Running Your First App](first_app.md).
 
 ### Implementing Our Own Custom App
@@ -785,15 +785,15 @@ In the previous section we developed the scaffolding for an
 we would need to pick a sensor fusion approach and implement it within
 {py:obj}`process_pntos_message<pntos.api.OrchestrationPlugin.process_pntos_message>`.
 
-The {py:obj}`SimpleGpsOrchestrationPlugin<pntos.cobra.SimpleGpsOrchestrationPlugin>` is designed to be a simple implementation
+The {py:obj}`TutorialGpsOrchestrationPlugin<pntos.cobra.TutorialGpsOrchestrationPlugin>` is designed to be a simple implementation
 of a {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` which demonstrates how one might write an
 {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` using a single EKF to do GPS/INS. The source code
-of the {py:obj}`SimpleGpsOrchestrationPlugin<pntos.cobra.SimpleGpsOrchestrationPlugin>` can be
-[found here](https://git.aspn.us/pntos/pntos-python/-/blob/main/pntos-cobra/src/pntos/cobra/SimpleGpsOrchestrationPlugin.py).
+of the {py:obj}`TutorialGpsOrchestrationPlugin<pntos.cobra.TutorialGpsOrchestrationPlugin>` can be
+[found here](https://git.aspn.us/pntos/pntos-python/-/blob/main/pntos-cobra/src/pntos/cobra/TutorialGpsOrchestrationPlugin.py).
 We can see from the source code that complementary nav ASPN messages are
-[sent to the EKF](https://git.aspn.us/pntos/pntos-python/-/blob/main/pntos-cobra/src/pntos/cobra/SimpleGpsOrchestrationPlugin.py#L558)
+[sent to the EKF](https://git.aspn.us/pntos/pntos-python/-/blob/main/pntos-cobra/src/pntos/cobra/TutorialGpsOrchestrationPlugin.py#L558)
 inside the {py:obj}`process_pntos_message<pntos.api.OrchestrationPlugin.process_pntos_message>`
-method, and that [buffered solutions from the EKF are returned](https://git.aspn.us/pntos/pntos-python/-/blob/main/pntos-cobra/src/pntos/cobra/SimpleGpsOrchestrationPlugin.py#L666)
+method, and that [buffered solutions from the EKF are returned](https://git.aspn.us/pntos/pntos-python/-/blob/main/pntos-cobra/src/pntos/cobra/TutorialGpsOrchestrationPlugin.py#L666)
 by the {py:obj}`request_solutions<pntos.api.OrchestrationPlugin.request_solutions>`, as described above.
 
 <!-- TODO: Level 1 vs Level 2, and a link to the Level 2 docs when they exist -->
