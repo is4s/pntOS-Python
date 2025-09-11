@@ -5,6 +5,9 @@
 -e ./pntos-cobra
 alabaster==1.0.0
     # via sphinx
+analysis-lcm @ git+ssh://git@git.aspn.us/pntos/analysis-scripts.git@e8e1b2c03709ed5c4d42d7728b359c3a1bd87a0e#subdirectory=analysis-lcm
+    # via analysis-ros
+analysis-ros @ git+ssh://git@git.aspn.us/pntos/analysis-scripts.git@e8e1b2c03709ed5c4d42d7728b359c3a1bd87a0e#subdirectory=analysis-ros
 aspn-lcm @ git+ssh://git@git.aspn.us/pntos/lcm-generated.git@14045fe000e4395bf81708e963aea09948e52949#subdirectory=python
     # via
     #   aspn2-translations
@@ -66,6 +69,8 @@ imagesize==1.4.1
     # via sphinx
 iniconfig==2.1.0
     # via pytest
+inu==1.1.0
+    # via analysis-lcm
 ipython==8.37.0 ; python_full_version < '3.11'
 ipython==9.4.0 ; python_full_version >= '3.11'
 ipython-pygments-lexers==1.1.1 ; python_full_version >= '3.11'
@@ -110,6 +115,7 @@ numpy==2.1.3
     #   aspn23
     #   contourpy
     #   h5py
+    #   inu
     #   matplotlib
     #   navtk
     #   pntos-cobra
@@ -147,6 +153,12 @@ pygments==2.19.2
     #   sphinx
 pyparsing==3.2.3
     # via matplotlib
+pyqt6==6.9.1 ; sys_platform == 'linux'
+    # via analysis-lcm
+pyqt6-qt6==6.9.2 ; sys_platform == 'linux'
+    # via pyqt6
+pyqt6-sip==13.10.2 ; sys_platform == 'linux'
+    # via pyqt6
 pytest==8.4.1
     # via pytest-cov
 pytest-cov==6.2.1
@@ -160,9 +172,13 @@ roman-numerals-py==3.1.0 ; python_full_version >= '3.11'
     # via sphinx
 ruff==0.7.0
 scipy==1.15.3 ; python_full_version < '3.11'
-    # via pntos-cobra
+    # via
+    #   inu
+    #   pntos-cobra
 scipy==1.16.1 ; python_full_version >= '3.11'
-    # via pntos-cobra
+    # via
+    #   inu
+    #   pntos-cobra
 six==1.17.0
     # via python-dateutil
 smmap==5.0.2
@@ -202,13 +218,18 @@ sphinxcontrib-serializinghtml==2.0.0
     # via sphinx
 stack-data==0.6.3
     # via ipython
+tabulate==0.9.0
+    # via analysis-lcm
 tomli==2.2.1 ; python_full_version <= '3.11'
     # via
     #   coverage
     #   mypy
     #   pytest
     #   sphinx
+tomlkit==0.13.3
+    # via analysis-lcm
 tqdm==4.67.1
+    # via analysis-lcm
 traitlets==5.14.3
     # via
     #   ipython

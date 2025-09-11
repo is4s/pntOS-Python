@@ -1,53 +1,48 @@
 #!/usr/bin/env python3
 
 import argparse
-from os import mkdir, path
-from typing import Any
+import os
 
-from plots import plot_solution
+import matplotlib.pyplot as plt
+import numpy as np
+from analysis.lcm.data import LogData, PvaData
+from analysis.lcm.log_readers import read_pva
+from pntos.cobra.utils import plot_pva
 
 
-def harvest_data(logfile: str, channels: list[str]) -> dict[str, Any]:
+def harvest_data(logfile: str, channels: list[str]) -> LogData[PvaData]:
     # ROS bagfile
     if logfile.endswith('.db3') or logfile.endswith('.mcap'):
-        from ros_bag_reader import RosBagReader
+        from analysis.ros import RosBagReader
 
         return RosBagReader(logfile).harvest_topics(channels)
 
     # LCM logfile
-    with open(logfile, 'rb') as f:
-        if f.read(4) != b'\xed\xa1\xda\x01':  # LCM logfile magic bytes
-            raise ValueError(f'Invalid ROS/LCM log file: {logfile}')
-    from lcm_stripper import harvest_by_channel
-
-    return harvest_by_channel(logfile, channels)
+    return read_pva(logfile=logfile, read_all=True)
 
 
 def plot_results(logfile: str, solution_channel: str, truth_channel: str):
-    data = harvest_data(logfile, [solution_channel, truth_channel])
+    log_data = harvest_data(logfile, [solution_channel, truth_channel])
 
-    log_dir = path.dirname(logfile)
-    filt = path.basename(logfile).split('.')[0]
-    filt_dir = path.join(log_dir, filt)
-    if not path.exists(filt_dir):
-        mkdir(filt_dir)
+    solution = log_data.data[solution_channel]
+    solution.label = 'Cobra Solution'
+    truth = log_data.data[truth_channel]
+    truth.label = 'Truth'
 
-    print(f'Plotting results...')
-    try:
-        plot_solution(
-            [f'Cobra Solution ({solution_channel})', data[solution_channel]],
-            [f'Truth ({truth_channel})', data[truth_channel]],
-            filt_dir,
-            True,
-        )
-    except IndexError as e:
-        print(
-            '*' * 16,
-            'Hint: are the solution and truth channels set correctly?',
-            '*' * 16,
-        )
-        raise e
-    print(f'Plots have been saved to {filt_dir}')
+    # Flip truth RPY, as there is a bug in the smartcable (TODO: #236)
+    truth_rpy = log_data.data[truth_channel].rpy
+    log_data.data[truth_channel].rpy = np.transpose(
+        np.stack((truth_rpy[:, 1], truth_rpy[:, 0], -truth_rpy[:, 2]))
+    )
+
+    print('Plotting results...')
+    plt.rcParams['figure.figsize'] = (10, 6)
+    save_dir = os.path.join(
+        os.path.dirname(logfile), os.path.splitext(os.path.basename(logfile))[0]
+    )
+    plot_pva(solution, truth, log_data.t0, save_dir=save_dir)
+    print(f'Plots saved to {save_dir}.')
+    plt.show()
 
 
 if __name__ == '__main__':
