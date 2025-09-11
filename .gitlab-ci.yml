@@ -175,7 +175,7 @@ GPS INS Tutorial App:
     script:
         - docker run --rm -dit -v $(pwd):/work --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
         - docker exec pntos-python uv sync -v
-        - docker exec pntos-python postprocessing/run_app_and_record_data.py
+        - docker exec pntos-python postprocessing/run_app_and_record_data.py apps/tutorial/gps_ins.py
     artifacts:
         paths:
             - pntos_output/
@@ -187,7 +187,7 @@ GPS INS Velocity App:
     script:
         - docker run --rm -dit -v $(pwd):/work --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
         - docker exec pntos-python uv sync -v
-        - docker exec pntos-python postprocessing/run_app_and_record_data.py tutorial/gps_vel_ins
+        - docker exec pntos-python postprocessing/run_app_and_record_data.py apps/tutorial/gps_vel_ins.py
     artifacts:
         paths:
             - pntos_output/
@@ -199,7 +199,7 @@ GPS INS Standard App:
     script:
         - docker run --rm -dit -v $(pwd):/work --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
         - docker exec pntos-python uv sync -v
-        - docker exec pntos-python postprocessing/run_app_and_record_data.py standard/gps_ins
+        - docker exec pntos-python postprocessing/run_app_and_record_data.py
     artifacts:
         paths:
             - pntos_output/
