@@ -51,7 +51,7 @@ source .venv/bin/activate.fish
 
 The available apps can be found in each subfolder of the `{workspace-root}/apps`
 directory. If this is your first time with the {term}`Python pntOS API`, it is recommended you
-start with the `fusion_gps_ins` app. If you are running your own custom app, just switch
+start with the `gps_ins` app. If you are running your own custom app, just switch
 out the paths to the off-the-shelf apps with the path to your app in the following instructions.
 
 The available off-the-shelf apps are in the
@@ -59,25 +59,57 @@ The available off-the-shelf apps are in the
 
 `````{tab-set}
 
-````{tab-item} GPS INS Fusion App
-:sync: gps-ins-fusion
-For documentation specifically explaining the `fusion_gps_ins` app, see
-[](./apps/fusion_gps_ins.md).
+````{tab-item} GPS INS Tutorial App
+:sync: gps-ins-tutorial
+For documentation specifically explaining the `gps_ins` app, see
+[](./apps/gps_ins.md).
 
-### Run the GPS INS Fusion App
+### Run the GPS INS Tutorial App
 
 To run this app, run this command from the root workspace directory (with the Python virtual
 environment activated):
 
 ```shell
-apps/fusion_gps_ins.py
+apps/tutorial/gps_ins.py
 ```
+
+You should see something like the following:
+
+```shell
+WARNING:  [Controller] Expected one UiPlugin but received 0. Running without a UI plugin.
+[31/03/2025 11:55:06] [LoggingPlugin] [INFO] using hard-coded global logging level INFO
+[31/03/2025 11:55:06] [OrchestrationPlugin] [INFO] Aligned filter at TypeTimestamp(elapsed_nsec=1743621678330456320).
+LCM tcpq: connecting...
+[31/03/2025 11:55:06] [TransportPlugin] [INFO] LCM message handler is running.
+[31/03/2025 11:55:06] [ControllerPlugin] [INFO] Press Ctrl + C at any time to shut down pntOS...
+```
+
+Then push the `play` button in the LogPlayer.
+
+```{note}
+This app uses real data. There is some jitter present in the IMU sensor timestamps which will
+produce a few warnings in the output. They are of the form:
+
+    [warning] Suspicious dt of 0.015978679000000003 compared against nominal of 0.010000062688925596 detected at time 1747683329.241135205s
+
+A more complex app might, for example, use a Preprocessor plugin to correct the incoming data.
+```
+
+### Validate Results
+
+To plot the saved results run:
+
+```shell
+postprocessing/plot_results.py pntos_output.log
+```
+
+For more information on the expected results for this app, see [](./apps/gps_ins.md#expected-results).
 ````
 
-````{tab-item} GPS INS Velocity App
+````{tab-item} GPS INS Velocity Tutorial App
 :sync: vel-app
 For documentation specifically explaining the this app, see
-[](./apps/fusion_gps_vel_ins.md).
+[](./apps/gps_vel_ins.md).
 
 ### Position and Velocity Update App
 
@@ -85,10 +117,8 @@ To run this app, run this command from the root workspace directory (with the Py
 environment activated):
 
 ```shell
-apps/fusion_gps_vel_ins.py
+apps/tutorial/gps_vel_ins.py
 ```
-````
-`````
 
 Once the app is started, you should see something like the following:
 
@@ -110,3 +140,43 @@ The app records the filter PVA solution to `pntos_output.log`. To plot the recor
 ```shell
 postprocessing/plot_results.py pntos_output.log
 ```
+
+These plots should look fairly similar to the first app's plots, since the position update will be
+the dominating update. To be able to see a bigger difference, try inducing a position measurement
+outage to see the velocity update constrain the solution's drift.
+````
+
+````{tab-item} GPS INS Standard App
+:sync: gps-ins-standard
+
+### Run the GPS INS Standard App
+
+To run this app, run this command from the root workspace directory (with the Python virtual
+environment activated):
+
+```shell
+apps/standard/gps_ins.py
+```
+
+You should see something like the following:
+
+```shell
+WARNING:  [Controller] Expected one UiPlugin but received 0. Running without a UI plugin.
+[31/03/2025 11:55:06] [LoggingPlugin] [INFO] using hard-coded global logging level INFO
+[31/03/2025 11:55:06] [OrchestrationPlugin] [INFO] Aligned filter at TypeTimestamp(elapsed_nsec=1743621678330456320).
+LCM tcpq: connecting...
+[31/03/2025 11:55:06] [TransportPlugin] [INFO] LCM message handler is running.
+[31/03/2025 11:55:06] [ControllerPlugin] [INFO] Press Ctrl + C at any time to shut down pntOS...
+```
+
+Then push the `play` button in the LogPlayer.
+
+### Validate Results
+
+To plot the saved results run:
+
+```shell
+postprocessing/plot_results.py pntos_output.log
+```
+````
+`````

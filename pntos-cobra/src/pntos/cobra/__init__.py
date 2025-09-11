@@ -1,12 +1,6 @@
 from .dummy_plugins.DummyTransportPlugin import (
     DummyTransportPlugin as DummyTransportPlugin,
 )
-from .orchestration_plugins.SimpleGpsOrchestrationPlugin import (
-    SimpleGpsOrchestrationPlugin as SimpleGpsOrchestrationPlugin,
-)
-from .orchestration_plugins.SimpleGpsVelOrchestrationPlugin import (
-    SimpleGpsVelOrchestrationPlugin as SimpleGpsVelOrchestrationPlugin,
-)
 from .simple_controller.SimpleControllerPlugin import (
     SimpleControllerPlugin as SimpleControllerPlugin,
 )
@@ -31,6 +25,9 @@ from .standard_plugins.StandardInertialPlugin import (
 from .standard_plugins.StandardLoggingPlugin import (
     StandardLoggingPlugin as StandardLoggingPlugin,
 )
+from .standard_plugins.StandardOrchestrationPlugin import (
+    StandardOrchestrationPlugin as StandardOrchestrationPlugin,
+)
 from .standard_plugins.StandardPreprocessorPlugin import (
     StandardPreprocessorPlugin as StandardPreprocessorPlugin,
 )
@@ -42,6 +39,15 @@ from .standard_plugins.StaticAlignInitializationPlugin import (
 )
 from .state_modeling_simple_gps_ins.SimpleGpsInsStateModelingPlugin import (
     SimpleGpsInsStateModelingPlugin as SimpleGpsInsStateModelingPlugin,
+)
+from .state_modeling_simple_gps_ins.StandardGpsInsStateModelingPlugin import (
+    StandardGpsInsStateModelingPlugin as StandardGpsInsStateModelingPlugin,
+)
+from .tutorial_plugins.TutorialGpsOrchestrationPlugin import (
+    TutorialGpsOrchestrationPlugin as TutorialGpsOrchestrationPlugin,
+)
+from .tutorial_plugins.TutorialGpsVelOrchestrationPlugin import (
+    TutorialGpsVelOrchestrationPlugin as TutorialGpsVelOrchestrationPlugin,
 )
 from .tutorial_plugins.TutorialInitializationPlugin import (
     TutorialInitializationPlugin as TutorialInitializationPlugin,

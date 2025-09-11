@@ -13,7 +13,7 @@ from plot_results import plot_results
 BAG_PATH = 'pntos_output'
 
 
-def run_pntos(app_to_run: str = 'fusion_gps_ins_ros'):
+def run_pntos(app_to_run: str = 'advanced/gps_ins_ros'):
     """Spin up pntOS and any supporting processes, wait, then spin them down."""
 
     # Remove any pre-existing output

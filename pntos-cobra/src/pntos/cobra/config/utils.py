@@ -1,12 +1,18 @@
 from dataclasses import fields
 from enum import Enum
 from inspect import isclass
-from typing import Any, TypeVar, get_origin
+from typing import Any, TypeVar, get_args, get_origin
 
 import numpy as np
 from navtk.filtering import ImuModel
 
-from pntos.api import LoggingLevel, Mediator, Registry, RegistryValueTypeUnion
+from pntos.api import (
+    KeyValueStore,
+    LoggingLevel,
+    Mediator,
+    Registry,
+    RegistryValueTypeUnion,
+)
 
 from .BaseConfig import BaseConfig
 from .ImuConfig import ImuConfig
@@ -80,23 +86,48 @@ def config_from_registry(
     """
     conf_params = [f for f in fields(config_type) if f.name != 'group']
     kv = mediator.registry.batch_start(config_group)
-    out: dict[str, RegistryValueTypeUnion | tuple[float, ...] | Enum | BaseConfig] = {}
+    out: dict[str, RegistryValueTypeUnion | tuple[float, ...] | Enum | None] = {}
     fail = False
     for param in conf_params:
-        val: RegistryValueTypeUnion | tuple[float, ...] | Enum | BaseConfig | None = kv[
-            param.name
-        ]
-        # Special case: nested config. Identifiable by the first field, which is called `group` and
-        # is a str.
-        if val is None:
-            try:
-                first_field = fields(param.type)[0]
-                if first_field.name == 'group' and first_field.type is str:
-                    kv.batch_end()
-                    val = config_from_registry(param.type, mediator, config_group)
-                    kv.batch_restart()
-            except TypeError:
-                pass
+        if param.name in kv:
+            val: RegistryValueTypeUnion | tuple[float, ...] | Enum | None = kv[
+                param.name
+            ]
+        # Special case: nested config or list of nested configs
+        else:
+            group_key = '_' + param.name + '_groups'
+            if group_key not in kv:
+                if _is_type_optional(param.type):
+                    out[param.name] = None
+                    continue
+                mediator.log_message(
+                    LoggingLevel.WARN,
+                    f'Could not retrieve {param.name} from store',
+                )
+                fail = True
+                continue
+
+            groups = kv[group_key]
+            val = []
+            kv.batch_end()
+            if isinstance(groups, str):
+                if _is_type_optional(param.type):
+                    conf_type = get_args(param.type)[0]
+                else:
+                    conf_type = param.type
+                val = config_from_registry(conf_type, mediator, groups)
+            elif isinstance(groups, list):
+                conf_type = get_args(param.type)[0]
+                if _is_type_optional(param.type):
+                    conf_type = get_args(conf_type)[0]
+                for group in groups:
+                    conf = config_from_registry(conf_type, mediator, group)
+                    if not conf:
+                        fail = True
+                        break
+                    val.append(conf)
+            kv.batch_restart()
+
         if val is None:
             mediator.log_message(
                 LoggingLevel.WARN,
@@ -164,17 +195,24 @@ def config_to_registry(config: BaseConfig, mediator: Mediator) -> None:
             if len(val_to_store) > 0:
                 if isinstance(val_to_store[0], (int, float, np.int_)):
                     val_to_store = np.array(val_to_store, dtype=float)
+                elif isinstance(val_to_store[0], BaseConfig):
+                    nested_groups = []
+                    for nested_config in val_to_store:
+                        nested_groups.append(nested_config.group)
+                        kv.batch_end()
+                        config_to_registry(nested_config, mediator)
+                        kv.batch_restart()
+                    kv['_' + param.name + '_groups'] = nested_groups
+                    continue
         elif isinstance(val_to_store, Enum):
             val_to_store = val_to_store.value
         elif isinstance(val_to_store, BaseConfig):
-            if val_to_store.group != config.group:
-                mediator.log_message(
-                    LoggingLevel.WARN,
-                    'Nested config uses a different group. It will not be able to be retrieved via config_from_registry',
-                )
             kv.batch_end()
             config_to_registry(val_to_store, mediator)
             kv.batch_restart()
+            kv['_' + param.name + '_groups'] = val_to_store.group
+            continue
+        elif val_to_store is None:
             continue
         kv[param.name] = val_to_store
     kv.batch_end()
@@ -195,9 +233,32 @@ def _confirm_types(out_val: Any, expected_type: type[Any]) -> bool:
     """
     out_type = type(out_val)
 
+    if _is_type_optional(expected_type):
+        types = get_args(expected_type)
+        valid_type = False
+        for t in types:
+            if hasattr(t, '__origin__'):
+                return out_type is get_origin(t)
+            if out_type is t:
+                valid_type = True
+        if valid_type:
+            return True
+        else:
+            return False
+
     # Check if expected_type is generic alias (list[str], tuple[float], ect...)
     if hasattr(expected_type, '__origin__'):
         return out_type is get_origin(expected_type)
 
     # Otherwise, just see if it's the same type
     return out_type is expected_type
+
+
+def _is_type_optional(field_type: type[Any] | str) -> bool:
+    if isinstance(field_type, type):
+        return False
+    types = get_args(field_type)
+    for t in types:
+        if t is type(None):
+            return True
+    return False

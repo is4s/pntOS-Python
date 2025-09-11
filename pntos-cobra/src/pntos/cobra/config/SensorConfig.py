@@ -22,11 +22,6 @@ class SensorConfig(BaseConfig):
     The corresponding DCM would be C_sensor_to_platform.
     """
 
-    use_for_alignment: bool
-    """
-    If true this config will be used during alignment with the platform frame.
-    """
-
     sensor_name: str
     """
     A designated name for the sensor.

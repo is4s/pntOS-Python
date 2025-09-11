@@ -8,6 +8,8 @@ from aspn23 import (
 )
 from numpy import array, float64, zeros
 from numpy.typing import NDArray
+from scipy.linalg import block_diag
+
 from pntos.api import (
     EstimateWithCovariance,
     InertialInitializationStrategy,
@@ -21,15 +23,15 @@ from pntos.api import (
     StandardFusionEngine,
     StandardInertialMechanization,
 )
-from pntos.cobra.utils import (
-    SortedPlugins,
+
+from .navigation import (
     correct_dcm_with_tilt,
     dcm_to_quat,
     east_to_delta_lon,
     north_to_delta_lat,
     quat_to_dcm,
 )
-from scipy.linalg import block_diag
+from .plugins import SortedPlugins
 
 
 def set_up_preprocessors(
@@ -88,7 +90,7 @@ def initialization_ready(
     """
     Utility function to poll the state of the init strategy plugin.
 
-    Populates initialization_state with the relevant :class:`InitializationStatus`.
+    Populates initialization_state with the relevant :class:`pntos.api.InitializationStatus`.
     """
     initialization_state = initializer.request_current_status()
     return initialization_state is InitializationStatus.INITIALIZED_GOOD
@@ -262,11 +264,7 @@ def set_up_inertial_mechanization(
     """Get initial inertial solution and use it to set up the inertial."""
     init_solution = initializer.request_solution()
 
-    if (
-        init_solution.solution is None
-        or init_solution.inertial_errors is None
-        or init_solution.inertial_error_covariance is None
-    ):
+    if init_solution.solution is None:
         log_func(
             LoggingLevel.ERROR,
             'Invalid InitialInertialSolution returned from init strategy - unable to proceed.',
@@ -300,10 +298,14 @@ def set_up_inertial_mechanization(
         )
         return None
 
-    inertial.correct_sensor_errors(
-        init_solution.solution.wrapped_message.time_of_validity,
-        init_solution.inertial_errors,
-    )
+    if not (
+        init_solution.inertial_errors is None
+        or init_solution.inertial_error_covariance is None
+    ):
+        inertial.correct_sensor_errors(
+            init_solution.solution.wrapped_message.time_of_validity,
+            init_solution.inertial_errors,
+        )
     return inertial, init_solution
 
 

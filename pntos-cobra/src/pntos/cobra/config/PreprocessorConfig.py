@@ -1,0 +1,109 @@
+from dataclasses import dataclass
+
+from .BaseConfig import BaseConfig
+
+
+@dataclass
+class PreprocessorConfig(BaseConfig):
+    """The base preprocessor config all preprocessor configs should inherit from."""
+
+    group: str
+
+    identifier: str
+    """
+    A string that specifies which preprocessor this config should be used in.
+
+    This field will be matched against the `preprocessor_identifiers` field on the preprocessor plugin.
+    """
+
+
+@dataclass
+class BarometerToAltitudeConfig(PreprocessorConfig):
+    """
+    Configuration for the barometer to altitude preprocessor.
+    """
+
+    # INHERITED FIELDS
+    group: str
+
+    identifier: str
+
+    # UNIQUE FIELDS
+    channel: str
+    """
+    The name of the channel to convert.
+    """
+
+
+@dataclass
+class DownsamplerConfig(PreprocessorConfig):
+    """
+    Configuration for the downsampler preprocessor.
+    """
+
+    # INHERITED FIELDS
+    group: str
+
+    identifier: str
+
+    # UNIQUE FIELDS
+    channels_to_downsample: list[str]
+    """
+    A list of channels to downsample
+    """
+
+    downsampling_factors: list[int]
+    """
+    List of downsampling factors to apply to the channels
+    """
+
+
+@dataclass
+class ImuRotatorConfig(PreprocessorConfig):
+    """
+    Configuration for the IMU rotator preprocessor
+    """
+
+    # INHERITED FIELDS
+    group: str
+
+    identifier: str
+
+    # UNIQUE FIELDS
+    channel: str
+    """
+    The name of the channel to rotate.
+    """
+
+    C_imu_to_platform: tuple[
+        tuple[float, float, float],
+        tuple[float, float, float],
+        tuple[float, float, float],
+    ]
+    """DCM used to rotate measurements from IMU sensor frame to platform frame."""
+
+
+@dataclass
+class TimeAdjusterConfig(PreprocessorConfig):
+    """
+    Configuration for the time adjuster preprocessor.
+    """
+
+    # INHERITED FIELDS
+    group: str
+
+    identifier: str
+
+    # UNIQUE FIELDS
+    channel_to_correct: str
+    """
+    The name of the channel to correct.
+    """
+
+    expected_dt_nsec: int
+    """
+    The expected time between messages in nanoseconds.
+
+    For example, a 100 Hz sensor sends 100 messages per second which is 0.01 seconds per message (interval in seconds).
+    Convert that to nanoseconds like so `int(0.01 * 1e9)`.
+    """

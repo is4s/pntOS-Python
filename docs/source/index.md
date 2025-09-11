@@ -30,8 +30,8 @@ plugins
 ```{toctree}
 :caption: Tutorial Apps
 :name: tutorial-apps
-apps/fusion_gps_ins
-apps/fusion_gps_vel_ins
+apps/gps_ins
+apps/gps_vel_ins
 ```
 
 ```{toctree}
@@ -51,6 +51,7 @@ aspn
 genindex
 glossary
 contributing
+config
 ```
 
 ```{toctree}

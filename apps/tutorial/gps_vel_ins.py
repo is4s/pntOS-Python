@@ -1,34 +1,53 @@
 #!/usr/bin/env python3
 
+import sys
+
 # API imports
 from pntos.api import LoggingLevel
 
 # Import Cobra plugins and config structs
 from pntos.cobra import (
     EkfFusionStrategyPlugin,
+    LcmLogTransportPlugin,
     SimpleControllerPlugin,
     SimpleGpsInsStateModelingPlugin,
-    SimpleGpsOrchestrationPlugin,
     StandardFusionPlugin,
     StandardInertialPlugin,
     StandardLoggingPlugin,
     StandardPreprocessorPlugin,
     StandardRegistryPlugin,
+    TutorialGpsVelOrchestrationPlugin,
     TutorialInitializationPlugin,
 )
-from pntos.cobra.advanced import Aspn23RosTransportPlugin
 from pntos.cobra.config import (
+    AspnVersion,
     FogmConfig,
     ImuConfig,
+    ImuRotatorConfig,
     InertialConfig,
+    LcmLogTransportConfig,
     ManualAlignmentConfig,
-    OrchestrationConfig,
     SensorConfig,
     TimeAdjusterConfig,
+    TutorialOrchestrationConfig,
 )
+from pntos_python_datasets import EXAMPLE_LCM_LOG
+
+OUTPUT_LOG = sys.argv[1] if len(sys.argv) > 1 else 'pntos_output.log'
 
 # Config setup
+C_imu_to_platform = (
+    (0.99776363, 0.01784622, 0.06441467),
+    (-0.01741603, 0.99982216, -0.00723391),
+    (-0.06453231, 0.00609588, 0.997897),
+)
 my_config = [
+    LcmLogTransportConfig(
+        input_file=EXAMPLE_LCM_LOG,
+        output_file=OUTPUT_LOG,
+        output_version=AspnVersion.V23,
+        group='config/lcm_log_transport',
+    ),
     ImuConfig(
         group='config/inertial_state',
         accel_bias_sigma=(2.4e-3, 2.4e-3, 2.4e-3),
@@ -60,18 +79,13 @@ my_config = [
         group='config/gp3d_state_modeling',
         lever_arm=(-0.50, 0.38, -0.05),
         orientation=(0.0, 0.0, 0.0, 0.0),
-        use_for_alignment=True,
         sensor_name='position',
     ),
     InertialConfig(
         group='config/inertial',
         expected_dt=0.01,
-        channel='/sensor/vn_100/imu',
-        C_imu_to_platform=(
-            (0.99776363, 0.01784622, 0.06441467),
-            (-0.01741603, 0.99982216, -0.00723391),
-            (-0.06453231, 0.00609588, 0.997897),
-        ),
+        channel='/sensor/vn-100/imu',
+        C_imu_to_platform=C_imu_to_platform,
         inertial_buffer_length=10.0,
     ),
     FogmConfig(
@@ -79,14 +93,22 @@ my_config = [
         sigma=(1.5, 1.5, 2.0),
         tau=(300.0, 300.0, 200.0),
     ),
-    OrchestrationConfig(
-        gps_channel='/sensor/ublox_ZED_F9T/position',
+    TutorialOrchestrationConfig(
+        gps_channel='/sensor/ublox-ZED-F9T/position',
         group='config/orchestration',
+        velocity_channel='/sensor/ublox-ZED-F9T/velocity',
     ),
     TimeAdjusterConfig(
         group='config/time_adjuster',
-        channel_to_correct='/sensor/vn_100/imu',
+        identifier='time_adjuster',
+        channel_to_correct='/sensor/vn-100/imu',
         expected_dt_nsec=int(0.01 * 1e9),
+    ),
+    ImuRotatorConfig(
+        group='config/imu_rotator',
+        identifier='imu_rotator',
+        C_imu_to_platform=C_imu_to_platform,
+        channel='/sensor/vn-100/imu',
     ),
 ]
 # End Config
@@ -94,7 +116,7 @@ my_config = [
 # Instantiate all of our plugins
 controller = SimpleControllerPlugin('Cobra Simple Controller Plugin')
 plugins = [
-    Aspn23RosTransportPlugin('Cobra ASPN23-ROS Transport Plugin'),
+    LcmLogTransportPlugin('Cobra LCM Log Transport Plugin'),
     EkfFusionStrategyPlugin('Cobra EKF Fusion Strategy Plugin'),
     StandardFusionPlugin('Cobra Standard Fusion Plugin'),
     SimpleGpsInsStateModelingPlugin('Cobra Simple State Modeling Plugin'),
@@ -104,9 +126,9 @@ plugins = [
         'Cobra Standard Logging Plugin',
         global_log_level=LoggingLevel.INFO,  # Switch to `DEBUG` for more informative log output
     ),
-    SimpleGpsOrchestrationPlugin('Cobra Simple Orchestration Plugin'),
     StandardRegistryPlugin('Cobra Standard Registry Plugin', config=my_config),
     StandardPreprocessorPlugin('Cobra Standard Preprocessor Plugin'),
+    TutorialGpsVelOrchestrationPlugin('Cobra Tutorial Orchestration Plugin'),
 ]
 
 # Start the controller, and pass it all of the other plugins to use

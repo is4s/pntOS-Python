@@ -1,18 +1,18 @@
-diff --git a/apps/fusion_gps_ins.py b/apps/fusion_gps_vel_ins.py
-index a8bc473e..1c4014e8 100755
---- a/apps/fusion_gps_ins.py
-+++ b/apps/fusion_gps_vel_ins.py
-@@ -13,7 +13,7 @@ from pntos.cobra import (
-     LcmLogTransportPlugin,
-     SimpleControllerPlugin,
-     SimpleGpsInsStateModelingPlugin,
--    SimpleGpsOrchestrationPlugin,
-+    SimpleGpsVelOrchestrationPlugin,
-     StandardFusionPlugin,
-     StandardInertialPlugin,
+diff --git a/apps/tutorial/gps_ins.py b/apps/tutorial/gps_vel_ins.py
+index ceb1f9e3..c224b0e4 100755
+--- a/apps/tutorial/gps_ins.py
++++ b/apps/tutorial/gps_vel_ins.py
+@@ -16,7 +16,7 @@ from pntos.cobra import (
      StandardLoggingPlugin,
-@@ -105,6 +105,7 @@ my_config = [
-     OrchestrationConfig(
+     StandardPreprocessorPlugin,
+     StandardRegistryPlugin,
+-    TutorialGpsOrchestrationPlugin,
++    TutorialGpsVelOrchestrationPlugin,
+     TutorialInitializationPlugin,
+ )
+ from pntos.cobra.config import (
+@@ -96,6 +96,7 @@ my_config = [
+     TutorialOrchestrationConfig(
          gps_channel='/sensor/ublox-ZED-F9T/position',
          group='config/orchestration',
 +        velocity_channel='/sensor/ublox-ZED-F9T/velocity',
@@ -20,11 +20,11 @@ index a8bc473e..1c4014e8 100755
      TimeAdjusterConfig(
          group='config/time_adjuster',
 @@ -127,7 +128,7 @@ plugins = [
-         'Cobra Standard Logging Plugin',
-         global_log_level=LoggingLevel.INFO,  # Switch to `DEBUG` for more informative log output
      ),
--    SimpleGpsOrchestrationPlugin('Cobra Simple Orchestration Plugin'),
-+    SimpleGpsVelOrchestrationPlugin('Cobra Simple Orchestration Plugin'),
      StandardRegistryPlugin('Cobra Standard Registry Plugin', config=my_config),
      StandardPreprocessorPlugin('Cobra Standard Preprocessor Plugin'),
+-    TutorialGpsOrchestrationPlugin('Cobra Tutorial Orchestration Plugin'),
++    TutorialGpsVelOrchestrationPlugin('Cobra Tutorial Orchestration Plugin'),
  ]
+ 
+ # Start the controller, and pass it all of the other plugins to use

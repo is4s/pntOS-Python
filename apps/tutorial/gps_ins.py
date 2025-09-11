@@ -11,30 +11,36 @@ from pntos.cobra import (
     LcmLogTransportPlugin,
     SimpleControllerPlugin,
     SimpleGpsInsStateModelingPlugin,
-    SimpleGpsOrchestrationPlugin,
     StandardFusionPlugin,
     StandardInertialPlugin,
     StandardLoggingPlugin,
     StandardPreprocessorPlugin,
     StandardRegistryPlugin,
+    TutorialGpsOrchestrationPlugin,
     TutorialInitializationPlugin,
 )
 from pntos.cobra.config import (
     AspnVersion,
     FogmConfig,
     ImuConfig,
+    ImuRotatorConfig,
     InertialConfig,
     LcmLogTransportConfig,
     ManualAlignmentConfig,
-    OrchestrationConfig,
     SensorConfig,
     TimeAdjusterConfig,
+    TutorialOrchestrationConfig,
 )
 from pntos_python_datasets import EXAMPLE_LCM_LOG
 
 OUTPUT_LOG = sys.argv[1] if len(sys.argv) > 1 else 'pntos_output.log'
 
 # Config setup
+C_imu_to_platform = (
+    (0.99776363, 0.01784622, 0.06441467),
+    (-0.01741603, 0.99982216, -0.00723391),
+    (-0.06453231, 0.00609588, 0.997897),
+)
 my_config = [
     LcmLogTransportConfig(
         input_file=EXAMPLE_LCM_LOG,
@@ -73,18 +79,13 @@ my_config = [
         group='config/gp3d_state_modeling',
         lever_arm=(-0.50, 0.38, -0.05),
         orientation=(0.0, 0.0, 0.0, 0.0),
-        use_for_alignment=True,
         sensor_name='position',
     ),
     InertialConfig(
         group='config/inertial',
         expected_dt=0.01,
         channel='/sensor/vn-100/imu',
-        C_imu_to_platform=(
-            (0.99776363, 0.01784622, 0.06441467),
-            (-0.01741603, 0.99982216, -0.00723391),
-            (-0.06453231, 0.00609588, 0.997897),
-        ),
+        C_imu_to_platform=C_imu_to_platform,
         inertial_buffer_length=10.0,
     ),
     FogmConfig(
@@ -92,14 +93,21 @@ my_config = [
         sigma=(1.5, 1.5, 2.0),
         tau=(300.0, 300.0, 200.0),
     ),
-    OrchestrationConfig(
+    TutorialOrchestrationConfig(
         gps_channel='/sensor/ublox-ZED-F9T/position',
         group='config/orchestration',
     ),
     TimeAdjusterConfig(
         group='config/time_adjuster',
+        identifier='time_adjuster',
         channel_to_correct='/sensor/vn-100/imu',
         expected_dt_nsec=int(0.01 * 1e9),
+    ),
+    ImuRotatorConfig(
+        group='config/imu_rotator',
+        identifier='imu_rotator',
+        C_imu_to_platform=C_imu_to_platform,
+        channel='/sensor/vn-100/imu',
     ),
 ]
 # End Config
@@ -117,9 +125,9 @@ plugins = [
         'Cobra Standard Logging Plugin',
         global_log_level=LoggingLevel.INFO,  # Switch to `DEBUG` for more informative log output
     ),
-    SimpleGpsOrchestrationPlugin('Cobra Simple Orchestration Plugin'),
     StandardRegistryPlugin('Cobra Standard Registry Plugin', config=my_config),
     StandardPreprocessorPlugin('Cobra Standard Preprocessor Plugin'),
+    TutorialGpsOrchestrationPlugin('Cobra Tutorial Orchestration Plugin'),
 ]
 
 # Start the controller, and pass it all of the other plugins to use

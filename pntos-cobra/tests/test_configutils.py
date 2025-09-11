@@ -11,9 +11,17 @@ from pntos.cobra.config import (
     BaseConfig,
     DownsamplerConfig,
     ImuConfig,
+    ImuRotatorConfig,
+    InertialConfig,
     ManualAlignmentConfig,
+    MeasurementProcessorConfig,
+    PinsonStateBlockConfig,
+    PreprocessorConfig,
     SensorConfig,
+    StandardOrchestrationConfig,
+    StateBlockConfig,
     StaticAlignmentConfig,
+    TimeAdjusterConfig,
     config_from_registry,
     config_to_registry,
 )
@@ -116,7 +124,6 @@ class TestConfigUtils(unittest.TestCase):
             CONFIG_TEST_GROUP,
             (0.7, 0.8, 0.9),
             (1.1, 2.2, 3.3, 4.4),
-            True,
             'NCC-1701',
         )
 
@@ -134,7 +141,7 @@ class TestConfigUtils(unittest.TestCase):
 
     def test_DownsamplerConfig_to_from_registry(self) -> None:
         test_conf = DownsamplerConfig(
-            CONFIG_TEST_GROUP, ['chan1', 'chan2', 'chan3'], [1, 2, 3]
+            CONFIG_TEST_GROUP, 'downsampler', ['chan1', 'chan2', 'chan3'], [1, 2, 3]
         )
         # Test config_to_registry
         config_to_registry(test_conf, self.mediator)
@@ -145,6 +152,122 @@ class TestConfigUtils(unittest.TestCase):
         )
         assert result_conf is not None
         self._validate_conf_from_registry(test_conf, result_conf)
+
+    def test_PreprocessorConfig_to_from_registry(self) -> None:
+        test_conf = PreprocessorConfig(CONFIG_TEST_GROUP, 'downsampler')
+        # Test config_to_registry
+        config_to_registry(test_conf, self.mediator)
+        self._validate_conf_to_registry(test_conf)
+
+        result_conf = config_from_registry(
+            PreprocessorConfig, self.mediator, CONFIG_TEST_GROUP
+        )
+        assert result_conf is not None
+        self._validate_conf_from_registry(test_conf, result_conf)
+
+    def test_OrchestrationConfig_to_from_registry(self) -> None:
+        C_imu_to_platform = (
+            (0.99776363, 0.01784622, 0.06441467),
+            (-0.01741603, 0.99982216, -0.00723391),
+            (-0.06453231, 0.00609588, 0.997897),
+        )
+        test_conf = StandardOrchestrationConfig(
+            best_sol_channel='/solution/pntos/best',
+            imu_sol_channel='/solution/pntos/imu',
+            alignment_channels=['/sensor/ublox-ZED-F9T/position', '/sensor/vn-100/imu'],
+            pinson_sb_config=PinsonStateBlockConfig(
+                group='config/pinson_block',
+                identifier='pinson15',
+                label='pinson15',
+                imu_model=ImuConfig(
+                    group='config/inertial_state',
+                    accel_bias_sigma=(2.4e-3, 2.4e-3, 2.4e-3),
+                    accel_bias_tau=(300.0, 300.0, 300.0),
+                    accel_random_walk_sigma=(3.887e-6, 3.887e-6, 3.887e-6),
+                    gyro_bias_sigma=(2e-4, 2e-4, 2e-4),
+                    gyro_bias_tau=(500.0, 500.0, 500.0),
+                    gyro_random_walk_sigma=(9.9e-4, 9.9e-4, 6.7e-5),
+                ),
+            ),
+            additional_sb_configs=[
+                StateBlockConfig(
+                    group='config/fogm_block',
+                    identifier='fogm',
+                    label='pos_fogm',
+                ),
+            ],
+            mp_configs=[
+                MeasurementProcessorConfig(
+                    group='config/gps_measurement_processor',
+                    identifier='pinson_with_ned_fogm_position',
+                    label='gps',
+                    channel='/sensor/ublox-ZED-F9T/position',
+                    state_block_labels=['pinson15', 'pos_fogm'],
+                ),
+                MeasurementProcessorConfig(
+                    group='config/vel_measurement_processor',
+                    identifier='pinson_velocity',
+                    label='vel',
+                    channel='/sensor/ublox-ZED-F9T/velocity',
+                    state_block_labels=['pinson15'],
+                ),
+            ],
+            inertial_config=InertialConfig(
+                group='config/inertial',
+                expected_dt=0.01,
+                channel='/sensor/vn-100/imu',
+                C_imu_to_platform=C_imu_to_platform,
+                inertial_buffer_length=10.0,
+            ),
+            alignment_config=ManualAlignmentConfig(
+                group='config/default/alignment',
+                initial_pos_var=(0.1, 0.1, 0.1),
+                initial_vel_var=(1e-3, 1e-3, 1e-3),
+                initial_tilt_var=(5e-4, 5e-4, 5e-4),
+                initial_accel_bias_var=(5.2e-3, 5.2e-3, 5.2e-3),
+                initial_gyro_bias_var=(9e-6, 9e-6, 9e-6),
+                initial_accel_bias=(-0.0023383, 0.00085563, -0.05412892),
+                initial_accel_scale_factor=(0.0, 0.0, 0.0),
+                initial_accel_scale_factor_var=(0.0, 0.0, 0.0),
+                initial_gyro_bias=(-0.00160958, -0.00204483, -0.00267885),
+                initial_gyro_scale_factor=(0.0, 0.0, 0.0),
+                initial_gyro_scale_factor_var=(0.0, 0.0, 0.0),
+                initial_pos=(0.6938996038254822, -1.4679920679462133, 225.493),
+                initial_rpy=(
+                    -0.014713125594312194,
+                    -0.040718531449027706,
+                    0.06895795874629593,
+                ),
+                initial_time=1747680879.539799718,
+                initial_vel=(0.0, 0.0, 0.0),
+            ),
+            preprocessor_configs=[
+                ImuRotatorConfig(
+                    group='config/imu_rotator',
+                    identifier='imu_rotator',
+                    channel='/sensor/vn-100/imu',
+                    C_imu_to_platform=C_imu_to_platform,
+                ),
+                TimeAdjusterConfig(
+                    group='config/time_adjuster',
+                    identifier='time_adjuster',
+                    channel_to_correct='/sensor/vn-100/imu',
+                    expected_dt_nsec=int(0.01 * 1e9),
+                ),
+            ],
+            group=CONFIG_TEST_GROUP,
+        )
+
+        # Verify configs survive
+        config_to_registry(test_conf, self.mediator)
+        result_config = config_from_registry(
+            StandardOrchestrationConfig, self.mediator, CONFIG_TEST_GROUP
+        )
+        assert result_config is not None
+        assert result_config.additional_sb_configs is not None
+        assert result_config.mp_configs is not None
+        assert result_config.inertial_config is not None
+        assert result_config.preprocessor_configs is not None
 
     def test_static_align_config_to_from_registry(self) -> None:
         imu_model = ImuConfig(
@@ -174,7 +297,6 @@ class TestConfigUtils(unittest.TestCase):
             CONFIG_TEST_GROUP,
             (0.1, 0.2, 0.3),
             (0.4, 0.5, 0.6, 0.7),
-            True,
             'NCC-1701',
         )
 
@@ -184,7 +306,7 @@ class TestConfigUtils(unittest.TestCase):
 
         # Whoops, modified a value in the registry
         reg = self.mediator.registry.batch_start(CONFIG_TEST_GROUP)
-        reg['use_for_alignment'] = ['wrong type']
+        reg['lever_arm'] = ['wrong type']
         reg.batch_end()
 
         # Test config_from_registry()

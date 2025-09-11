@@ -66,7 +66,6 @@ my_config: list[BaseConfig] = [
     SensorConfig(
         lever_arm=(0.0, 0.0, 0.0),
         orientation=(0.0, 0.0, 0.0, 0.0),
-        use_for_alignment=True,
         sensor_name='novatel',
         group='config/default/test',
     ),
