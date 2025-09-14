@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 
+import numpy as np
+
 # API imports
-from pntos.api import LoggingLevel
+from pntos.api import EstimateWithCovarianceType, LoggingLevel
 
 # Import Cobra plugins and config structs
 from pntos.cobra import (
@@ -18,6 +20,8 @@ from pntos.cobra import (
     TutorialInitializationPlugin,
 )
 from pntos.cobra.config import (
+    AspnVersion,
+    EstimateWithCovarianceConfig,
     FogmConfig,
     FogmStateBlockConfig,
     ImuConfig,
@@ -31,7 +35,6 @@ from pntos.cobra.config import (
     StandardOrchestrationConfig,
     TimeAdjusterConfig,
 )
-from pntos.cobra.config.LcmTransportConfig import AspnVersion
 
 # Config setup
 C_imu_to_platform = (
@@ -64,6 +67,12 @@ my_config = [
                 group='config/fogm_block',
                 identifier='fogm',
                 label='pos_fogm',
+                ewc=EstimateWithCovarianceConfig(
+                    group='config/fogm_block',
+                    ewc_type=EstimateWithCovarianceType.EWC_GENERIC,
+                    estimate=np.zeros((3,)),
+                    covariance=(np.eye(3) * 9.0),
+                ),
                 fogm_model=FogmConfig(
                     group='config/pos_sensor_error',
                     sigma=(1.5, 1.5, 2.0),

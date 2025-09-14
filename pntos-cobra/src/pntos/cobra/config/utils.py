@@ -7,15 +7,15 @@ import numpy as np
 from navtk.filtering import ImuModel
 
 from pntos.api import (
-    KeyValueStore,
+    EstimateWithCovariance,
     LoggingLevel,
     Mediator,
-    Registry,
     RegistryValueTypeUnion,
 )
 
 from .BaseConfig import BaseConfig
 from .ImuConfig import ImuConfig
+from .OrchestrationConfig import EstimateWithCovarianceConfig
 
 ConfigType = TypeVar('ConfigType', bound=BaseConfig)
 
@@ -216,6 +216,20 @@ def config_to_registry(config: BaseConfig, mediator: Mediator) -> None:
             continue
         kv[param.name] = val_to_store
     kv.batch_end()
+
+
+def ewcConfig_to_ewc(ewcConfig: EstimateWithCovarianceConfig) -> EstimateWithCovariance:
+    return EstimateWithCovariance(
+        ewcConfig.ewc_type, ewcConfig.estimate, ewcConfig.covariance
+    )
+
+
+def ewc_to_ewcConfig(
+    ewc: EstimateWithCovariance, group: str
+) -> EstimateWithCovarianceConfig:
+    return EstimateWithCovarianceConfig(
+        group=group, ewc_type=ewc.type, estimate=ewc.estimate, covariance=ewc.covariance
+    )
 
 
 def _confirm_types(out_val: Any, expected_type: type[Any]) -> bool:
