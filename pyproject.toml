@@ -3,7 +3,15 @@ name = "pntos-python"
 version = "0.1.0.dev0"
 description = "A meta package for pntOS that contains the components of pntOS."
 authors = [{ name = "IS4S", email = "pntos@is4s.com" }]
-dependencies = []
+dependencies = [
+    "pntos-cobra",
+    "pntos-api",
+    # Generated from branch v3.1 on 13 Aug 2025
+    "pntos-python-datasets==0.3.1",
+    "matplotlib",
+    "analysis-lcm @ git+ssh://git@git.aspn.us/pntos/analysis-scripts.git@e8e1b2c03709ed5c4d42d7728b359c3a1bd87a0e#subdirectory=analysis-lcm",
+    "analysis-ros @ git+ssh://git@git.aspn.us/pntos/analysis-scripts.git@e8e1b2c03709ed5c4d42d7728b359c3a1bd87a0e#subdirectory=analysis-ros",
+]
 readme = "README.md"
 requires-python = ">= 3.10"
 
@@ -30,16 +38,10 @@ dev = [
     "sphinx_rtd_theme>=3.0.2",
     "sphinx-design",
     "sphinx-copybutton",
-    "tqdm",
-    "matplotlib",
-    "pntos-cobra",
-    "pntos-api",
     # Generated from commit a44dac604ec22c200e092e65dfe0d62cb9fe32c3 on 19 May 2025
     "pntos-python-docs-data==0.1.5",
     "GitPython>=3.1.44",
     "libclang>=18.1.1",
-    "analysis-lcm @ git+ssh://git@git.aspn.us/pntos/analysis-scripts.git@e8e1b2c03709ed5c4d42d7728b359c3a1bd87a0e#subdirectory=analysis-lcm",
-    "analysis-ros @ git+ssh://git@git.aspn.us/pntos/analysis-scripts.git@e8e1b2c03709ed5c4d42d7728b359c3a1bd87a0e#subdirectory=analysis-ros",
 ]
 
 [tool.ruff.lint]
