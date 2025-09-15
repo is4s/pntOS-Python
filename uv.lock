@@ -1,5 +1,5 @@
 version = 1
-revision = 2
+revision = 3
 requires-python = ">=3.10"
 resolution-markers = [
     "python_full_version >= '3.11'",
@@ -1322,16 +1322,22 @@ version = "0.1.0.dev0"
 source = { editable = "pntos-api" }
 dependencies = [
     { name = "aspn23" },
+    { name = "numpy" },
 ]
 
 [package.metadata]
-requires-dist = [{ name = "aspn23", git = "ssh://git@git.aspn.us/pntos/firehose-outputs.git?subdirectory=aspn-py&rev=d425e26330e62371038f14ad12a8d8b4374698a6" }]
+requires-dist = [
+    { name = "aspn23", git = "ssh://git@git.aspn.us/pntos/firehose-outputs.git?subdirectory=aspn-py&rev=d425e26330e62371038f14ad12a8d8b4374698a6" },
+    { name = "numpy" },
+]
 
 [[package]]
 name = "pntos-cobra"
 version = "0.1.0.dev0"
 source = { editable = "pntos-cobra" }
 dependencies = [
+    { name = "analysis-lcm" },
+    { name = "analysis-ros" },
     { name = "aspn-lcm" },
     { name = "aspn2-translations" },
     { name = "aspn23" },
@@ -1341,13 +1347,15 @@ dependencies = [
     { name = "navtk" },
     { name = "numpy" },
     { name = "pntos-api" },
-    { name = "pntos-python-datasets" },
     { name = "scipy", version = "1.15.3", source = { registry = "https://git.aspn.us/api/v4/projects/94/packages/pypi/simple" }, marker = "python_full_version < '3.11'" },
     { name = "scipy", version = "1.16.1", source = { registry = "https://git.aspn.us/api/v4/projects/94/packages/pypi/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "tqdm" },
 ]
 
 [package.metadata]
 requires-dist = [
+    { name = "analysis-lcm", git = "ssh://git@git.aspn.us/pntos/analysis-scripts.git?subdirectory=analysis-lcm&rev=e8e1b2c03709ed5c4d42d7728b359c3a1bd87a0e" },
+    { name = "analysis-ros", git = "ssh://git@git.aspn.us/pntos/analysis-scripts.git?subdirectory=analysis-ros&rev=e8e1b2c03709ed5c4d42d7728b359c3a1bd87a0e" },
     { name = "aspn-lcm", git = "ssh://git@git.aspn.us/pntos/lcm-generated.git?subdirectory=python&rev=14045fe000e4395bf81708e963aea09948e52949" },
     { name = "aspn2-translations", git = "ssh://git@git.aspn.us/pntos/firehose-outputs.git?subdirectory=aspn2_to_aspn_py_translations&rev=9e2a4f463ff4288bd40098ebf775304966a76393" },
     { name = "aspn23", git = "ssh://git@git.aspn.us/pntos/firehose-outputs.git?subdirectory=aspn-py&rev=d425e26330e62371038f14ad12a8d8b4374698a6" },
@@ -1357,29 +1365,32 @@ requires-dist = [
     { name = "navtk", specifier = "==2.1.0.post3.dev0" },
     { name = "numpy", specifier = "!=2.2" },
     { name = "pntos-api", editable = "pntos-api" },
-    { name = "pntos-python-datasets", specifier = "==0.3.1" },
     { name = "scipy", specifier = ">=1.15.2" },
+    { name = "tqdm" },
 ]
 
 [[package]]
 name = "pntos-python"
 version = "0.1.0.dev0"
 source = { virtual = "." }
+dependencies = [
+    { name = "analysis-lcm" },
+    { name = "analysis-ros" },
+    { name = "matplotlib" },
+    { name = "pntos-api" },
+    { name = "pntos-cobra" },
+    { name = "pntos-python-datasets" },
+]
 
 [package.dev-dependencies]
 dev = [
-    { name = "analysis-lcm" },
-    { name = "analysis-ros" },
     { name = "gitpython" },
     { name = "ipython", version = "8.37.0", source = { registry = "https://git.aspn.us/api/v4/projects/94/packages/pypi/simple" }, marker = "python_full_version < '3.11'" },
     { name = "ipython", version = "9.4.0", source = { registry = "https://git.aspn.us/api/v4/projects/94/packages/pypi/simple" }, marker = "python_full_version >= '3.11'" },
     { name = "libclang" },
-    { name = "matplotlib" },
     { name = "mypy" },
     { name = "myst-parser" },
     { name = "pip" },
-    { name = "pntos-api" },
-    { name = "pntos-cobra" },
     { name = "pntos-python-docs-data" },
     { name = "pytest" },
     { name = "pytest-cov" },
@@ -1389,24 +1400,26 @@ dev = [
     { name = "sphinx-copybutton" },
     { name = "sphinx-design" },
     { name = "sphinx-rtd-theme" },
-    { name = "tqdm" },
 ]
 
 [package.metadata]
+requires-dist = [
+    { name = "analysis-lcm", git = "ssh://git@git.aspn.us/pntos/analysis-scripts.git?subdirectory=analysis-lcm&rev=e8e1b2c03709ed5c4d42d7728b359c3a1bd87a0e" },
+    { name = "analysis-ros", git = "ssh://git@git.aspn.us/pntos/analysis-scripts.git?subdirectory=analysis-ros&rev=e8e1b2c03709ed5c4d42d7728b359c3a1bd87a0e" },
+    { name = "matplotlib" },
+    { name = "pntos-api", editable = "pntos-api" },
+    { name = "pntos-cobra", editable = "pntos-cobra" },
+    { name = "pntos-python-datasets", specifier = "==0.3.1" },
+]
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "analysis-lcm", git = "ssh://git@git.aspn.us/pntos/analysis-scripts.git?subdirectory=analysis-lcm&rev=e8e1b2c03709ed5c4d42d7728b359c3a1bd87a0e" },
-    { name = "analysis-ros", git = "ssh://git@git.aspn.us/pntos/analysis-scripts.git?subdirectory=analysis-ros&rev=e8e1b2c03709ed5c4d42d7728b359c3a1bd87a0e" },
     { name = "gitpython", specifier = ">=3.1.44" },
     { name = "ipython", specifier = ">=8.24.0" },
     { name = "libclang", specifier = ">=18.1.1" },
-    { name = "matplotlib" },
     { name = "mypy", specifier = "==1.10.0" },
     { name = "myst-parser", specifier = ">=4.0.0" },
     { name = "pip", specifier = ">=24.0" },
-    { name = "pntos-api", editable = "pntos-api" },
-    { name = "pntos-cobra", editable = "pntos-cobra" },
     { name = "pntos-python-docs-data", specifier = "==0.1.5" },
     { name = "pytest", specifier = ">=8.2.0" },
     { name = "pytest-cov", specifier = ">=6.0.0" },
@@ -1415,7 +1428,6 @@ dev = [
     { name = "sphinx-copybutton" },
     { name = "sphinx-design" },
     { name = "sphinx-rtd-theme", specifier = ">=3.0.2" },
-    { name = "tqdm" },
 ]
 
 [[package]]
