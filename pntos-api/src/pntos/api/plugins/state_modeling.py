@@ -484,7 +484,7 @@ class StandardStateModelProvider(ABC):
                 create different kinds of virtual state blocks, the
                 ``virtual_block_index parameter`` is used to select which kind of
                 virtual state block to create a new instance of. The
-                :attr:`virtual_block_identifiers` field contains identifying strings for
+                :attr:`pntos.api.StandardStateModelProvider.virtual_block_identifiers` field contains identifying strings for
                 the kinds of virtual state blocks. For example, if the model can
                 create 45 different virtual state blocks, the identifier of the
                 last virtual state block that can be created is found in

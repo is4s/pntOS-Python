@@ -29,6 +29,9 @@ from pntos.cobra.utils import (
 class PinsonPositionMeasurementProcessor(StandardMeasurementProcessor):
     """
     Generates a model that maps a position measurement to an inertial error state block.
+
+    See :meth:`generate_model` for a detailed description of the assumptions and capabilities of
+    this processor.
     """
 
     _mediator: Mediator
@@ -106,6 +109,81 @@ class PinsonPositionMeasurementProcessor(StandardMeasurementProcessor):
     def generate_model(
         self, message: Message, x_and_p: EstimateWithCovariance
     ) -> StandardMeasurementModel | None:
+        """
+        Generates the model mapping state estimates to the provided measurement.
+
+        Args:
+            message (Message): Measurement to process. `message.wrapped_message` must be a
+                MeasurementPosition using the GEODETIC reference frame.
+            x_and_p: Current state estimate and covariance for the pinson-style block this processor
+                is updating. NED position errors in meters are expected in at indices [0:3] and
+                NED tilt errors in radians at indices [6:9].
+        Returns:
+            StandardMeasurementModel if all restrictions on `message` and `x_and_p` are met and
+            proper aux data is available, None otherwise.
+
+        **Model Description and Derivation**
+
+        Measurements accepted by this this processor are modeled as
+
+        :math:`P_s^g = P_p^g + C^g_p l_{p \\Rightarrow s}^p + \\eta(0, \\sigma_z)`
+
+        where
+
+        :math:`P_s^g` is the measured position vector of the :math:`s` sensor frame origin in some global Cartesian frame :math:`g`.
+
+        :math:`P_p^g` is the true position of the :math:`p` platform frame origin in the :math:`g` frame.
+
+        :math:`C^g_p` is the true rotation from the :math:`p` frame to the :math:`g` frame.
+
+        :math:`l_{p \\Rightarrow s}^p` is the lever arm, a vector from the :math:`p` frame origin to the
+        :math:`s` frame origin, expressed in the :math:`p` frame.
+
+        :math:`\\eta(0, \\sigma_z)` is 0-mean Gaussian white noise.
+
+        In other words, the measurement is modeled as perfect aside from white noise, offset from the
+        platform frame by a known lever arm.
+
+        The measurement is used to update the estimates of the error in the nominal trajectory of the
+        platform frame, provided through a `MeasurementPositionVelocityAttitude` (PVA) via the
+        :meth:`receive_aux_data` function. This PVA provides the following values of interest:
+
+        :math:`\\hat{P_p^g}`: The estimated position of the platform frame origin in the :math:`g` frame.
+
+        :math:`\\hat{C^{ned}_p}`: The estimated orientation of the platform frame with respect to the `NED` frame.
+
+        We wish to use this measurement to update estimates of the following states contained in the
+        'Pinson' state block:
+
+        :math:`\\delta P_p^{ned}`: the estimate of the error in the current nominal position of the
+        platform frame, expressed in the North-East-Down (NED) frame. The relationship between the true
+        position, the nominal position, and the error state estimates is :math:`P = \\hat{P} + \\delta P`
+
+        :math:`\\delta \\psi^{ned}`: The NED frame tilt error estimates. The relationship between the true
+        and estimated rotations is :math:`C^{ned}_p = C^{ned}_{\\hat{ned}}C^{\\hat{ned}}_p \\approx [I - \\delta \\psi^{ned} \\times ]C^{\\hat{ned}}_p`
+        (where :math:`\\times` is the skew/cross operator).
+
+        The measurement vector provided to the filter :math:`z` is the difference between the
+        measurement and the nominal platform frame position (white noise terms dropped, and :math:`ned` frame used as `g` frame):
+
+        :math:`z = P_s^{ned}  - \\hat{P^{ned}_p}`
+
+        The measurement model :math:`h(x)` is found by expanding :math:`z` in terms of the states :math:`x` (i.e. :math:`\\delta P_p^{ned}` and :math:`\\delta \\psi^{ned}`):
+
+        :math:`P_s^{ned}  - \\hat{P^{ned}_p} = P_p^{ned} + C^{ned}_p l_{p \\Rightarrow s}^p  - \\hat{P}_p^{ned}`
+
+        :math:`= \\hat{P_p^{ned}} + \\delta P_p^{ned} + C^{ned}_p l_{p \\Rightarrow s}^p - \\hat{P}_p^{ned}`
+
+        :math:`= \\delta P_p^{ned} + C^{ned}_p l_{p \\Rightarrow s}^p`
+
+        :math:`h(x) \\approx \\delta P_p^{ned} + [I - \\delta \\psi^{ned} \\times ]C^{\\hat{ned}}_p l_{p \\Rightarrow s}^p`
+
+        Finally, to generate the measurement Jacobian :math:`H` we take derivatives of :math:`h(x)`:
+
+        :math:`\\frac{\\delta h(x)}{d \\delta P_p^{ned}} = I`
+
+        :math:`\\frac{\\delta h(x)}{d \\delta \\psi^{ned}} = C^{\\hat{ned}}_p l_{p \\Rightarrow s}^p \\times`
+        """
         if len(self.state_block_labels) != self._num_required_blocks:
             self._mediator.log_message(
                 LoggingLevel.ERROR,
@@ -166,7 +244,7 @@ class PinsonPositionMeasurementProcessor(StandardMeasurementProcessor):
 
         H = np.zeros((3, x_and_p.estimate.shape[0]))
         H[:, 0:3] = np.eye(3)
-        H[:, 6:9] = C_platform_to_nav @ self._l_ps_p
+        H[:, 6:9] = skew(C_platform_to_nav @ self._l_ps_p)
 
         def h(x: NDArray[float64]) -> NDArray[float64]:
             return (

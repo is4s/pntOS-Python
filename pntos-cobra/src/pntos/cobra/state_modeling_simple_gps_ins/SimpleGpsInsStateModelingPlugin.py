@@ -62,10 +62,11 @@ class SimpleGpsInsStateModelProvider(StandardStateModelProvider):
 
         Args:
             processor_index (int): Index into self.processor_identifiers used to select the desired type of measurement processor.
-                - Index 0 corresponds to a PinsonPositionMeasurementProcessor.
-                - Index 1 corresponds to a PinsonVelocityMeasurementProcessor.
-                - Index 2 corresponds to a PinsonWithNedFogmPositionMeasurementProcessor.
-                - Index 3 corresponds to a AltitudeMeasurementProcessor.
+
+                - Index 0 corresponds to a :class:`PinsonPositionMeasurementProcessor`.
+                - Index 1 corresponds to a :class:`PinsonVelocityMeasurementProcessor`.
+                - Index 2 corresponds to a :class:`PinsonWithNedFogmPositionMeasurementProcessor`.
+                - Index 3 corresponds to a :class:`AltitudeMeasurementProcessor`.
                 - All other indices will result in a return value of None.
             engine (StandardFusionEngine | None): An optional parameter that may be provided to the
                 new processor, such that the processor may interact with the fusion engine it
@@ -162,6 +163,7 @@ class SimpleGpsInsStateModelProvider(StandardStateModelProvider):
 
         Args:
             block_index (int): Index into self.block_identifiers used to select the desired type of state block.
+
                 - Index 0 corresponds to a Pinson15NedBlock.
                 - Index 1 corresponds to a FogmBlock.
                 - All other indices will result in a return value of None.
@@ -244,7 +246,7 @@ class SimpleGpsInsStateModelProvider(StandardStateModelProvider):
 
 
 class SimpleGpsInsStateModelingPlugin(StateModelingPlugin):
-    """StateModelingPlugin that generates a SimpleGpsInsStateModelProvider."""
+    """StateModelingPlugin that generates a :class:`pntos.cobra.internal.SimpleGpsInsStateModelProvider`."""
 
     _mediator: Mediator
 
