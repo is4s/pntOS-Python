@@ -93,10 +93,12 @@ class StandardFusionEngine(api.StandardFusionEngine):
             self._sb[this_key].stop_index = i_next + self._sb[this_key].num_states - 1
             i_next = i_next + self._sb[this_key].num_states
 
-    def get_num_states(self) -> int:
+    @property
+    def num_states(self) -> int:
         return self._num_states
 
-    def get_state_block_labels(self) -> list[str] | None:
+    @property
+    def state_block_labels(self) -> list[str] | None:
         if self._num_states > 0:
             return list(self._sb.keys())
         self._mediator.log_message(LoggingLevel.WARN, 'No state blocks added.')
@@ -129,7 +131,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
 
         # Index of the start of the new stateblock is the same as the number of current
         # states due to zero indexing
-        num_cur_states = self._strategy.get_num_states()
+        num_cur_states = self._strategy.num_states
         new_sb = stateblock_info(
             block=block,
             num_states=num_new_states,
@@ -194,7 +196,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
             return None
 
         # Get the full state vector and extract the part needed
-        full_estimate = self._strategy.get_estimate()
+        full_estimate = self._strategy.estimate
         if full_estimate is None:
             self._mediator.log_message(
                 LoggingLevel.ERROR, 'Unable to get estimate from strategy.'
@@ -211,7 +213,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
             return None
 
         # Get the full state vector and extract the part needed
-        full_covariance = self._strategy.get_covariance()
+        full_covariance = self._strategy.covariance
         if full_covariance is None:
             self._mediator.log_message(
                 LoggingLevel.ERROR, 'Unable to get covariance from strategy.'
@@ -232,7 +234,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
             return None
 
         # Get the full state vector and extract the part needed
-        full_covariance = self._strategy.get_covariance()
+        full_covariance = self._strategy.covariance
         if full_covariance is None:
             self._mediator.log_message(
                 LoggingLevel.ERROR, 'Unable to get covariance from strategy.'
@@ -371,8 +373,9 @@ class StandardFusionEngine(api.StandardFusionEngine):
         # Re-index the stateblock dictionary indexes
         self._re_index_stateblocks()
 
-    def get_virtual_state_block_target_labels(self) -> list[str] | None:
-        pass
+    @property
+    def virtual_state_block_target_labels(self) -> list[str] | None:
+        return None
 
     def has_virtual_state_block(self, vsb_target_label: str) -> bool:
         return False
@@ -383,7 +386,8 @@ class StandardFusionEngine(api.StandardFusionEngine):
     def remove_virtual_state_block(self, vsb_target_label: str) -> None:
         pass
 
-    def get_measurement_processor_labels(self) -> list[str] | None:
+    @property
+    def measurement_processor_labels(self) -> list[str] | None:
         if not self._mp.keys():
             return None
         return list(self._mp.keys())
@@ -637,8 +641,8 @@ class StandardFusionEngine(api.StandardFusionEngine):
             i_keep = np.append(i_keep, i_to_add)
 
         # Retrieve the full estimate (x) and covariance (P)
-        x = self._strategy.get_estimate()
-        P = self._strategy.get_covariance()
+        x = self._strategy.estimate
+        P = self._strategy.covariance
         if x is None or P is None:
             self._mediator.log_message(
                 LoggingLevel.ERROR,

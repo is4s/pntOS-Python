@@ -47,7 +47,7 @@ class StandardFusionStrategy(ABC):
        parameter that describes how to take the current estimate at 5.0s and
        incorporate the new information from the measurement.
     4. At any point, when the user wants to know the latest estimate given all
-       the propagate/updates that have occurred, they may call :meth:`get_estimate`.
+       the propagate/updates that have occurred, they may call :attr:`estimate`.
 
     Note:
         This class must have an operational ``__deepcopy__`` method. For most classes, the default
@@ -57,8 +57,9 @@ class StandardFusionStrategy(ABC):
         copies all fields.
     """
 
+    @property
     @abstractmethod
-    def get_num_states(self) -> int:
+    def num_states(self) -> int:
         """
         Get the total number of states this filter is estimating.
 
@@ -107,8 +108,9 @@ class StandardFusionStrategy(ABC):
         """
         ...
 
+    @property
     @abstractmethod
-    def get_estimate(self) -> NDArray[float64] | None:
+    def estimate(self) -> NDArray[float64] | None:
         """
         Get the current internal estimate managed by this strategy.
 
@@ -141,8 +143,9 @@ class StandardFusionStrategy(ABC):
         """
         ...
 
+    @property
     @abstractmethod
-    def get_covariance(self) -> NDArray[float64] | None:
+    def covariance(self) -> NDArray[float64] | None:
         """
         Get the covariance of the current estimate.
 
@@ -199,7 +202,7 @@ class StandardFusionStrategy(ABC):
         then takes the current state space estimate and the ``dynamics_model`` and
         uses both to compute an estimate at the new time. The new estimate
         clobbers the old estimate managed by this class, and be acquired by
-        calling :meth:`get_estimate`.
+        calling :attr:`estimate`.
 
         Args:
             dynamics_model (StandardDynamicsModel)
@@ -215,7 +218,7 @@ class StandardFusionStrategy(ABC):
         :meth:`add_states` method. The ``measurement_model`` parameter includes both the measurement
         itself and a description of how the measurement relates to the state space. This method then
         takes the current state space estimate and updates it using information from the
-        ``measurement_model``. The updated estimate can be acquired by calling :meth:`get_estimate`.
+        ``measurement_model``. The updated estimate can be acquired by calling :attr:`estimate`.
 
         Args:
             measurement_model (StandardMeasurementModel): The measurement with which to update the

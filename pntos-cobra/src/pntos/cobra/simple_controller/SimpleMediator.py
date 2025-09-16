@@ -64,11 +64,12 @@ class SimpleMediator(Mediator):
         self._attached_plugin_identifier: str = attached_plugin_identifier
         self._last_solution_time = None
 
-    def get_filter_description_list(self) -> list[str]:
+    @property
+    def filter_description_list(self) -> list[str]:
         assert (
             self._orchestration_plugin is not None
         ), 'Orchestration plugin used before initialized and passed to mediator.'
-        return self._orchestration_plugin.get_filter_description_list()
+        return self._orchestration_plugin.filter_description_list
 
     def request_solutions(
         self,

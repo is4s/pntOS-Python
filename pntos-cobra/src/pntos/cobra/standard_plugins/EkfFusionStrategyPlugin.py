@@ -35,7 +35,8 @@ class EkfFusionStrategy(StandardFusionStrategy):
         self._num_states = 0
         self._mediator = mediator
 
-    def get_num_states(self) -> int:
+    @property
+    def num_states(self) -> int:
         return self._num_states
 
     def add_states(
@@ -110,7 +111,8 @@ class EkfFusionStrategy(StandardFusionStrategy):
         # Update num_states
         self._num_states -= count
 
-    def get_estimate(self) -> NDArray[np.float64] | None:
+    @property
+    def estimate(self) -> NDArray[np.float64] | None:
         if self._num_states == 0:
             return None
         else:
@@ -130,7 +132,8 @@ class EkfFusionStrategy(StandardFusionStrategy):
 
         self._x[first_index : first_index + n] = new_estimate
 
-    def get_covariance(self) -> NDArray[np.float64] | None:
+    @property
+    def covariance(self) -> NDArray[np.float64] | None:
         if self._num_states == 0:
             return None
         else:

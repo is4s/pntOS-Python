@@ -31,7 +31,8 @@ CONFIG_TEST_GROUP = 'config_test_group'
 
 
 class DummyMediator(Mediator):
-    def get_filter_description_list(self) -> list[str]:
+    @property
+    def filter_description_list(self) -> list[str]:
         return []
 
     def request_solutions(

@@ -661,7 +661,7 @@ class MyOrchestrationPlugin(OrchestrationPlugin):
         # and stored away in `self` in order to return a solution at the requested time.
         return None
 
-    def get_filter_description_list(self) -> list[str]:
+    def filter_description_list(self) -> list[str]:
         # We only have one solution, our 'best' solution
         return ["BEST"]
 
@@ -746,7 +746,7 @@ we should use the solution we previously computed and return it in this function
 That brings us to our next method:
 
 ```Python
-def get_filter_description_list(self) -> list[str]:
+def filter_description_list(self) -> list[str]:
     # We only have one solution, our 'best' solution
     return ["BEST"]
 ```
