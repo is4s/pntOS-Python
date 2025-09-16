@@ -14,6 +14,7 @@ from pntos.cobra.config import (
     config_from_registry,
 )
 
+from .AltitudeMeasurementProcessor import AltitudeMeasurementProcessor
 from .FogmBlock import FogmBlock
 from .Pinson15NedBlock import Pinson15NedBlock
 from .PinsonPositionMeasurementProcessor import PinsonPositionMeasurementProcessor
@@ -42,6 +43,7 @@ class StandardGpsInsStateModelProvider(StandardStateModelProvider):
             'pinson_position',
             'pinson_velocity',
             'pinson_with_ned_fogm_position',
+            'pinson_altitude',
         ]
         self.block_identifiers: list[str] = ['pinson15', 'fogm']
         self.virtual_block_identifiers = None
@@ -57,6 +59,7 @@ class StandardGpsInsStateModelProvider(StandardStateModelProvider):
         PinsonPositionMeasurementProcessor
         | PinsonWithNedFogmPositionMeasurementProcessor
         | PinsonVelocityMeasurementProcessor
+        | AltitudeMeasurementProcessor
         | None
     ):
         """
@@ -67,6 +70,7 @@ class StandardGpsInsStateModelProvider(StandardStateModelProvider):
                 - Index 0 corresponds to a PinsonPositionMeasurementProcessor.
                 - Index 1 corresponds to a PinsonVelocityMeasurementProcessor.
                 - Index 2 corresponds to a PinsonWithNedFogmPositionMeasurementProcessor.
+                - Index 3 corresponds to a AltitudeMeasurementProcessor.
                 - All other indices will result in a return value of None.
             engine (StandardFusionEngine | None): An optional parameter that may be provided to the
                 new processor, such that the processor may interact with the fusion engine it
@@ -138,10 +142,16 @@ class StandardGpsInsStateModelProvider(StandardStateModelProvider):
                     self._mediator,
                     np.array(sensor_mp_config.sensor_config.lever_arm),
                 )
+            case 3:
+                return AltitudeMeasurementProcessor(
+                    label,
+                    state_block_labels,
+                    self._mediator,
+                )
 
         self._mediator.log_message(
             LoggingLevel.ERROR,
-            f'Invalid processor index of {processor_index}. SimpleGpsInsStateModelProvider provides {len(self.processor_identifiers)} processors.',
+            f'Invalid processor index of {processor_index}. StandardGpsInsStateModelProvider provides {len(self.processor_identifiers)} processors.',
         )
         return None
 
@@ -224,7 +234,7 @@ class StandardGpsInsStateModelProvider(StandardStateModelProvider):
 
         self._mediator.log_message(
             LoggingLevel.ERROR,
-            f'Invalid block index of {block_index}. SimpleGpsInsStateModelProvider provides {len(self.block_identifiers)} state blocks.',
+            f'Invalid block index of {block_index}. StandardGpsInsStateModelProvider provides {len(self.block_identifiers)} state blocks.',
         )
         return None
 
@@ -242,7 +252,7 @@ class StandardGpsInsStateModelProvider(StandardStateModelProvider):
 
         self._mediator.log_message(
             LoggingLevel.ERROR,
-            f'Invalid virtual block index of {virtual_block_index}. SimpleGpsInsStateModelProvider provides {virtual_block_count} virtual state blocks.',
+            f'Invalid virtual block index of {virtual_block_index}. StandardGpsInsStateModelProvider provides {virtual_block_count} virtual state blocks.',
         )
         return None
 
