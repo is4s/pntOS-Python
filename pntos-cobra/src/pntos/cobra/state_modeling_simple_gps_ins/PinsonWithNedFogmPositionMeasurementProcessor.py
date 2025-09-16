@@ -30,6 +30,9 @@ class PinsonWithNedFogmPositionMeasurementProcessor(StandardMeasurementProcessor
     """
     Generates a model that maps a position measurement to an inertial error state
     block and a position measurement error block.
+
+    See :meth:`generate_model` for a detailed description of the assumptions and capabilities of
+    this processor.
     """
 
     _mediator: Mediator
@@ -113,6 +116,47 @@ class PinsonWithNedFogmPositionMeasurementProcessor(StandardMeasurementProcessor
     def generate_model(
         self, message: Message, x_and_p: EstimateWithCovariance
     ) -> StandardMeasurementModel | None:
+        """
+        Generates the model mapping state estimates to the provided measurement.
+
+        Args:
+            message (Message): Measurement to process. `message.wrapped_message` must be a
+                MeasurementPosition using the GEODETIC reference frame.
+            x_and_p: Current joint state estimate and covariance for both the pinson-style block
+                and sensor measurement error blocks this processor is updating. NED platform position
+                errors in meters are expected in at indices [0:3] and NED tilt errors in radians at
+                indices [6:9]. Sensor measurement error states in the NED frame are expected to
+                be the last 3 states.
+        Returns:
+            StandardMeasurementModel if all restrictions on `message` and `x_and_p` are met and
+            proper aux data is available, None otherwise.
+
+        **Model Description and Derivation**
+
+        This processor uses a model identical to that used described in
+        :meth:`pntos.cobra.internal.PinsonPositionMeasurementProcessor.generate_model`, aside from
+        the addition of error states to track position error present in the sensor measurements.
+        See the linked function for definitions of terms not repeated here.
+
+        The addition of the new states changes the original sensor measurement model from:
+
+        :math:`P_s^g = P_p^g + C^g_p l_{p \\Rightarrow s}^p + \\eta(0, \\sigma_z)`
+
+        to
+
+        :math:`P_s^g = P_p^g + C^g_p l_{p \\Rightarrow s}^p - \\delta z^{g} + \\eta(0, \\sigma_z)`
+
+        where :math:`\\delta z^{g}` is measurement error in the :math:`g` frame.
+
+        This results in additional term being added to the prior model :math:`h(x)`, giving:
+
+        :math:`h(x) \\approx \\delta P_p^{ned} + [I - \\delta \\psi^{ned} \\times ]C^{\\hat{ned}}_p l_{p \\Rightarrow s}^p - \\delta z^{ned}`
+
+        and an additional entry in the Jacobian matrix :math:`H`:
+
+        :math:`\\frac{\\delta h(x)}{d \\delta z^{ned}} = -I`
+
+        """
         if len(self.state_block_labels) != self._num_required_blocks:
             self._mediator.log_message(
                 LoggingLevel.ERROR,
@@ -181,7 +225,7 @@ class PinsonWithNedFogmPositionMeasurementProcessor(StandardMeasurementProcessor
 
         H = np.zeros((3, x_and_p.estimate.shape[0]))
         H[:, 0:3] = np.eye(3)
-        H[:, 6:9] = C_platform_to_nav @ self._l_ps_p
+        H[:, 6:9] = skew(C_platform_to_nav @ self._l_ps_p)
         H[:, -3:] = -np.eye(3)
 
         def h(x: NDArray[float64]) -> NDArray[float64]:
