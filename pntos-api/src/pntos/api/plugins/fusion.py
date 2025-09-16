@@ -110,8 +110,9 @@ class StandardFusionEngine(ABC):
         """The setter for the :meth:`strategy` property on :class:`pntos.api.StandardFusionEngine`."""
         pass
 
+    @property
     @abstractmethod
-    def get_num_states(self) -> int:
+    def num_states(self) -> int:
         """
         Get the total number of states currently in the fusion engine.
 
@@ -122,15 +123,16 @@ class StandardFusionEngine(ABC):
         """
         pass
 
+    @property
     @abstractmethod
-    def get_state_block_labels(self) -> list[str] | None:
+    def state_block_labels(self) -> list[str] | None:
         """
         Get a list of :class:`pntos.api.StandardStateBlock` labels that have been added to this fusion engine.
 
         Returns:
             list[str] | None: A list of the :class:`pntos.api.StandardStateBlock` labels that have been added
             to this fusion engine. Returns ``None`` if no state blocks have been added. Guaranteed
-            to not return ``None`` if :meth:`get_num_states` returns a value other than 0.
+            to not return ``None`` if :attr:`num_states` is a value other than 0.
         """
         pass
 
@@ -144,7 +146,7 @@ class StandardFusionEngine(ABC):
         """
         Add the given :class:`pntos.api.StandardStateBlock` to the fusion engine.
 
-        This will expand the state vector being estimated by the value of :meth:`get_num_states`.
+        This will expand the state vector being estimated by the value of :attr:`num_states`.
 
         Args:
             block (StandardStateBlock): The :class:`pntos.api.StandardStateBlock` to be added to the fusion
@@ -178,7 +180,7 @@ class StandardFusionEngine(ABC):
             virtual state block (VSB) this will return a converted estimate, converted into the VSBs
             coordinate frame. Returns ``None`` if ``block_label`` does not correspond to a block
             that has been added to the fusion engine. Guaranteed to not return ``None`` when
-            ``block_label`` is in the list returned by :meth:`get_state_block_labels` and
+            ``block_label`` is in the list returned by :attr:`state_block_labels` and
             :attr:`strategy` is not ``None``.
         """
         pass
@@ -199,7 +201,7 @@ class StandardFusionEngine(ABC):
             virtual state block (VSB) this will return a converted covariance, converted into the
             VSBs coordinate frame. Returns ``None`` if ``block_label`` does not correspond to a
             block that has been added to the fusion engine. Guaranteed to not return ``None`` when
-            ``block_label`` is in the list returned by :meth:`get_state_block_labels` and
+            ``block_label`` is in the list returned by :attr:`state_block_labels` and
             :attr:`strategy` is not ``None``.
         """
         pass
@@ -223,7 +225,7 @@ class StandardFusionEngine(ABC):
             ``block_label2``. Returns ``None`` if ``block_label1`` or ``block_label2`` do not
             correspond to blocks that have been added to the fusion engine. Guaranteed to not return
             ``None`` when both ``block_label1`` and ``block_label2`` are in the list returned by
-            :meth:`get_state_block_labels` and :attr:`strategy` is not ``None``.
+            :attr:`state_block_labels` and :attr:`strategy` is not ``None``.
         """
         pass
 
@@ -301,8 +303,9 @@ class StandardFusionEngine(ABC):
         """
         pass
 
+    @property
     @abstractmethod
-    def get_virtual_state_block_target_labels(self) -> list[str] | None:
+    def virtual_state_block_target_labels(self) -> list[str] | None:
         """
         Gets a list of the target labels of virtual state blocks that have been added.
 
@@ -356,8 +359,9 @@ class StandardFusionEngine(ABC):
         """
         pass
 
+    @property
     @abstractmethod
-    def get_measurement_processor_labels(self) -> list[str] | None:
+    def measurement_processor_labels(self) -> list[str] | None:
         """
         Get a list of the labels of measurement processors that have been added.
 
@@ -434,7 +438,7 @@ class StandardFusionEngine(ABC):
 
         - ``time`` is equal to or after the filter time (which can be checked with :attr:`time`).
         - All labels in ``block_labels`` correspond to a block that has been added to the fusion
-          engine (which can be checked with :meth:`get_state_block_labels`).
+          engine (which can be checked with :attr:`state_block_labels`).
         - ``block_labels`` has at least one element.
 
         Then the result returned is guaranteed to not be ``None``. Otherwise, if any of the above
@@ -462,7 +466,7 @@ class StandardFusionEngine(ABC):
         If all of the following are true:
 
             - All labels in ``block_labels`` correspond to a block that has been added to the fusion
-              engine (which can be checked with :meth:`get_state_block_labels`).
+              engine (which can be checked with :attr:`state_block_labels`).
             - ``block_labels`` has at least one element.
 
         Then the result returned is guaranteed to not be ``None``. Otherwise, if any of the above

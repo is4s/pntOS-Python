@@ -185,8 +185,9 @@ class OrchestrationPlugin(CommonPlugin, ABC):
         """
         pass
 
+    @property
     @abstractmethod
-    def get_filter_description_list(self) -> list[str]:
+    def filter_description_list(self) -> list[str]:
         """
         Get a list of strings describing the filters available in this :class:`pntos.api.OrchestrationPlugin`.
 
@@ -237,7 +238,7 @@ class OrchestrationPlugin(CommonPlugin, ABC):
             filter_description (str | None, optional): An :class:`pntos.api.OrchestrationPlugin` may run
                 multiple filters. To select which filter(s) to request solutions from, enter a valid
                 filter description string in ``filter_description``. Valid filter description
-                strings can be obtained by calling :meth:`get_filter_description_list`. Passing in
+                strings can be obtained by calling :attr:`filter_description_list`. Passing in
                 ``None`` will provide a result specific to a particular :class:`pntos.api.OrchestrationPlugin`
                 implementation. When ``filter_description`` is ``None``, the implementation should
                 endeavor to return its best solution.

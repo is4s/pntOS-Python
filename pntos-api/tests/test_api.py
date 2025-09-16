@@ -210,7 +210,7 @@ class MockOrchestrationPlugin(api.OrchestrationPlugin):
     def init_orchestration_plugin(self, plugins, stream_config):  # type: ignore
         return
 
-    def get_filter_description_list(self):  # type: ignore
+    def filter_description_list(self):  # type: ignore
         return None
 
     def process_pntos_message(self, message, sequenced):  # type: ignore

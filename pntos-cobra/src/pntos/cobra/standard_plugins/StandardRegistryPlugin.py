@@ -538,7 +538,8 @@ class StandardRegistry(Registry):
         self.groups[group]._batch_live = True
         return self.groups[group]
 
-    def get_group_array(self) -> list[str] | None:
+    @property
+    def group_array(self) -> list[str] | None:
         if len(self.groups) == 0:
             return None
         else:

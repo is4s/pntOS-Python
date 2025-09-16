@@ -410,7 +410,8 @@ class TutorialGpsVelOrchestrationPlugin(OrchestrationPlugin):
                 self._log,
             )
 
-    def get_filter_description_list(self) -> list[str]:
+    @property
+    def filter_description_list(self) -> list[str]:
         descriptions = []
         aspn_pva = 'ASPN_MEASUREMENT_POSITION_VELOCITY_ATTITUDE_ESTIMATE'
         for label in ['GPS_INS']:
@@ -472,7 +473,7 @@ class TutorialGpsVelOrchestrationPlugin(OrchestrationPlugin):
             )
 
         else:
-            descriptions = ', '.join(self.get_filter_description_list())
+            descriptions = ', '.join(self.filter_description_list)
             self._log(
                 LoggingLevel.ERROR,
                 f'Solution {filter_description} was requested, but available solution '

@@ -723,8 +723,9 @@ class Registry(ABC):
         """
         pass
 
+    @property
     @abstractmethod
-    def get_group_array(self) -> list[str] | None:
+    def group_array(self) -> list[str] | None:
         """
         Get the array of groups which currently exist.
 
@@ -788,8 +789,9 @@ class Mediator(ABC):
             the pntOS global registry.
     """
 
+    @property
     @abstractmethod
-    def get_filter_description_list(self) -> list[str]:
+    def filter_description_list(self) -> list[str]:
         """
         Request a list of strings describing the solutions available.
 
@@ -836,19 +838,17 @@ class Mediator(ABC):
         Request filtering solutions at the times specified in the array ``solution_times``.
 
         Args:
-            solution_times (list[TypeTimestamp]): The number of time entries in ``solution_times``
-                is specified by ``num_solution_times``.
+            solution_times (list[TypeTimestamp]): The times at which to return solutions.
             filter_description (str | None, optional): To select which filter(s) to request
                 solutions from, enter a valid filter description string in ``filter_description``.
                 Valid filter description strings can be obtained by calling
-                :meth:`get_filter_description_list`. Passing in ``None`` will provide a result
+                :attr:`filter_description_list`. Passing in ``None`` will provide a result
                 specific to a particular implementation. When ``filter_description`` is ``None``,
                 the implementation should endeavor to return its best solution.
 
         Returns:
             list[Message] | None: An array of messages containing the filter solutions for the requested
-            ``solution_times``. The number of solutions should equal ``num_solution_times``,
-            although some entries may be ``None`` if they are unavailable at the corresponding time
+            ``solution_times``. Some entries may be ``None`` if they are unavailable at the corresponding time
             in ``solution_times``. The returned :class:`pntos.api.Message` array may be ``None`` if
             ``filter_description`` is invalid.
         """

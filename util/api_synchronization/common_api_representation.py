@@ -134,11 +134,19 @@ class CtoPyApiComparator:
             'get_strategy': 'strategy',
             'set_time': 'time',
             'set_strategy': 'strategy',
+            'get_state_block_labels': 'state_block_labels',
+            'get_measurement_processor_labels': 'measurement_processor_labels',
+            'get_virtual_state_block_target_labels': 'virtual_state_block_target_labels',
             'has_block': '',
             'has_processor': '',
             # StandardFusionStrategy
             'set_covariance_block': 'set_covariance_slice',
             'set_covariance_slice': 'set_covariance_slice',
+            'get_num_states': 'num_states',
+            'get_estimate': 'estimate',
+            'get_covariance': 'covariance',
+            # Orchestration/Mediator
+            'get_filter_description_list': 'filter_description_list',
         }
         self.parameter_exceptions = {
             'receiver': '',

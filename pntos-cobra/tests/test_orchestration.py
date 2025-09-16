@@ -532,22 +532,18 @@ class Test_Orchestration(unittest.TestCase):
 
         self.orchestration_plugin.process_pntos_message(pva_message, False)
 
-    def test_get_filter_description_list_tutorial(self) -> None:
+    def test_filter_description_list_tutorial(self) -> None:
         self.test_init_orchestration_plugin_tutorial()  # To get past init_orchestration_plugin()
-        filter_description_list = (
-            self.orchestration_plugin.get_filter_description_list()
-        )
+        filter_description_list = self.orchestration_plugin.filter_description_list
         expected_filter_description_list = [
             'GPS_INS_BEST_ASPN_MEASUREMENT_POSITION_VELOCITY_ATTITUDE_ESTIMATE',
             'GPS_INS_DEAD_RECKONING_ASPN_MEASUREMENT_POSITION_VELOCITY_ATTITUDE_ESTIMATE',
         ]
         assert filter_description_list == expected_filter_description_list
 
-    def test_get_filter_description_list_standard(self) -> None:
+    def test_filter_description_list_standard(self) -> None:
         self.test_init_orchestration_plugin_standard()  # To get past init_orchestration_plugin()
-        filter_description_list = (
-            self.orchestration_plugin.get_filter_description_list()
-        )
+        filter_description_list = self.orchestration_plugin.filter_description_list
         expected_filter_description_list = [
             'GPS_INS_BEST_ASPN_MEASUREMENT_POSITION_VELOCITY_ATTITUDE_ESTIMATE',
             'GPS_INS_DEAD_RECKONING_ASPN_MEASUREMENT_POSITION_VELOCITY_ATTITUDE_ESTIMATE',
@@ -597,7 +593,7 @@ class Test_Orchestration(unittest.TestCase):
     def test_request_solutions_using_filter_descriptions(self) -> None:
         self.test_init_orchestration_plugin_tutorial()
         solution_times = [TypeTimestamp(100)]
-        descriptions = self.orchestration_plugin.get_filter_description_list()
+        descriptions = self.orchestration_plugin.filter_description_list
         expected_descriptions = [
             'GPS_INS_BEST_ASPN_MEASUREMENT_POSITION_VELOCITY_ATTITUDE_ESTIMATE',
             'GPS_INS_DEAD_RECKONING_ASPN_MEASUREMENT_POSITION_VELOCITY_ATTITUDE_ESTIMATE',
@@ -615,7 +611,7 @@ class Test_Orchestration(unittest.TestCase):
     def test_request_solutions_using_filter_descriptions_standard(self) -> None:
         self.test_init_orchestration_plugin_standard()
         solution_times = [TypeTimestamp(0)]
-        descriptions = self.orchestration_plugin.get_filter_description_list()
+        descriptions = self.orchestration_plugin.filter_description_list
         expected_descriptions = [
             'GPS_INS_BEST_ASPN_MEASUREMENT_POSITION_VELOCITY_ATTITUDE_ESTIMATE',
             'GPS_INS_DEAD_RECKONING_ASPN_MEASUREMENT_POSITION_VELOCITY_ATTITUDE_ESTIMATE',

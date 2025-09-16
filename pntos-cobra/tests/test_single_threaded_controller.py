@@ -152,10 +152,12 @@ class DummyStandardFusionEngine(StandardFusionEngine):
     def strategy(self, strategy: StandardFusionStrategy) -> None:
         self._strategy = strategy
 
-    def get_num_states(self) -> int:
+    @property
+    def num_states(self) -> int:
         return 0
 
-    def get_state_block_labels(self) -> List[str] | None:
+    @property
+    def state_block_labels(self) -> List[str] | None:
         pass
 
     def add_state_block(
@@ -195,7 +197,8 @@ class DummyStandardFusionEngine(StandardFusionEngine):
     def remove_state_block(self, block_label: str) -> None:
         pass
 
-    def get_virtual_state_block_target_labels(self) -> List[str] | None:
+    @property
+    def virtual_state_block_target_labels(self) -> List[str] | None:
         pass
 
     def has_virtual_state_block(self, vsb_target_label: str) -> bool:
@@ -207,7 +210,8 @@ class DummyStandardFusionEngine(StandardFusionEngine):
     def remove_virtual_state_block(self, vsb_target_label: str) -> None:
         pass
 
-    def get_measurement_processor_labels(self) -> List[str] | None:
+    @property
+    def measurement_processor_labels(self) -> List[str] | None:
         pass
 
     def add_measurement_processor(
@@ -332,7 +336,8 @@ class DummyStandardStateModelProvider(StandardStateModelProvider):
 
 
 class DummyStandardFusionStrategy(StandardFusionStrategy):
-    def get_num_states(self) -> int:
+    @property
+    def num_states(self) -> int:
         return 0
 
     def add_states(
@@ -346,7 +351,8 @@ class DummyStandardFusionStrategy(StandardFusionStrategy):
     def remove_states(self, first_index: int, count: int) -> None:
         pass
 
-    def get_estimate(self) -> NDArray[float64] | None:
+    @property
+    def estimate(self) -> NDArray[float64] | None:
         return None
 
     def set_estimate_slice(
@@ -354,7 +360,8 @@ class DummyStandardFusionStrategy(StandardFusionStrategy):
     ) -> None:
         pass
 
-    def get_covariance(self) -> NDArray[float64] | None:
+    @property
+    def covariance(self) -> NDArray[float64] | None:
         pass
 
     def set_covariance_slice(
@@ -420,7 +427,8 @@ class DummyUiPlugin(UiPlugin):
 class DummyMediator(Mediator):
     registry: Registry
 
-    def get_filter_description_list(self) -> list[str]:
+    @property
+    def filter_description_list(self) -> list[str]:
         return []
 
     def request_solutions(
@@ -497,7 +505,8 @@ class DummyOrchestrationPlugin(OrchestrationPlugin):
     def process_pntos_message(self, message: Message, sequenced: bool) -> None:
         pass
 
-    def get_filter_description_list(self) -> List[str]:
+    @property
+    def filter_description_list(self) -> List[str]:
         return []
 
     def request_solutions(
@@ -593,13 +602,13 @@ class Test_SimpleControllerPlugin(unittest.TestCase):
         except ExitThread:  # Thrown inside DummyUiPlugin.run_main_thread
             pass
 
-    def test_mediator_get_filter_description_list(self) -> None:
+    def test_mediator_filter_description_list(self) -> None:
         expected_filter_description_list: list[str] = []
         self.set_up_plugins()
         mediator = SimpleMediator(self.controller.identifier, ControllerPlugin)
         orchestration_plugin = DummyOrchestrationPlugin('Dummy orchestration')
         SimpleMediator._orchestration_plugin = orchestration_plugin
-        filter_description_list = mediator.get_filter_description_list()
+        filter_description_list = mediator.filter_description_list
         assert len(filter_description_list) == len(expected_filter_description_list)
         for i in range(len(filter_description_list)):
             assert filter_description_list[i] == expected_filter_description_list[i]
