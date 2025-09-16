@@ -12,7 +12,6 @@ from .ManualHeadingAlignmentConfig import (
     ManualHeadingAlignmentConfig as ManualHeadingAlignmentConfig,
 )
 from .OrchestrationConfig import (
-    EstimateWithCovarianceConfig as EstimateWithCovarianceConfig,
     FogmStateBlockConfig as FogmStateBlockConfig,
     MeasurementProcessorConfig as MeasurementProcessorConfig,
     PinsonStateBlockConfig as PinsonStateBlockConfig,

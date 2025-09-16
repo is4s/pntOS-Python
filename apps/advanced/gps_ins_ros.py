@@ -3,7 +3,7 @@
 import numpy as np
 
 # API imports
-from pntos.api import EstimateWithCovarianceType, LoggingLevel
+from pntos.api import EstimateWithCovariance, EstimateWithCovarianceType, LoggingLevel
 
 # Import Cobra plugins and config structs
 from pntos.cobra import (
@@ -20,7 +20,6 @@ from pntos.cobra import (
 )
 from pntos.cobra.advanced_plugins import Aspn23RosTransportPlugin
 from pntos.cobra.config import (
-    EstimateWithCovarianceConfig,
     FogmConfig,
     FogmStateBlockConfig,
     ImuConfig,
@@ -64,9 +63,8 @@ my_config = [
                 group='config/fogm_block',
                 identifier='fogm',
                 label='pos_fogm',
-                ewc=EstimateWithCovarianceConfig(
-                    group='config/fogm_block',
-                    ewc_type=EstimateWithCovarianceType.EWC_GENERIC,
+                estimate_with_covariance=EstimateWithCovariance(
+                    type=EstimateWithCovarianceType.EWC_GENERIC,
                     estimate=np.zeros((3,)),
                     covariance=(np.eye(3) * 9.0),
                 ),

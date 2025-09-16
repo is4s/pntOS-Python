@@ -22,6 +22,7 @@ from aspn23 import (
 from navtk.navutils import rpy_to_quat
 from numpy import float64
 from pntos.api import (
+    EstimateWithCovariance,
     EstimateWithCovarianceType,
     FusionEngineType,
     FusionPlugin,
@@ -53,7 +54,6 @@ from pntos.cobra import (
 )
 from pntos.cobra.config import (
     AlignmentStrategy,
-    EstimateWithCovarianceConfig,
     FogmConfig,
     FogmStateBlockConfig,
     ImuConfig,
@@ -169,9 +169,8 @@ standard_config = [
                 group='config/fogm_block',
                 identifier='fogm',
                 label='pos_fogm',
-                ewc=EstimateWithCovarianceConfig(
-                    group='config/fogm_block',
-                    ewc_type=EstimateWithCovarianceType.EWC_GENERIC,
+                estimate_with_covariance=EstimateWithCovariance(
+                    type=EstimateWithCovarianceType.EWC_GENERIC,
                     estimate=np.zeros((3,)),
                     covariance=(np.eye(3) * 9.0),
                 ),
@@ -219,9 +218,10 @@ standard_config = [
 ]
 
 manual_fogm_config = deepcopy(standard_config)
-manual_fogm_config[0].additional_sb_configs[0].ewc = EstimateWithCovarianceConfig(  # type: ignore[index]
-    group='config/fogm_block',
-    ewc_type=EstimateWithCovarianceType.EWC_GENERIC,
+manual_fogm_config[0].additional_sb_configs[
+    0
+].estimate_with_covariance = EstimateWithCovariance(  # type: ignore[index]
+    type=EstimateWithCovarianceType.EWC_GENERIC,
     estimate=np.zeros((3,)),
     covariance=np.eye(3),
 )

@@ -2,7 +2,6 @@ from numpy import allclose, eye, float64
 from numpy.typing import NDArray
 
 from pntos.api import EstimateWithCovariance, LoggingLevel, Mediator
-from pntos.cobra.config import EstimateWithCovarianceConfig
 
 
 def validate_array(

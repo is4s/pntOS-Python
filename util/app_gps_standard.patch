@@ -1,8 +1,8 @@
 diff --git a/apps/tutorial/gps_ins.py b/apps/standard/gps_ins.py
-index ceb1f9e3..184d1417 100755
+index ceb1f9e3..9be4a11e 100755
 --- a/apps/tutorial/gps_ins.py
 +++ b/apps/standard/gps_ins.py
-@@ -2,34 +2,40 @@
+@@ -2,34 +2,39 @@
  
  import sys
  
@@ -10,7 +10,7 @@ index ceb1f9e3..184d1417 100755
 +
  # API imports
 -from pntos.api import LoggingLevel
-+from pntos.api import EstimateWithCovarianceType, LoggingLevel
++from pntos.api import EstimateWithCovariance, EstimateWithCovarianceType, LoggingLevel
  
  # Import Cobra plugins and config structs
  from pntos.cobra import (
@@ -30,7 +30,6 @@ index ceb1f9e3..184d1417 100755
  )
  from pntos.cobra.config import (
      AspnVersion,
-+    EstimateWithCovarianceConfig,
      FogmConfig,
 +    FogmStateBlockConfig,
      ImuConfig,
@@ -47,7 +46,7 @@ index ceb1f9e3..184d1417 100755
  )
  from pntos_python_datasets import EXAMPLE_LCM_LOG
  
-@@ -48,67 +54,102 @@ my_config = [
+@@ -48,67 +53,101 @@ my_config = [
          output_version=AspnVersion.V23,
          group='config/lcm_log_transport',
      ),
@@ -121,9 +120,8 @@ index ceb1f9e3..184d1417 100755
 +                group='config/fogm_block',
 +                identifier='fogm',
 +                label='pos_fogm',
-+                ewc=EstimateWithCovarianceConfig(
-+                    group='config/fogm_block',
-+                    ewc_type=EstimateWithCovarianceType.EWC_GENERIC,
++                estimate_with_covariance=EstimateWithCovariance(
++                    type=EstimateWithCovarianceType.EWC_GENERIC,
 +                    estimate=np.zeros((3,)),
 +                    covariance=(np.eye(3) * 9.0),
 +                ),
@@ -209,7 +207,7 @@ index ceb1f9e3..184d1417 100755
  ]
  # End Config
  
-@@ -118,7 +159,7 @@ plugins = [
+@@ -118,7 +157,7 @@ plugins = [
      LcmLogTransportPlugin('Cobra LCM Log Transport Plugin'),
      EkfFusionStrategyPlugin('Cobra EKF Fusion Strategy Plugin'),
      StandardFusionPlugin('Cobra Standard Fusion Plugin'),
@@ -218,7 +216,7 @@ index ceb1f9e3..184d1417 100755
      StandardInertialPlugin('Cobra Standard Inertial Plugin'),
      TutorialInitializationPlugin('Cobra Manual Initialization Plugin'),
      StandardLoggingPlugin(
-@@ -127,7 +168,7 @@ plugins = [
+@@ -127,7 +166,7 @@ plugins = [
      ),
      StandardRegistryPlugin('Cobra Standard Registry Plugin', config=my_config),
      StandardPreprocessorPlugin('Cobra Standard Preprocessor Plugin'),

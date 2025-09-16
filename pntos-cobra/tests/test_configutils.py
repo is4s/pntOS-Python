@@ -17,7 +17,6 @@ from pntos.cobra.config import (
     AlignmentStrategy,
     BaseConfig,
     DownsamplerConfig,
-    EstimateWithCovarianceConfig,
     ImuConfig,
     ImuRotatorConfig,
     InertialConfig,
@@ -33,7 +32,6 @@ from pntos.cobra.config import (
     config_from_registry,
     config_to_registry,
 )
-from pntos.cobra.config.utils import ewc_to_ewcConfig, ewcConfig_to_ewc
 from pntos.cobra.utils import validate_manual_ewc
 
 DEBUG_LOG: str = ''
@@ -205,7 +203,6 @@ class TestConfigUtils(unittest.TestCase):
                     group='config/fogm_block',
                     identifier='fogm',
                     label='pos_fogm',
-                    ewc=None,
                 ),
             ],
             mp_configs=[
@@ -326,28 +323,6 @@ class TestConfigUtils(unittest.TestCase):
             SensorConfig, self.mediator, CONFIG_TEST_GROUP
         )
         assert result_conf is None
-
-    def test_ewc_conversions(self) -> None:
-        init_conf = EstimateWithCovarianceConfig(
-            group='test',
-            ewc_type=EstimateWithCovarianceType.EWC_GENERIC,
-            estimate=np.zeros((3, 1)),
-            covariance=np.eye(3),
-        )
-        init_ewc = EstimateWithCovariance(
-            type=EstimateWithCovarianceType.EWC_GENERIC,
-            estimate=np.zeros((3, 1)),
-            covariance=np.eye(3),
-        )
-        # Test conversion to config
-        conv_conf = ewc_to_ewcConfig(init_ewc, 'test')
-        assert conv_conf.ewc_type == init_conf.ewc_type
-        assert np.allclose(conv_conf.estimate, init_conf.estimate)
-        assert np.allclose(conv_conf.covariance, init_conf.covariance)
-
-        # Test conversion to ewc
-        conv_ewc = ewcConfig_to_ewc(init_conf)
-        self._compare_ewc(conv_ewc, init_ewc)
 
     def test_manual_ewc_validation(self) -> None:
         # Test valid ewc is returned in the same state

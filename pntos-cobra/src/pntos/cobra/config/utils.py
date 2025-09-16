@@ -8,6 +8,7 @@ from navtk.filtering import ImuModel
 
 from pntos.api import (
     EstimateWithCovariance,
+    EstimateWithCovarianceType,
     LoggingLevel,
     Mediator,
     RegistryValueTypeUnion,
@@ -15,7 +16,6 @@ from pntos.api import (
 
 from .BaseConfig import BaseConfig
 from .ImuConfig import ImuConfig
-from .OrchestrationConfig import EstimateWithCovarianceConfig
 
 ConfigType = TypeVar('ConfigType', bound=BaseConfig)
 
@@ -86,13 +86,36 @@ def config_from_registry(
     """
     conf_params = [f for f in fields(config_type) if f.name != 'group']
     kv = mediator.registry.batch_start(config_group)
-    out: dict[str, RegistryValueTypeUnion | tuple[float, ...] | Enum | None] = {}
+    out: dict[
+        str,
+        RegistryValueTypeUnion
+        | tuple[float, ...]
+        | Enum
+        | EstimateWithCovariance
+        | None,
+    ] = {}
     fail = False
     for param in conf_params:
         if param.name in kv:
-            val: RegistryValueTypeUnion | tuple[float, ...] | Enum | None = kv[
-                param.name
-            ]
+            val: (
+                RegistryValueTypeUnion
+                | tuple[float, ...]
+                | Enum
+                | EstimateWithCovariance
+                | None
+            ) = kv[param.name]
+        elif (
+            param.type == EstimateWithCovariance | None
+            or param.type == EstimateWithCovariance
+        ):
+            if not '_ewc_type' in kv:
+                out[param.name] = None
+                continue
+            val = EstimateWithCovariance(
+                type=EstimateWithCovarianceType(kv['_ewc_type']),
+                estimate=kv['_estimate'],  # type: ignore[arg-type]
+                covariance=kv['_covariance'],  # type: ignore[arg-type]
+            )
         # Special case: nested config or list of nested configs
         else:
             group_key = '_' + param.name + '_groups'
@@ -206,6 +229,12 @@ def config_to_registry(config: BaseConfig, mediator: Mediator) -> None:
                     continue
         elif isinstance(val_to_store, Enum):
             val_to_store = val_to_store.value
+        elif isinstance(val_to_store, EstimateWithCovariance):
+            print(config.group)
+            kv['_estimate'] = val_to_store.estimate
+            kv['_covariance'] = val_to_store.covariance
+            kv['_ewc_type'] = val_to_store.type.value
+            continue
         elif isinstance(val_to_store, BaseConfig):
             kv.batch_end()
             config_to_registry(val_to_store, mediator)
@@ -216,20 +245,6 @@ def config_to_registry(config: BaseConfig, mediator: Mediator) -> None:
             continue
         kv[param.name] = val_to_store
     kv.batch_end()
-
-
-def ewcConfig_to_ewc(ewcConfig: EstimateWithCovarianceConfig) -> EstimateWithCovariance:
-    return EstimateWithCovariance(
-        ewcConfig.ewc_type, ewcConfig.estimate, ewcConfig.covariance
-    )
-
-
-def ewc_to_ewcConfig(
-    ewc: EstimateWithCovariance, group: str
-) -> EstimateWithCovarianceConfig:
-    return EstimateWithCovarianceConfig(
-        group=group, ewc_type=ewc.type, estimate=ewc.estimate, covariance=ewc.covariance
-    )
 
 
 def _confirm_types(out_val: Any, expected_type: type[Any]) -> bool:

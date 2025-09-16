@@ -1,5 +1,5 @@
 diff --git a/apps/standard/gps_ins.py b/apps/standard/lcm_relay.py
-index 184d1417..9f966db2 100755
+index 9be4a11e..685faef4 100755
 --- a/apps/standard/gps_ins.py
 +++ b/apps/standard/lcm_relay.py
 @@ -1,7 +1,5 @@
@@ -10,7 +10,7 @@ index 184d1417..9f966db2 100755
  import numpy as np
  
  # API imports
-@@ -10,7 +8,7 @@ from pntos.api import EstimateWithCovarianceType, LoggingLevel
+@@ -10,7 +8,7 @@ from pntos.api import EstimateWithCovariance, EstimateWithCovarianceType, Loggin
  # Import Cobra plugins and config structs
  from pntos.cobra import (
      EkfFusionStrategyPlugin,
@@ -19,7 +19,7 @@ index 184d1417..9f966db2 100755
      SimpleControllerPlugin,
      StandardFusionPlugin,
      StandardGpsInsStateModelingPlugin,
-@@ -29,7 +27,7 @@ from pntos.cobra.config import (
+@@ -28,7 +26,7 @@ from pntos.cobra.config import (
      ImuConfig,
      ImuRotatorConfig,
      InertialConfig,
@@ -28,7 +28,7 @@ index 184d1417..9f966db2 100755
      ManualAlignmentConfig,
      PinsonStateBlockConfig,
      SensorConfig,
-@@ -37,9 +35,6 @@ from pntos.cobra.config import (
+@@ -36,9 +34,6 @@ from pntos.cobra.config import (
      StandardOrchestrationConfig,
      TimeAdjusterConfig,
  )
@@ -38,7 +38,7 @@ index 184d1417..9f966db2 100755
  
  # Config setup
  C_imu_to_platform = (
-@@ -48,12 +43,7 @@ C_imu_to_platform = (
+@@ -47,12 +42,7 @@ C_imu_to_platform = (
      (-0.06453231, 0.00609588, 0.997897),
  )
  my_config = [
@@ -52,7 +52,7 @@ index 184d1417..9f966db2 100755
      StandardOrchestrationConfig(
          best_sol_channel='/solution/pntos/pva',
          imu_sol_channel='/solution/pntos-imu/pva',
-@@ -156,7 +146,7 @@ my_config = [
+@@ -154,7 +144,7 @@ my_config = [
  # Instantiate all of our plugins
  controller = SimpleControllerPlugin('Cobra Simple Controller Plugin')
  plugins = [

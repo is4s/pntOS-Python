@@ -29,14 +29,13 @@ from pntos.api import (
     StateModelingPlugin,
 )
 from pntos.cobra.config import (
-    EstimateWithCovarianceConfig,
     MeasurementProcessorConfig,
     PinsonStateBlockConfig,
     PreprocessorConfig,
     StandardOrchestrationConfig,
     StateBlockConfig,
 )
-from pntos.cobra.config.utils import config_from_registry, ewcConfig_to_ewc
+from pntos.cobra.config.utils import config_from_registry
 from pntos.cobra.utils import (
     SortedPlugins,
     dispatch_to_fusion_engine,
@@ -179,7 +178,6 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
             self.preprocessors = self._set_up_preprocessors(
                 sorted_plugins, orch_config.preprocessor_configs
             )
-
         self._set_up_fusion_engine(
             orch_config.additional_sb_configs, orch_config.mp_configs
         )
@@ -310,7 +308,9 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
                     )
                     return
                 ewc = self._create_state_block_ewc(
-                    sb_config.identifier, state_block.num_states, sb_config.ewc
+                    sb_config.identifier,
+                    state_block.num_states,
+                    sb_config.estimate_with_covariance,
                 )
                 if ewc is None:
                     return
@@ -395,19 +395,18 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
         self,
         state_block_id: str,
         num_states: int,
-        ewcConfig: EstimateWithCovarianceConfig | None = None,
+        ewc: EstimateWithCovariance | None = None,
     ) -> EstimateWithCovariance | None:
         if state_block_id == 'pinson15':
             # use alignment for pinson if manual is not provided
-            if ewcConfig is None and self.init_pinson_cov is not None:
+            if ewc is None and self.init_pinson_cov is not None:
                 return EstimateWithCovariance(
                     EstimateWithCovarianceType.EWC_GENERIC,
                     estimate=np.zeros((num_states, 1)),
                     covariance=self.init_pinson_cov,
                 )
-        if ewcConfig is not None:
+        if ewc is not None:
             # manual EWC config was provided
-            ewc = ewcConfig_to_ewc(ewcConfig)
             return validate_manual_ewc(ewc, num_states, self.mediator)
 
         return None

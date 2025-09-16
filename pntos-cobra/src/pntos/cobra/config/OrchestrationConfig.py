@@ -1,9 +1,6 @@
 from dataclasses import dataclass
 
-from numpy import float64
-from numpy.typing import NDArray
-
-from pntos.api import EstimateWithCovarianceType
+from pntos.api import EstimateWithCovariance
 
 from .BaseConfig import BaseConfig
 from .FogmConfig import FogmConfig
@@ -11,30 +8,6 @@ from .ImuConfig import ImuConfig
 from .InertialConfig import InertialConfig
 from .PreprocessorConfig import PreprocessorConfig
 from .SensorConfig import SensorConfig
-
-
-@dataclass(kw_only=True)
-class EstimateWithCovarianceConfig(BaseConfig):
-    """
-    Configuration used to store an initial estimate and covariance in the registry.
-    """
-
-    group: str
-
-    ewc_type: EstimateWithCovarianceType
-    """
-    Describes how the 'estimate' and 'covariance' fields will be used.
-    """
-
-    estimate: NDArray[float64]
-    """
-    A one-dimensional array of doubles representing an estimate vector.
-    """
-
-    covariance: NDArray[float64]
-    """
-    An array of doubles representing a square covariance matrix.
-    """
 
 
 @dataclass(kw_only=True)
@@ -57,7 +30,7 @@ class StateBlockConfig(BaseConfig):
     The name used to identify and track this state block through its lifecycle.
     """
 
-    ewc: EstimateWithCovarianceConfig | None
+    estimate_with_covariance: EstimateWithCovariance | None = None
     """
     An optional field that allows an initial estimate and covariance to be associated with the state block.
     """
@@ -76,7 +49,7 @@ class PinsonStateBlockConfig(StateBlockConfig):
 
     label: str
 
-    ewc: EstimateWithCovarianceConfig | None = None
+    estimate_with_covariance: EstimateWithCovariance | None = None
 
     # UNIQUE FIELDS
     imu_model: ImuConfig
@@ -100,7 +73,7 @@ class FogmStateBlockConfig(StateBlockConfig):
 
     label: str
 
-    ewc: EstimateWithCovarianceConfig  # not optional on this block
+    estimate_with_covariance: EstimateWithCovariance  # not optional on this block
 
     # UNIQUE FIELDS
     fogm_model: FogmConfig
