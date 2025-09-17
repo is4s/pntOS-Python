@@ -89,8 +89,9 @@ class StandardFusionStrategy(ABC):
             initial_covariance (NDArray[float64]): The initial covariance matrix used to initialize the
                 uncertainty of the new states.
             cross_covariance (NDArray[float64] | None): A covariance matrix that describes the cross terms
-                between the new states and all previous states. If ``None``, the cross-terms will be
-                set to zero.
+                between the previous states and the new states. If ``None``, the
+                cross-terms will be set to zero. Otherwise, if there are ``n`` existing states and
+                ``m`` new states being added, this argument should have shape ``[n, m]``.
 
         Returns:
             int: Index of first state being added to this filter (zero indexed).
