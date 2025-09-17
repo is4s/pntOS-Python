@@ -57,7 +57,7 @@ ruff check:
     tags:
         - linux-light-runner
     script:
-        - docker run --rm -v $(pwd):/work -v $HOME/.ccache:/root/.cache/uv -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE "uv sync -v && ruff check"
+        - docker run --rm -v $(pwd):/work -v $HOME/.ccache:/root/.cache/uv -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE "uv sync && ruff check"
 
 ruff format:
     stage: check
@@ -65,7 +65,7 @@ ruff format:
         - linux-light-runner
     script:
         # Run the formatter to see if it produces a diff.
-        - docker run --rm -v $(pwd):/work -v $HOME/.ccache:/root/.cache/uv -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE "uv sync -v && ruff format"
+        - docker run --rm -v $(pwd):/work -v $HOME/.ccache:/root/.cache/uv -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE "uv sync && ruff format"
         # If there's a diff, fail the stage.
         - git diff --exit-code
 
@@ -75,7 +75,7 @@ app and orchestration synchronization:
         - linux-light-runner
     script:
         - docker run --rm -dit -v $(pwd):/work -v $HOME/.ccache:/root/.cache/uv --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
-        - docker exec pntos-python uv sync -v
+        - docker exec pntos-python uv sync
         # Run sync check script
         - util/check_sync.sh
 
@@ -86,7 +86,7 @@ requirements up-to-date:
     script:
         - docker run --rm -dit -v $(pwd):/work -v $HOME/.ccache:/root/.cache/uv --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
         # Generate uv.lock
-        - docker exec pntos-python uv sync -v
+        - docker exec pntos-python uv sync
         # Generate requirements*.txt files
         - docker exec pntos-python uv export --frozen --no-dev --no-hashes > requirements-minimal.txt
         - docker exec pntos-python uv export --frozen --no-hashes > requirements.txt
@@ -99,7 +99,7 @@ Python 3.10 Test:
         - linux-light-runner
     script:
         - docker run --rm -dit -v $(pwd):/work -v $HOME/.ccache:/root/.cache/uv --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
-        - docker exec pntos-python uv sync -v
+        - docker exec pntos-python uv sync
         - docker exec pntos-python pytest --cov --cov-fail-under=75 --cov-report={term,html}  --cov-config=.coveragerc
     coverage:
         '/TOTAL.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
@@ -113,7 +113,7 @@ Python 3.13 Test:
         - linux-light-runner
     script:
         - docker run --rm -dit -v $(pwd):/work -v $HOME/.ccache:/root/.cache/uv --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
-        - docker exec pntos-python uv sync -v --python 3.13
+        - docker exec pntos-python uv sync --python 3.13
         - docker exec pntos-python pytest --cov --cov-fail-under=75 --cov-report={term,html}  --cov-config=.coveragerc
 
 ASPN-ROS Test:
@@ -122,7 +122,7 @@ ASPN-ROS Test:
         - linux-light-runner
     script:
         - docker run --rm -dit -v $(pwd):/work -v $HOME/.ccache:/root/.cache/uv --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
-        - docker exec pntos-python uv sync -v --python 3.12  # 3.12 for Jazzy compatibility
+        - docker exec pntos-python uv sync --python 3.12  # 3.12 for Jazzy compatibility
         - docker exec pntos-python git clone --depth 1 -b main git@git.aspn.us:pntos/firehose-outputs.git
         - docker exec pntos-python bash -c "cd firehose-outputs &&
                                             git fetch --depth 1 origin $FIREHOSE_OUTPUTS_VERSION &&
@@ -136,7 +136,7 @@ mypy:
         - linux-light-runner
     script:
         - docker run --rm -dit -v $(pwd):/work -v $HOME/.ccache:/root/.cache/uv --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
-        - docker exec pntos-python uv sync -v
+        - docker exec pntos-python uv sync
         - docker exec pntos-python mypy pntos-api --no-implicit-reexport
         - docker exec pntos-python mypy pntos-cobra --no-implicit-reexport
         - docker exec pntos-python mypy apps/advanced/ --no-implicit-reexport
@@ -149,7 +149,7 @@ documentation check:
         - linux-light-runner
     script:
         - docker run --rm -dit -v $(pwd):/work -v $HOME/.ccache:/root/.cache/uv --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
-        - docker exec pntos-python uv sync -v
+        - docker exec pntos-python uv sync
         # Build the documentation
         - docker exec -e TZ=UTC pntos-python sphinx-build --exception-on-warning docs/source/ docs/build/
     artifacts:
@@ -164,7 +164,7 @@ link check:
         - linux-light-runner
     script:
         - docker run --rm -dit -v $(pwd):/work -v $HOME/.ccache:/root/.cache/uv --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
-        - docker exec pntos-python uv sync -v
+        - docker exec pntos-python uv sync
         # Check external links in the documentation
         - docker exec -e TZ=UTC pntos-python sphinx-build -b linkcheck --exception-on-warning docs/source/ docs/build/
 
@@ -174,7 +174,7 @@ GPS INS Tutorial App:
         - linux-light-runner
     script:
         - docker run --rm -dit -v $(pwd):/work -v $HOME/.ccache:/root/.cache/uv --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
-        - docker exec pntos-python uv sync -v
+        - docker exec pntos-python uv sync
         - docker exec pntos-python postprocessing/run_app_and_record_data.py apps/tutorial/gps_ins.py
     artifacts:
         paths:
@@ -186,7 +186,7 @@ GPS INS Velocity App:
         - linux-light-runner
     script:
         - docker run --rm -dit -v $(pwd):/work -v $HOME/.ccache:/root/.cache/uv --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
-        - docker exec pntos-python uv sync -v
+        - docker exec pntos-python uv sync
         - docker exec pntos-python postprocessing/run_app_and_record_data.py apps/tutorial/gps_vel_ins.py
     artifacts:
         paths:
@@ -198,7 +198,7 @@ GPS INS Standard App:
         - linux-light-runner
     script:
         - docker run --rm -dit -v $(pwd):/work -v $HOME/.ccache:/root/.cache/uv --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
-        - docker exec pntos-python uv sync -v
+        - docker exec pntos-python uv sync
         - docker exec pntos-python postprocessing/run_app_and_record_data.py
     artifacts:
         paths:
@@ -211,7 +211,7 @@ GPS INS ROS App:
     retry: 1
     script:
         - docker run --rm -dit -v $(pwd):/work -v $HOME/.ccache:/root/.cache/uv --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
-        - docker exec pntos-python uv sync -v --python 3.12  # 3.12 for Jazzy compatibility
+        - docker exec pntos-python uv sync --python 3.12  # 3.12 for Jazzy compatibility
         - docker exec pntos-python git clone --depth 1 -b main git@git.aspn.us:pntos/firehose-outputs.git
         - docker exec pntos-python bash -c "cd firehose-outputs &&
                                             git fetch --depth 1 origin $FIREHOSE_OUTPUTS_VERSION &&
@@ -256,7 +256,7 @@ build wheels:
         - linux-light-runner
     script:
         - docker run --rm -dit -v $(pwd):/work -v $HOME/.ccache:/root/.cache/uv --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
-        - docker exec pntos-python uv sync -v
+        - docker exec pntos-python uv sync
         - docker exec pntos-python uv build pntos-api
         - docker exec pntos-python uv build pntos-cobra
     artifacts:
