@@ -57,7 +57,7 @@ ruff check:
     tags:
         - linux-light-runner
     script:
-        - docker run --rm -v $(pwd):/work -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE "uv sync -v && ruff check"
+        - docker run --rm -v $(pwd):/work -v $HOME/.ccache:/root/.cache/uv -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE "uv sync -v && ruff check"
 
 ruff format:
     stage: check
@@ -65,7 +65,7 @@ ruff format:
         - linux-light-runner
     script:
         # Run the formatter to see if it produces a diff.
-        - docker run --rm -v $(pwd):/work -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE "uv sync -v && ruff format"
+        - docker run --rm -v $(pwd):/work -v $HOME/.ccache:/root/.cache/uv -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE "uv sync -v && ruff format"
         # If there's a diff, fail the stage.
         - git diff --exit-code
 
@@ -74,7 +74,7 @@ app and orchestration synchronization:
     tags:
         - linux-light-runner
     script:
-        - docker run --rm -dit -v $(pwd):/work --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
+        - docker run --rm -dit -v $(pwd):/work -v $HOME/.ccache:/root/.cache/uv --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
         - docker exec pntos-python uv sync -v
         # Run sync check script
         - util/check_sync.sh
@@ -84,7 +84,7 @@ requirements up-to-date:
     tags:
         - linux-light-runner
     script:
-        - docker run --rm -dit -v $(pwd):/work --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
+        - docker run --rm -dit -v $(pwd):/work -v $HOME/.ccache:/root/.cache/uv --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
         # Generate uv.lock
         - docker exec pntos-python uv sync -v
         # Generate requirements*.txt files
@@ -98,7 +98,7 @@ Python 3.10 Test:
     tags:
         - linux-light-runner
     script:
-        - docker run --rm -dit -v $(pwd):/work --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
+        - docker run --rm -dit -v $(pwd):/work -v $HOME/.ccache:/root/.cache/uv --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
         - docker exec pntos-python uv sync -v
         - docker exec pntos-python pytest --cov --cov-fail-under=75 --cov-report={term,html}  --cov-config=.coveragerc
     coverage:
@@ -112,7 +112,7 @@ Python 3.13 Test:
     tags:
         - linux-light-runner
     script:
-        - docker run --rm -dit -v $(pwd):/work --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
+        - docker run --rm -dit -v $(pwd):/work -v $HOME/.ccache:/root/.cache/uv --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
         - docker exec pntos-python uv sync -v --python 3.13
         - docker exec pntos-python pytest --cov --cov-fail-under=75 --cov-report={term,html}  --cov-config=.coveragerc
 
@@ -121,7 +121,7 @@ ASPN-ROS Test:
     tags:
         - linux-light-runner
     script:
-        - docker run --rm -dit -v $(pwd):/work --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
+        - docker run --rm -dit -v $(pwd):/work -v $HOME/.ccache:/root/.cache/uv --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
         - docker exec pntos-python uv sync -v --python 3.12  # 3.12 for Jazzy compatibility
         - docker exec pntos-python git clone --depth 1 -b main git@git.aspn.us:pntos/firehose-outputs.git
         - docker exec pntos-python bash -c "cd firehose-outputs &&
@@ -135,7 +135,7 @@ mypy:
     tags:
         - linux-light-runner
     script:
-        - docker run --rm -dit -v $(pwd):/work --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
+        - docker run --rm -dit -v $(pwd):/work -v $HOME/.ccache:/root/.cache/uv --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
         - docker exec pntos-python uv sync -v
         - docker exec pntos-python mypy pntos-api --no-implicit-reexport
         - docker exec pntos-python mypy pntos-cobra --no-implicit-reexport
@@ -148,7 +148,7 @@ documentation check:
     tags:
         - linux-light-runner
     script:
-        - docker run --rm -dit -v $(pwd):/work --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
+        - docker run --rm -dit -v $(pwd):/work -v $HOME/.ccache:/root/.cache/uv --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
         - docker exec pntos-python uv sync -v
         # Build the documentation
         - docker exec -e TZ=UTC pntos-python sphinx-build --exception-on-warning docs/source/ docs/build/
@@ -163,7 +163,7 @@ link check:
     tags:
         - linux-light-runner
     script:
-        - docker run --rm -dit -v $(pwd):/work --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
+        - docker run --rm -dit -v $(pwd):/work -v $HOME/.ccache:/root/.cache/uv --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
         - docker exec pntos-python uv sync -v
         # Check external links in the documentation
         - docker exec -e TZ=UTC pntos-python sphinx-build -b linkcheck --exception-on-warning docs/source/ docs/build/
@@ -173,7 +173,7 @@ GPS INS Tutorial App:
     tags:
         - linux-light-runner
     script:
-        - docker run --rm -dit -v $(pwd):/work --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
+        - docker run --rm -dit -v $(pwd):/work -v $HOME/.ccache:/root/.cache/uv --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
         - docker exec pntos-python uv sync -v
         - docker exec pntos-python postprocessing/run_app_and_record_data.py apps/tutorial/gps_ins.py
     artifacts:
@@ -185,7 +185,7 @@ GPS INS Velocity App:
     tags:
         - linux-light-runner
     script:
-        - docker run --rm -dit -v $(pwd):/work --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
+        - docker run --rm -dit -v $(pwd):/work -v $HOME/.ccache:/root/.cache/uv --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
         - docker exec pntos-python uv sync -v
         - docker exec pntos-python postprocessing/run_app_and_record_data.py apps/tutorial/gps_vel_ins.py
     artifacts:
@@ -197,7 +197,7 @@ GPS INS Standard App:
     tags:
         - linux-light-runner
     script:
-        - docker run --rm -dit -v $(pwd):/work --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
+        - docker run --rm -dit -v $(pwd):/work -v $HOME/.ccache:/root/.cache/uv --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
         - docker exec pntos-python uv sync -v
         - docker exec pntos-python postprocessing/run_app_and_record_data.py
     artifacts:
@@ -210,7 +210,7 @@ GPS INS ROS App:
         - linux-light-runner
     retry: 1
     script:
-        - docker run --rm -dit -v $(pwd):/work --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
+        - docker run --rm -dit -v $(pwd):/work -v $HOME/.ccache:/root/.cache/uv --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
         - docker exec pntos-python uv sync -v --python 3.12  # 3.12 for Jazzy compatibility
         - docker exec pntos-python git clone --depth 1 -b main git@git.aspn.us:pntos/firehose-outputs.git
         - docker exec pntos-python bash -c "cd firehose-outputs &&
@@ -227,7 +227,7 @@ pip workflow check:
     tags:
         - linux-light-runner
     script:
-        - docker run --rm -dit -v $(pwd):/work --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
+        - docker run --rm -dit -v $(pwd):/work -v $HOME/.ccache:/root/.cache/pip --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
         - docker exec pntos-python python3 -m venv /work/.venv
         - docker exec pntos-python .venv/bin/pip install -v -r requirements.txt --extra-index-url=${UV_INDEX}
         - docker exec pntos-python postprocessing/run_app_and_record_data.py
@@ -237,7 +237,7 @@ minimal pip workflow check:
     tags:
         - linux-light-runner
     script:
-        - docker run --rm -dit -v $(pwd):/work --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
+        - docker run --rm -dit -v $(pwd):/work -v $HOME/.ccache:/root/.cache/pip --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
         - docker exec pntos-python python3 -m venv /work/.venv
         - docker exec pntos-python .venv/bin/pip install -v -r requirements-minimal.txt --extra-index-url=${UV_INDEX}
         - docker exec pntos-python python3 -c "import pntos.cobra; import pntos.api"
@@ -255,7 +255,7 @@ build wheels:
     tags:
         - linux-light-runner
     script:
-        - docker run --rm -dit -v $(pwd):/work --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
+        - docker run --rm -dit -v $(pwd):/work -v $HOME/.ccache:/root/.cache/uv --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
         - docker exec pntos-python uv sync -v
         - docker exec pntos-python uv build pntos-api
         - docker exec pntos-python uv build pntos-cobra
@@ -291,7 +291,7 @@ deploy wheels:
         # Don't clean artifacts from previous job
         GIT_CLEAN_FLAGS: -f
     script:
-        - docker run --rm -dit -v $(pwd):/work --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
+        - docker run --rm -dit -v $(pwd):/work -v $HOME/.ccache:/root/.cache/uv --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
         - docker exec pntos-python python3 -m venv /work/.venv
         - docker exec pntos-python .venv/bin/pip install twine==6.1.0
         - export REPO_URL=${CI_API_V4_URL}/projects/94/packages/pypi
