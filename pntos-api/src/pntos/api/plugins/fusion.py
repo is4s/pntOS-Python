@@ -22,27 +22,28 @@ from .state_modeling import (
 @dataclass
 class CrossCovariances:
     """
-    A container for a set of covariances relating a StateBlock to a set of other StateBlocks.
+    A container for a set of covariances relating a StateBlock to one or more other StateBlocks.
 
-    Suppose that some StateBlock named ``A`` existed. Then this structure could define the cross
-    covariance of ``A`` with respect to other StateBlocks named ``B`` and ``C``. In that case,
-    :attr:`block_labels` would be an array of 2 strings ``B`` and ``C``, and
-    :attr:`cross_covariances` would be a an array of two matrices: the cross-covariance matrix of
-    ``A`` and ``B`` and the cross-covariance matrix of ``A`` and ``C``.
+    For example, suppose that some StateBlock named ``A`` existed containing ``a`` states. Then this
+    structure could define the cross covariance of ``A`` with respect to other StateBlocks named
+    ``B`` (with ``b`` states) and ``C`` (with ``c`` states). In that case, :attr:`block_labels`
+    would be an array of 2 strings ``B`` and ``C``, and :attr:`cross_covariances` would be an array
+    of two matrices: the cross-covariance matrix of ``B`` and ``A``, with shape ``[b, a]`` and the
+    cross-covariance matrix of ``C`` and ``A`` with shape ``[c, a]``.
 
     Attributes:
-        block_labels (list[str]): A list of labels of the :class:`pntos.api.StandardStateBlock` this structure
-            contains the cross-covariances for.
+        block_labels (list[str]): A list of labels of the :class:`pntos.api.StandardStateBlock` this
+            structure contains the cross-covariances for.
         cross_covariances (list[NDArray[float64]]): A list of cross-covariance matrices between a single
             StateBlock and the set of StateBlocks listed in :attr:`block_labels`.
     """
 
     block_labels: list[str]
-    """The labels of the two state blocks which ``cross_covariances`` is valid for.
+    """The labels of the state blocks that the entries in ``cross_covariances`` relate to.
     """
 
     cross_covariances: list[NDArray[float64]]
-    """The correlations between the state blocks.
+    """The covariances between the state blocks.
     """
 
 
