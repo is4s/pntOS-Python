@@ -59,7 +59,7 @@ The available off-the-shelf apps are in the
 
 `````{tab-set}
 
-````{tab-item} GPS INS Tutorial App
+````{tab-item} GPS INS App
 :sync: gps-ins-tutorial
 For documentation specifically explaining the `gps_ins` app, see
 [](./apps/gps_ins.md).
@@ -72,41 +72,9 @@ environment activated):
 ```shell
 apps/tutorial/gps_ins.py
 ```
-
-You should see something like the following:
-
-```shell
-WARNING:  [Controller] Expected one UiPlugin but received 0. Running without a UI plugin.
-[31/03/2025 11:55:06] [LoggingPlugin] [INFO] using hard-coded global logging level INFO
-[31/03/2025 11:55:06] [OrchestrationPlugin] [INFO] Aligned filter at TypeTimestamp(elapsed_nsec=1743621678330456320).
-LCM tcpq: connecting...
-[31/03/2025 11:55:06] [TransportPlugin] [INFO] LCM message handler is running.
-[31/03/2025 11:55:06] [ControllerPlugin] [INFO] Press Ctrl + C at any time to shut down pntOS...
-```
-
-Then push the `play` button in the LogPlayer.
-
-```{note}
-This app uses real data. There is some jitter present in the IMU sensor timestamps which will
-produce a few warnings in the output. They are of the form:
-
-    [warning] Suspicious dt of 0.015978679000000003 compared against nominal of 0.010000062688925596 detected at time 1747683329.241135205s
-
-A more complex app might, for example, use a Preprocessor plugin to correct the incoming data.
-```
-
-### Validate Results
-
-To plot the saved results run:
-
-```shell
-postprocessing/plot_results.py pntos_output.log
-```
-
-For more information on the expected results for this app, see [](./apps/gps_ins.md#expected-results).
 ````
 
-````{tab-item} GPS INS Velocity Tutorial App
+````{tab-item} GPS INS Velocity App
 :sync: vel-app
 For documentation specifically explaining the this app, see
 [](./apps/gps_vel_ins.md).
@@ -119,6 +87,21 @@ environment activated):
 ```shell
 apps/tutorial/gps_vel_ins.py
 ```
+````
+
+````{tab-item} GPS INS Standard App
+:sync: gps-ins-standard
+
+### Run the GPS INS Standard App
+
+To run this app, run this command from the root workspace directory (with the Python virtual
+environment activated):
+
+```shell
+apps/standard/gps_ins.py
+```
+````
+`````
 
 Once the app is started, you should see something like the following:
 
@@ -144,39 +127,4 @@ postprocessing/plot_results.py pntos_output.log
 These plots should look fairly similar to the first app's plots, since the position update will be
 the dominating update. To be able to see a bigger difference, try inducing a position measurement
 outage to see the velocity update constrain the solution's drift.
-````
 
-````{tab-item} GPS INS Standard App
-:sync: gps-ins-standard
-
-### Run the GPS INS Standard App
-
-To run this app, run this command from the root workspace directory (with the Python virtual
-environment activated):
-
-```shell
-apps/standard/gps_ins.py
-```
-
-You should see something like the following:
-
-```shell
-WARNING:  [Controller] Expected one UiPlugin but received 0. Running without a UI plugin.
-[31/03/2025 11:55:06] [LoggingPlugin] [INFO] using hard-coded global logging level INFO
-[31/03/2025 11:55:06] [OrchestrationPlugin] [INFO] Aligned filter at TypeTimestamp(elapsed_nsec=1743621678330456320).
-LCM tcpq: connecting...
-[31/03/2025 11:55:06] [TransportPlugin] [INFO] LCM message handler is running.
-[31/03/2025 11:55:06] [ControllerPlugin] [INFO] Press Ctrl + C at any time to shut down pntOS...
-```
-
-Then push the `play` button in the LogPlayer.
-
-### Validate Results
-
-To plot the saved results run:
-
-```shell
-postprocessing/plot_results.py pntos_output.log
-```
-````
-`````
