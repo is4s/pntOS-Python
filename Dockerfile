@@ -26,8 +26,9 @@ ARG TOKEN_URL
 RUN bash -c \
 'if [[ -n $TOKEN_URL ]]; then \
   echo -e \
-  "[url \"$TOKEN_URL\"]\n\tinsteadOf = git@git.aspn.us:\n\tinsteadOf = ssh://git@git.aspn.us/" \
-  > /root/.gitconfig; \
+  "[url \"$TOKEN_URL\"]\n\tinsteadOf = git@git.aspn.us:\n\tinsteadOf = ssh://git@git.aspn.us/\n" \
+  "[safe]\n\tdirectory = *\n" \
+  >> /root/.gitconfig; \
 fi'
 
 WORKDIR /work

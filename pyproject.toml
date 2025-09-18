@@ -25,6 +25,10 @@ members = ["pntos-api", "pntos-cobra"]
 pntos-api = { workspace = true }
 pntos-cobra = { workspace = true }
 
+[[tool.uv.index]]
+url = "https://git.aspn.us/api/v4/projects/94/packages/pypi/simple"
+cache-control = { api = "max-age=600", files = "max-age=365000000, immutable" }
+
 [dependency-groups]
 dev = [
     "pytest>=8.2.0",
