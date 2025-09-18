@@ -47,6 +47,7 @@ from pntos.cobra.utils import (
     set_up_inertial_mechanization,
     set_up_initializer,
     sort_plugins_dataclass,
+    validate_manual_ewc,
     validate_plugins,
 )
 from scipy.linalg import block_diag
@@ -177,7 +178,6 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
             self.preprocessors = self._set_up_preprocessors(
                 sorted_plugins, orch_config.preprocessor_configs
             )
-
         self._set_up_fusion_engine(
             orch_config.additional_sb_configs, orch_config.mp_configs
         )
@@ -308,7 +308,9 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
                     )
                     return
                 ewc = self._create_state_block_ewc(
-                    sb_config.identifier, state_block.num_states
+                    sb_config.identifier,
+                    state_block.num_states,
+                    sb_config.estimate_with_covariance,
                 )
                 if ewc is None:
                     return
@@ -390,38 +392,24 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
                 self.measurement_channels[mp_config.channel] = mp_config.label
 
     def _create_state_block_ewc(
-        self, state_block_id: str, num_states: int
+        self,
+        state_block_id: str,
+        num_states: int,
+        ewc: EstimateWithCovariance | None = None,
     ) -> EstimateWithCovariance | None:
-        match state_block_id:
-            case 'pinson15':
-                if self.init_pinson_cov is None:
-                    self._log(
-                        LoggingLevel.ERROR,
-                        f'The pinson state block cannot be added to the fusion engine before alignment. Filter cannot be initialized.',
-                    )
-                    return None
+        if state_block_id == 'pinson15':
+            # use alignment for pinson if manual is not provided
+            if ewc is None and self.init_pinson_cov is not None:
                 return EstimateWithCovariance(
                     EstimateWithCovarianceType.EWC_GENERIC,
                     estimate=np.zeros((num_states, 1)),
                     covariance=self.init_pinson_cov,
                 )
-            case 'fogm':
-                return EstimateWithCovariance(
-                    EstimateWithCovarianceType.EWC_GENERIC,
-                    estimate=np.zeros((num_states, 1)),
-                    covariance=(np.eye(num_states) * 9.0),
-                )
-            case _:
-                # TODO: Issue #232
-                self._log(
-                    LoggingLevel.WARN,
-                    f'No matching EstimateWithCovariance object could be generated for State Block ID "{state_block_id}". Using 0\'s for initial estimate and covariance.',
-                )
-                return EstimateWithCovariance(
-                    EstimateWithCovarianceType.EWC_GENERIC,
-                    estimate=np.zeros((num_states, 1)),
-                    covariance=np.zeros((num_states, num_states)),
-                )
+        if ewc is not None:
+            # manual EWC config was provided
+            return validate_manual_ewc(ewc, num_states, self.mediator)
+
+        return None
 
     def _preprocess_message(self, message: Message) -> list[Message] | None:
         """Process the given message by the full chain of preprocessors.

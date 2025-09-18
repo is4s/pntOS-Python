@@ -22,6 +22,8 @@ from aspn23 import (
 from navtk.navutils import rpy_to_quat
 from numpy import float64
 from pntos.api import (
+    EstimateWithCovariance,
+    EstimateWithCovarianceType,
     FusionEngineType,
     FusionPlugin,
     FusionStrategyPlugin,
@@ -167,6 +169,11 @@ standard_config = [
                 group='config/fogm_block',
                 identifier='fogm',
                 label='pos_fogm',
+                estimate_with_covariance=EstimateWithCovariance(
+                    type=EstimateWithCovarianceType.EWC_GENERIC,
+                    estimate=np.zeros((3,)),
+                    covariance=(np.eye(3) * 9.0),
+                ),
                 fogm_model=FogmConfig(
                     group='config/pos_sensor_error',
                     sigma=(1.5, 1.5, 2.0),
@@ -209,6 +216,15 @@ standard_config = [
         group='config/orchestration',
     ),
 ]
+
+manual_fogm_config = deepcopy(standard_config)
+manual_fogm_config[0].additional_sb_configs[
+    0
+].estimate_with_covariance = EstimateWithCovariance(  # type: ignore[index]
+    type=EstimateWithCovarianceType.EWC_GENERIC,
+    estimate=np.zeros((3,)),
+    covariance=np.eye(3),
+)
 
 
 class Test_Orchestration(unittest.TestCase):
@@ -276,6 +292,18 @@ class Test_Orchestration(unittest.TestCase):
 
     def set_up_standard_orchestration(self) -> None:
         plugins = self.instantiate_default_plugins(standard_config)
+        self.orchestration_plugin = StandardOrchestrationPlugin(
+            'StandardOrchestrationPlugin'
+        )
+        self.state_modeling_plugin = StandardGpsInsStateModelingPlugin(
+            'Cobra Standard State Modeling Plugin'
+        )
+        plugins.append(self.orchestration_plugin)
+        plugins.append(self.state_modeling_plugin)
+        self.init_all_plugins(plugins)
+
+    def set_up_manual_fogm_orchestration(self) -> None:
+        plugins = self.instantiate_default_plugins(manual_fogm_config)
         self.orchestration_plugin = StandardOrchestrationPlugin(
             'StandardOrchestrationPlugin'
         )
@@ -410,6 +438,10 @@ class Test_Orchestration(unittest.TestCase):
 
     def test_init_orchestration_plugin_standard(self) -> None:
         self.set_up_standard_orchestration()
+        self.init_orchestration_plugin()
+
+    def test_init_orchestration_plugin_man_fogm(self) -> None:
+        self.set_up_manual_fogm_orchestration()
         self.init_orchestration_plugin()
 
     def test_process_pntos_message_tutorial(self) -> None:

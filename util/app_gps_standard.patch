@@ -1,8 +1,19 @@
 diff --git a/apps/tutorial/gps_ins.py b/apps/standard/gps_ins.py
-index ceb1f9e3..151ea8bc 100755
+index ceb1f9e3..9be4a11e 100755
 --- a/apps/tutorial/gps_ins.py
 +++ b/apps/standard/gps_ins.py
-@@ -10,26 +10,29 @@ from pntos.cobra import (
+@@ -2,34 +2,39 @@
+ 
+ import sys
+ 
++import numpy as np
++
+ # API imports
+-from pntos.api import LoggingLevel
++from pntos.api import EstimateWithCovariance, EstimateWithCovarianceType, LoggingLevel
+ 
+ # Import Cobra plugins and config structs
+ from pntos.cobra import (
      EkfFusionStrategyPlugin,
      LcmLogTransportPlugin,
      SimpleControllerPlugin,
@@ -35,7 +46,7 @@ index ceb1f9e3..151ea8bc 100755
  )
  from pntos_python_datasets import EXAMPLE_LCM_LOG
  
-@@ -48,67 +51,96 @@ my_config = [
+@@ -48,67 +53,101 @@ my_config = [
          output_version=AspnVersion.V23,
          group='config/lcm_log_transport',
      ),
@@ -109,6 +120,11 @@ index ceb1f9e3..151ea8bc 100755
 +                group='config/fogm_block',
 +                identifier='fogm',
 +                label='pos_fogm',
++                estimate_with_covariance=EstimateWithCovariance(
++                    type=EstimateWithCovarianceType.EWC_GENERIC,
++                    estimate=np.zeros((3,)),
++                    covariance=(np.eye(3) * 9.0),
++                ),
 +                fogm_model=FogmConfig(
 +                    group='config/pos_sensor_error',
 +                    sigma=(1.5, 1.5, 2.0),
@@ -191,7 +207,7 @@ index ceb1f9e3..151ea8bc 100755
  ]
  # End Config
  
-@@ -118,7 +150,7 @@ plugins = [
+@@ -118,7 +157,7 @@ plugins = [
      LcmLogTransportPlugin('Cobra LCM Log Transport Plugin'),
      EkfFusionStrategyPlugin('Cobra EKF Fusion Strategy Plugin'),
      StandardFusionPlugin('Cobra Standard Fusion Plugin'),
@@ -200,7 +216,7 @@ index ceb1f9e3..151ea8bc 100755
      StandardInertialPlugin('Cobra Standard Inertial Plugin'),
      TutorialInitializationPlugin('Cobra Manual Initialization Plugin'),
      StandardLoggingPlugin(
-@@ -127,7 +159,7 @@ plugins = [
+@@ -127,7 +166,7 @@ plugins = [
      ),
      StandardRegistryPlugin('Cobra Standard Registry Plugin', config=my_config),
      StandardPreprocessorPlugin('Cobra Standard Preprocessor Plugin'),

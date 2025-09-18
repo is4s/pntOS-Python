@@ -4,7 +4,14 @@ from enum import Enum
 
 import numpy as np
 from aspn23 import TypeTimestamp
-from pntos.api import LoggingLevel, Mediator, Message, RegistryValueTypeUnion
+from pntos.api import (
+    EstimateWithCovariance,
+    EstimateWithCovarianceType,
+    LoggingLevel,
+    Mediator,
+    Message,
+    RegistryValueTypeUnion,
+)
 from pntos.cobra import StandardRegistryPlugin
 from pntos.cobra.config import (
     AlignmentStrategy,
@@ -25,6 +32,7 @@ from pntos.cobra.config import (
     config_from_registry,
     config_to_registry,
 )
+from pntos.cobra.utils import validate_manual_ewc
 
 DEBUG_LOG: str = ''
 CONFIG_TEST_GROUP = 'config_test_group'
@@ -315,6 +323,71 @@ class TestConfigUtils(unittest.TestCase):
             SensorConfig, self.mediator, CONFIG_TEST_GROUP
         )
         assert result_conf is None
+
+    def test_manual_ewc_validation(self) -> None:
+        # Test valid ewc is returned in the same state
+        type = EstimateWithCovarianceType.EWC_GENERIC
+        est = np.zeros((3, 1))
+        cov = np.eye(3)
+        valid_ewc = EstimateWithCovariance(type, est, cov)
+        ret_ewc = validate_manual_ewc(valid_ewc, 3, self.mediator)
+        assert ret_ewc is not None
+        self._compare_ewc(ret_ewc, valid_ewc)
+        # Test convertable dimensionality
+        est = np.zeros((3,))
+        cov = np.array([1, 1, 1])
+        convertable_ewc = EstimateWithCovariance(type, est, cov)
+        ret_ewc = validate_manual_ewc(convertable_ewc, 3, self.mediator)
+        assert ret_ewc is not None
+        self._compare_ewc(ret_ewc, valid_ewc)
+        assert ret_ewc.estimate.ndim == 2
+        assert ret_ewc.covariance.ndim == 2
+        # Test invalid dimensionality for est and cov
+        assert (
+            validate_manual_ewc(
+                EstimateWithCovariance(type, np.zeros((3, 1, 3)), cov), 3, self.mediator
+            )
+            is None
+        )
+        assert (
+            validate_manual_ewc(
+                EstimateWithCovariance(type, est, np.zeros((3, 3, 3))), 3, self.mediator
+            )
+            is None
+        )
+        # Test state count mismatch for est and cov
+        assert (
+            validate_manual_ewc(
+                EstimateWithCovariance(type, est, cov), 4, self.mediator
+            )
+            is None
+        )
+        assert (
+            validate_manual_ewc(
+                EstimateWithCovariance(type, np.zeros((4,)), cov), 4, self.mediator
+            )
+            is None
+        )
+        # Test wrong size in 2nd dimension
+        assert (
+            validate_manual_ewc(
+                EstimateWithCovariance(type, np.zeros((3, 2)), cov), 3, self.mediator
+            )
+            is None
+        )
+        assert (
+            validate_manual_ewc(
+                EstimateWithCovariance(type, est, np.zeros((3, 2))), 3, self.mediator
+            )
+            is None
+        )
+
+    def _compare_ewc(
+        self, ewc1: EstimateWithCovariance, ewc2: EstimateWithCovariance
+    ) -> None:
+        assert ewc1.type == ewc2.type
+        assert np.allclose(ewc1.estimate, ewc2.estimate)
+        assert np.allclose(ewc1.covariance, ewc2.covariance)
 
     def _validate_conf_to_registry(self, test_conf: BaseConfig) -> None:
         kv = self.mediator.registry.batch_start(CONFIG_TEST_GROUP)

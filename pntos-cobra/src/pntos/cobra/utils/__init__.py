@@ -1,6 +1,7 @@
 from .arrays import (
     is_symmetric as is_symmetric,
     validate_array as validate_array,
+    validate_manual_ewc as validate_manual_ewc,
 )
 from .conversions import (
     convert_header_from_cpp as convert_header_from_cpp,

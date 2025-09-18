@@ -1,5 +1,6 @@
 from dataclasses import dataclass
-from typing import Optional
+
+from pntos.api import EstimateWithCovariance
 
 from .BaseConfig import BaseConfig
 from .FogmConfig import FogmConfig
@@ -9,7 +10,7 @@ from .PreprocessorConfig import PreprocessorConfig
 from .SensorConfig import SensorConfig
 
 
-@dataclass
+@dataclass(kw_only=True)
 class StateBlockConfig(BaseConfig):
     """
     Configuration used to generate a new state block.
@@ -29,8 +30,13 @@ class StateBlockConfig(BaseConfig):
     The name used to identify and track this state block through its lifecycle.
     """
 
+    estimate_with_covariance: EstimateWithCovariance | None = None
+    """
+    An optional field that allows an initial estimate and covariance to be associated with the state block.
+    """
 
-@dataclass
+
+@dataclass(kw_only=True)
 class PinsonStateBlockConfig(StateBlockConfig):
     """
     Configuration used to generate a new pinson state block.
@@ -43,6 +49,8 @@ class PinsonStateBlockConfig(StateBlockConfig):
 
     label: str
 
+    estimate_with_covariance: EstimateWithCovariance | None = None
+
     # UNIQUE FIELDS
     imu_model: ImuConfig
     """
@@ -52,7 +60,7 @@ class PinsonStateBlockConfig(StateBlockConfig):
     """
 
 
-@dataclass
+@dataclass(kw_only=True)
 class FogmStateBlockConfig(StateBlockConfig):
     """
     Configuration used to generate a new FOGM state block.
@@ -64,6 +72,8 @@ class FogmStateBlockConfig(StateBlockConfig):
     identifier: str
 
     label: str
+
+    estimate_with_covariance: EstimateWithCovariance  # not optional on this block
 
     # UNIQUE FIELDS
     fogm_model: FogmConfig
