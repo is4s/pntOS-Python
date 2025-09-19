@@ -20,8 +20,8 @@ from .TutorialPinsonWithNedFogmPositionMeasurementProcessor import (
 
 
 class TutorialGpsInsStateModelProvider(StandardStateModelProvider):
-    """StandardStateModelProvider that offers a 15-state pinson state block, variable-size
-    Fogm Block and various position and velocity measurement processors.
+    """A tutorial implementation of StandardStateModelProvider that offers a 15-state pinson state block,
+    variable-size FOGM block, a position measurement processor and a velocity measurement processor.
     """
 
     _mediator: Mediator
@@ -59,8 +59,8 @@ class TutorialGpsInsStateModelProvider(StandardStateModelProvider):
 
         Args:
             processor_index (int): Index into self.processor_identifiers used to select the desired type of measurement processor.
-                - Index 1 corresponds to a PinsonVelocityMeasurementProcessor.
-                - Index 2 corresponds to a PinsonWithNedFogmPositionMeasurementProcessor.
+                - Index 0 corresponds to a :class:`pntos.cobra.internal.TutorialPinsonVelocityMeasurementProcessor`.
+                - Index 1 corresponds to a :class:`pntos.cobra.internal.TutorialPinsonWithNedFogmPositionMeasurementProcessor`.
                 - All other indices will result in a return value of None.
             engine (pntos.api.plugins.fusion.StandardFusionEngine | None): An optional parameter that may be provided to the
                 new processor, such that the processor may interact with the fusion engine it
@@ -118,8 +118,8 @@ class TutorialGpsInsStateModelProvider(StandardStateModelProvider):
         Args:
             block_index (int): Index into self.block_identifiers used to select the desired type of state block.
 
-                - Index 0 corresponds to a Pinson15NedBlock.
-                - Index 1 corresponds to a FogmBlock.
+                - Index 0 corresponds to a :class:`pntos.cobra.internal.TutorialPinson15NedBlock`.
+                - Index 1 corresponds to a :class:`pntos.cobra.internal.TutorialFogmBlock`.
                 - All other indices will result in a return value of None.
             engine (pntos.api.plugins.fusion.StandardFusionEngine | None): An optional parameter that may be provided to the
                 new block, such that the block may interact with the fusion engine it

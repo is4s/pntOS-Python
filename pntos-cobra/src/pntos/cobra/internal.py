@@ -46,8 +46,20 @@ from .standard_plugins.state_modeling.StandardGpsInsStateModelingPlugin import (
     StandardGpsInsStateModelProvider as StandardGpsInsStateModelProvider,
 )
 from .standard_plugins.StaticAlignInitializationPlugin import StaticAlign as StaticAlign
+from .tutorial_plugins.state_modeling.TutorialFogmBlock import (
+    TutorialFogmBlock as TutorialFogmBlock,
+)
 from .tutorial_plugins.state_modeling.TutorialGpsInsStateModelingPlugin import (
     TutorialGpsInsStateModelProvider as TutorialGpsInsStateModelProvider,
+)
+from .tutorial_plugins.state_modeling.TutorialPinson15NedBlock import (
+    TutorialPinson15NedBlock as TutorialPinson15NedBlock,
+)
+from .tutorial_plugins.state_modeling.TutorialPinsonVelocityMeasurementProcessor import (
+    TutorialPinsonVelocityMeasurementProcessor as TutorialPinsonVelocityMeasurementProcessor,
+)
+from .tutorial_plugins.state_modeling.TutorialPinsonWithNedFogmPositionMeasurementProcessor import (
+    TutorialPinsonWithNedFogmPositionMeasurementProcessor as TutorialPinsonWithNedFogmPositionMeasurementProcessor,
 )
 from .tutorial_plugins.TutorialInitializationPlugin import (
     ManualInitialization as ManualInitialization,
