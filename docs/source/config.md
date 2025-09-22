@@ -52,4 +52,9 @@ Within Cobra, there are a set of existing configuration files that are used in s
 There is also a set of utility functions in `pntos-cobra/src/pntos/cobra/config/utils.py` that are used throughout Cobra to make storing and retrieving these config objects easier. In order to simplify some of the utility functions, namely `config_to_registry` and `config_from_registry`, some conventions were designed which are as follows:
 
 - No field within a config class should start with an underscore `_`. Following this convention ensures there will be no key-value store collisions with internal entries created and stored in the registry.
-- The functions support all registry types denoted by `RegistryTypeValueUnion`, any data class in `pntos-cobra/src/pntos/cobra/config/`, `Enum`'s, `tuple[float64, ...]`, and the {py:obj}`EstimateWithCovariance<pntos.api.EstimateWithCovariance>` data class.
+- The functions support the following types:
+    - Registry types denoted by `RegistryTypeValueUnion`
+    - Any data class in `pntos-cobra/src/pntos/cobra/config/` as well as lists of these classes (i.e. `list[BaseConfig]`)
+    - `Enum`'s
+    - Stand-alone and nested `tuple[float, ...]`
+    - The {py:obj}`EstimateWithCovariance<pntos.api.EstimateWithCovariance>` data class.

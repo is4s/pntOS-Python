@@ -204,7 +204,7 @@ def config_to_registry(config: BaseConfig, mediator: Mediator) -> None:
     This function will convert certain types (list[float], list|nd.array[int], Enum, tuple[float])
     unsupported by the registry to the corresponding supported type represented by ``RegistryValueType``.
     It will convert an ``int`` to a ``float`` if the field is type hinted as a ``float``.
-    It also supports storing nested config objects.
+    It also supports storing nested config objects and the API defined :class:`pntos.api.EstimateWithCovariance`.
 
     Args:
         config (BaseConfig): The config to be stored in the registry.
@@ -222,8 +222,10 @@ def config_to_registry(config: BaseConfig, mediator: Mediator) -> None:
             kv.batch_end()
             return None
         val_to_store = getattr(config, param.name)
+        # internally convert int to float if type is supposed to be float
         if isinstance(val_to_store, int) and param.type is float:
             val_to_store = float(val_to_store)
+        # compare user provided type with the validated config type hint
         if not _confirm_types(val_to_store, param.type):
             mediator.log_message(
                 LoggingLevel.ERROR,
@@ -303,6 +305,15 @@ def _confirm_types(out_val: Any, expected_type: type[Any]) -> bool:
 
 
 def _is_type_optional(field_type: type[Any] | str) -> bool:
+    """
+    A helper function that determines if the provided type is optional i.e. contains `| None`.
+
+    Args:
+        field_type (type[Any] | str): The type to be checked.
+
+    Returns:
+        bool
+    """
     if isinstance(field_type, type):
         return False
     types = get_args(field_type)
@@ -313,6 +324,16 @@ def _is_type_optional(field_type: type[Any] | str) -> bool:
 
 
 def _is_type_supported(field_type: type[Any]) -> bool:
+    """
+    A helper function that determines if the provided type is supported by ``config_from_registry``
+    and ``config_to_registry``.
+
+    Args:
+        field_type (type[Any] | str): The type to be checked.
+
+    Returns:
+        bool
+    """
     type_to_compare = field_type
     if _is_type_optional(type_to_compare):
         type_to_compare = get_args(type_to_compare)[0]
@@ -333,6 +354,16 @@ def _is_type_supported(field_type: type[Any]) -> bool:
 
 
 def _validate_tuple_type(tuple_type: type[Any]) -> bool:
+    """
+    A recursive function that checks each type of the input ``tuple`` and determines
+    if they are supported by ``config_from_registry`` and ``config_to_registry``.
+
+    Args:
+        tuple_type (type[Any]): The tuple type-hint to be checked.
+
+    Returns:
+        bool
+    """
     args = get_args(tuple_type)
     for arg in args:
         arg_org = get_origin(arg)
