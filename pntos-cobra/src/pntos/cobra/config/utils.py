@@ -18,6 +18,9 @@ from .BaseConfig import BaseConfig
 from .ImuConfig import ImuConfig
 
 ConfigType = TypeVar('ConfigType', bound=BaseConfig)
+SUPPORTED_TYPES = set(
+    get_args(RegistryValueTypeUnion) + (tuple[float, ...], Enum, EstimateWithCovariance)
+)
 
 
 def imu_model_to_config(model: ImuModel, group: str) -> ImuConfig:
@@ -211,6 +214,13 @@ def config_to_registry(config: BaseConfig, mediator: Mediator) -> None:
     kv = mediator.registry.batch_start(config.group)
 
     for param in conf_params:
+        if not _is_type_supported(param.type):
+            mediator.log_message(
+                LoggingLevel.ERROR,
+                f'Support for converting {param.type} to a registry type does not exist. Support must be added or a different type must be used on the config class {type(config)}',
+            )
+            kv.batch_end()
+            return None
         val_to_store = getattr(config, param.name)
         if isinstance(val_to_store, int) and param.type is float:
             val_to_store = float(val_to_store)
@@ -300,3 +310,38 @@ def _is_type_optional(field_type: type[Any] | str) -> bool:
         if t is type(None):
             return True
     return False
+
+
+def _is_type_supported(field_type: type[Any]) -> bool:
+    type_to_compare = field_type
+    if _is_type_optional(type_to_compare):
+        type_to_compare = get_args(type_to_compare)[0]
+    origin = get_origin(type_to_compare)
+    # if type is a tuple, check each type it contains
+    if origin is tuple:
+        return _validate_tuple_type(type_to_compare)
+    # we support lists of one of the following types: int, str, float, BaseConfig
+    elif origin is list:
+        args = get_args(type_to_compare)
+        if len(args) != 1:
+            return False
+        if issubclass(args[0], (int, str, float, BaseConfig)):
+            return True
+    return type_to_compare in SUPPORTED_TYPES or issubclass(
+        type_to_compare, (Enum, BaseConfig)
+    )
+
+
+def _validate_tuple_type(tuple_type: type[Any]) -> bool:
+    args = get_args(tuple_type)
+    for arg in args:
+        arg_org = get_origin(arg)
+        if arg_org is tuple:
+            if not _validate_tuple_type(arg):
+                return False
+        elif arg_org is None:
+            if arg is not float and arg is not Ellipsis:
+                return False
+        else:
+            return False
+    return True
