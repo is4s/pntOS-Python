@@ -181,7 +181,7 @@ def config_from_registry(
         if not _confirm_types(val, param.type):
             mediator.log_message(
                 LoggingLevel.ERROR,
-                f'Expected field {param} in {config_type} to have type '
+                f'Expected field {param.name} in {config_type} to have type '
                 + f'{param.type} but received {type(val)} from registry.',
             )
             kv.batch_end()
@@ -200,8 +200,8 @@ def config_to_registry(config: BaseConfig, mediator: Mediator) -> None:
 
     This function will convert certain types (list[float], list|nd.array[int], Enum, tuple[float])
     unsupported by the registry to the corresponding supported type represented by ``RegistryValueType``.
-    It also supports storing nested config objects, though it expects the nested object to have the
-    same config group as the outer object.
+    It will convert an ``int`` to a ``float`` if the field is type hinted as a ``float``.
+    It also supports storing nested config objects.
 
     Args:
         config (BaseConfig): The config to be stored in the registry.
@@ -212,6 +212,16 @@ def config_to_registry(config: BaseConfig, mediator: Mediator) -> None:
 
     for param in conf_params:
         val_to_store = getattr(config, param.name)
+        if isinstance(val_to_store, int) and param.type is float:
+            val_to_store = float(val_to_store)
+        if not _confirm_types(val_to_store, param.type):
+            mediator.log_message(
+                LoggingLevel.ERROR,
+                f'Expected field {param.name} in {type(config)} to have type {param.type} '
+                + f'but received {type(val_to_store)} from registry.',
+            )
+            kv.batch_end()
+            return None
         if isinstance(val_to_store, tuple):
             val_to_store = np.array(val_to_store, dtype=np.float64)
         elif isinstance(val_to_store, list) or isinstance(val_to_store, np.ndarray):
@@ -230,7 +240,6 @@ def config_to_registry(config: BaseConfig, mediator: Mediator) -> None:
         elif isinstance(val_to_store, Enum):
             val_to_store = val_to_store.value
         elif isinstance(val_to_store, EstimateWithCovariance):
-            print(config.group)
             kv['_estimate'] = val_to_store.estimate
             kv['_covariance'] = val_to_store.covariance
             kv['_ewc_type'] = val_to_store.type.value
@@ -275,12 +284,12 @@ def _confirm_types(out_val: Any, expected_type: type[Any]) -> bool:
         else:
             return False
 
-    # Check if expected_type is generic alias (list[str], tuple[float], ect...)
+    # Check if expected_type is generic alias (list[str], tuple[float], etc...)
     if hasattr(expected_type, '__origin__'):
         return out_type is get_origin(expected_type)
 
     # Otherwise, just see if it's the same type
-    return out_type is expected_type
+    return issubclass(out_type, expected_type)
 
 
 def _is_type_optional(field_type: type[Any] | str) -> bool:
