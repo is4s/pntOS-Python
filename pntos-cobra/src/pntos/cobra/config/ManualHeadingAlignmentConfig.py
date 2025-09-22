@@ -1,17 +1,25 @@
 from dataclasses import dataclass
 
-from .BaseConfig import BaseConfig
+from .ImuConfig import ImuConfig
+from .StaticAlignmentConfig import AlignmentStrategy, StaticAlignmentConfig
 
 
 @dataclass
-class ManualHeadingAlignmentConfig(BaseConfig):
+class ManualHeadingAlignmentConfig(StaticAlignmentConfig):
     """
     Configuration specifically for a manual heading alignment which is used in the 'StaticAlignInitializationPlugin.py' plugin.
-
-    This is designed to be used in conjunction with a StaticAlignmentConfig.
-
-    See StaticAlignmentConfig.py for more information.
     """
+
+    # INHERITED FIELDS
+    group: str
+
+    strategy: AlignmentStrategy
+
+    static_time: float
+
+    imu_model: ImuConfig
+
+    # UNIQUE FIELDS
 
     heading: float
     """
@@ -23,5 +31,3 @@ class ManualHeadingAlignmentConfig(BaseConfig):
     """
     The one-sigma, standard deviation of the tilt error about the down axis associated with the initial heading.
     """
-
-    group: str

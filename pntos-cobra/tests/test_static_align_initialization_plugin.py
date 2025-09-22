@@ -183,14 +183,15 @@ def test() -> None:
     config_to_registry(config, mediator)
     _test_aligner(plugin, group, config.static_time, config.strategy)
 
-    # Modify config for manual heading alignment and test it.
-    config.strategy = AlignmentStrategy.MANUAL_HEADING
-    config_to_registry(config, mediator)
-
-    heading_config = ManualHeadingAlignmentConfig(
-        heading=-np.pi / 2, heading_sigma=0.017453292519943295, group=group
+    config = ManualHeadingAlignmentConfig(
+        strategy=AlignmentStrategy.MANUAL_HEADING,
+        static_time=static_time,
+        imu_model=imu_config,
+        heading=-np.pi / 2,
+        heading_sigma=0.017453292519943295,
+        group=group,
     )
-    config_to_registry(heading_config, mediator)
+    config_to_registry(config, mediator)
     _test_aligner(plugin, group, config.static_time, config.strategy)
 
 
