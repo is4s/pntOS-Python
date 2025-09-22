@@ -1,5 +1,5 @@
 diff --git a/apps/standard/gps_ins.py b/apps/advanced/gps_ins_ros.py
-index 9be4a11e..bc466a25 100755
+index 5565967a..b6c6b295 100755
 --- a/apps/standard/gps_ins.py
 +++ b/apps/advanced/gps_ins_ros.py
 @@ -1,7 +1,5 @@
@@ -18,12 +18,13 @@ index 9be4a11e..bc466a25 100755
      SimpleControllerPlugin,
      StandardFusionPlugin,
      StandardGpsInsStateModelingPlugin,
-@@ -21,14 +18,13 @@ from pntos.cobra import (
+@@ -21,15 +18,14 @@ from pntos.cobra import (
      StandardRegistryPlugin,
-     TutorialInitializationPlugin,
+     StaticAlignInitializationPlugin,
  )
 +from pntos.cobra.advanced_plugins import Aspn23RosTransportPlugin
  from pntos.cobra.config import (
+     AlignmentStrategy,
 -    AspnVersion,
      FogmConfig,
      FogmStateBlockConfig,
@@ -31,10 +32,10 @@ index 9be4a11e..bc466a25 100755
      ImuRotatorConfig,
      InertialConfig,
 -    LcmLogTransportConfig,
-     ManualAlignmentConfig,
+     ManualHeadingAlignmentConfig,
      PinsonStateBlockConfig,
      SensorConfig,
-@@ -36,9 +32,6 @@ from pntos.cobra.config import (
+@@ -37,9 +33,6 @@ from pntos.cobra.config import (
      StandardOrchestrationConfig,
      TimeAdjusterConfig,
  )
@@ -44,8 +45,8 @@ index 9be4a11e..bc466a25 100755
  
  # Config setup
  C_imu_to_platform = (
-@@ -47,16 +40,10 @@ C_imu_to_platform = (
-     (-0.06453231, 0.00609588, 0.997897),
+@@ -57,16 +50,10 @@ imu_model = ImuConfig(
+     gyro_random_walk_sigma=(9.9e-4, 9.9e-4, 6.7e-5),
  )
  my_config = [
 -    LcmLogTransportConfig(
@@ -62,7 +63,7 @@ index 9be4a11e..bc466a25 100755
          pinson_sb_config=PinsonStateBlockConfig(
              group='config/pinson_block',
              identifier='pinson15',
-@@ -93,7 +80,7 @@ my_config = [
+@@ -95,7 +82,7 @@ my_config = [
                  group='config/gps_measurement_processor',
                  identifier='pinson_with_ned_fogm_position',
                  label='gps',
@@ -71,7 +72,7 @@ index 9be4a11e..bc466a25 100755
                  state_block_labels=['pinson15', 'pos_fogm'],
                  sensor_config=SensorConfig(
                      group='config/gp3d_state_modeling',
-@@ -106,7 +93,7 @@ my_config = [
+@@ -108,7 +95,7 @@ my_config = [
          inertial_config=InertialConfig(
              group='config/inertial',
              expected_dt=0.01,
@@ -80,7 +81,7 @@ index 9be4a11e..bc466a25 100755
              C_imu_to_platform=C_imu_to_platform,
              inertial_buffer_length=10.0,
          ),
-@@ -136,13 +123,13 @@ my_config = [
+@@ -124,13 +111,13 @@ my_config = [
              ImuRotatorConfig(
                  group='config/imu_rotator',
                  identifier='imu_rotator',
@@ -96,7 +97,7 @@ index 9be4a11e..bc466a25 100755
                  expected_dt_nsec=int(0.01 * 1e9),
              ),
          ],
-@@ -154,7 +141,7 @@ my_config = [
+@@ -142,7 +129,7 @@ my_config = [
  # Instantiate all of our plugins
  controller = SimpleControllerPlugin('Cobra Simple Controller Plugin')
  plugins = [
@@ -105,7 +106,7 @@ index 9be4a11e..bc466a25 100755
      EkfFusionStrategyPlugin('Cobra EKF Fusion Strategy Plugin'),
      StandardFusionPlugin('Cobra Standard Fusion Plugin'),
      StandardGpsInsStateModelingPlugin('Cobra Standard State Modeling Plugin'),
-@@ -164,7 +151,7 @@ plugins = [
+@@ -152,7 +139,7 @@ plugins = [
          'Cobra Standard Logging Plugin',
          global_log_level=LoggingLevel.INFO,  # Switch to `DEBUG` for more informative log output
      ),

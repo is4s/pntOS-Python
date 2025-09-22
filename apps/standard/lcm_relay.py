@@ -17,9 +17,10 @@ from pntos.cobra import (
     StandardOrchestrationPlugin,
     StandardPreprocessorPlugin,
     StandardRegistryPlugin,
-    TutorialInitializationPlugin,
+    StaticAlignInitializationPlugin,
 )
 from pntos.cobra.config import (
+    AlignmentStrategy,
     AspnVersion,
     FogmConfig,
     FogmStateBlockConfig,
@@ -27,7 +28,7 @@ from pntos.cobra.config import (
     ImuRotatorConfig,
     InertialConfig,
     LcmTransportConfig,
-    ManualAlignmentConfig,
+    ManualHeadingAlignmentConfig,
     PinsonStateBlockConfig,
     SensorConfig,
     SensorMeasurementProcessorConfig,
@@ -41,6 +42,15 @@ C_imu_to_platform = (
     (-0.01741603, 0.99982216, -0.00723391),
     (-0.06453231, 0.00609588, 0.997897),
 )
+imu_model = ImuConfig(
+    group='config/inertial_state',
+    accel_bias_sigma=(2.4e-3, 2.4e-3, 2.4e-3),
+    accel_bias_tau=(300.0, 300.0, 300.0),
+    accel_random_walk_sigma=(3.887e-6, 3.887e-6, 3.887e-6),
+    gyro_bias_sigma=(2e-4, 2e-4, 2e-4),
+    gyro_bias_tau=(500.0, 500.0, 500.0),
+    gyro_random_walk_sigma=(9.9e-4, 9.9e-4, 6.7e-5),
+)
 my_config = [
     LcmTransportConfig(output_version=AspnVersion.V23, group='config/lcm_transport'),
     StandardOrchestrationConfig(
@@ -51,15 +61,7 @@ my_config = [
             group='config/pinson_block',
             identifier='pinson15',
             label='pinson15',
-            imu_model=ImuConfig(
-                group='config/inertial_state',
-                accel_bias_sigma=(2.4e-3, 2.4e-3, 2.4e-3),
-                accel_bias_tau=(300.0, 300.0, 300.0),
-                accel_random_walk_sigma=(3.887e-6, 3.887e-6, 3.887e-6),
-                gyro_bias_sigma=(2e-4, 2e-4, 2e-4),
-                gyro_bias_tau=(500.0, 500.0, 500.0),
-                gyro_random_walk_sigma=(9.9e-4, 9.9e-4, 6.7e-5),
-            ),
+            imu_model=imu_model,
         ),
         additional_sb_configs=[
             FogmStateBlockConfig(
@@ -100,27 +102,13 @@ my_config = [
             C_imu_to_platform=C_imu_to_platform,
             inertial_buffer_length=10.0,
         ),
-        alignment_config=ManualAlignmentConfig(
+        alignment_config=ManualHeadingAlignmentConfig(
             group='config/default/alignment',
-            initial_pos_var=(0.1, 0.1, 0.1),
-            initial_vel_var=(1e-3, 1e-3, 1e-3),
-            initial_tilt_var=(5e-4, 5e-4, 5e-4),
-            initial_accel_bias_var=(5.2e-3, 5.2e-3, 5.2e-3),
-            initial_gyro_bias_var=(9e-6, 9e-6, 9e-6),
-            initial_accel_bias=(-0.0023383, 0.00085563, -0.05412892),
-            initial_accel_scale_factor=(0.0, 0.0, 0.0),
-            initial_accel_scale_factor_var=(0.0, 0.0, 0.0),
-            initial_gyro_bias=(-0.00160958, -0.00204483, -0.00267885),
-            initial_gyro_scale_factor=(0.0, 0.0, 0.0),
-            initial_gyro_scale_factor_var=(0.0, 0.0, 0.0),
-            initial_pos=(0.6938996038254822, -1.4679920679462133, 225.493),
-            initial_rpy=(
-                -0.014713125594312194,
-                -0.040718531449027706,
-                0.06895795874629593,
-            ),
-            initial_time=1747680879.539799718,
-            initial_vel=(0.0, 0.0, 0.0),
+            strategy=AlignmentStrategy.MANUAL_HEADING,
+            static_time=10.0,
+            imu_model=imu_model,
+            heading=0.06895795874629593,
+            heading_sigma=0.02236067977,
         ),
         preprocessor_configs=[
             ImuRotatorConfig(
@@ -149,7 +137,7 @@ plugins = [
     StandardFusionPlugin('Cobra Standard Fusion Plugin'),
     StandardGpsInsStateModelingPlugin('Cobra Standard State Modeling Plugin'),
     StandardInertialPlugin('Cobra Standard Inertial Plugin'),
-    TutorialInitializationPlugin('Cobra Manual Initialization Plugin'),
+    StaticAlignInitializationPlugin('Cobra Static Align Initialization Plugin'),
     StandardLoggingPlugin(
         'Cobra Standard Logging Plugin',
         global_log_level=LoggingLevel.INFO,  # Switch to `DEBUG` for more informative log output

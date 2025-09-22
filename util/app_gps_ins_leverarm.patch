@@ -1,8 +1,8 @@
 diff --git a/apps/standard/gps_ins.py b/apps/standard/gps_ins_leverarm.py
-index 9be4a11e..42c81fd6 100755
+index 5565967a..19c1b0a5 100755
 --- a/apps/standard/gps_ins.py
 +++ b/apps/standard/gps_ins_leverarm.py
-@@ -73,9 +73,9 @@ my_config = [
+@@ -75,9 +75,9 @@ my_config = [
          ),
          additional_sb_configs=[
              FogmStateBlockConfig(
@@ -14,7 +14,7 @@ index 9be4a11e..42c81fd6 100755
                  estimate_with_covariance=EstimateWithCovariance(
                      type=EstimateWithCovarianceType.EWC_GENERIC,
                      estimate=np.zeros((3,)),
-@@ -87,17 +87,40 @@ my_config = [
+@@ -89,17 +89,40 @@ my_config = [
                      tau=(300.0, 300.0, 200.0),
                  ),
              ),

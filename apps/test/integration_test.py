@@ -60,6 +60,7 @@ def validate_results(
     pos_err_limits: ErrorLimits,
     vel_err_limits: ErrorLimits,
     tilt_err_limits: ErrorLimits,
+    expected_start_time_offset: float = 0.0,
 ) -> None:
     filter_time: NDArray[np.float64] = pva.time
     truth_time: NDArray[np.float64] = truth.time
@@ -76,7 +77,7 @@ def validate_results(
     assert not np.isnan(pva.tilt_sig).any()
 
     # ensure solution starts and ends within 3 seconds of truth start and end
-    assert abs(filter_time[0] - truth_time[0]) < 3  # noqa: PLR2004
+    assert abs(filter_time[0] - expected_start_time_offset - truth_time[0]) < 3.0  # noqa: PLR2004
     assert abs(filter_time[-1] - truth_time[-1]) < 3  # noqa: PLR2004
 
     # Rotate INS-D rpy since there's a bug in the smartcable (TODO: #236)
@@ -117,12 +118,13 @@ def test_standard_gps_ins_app() -> None:
     validate_results(
         log_data.data[SOLUTION_CHANNEL],
         log_data.data[TRUTH_CHANNEL],
-        num_points=2593,
+        num_points=2584,
         pos_err_limits=ErrorLimits(std_thresh=2.0, max_thresh=4.0, pct_below_1sigma=60),
         vel_err_limits=ErrorLimits(std_thresh=0.11, max_thresh=1.0),
         tilt_err_limits=ErrorLimits(
             std_thresh=0.8, max_thresh=2.5, pct_below_1sigma=48, pct_below_2sigma=91
         ),
+        expected_start_time_offset=10.0,
     )
 
 
@@ -137,12 +139,13 @@ def test_standard_gps_ins_network_app() -> None:
     validate_results(
         log_data.data[SOLUTION_CHANNEL],
         log_data.data[TRUTH_CHANNEL],
-        num_points=2593,
+        num_points=2584,
         pos_err_limits=ErrorLimits(std_thresh=2.0, max_thresh=4.0, pct_below_1sigma=60),
         vel_err_limits=ErrorLimits(std_thresh=0.11, max_thresh=1.0),
         tilt_err_limits=ErrorLimits(
             std_thresh=0.8, max_thresh=2.5, pct_below_1sigma=48, pct_below_2sigma=91
         ),
+        expected_start_time_offset=10.0,
     )
 
 
@@ -188,12 +191,13 @@ def test_standard_gps_ins_leverarm_app() -> None:
     validate_results(
         log_data.data[SOLUTION_CHANNEL],
         log_data.data[TRUTH_CHANNEL],
-        num_points=2593,
+        num_points=2584,
         pos_err_limits=ErrorLimits(std_thresh=2.0, max_thresh=4.1, pct_below_1sigma=60),
         vel_err_limits=ErrorLimits(std_thresh=0.11, max_thresh=1.0),
         tilt_err_limits=ErrorLimits(
             std_thresh=0.81, max_thresh=2.5, pct_below_1sigma=53, pct_below_2sigma=91
         ),
+        expected_start_time_offset=10.0,
     )
 
 
