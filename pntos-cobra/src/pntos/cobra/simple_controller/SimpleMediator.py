@@ -126,7 +126,7 @@ class SimpleMediator(Mediator):
                     )
             else:
                 self.log_message(
-                    LoggingLevel.WARN,
+                    LoggingLevel.DEBUG,
                     'Could not receive solution from orchestration.',
                 )
             self._last_solution_time = cur_time
