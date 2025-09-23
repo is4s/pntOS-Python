@@ -174,32 +174,10 @@ class TutorialPinson15NedBlock(StandardStateBlock):
         Q_prop = Phi @ Q @ Phi.T
         Qd = (Q_prop + Q) * (0.5 * dt)
 
-        self.scale_phi(Phi)
-
         def g(x: NDArray[float64]) -> NDArray[float64]:
             return Phi @ x
 
         return StandardDynamicsModel(g, Phi, Qd)
-
-    def scale_phi(self, Phi: NDArray[float64]) -> None:
-        """Scale first 15 elements of first 2 columns of `phi` such to account for change in rad to meter scale factors over propagation time.
-
-        Args:
-            Phi (NDArray[float64]): Matrix obtained by discretizing the propagation Jacobian. This matrix will be modified to account for the rad to meter scaling.
-        """
-        if self._old_pva_aux is not None and self._new_pva_aux is not None:
-            pos = extract_pos(self._old_pva_aux)
-            lat_factor0 = delta_lat_to_north(1, pos[0], pos[2])
-            lon_factor0 = delta_lon_to_east(1, pos[0], pos[2])
-
-            new_pos = extract_pos(self._new_pva_aux)
-            lat_factor1 = delta_lat_to_north(1, new_pos[0], new_pos[2])
-            lon_factor1 = delta_lon_to_east(1, new_pos[0], new_pos[2])
-
-            lat0_to_lat1 = lat_factor1 / lat_factor0
-            lon0_to_lon1 = lon_factor1 / lon_factor0
-            Phi[:, 0] *= lat0_to_lat1
-            Phi[:, 1] *= lon0_to_lon1
 
     def generate_f_pinson15(self) -> NDArray[float64]:
         """Generates the continuous time propagation matrix F.
@@ -281,21 +259,6 @@ class TutorialPinson15NedBlock(StandardStateBlock):
             ]
         )
 
-        # Try adding gravity effect based on lat/north error. Derived from the
-        # 'Schwartz' gravity model
-        a1 = 9.7803267715
-        a2 = 0.0052790414
-        a3 = 0.0000232718
-        a4 = -3.0876910891e-6
-        a5 = 4.3977311e-9
-        a6 = 7.211e-13
-        dgdlat = (
-            2 * a1 * a2 * cos(2 * pos[0])
-            + a1 * a3 * (12 * (1 - cos(4 * pos[0])) / 8 - pow(sin(pos[0]), 4))
-            + 2 * a5 * (cos(2 * pos[0]) - cosl * sinl) * pos[2]
-        )
-        dgdalt = (a4 + a5 * pow(sinl, 2)) + a6 * 2 * pos[2]
-
         # block6: deltavel = block6 * dpos
         block6 = (
             np.array(
@@ -314,9 +277,9 @@ class TutorialPinson15NedBlock(StandardStateBlock):
                         -ve / pow(re, 2) * (vn * tanl + vd),
                     ],
                     [
-                        2 * omega * ve * sinl + dgdlat,
+                        2 * omega * ve * sinl,
                         0,
-                        vn * vn / pow(rn, 2) + ve * ve / pow(re, 2) + dgdalt,
+                        vn * vn / pow(rn, 2) + ve * ve / pow(re, 2),
                     ],
                 ]
             )
