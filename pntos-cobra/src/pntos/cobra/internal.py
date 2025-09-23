@@ -37,11 +37,17 @@ from .state_modeling_simple_gps_ins.PinsonPositionMeasurementProcessor import (
 from .state_modeling_simple_gps_ins.PinsonVelocityMeasurementProcessor import (
     PinsonVelocityMeasurementProcessor as PinsonVelocityMeasurementProcessor,
 )
+from .state_modeling_simple_gps_ins.PinsonWithLeverArmPositionMeasurementProcessor import (
+    PinsonWithLeverArmPositionMeasurementProcessor as PinsonWithLeverArmPositionMeasurementProcessor,
+)
 from .state_modeling_simple_gps_ins.PinsonWithNedFogmPositionMeasurementProcessor import (
     PinsonWithNedFogmPositionMeasurementProcessor as PinsonWithNedFogmPositionMeasurementProcessor,
 )
 from .state_modeling_simple_gps_ins.SimpleGpsInsStateModelingPlugin import (
     SimpleGpsInsStateModelProvider as SimpleGpsInsStateModelProvider,
+)
+from .state_modeling_simple_gps_ins.StandardGpsInsStateModelingPlugin import (
+    StandardGpsInsStateModelProvider as StandardGpsInsStateModelProvider,
 )
 from .tutorial_plugins.TutorialInitializationPlugin import (
     ManualInitialization as ManualInitialization,

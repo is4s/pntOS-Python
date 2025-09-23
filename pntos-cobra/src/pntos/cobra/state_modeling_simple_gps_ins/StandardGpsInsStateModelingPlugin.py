@@ -10,6 +10,7 @@ from pntos.api.plugins.state_modeling import (
 from pntos.cobra.config import (
     FogmStateBlockConfig,
     PinsonStateBlockConfig,
+    SensorConfig,
     SensorMeasurementProcessorConfig,
     config_from_registry,
 )
@@ -19,6 +20,9 @@ from .FogmBlock import FogmBlock
 from .Pinson15NedBlock import Pinson15NedBlock
 from .PinsonPositionMeasurementProcessor import PinsonPositionMeasurementProcessor
 from .PinsonVelocityMeasurementProcessor import PinsonVelocityMeasurementProcessor
+from .PinsonWithLeverArmPositionMeasurementProcessor import (
+    PinsonWithLeverArmPositionMeasurementProcessor,
+)
 from .PinsonWithNedFogmPositionMeasurementProcessor import (
     PinsonWithNedFogmPositionMeasurementProcessor,
 )
@@ -44,6 +48,7 @@ class StandardGpsInsStateModelProvider(StandardStateModelProvider):
             'pinson_velocity',
             'pinson_with_ned_fogm_position',
             'pinson_altitude',
+            'pinson_with_lever_arm_position',
         ]
         self.block_identifiers: list[str] = ['pinson15', 'fogm']
         self.virtual_block_identifiers = None
@@ -60,6 +65,7 @@ class StandardGpsInsStateModelProvider(StandardStateModelProvider):
         | PinsonWithNedFogmPositionMeasurementProcessor
         | PinsonVelocityMeasurementProcessor
         | AltitudeMeasurementProcessor
+        | PinsonWithLeverArmPositionMeasurementProcessor
         | None
     ):
         """
@@ -67,10 +73,12 @@ class StandardGpsInsStateModelProvider(StandardStateModelProvider):
 
         Args:
             processor_index (int): Index into self.processor_identifiers used to select the desired type of measurement processor.
-                - Index 0 corresponds to a PinsonPositionMeasurementProcessor.
-                - Index 1 corresponds to a PinsonVelocityMeasurementProcessor.
-                - Index 2 corresponds to a PinsonWithNedFogmPositionMeasurementProcessor.
-                - Index 3 corresponds to a AltitudeMeasurementProcessor.
+
+                - Index 0 corresponds to a :class:`PinsonPositionMeasurementProcessor`.
+                - Index 1 corresponds to a :class:`PinsonVelocityMeasurementProcessor`.
+                - Index 2 corresponds to a :class:`PinsonWithNedFogmPositionMeasurementProcessor`.
+                - Index 3 corresponds to a :class:`AltitudeMeasurementProcessor`.
+                - Index 4 corresponds to a :class:`PinsonWithLeverArmPositionMeasurementProcessor`.
                 - All other indices will result in a return value of None.
             engine (StandardFusionEngine | None): An optional parameter that may be provided to the
                 new processor, such that the processor may interact with the fusion engine it
@@ -148,6 +156,28 @@ class StandardGpsInsStateModelProvider(StandardStateModelProvider):
                     state_block_labels,
                     self._mediator,
                 )
+            case 4:
+                if config_group is None:
+                    self._mediator.log_message(
+                        LoggingLevel.ERROR,
+                        f'A config group is required for processor type {self.processor_identifiers[processor_index]}',
+                    )
+                    return None
+                sensor_config = config_from_registry(
+                    SensorMeasurementProcessorConfig, self._mediator, config_group
+                )
+                if sensor_config is None:
+                    self._mediator.log_message(
+                        LoggingLevel.ERROR,
+                        f'Could not get position sensor config from registry.',
+                    )
+                    return None
+                return PinsonWithLeverArmPositionMeasurementProcessor(
+                    label,
+                    state_block_labels,
+                    self._mediator,
+                    np.array(sensor_config.sensor_config.lever_arm),
+                )
 
         self._mediator.log_message(
             LoggingLevel.ERROR,
@@ -167,6 +197,7 @@ class StandardGpsInsStateModelProvider(StandardStateModelProvider):
 
         Args:
             block_index (int): Index into self.block_identifiers used to select the desired type of state block.
+
                 - Index 0 corresponds to a Pinson15NedBlock.
                 - Index 1 corresponds to a FogmBlock.
                 - All other indices will result in a return value of None.
@@ -258,7 +289,7 @@ class StandardGpsInsStateModelProvider(StandardStateModelProvider):
 
 
 class StandardGpsInsStateModelingPlugin(StateModelingPlugin):
-    """StateModelingPlugin that generates a StandardGpsInsStateModelProvider."""
+    """StateModelingPlugin that generates a :class:`pntos.cobra.internal.StandardGpsInsStateModelProvider`."""
 
     _mediator: Mediator
 

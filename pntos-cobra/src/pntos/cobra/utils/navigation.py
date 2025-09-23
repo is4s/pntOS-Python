@@ -205,11 +205,47 @@ def correct_dcm_with_tilt(
         I = np.eye(3)
         s = skew(tilt)
         # Below is equivalent to I - sin(m) * s / m + dot((1 - cos(m)) * s, s) / pow(m, 2)
+        # B is an approximation of rpy_to_dcm(-tilt) and/or I - skew(tilt)
         B: NDArray[float64] = (1 - cos(m)) / sum_squares * np.linalg.matrix_power(
             s, 2
         ) + (-sin(m) / m * s + I)
         return B @ dcm
     return dcm
+
+
+def dcm_to_rpy(dcm: NDArray[float64]) -> NDArray[float64]:
+    asin_arg = min(1.0, max(dcm[2, 0], -1.0))
+    r = np.arctan2(dcm[2, 1], dcm[2, 2])
+    p = -np.arcsin(asin_arg)
+    y = np.arctan2(dcm[1, 0], dcm[0, 0])
+
+    if asin_arg <= -0.999:
+        y_min_r = np.arctan2(dcm[1, 2] - dcm[0, 1], dcm[0, 2] + dcm[1, 1])
+        y = y_min_r + r
+
+    if asin_arg >= 0.999:
+        y_pls_r = np.arctan2(dcm[1, 2] + dcm[0, 1], dcm[0, 2] - dcm[1, 1]) + np.pi
+        y = np.remainder((y_pls_r - r), 2.0 * np.pi)
+
+    return np.array([r, p, y])
+
+
+def calculate_gravity_schwartz(sin_l: float, alt_msl: float) -> float:
+    A1 = 9.7803267715
+    A2 = 0.0052790414
+    A3 = 0.0000232718
+    A4 = -3.0876910891e-6
+    A5 = 4.3977311e-9
+    A6 = 7.211e-13
+
+    sin2_l = pow(sin_l, 2)
+    sin4_l = pow(sin2_l, 2)
+
+    return (
+        A1 * (1.0 + A2 * sin2_l + A3 * sin4_l)
+        + (A4 + A5 * sin2_l) * alt_msl
+        + A6 * pow(alt_msl, 2)
+    )
 
 
 RAD_E = 6378137.0
@@ -219,13 +255,6 @@ ECC_SQUARE = F * (2 - F)
 
 
 class EarthModel:
-    A1 = 9.7803267715
-    A2 = 0.0052790414
-    A3 = 0.0000232718
-    A4 = -3.0876910891e-6
-    A5 = 4.3977311e-9
-    A6 = 7.211e-13
-
     def __init__(self, pos: NDArray[float64], vel: NDArray[float64]) -> None:
         lat, lon, alt_msl = pos
         vn, ve, vd = vel
@@ -258,15 +287,7 @@ class EarthModel:
         self.g_n = np.array([0.0, 0.0, self.calculate_gravity(alt_msl)])
 
     def calculate_gravity(self, alt_msl: float) -> float:
-        # Calculate gravity using Schwartz model
-        sin2_l = pow(self.sin_l, 2)
-        sin4_l = pow(sin2_l, 2)
-
-        return (
-            self.A1 * (1.0 + self.A2 * sin2_l + self.A3 * sin4_l)
-            + (self.A4 + self.A5 * sin2_l) * alt_msl
-            + self.A6 * pow(alt_msl, 2)
-        )
+        return calculate_gravity_schwartz(self.sin_l, alt_msl)
 
 
 # Explicitly define exports so that we can exclude symbols imported by this file when doing `from navutils import *`.
@@ -289,4 +310,6 @@ __all__ = [
     'F',
     'ECC_SQUARE',
     'correct_dcm_with_tilt',
+    'dcm_to_rpy',
+    'calculate_gravity_schwartz',
 ]
