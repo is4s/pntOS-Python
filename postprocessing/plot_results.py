@@ -30,10 +30,7 @@ def plot_results(logfile: str, solution_channel: str, truth_channel: str):
     truth.label = 'Truth'
 
     # Flip truth RPY, as there is a bug in the smartcable (TODO: #236)
-    truth_rpy = log_data.data[truth_channel].rpy
-    log_data.data[truth_channel].rpy = np.transpose(
-        np.stack((truth_rpy[:, 1], truth_rpy[:, 0], -truth_rpy[:, 2]))
-    )
+    truth.rpy = np.column_stack([truth.rpy[:, 1], truth.rpy[:, 0], -truth.rpy[:, 2]])
 
     print('Plotting results...')
     plt.rcParams['figure.figsize'] = (10, 6)

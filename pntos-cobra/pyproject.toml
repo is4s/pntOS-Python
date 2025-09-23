@@ -21,8 +21,8 @@ dependencies = [
     # Generated from commit 2d65da3693e7087a0e9ae56db6eba900c9e7ea91 on 8 May 2025
     "navtk==2.1.0.post3.dev0",
     "tqdm",
-    "analysis-lcm @ git+ssh://git@git.aspn.us/pntos/analysis-scripts.git@e8e1b2c03709ed5c4d42d7728b359c3a1bd87a0e#subdirectory=analysis-lcm",
-    "analysis-ros @ git+ssh://git@git.aspn.us/pntos/analysis-scripts.git@e8e1b2c03709ed5c4d42d7728b359c3a1bd87a0e#subdirectory=analysis-ros",
+    "analysis-lcm @ git+ssh://git@git.aspn.us/pntos/analysis-scripts.git@44b3baa301b4a4b31a6ac1f8a8a55caa0bacf126#subdirectory=analysis-lcm",
+    "analysis-ros @ git+ssh://git@git.aspn.us/pntos/analysis-scripts.git@44b3baa301b4a4b31a6ac1f8a8a55caa0bacf126#subdirectory=analysis-ros",
 
 ]
 readme = "README.md"

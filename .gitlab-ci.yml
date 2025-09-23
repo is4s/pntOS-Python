@@ -100,7 +100,7 @@ Python 3.10 Test:
     script:
         - docker run --rm -dit -v $(pwd):/work -v $HOME/.ccache:/root/.cache/uv --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
         - docker exec pntos-python uv sync
-        - docker exec pntos-python pytest --cov --cov-fail-under=75 --cov-report={term,html}  --cov-config=.coveragerc
+        - docker exec pntos-python pytest pntos-cobra --cov --cov-fail-under=75 --cov-report={term,html}  --cov-config=.coveragerc
     coverage:
         '/TOTAL.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
     artifacts:
@@ -114,7 +114,7 @@ Python 3.13 Test:
     script:
         - docker run --rm -dit -v $(pwd):/work -v $HOME/.ccache:/root/.cache/uv --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
         - docker exec pntos-python uv sync --python 3.13
-        - docker exec pntos-python pytest --cov --cov-fail-under=75 --cov-report={term,html}  --cov-config=.coveragerc
+        - docker exec pntos-python pytest pntos-cobra --cov --cov-fail-under=75 --cov-report={term,html}  --cov-config=.coveragerc
 
 ASPN-ROS Test:
     stage: check
@@ -168,47 +168,46 @@ link check:
         # Check external links in the documentation
         - docker exec -e TZ=UTC pntos-python sphinx-build -b linkcheck --exception-on-warning docs/source/ docs/build/
 
-GPS INS Tutorial App:
+Tutorial GPS INS App:
     stage: check
     tags:
         - linux-light-runner
     script:
         - docker run --rm -dit -v $(pwd):/work -v $HOME/.ccache:/root/.cache/uv --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
         - docker exec pntos-python uv sync
-        - docker exec pntos-python postprocessing/run_app_and_record_data.py apps/tutorial/gps_ins.py
-    artifacts:
-        paths:
-            - pntos_output/
+        - docker exec pntos-python pytest apps -k test_tutorial_gps_ins_app -s
 
-GPS INS Velocity App:
+Tutorial GPS INS Velocity App:
+    stage: check
+    tags:
+        - linux-light-runner
+    script:
+        - docker run --rm -dit -v $(pwd):/work --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
+        - docker exec pntos-python uv sync -v
+        - docker exec pntos-python pytest apps -k test_tutorial_gps_ins_vel_app -s
+
+Standard GPS INS App w/ Log-based Transport:
     stage: check
     tags:
         - linux-light-runner
     script:
         - docker run --rm -dit -v $(pwd):/work -v $HOME/.ccache:/root/.cache/uv --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
         - docker exec pntos-python uv sync
-        - docker exec pntos-python postprocessing/run_app_and_record_data.py apps/tutorial/gps_vel_ins.py
-    artifacts:
-        paths:
-            - pntos_output/
+        - docker exec pntos-python pytest apps -k test_standard_gps_ins_app -s
 
-GPS INS Standard App:
+Standard GPS INS App w/ Network-based Transport:
     stage: check
     tags:
         - linux-light-runner
     script:
         - docker run --rm -dit -v $(pwd):/work -v $HOME/.ccache:/root/.cache/uv --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
         - docker exec pntos-python uv sync
-        - docker exec pntos-python postprocessing/run_app_and_record_data.py
-    artifacts:
-        paths:
-            - pntos_output/
+        - docker exec pntos-python pytest apps -k test_standard_gps_ins_network_app -s
 
-GPS INS ROS App:
+Advanced GPS INS ROS App:
     stage: check
     tags:
         - linux-light-runner
-    retry: 1
     script:
         - docker run --rm -dit -v $(pwd):/work -v $HOME/.ccache:/root/.cache/uv --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
         - docker exec pntos-python uv sync --python 3.12  # 3.12 for Jazzy compatibility
@@ -217,10 +216,7 @@ GPS INS ROS App:
                                             git fetch --depth 1 origin $FIREHOSE_OUTPUTS_VERSION &&
                                             git checkout $FIREHOSE_OUTPUTS_VERSION"
         - docker exec pntos-python bash -c ". firehose-outputs/ros_devel/jazzy/setup.bash &&
-                                            postprocessing/run_app_and_record_data_ros.py"
-    artifacts:
-        paths:
-            - pntos_output/
+                                            pytest apps -k test_advanced_gps_ins_ros_app -s"
 
 pip workflow check:
     stage: check
