@@ -1,3 +1,6 @@
+from .apps import (
+    run_app as run_app,
+)
 from .arrays import (
     is_symmetric as is_symmetric,
     validate_array as validate_array,
@@ -27,6 +30,11 @@ from .lcm import (
     marshal_to_aspn2_lcm as marshal_to_aspn2_lcm,
     marshal_to_aspn23_lcm as marshal_to_aspn23_lcm,
     process_lcm_message as process_lcm_message,
+    run_lcm_logger as run_lcm_logger,
+    run_lcm_logplayer as run_lcm_logplayer,
+    run_pntos_with_log_transport as run_pntos_with_log_transport,
+    run_pntos_with_network_transport as run_pntos_with_network_transport,
+    run_tcp_relay as run_tcp_relay,
 )
 from .navigation import *
 from .orchestration_utils import (
@@ -61,4 +69,10 @@ from .plugins import (
     find_base_plugin_type as find_base_plugin_type,
     sort_plugins_dataclass as sort_plugins_dataclass,
     validate_plugins as validate_plugins,
+)
+from .ros import (
+    get_ros_bag_file as get_ros_bag_file,
+    run_pntos_with_ros_transport as run_pntos_with_ros_transport,
+    run_ros_bag_player as run_ros_bag_player,
+    run_ros_logger as run_ros_logger,
 )

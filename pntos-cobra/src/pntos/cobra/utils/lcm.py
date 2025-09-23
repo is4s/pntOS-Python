@@ -1,3 +1,7 @@
+import os
+import re
+from site import getsitepackages
+from subprocess import PIPE, Popen
 from typing import Callable
 
 import aspn2_translations
@@ -7,6 +11,8 @@ import datasources.lcm.messages.aspn as aspn2_lcm
 
 from pntos.api import LoggingLevel, Mediator, Message
 from pntos.cobra.config import AspnVersion
+
+from .apps import kill, monitor_app_output, run_app, wait_until_file_stable
 
 Aspn23LcmMeasurement = (
     aspn23_lcm.measurement_angular_velocity_1d
@@ -451,3 +457,101 @@ def create_lcm_message(
         lcm_msg = marshal_to_aspn23_lcm(message.wrapped_message)
 
     return lcm_msg
+
+
+def run_tcp_relay() -> Popen[str]:  # pragma: no cover
+    sitepackages_dir = getsitepackages()[0]
+    process = Popen(
+        [
+            'java',
+            '-classpath',
+            os.path.join(sitepackages_dir, 'share', 'java', 'lcm.jar'),
+            'lcm.lcm.TCPService',
+        ],
+        text=True,
+        stdout=PIPE,
+        start_new_session=True,
+    )
+    # wait until we start seeing output from relay
+    process.stdout.readline()  # type: ignore[union-attr]
+    return process
+
+
+def run_lcm_logger(output_file: str) -> Popen[bytes]:  # pragma: no cover
+    # Remove any pre-existing output
+    if os.path.exists(output_file):
+        os.remove(output_file)
+    return Popen(
+        ['lcm-logger', '--lcm-url=tcpq://', '-q', output_file],
+        start_new_session=True,
+    )
+
+
+def run_lcm_logplayer(logfile: str) -> Popen[bytes]:  # pragma: no cover
+    return Popen(
+        ['lcm-logplayer', '--lcm-url=tcpq://', '--speed=1000', logfile],
+        start_new_session=True,
+    )
+
+
+def run_pntos_with_log_transport(
+    app: str,
+    output_log: str,
+    validate: bool = False,
+) -> None:  # pragma: no cover
+    """Spin up app, process log, then shut down.
+
+    Args:
+        app (str): Path to app to run.
+        output_log (str): LCM log to which output should be recorded.
+        validate (bool): Whether to validate the app's output, ensuring there are no
+            warnings or errors. Defaults to False.
+    """
+    try:
+        app_process = run_app(app, output_log, validate=validate)
+
+        # Wait until pntOS is done processing the LCM log
+        done_msg = 'Done processing LCM log. Press Ctrl + C to shut down pntOS.'
+        assert app_process.stdout is not None
+        monitor_app_output(app_process.stdout, validate=validate, wait_for_msg=done_msg)
+
+    finally:
+        kill(app_process)
+
+
+def run_pntos_with_network_transport(
+    app: str,
+    input_log: str,
+    output_log: str,
+    validate: bool = False,
+) -> None:  # pragma: no cover
+    """Spin up app and network tools necessary to run it, process log, then shut down.
+
+    Args:
+        app (str): Path to app to run.
+        input_log (str): LCM log containing the measurements to be processed.
+        output_log (str): LCM log to which output should be recorded.
+        validate (bool): Whether to validate the app's output, ensuring there are no
+            warnings or errors. Defaults to False.
+    """
+    try:
+        relay_process = run_tcp_relay()
+        logger_process = run_lcm_logger(output_log)
+        app_process = run_app(app, output_log, monitor=True, validate=validate)
+
+        # wait for cobra to connect to TCP relay
+        for line in relay_process.stdout:  # type: ignore[union-attr]
+            # wait for at least 2 clients to be connected (cobra and LCM logger)
+            if re.search(r'[2-9] clients', line):
+                break
+
+        # play log. note that logplayer process automatically terminates at end of log
+        run_lcm_logplayer(input_log)
+
+        # Wait until data is no longer being recorded to output log
+        wait_until_file_stable(output_log, stable_secs=5)
+
+    finally:
+        kill(app_process)
+        kill(logger_process)
+        kill(relay_process)

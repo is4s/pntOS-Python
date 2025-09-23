@@ -2,12 +2,12 @@
 
 ## Checking Contributions
 
-New contributions to this repo should pass the checks contained in `run_all_checks.sh`. Using an
+New contributions to this repo should pass the checks contained in `all_checks.sh`. Using an
 activated virtual environment with all of this project's dependencies installed (see installation
 instructions on how to set this up), run:
 
 ```shell
-util/run_all_checks.sh
+util/all_checks.sh
 ```
 
 You can view a detailed code coverage report from the `index.html` in the `htmlcov` directory.

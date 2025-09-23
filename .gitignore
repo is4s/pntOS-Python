@@ -8,7 +8,7 @@ wheels/
 .*_cache
 .DS_Store
 **/registry_permanency_files/
-.coverage
+.coverage*
 .vscode
 *.hdf5
 # LCM Logger artifacts
