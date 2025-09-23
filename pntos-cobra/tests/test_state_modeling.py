@@ -45,13 +45,19 @@ from pntos.cobra.internal import (
     Pinson15NedBlock,
     PinsonPositionMeasurementProcessor,
     PinsonVelocityMeasurementProcessor,
+    PinsonWithLeverArmPositionMeasurementProcessor,
     PinsonWithNedFogmPositionMeasurementProcessor,
+    SimpleGpsInsStateModelProvider,
     SimpleMediator,
 )
-from pntos.cobra.state_modeling_simple_gps_ins.SimpleGpsInsStateModelingPlugin import (
-    SimpleGpsInsStateModelProvider,
+from pntos.cobra.utils.navigation import (
+    delta_lat_to_north,
+    delta_lon_to_east,
+    quat_to_dcm,
+    skew,
 )
-from pntos.cobra.utils.navigation import delta_lat_to_north, delta_lon_to_east
+
+_lever_arm = (-2.0, 3.0, 5.0)
 
 my_config: list[BaseConfig] = [
     ImuConfig(
@@ -74,7 +80,7 @@ my_config: list[BaseConfig] = [
     ),
     SensorConfig(
         group='/config/cobra/sensor',
-        lever_arm=(0.0, 0.0, 0.0),
+        lever_arm=_lever_arm,
         orientation=(1.0, 0.0, 0.0, 0.0),
         sensor_name='novatel',
     ),
@@ -121,13 +127,56 @@ def pinson_block(
 @pytest.fixture
 def position_mp(
     state_model_provider: StateModelProviderType,
-) -> StandardMeasurementProcessor | None:
+) -> StandardMeasurementProcessor:
     out = state_model_provider.new_processor(
         0, None, 'position', ['pinson'], '/config/cobra/sensor'
     )
-    if isinstance(out, StandardMeasurementProcessor):
-        return out
-    return None
+    assert isinstance(out, StandardMeasurementProcessor)
+    return out
+
+
+@pytest.fixture
+def position_mp2(
+    state_model_provider: StateModelProviderType,
+) -> StandardMeasurementProcessor:
+    out = state_model_provider.new_processor(
+        2, None, 'position', ['pinson', 'fogm'], '/config/cobra/sensor'
+    )
+    assert isinstance(out, StandardMeasurementProcessor)
+    return out
+
+
+@pytest.fixture
+def position_mp3(
+    state_model_provider: StateModelProviderType,
+) -> StandardMeasurementProcessor:
+    out = state_model_provider.new_processor(
+        4, None, 'position', ['pinson', 'fogm', 'fogm2'], '/config/cobra/sensor'
+    )
+    assert isinstance(out, StandardMeasurementProcessor)
+    return out
+
+
+all_pos_proc_type = list[
+    tuple[
+        PinsonPositionMeasurementProcessor
+        | PinsonWithNedFogmPositionMeasurementProcessor
+        | PinsonWithLeverArmPositionMeasurementProcessor,
+        int,
+        int,
+        int,
+    ]
+]
+
+
+@pytest.fixture
+def all_pos_processors(
+    position_mp: PinsonPositionMeasurementProcessor,
+    position_mp2: PinsonWithNedFogmPositionMeasurementProcessor,
+    position_mp3: PinsonWithLeverArmPositionMeasurementProcessor,
+) -> all_pos_proc_type:
+    # Second arg is num expected states, third is expected number of state block labels, 4th is index to create
+    return [(position_mp, 15, 1, 0), (position_mp2, 18, 2, 2), (position_mp3, 21, 3, 4)]
 
 
 @pytest.fixture
@@ -136,18 +185,6 @@ def velocity_mp(
 ) -> StandardMeasurementProcessor | None:
     out = state_model_provider.new_processor(
         1, None, 'velocity', ['pinson'], '/config/cobra/sensor'
-    )
-    if isinstance(out, StandardMeasurementProcessor):
-        return out
-    return None
-
-
-@pytest.fixture
-def position_mp2(
-    state_model_provider: StateModelProviderType,
-) -> StandardMeasurementProcessor | None:
-    out = state_model_provider.new_processor(
-        2, None, 'position', ['pinson', 'fogm'], '/config/cobra/sensor'
     )
     if isinstance(out, StandardMeasurementProcessor):
         return out
@@ -283,6 +320,12 @@ def force_and_rate_aux_data() -> Message:
     )
 
 
+def gxp(num: int) -> EstimateWithCovariance:
+    return EstimateWithCovariance(
+        EstimateWithCovarianceType.EWC_GENERIC, np.ones((num, 1)) * 0.01, np.eye(num)
+    )
+
+
 def test_invalid_fusion_type(
     state_modeling_plugin: SimpleGpsInsStateModelingPlugin,
 ) -> None:
@@ -343,55 +386,38 @@ def test_wrong_number_blocks(
     state_model_provider: StateModelProviderType,
     pva_aux_data: Message,
     pos_meas: Message,
+    all_pos_processors: all_pos_proc_type,
 ) -> None:
     inertial_pva = pva_aux_data.wrapped_message
     assert isinstance(inertial_pva, MeasurementPositionVelocityAttitude)
     pos = pos_meas.wrapped_message
     assert isinstance(pos, MeasurementPosition)
-    x_and_p = EstimateWithCovariance(
-        EstimateWithCovarianceType.EWC_GENERIC, np.zeros(18).reshape(18, 1), np.eye(18)
-    )
+    labs = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
 
-    invalid_mp = state_model_provider.new_processor(
-        0, None, 'label', [], '/config/cobra/sensor'
-    )
-    assert isinstance(invalid_mp, PinsonPositionMeasurementProcessor)
-    invalid_mp.receive_aux_data([pva_aux_data])
-    mod = invalid_mp.generate_model(pos_meas, x_and_p)
-    assert mod is None
+    for m in all_pos_processors:
+        x_and_p = gxp(m[1])
 
-    invalid_mp = state_model_provider.new_processor(
-        0, None, 'label', ['a', 'b'], '/config/cobra/sensor'
-    )
-    assert isinstance(invalid_mp, PinsonPositionMeasurementProcessor)
-    invalid_mp.receive_aux_data([pva_aux_data])
-    mod = invalid_mp.generate_model(pos_meas, x_and_p)
-    assert mod is None
-    invalid_mp = state_model_provider.new_processor(
-        2, None, 'label', [], '/config/cobra/sensor'
-    )
-    assert isinstance(invalid_mp, PinsonWithNedFogmPositionMeasurementProcessor)
-    invalid_mp.receive_aux_data([pva_aux_data])
-    mod = invalid_mp.generate_model(pos_meas, x_and_p)
-    assert mod is None
-    invalid_mp = state_model_provider.new_processor(
-        2, None, 'label', ['a'], '/config/cobra/sensor'
-    )
-    assert isinstance(invalid_mp, PinsonWithNedFogmPositionMeasurementProcessor)
-    invalid_mp.receive_aux_data([pva_aux_data])
-    mod = invalid_mp.generate_model(pos_meas, x_and_p)
-    assert mod is None
-    invalid_mp = state_model_provider.new_processor(
-        2, None, 'label', ['a', 'b', 'c'], '/config/cobra/sensor'
-    )
-    assert isinstance(invalid_mp, PinsonWithNedFogmPositionMeasurementProcessor)
-    invalid_mp.receive_aux_data([pva_aux_data])
-    mod = invalid_mp.generate_model(pos_meas, x_and_p)
-    assert mod is None
+        invalid_mp = state_model_provider.new_processor(
+            m[3], None, 'label', [], '/config/cobra/sensor'
+        )
+        assert invalid_mp is not None
+        assert isinstance(invalid_mp, type(m[0]))
+        invalid_mp.receive_aux_data([pva_aux_data])
+        mod = invalid_mp.generate_model(pos_meas, x_and_p)
+        assert mod is None
+
+        invalid_mp = state_model_provider.new_processor(
+            m[3], None, 'label', labs[: (m[2] + 1)], '/config/cobra/sensor'
+        )
+        assert invalid_mp is not None
+        assert isinstance(invalid_mp, type(m[0]))
+        invalid_mp.receive_aux_data([pva_aux_data])
+        mod = invalid_mp.generate_model(pos_meas, x_and_p)
+        assert mod is None
 
 
 def test_bad_meas_inputs(
-    state_model_provider: StateModelProviderType,
+    all_pos_processors: all_pos_proc_type,
     pva_aux_data: Message,
     pos_meas: Message,
 ) -> None:
@@ -399,89 +425,62 @@ def test_bad_meas_inputs(
     assert isinstance(inertial_pva, MeasurementPositionVelocityAttitude)
     pos = pos_meas.wrapped_message
     assert isinstance(pos, MeasurementPosition)
-    x_and_p = EstimateWithCovariance(
-        EstimateWithCovarianceType.EWC_GENERIC, np.zeros(15).reshape(15, 1), np.eye(15)
-    )
 
-    mp = state_model_provider.new_processor(0, None, 'l', ['p'], '/config/cobra/sensor')
-    assert isinstance(mp, PinsonPositionMeasurementProcessor)
-    mp2 = state_model_provider.new_processor(
-        2, None, 'l', ['p', 'f'], '/config/cobra/sensor'
-    )
-    assert isinstance(mp2, PinsonWithNedFogmPositionMeasurementProcessor)
-    ms = [mp, mp2]
     pv2 = deepcopy(pva_aux_data)
     assert isinstance(pv2.wrapped_message, MeasurementPositionVelocityAttitude)
     pv2.wrapped_message.quaternion = None
-    for m in ms:
-        m.receive_aux_data([pva_aux_data])
-        mod = m.generate_model(pos_meas, x_and_p)
+    for m in all_pos_processors:
+        x_and_p = gxp(m[1])
+        m[0].receive_aux_data([pva_aux_data])
+        mod = m[0].generate_model(pos_meas, x_and_p)
         assert mod is not None
         pos.reference_frame = MeasurementPositionReferenceFrame.ECI
-        mod = m.generate_model(pos_meas, x_and_p)
+        mod = m[0].generate_model(pos_meas, x_and_p)
         assert mod is None
         pos.reference_frame = MeasurementPositionReferenceFrame.GEODETIC
-        mod = m.generate_model(pos_meas, x_and_p)
+        mod = m[0].generate_model(pos_meas, x_and_p)
         assert mod is not None
-        m.receive_aux_data([pv2])
-        mod = m.generate_model(pos_meas, x_and_p)
+        m[0].receive_aux_data([pv2])
+        mod = m[0].generate_model(pos_meas, x_and_p)
         assert mod is not None
 
 
-def test_invalid_aux_data(
-    pinson_block: Pinson15NedBlock,
-    position_mp: PinsonPositionMeasurementProcessor,
-) -> None:
+def test_invalid_aux_block(pinson_block: Pinson15NedBlock) -> None:
     bad_aux = Message(TypeHeader(0, 0, 0, 0), 'bad_aux')
     pinson_block.receive_aux_data([bad_aux])
     assert pinson_block._new_pva_aux is None
     assert pinson_block._force_and_rate_aux is None
 
-    position_mp.receive_aux_data([bad_aux])
-    assert position_mp._inertial_pva is None
 
-    position_mp.receive_aux_data([])
-    assert position_mp._inertial_pva is None
-
-
-def test_invalid_aux_data2(
-    position_mp2: PinsonWithNedFogmPositionMeasurementProcessor, pva_aux_data: Message
+def test_invalid_aux_proc(
+    all_pos_processors: all_pos_proc_type,
 ) -> None:
     bad_aux = Message(TypeHeader(0, 0, 0, 0), 'bad_aux')
-    position_mp2.receive_aux_data([bad_aux])
-    assert position_mp2._inertial_pva is None
-    position_mp2.receive_aux_data([])
-    assert position_mp2._inertial_pva is None
+    for proc in all_pos_processors:
+        proc[0].receive_aux_data([bad_aux])
+        assert proc[0]._inertial_pva is None
+        proc[0].receive_aux_data([])
+        assert proc[0]._inertial_pva is None
 
 
-def test_no_aux_data(
-    pinson_block: Pinson15NedBlock,
-    position_mp: PinsonPositionMeasurementProcessor,
-    pos_meas: Message,
-) -> None:
-    x_and_p = EstimateWithCovariance(
-        EstimateWithCovarianceType.EWC_GENERIC, np.zeros(15), np.eye(15)
-    )
+def test_no_aux_block(pinson_block: Pinson15NedBlock) -> None:
+    x_and_p = x_and_p = gxp(15)
     dm = pinson_block.generate_dynamics(x_and_p, TypeTimestamp(0), TypeTimestamp(1))
     assert dm is None
 
-    mm = position_mp.generate_model(pos_meas, x_and_p)
-    assert mm is None
 
-
-def test_no_aux_data2(
-    position_mp2: PinsonWithNedFogmPositionMeasurementProcessor,
+def test_no_aux_data_proc(
+    all_pos_processors: all_pos_proc_type,
     pos_meas: Message,
 ) -> None:
-    x_and_p = EstimateWithCovariance(
-        EstimateWithCovarianceType.EWC_GENERIC, np.zeros(18), np.eye(18)
-    )
-    mm = position_mp2.generate_model(pos_meas, x_and_p)
-    assert mm is None
+    for m in all_pos_processors:
+        x_and_p = gxp(m[1])
+        mm = m[0].generate_model(pos_meas, x_and_p)
+        assert mm is None
 
 
 def test_stale_aux_data(
-    position_mp: PinsonPositionMeasurementProcessor,
+    all_pos_processors: all_pos_proc_type,
     pva_aux_data: Message,
     pos_meas: Message,
 ) -> None:
@@ -491,57 +490,39 @@ def test_stale_aux_data(
     pos_time = pos_meas.wrapped_message.time_of_validity
     # Set aux data ToV to be 1 second older than pos meas ToV
     inertial_pva.time_of_validity.elapsed_nsec = pos_time.elapsed_nsec - 1_000_000_000
-    position_mp.receive_aux_data([pva_aux_data])
-    assert position_mp._inertial_pva is not None
-    x_and_p = EstimateWithCovariance(
-        EstimateWithCovarianceType.EWC_GENERIC, np.zeros(15), np.eye(15)
-    )
-    mm = position_mp.generate_model(pos_meas, x_and_p)
-    assert mm is None
+    for m in all_pos_processors:
+        m[0].receive_aux_data([pva_aux_data])
+        assert m[0]._inertial_pva is not None
+        x_and_p = gxp(m[1])
+        mm = m[0].generate_model(pos_meas, x_and_p)
+        assert mm is None
 
 
 def test_stale_aux_data2(
-    position_mp2: PinsonWithNedFogmPositionMeasurementProcessor,
+    all_pos_processors: all_pos_proc_type,
     pva_aux_data: Message,
     pos_meas: Message,
 ) -> None:
     assert isinstance(pos_meas.wrapped_message, MeasurementPosition)
-    position_mp2.receive_aux_data([pva_aux_data])
-    assert position_mp2._inertial_pva is not None
-    x_and_p = EstimateWithCovariance(
-        EstimateWithCovarianceType.EWC_GENERIC, np.zeros(18), np.eye(18)
-    )
-    pos_meas.wrapped_message.time_of_validity.elapsed_nsec += 1_000_000_000
-    mm = position_mp2.generate_model(pos_meas, x_and_p)
-    assert mm is None
+    for m in all_pos_processors:
+        m[0].receive_aux_data([pva_aux_data])
+        assert m[0]._inertial_pva is not None
+        x_and_p = gxp(m[1])
+        pos_meas.wrapped_message.time_of_validity.elapsed_nsec += 1_000_000_000
+        mm = m[0].generate_model(pos_meas, x_and_p)
+        assert mm is None
 
 
-def test_invalid_measurement(
-    position_mp: PinsonPositionMeasurementProcessor,
-) -> None:
-    x_and_p = EstimateWithCovariance(
-        EstimateWithCovarianceType.EWC_GENERIC, np.zeros(15), np.eye(15)
-    )
-    mm = position_mp.generate_model(
-        Message(TypeHeader(0, 0, 0, 0), 'bad_meas'), x_and_p
-    )
-    assert mm is None
+def test_invalid_measurement(all_pos_processors: all_pos_proc_type) -> None:
+    msg = Message(TypeHeader(0, 0, 0, 0), 'bad_meas')
+    for m in all_pos_processors:
+        x_and_p = gxp(m[1])
+        mm = m[0].generate_model(msg, x_and_p)
+        assert mm is None
 
 
-def test_invalid_measurement2(
-    position_mp2: PinsonWithNedFogmPositionMeasurementProcessor,
-) -> None:
-    x_and_p = EstimateWithCovariance(
-        EstimateWithCovarianceType.EWC_GENERIC, np.zeros(18), np.eye(18)
-    )
-    mm = position_mp2.generate_model(
-        Message(TypeHeader(0, 0, 0, 0), 'bad_meas'), x_and_p
-    )
-    assert mm is None
-
-
-def test_generate_model_gps(
-    position_mp: PinsonPositionMeasurementProcessor,
+def test_generate_model_gps_all(
+    all_pos_processors: all_pos_proc_type,
     pva_aux_data: Message,
     pos_meas: Message,
 ) -> None:
@@ -549,65 +530,44 @@ def test_generate_model_gps(
     assert isinstance(inertial_pva, MeasurementPositionVelocityAttitude)
     pos = pos_meas.wrapped_message
     assert isinstance(pos, MeasurementPosition)
-    position_mp.receive_aux_data([pva_aux_data])
-    assert position_mp._inertial_pva is not None
-    x_and_p = EstimateWithCovariance(
-        EstimateWithCovarianceType.EWC_GENERIC, np.zeros(15).reshape(15, 1), np.eye(15)
-    )
-    mm = position_mp.generate_model(pos_meas, x_and_p)
-    assert mm is not None
-    exp_H = np.zeros((3, 15))
-    exp_H[:, :3] = np.eye(3)
-    exp_R = pos.covariance
-    meas_llh = np.array([pos.term1, pos.term2, pos.term3])
-    inertial_llh = np.array([inertial_pva.p1, inertial_pva.p2, inertial_pva.p3])
-    delta_pos = meas_llh - inertial_llh
-    lat_factor = delta_lat_to_north(1, meas_llh[0], meas_llh[2])
-    lon_factor = delta_lon_to_east(1, meas_llh[0], meas_llh[2])
-    exp_z = np.array(
-        [[delta_pos[0] * lat_factor], [delta_pos[1] * lon_factor], [-delta_pos[2]]]
-    )
-    assert np.array_equal(mm.H, exp_H)
-    assert np.array_equal(mm.R, exp_R)
-    assert np.array_equal(mm.h(x_and_p.estimate).flatten(), np.zeros(3))
-    assert np.allclose(mm.z, exp_z)
+    for m in all_pos_processors:
+        m[0].receive_aux_data([pva_aux_data])
+        assert m[0]._inertial_pva is not None
+        x_and_p = gxp(m[1])
+        mm = m[0].generate_model(pos_meas, x_and_p)
+        assert mm is not None
+        exp_H = np.zeros((3, m[1]))
+        exp_H[:, :3] = np.eye(3)
+        assert inertial_pva.quaternion is not None
+        la_as_array = np.array([_lever_arm[0], _lever_arm[1], _lever_arm[2]])
+        C = quat_to_dcm(inertial_pva.quaternion)
+        c_cor = (np.eye(3) - skew(x_and_p.estimate[6:9, 0])) @ C
+        exp_H[:, 6:9] = skew(C @ la_as_array)
+        exp_pred = x_and_p.estimate[0:3, 0] + c_cor @ la_as_array
+        if isinstance(m[0], PinsonWithNedFogmPositionMeasurementProcessor):
+            exp_H[:, -3:] = -np.eye(3)
+            exp_pred -= x_and_p.estimate[-3:, 0]
+        if isinstance(m[0], PinsonWithLeverArmPositionMeasurementProcessor):
+            exp_H[:, -6:-3] = -np.eye(3)
+            exp_H[:, -3:] = c_cor
+            exp_H[:, 6:9] += skew(C @ x_and_p.estimate[-3:, 0])
+            exp_pred -= x_and_p.estimate[-6:-3, 0]
+            exp_pred += c_cor @ x_and_p.estimate[-3:, 0]
 
-
-def test_generate_model_gps2(
-    position_mp2: PinsonWithNedFogmPositionMeasurementProcessor,
-    pva_aux_data: Message,
-    pos_meas: Message,
-) -> None:
-    inertial_pva = pva_aux_data.wrapped_message
-    assert isinstance(inertial_pva, MeasurementPositionVelocityAttitude)
-    pos = pos_meas.wrapped_message
-    assert isinstance(pos, MeasurementPosition)
-    bad_aux = Message(TypeHeader(0, 0, 0, 0), 'bad_aux')
-    # only first in list honored currently
-    position_mp2.receive_aux_data([pva_aux_data, bad_aux])
-    assert position_mp2._inertial_pva is not None
-    x_and_p = EstimateWithCovariance(
-        EstimateWithCovarianceType.EWC_GENERIC, np.zeros(18).reshape(18, 1), np.eye(18)
-    )
-    mm = position_mp2.generate_model(pos_meas, x_and_p)
-    assert mm is not None
-    exp_H = np.zeros((3, 18))
-    exp_H[:, :3] = np.eye(3)
-    exp_H[:, -3:] = -np.eye(3)
-    # No tilt component unless lever arm set
-    exp_R = pos.covariance
-    meas_llh = np.array([pos.term1, pos.term2, pos.term3])
-    inertial_llh = np.array([inertial_pva.p1, inertial_pva.p2, inertial_pva.p3])
-    delta_pos = meas_llh - inertial_llh
-    lat_factor = delta_lat_to_north(1, meas_llh[0], meas_llh[2])
-    lon_factor = delta_lon_to_east(1, meas_llh[0], meas_llh[2])
-    exp_z = np.array(
-        [[delta_pos[0] * lat_factor], [delta_pos[1] * lon_factor], [-delta_pos[2]]]
-    )
-    assert np.array_equal(mm.H, exp_H)
-    assert np.array_equal(mm.R, exp_R)
-    assert np.array_equal(mm.h(x_and_p.estimate).flatten(), np.zeros(3))
-    assert np.allclose(mm.z, exp_z)
+        exp_R = pos.covariance
+        meas_llh = np.array([pos.term1, pos.term2, pos.term3])
+        inertial_llh = np.array([inertial_pva.p1, inertial_pva.p2, inertial_pva.p3])
+        delta_pos = meas_llh - inertial_llh
+        lat_factor = delta_lat_to_north(1, meas_llh[0], meas_llh[2])
+        lon_factor = delta_lon_to_east(1, meas_llh[0], meas_llh[2])
+        exp_z = np.array(
+            [[delta_pos[0] * lat_factor], [delta_pos[1] * lon_factor], [-delta_pos[2]]]
+        )
+        assert np.array_equal(mm.H, exp_H)
+        assert np.array_equal(mm.R, exp_R)
+        pre = mm.h(x_and_p.estimate).flatten()
+        assert np.allclose(pre, exp_pred)
+        assert np.allclose(mm.z, exp_z)
 
 
 def test_generate_model_vel(
@@ -806,11 +766,7 @@ def test_generate_dynamics(
     assert np.allclose(expected_Qd, dyn.Qd, relative_tolerance, absolute_tolerance)
 
 
-def test_copy(
-    pinson_block: Pinson15NedBlock,
-    position_mp: PinsonPositionMeasurementProcessor,
-    pva_aux_data: Message,
-) -> None:
+def test_copy_block(pinson_block: Pinson15NedBlock) -> None:
     # copy pinson block and compare with new block
     new_pinson_block = deepcopy(pinson_block)
     assert (
@@ -824,33 +780,21 @@ def test_copy(
         == pinson_block._imu_model.accel_bias_sigma
     )
 
-    # pass PVA aux data to position MP
-    assert position_mp._inertial_pva is None
-    position_mp.receive_aux_data([pva_aux_data])
-    assert position_mp._inertial_pva is not None
 
-    # copy MP and compare with new MP
-    new_position_mp = deepcopy(position_mp)  # type: ignore[unreachable]
-    assert new_position_mp._inertial_pva is not None
-    assert new_position_mp._inertial_pva.p1 == position_mp._inertial_pva.p1
-    # modify new MP and re-compare with original MP
-    new_position_mp._inertial_pva.p1 = 3
-    assert not (new_position_mp._inertial_pva.p1 == position_mp._inertial_pva.p1)
-
-
-def test_copy2(
-    position_mp2: PinsonWithNedFogmPositionMeasurementProcessor,
+def test_copy_proc(
+    all_pos_processors: all_pos_proc_type,
     pva_aux_data: Message,
 ) -> None:
-    # pass PVA aux data to position MP
-    assert position_mp2._inertial_pva is None
-    position_mp2.receive_aux_data([pva_aux_data])
-    assert position_mp2._inertial_pva is not None
+    for m in all_pos_processors:
+        # pass PVA aux data to position MP
+        assert m[0]._inertial_pva is None
+        m[0].receive_aux_data([pva_aux_data])
+        assert m[0]._inertial_pva is not None
 
-    # copy MP and compare with new MP
-    new_position_mp = deepcopy(position_mp2)  # type: ignore[unreachable]
-    assert new_position_mp._inertial_pva is not None
-    assert new_position_mp._inertial_pva.p1 == position_mp2._inertial_pva.p1
-    # modify new MP and re-compare with original MP
-    new_position_mp._inertial_pva.p1 = 3
-    assert not (new_position_mp._inertial_pva.p1 == position_mp2._inertial_pva.p1)
+        # copy MP and compare with new MP
+        new_position_mp = deepcopy(m[0])  # type: ignore[unreachable]
+        assert new_position_mp._inertial_pva is not None
+        assert new_position_mp._inertial_pva.p1 == m[0]._inertial_pva.p1
+        # modify new MP and re-compare with original MP
+        new_position_mp._inertial_pva.p1 = 3
+        assert not (new_position_mp._inertial_pva.p1 == m[0]._inertial_pva.p1)

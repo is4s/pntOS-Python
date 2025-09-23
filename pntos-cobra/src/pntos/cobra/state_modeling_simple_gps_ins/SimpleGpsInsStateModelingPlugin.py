@@ -14,6 +14,9 @@ from .FogmBlock import FogmBlock
 from .Pinson15NedBlock import Pinson15NedBlock
 from .PinsonPositionMeasurementProcessor import PinsonPositionMeasurementProcessor
 from .PinsonVelocityMeasurementProcessor import PinsonVelocityMeasurementProcessor
+from .PinsonWithLeverArmPositionMeasurementProcessor import (
+    PinsonWithLeverArmPositionMeasurementProcessor,
+)
 from .PinsonWithNedFogmPositionMeasurementProcessor import (
     PinsonWithNedFogmPositionMeasurementProcessor,
 )
@@ -21,7 +24,7 @@ from .PinsonWithNedFogmPositionMeasurementProcessor import (
 
 class SimpleGpsInsStateModelProvider(StandardStateModelProvider):
     """StandardStateModelProvider that offers a 15-state pinson state block, variable-size
-    Fogm Block and various position measurement processors.
+    Fogm Block and various position and velocity measurement processors.
     """
 
     _mediator: Mediator
@@ -39,9 +42,11 @@ class SimpleGpsInsStateModelProvider(StandardStateModelProvider):
             'pinson_velocity',
             'pinson_with_ned_fogm_position',
             'pinson_altitude',
+            'pinson_with_lever_arm_position',
         ]
         self.block_identifiers: list[str] = ['pinson15', 'fogm']
         self.virtual_block_identifiers: list[str] = []
+        """List of identifiers for virtual state blocks."""
 
     def new_processor(
         self,
@@ -55,6 +60,7 @@ class SimpleGpsInsStateModelProvider(StandardStateModelProvider):
         | PinsonWithNedFogmPositionMeasurementProcessor
         | PinsonVelocityMeasurementProcessor
         | AltitudeMeasurementProcessor
+        | PinsonWithLeverArmPositionMeasurementProcessor
         | None
     ):
         """
@@ -67,8 +73,9 @@ class SimpleGpsInsStateModelProvider(StandardStateModelProvider):
                 - Index 1 corresponds to a :class:`PinsonVelocityMeasurementProcessor`.
                 - Index 2 corresponds to a :class:`PinsonWithNedFogmPositionMeasurementProcessor`.
                 - Index 3 corresponds to a :class:`AltitudeMeasurementProcessor`.
+                - Index 4 corresponds to a :class:`PinsonWithLeverArmPositionMeasurementProcessor`.
                 - All other indices will result in a return value of None.
-            engine (StandardFusionEngine | None): An optional parameter that may be provided to the
+            engine (pntos.api.plugins.fusion.StandardFusionEngine | None): An optional parameter that may be provided to the
                 new processor, such that the processor may interact with the fusion engine it
                 is being used in (for example, to add/remove states). Set it to
                 ``None`` when no engine is available for the processor to use.
@@ -144,6 +151,28 @@ class SimpleGpsInsStateModelProvider(StandardStateModelProvider):
                     state_block_labels,
                     self._mediator,
                 )
+            case 4:
+                if config_group is None:
+                    self._mediator.log_message(
+                        LoggingLevel.ERROR,
+                        f'A config group is required for processor type {self.processor_identifiers[processor_index]}',
+                    )
+                    return None
+                sensor_config = config_from_registry(
+                    SensorConfig, self._mediator, config_group
+                )
+                if sensor_config is None:
+                    self._mediator.log_message(
+                        LoggingLevel.ERROR,
+                        f'Could not get position sensor config from registry.',
+                    )
+                    return None
+                return PinsonWithLeverArmPositionMeasurementProcessor(
+                    label,
+                    state_block_labels,
+                    self._mediator,
+                    np.array(sensor_config.lever_arm),
+                )
 
         self._mediator.log_message(
             LoggingLevel.ERROR,
@@ -167,7 +196,7 @@ class SimpleGpsInsStateModelProvider(StandardStateModelProvider):
                 - Index 0 corresponds to a Pinson15NedBlock.
                 - Index 1 corresponds to a FogmBlock.
                 - All other indices will result in a return value of None.
-            engine (StandardFusionEngine | None): An optional parameter that may be provided to the
+            engine (pntos.api.plugins.fusion.StandardFusionEngine | None): An optional parameter that may be provided to the
                 new block, such that the block may interact with the fusion engine it
                 is being used in (for example, to add/remove states). Set it to
                 ``None`` when no engine is available for the block to use.

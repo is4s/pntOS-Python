@@ -199,7 +199,7 @@ class PinsonWithNedFogmPositionMeasurementProcessor(StandardMeasurementProcessor
                 f'PinsonWithNedFogmPositionMeasurementProcessor expected MeasurementPosition\
                 with a reference frame of {MeasurementPositionReferenceFrame.GEODETIC}, but got measurement at\
                 time {time.elapsed_nsec / 1e9}s with a reference frame of\
-                {pos.reference_frame}.Cannot process message.',
+                {pos.reference_frame}. Cannot process message.',
             )
             return None
 
