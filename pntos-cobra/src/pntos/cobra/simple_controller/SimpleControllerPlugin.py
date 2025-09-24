@@ -269,10 +269,9 @@ class SimpleControllerPlugin(ControllerPlugin):
         for transport in self._transport_plugins:
             transport.start_listening()
 
-        if self._ui_plugin is not None:
+        if self._ui_plugin is not None and self._ui_plugin.requires_main_thread():
             # See if UI needs to update
-            if self._ui_plugin.requires_main_thread():
-                self._ui_plugin.run_main_thread()
+            self._ui_plugin.run_main_thread()
 
         else:  # wait for ctrl + c to exit
             self._log(

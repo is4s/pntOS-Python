@@ -23,6 +23,10 @@ OUTPUT_BAG = os.path.splitext(OUTPUT_LOG)[0]
 SOLUTION_CHANNEL = '/solution/pntos/pva'
 TRUTH_CHANNEL = '/sensor/ins-d/pva'
 
+# Use non-GUI backend for any plots that apps generate, since we just want to
+# programatically validate the filter solution
+os.environ['MPLBACKEND'] = 'Agg'
+
 
 @dataclass
 class ErrorLimits:
