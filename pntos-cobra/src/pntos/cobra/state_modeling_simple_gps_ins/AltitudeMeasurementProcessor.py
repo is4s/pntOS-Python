@@ -85,7 +85,7 @@ class AltitudeMeasurementProcessor(StandardMeasurementProcessor):
         if pva.p1 is None or pva.p2 is None or pva.p3 is None:
             self._mediator.log_message(
                 LoggingLevel.ERROR,
-                f'AltitudeMeasurementProcessor received PVA aux data with no position at time {pva.time_of_validity.elapsed_nsec / 1e9}s.',
+                f'AltitudeMeasurementProcessor received PVA aux data with no position at time {pva.time_of_validity.elapsed_nsec / 1e9:.9f}s.',
             )
             return
 
@@ -145,14 +145,14 @@ class AltitudeMeasurementProcessor(StandardMeasurementProcessor):
         if alt is None:
             self._mediator.log_message(
                 LoggingLevel.ERROR,
-                f'AltitudeMeasurementProcessor got message without a valid altitude at time {time.elapsed_nsec / 1e9}. Cannot process message.',
+                f'AltitudeMeasurementProcessor got message without a valid altitude at time {time.elapsed_nsec / 1e9:.9f}s. Cannot process message.',
             )
             return None
 
         if abs(self._inertial_solution_time_nsec - time.elapsed_nsec) > 1000:
             self._mediator.log_message(
                 LoggingLevel.ERROR,
-                f'AltitudeMeasurementProcessor cannot process message at time {time.elapsed_nsec / 1e9}s as inertial PVA aux data is at a different time (t={self._inertial_solution_time_nsec / 1e9}s).',
+                f'AltitudeMeasurementProcessor cannot process message at time {time.elapsed_nsec / 1e9:.9f}s as inertial PVA aux data is at a different time (t={self._inertial_solution_time_nsec / 1e9:.9f}s).',
             )
             return None
 

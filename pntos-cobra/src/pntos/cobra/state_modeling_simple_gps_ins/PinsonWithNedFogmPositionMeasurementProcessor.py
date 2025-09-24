@@ -107,7 +107,7 @@ class PinsonWithNedFogmPositionMeasurementProcessor(StandardMeasurementProcessor
             self._mediator.log_message(
                 LoggingLevel.ERROR,
                 f'PinsonWithNedFogmPositionMeasurementProcessor received PVA aux data with no quaternion\
-                at time {pva.time_of_validity.elapsed_nsec / 1e9}s.',
+                at time {pva.time_of_validity.elapsed_nsec / 1e9:.9f}s.',
             )
             return
 
@@ -179,7 +179,7 @@ class PinsonWithNedFogmPositionMeasurementProcessor(StandardMeasurementProcessor
             self._mediator.log_message(
                 LoggingLevel.ERROR,
                 f'PinsonWithNedFogmPositionMeasurementProcessor cannot process message at time\
-                {time.elapsed_nsec / 1e9}s as it has not received inertial PVA aux data.',
+                {time.elapsed_nsec / 1e9:.9f}s as it has not received inertial PVA aux data.',
             )
             return None
 
@@ -188,8 +188,8 @@ class PinsonWithNedFogmPositionMeasurementProcessor(StandardMeasurementProcessor
             self._mediator.log_message(
                 LoggingLevel.ERROR,
                 f'PinsonWithNedFogmPositionMeasurementProcessor cannot process message at time\
-                {time.elapsed_nsec / 1e9}s as inertial PVA aux data is at a\
-                different time (t={pva_aux_time.elapsed_nsec / 1e9}s).',
+                {time.elapsed_nsec / 1e9:.9f}s as inertial PVA aux data is at a\
+                different time (t={pva_aux_time.elapsed_nsec / 1e9:.9f}s).',
             )
             return None
 
@@ -198,7 +198,7 @@ class PinsonWithNedFogmPositionMeasurementProcessor(StandardMeasurementProcessor
                 LoggingLevel.ERROR,
                 f'PinsonWithNedFogmPositionMeasurementProcessor expected MeasurementPosition\
                 with a reference frame of {MeasurementPositionReferenceFrame.GEODETIC}, but got measurement at\
-                time {time.elapsed_nsec / 1e9}s with a reference frame of\
+                time {time.elapsed_nsec / 1e9:.9f}s with a reference frame of\
                 {pos.reference_frame}. Cannot process message.',
             )
             return None

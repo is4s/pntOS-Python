@@ -108,7 +108,7 @@ def send_inertial_aux_to_measurement_processor(
     if pva_message is None:
         log_func(
             LoggingLevel.ERROR,
-            f'Cannot send inertial aux to measurement processor. Solution not available at time {time}',
+            f'Cannot send inertial aux to measurement processor. Solution not available at time {time.elapsed_nsec/1e9:.9f}s',
         )
         return
     fusion_engine.give_measurement_processor_aux_data(mp_label, [pva_message])
@@ -131,14 +131,14 @@ def send_inertial_aux_to_pinson(
     if pva_message is None:
         log_func(
             LoggingLevel.ERROR,
-            f'Cannot send inertial aux to pinson block. Solution not available at time {time}',
+            f'Cannot send inertial aux to pinson block. Solution not available at time {time.elapsed_nsec/1e9:.9f}s',
         )
         return
     imu = inertial.request_forces_and_rates(time)
     if imu is None:
         log_func(
             LoggingLevel.ERROR,
-            f'Cannot send inertial aux to pinson block. Forces not available at time {time}',
+            f'Cannot send inertial aux to pinson block. Forces not available at time {time.elapsed_nsec/1e9:.9f}s',
         )
         return
     imu_message = Message(imu.forces_and_rates, 'Orchestration forces and rates')
@@ -222,7 +222,7 @@ def get_best_solution(
     if x_and_p is None:
         log_func(
             LoggingLevel.WARN,
-            f'Cannot get filter solution at time {time}. Filter is already at time {fusion_engine.time}.',
+            f'Cannot get filter solution at time {time.elapsed_nsec * 1e-9:.9f}s. Filter is already at time {fusion_engine.time.elapsed_nsec*1e-9:.9f}s.',
         )
         return None
 
@@ -231,7 +231,7 @@ def get_best_solution(
     if inertial_solution is None:
         log_func(
             LoggingLevel.ERROR,
-            f'Unable to obtain solution from inertial at time {time}. Cannot generate BEST solution.',
+            f'Unable to obtain solution from inertial at time {time.elapsed_nsec*1e-9:.9f}s. Cannot generate BEST solution.',
         )
         return None
 
@@ -365,7 +365,7 @@ def initialize_filter(
 
     log_func(
         LoggingLevel.INFO,
-        f'Aligned filter at {init_time}.',
+        f'Aligned filter at {init_time.elapsed_nsec*1e-9:.9f}s.',
     )
 
 
@@ -412,7 +412,7 @@ def dispatch_to_fusion_engine(
     if inertial_pva_message is None:
         log_func(
             LoggingLevel.ERROR,
-            f'Unable to obtain solution from inertial at time {cur_time}.',
+            f'Unable to obtain solution from inertial at time {cur_time.elapsed_nsec/1e9:.9f}s.',
         )
         return
 
@@ -439,7 +439,7 @@ def dispatch_to_fusion_engine(
     if imu_errors is None:
         log_func(
             LoggingLevel.ERROR,
-            f'Unable to obtain sensor errors from inertial at time {cur_time}.',
+            f'Unable to obtain sensor errors from inertial at time {cur_time.elapsed_nsec/1e9:.9f}s.',
         )
         return
 

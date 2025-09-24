@@ -420,8 +420,8 @@ class StandardFusionEngine(api.StandardFusionEngine):
         if time.elapsed_nsec < self.time.elapsed_nsec:
             self._mediator.log_message(
                 LoggingLevel.WARN,
-                f'Attempted to propagate backwards in time.  propagate_time = {time.elapsed_nsec / 1e9}, \
-                    filter_time = {self.time.elapsed_nsec / 1e9}.  No action taken.',
+                f'Attempted to propagate backwards in time.  propagate_time = {time.elapsed_nsec / 1e9:.9f}, \
+                    filter_time = {self.time.elapsed_nsec / 1e9:.9f}s.  No action taken.',
             )
             return None
 
@@ -578,8 +578,8 @@ class StandardFusionEngine(api.StandardFusionEngine):
         if time.elapsed_nsec < self.time.elapsed_nsec:
             self._mediator.log_message(
                 LoggingLevel.WARN,
-                f'Peek ahead time ({time.elapsed_nsec / 1e9}) is before filter time\
-                      ({self.time.elapsed_nsec / 1e9}).',
+                f'Peek ahead time ({time.elapsed_nsec / 1e9:.9f}s) is before filter time\
+                      ({self.time.elapsed_nsec / 1e9:.9f}s).',
             )
             return None
 
