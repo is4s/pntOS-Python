@@ -18,6 +18,7 @@ from pntos.cobra import (
     StandardRegistryPlugin,
     TutorialGpsVelOrchestrationPlugin,
     TutorialInitializationPlugin,
+    UiLogPlottingPlugin,
 )
 from pntos.cobra.config import (
     AspnVersion,
@@ -30,6 +31,7 @@ from pntos.cobra.config import (
     SensorConfig,
     TimeAdjusterConfig,
     TutorialOrchestrationConfig,
+    UiLogPlottingConfig,
 )
 from pntos_python_datasets import EXAMPLE_LCM_LOG
 
@@ -104,6 +106,12 @@ my_config = [
         channel_to_correct='/sensor/vn-100/imu',
         expected_dt_nsec=int(0.01 * 1e9),
     ),
+    UiLogPlottingConfig(
+        group='config/ui_logfile_plotting',
+        logfile=OUTPUT_LOG,
+        solution_channel='/solution/pntos/pva',
+        truth_channel='/sensor/ins-d/pva',
+    ),
     ImuRotatorConfig(
         group='config/imu_rotator',
         identifier='imu_rotator',
@@ -128,6 +136,7 @@ plugins = [
     ),
     StandardRegistryPlugin('Cobra Standard Registry Plugin', config=my_config),
     StandardPreprocessorPlugin('Cobra Standard Preprocessor Plugin'),
+    UiLogPlottingPlugin('Cobra UI Logfile Plotting Plugin'),
     TutorialGpsVelOrchestrationPlugin('Cobra Tutorial Orchestration Plugin'),
 ]
 

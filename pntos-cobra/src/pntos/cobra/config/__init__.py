@@ -32,6 +32,7 @@ from .StaticAlignmentConfig import (
     AlignmentStrategy as AlignmentStrategy,
     StaticAlignmentConfig as StaticAlignmentConfig,
 )
+from .UiConfig import UiLogPlottingConfig as UiLogPlottingConfig
 from .utils import (
     config_from_registry as config_from_registry,
     config_to_registry as config_to_registry,

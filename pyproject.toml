@@ -9,8 +9,8 @@ dependencies = [
     # Generated from branch v3.1 on 13 Aug 2025
     "pntos-python-datasets==0.3.1",
     "matplotlib",
-    "analysis-lcm @ git+ssh://git@git.aspn.us/pntos/analysis-scripts.git@44b3baa301b4a4b31a6ac1f8a8a55caa0bacf126#subdirectory=analysis-lcm",
-    "analysis-ros @ git+ssh://git@git.aspn.us/pntos/analysis-scripts.git@44b3baa301b4a4b31a6ac1f8a8a55caa0bacf126#subdirectory=analysis-ros",
+    "analysis-lcm @ git+ssh://git@git.aspn.us/pntos/analysis-scripts.git@c6b14286900111e03c7743d49389455c7542a6a2#subdirectory=analysis-lcm",
+    "analysis-ros @ git+ssh://git@git.aspn.us/pntos/analysis-scripts.git@c6b14286900111e03c7743d49389455c7542a6a2#subdirectory=analysis-ros",
 ]
 readme = "README.md"
 requires-python = ">= 3.10"

@@ -515,6 +515,9 @@ def run_pntos_with_log_transport(
         assert app_process.stdout is not None
         monitor_app_output(app_process.stdout, validate=validate, wait_for_msg=done_msg)
 
+        # Continue to forward app output to stdout
+        monitor_app_output(app_process.stdout, separate_thread=True)
+
     finally:
         kill(app_process)
 

@@ -55,3 +55,4 @@ from .tutorial_plugins.TutorialInitializationPlugin import (
 from .tutorial_plugins.TutorialLcmTransportPlugin import (
     TutorialLcmTransportPlugin as TutorialLcmTransportPlugin,
 )
+from .ui_plugins.UiLogPlotterPlugin import UiLogPlottingPlugin as UiLogPlottingPlugin
