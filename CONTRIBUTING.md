@@ -13,11 +13,11 @@ util/all_checks.sh
 You can view a detailed code coverage report from the `index.html` in the `htmlcov` directory.
 
 ### Synchronization
-At the end of `run_all_checks.sh` there is a synchronization check that ensures updates made to files
+At the end of `all_checks.sh` there is a synchronization check that ensures updates made to files
 with duplicate code are applied to all relevant files. So if someone were to update
 `apps/standard/gps_ins.py`, there is a line of defense to make sure that update propagates into
 `apps/standard/lcm_relay.py`. There are cases where only one app needs the update or the context
-to compare files changes. Thus, you may need to re-generate the patch files used 
+to compare files changes. Thus, you may need to re-generate the patch files used
 for the synchronization check. To do so, simply  run:
 
 ```shell
