@@ -14,7 +14,6 @@ from pntos.api import (
 )
 from pntos.cobra import StandardRegistryPlugin
 from pntos.cobra.config import (
-    AlignmentStrategy,
     BaseConfig,
     DownsamplerConfig,
     ImuConfig,
@@ -288,9 +287,7 @@ class TestConfigUtils(unittest.TestCase):
             (2e-2, 3e-3, 4e-4),
             (1.23e-10, 2.34e-10, 3.45e-10),
         )
-        config = StaticAlignmentConfig(
-            CONFIG_TEST_GROUP, AlignmentStrategy.STATIC, 1.23, imu_model
-        )
+        config = StaticAlignmentConfig(CONFIG_TEST_GROUP, 1.23, imu_model)
 
         # Verify config survives round trip
         config_to_registry(config, self.mediator)

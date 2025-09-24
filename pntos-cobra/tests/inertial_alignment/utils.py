@@ -11,7 +11,6 @@ from aspn23 import (
     TypeHeader,
     TypeTimestamp,
 )
-from navtk.filtering import hg1700_model
 from navtk.navutils import quat_to_rpy
 from pntos.api import (
     EwcInitializationStrategy,
@@ -20,16 +19,8 @@ from pntos.api import (
     InitializationPlugin,
     InitializationStatus,
     LoggingLevel,
+    Mediator,
     Message,
-)
-from pntos.cobra import StaticAlignInitializationPlugin
-from pntos.cobra.config import config_to_registry, imu_model_to_config
-from pntos.cobra.config.ManualHeadingAlignmentConfig import (
-    ManualHeadingAlignmentConfig,
-)
-from pntos.cobra.config.StaticAlignmentConfig import (
-    AlignmentStrategy,
-    StaticAlignmentConfig,
 )
 from pntos.cobra.internal import SimpleMediator, StandardRegistry
 
@@ -78,12 +69,17 @@ def generate_imu(time: TypeTimestamp) -> Message:
     return Message(imu, '')
 
 
-def _test_aligner(
-    plugin: StaticAlignInitializationPlugin,
+def check_inertial_align_initialization_plugin(
+    plugin: InitializationPlugin,
     config_group: str,
     static_time: float,
-    strategy: AlignmentStrategy,
+    identifier: str,
+    expect_inertial_errors: bool,
 ) -> None:
+    assert plugin.identifier == identifier
+    assert plugin.is_initialization_type_supported(InertialInitializationStrategy)
+    assert not plugin.is_initialization_type_supported(EwcInitializationStrategy)
+
     # Create initialization strategy
     aligner = plugin.new_initialization_strategy(
         InertialInitializationStrategy, config_group
@@ -140,10 +136,10 @@ def _test_aligner(
     np.fill_diagonal(covariance, 0)
     assert np.allclose(covariance, np.zeros((6, 6)))
 
-    if strategy == AlignmentStrategy.STATIC:
-        assert solution.inertial_errors is None
-    else:
+    if expect_inertial_errors:
         assert solution.inertial_errors is not None
+    else:
+        assert solution.inertial_errors is None
 
     assert solution.status == InitializationStatus.INITIALIZED_GOOD
 
@@ -152,48 +148,8 @@ def dummy_log(level: LoggingLevel, message: str) -> None:
     pass
 
 
-def test() -> None:
-    # Set up registry and mediator
-    plugin = StaticAlignInitializationPlugin('Cobra static align initialization plugin')
-
+def set_up_mediator() -> Mediator:
     registry = StandardRegistry(dummy_log)
-    mediator = SimpleMediator(plugin.identifier, InitializationPlugin)
+    mediator = SimpleMediator('', InitializationPlugin)
     SimpleMediator.registry = registry
-
-    # Set up and test plugin.
-    plugin.init_plugin(None, mediator)
-
-    assert plugin.identifier == 'Cobra static align initialization plugin'
-    assert plugin.is_initialization_type_supported(InertialInitializationStrategy)
-    assert not plugin.is_initialization_type_supported(EwcInitializationStrategy)
-
-    # Create config for pure static alignment and test pure static alignment.
-    static_time = 120.0
-    group = 'test/config/static_align'
-    imu_config = imu_model_to_config(
-        model=hg1700_model(),
-        group=group,
-    )
-    config = StaticAlignmentConfig(
-        strategy=AlignmentStrategy.STATIC,
-        static_time=static_time,
-        imu_model=imu_config,
-        group=group,
-    )
-    config_to_registry(config, mediator)
-    _test_aligner(plugin, group, config.static_time, config.strategy)
-
-    config = ManualHeadingAlignmentConfig(
-        strategy=AlignmentStrategy.MANUAL_HEADING,
-        static_time=static_time,
-        imu_model=imu_config,
-        heading=-np.pi / 2,
-        heading_sigma=0.017453292519943295,
-        group=group,
-    )
-    config_to_registry(config, mediator)
-    _test_aligner(plugin, group, config.static_time, config.strategy)
-
-
-if __name__ == '__main__':
-    test()
+    return mediator

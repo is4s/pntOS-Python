@@ -5,6 +5,9 @@ from .simple_controller.SimpleMessageStreamConfig import (
 from .standard_plugins.EkfFusionStrategyPlugin import (
     EkfFusionStrategy as EkfFusionStrategy,
 )
+from .standard_plugins.ManualHeadingAlignInitializationPlugin import (
+    ManualHeadingAlign as ManualHeadingAlign,
+)
 from .standard_plugins.StandardFusionPlugin import (
     StandardFusionEngine as StandardFusionEngine,
 )

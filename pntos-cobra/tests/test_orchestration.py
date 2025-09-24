@@ -48,7 +48,6 @@ from pntos.cobra import (
     TutorialInitializationPlugin,
 )
 from pntos.cobra.config import (
-    AlignmentStrategy,
     FogmConfig,
     FogmStateBlockConfig,
     ImuConfig,
@@ -678,10 +677,8 @@ class Test_Orchestration(unittest.TestCase):
 
     def test_process_pntos_message_before_aligned(self) -> None:
         static_time = 5.0
-        align_strat = AlignmentStrategy.STATIC
         align_config = StaticAlignmentConfig(
             group='config/static/alignment',
-            strategy=align_strat,
             static_time=static_time,
             imu_model=imu_config,
         )

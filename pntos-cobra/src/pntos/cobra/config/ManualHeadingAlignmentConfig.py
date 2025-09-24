@@ -1,33 +1,36 @@
 from dataclasses import dataclass
 
+from .BaseConfig import BaseConfig
 from .ImuConfig import ImuConfig
-from .StaticAlignmentConfig import AlignmentStrategy, StaticAlignmentConfig
 
 
 @dataclass
-class ManualHeadingAlignmentConfig(StaticAlignmentConfig):
+class ManualHeadingAlignmentConfig(BaseConfig):
     """
-    Configuration specifically for a manual heading alignment which is used in the 'StaticAlignInitializationPlugin.py' plugin.
+    Configuration specifically for a manual heading alignment which is used in the 'ManualHeadingAlignInitializationPlugin.py' plugin.
     """
-
-    # INHERITED FIELDS
-    group: str
-
-    strategy: AlignmentStrategy
 
     static_time: float
+    """
+    The amount of IMU data that must be collected before calculating an alignment. (s)
+    """
 
     imu_model: ImuConfig
+    """
+    A nested config that contains IMU model info.
 
-    # UNIQUE FIELDS
+    For more information, see ImuConfig.py.
+    """
 
     heading: float
     """
-    Heading of the platform. (rad, right handed rotation from north,
-    about the down axis)
+    Heading of the platform. (rad, right handed rotation from north, about the down axis)
     """
 
     heading_sigma: float
     """
-    The one-sigma, standard deviation of the tilt error about the down axis associated with the initial heading.
+    The one-sigma, standard deviation of the tilt error about the down axis associated with the
+    initial heading.
     """
+
+    group: str

@@ -29,7 +29,6 @@ from .PreprocessorConfig import (
 )
 from .SensorConfig import SensorConfig as SensorConfig
 from .StaticAlignmentConfig import (
-    AlignmentStrategy as AlignmentStrategy,
     StaticAlignmentConfig as StaticAlignmentConfig,
 )
 from .UiConfig import UiLogPlottingConfig as UiLogPlottingConfig

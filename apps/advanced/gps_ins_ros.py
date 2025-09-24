@@ -8,6 +8,7 @@ from pntos.api import EstimateWithCovariance, EstimateWithCovarianceType, Loggin
 # Import Cobra plugins and config structs
 from pntos.cobra import (
     EkfFusionStrategyPlugin,
+    ManualHeadingAlignInitializationPlugin,
     SimpleControllerPlugin,
     StandardFusionPlugin,
     StandardGpsInsStateModelingPlugin,
@@ -16,11 +17,9 @@ from pntos.cobra import (
     StandardOrchestrationPlugin,
     StandardPreprocessorPlugin,
     StandardRegistryPlugin,
-    StaticAlignInitializationPlugin,
 )
 from pntos.cobra.advanced_plugins import Aspn23RosTransportPlugin
 from pntos.cobra.config import (
-    AlignmentStrategy,
     FogmConfig,
     FogmStateBlockConfig,
     ImuConfig,
@@ -101,7 +100,6 @@ my_config = [
         ),
         alignment_config=ManualHeadingAlignmentConfig(
             group='config/default/alignment',
-            strategy=AlignmentStrategy.MANUAL_HEADING,
             static_time=10.0,
             imu_model=imu_model,
             heading=0.06895795874629593,
@@ -134,7 +132,9 @@ plugins = [
     StandardFusionPlugin('Cobra Standard Fusion Plugin'),
     StandardGpsInsStateModelingPlugin('Cobra Standard State Modeling Plugin'),
     StandardInertialPlugin('Cobra Standard Inertial Plugin'),
-    StaticAlignInitializationPlugin('Cobra Static Align Initialization Plugin'),
+    ManualHeadingAlignInitializationPlugin(
+        'Cobra Manual Heading Static Align Initialization Plugin'
+    ),
     StandardLoggingPlugin(
         'Cobra Standard Logging Plugin',
         global_log_level=LoggingLevel.INFO,  # Switch to `DEBUG` for more informative log output
