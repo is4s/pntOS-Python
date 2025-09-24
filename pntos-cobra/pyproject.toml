@@ -21,9 +21,9 @@ dependencies = [
     # Generated from commit 2d65da3693e7087a0e9ae56db6eba900c9e7ea91 on 8 May 2025
     "navtk==2.1.0.post3.dev0",
     "tqdm",
+    "matplotlib",
     "analysis-lcm @ git+ssh://git@git.aspn.us/pntos/analysis-scripts.git@44b3baa301b4a4b31a6ac1f8a8a55caa0bacf126#subdirectory=analysis-lcm",
     "analysis-ros @ git+ssh://git@git.aspn.us/pntos/analysis-scripts.git@44b3baa301b4a4b31a6ac1f8a8a55caa0bacf126#subdirectory=analysis-ros",
-
 ]
 readme = "README.md"
 requires-python = ">= 3.10"
@@ -34,6 +34,9 @@ build-backend = "hatchling.build"
 
 [tool.hatch.metadata]
 allow-direct-references = true
+
+[[tool.uv.index]]
+url = "https://git.aspn.us/api/v4/projects/94/packages/pypi/simple"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/pntos"]

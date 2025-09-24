@@ -88,8 +88,8 @@ requirements up-to-date:
         # Generate uv.lock
         - docker exec pntos-python uv sync
         # Generate requirements*.txt files
-        - docker exec pntos-python uv export --frozen --no-dev --no-hashes > requirements-minimal.txt
-        - docker exec pntos-python uv export --frozen --no-hashes > requirements.txt
+        - docker exec pntos-python uv export --frozen --no-dev --no-hashes -o requirements-minimal.txt
+        - docker exec pntos-python uv export --frozen --no-hashes -o requirements.txt
         # If there's still a diff, then there's unsynced changes; fail the job.
         - git diff --exit-code
 
