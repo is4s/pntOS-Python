@@ -40,8 +40,8 @@ separate step, by running:
 
 ```shell
 uv sync
-uv export --frozen --no-dev --no-hashes > requirements-minimal.txt
-uv export --frozen --no-hashes > requirements.txt
+uv export --frozen --no-dev --no-hashes -o requirements-minimal.txt
+uv export --frozen --no-hashes -o requirements.txt
 ```
 
 Note that files that are installed via a local path are installed as [editable
