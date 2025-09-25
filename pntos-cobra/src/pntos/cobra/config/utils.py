@@ -18,6 +18,9 @@ from .BaseConfig import BaseConfig
 from .ImuConfig import ImuConfig
 
 ConfigType = TypeVar('ConfigType', bound=BaseConfig)
+SUPPORTED_TYPES = set(
+    get_args(RegistryValueTypeUnion) + (tuple[float, ...], Enum, EstimateWithCovariance)
+)
 
 
 def imu_model_to_config(model: ImuModel, group: str) -> ImuConfig:
@@ -181,7 +184,7 @@ def config_from_registry(
         if not _confirm_types(val, param.type):
             mediator.log_message(
                 LoggingLevel.ERROR,
-                f'Expected field {param} in {config_type} to have type '
+                f'Expected field {param.name} in {config_type} to have type '
                 + f'{param.type} but received {type(val)} from registry.',
             )
             kv.batch_end()
@@ -200,8 +203,8 @@ def config_to_registry(config: BaseConfig, mediator: Mediator) -> None:
 
     This function will convert certain types (list[float], list|nd.array[int], Enum, tuple[float])
     unsupported by the registry to the corresponding supported type represented by ``RegistryValueType``.
-    It also supports storing nested config objects, though it expects the nested object to have the
-    same config group as the outer object.
+    It will convert an ``int`` to a ``float`` if the field is type hinted as a ``float``.
+    It also supports storing nested config objects and the API defined :class:`pntos.api.EstimateWithCovariance`.
 
     Args:
         config (BaseConfig): The config to be stored in the registry.
@@ -211,7 +214,26 @@ def config_to_registry(config: BaseConfig, mediator: Mediator) -> None:
     kv = mediator.registry.batch_start(config.group)
 
     for param in conf_params:
+        if not _is_type_supported(param.type):
+            mediator.log_message(
+                LoggingLevel.ERROR,
+                f'Support for converting {param.type} to a registry type does not exist. Support must be added or a different type must be used on the config class {type(config)}',
+            )
+            kv.batch_end()
+            return None
         val_to_store = getattr(config, param.name)
+        # internally convert int to float if type is supposed to be float
+        if isinstance(val_to_store, int) and param.type is float:
+            val_to_store = float(val_to_store)
+        # compare user provided type with the validated config type hint
+        if not _confirm_types(val_to_store, param.type):
+            mediator.log_message(
+                LoggingLevel.ERROR,
+                f'Expected field {param.name} in {type(config)} to have type {param.type} '
+                + f'but received {type(val_to_store)} from registry.',
+            )
+            kv.batch_end()
+            return None
         if isinstance(val_to_store, tuple):
             val_to_store = np.array(val_to_store, dtype=np.float64)
         elif isinstance(val_to_store, list) or isinstance(val_to_store, np.ndarray):
@@ -230,7 +252,6 @@ def config_to_registry(config: BaseConfig, mediator: Mediator) -> None:
         elif isinstance(val_to_store, Enum):
             val_to_store = val_to_store.value
         elif isinstance(val_to_store, EstimateWithCovariance):
-            print(config.group)
             kv['_estimate'] = val_to_store.estimate
             kv['_covariance'] = val_to_store.covariance
             kv['_ewc_type'] = val_to_store.type.value
@@ -275,15 +296,24 @@ def _confirm_types(out_val: Any, expected_type: type[Any]) -> bool:
         else:
             return False
 
-    # Check if expected_type is generic alias (list[str], tuple[float], ect...)
+    # Check if expected_type is generic alias (list[str], tuple[float], etc...)
     if hasattr(expected_type, '__origin__'):
         return out_type is get_origin(expected_type)
 
     # Otherwise, just see if it's the same type
-    return out_type is expected_type
+    return issubclass(out_type, expected_type)
 
 
 def _is_type_optional(field_type: type[Any] | str) -> bool:
+    """
+    A helper function that determines if the provided type is optional i.e. contains `| None`.
+
+    Args:
+        field_type (type[Any] | str): The type to be checked.
+
+    Returns:
+        bool
+    """
     if isinstance(field_type, type):
         return False
     types = get_args(field_type)
@@ -291,3 +321,58 @@ def _is_type_optional(field_type: type[Any] | str) -> bool:
         if t is type(None):
             return True
     return False
+
+
+def _is_type_supported(field_type: type[Any]) -> bool:
+    """
+    A helper function that determines if the provided type is supported by ``config_from_registry``
+    and ``config_to_registry``.
+
+    Args:
+        field_type (type[Any] | str): The type to be checked.
+
+    Returns:
+        bool
+    """
+    type_to_compare = field_type
+    if _is_type_optional(type_to_compare):
+        type_to_compare = get_args(type_to_compare)[0]
+    origin = get_origin(type_to_compare)
+    # if type is a tuple, check each type it contains
+    if origin is tuple:
+        return _validate_tuple_type(type_to_compare)
+    # we support lists of one of the following types: int, str, float, BaseConfig
+    elif origin is list:
+        args = get_args(type_to_compare)
+        if len(args) != 1:
+            return False
+        if issubclass(args[0], (int, str, float, BaseConfig)):
+            return True
+    return type_to_compare in SUPPORTED_TYPES or issubclass(
+        type_to_compare, (Enum, BaseConfig)
+    )
+
+
+def _validate_tuple_type(tuple_type: type[Any]) -> bool:
+    """
+    A recursive function that checks each type of the input ``tuple`` and determines
+    if they are supported by ``config_from_registry`` and ``config_to_registry``.
+
+    Args:
+        tuple_type (type[Any]): The tuple type-hint to be checked.
+
+    Returns:
+        bool
+    """
+    args = get_args(tuple_type)
+    for arg in args:
+        arg_org = get_origin(arg)
+        if arg_org is tuple:
+            if not _validate_tuple_type(arg):
+                return False
+        elif arg_org is None:
+            if arg is not float and arg is not Ellipsis:
+                return False
+        else:
+            return False
+    return True
