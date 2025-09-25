@@ -15,10 +15,7 @@ from pntos.api import (
 )
 from pntos.cobra import StandardRegistryPlugin
 from pntos.cobra.config import BaseConfig
-from pntos.cobra.internal import SimpleMediator
-from pntos.cobra.state_modeling_simple_gps_ins.FogmBlock import (
-    FogmBlock,
-)
+from pntos.cobra.internal import FogmBlock, SimpleMediator
 
 my_config: list[BaseConfig] = []
 

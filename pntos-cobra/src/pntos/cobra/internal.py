@@ -21,33 +21,45 @@ from .standard_plugins.StandardRegistryPlugin import (
     StandardKeyValueStore as StandardKeyValueStore,
     StandardRegistry as StandardRegistry,
 )
-from .standard_plugins.StaticAlignInitializationPlugin import StaticAlign as StaticAlign
-from .state_modeling_simple_gps_ins.AltitudeMeasurementProcessor import (
+from .standard_plugins.state_modeling.AltitudeMeasurementProcessor import (
     AltitudeMeasurementProcessor as AltitudeMeasurementProcessor,
 )
-from .state_modeling_simple_gps_ins.FogmBlock import (
+from .standard_plugins.state_modeling.FogmBlock import (
     FogmBlock as FogmBlock,
 )
-from .state_modeling_simple_gps_ins.Pinson15NedBlock import (
+from .standard_plugins.state_modeling.Pinson15NedBlock import (
     Pinson15NedBlock as Pinson15NedBlock,
 )
-from .state_modeling_simple_gps_ins.PinsonPositionMeasurementProcessor import (
+from .standard_plugins.state_modeling.PinsonPositionMeasurementProcessor import (
     PinsonPositionMeasurementProcessor as PinsonPositionMeasurementProcessor,
 )
-from .state_modeling_simple_gps_ins.PinsonVelocityMeasurementProcessor import (
+from .standard_plugins.state_modeling.PinsonVelocityMeasurementProcessor import (
     PinsonVelocityMeasurementProcessor as PinsonVelocityMeasurementProcessor,
 )
-from .state_modeling_simple_gps_ins.PinsonWithLeverArmPositionMeasurementProcessor import (
+from .standard_plugins.state_modeling.PinsonWithLeverArmPositionMeasurementProcessor import (
     PinsonWithLeverArmPositionMeasurementProcessor as PinsonWithLeverArmPositionMeasurementProcessor,
 )
-from .state_modeling_simple_gps_ins.PinsonWithNedFogmPositionMeasurementProcessor import (
+from .standard_plugins.state_modeling.PinsonWithNedFogmPositionMeasurementProcessor import (
     PinsonWithNedFogmPositionMeasurementProcessor as PinsonWithNedFogmPositionMeasurementProcessor,
 )
-from .state_modeling_simple_gps_ins.SimpleGpsInsStateModelingPlugin import (
-    SimpleGpsInsStateModelProvider as SimpleGpsInsStateModelProvider,
-)
-from .state_modeling_simple_gps_ins.StandardGpsInsStateModelingPlugin import (
+from .standard_plugins.state_modeling.StandardGpsInsStateModelingPlugin import (
     StandardGpsInsStateModelProvider as StandardGpsInsStateModelProvider,
+)
+from .standard_plugins.StaticAlignInitializationPlugin import StaticAlign as StaticAlign
+from .tutorial_plugins.state_modeling.TutorialFogmBlock import (
+    TutorialFogmBlock as TutorialFogmBlock,
+)
+from .tutorial_plugins.state_modeling.TutorialGpsInsStateModelingPlugin import (
+    TutorialGpsInsStateModelProvider as TutorialGpsInsStateModelProvider,
+)
+from .tutorial_plugins.state_modeling.TutorialPinson15NedBlock import (
+    TutorialPinson15NedBlock as TutorialPinson15NedBlock,
+)
+from .tutorial_plugins.state_modeling.TutorialPinsonVelocityMeasurementProcessor import (
+    TutorialPinsonVelocityMeasurementProcessor as TutorialPinsonVelocityMeasurementProcessor,
+)
+from .tutorial_plugins.state_modeling.TutorialPinsonWithNedFogmPositionMeasurementProcessor import (
+    TutorialPinsonWithNedFogmPositionMeasurementProcessor as TutorialPinsonWithNedFogmPositionMeasurementProcessor,
 )
 from .tutorial_plugins.TutorialInitializationPlugin import (
     ManualInitialization as ManualInitialization,
