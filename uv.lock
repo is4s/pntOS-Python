@@ -25,10 +25,9 @@ wheels = [
 [[package]]
 name = "analysis-lcm"
 version = "0.1.0"
-source = { git = "ssh://git@git.aspn.us/pntos/analysis-scripts.git?subdirectory=analysis-lcm&rev=c6b14286900111e03c7743d49389455c7542a6a2#c6b14286900111e03c7743d49389455c7542a6a2" }
+source = { git = "ssh://git@git.aspn.us/pntos/analysis-scripts.git?subdirectory=analysis-lcm&rev=8e56a7ca9722f5ac803c80901e57241c1b016796#8e56a7ca9722f5ac803c80901e57241c1b016796" }
 dependencies = [
     { name = "inu" },
-    { name = "pyqt6", marker = "sys_platform == 'linux'" },
     { name = "tabulate" },
     { name = "tomlkit" },
     { name = "tqdm" },
@@ -37,7 +36,7 @@ dependencies = [
 [[package]]
 name = "analysis-ros"
 version = "0.1.0"
-source = { git = "ssh://git@git.aspn.us/pntos/analysis-scripts.git?subdirectory=analysis-ros&rev=c6b14286900111e03c7743d49389455c7542a6a2#c6b14286900111e03c7743d49389455c7542a6a2" }
+source = { git = "ssh://git@git.aspn.us/pntos/analysis-scripts.git?subdirectory=analysis-ros&rev=8e56a7ca9722f5ac803c80901e57241c1b016796#8e56a7ca9722f5ac803c80901e57241c1b016796" }
 dependencies = [
     { name = "analysis-lcm" },
 ]
@@ -1355,8 +1354,8 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "analysis-lcm", git = "ssh://git@git.aspn.us/pntos/analysis-scripts.git?subdirectory=analysis-lcm&rev=c6b14286900111e03c7743d49389455c7542a6a2" },
-    { name = "analysis-ros", git = "ssh://git@git.aspn.us/pntos/analysis-scripts.git?subdirectory=analysis-ros&rev=c6b14286900111e03c7743d49389455c7542a6a2" },
+    { name = "analysis-lcm", git = "ssh://git@git.aspn.us/pntos/analysis-scripts.git?subdirectory=analysis-lcm&rev=8e56a7ca9722f5ac803c80901e57241c1b016796" },
+    { name = "analysis-ros", git = "ssh://git@git.aspn.us/pntos/analysis-scripts.git?subdirectory=analysis-ros&rev=8e56a7ca9722f5ac803c80901e57241c1b016796" },
     { name = "aspn-lcm", git = "ssh://git@git.aspn.us/pntos/lcm-generated.git?subdirectory=python&rev=14045fe000e4395bf81708e963aea09948e52949" },
     { name = "aspn2-translations", git = "ssh://git@git.aspn.us/pntos/firehose-outputs.git?subdirectory=aspn2_to_aspn_py_translations&rev=9e2a4f463ff4288bd40098ebf775304966a76393" },
     { name = "aspn23", git = "ssh://git@git.aspn.us/pntos/firehose-outputs.git?subdirectory=aspn-py&rev=d425e26330e62371038f14ad12a8d8b4374698a6" },
@@ -1406,8 +1405,8 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "analysis-lcm", git = "ssh://git@git.aspn.us/pntos/analysis-scripts.git?subdirectory=analysis-lcm&rev=c6b14286900111e03c7743d49389455c7542a6a2" },
-    { name = "analysis-ros", git = "ssh://git@git.aspn.us/pntos/analysis-scripts.git?subdirectory=analysis-ros&rev=c6b14286900111e03c7743d49389455c7542a6a2" },
+    { name = "analysis-lcm", git = "ssh://git@git.aspn.us/pntos/analysis-scripts.git?subdirectory=analysis-lcm&rev=8e56a7ca9722f5ac803c80901e57241c1b016796" },
+    { name = "analysis-ros", git = "ssh://git@git.aspn.us/pntos/analysis-scripts.git?subdirectory=analysis-ros&rev=8e56a7ca9722f5ac803c80901e57241c1b016796" },
     { name = "matplotlib" },
     { name = "pntos-api", editable = "pntos-api" },
     { name = "pntos-cobra", editable = "pntos-cobra" },
@@ -1494,45 +1493,6 @@ source = { registry = "https://git.aspn.us/api/v4/projects/94/packages/pypi/simp
 sdist = { url = "https://files.pythonhosted.org/packages/bb/22/f1129e69d94ffff626bdb5c835506b3a5b4f3d070f17ea295e12c2c6f60f/pyparsing-3.2.3.tar.gz", hash = "sha256:b9c13f1ab8b3b542f72e28f634bad4de758ab3ce4546e4301970ad6fa77c38be", size = 1088608, upload-time = "2025-03-25T05:01:28.114Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/05/e7/df2285f3d08fee213f2d041540fa4fc9ca6c2d44cf36d3a035bf2a8d2bcc/pyparsing-3.2.3-py3-none-any.whl", hash = "sha256:a749938e02d6fd0b59b356ca504a24982314bb090c383e3cf201c95ef7e2bfcf", size = 111120, upload-time = "2025-03-25T05:01:24.908Z" },
-]
-
-[[package]]
-name = "pyqt6"
-version = "6.9.1"
-source = { registry = "https://git.aspn.us/api/v4/projects/94/packages/pypi/simple" }
-dependencies = [
-    { name = "pyqt6-qt6" },
-    { name = "pyqt6-sip" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/32/1b/567f46eb43ca961efd38d7a0b73efb70d7342854f075fd919179fdb2a571/pyqt6-6.9.1.tar.gz", hash = "sha256:50642be03fb40f1c2111a09a1f5a0f79813e039c15e78267e6faaf8a96c1c3a6", size = 1067230, upload-time = "2025-06-06T08:49:30.307Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/d5/78/92f3c46440a83ebe22ae614bd6792e7b052bcb58ff128f677f5662015184/pyqt6-6.9.1-cp39-abi3-manylinux_2_28_x86_64.whl", hash = "sha256:37884df27f774e2e1c0c96fa41e817a222329b80ffc6241725b0dc8c110acb35", size = 37804959, upload-time = "2025-06-06T08:48:39.587Z" },
-    { url = "https://files.pythonhosted.org/packages/5a/5e/e77fa2761d809cd08d724f44af01a4b6ceb0ff9648e43173187b0e4fac4e/pyqt6-6.9.1-cp39-abi3-manylinux_2_39_aarch64.whl", hash = "sha256:055870b703c1a49ca621f8a89e2ec4d848e6c739d39367eb9687af3b056d9aa3", size = 40414608, upload-time = "2025-06-06T08:49:00.26Z" },
-]
-
-[[package]]
-name = "pyqt6-qt6"
-version = "6.9.2"
-source = { registry = "https://git.aspn.us/api/v4/projects/94/packages/pypi/simple" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/a8/07/21f7dc188e35b46631707f3b40ace5643a0e03a8e1e446854826d08a04ae/pyqt6_qt6-6.9.2-py3-none-manylinux_2_28_x86_64.whl", hash = "sha256:9abfc0ee4a8293a6442128ae3f87f68e82e2a949d7b9caabd98c86ba5679ab48", size = 82322871, upload-time = "2025-09-01T11:43:41.685Z" },
-    { url = "https://files.pythonhosted.org/packages/0c/c0/da658e735817feaa35ddfddb4c5d699291e8b8e3138e69ad7ae1a38a7db8/pyqt6_qt6-6.9.2-py3-none-manylinux_2_39_aarch64.whl", hash = "sha256:940aac6462532578e8ddefe0494cd17e33a85e0f3cfb21c612f56ab9ad7bc871", size = 80826693, upload-time = "2025-09-01T11:43:46.823Z" },
-]
-
-[[package]]
-name = "pyqt6-sip"
-version = "13.10.2"
-source = { registry = "https://git.aspn.us/api/v4/projects/94/packages/pypi/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/2f/4a/96daf6c2e4f689faae9bd8cebb52754e76522c58a6af9b5ec86a2e8ec8b4/pyqt6_sip-13.10.2.tar.gz", hash = "sha256:464ad156bf526500ce6bd05cac7a82280af6309974d816739b4a9a627156fafe", size = 92548, upload-time = "2025-05-23T12:26:49.901Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/0b/29/79a2dba1cc6ec02c927dd0ffd596ca15ba0a2968123143bc00fc35f0173b/pyqt6_sip-13.10.2-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:07f77e89d93747dda71b60c3490b00d754451729fbcbcec840e42084bf061655", size = 305804, upload-time = "2025-05-23T12:26:23.297Z" },
-    { url = "https://files.pythonhosted.org/packages/bb/4f/fa8468f055679905d0e38d471ae16b5968896ee1d951477e162d9d0a712d/pyqt6_sip-13.10.2-cp310-cp310-manylinux_2_5_x86_64.manylinux1_x86_64.whl", hash = "sha256:4ffa71ddff6ef031d52cd4f88b8bba08b3516313c023c7e5825cf4a0ba598712", size = 284059, upload-time = "2025-05-23T12:26:24.507Z" },
-    { url = "https://files.pythonhosted.org/packages/d6/00/984a94f14ba378c802a8e304803bb6dc6961cd9f24befa1bf3987731f0c3/pyqt6_sip-13.10.2-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:b1d3cc9015a1bd8c8d3e86a009591e897d4d46b0c514aede7d2970a2208749cd", size = 317301, upload-time = "2025-05-23T12:26:28.182Z" },
-    { url = "https://files.pythonhosted.org/packages/0d/b1/c3b433ebcee2503571d71be025de5dab4489d7153007fd5ae79c543eeedb/pyqt6_sip-13.10.2-cp311-cp311-manylinux_2_5_x86_64.manylinux1_x86_64.whl", hash = "sha256:ddd578a8d975bfb5fef83751829bf09a97a1355fa1de098e4fb4d1b74ee872fc", size = 294277, upload-time = "2025-05-23T12:26:29.406Z" },
-    { url = "https://files.pythonhosted.org/packages/51/11/1fc3bae02a12a3ac8354aa579b56206286e8b5ca9586677b1058c81c2f74/pyqt6_sip-13.10.2-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:4ccf197f8fa410e076936bee28ad9abadb450931d5be5625446fd20e0d8b27a6", size = 322757, upload-time = "2025-05-23T12:26:33.752Z" },
-    { url = "https://files.pythonhosted.org/packages/21/40/de9491213f480a27199690616959a17a0f234962b86aa1dd4ca2584e922d/pyqt6_sip-13.10.2-cp312-cp312-manylinux_2_5_x86_64.manylinux1_x86_64.whl", hash = "sha256:37af463dcce39285e686d49523d376994d8a2508b9acccb7616c4b117c9c4ed7", size = 304251, upload-time = "2025-05-23T12:26:35.66Z" },
-    { url = "https://files.pythonhosted.org/packages/d9/21/84c230048e3bfef4a9209d16e56dcd2ae10590d03a31556ae8b5f1dcc724/pyqt6_sip-13.10.2-cp313-cp313-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:ad376a6078da37b049fdf9d6637d71b52727e65c4496a80b753ddc8d27526aca", size = 322920, upload-time = "2025-05-23T12:26:39.856Z" },
-    { url = "https://files.pythonhosted.org/packages/b0/1e/c6a28a142f14e735088534cc92951c3f48cccd77cdd4f3b10d7996be420f/pyqt6_sip-13.10.2-cp313-cp313-manylinux_2_5_x86_64.manylinux1_x86_64.whl", hash = "sha256:3dde8024d055f496eba7d44061c5a1ba4eb72fc95e5a9d7a0dbc908317e0888b", size = 303833, upload-time = "2025-05-23T12:26:41.075Z" },
 ]
 
 [[package]]
