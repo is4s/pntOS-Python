@@ -74,6 +74,8 @@ check_sync $orig_dir"/util/app_gps_ros.patch"
 check_sync $orig_dir"/util/app_gps_standard.patch"
 # Apply app lcm-relay patch
 check_sync $orig_dir"/util/app_lcm_relay.patch"
+# Apply app lever_arm patch
+check_sync $orig_dir"/util/app_gps_ins_leverarm.patch"
 
 # Cleanup and return
 popd > /dev/null
