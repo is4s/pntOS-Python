@@ -8,12 +8,12 @@
     # via pntos-python
 alabaster==1.0.0
     # via sphinx
-analysis-lcm @ git+ssh://git@git.aspn.us/pntos/analysis-scripts.git@c6b14286900111e03c7743d49389455c7542a6a2#subdirectory=analysis-lcm
+analysis-lcm @ git+ssh://git@git.aspn.us/pntos/analysis-scripts.git@8e56a7ca9722f5ac803c80901e57241c1b016796#subdirectory=analysis-lcm
     # via
     #   analysis-ros
     #   pntos-cobra
     #   pntos-python
-analysis-ros @ git+ssh://git@git.aspn.us/pntos/analysis-scripts.git@c6b14286900111e03c7743d49389455c7542a6a2#subdirectory=analysis-ros
+analysis-ros @ git+ssh://git@git.aspn.us/pntos/analysis-scripts.git@8e56a7ca9722f5ac803c80901e57241c1b016796#subdirectory=analysis-ros
     # via
     #   pntos-cobra
     #   pntos-python
@@ -166,12 +166,6 @@ pygments==2.19.2
     #   sphinx
 pyparsing==3.2.3
     # via matplotlib
-pyqt6==6.9.1 ; sys_platform == 'linux'
-    # via analysis-lcm
-pyqt6-qt6==6.9.2 ; sys_platform == 'linux'
-    # via pyqt6
-pyqt6-sip==13.10.2 ; sys_platform == 'linux'
-    # via pyqt6
 pytest==8.4.1
     # via pytest-cov
 pytest-cov==6.2.1
