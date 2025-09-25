@@ -1,0 +1,60 @@
+diff --git a/apps/standard/gps_ins.py b/apps/standard/gps_ins_leverarm.py
+index 9be4a11e..42c81fd6 100755
+--- a/apps/standard/gps_ins.py
++++ b/apps/standard/gps_ins_leverarm.py
+@@ -73,9 +73,9 @@ my_config = [
+         ),
+         additional_sb_configs=[
+             FogmStateBlockConfig(
+-                group='config/fogm_block',
++                group='config/fogm_block1',
+                 identifier='fogm',
+-                label='pos_fogm',
++                label='pos_sensor_error',
+                 estimate_with_covariance=EstimateWithCovariance(
+                     type=EstimateWithCovarianceType.EWC_GENERIC,
+                     estimate=np.zeros((3,)),
+@@ -87,17 +87,40 @@ my_config = [
+                     tau=(300.0, 300.0, 200.0),
+                 ),
+             ),
++            FogmStateBlockConfig(
++                group='config/fogm_block2',
++                identifier='fogm',
++                label='pos_sensor_lever_arm',
++                estimate_with_covariance=EstimateWithCovariance(
++                    type=EstimateWithCovarianceType.EWC_GENERIC,
++                    estimate=np.zeros((3,)),
++                    covariance=(np.eye(3) * 100.0),
++                ),
++                fogm_model=FogmConfig(
++                    group='config/pos_sensor_lever_arm',
++                    sigma=(2.0, 2.0, 2.0),
++                    tau=(1e5, 1e5, 1e5),
++                ),
++            ),
+         ],
+         mp_configs=[
+             SensorMeasurementProcessorConfig(
+                 group='config/gps_measurement_processor',
+-                identifier='pinson_with_ned_fogm_position',
++                identifier='pinson_with_lever_arm_position',
+                 label='gps',
+                 channel='/sensor/ublox-ZED-F9T/position',
+-                state_block_labels=['pinson15', 'pos_fogm'],
++                state_block_labels=[
++                    'pinson15',
++                    'pos_sensor_error',
++                    'pos_sensor_lever_arm',
++                ],
+                 sensor_config=SensorConfig(
+                     group='config/gp3d_state_modeling',
+-                    lever_arm=(-0.50, 0.38, -0.05),
++                    lever_arm=(
++                        -8.50,
++                        8.38,
++                        -8.05,
++                    ),  # Initial lever arm incorrect to demonstrate estimation
+                     orientation=(0.0, 0.0, 0.0, 0.0),
+                     sensor_name='position',
+                 ),
