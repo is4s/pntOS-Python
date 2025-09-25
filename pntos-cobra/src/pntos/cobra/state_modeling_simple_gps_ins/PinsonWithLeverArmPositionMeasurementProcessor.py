@@ -124,7 +124,7 @@ class PinsonWithLeverArmPositionMeasurementProcessor(StandardMeasurementProcesso
             self._mediator.log_message(
                 LoggingLevel.ERROR,
                 f'PinsonWithLeverArmPositionMeasurementProcessor received PVA aux data with no \
-                    quaternion at time {pva.time_of_validity.elapsed_nsec / 1e9}s.',
+                    quaternion at time {pva.time_of_validity.elapsed_nsec / 1e9:.9f}s.',
             )
             return
 
@@ -198,7 +198,7 @@ class PinsonWithLeverArmPositionMeasurementProcessor(StandardMeasurementProcesso
         if len(self.state_block_labels) != self._num_required_blocks:
             self._mediator.log_message(
                 LoggingLevel.ERROR,
-                r'PinsonWithLeverArmPositionMeasurementProcessor has wrong number of state blocks \
+                'PinsonWithLeverArmPositionMeasurementProcessor has wrong number of state blocks \
                  Cannot generate model.',
             )
             return None
@@ -218,7 +218,7 @@ class PinsonWithLeverArmPositionMeasurementProcessor(StandardMeasurementProcesso
             self._mediator.log_message(
                 LoggingLevel.ERROR,
                 f'PinsonWithLeverArmPositionMeasurementProcessor cannot process message at time \
-                {time.elapsed_nsec / 1e9}s as it has not received inertial PVA aux data.',
+                {time.elapsed_nsec / 1e9:.9f}s as it has not received inertial PVA aux data.',
             )
             return None
 
@@ -227,8 +227,8 @@ class PinsonWithLeverArmPositionMeasurementProcessor(StandardMeasurementProcesso
             self._mediator.log_message(
                 LoggingLevel.ERROR,
                 f'PinsonWithLeverArmPositionMeasurementProcessor cannot process message at time \
-                {time.elapsed_nsec / 1e9}s as inertial PVA aux data is at a\
-                different time (t={pva_aux_time.elapsed_nsec / 1e9}s).',
+                {time.elapsed_nsec / 1e9:.9f}s as inertial PVA aux data is at a\
+                different time (t={pva_aux_time.elapsed_nsec / 1e9:.9f}s).',
             )
             return None
 
@@ -237,7 +237,7 @@ class PinsonWithLeverArmPositionMeasurementProcessor(StandardMeasurementProcesso
                 LoggingLevel.ERROR,
                 f'PinsonWithLeverArmPositionMeasurementProcessor expected MeasurementPosition \
                 with a reference frame of GEODETIC, but got measurement at \
-                time {time.elapsed_nsec / 1e9}s with a reference frame of \
+                time {time.elapsed_nsec / 1e9:.9f}s with a reference frame of \
                 {pos.reference_frame}. Cannot process message.',
             )
             return None

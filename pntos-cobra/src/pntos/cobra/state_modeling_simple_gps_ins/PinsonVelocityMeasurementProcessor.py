@@ -74,7 +74,7 @@ class PinsonVelocityMeasurementProcessor(StandardMeasurementProcessor):
         if pva.quaternion is None:
             self._mediator.log_message(
                 LoggingLevel.ERROR,
-                f'PinsonVelocityMeasurementProcessor received PVA aux data with no quaternion at time {pva.time_of_validity.elapsed_nsec / 1e9}s.',
+                f'PinsonVelocityMeasurementProcessor received PVA aux data with no quaternion at time {pva.time_of_validity.elapsed_nsec / 1e9:.9f}s.',
             )
             return
 
@@ -95,7 +95,7 @@ class PinsonVelocityMeasurementProcessor(StandardMeasurementProcessor):
         if self._inertial_pva is None:
             self._mediator.log_message(
                 LoggingLevel.ERROR,
-                f'PinsonVelocityMeasurementProcessor cannot process message at time {time.elapsed_nsec / 1e9}s as it has not received inertial PVA aux data.',
+                f'PinsonVelocityMeasurementProcessor cannot process message at time {time.elapsed_nsec / 1e9:.9f}s as it has not received inertial PVA aux data.',
             )
             return None
 
@@ -103,14 +103,14 @@ class PinsonVelocityMeasurementProcessor(StandardMeasurementProcessor):
         if abs(pva_aux_time.elapsed_nsec - time.elapsed_nsec) > 1000:
             self._mediator.log_message(
                 LoggingLevel.ERROR,
-                f'PinsonVelocityMeasurementProcessor cannot process message at time {time.elapsed_nsec / 1e9}s as inertial PVA aux data is at a different time (t={pva_aux_time.elapsed_nsec / 1e9}s).',
+                f'PinsonVelocityMeasurementProcessor cannot process message at time {time.elapsed_nsec / 1e9:.9f}s as inertial PVA aux data is at a different time (t={pva_aux_time.elapsed_nsec / 1e9:.9f}s).',
             )
             return None
 
         if vel.reference_frame is not MeasurementVelocityReferenceFrame.NED:
             self._mediator.log_message(
                 LoggingLevel.ERROR,
-                f'PinsonVelocityMeasurementProcessor expected MeasurementVelocity with a reference frame of {MeasurementVelocityReferenceFrame.NED}, but got measurement at time {time.elapsed_nsec / 1e9}s with a reference frame of {vel.reference_frame}. Cannot process message.',
+                f'PinsonVelocityMeasurementProcessor expected MeasurementVelocity with a reference frame of {MeasurementVelocityReferenceFrame.NED}, but got measurement at time {time.elapsed_nsec / 1e9:.9f}s with a reference frame of {vel.reference_frame}. Cannot process message.',
             )
             return None
 

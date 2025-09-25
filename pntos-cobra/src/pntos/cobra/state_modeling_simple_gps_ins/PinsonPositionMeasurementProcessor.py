@@ -100,7 +100,7 @@ class PinsonPositionMeasurementProcessor(StandardMeasurementProcessor):
         if pva.quaternion is None:
             self._mediator.log_message(
                 LoggingLevel.ERROR,
-                f'PinsonPositionMeasurementProcessor received PVA aux data with no quaternion at time {pva.time_of_validity.elapsed_nsec / 1e9}s.',
+                f'PinsonPositionMeasurementProcessor received PVA aux data with no quaternion at time {pva.time_of_validity.elapsed_nsec / 1e9:.9f}s.',
             )
             return
 
@@ -203,7 +203,7 @@ class PinsonPositionMeasurementProcessor(StandardMeasurementProcessor):
         if self._inertial_pva is None:
             self._mediator.log_message(
                 LoggingLevel.ERROR,
-                f'PinsonPositionMeasurementProcessor cannot process message at time {time.elapsed_nsec / 1e9}s as it has not received inertial PVA aux data.',
+                f'PinsonPositionMeasurementProcessor cannot process message at time {time.elapsed_nsec / 1e9:.9f}s as it has not received inertial PVA aux data.',
             )
             return None
 
@@ -211,14 +211,14 @@ class PinsonPositionMeasurementProcessor(StandardMeasurementProcessor):
         if abs(pva_aux_time.elapsed_nsec - time.elapsed_nsec) > 1000:
             self._mediator.log_message(
                 LoggingLevel.ERROR,
-                f'PinsonPositionMeasurementProcessor cannot process message at time {time.elapsed_nsec / 1e9}s as inertial PVA aux data is at a different time (t={pva_aux_time.elapsed_nsec / 1e9}s).',
+                f'PinsonPositionMeasurementProcessor cannot process message at time {time.elapsed_nsec / 1e9:.9f}s as inertial PVA aux data is at a different time (t={pva_aux_time.elapsed_nsec / 1e9:.9f}s).',
             )
             return None
 
         if pos.reference_frame is not MeasurementPositionReferenceFrame.GEODETIC:
             self._mediator.log_message(
                 LoggingLevel.ERROR,
-                f'PinsonPositionMeasurementProcessor expected MeasurementPosition with a reference frame of f{MeasurementPositionReferenceFrame.GEODETIC}, but got measurement at time {time.elapsed_nsec / 1e9}s with a reference frame of {pos.reference_frame}. Cannot process message.',
+                f'PinsonPositionMeasurementProcessor expected MeasurementPosition with a reference frame of f{MeasurementPositionReferenceFrame.GEODETIC}, but got measurement at time {time.elapsed_nsec / 1e9:.9f}s with a reference frame of {pos.reference_frame}. Cannot process message.',
             )
             return None
 

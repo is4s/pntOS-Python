@@ -279,7 +279,9 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
         # sync fusion engine and initial solution time
         init_time = self.init_solution.solution.wrapped_message.time_of_validity  # type: ignore[union-attr]
         self.fusion_engine.time = init_time
-        self._log(LoggingLevel.INFO, f'Aligned filter at {init_time}')
+        self._log(
+            LoggingLevel.INFO, f'Aligned filter at {init_time.elapsed_nsec * 1e-9:.9f}s'
+        )
 
     def _add_state_block(
         self,

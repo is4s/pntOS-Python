@@ -155,7 +155,7 @@ class Pinson15NedBlock(StandardStateBlock):
                 if pva.quaternion is None:
                     self._mediator.log_message(
                         LoggingLevel.WARN,
-                        f'Pinson15NedBlock received PVA aux data with no quaternion at time {pva.time_of_validity.elapsed_nsec / 1e9}s. Ignoring.',
+                        f'Pinson15NedBlock received PVA aux data with no quaternion at time {pva.time_of_validity.elapsed_nsec / 1e9:.9f}s. Ignoring.',
                     )
                     continue
                 self._old_pva_aux = self._new_pva_aux
@@ -177,7 +177,7 @@ class Pinson15NedBlock(StandardStateBlock):
         if not self._new_pva_aux or not self._force_and_rate_aux:
             self._mediator.log_message(
                 LoggingLevel.ERROR,
-                f'Pinson15NedBlock cannot propagate from time {time_from.elapsed_nsec / 1e9}s to {time_to.elapsed_nsec / 1e9}s as it has not received PVA and force aux data.',
+                f'Pinson15NedBlock cannot propagate from time {time_from.elapsed_nsec / 1e9:.9f}s to {time_to.elapsed_nsec / 1e9:.9f}s as it has not received PVA and force aux data.',
             )
             return None
 

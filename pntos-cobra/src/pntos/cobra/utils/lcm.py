@@ -434,7 +434,7 @@ def process_lcm_message(
         )
         mediator.log_message(
             LoggingLevel.INFO,
-            f'Found new channel {channel}\t with a timestamp of {ts}s',
+            f'Found new channel {channel}\t with a timestamp of {ts:.9f}s',
         )
         channels.add(channel)
     if isinstance(aspn_msg, list):
