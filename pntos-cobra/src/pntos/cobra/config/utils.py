@@ -5,6 +5,7 @@ from typing import Any, TypeVar, get_args, get_origin
 
 import numpy as np
 from navtk.filtering import ImuModel
+from numpy.typing import NDArray
 
 from pntos.api import (
     EstimateWithCovariance,
@@ -173,7 +174,7 @@ def config_from_registry(  # noqa: PLR0915
             if hasattr(param.type, '__origin__'):
                 p_type = get_origin(param.type)
                 if p_type is tuple:
-                    val = tuple(val)
+                    val = _ndarray_to_tuple(val)
                 elif p_type is list:
                     # Convert numpy array to list
                     if str(param.type) == 'list[int]':
@@ -232,7 +233,9 @@ def config_to_registry(config: BaseConfig, mediator: Mediator) -> None:
         if isinstance(val_to_store, int) and param.type is float:
             val_to_store = float(val_to_store)
         # compare user provided type with the validated config type hint
-        if not _confirm_types(val_to_store, param.type):  # type: ignore[arg-type]
+        if not isinstance(val_to_store, tuple) and not _confirm_types(
+            val_to_store, param.type
+        ):
             mediator.log_message(
                 LoggingLevel.ERROR,
                 f'Expected field {param.name} in {type(config)} to have type {param.type} '
@@ -288,15 +291,50 @@ def _confirm_types(out_val: Any, expected_type: type[Any]) -> bool:  # noqa: ANN
         bool
     """
 
+    def compare_tuples(tuple1: type[Any], tuple2: type[Any]) -> bool:
+        args1, args2 = (get_args(tuple1), get_args(tuple2))
+        for i, arg1 in enumerate(args1):
+            # if at the end of tuple2, iterate over the rest of tuple1
+            if i < len(args2):
+                arg2 = args2[i]
+            org1, org2 = (get_origin(arg1), get_origin(arg2))
+            if org1 is tuple and org2 is tuple:
+                if not compare_tuples(arg1, arg2):
+                    return False
+            elif org1 is None and org2 is None:
+                if arg1 == arg2:
+                    continue
+                if arg1 is float and arg2 is Ellipsis:
+                    continue
+                return False
+            elif org1 is tuple and org2 is None:
+                if not _validate_tuple_type(arg1):
+                    return False
+                continue
+            else:
+                return False
+        return True
+
     def compare_type(type_to_compare: type[Any], expected_type: type[Any]) -> bool:
+        if str(type_to_compare) == str(expected_type):
+            return True
+
+        exp_org = get_origin(expected_type)
+        ret_org = get_origin(type_to_compare)
+        if exp_org != ret_org:
+            return False
         # Check if expected_type is generic alias (list[str], tuple[float], etc...)
-        if hasattr(expected_type, '__origin__'):
-            return type_to_compare is get_origin(expected_type)
+        if exp_org is tuple:
+            return compare_tuples(type_to_compare, expected_type)
+        elif exp_org is list:
+            exp_arg = get_args(expected_type)[0]
+            ret_arg = get_args(type_to_compare)[0]
+            return np.issubdtype(ret_arg, exp_arg)
 
         # Otherwise, just see if it's the same type
         return issubclass(type_to_compare, expected_type)
 
-    out_type = type(out_val)
+    out_type = _get_verbose_type(out_val)
 
     if _is_type_optional(expected_type):
         types = get_args(expected_type)
@@ -306,6 +344,17 @@ def _confirm_types(out_val: Any, expected_type: type[Any]) -> bool:  # noqa: ANN
         return False
 
     return compare_type(out_type, expected_type)
+
+
+def _get_verbose_type(obj: Any) -> Any:
+    if isinstance(obj, tuple):
+        inner_types = tuple(_get_verbose_type(item) for item in obj)
+        return tuple[inner_types]  # type: ignore[valid-type]
+    elif isinstance(obj, list):
+        return list[type(obj[0])]  # type: ignore[misc]
+    elif isinstance(obj, np.ndarray):
+        return np.ndarray[Any, np.dtype[obj.dtype.type]]
+    return type(obj)
 
 
 def _is_type_optional(field_type: type[Any] | str) -> bool:
@@ -377,3 +426,10 @@ def _validate_tuple_type(tuple_type: type[Any]) -> bool:
         else:
             return False
     return True
+
+
+def _ndarray_to_tuple(arr: NDArray[np.float64]) -> tuple:  # type: ignore[type-arg]
+    if arr.ndim == 1:
+        return tuple(float(x) for x in arr)
+    else:
+        return tuple(_ndarray_to_tuple(sub) for sub in arr)

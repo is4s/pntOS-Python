@@ -1,10 +1,17 @@
 import unittest
-from dataclasses import fields
+from dataclasses import dataclass, field, fields
 from enum import Enum
 from pathlib import Path
+from typing import Any, get_args, get_origin
 
 import numpy as np
-from aspn23 import TypeTimestamp
+from aspn23 import (
+    MeasurementAltitude,
+    MeasurementAltitudeErrorModel,
+    MeasurementAltitudeReference,
+    TypeHeader,
+    TypeTimestamp,
+)
 from pntos.api import (
     EstimateWithCovariance,
     EstimateWithCovarianceType,
@@ -34,8 +41,24 @@ from pntos.cobra.config import (
 )
 from pntos.cobra.utils import validate_manual_ewc
 
+
+class DummyEnum(Enum):
+    RED = 0
+
+
 DEBUG_LOG: Path = Path()
 CONFIG_TEST_GROUP = 'config_test_group'
+SUPPORTED_TYPES = list(
+    get_args(RegistryValueTypeUnion)
+    + (
+        BaseConfig,
+        list[BaseConfig],
+        tuple[tuple[float, ...], ...],
+        tuple[float, ...],
+        DummyEnum,
+        EstimateWithCovariance,
+    )
+)
 
 
 class DummyMediator(Mediator):
@@ -415,8 +438,96 @@ class TestConfigUtils(unittest.TestCase):
             if isinstance(test_val, np.ndarray):
                 assert np.all(test_val == result_val)
                 assert test_val.dtype == result_val.dtype
+            elif isinstance(test_val, EstimateWithCovariance):
+                self._compare_ewc(test_val, result_val)
             else:
                 assert test_val == result_val
 
         # Make sure there weren't any error messages:
         assert Path() == DEBUG_LOG
+
+    def _make_config(
+        self, field_name: str, field_type: type, optional: bool = False
+    ) -> type[BaseConfig]:
+        annotations: dict[str, Any] = {}
+
+        actual_type = field_type | None if optional else field_type
+        annotations['group'] = str
+        annotations[field_name] = actual_type
+
+        fields_dict = {
+            '__annotations__': annotations,
+            'group': field(default='dynamic_test'),
+            field_name: field(default=None if optional else ...),
+        }
+
+        dynamic_class: type[BaseConfig] = dataclass(
+            type('DynamicConfigClass', (BaseConfig,), fields_dict)
+        )
+        return dynamic_class
+
+    def _create_dummy_value(self, in_type: type[Any]) -> Any:
+        origin = get_origin(in_type)
+
+        if origin is list:
+            return [self._create_dummy_value(get_args(in_type)[0])]
+        if origin is tuple:
+            val = self._create_dummy_value(get_args(in_type)[0])
+            return (val, val)
+        if origin is np.ndarray:
+            generic = get_args(in_type)[1]
+            return np.array([self._create_dummy_value(get_args(generic)[0])])
+
+        if in_type is bool:
+            return True
+        if issubclass(in_type, (int, np.int_)):
+            return 1
+        if issubclass(in_type, (float, np.floating)):
+            return 1.23
+        if in_type is str:
+            return 'test'
+        if issubclass(in_type, BaseConfig):
+            return in_type(group='dummy_val_test')
+        if issubclass(in_type, Message):
+            return in_type(
+                wrapped_message=MeasurementAltitude(
+                    header=TypeHeader(0, 0, 0, 0),
+                    time_of_validity=TypeTimestamp(0),
+                    reference=MeasurementAltitudeReference.HAE,
+                    altitude=1.0,
+                    variance=0.1,
+                    error_model=MeasurementAltitudeErrorModel.NONE,
+                    error_model_params=np.array([]),
+                    integrity=[],
+                ),
+                source_identifier='dummy',
+            )
+        if issubclass(in_type, Enum):
+            return list(in_type)[0]
+        if issubclass(in_type, EstimateWithCovariance):
+            return in_type(
+                type=EstimateWithCovarianceType.EWC_GENERIC,
+                estimate=np.zeros((3, 1)),
+                covariance=np.eye(3),
+            )
+
+        raise ValueError(f"Don't know how to create dummy value for {in_type}")
+
+    def test_supported_types(self) -> None:
+        for i in range(3):
+            for j, t in enumerate(SUPPORTED_TYPES):
+                dynamic_group = f'dynamic_test_{i}{j}'
+                DynConf = self._make_config('dynamic_field', t, optional=bool(i))
+                # test with dummy value when type hint is and isn't optional; test with None
+                if i == 0 or i == 3:
+                    val = self._create_dummy_value(t)
+                else:
+                    val = None
+                conf = DynConf(  # type: ignore[call-arg]
+                    dynamic_field=val,
+                    group=dynamic_group,
+                )
+                config_to_registry(conf, self.mediator)
+                out_conf = config_from_registry(DynConf, self.mediator, dynamic_group)
+                assert out_conf is not None
+                self._validate_conf_from_registry(conf, out_conf)
