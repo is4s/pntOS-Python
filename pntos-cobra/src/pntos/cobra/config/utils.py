@@ -287,24 +287,25 @@ def _confirm_types(out_val: Any, expected_type: type[Any]) -> bool:  # noqa: ANN
     Returns:
         bool
     """
+
+    def compare_type(type_to_compare: type[Any], expected_type: type[Any]) -> bool:
+        # Check if expected_type is generic alias (list[str], tuple[float], etc...)
+        if hasattr(expected_type, '__origin__'):
+            return type_to_compare is get_origin(expected_type)
+
+        # Otherwise, just see if it's the same type
+        return issubclass(type_to_compare, expected_type)
+
     out_type = type(out_val)
 
     if _is_type_optional(expected_type):
         types = get_args(expected_type)
-        valid_type = False
         for t in types:
-            if hasattr(t, '__origin__'):
-                return out_type is get_origin(t)
-            if out_type is t:
-                valid_type = True
-        return bool(valid_type)
+            if compare_type(out_type, t):
+                return True
+        return False
 
-    # Check if expected_type is generic alias (list[str], tuple[float], etc...)
-    if hasattr(expected_type, '__origin__'):
-        return out_type is get_origin(expected_type)
-
-    # Otherwise, just see if it's the same type
-    return issubclass(out_type, expected_type)
+    return compare_type(out_type, expected_type)
 
 
 def _is_type_optional(field_type: type[Any] | str) -> bool:
