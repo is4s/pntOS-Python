@@ -32,6 +32,7 @@ from pntos.cobra.config import (
     PinsonStateBlockConfig,
     PreprocessorConfig,
     SensorConfig,
+    SensorMeasurementProcessorConfig,
     StandardOrchestrationConfig,
     StateBlockConfig,
     StaticAlignmentConfig,
@@ -229,12 +230,18 @@ class TestConfigUtils(unittest.TestCase):
                 ),
             ],
             mp_configs=[
-                MeasurementProcessorConfig(
+                SensorMeasurementProcessorConfig(
                     group='config/gps_measurement_processor',
                     identifier='pinson_with_ned_fogm_position',
                     label='gps',
                     channel='/sensor/ublox-ZED-F9T/position',
                     state_block_labels=['pinson15', 'pos_fogm'],
+                    sensor_config=SensorConfig(
+                        CONFIG_TEST_GROUP,
+                        (0.7, 0.8, 0.9),
+                        (1.1, 2.2, 3.3, 4.4),
+                        'NCC-1701',
+                    ),
                 ),
                 MeasurementProcessorConfig(
                     group='config/vel_measurement_processor',
@@ -296,10 +303,7 @@ class TestConfigUtils(unittest.TestCase):
             StandardOrchestrationConfig, self.mediator, CONFIG_TEST_GROUP
         )
         assert result_config is not None
-        assert result_config.additional_sb_configs is not None
-        assert result_config.mp_configs is not None
-        assert result_config.inertial_config is not None
-        assert result_config.preprocessor_configs is not None
+        self._validate_conf_from_registry(test_conf, result_config)
 
     def test_static_align_config_to_from_registry(self) -> None:
         imu_model = ImuConfig(
@@ -434,12 +438,20 @@ class TestConfigUtils(unittest.TestCase):
             assert test_field.name == result_field.name
             test_val = getattr(test_conf, test_field.name)
             result_val = getattr(result_conf, result_field.name)
-            assert type(test_val) is type(result_val)
+            assert issubclass(type(test_val), type(result_val))
             if isinstance(test_val, np.ndarray):
                 assert np.all(test_val == result_val)
                 assert test_val.dtype == result_val.dtype
             elif isinstance(test_val, EstimateWithCovariance):
                 self._compare_ewc(test_val, result_val)
+            elif isinstance(test_val, list):
+                assert len(test_val) > 0
+                if isinstance(test_val[0], BaseConfig):
+                    for i in range(len(test_val)):
+                        assert issubclass(type(test_val[i]), type(result_val[i]))
+                        assert test_val[i].group == result_val[i].group
+            elif isinstance(test_val, BaseConfig):
+                assert test_val.group == result_val.group
             else:
                 assert test_val == result_val
 
