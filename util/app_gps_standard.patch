@@ -52,8 +52,8 @@ index 645d9adc..5692eebf 100755
  from pntos_python_datasets import EXAMPLE_LCM_LOG
  
 @@ -44,6 +47,17 @@ C_imu_to_platform = (
-     (-0.01741603, 0.99982216, -0.00723391),
-     (-0.06453231, 0.00609588, 0.997897),
+     (-0.01742059, 0.99983262, -0.00559042),
+     (-0.0603517, 0.00452957, 0.9981669),
  )
 +imu_model = ImuConfig(
 +    group='config/inertial_state',
