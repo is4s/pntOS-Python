@@ -1,11 +1,47 @@
 diff --git a/apps/standard/gps_ins.py b/apps/standard/gps_ins_bodyvel.py
-index 190c4b95..5ed84c16 100755
+index 6ca964a0..5ed84c16 100755
 --- a/apps/standard/gps_ins.py
 +++ b/apps/standard/gps_ins_bodyvel.py
-@@ -106,6 +106,19 @@ my_config = [
+@@ -68,14 +68,14 @@ my_config = [
+     StandardOrchestrationConfig(
+         best_sol_channel='/solution/pntos/pva',
+         imu_sol_channel='/solution/pntos-imu/pva',
+-        alignment_channels=('/sensor/ublox-ZED-F9T/position', '/sensor/vn-100/imu'),
++        alignment_channels=['/sensor/ublox-ZED-F9T/position', '/sensor/vn-100/imu'],
+         pinson_sb_config=PinsonStateBlockConfig(
+             group='config/pinson_block',
+             identifier='pinson15',
+             label='pinson15',
+             imu_model=imu_model,
+         ),
+-        additional_sb_configs=(
++        additional_sb_configs=[
+             FogmStateBlockConfig(
+                 group='config/fogm_block',
+                 identifier='fogm',
+@@ -91,14 +91,14 @@ my_config = [
+                     tau=(300.0, 300.0, 200.0),
+                 ),
+             ),
+-        ),
+-        mp_configs=(
++        ],
++        mp_configs=[
+             SensorMeasurementProcessorConfig(
+                 group='config/gps_measurement_processor',
+                 identifier='pinson_with_ned_fogm_position',
+                 label='gps',
+                 channel='/sensor/ublox-ZED-F9T/position',
+-                state_block_labels=('pinson15', 'pos_fogm'),
++                state_block_labels=['pinson15', 'pos_fogm'],
+                 sensor_config=SensorConfig(
+                     group='config/gp3d_state_modeling',
+                     lever_arm=(-0.50, 0.38, -0.05),
+@@ -106,7 +106,20 @@ my_config = [
                      sensor_name='position',
                  ),
              ),
+-        ),
 +            SensorMeasurementProcessorConfig(
 +                group='config/bodyvel_measurement_processor',
 +                identifier='pinson_body_velocity',
@@ -19,6 +55,25 @@ index 190c4b95..5ed84c16 100755
 +                    sensor_name='velocity',
 +                ),
 +            ),
-         ],
++        ],
          inertial_config=InertialConfig(
              group='config/inertial',
+             expected_dt=0.01,
+@@ -121,7 +134,7 @@ my_config = [
+             heading=0.06895795874629593,
+             heading_sigma=0.02236067977,
+         ),
+-        preprocessor_configs=(
++        preprocessor_configs=[
+             ImuRotatorConfig(
+                 group='config/imu_rotator',
+                 identifier='imu_rotator',
+@@ -142,7 +155,7 @@ my_config = [
+                 ],
+                 time_bias=int(0.15 * 1e9),
+             ),
+-        ),
++        ],
+         group='config/orchestration',
+     ),
+ ]

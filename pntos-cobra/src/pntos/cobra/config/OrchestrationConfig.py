@@ -111,7 +111,7 @@ class MeasurementProcessorConfig(BaseConfig):
     This corresponds to the `source_identifier` field on the ``pntos.api.Message`` class.
     """
 
-    state_block_labels: list[str]
+    state_block_labels: tuple[str, ...]
     """
     The labels of the state blocks this measurement processor will use.
     """
@@ -132,7 +132,7 @@ class SensorMeasurementProcessorConfig(MeasurementProcessorConfig):
 
     channel: str
 
-    state_block_labels: list[str]
+    state_block_labels: tuple[str, ...]
 
     # UNIQUE FIELDS
     sensor_config: SensorConfig
@@ -181,9 +181,9 @@ class StandardOrchestrationConfig(BaseConfig):
     The channel on which to output the imu solution of the filter.
     """
 
-    alignment_channels: list[str]
+    alignment_channels: tuple[str, ...]
     """
-    List of channels whose messages are to be used during initialization.
+    A series of channels whose messages are to be used during initialization.
     """
 
     pinson_sb_config: PinsonStateBlockConfig
@@ -192,14 +192,14 @@ class StandardOrchestrationConfig(BaseConfig):
     representing the error model of the inertial navigation system.
     """
 
-    additional_sb_configs: list[StateBlockConfig] | None = None
+    additional_sb_configs: tuple[StateBlockConfig, ...] | None = None
     """
-    A list of state block configs to use in addition to the core pinson state block.
+    A series of state block configs to use in addition to the core pinson state block.
     """
 
-    mp_configs: list[MeasurementProcessorConfig] | None = None
+    mp_configs: tuple[MeasurementProcessorConfig, ...] | None = None
     """
-    A list of measurement processor configs to use in the fusion engine.
+    A series of measurement processor configs to use in the fusion engine.
     """
 
     inertial_config: InertialConfig
@@ -211,9 +211,9 @@ class StandardOrchestrationConfig(BaseConfig):
     A config that contains information used to set up the initialization strategy.
     """
 
-    preprocessor_configs: list[PreprocessorConfig] | None = None
+    preprocessor_configs: tuple[PreprocessorConfig, ...] | None = None
     """
-    List of preprocessor configs to use. (optional)
+    A series of preprocessor configs to use. (optional)
     """
 
     group: str

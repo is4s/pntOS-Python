@@ -50,12 +50,17 @@ class DummyEnum(Enum):
 DEBUG_LOG: Path = Path()
 CONFIG_TEST_GROUP = 'config_test_group'
 SUPPORTED_TYPES = list(
-    get_args(RegistryValueTypeUnion)
-    + (
+    (
+        int,
+        float,
+        str,
+        bool,
         BaseConfig,
-        list[BaseConfig],
-        tuple[tuple[float, ...], ...],
+        tuple[int, ...],
+        tuple[str, ...],
         tuple[float, ...],
+        tuple[BaseConfig, ...],
+        tuple[tuple[float, ...], ...],
         DummyEnum,
         EstimateWithCovariance,
     )
@@ -174,7 +179,7 @@ class TestConfigUtils(unittest.TestCase):
 
     def test_DownsamplerConfig_to_from_registry(self) -> None:
         test_conf = DownsamplerConfig(
-            CONFIG_TEST_GROUP, 'downsampler', ['chan1', 'chan2', 'chan3'], [1, 2, 3]
+            CONFIG_TEST_GROUP, 'downsampler', ('chan1', 'chan2', 'chan3'), (1, 2, 3)
         )
         # Test config_to_registry
         config_to_registry(test_conf, self.mediator)
@@ -207,7 +212,7 @@ class TestConfigUtils(unittest.TestCase):
         test_conf = StandardOrchestrationConfig(
             best_sol_channel='/solution/pntos/best',
             imu_sol_channel='/solution/pntos/imu',
-            alignment_channels=['/sensor/ublox-ZED-F9T/position', '/sensor/vn-100/imu'],
+            alignment_channels=('/sensor/ublox-ZED-F9T/position', '/sensor/vn-100/imu'),
             pinson_sb_config=PinsonStateBlockConfig(
                 group='config/pinson_block',
                 identifier='pinson15',
@@ -222,20 +227,20 @@ class TestConfigUtils(unittest.TestCase):
                     gyro_random_walk_sigma=(9.9e-4, 9.9e-4, 6.7e-5),
                 ),
             ),
-            additional_sb_configs=[
+            additional_sb_configs=(
                 StateBlockConfig(
                     group='config/fogm_block',
                     identifier='fogm',
                     label='pos_fogm',
                 ),
-            ],
-            mp_configs=[
+            ),
+            mp_configs=(
                 SensorMeasurementProcessorConfig(
                     group='config/gps_measurement_processor',
                     identifier='pinson_with_ned_fogm_position',
                     label='gps',
                     channel='/sensor/ublox-ZED-F9T/position',
-                    state_block_labels=['pinson15', 'pos_fogm'],
+                    state_block_labels=('pinson15', 'pos_fogm'),
                     sensor_config=SensorConfig(
                         CONFIG_TEST_GROUP,
                         (0.7, 0.8, 0.9),
@@ -248,9 +253,9 @@ class TestConfigUtils(unittest.TestCase):
                     identifier='pinson_velocity',
                     label='vel',
                     channel='/sensor/ublox-ZED-F9T/velocity',
-                    state_block_labels=['pinson15'],
+                    state_block_labels=('pinson15',),
                 ),
-            ],
+            ),
             inertial_config=InertialConfig(
                 group='config/inertial',
                 expected_dt=0.01,
@@ -280,7 +285,7 @@ class TestConfigUtils(unittest.TestCase):
                 initial_time=1747680879.539799718,
                 initial_vel=(0.0, 0.0, 0.0),
             ),
-            preprocessor_configs=[
+            preprocessor_configs=(
                 ImuRotatorConfig(
                     group='config/imu_rotator',
                     identifier='imu_rotator',
@@ -293,7 +298,7 @@ class TestConfigUtils(unittest.TestCase):
                     channel_to_correct='/sensor/vn-100/imu',
                     expected_dt_nsec=int(0.01 * 1e9),
                 ),
-            ],
+            ),
             group=CONFIG_TEST_GROUP,
         )
 
@@ -418,12 +423,16 @@ class TestConfigUtils(unittest.TestCase):
         kv = self.mediator.registry.batch_start(CONFIG_TEST_GROUP)
         conf_fields = [f for f in fields(test_conf) if f.name != 'group']
         for conf_field in conf_fields:
-            val: RegistryValueTypeUnion | Enum | None = kv[conf_field.name]
+            val: RegistryValueTypeUnion | tuple[Any, ...] | Enum | None = kv[
+                conf_field.name
+            ]
             conf_val = getattr(test_conf, conf_field.name)
             if isinstance(val, np.ndarray):
                 assert np.all(val == conf_val)
             elif isinstance(conf_val, Enum):
                 val = type(conf_val)(val)
+            elif isinstance(val, list):
+                val = tuple(val)
             else:
                 assert val == conf_val
 
@@ -444,7 +453,7 @@ class TestConfigUtils(unittest.TestCase):
                 assert test_val.dtype == result_val.dtype
             elif isinstance(test_val, EstimateWithCovariance):
                 self._compare_ewc(test_val, result_val)
-            elif isinstance(test_val, list):
+            elif isinstance(test_val, tuple):
                 assert len(test_val) > 0
                 if isinstance(test_val[0], BaseConfig):
                     for i in range(len(test_val)):
@@ -481,14 +490,9 @@ class TestConfigUtils(unittest.TestCase):
     def _create_dummy_value(self, in_type: type[Any]) -> Any:
         origin = get_origin(in_type)
 
-        if origin is list:
-            return [self._create_dummy_value(get_args(in_type)[0])]
         if origin is tuple:
             val = self._create_dummy_value(get_args(in_type)[0])
             return (val, val)
-        if origin is np.ndarray:
-            generic = get_args(in_type)[1]
-            return np.array([self._create_dummy_value(get_args(generic)[0])])
 
         if in_type is bool:
             return True
@@ -539,6 +543,7 @@ class TestConfigUtils(unittest.TestCase):
                     dynamic_field=val,
                     group=dynamic_group,
                 )
+                print(conf)
                 config_to_registry(conf, self.mediator)
                 out_conf = config_from_registry(DynConf, self.mediator, dynamic_group)
                 assert out_conf is not None

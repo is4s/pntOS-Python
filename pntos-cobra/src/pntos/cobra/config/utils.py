@@ -19,12 +19,10 @@ from .BaseConfig import BaseConfig
 from .ImuConfig import ImuConfig
 
 ConfigType = TypeVar('ConfigType', bound=BaseConfig)
-SUPPORTED_TYPES = {
-    *get_args(RegistryValueTypeUnion),
-    tuple[float, ...],
-    Enum,
-    EstimateWithCovariance,
-}
+SUPPORTED_TYPES = set(
+    (int, float, str, bool, BaseConfig, tuple, Enum, EstimateWithCovariance)
+)
+SupportedTupleTypes = set((int, float, str, BaseConfig))
 
 
 def imu_model_to_config(model: ImuModel, group: str) -> ImuConfig:
@@ -127,7 +125,7 @@ def config_from_registry(  # noqa: PLR0915
                 estimate=kv['_estimate'],  # type: ignore[arg-type]
                 covariance=kv['_covariance'],  # type: ignore[arg-type]
             )
-        # Special case: nested config or list of nested configs
+        # Special case: nested config or a series of nested configs
         else:
             group_key = '_' + param.name + '_groups'
             if group_key not in kv:
@@ -171,19 +169,16 @@ def config_from_registry(  # noqa: PLR0915
             continue
 
         if isinstance(val, np.ndarray):
-            if hasattr(param.type, '__origin__'):
-                p_type = get_origin(param.type)
-                if p_type is tuple:
-                    val = _ndarray_to_tuple(val)
-                elif p_type is list:
-                    # Convert numpy array to list
-                    if str(param.type) == 'list[int]':
-                        # Convert to list of ints
-                        val = val.astype(int)
-                    val = list(val)
-                elif p_type is np.ndarray and np.dtype[np.int_] in param.type.__args__:  # type: ignore[union-attr]
-                    # Convert to np array of ints
-                    val = val.astype(int)
+            dtype = None
+            p_args = get_args(param.type)
+            p_org = get_origin(p_args[0])
+            while p_org is not None:
+                p_args = get_args(p_args[0])
+                p_org = get_origin(p_org)
+            dtype = p_args[0]
+            val = _ndarray_to_tuple(val, dtype)
+        elif isinstance(val, list):
+            val = tuple(val)  # type: ignore[arg-type]
         # Special case: enum. Convert integer back to enum type.
         elif isclass(param.type) and issubclass(param.type, Enum):
             val = param.type(val)
@@ -208,8 +203,7 @@ def config_to_registry(config: BaseConfig, mediator: Mediator) -> None:
     """
     A utility function that inserts a config into the registry.
 
-    This function will convert certain types (list[float], list|nd.array[int], Enum, tuple[float])
-    unsupported by the registry to the corresponding supported type represented by ``RegistryValueType``.
+    This function verifies that all series of data are within tuples and converts them to a registry equivalent.
     It will convert an ``int`` to a ``float`` if the field is type hinted as a ``float``.
     It also supports storing nested config objects and the API defined :class:`pntos.api.EstimateWithCovariance`.
 
@@ -244,11 +238,14 @@ def config_to_registry(config: BaseConfig, mediator: Mediator) -> None:
             kv.batch_end()
             return
         if isinstance(val_to_store, tuple):
-            val_to_store = np.array(val_to_store, dtype=np.float64)
-        elif isinstance(val_to_store, (list, np.ndarray)):
             if len(val_to_store) > 0:
-                if isinstance(val_to_store[0], (int, float, np.int_)):
+                # convert numerical tuples to ndarray; we only support multi dimensional tuples
+                if np.issubdtype(type(val_to_store[0]), np.number) or isinstance(
+                    val_to_store[0], tuple
+                ):
                     val_to_store = np.array(val_to_store, dtype=float)
+                elif isinstance(val_to_store[0], str):
+                    val_to_store = list(val_to_store)
                 elif isinstance(val_to_store[0], BaseConfig):
                     nested_groups = []
                     for nested_config in val_to_store:
@@ -304,7 +301,7 @@ def _confirm_types(out_val: Any, expected_type: type[Any]) -> bool:  # noqa: ANN
             elif org1 is None and org2 is None:
                 if arg1 == arg2:
                     continue
-                if arg1 is float and arg2 is Ellipsis:
+                if arg2 is Ellipsis:
                     continue
                 return False
             elif org1 is tuple and org2 is None:
@@ -392,12 +389,8 @@ def _is_type_supported(field_type: type[Any]) -> bool:
     if origin is tuple:
         return _validate_tuple_type(type_to_compare)
     # we support lists of one of the following types: int, str, float, BaseConfig
-    if origin is list:
-        args = get_args(type_to_compare)
-        if len(args) != 1:
-            return False
-        if issubclass(args[0], (int, str, float, BaseConfig)):
-            return True
+    elif origin is not None:
+        return False
     return type_to_compare in SUPPORTED_TYPES or issubclass(
         type_to_compare, (Enum, BaseConfig)
     )
@@ -415,21 +408,28 @@ def _validate_tuple_type(tuple_type: type[Any]) -> bool:
         bool
     """
     args = get_args(tuple_type)
+    first_arg = args[0]
     for arg in args:
+        if arg != first_arg and arg is not Ellipsis:
+            return False
         arg_org = get_origin(arg)
         if arg_org is tuple:
             if not _validate_tuple_type(arg):
                 return False
         elif arg_org is None:
-            if arg is not float and arg is not Ellipsis:
+            if (
+                arg not in SupportedTupleTypes
+                and arg is not Ellipsis
+                and not issubclass(arg, BaseConfig)
+            ):
                 return False
         else:
             return False
     return True
 
 
-def _ndarray_to_tuple(arr: NDArray[np.float64]) -> tuple:  # type: ignore[type-arg]
+def _ndarray_to_tuple(arr: NDArray[np.number], target_type: type[Any]) -> tuple:  # type: ignore[type-arg]
     if arr.ndim == 1:
-        return tuple(float(x) for x in arr)
+        return tuple(target_type(x) for x in arr)
     else:
-        return tuple(_ndarray_to_tuple(sub) for sub in arr)
+        return tuple(_ndarray_to_tuple(sub, target_type) for sub in arr)

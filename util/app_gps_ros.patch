@@ -1,5 +1,5 @@
 diff --git a/apps/standard/gps_ins.py b/apps/advanced/gps_ins_ros.py
-index 190c4b95..a5b9a349 100755
+index 6ca964a0..8619d61f 100755
 --- a/apps/standard/gps_ins.py
 +++ b/apps/advanced/gps_ins_ros.py
 @@ -1,7 +1,5 @@
@@ -57,8 +57,8 @@ index 190c4b95..a5b9a349 100755
      StandardOrchestrationConfig(
          best_sol_channel='/solution/pntos/pva',
          imu_sol_channel='/solution/pntos-imu/pva',
--        alignment_channels=['/sensor/ublox-ZED-F9T/position', '/sensor/vn-100/imu'],
-+        alignment_channels=['/sensor/ublox_ZED_F9T/position', '/sensor/vn_100/imu'],
+-        alignment_channels=('/sensor/ublox-ZED-F9T/position', '/sensor/vn-100/imu'),
++        alignment_channels=('/sensor/ublox_ZED_F9T/position', '/sensor/vn_100/imu'),
          pinson_sb_config=PinsonStateBlockConfig(
              group='config/pinson_block',
              identifier='pinson15',
@@ -68,7 +68,7 @@ index 190c4b95..a5b9a349 100755
                  label='gps',
 -                channel='/sensor/ublox-ZED-F9T/position',
 +                channel='/sensor/ublox_ZED_F9T/position',
-                 state_block_labels=['pinson15', 'pos_fogm'],
+                 state_block_labels=('pinson15', 'pos_fogm'),
                  sensor_config=SensorConfig(
                      group='config/gp3d_state_modeling',
 @@ -110,7 +97,7 @@ my_config = [

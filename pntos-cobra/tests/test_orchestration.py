@@ -161,14 +161,14 @@ standard_config = [
     StandardOrchestrationConfig(
         best_sol_channel=BEST_SOL_CHANNEL,
         imu_sol_channel=IMU_SOL_CHANNEL,
-        alignment_channels=[GPS_CHANNEL, IMU_CHANNEL],
+        alignment_channels=(GPS_CHANNEL, IMU_CHANNEL),
         pinson_sb_config=PinsonStateBlockConfig(
             group='config/pinson_block',
             identifier='pinson15',
             label='pinson15',
             imu_model=imu_config,
         ),
-        additional_sb_configs=[
+        additional_sb_configs=(
             FogmStateBlockConfig(
                 group='config/fogm_block',
                 identifier='fogm',
@@ -184,14 +184,14 @@ standard_config = [
                     tau=(300.0, 300.0, 200.0),
                 ),
             ),
-        ],
-        mp_configs=[
+        ),
+        mp_configs=(
             SensorMeasurementProcessorConfig(
                 group='config/gps_measurement_processor',
                 identifier='pinson_with_ned_fogm_position',
                 label='gps',
                 channel=GPS_CHANNEL,
-                state_block_labels=['pinson15', 'pos_fogm'],
+                state_block_labels=('pinson15', 'pos_fogm'),
                 sensor_config=SensorConfig(
                     group='config/gp3d_state_modeling',
                     lever_arm=(-0.50, 0.38, -0.05),
@@ -204,19 +204,19 @@ standard_config = [
                 identifier='pinson_velocity',
                 label='vel',
                 channel='/sensor/ublox-ZED-F9T/velocity',
-                state_block_labels=['pinson15'],
+                state_block_labels=('pinson15',),
             ),
-        ],
+        ),
         inertial_config=inertial_config,
         alignment_config=align_config,
-        preprocessor_configs=[
+        preprocessor_configs=(
             ImuRotatorConfig(
                 group='config/rotator',
                 identifier='imu_rotator',
                 channel=IMU_CHANNEL,
                 C_imu_to_platform=C_imu_to_platform,
-            )
-        ],
+            ),
+        ),
         group='config/orchestration',
     ),
 ]

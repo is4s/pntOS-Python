@@ -68,14 +68,14 @@ my_config = [
     StandardOrchestrationConfig(
         best_sol_channel='/solution/pntos/pva',
         imu_sol_channel='/solution/pntos-imu/pva',
-        alignment_channels=['/sensor/ublox-ZED-F9T/position', '/sensor/vn-100/imu'],
+        alignment_channels=('/sensor/ublox-ZED-F9T/position', '/sensor/vn-100/imu'),
         pinson_sb_config=PinsonStateBlockConfig(
             group='config/pinson_block',
             identifier='pinson15',
             label='pinson15',
             imu_model=imu_model,
         ),
-        additional_sb_configs=[
+        additional_sb_configs=(
             FogmStateBlockConfig(
                 group='config/fogm_block1',
                 identifier='fogm',
@@ -106,18 +106,18 @@ my_config = [
                     tau=(1e5, 1e5, 1e5),
                 ),
             ),
-        ],
-        mp_configs=[
+        ),
+        mp_configs=(
             SensorMeasurementProcessorConfig(
                 group='config/gps_measurement_processor',
                 identifier='pinson_with_lever_arm_position',
                 label='gps',
                 channel='/sensor/ublox-ZED-F9T/position',
-                state_block_labels=[
+                state_block_labels=(
                     'pinson15',
                     'pos_sensor_error',
                     'pos_sensor_lever_arm',
-                ],
+                ),
                 sensor_config=SensorConfig(
                     group='config/gp3d_state_modeling',
                     lever_arm=(
@@ -129,7 +129,7 @@ my_config = [
                     sensor_name='position',
                 ),
             ),
-        ],
+        ),
         inertial_config=InertialConfig(
             group='config/inertial',
             expected_dt=0.01,
@@ -144,7 +144,7 @@ my_config = [
             heading=0.06895795874629593,
             heading_sigma=0.02236067977,
         ),
-        preprocessor_configs=[
+        preprocessor_configs=(
             ImuRotatorConfig(
                 group='config/imu_rotator',
                 identifier='imu_rotator',
@@ -165,7 +165,7 @@ my_config = [
                 ],
                 time_bias=int(0.15 * 1e9),
             ),
-        ],
+        ),
         group='config/orchestration',
     ),
 ]
