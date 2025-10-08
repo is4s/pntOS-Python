@@ -61,6 +61,7 @@ from pntos.cobra.config import (
     StandardOrchestrationConfig,
     StaticAlignmentConfig,
     TimeAdjusterConfig,
+    TimeBiasConfig,
     TutorialOrchestrationConfig,
 )
 from pntos.cobra.internal import SimpleMediator, SimpleMessageStreamConfig
@@ -144,6 +145,15 @@ tutorial_config = [
         identifier='imu_rotator',
         channel=IMU_CHANNEL,
         C_imu_to_platform=C_imu_to_platform,
+    ),
+    TimeBiasConfig(
+        group='config/time_bias',
+        identifier='time_bias',
+        channels_to_correct=[
+            '/sensor/ublox-ZED-F9T/position',
+            '/sensor/ublox-ZED-F9T/velocity',
+        ],
+        time_bias=int(0.2 * 1e9),
     ),
 ]
 

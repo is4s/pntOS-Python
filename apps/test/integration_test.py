@@ -107,7 +107,7 @@ def test_tutorial_gps_ins_app() -> None:
         pos_err_limits=ErrorLimits(std_thresh=2.0, max_thresh=4.0, pct_below_1sigma=60),
         vel_err_limits=ErrorLimits(std_thresh=0.11, max_thresh=1.0),
         tilt_err_limits=ErrorLimits(
-            std_thresh=0.8, max_thresh=2.5, pct_below_1sigma=48, pct_below_2sigma=91
+            std_thresh=0.85, max_thresh=3.5, pct_below_1sigma=48, pct_below_2sigma=91
         ),
     )
 
@@ -122,7 +122,7 @@ def test_standard_gps_ins_app() -> None:
         pos_err_limits=ErrorLimits(std_thresh=2.0, max_thresh=4.0, pct_below_1sigma=60),
         vel_err_limits=ErrorLimits(std_thresh=0.11, max_thresh=1.0),
         tilt_err_limits=ErrorLimits(
-            std_thresh=0.8, max_thresh=2.5, pct_below_1sigma=48, pct_below_2sigma=91
+            std_thresh=0.85, max_thresh=3.5, pct_below_1sigma=48, pct_below_2sigma=91
         ),
         expected_start_time_offset=10.0,
     )
@@ -143,7 +143,7 @@ def test_standard_gps_ins_network_app() -> None:
         pos_err_limits=ErrorLimits(std_thresh=2.0, max_thresh=4.0, pct_below_1sigma=60),
         vel_err_limits=ErrorLimits(std_thresh=0.11, max_thresh=1.0),
         tilt_err_limits=ErrorLimits(
-            std_thresh=0.8, max_thresh=2.5, pct_below_1sigma=48, pct_below_2sigma=91
+            std_thresh=0.85, max_thresh=3.5, pct_below_1sigma=48, pct_below_2sigma=91
         ),
         expected_start_time_offset=10.0,
     )

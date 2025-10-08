@@ -30,6 +30,7 @@ from pntos.cobra.config import (
     ManualAlignmentConfig,
     SensorConfig,
     TimeAdjusterConfig,
+    TimeBiasConfig,
     TutorialOrchestrationConfig,
     UiLogPlottingConfig,
 )
@@ -117,6 +118,15 @@ my_config = [
         identifier='imu_rotator',
         C_imu_to_platform=C_imu_to_platform,
         channel='/sensor/vn-100/imu',
+    ),
+    TimeBiasConfig(
+        group='config/time_bias',
+        identifier='time_bias',
+        channels_to_correct=[
+            '/sensor/ublox-ZED-F9T/position',
+            '/sensor/ublox-ZED-F9T/velocity',
+        ],
+        time_bias=int(0.15 * 1e9),
     ),
 ]
 # End Config

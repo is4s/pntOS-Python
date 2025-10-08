@@ -13,8 +13,8 @@ index 4ee8dc07..c5db52c0 100644
  
  # Inertial parameters
  INERTIAL_GROUP = 'config/inertial'
-@@ -76,10 +80,10 @@ PREPROCESSOR_IDS = ['imu_rotator', 'time_adjuster']
- PREPROCESSOR_GROUPS = ['config/imu_rotator', 'config/time_adjuster']
+@@ -76,10 +80,10 @@ PREPROCESSOR_IDS = ['imu_rotator', 'time_adjuster', 'time_bias']
+ PREPROCESSOR_GROUPS = ['config/imu_rotator', 'config/time_adjuster', 'config/time_bias']
  
  
 -class TutorialGpsOrchestrationPlugin(OrchestrationPlugin):

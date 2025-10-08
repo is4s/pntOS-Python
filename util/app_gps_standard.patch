@@ -1,8 +1,8 @@
 diff --git a/apps/tutorial/gps_ins.py b/apps/standard/gps_ins.py
-index 9de1307f..f41b96bb 100755
+index 645d9adc..5692eebf 100755
 --- a/apps/tutorial/gps_ins.py
 +++ b/apps/standard/gps_ins.py
-@@ -2,8 +2,10 @@
+@@ -2,37 +2,40 @@
  
  import sys
  
@@ -45,12 +45,13 @@ index 9de1307f..f41b96bb 100755
 +    SensorMeasurementProcessorConfig,
 +    StandardOrchestrationConfig,
      TimeAdjusterConfig,
+     TimeBiasConfig,
 -    TutorialOrchestrationConfig,
 -    UiLogPlottingConfig,
  )
  from pntos_python_datasets import EXAMPLE_LCM_LOG
  
-@@ -43,6 +46,15 @@ C_imu_to_platform = (
+@@ -44,6 +47,17 @@ C_imu_to_platform = (
      (-0.01741603, 0.99982216, -0.00723391),
      (-0.06453231, 0.00609588, 0.997897),
  )
@@ -68,7 +69,7 @@ index 9de1307f..f41b96bb 100755
  my_config = [
      LcmLogTransportConfig(
          input_file=EXAMPLE_LCM_LOG,
-@@ -50,73 +64,78 @@ my_config = [
+@@ -51,81 +65,86 @@ my_config = [
          output_version=AspnVersion.V23,
          group='config/lcm_log_transport',
      ),
@@ -119,6 +120,31 @@ index 9de1307f..f41b96bb 100755
 -    ),
 -    TutorialOrchestrationConfig(
 -        gps_channel='/sensor/ublox-ZED-F9T/position',
+-        group='config/orchestration',
+-    ),
+-    TimeAdjusterConfig(
+-        group='config/time_adjuster',
+-        identifier='time_adjuster',
+-        channel_to_correct='/sensor/vn-100/imu',
+-        expected_dt_nsec=int(0.01 * 1e9),
+-    ),
+-    UiLogPlottingConfig(
+-        group='config/ui_logfile_plotting',
+-        logfile=OUTPUT_LOG,
+-        solution_channel='/solution/pntos/pva',
+-        truth_channel='/sensor/ins-d/pva',
+-    ),
+-    ImuRotatorConfig(
+-        group='config/imu_rotator',
+-        identifier='imu_rotator',
+-        C_imu_to_platform=C_imu_to_platform,
+-        channel='/sensor/vn-100/imu',
+-    ),
+-    TimeBiasConfig(
+-        group='config/time_bias',
+-        identifier='time_bias',
+-        channels_to_correct=[
+-            '/sensor/ublox-ZED-F9T/position',
 +    StandardOrchestrationConfig(
 +        best_sol_channel='/solution/pntos/pva',
 +        imu_sol_channel='/solution/pntos-imu/pva',
@@ -145,7 +171,8 @@ index 9de1307f..f41b96bb 100755
 +                    tau=(300.0, 300.0, 200.0),
 +                ),
 +            ),
-+        ],
+         ],
+-        time_bias=int(0.15 * 1e9),
 +        mp_configs=[
 +            SensorMeasurementProcessorConfig(
 +                group='config/gps_measurement_processor',
@@ -188,31 +215,20 @@ index 9de1307f..f41b96bb 100755
 +                channel_to_correct='/sensor/vn-100/imu',
 +                expected_dt_nsec=int(0.01 * 1e9),
 +            ),
++            TimeBiasConfig(
++                group='config/time_bias',
++                identifier='time_bias',
++                channels_to_correct=[
++                    '/sensor/ublox-ZED-F9T/position',
++                ],
++                time_bias=int(0.15 * 1e9),
++            ),
 +        ],
-         group='config/orchestration',
++        group='config/orchestration',
      ),
--    TimeAdjusterConfig(
--        group='config/time_adjuster',
--        identifier='time_adjuster',
--        channel_to_correct='/sensor/vn-100/imu',
--        expected_dt_nsec=int(0.01 * 1e9),
--    ),
--    UiLogPlottingConfig(
--        group='config/ui_logfile_plotting',
--        logfile=OUTPUT_LOG,
--        solution_channel='/solution/pntos/pva',
--        truth_channel='/sensor/ins-d/pva',
--    ),
--    ImuRotatorConfig(
--        group='config/imu_rotator',
--        identifier='imu_rotator',
--        C_imu_to_platform=C_imu_to_platform,
--        channel='/sensor/vn-100/imu',
--    ),
  ]
  # End Config
- 
-@@ -126,17 +143,16 @@ plugins = [
+@@ -136,17 +155,16 @@ plugins = [
      LcmLogTransportPlugin('Cobra LCM Log Transport Plugin'),
      EkfFusionStrategyPlugin('Cobra EKF Fusion Strategy Plugin'),
      StandardFusionPlugin('Cobra Standard Fusion Plugin'),
@@ -220,7 +236,9 @@ index 9de1307f..f41b96bb 100755
 +    StandardGpsInsStateModelingPlugin('Cobra Standard State Modeling Plugin'),
      StandardInertialPlugin('Cobra Standard Inertial Plugin'),
 -    TutorialInitializationPlugin('Cobra Manual Initialization Plugin'),
-+    ManualHeadingAlignInitializationPlugin('Cobra Manual Heading Static Align Initialization Plugin'),
++    ManualHeadingAlignInitializationPlugin(
++        'Cobra Manual Heading Static Align Initialization Plugin'
++    ),
      StandardLoggingPlugin(
          'Cobra Standard Logging Plugin',
          global_log_level=LoggingLevel.INFO,  # Switch to `DEBUG` for more informative log output
