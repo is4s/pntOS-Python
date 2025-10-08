@@ -62,11 +62,13 @@ index 9de1307f..f41b96bb 100755
 +    gyro_bias_sigma=(2e-4, 2e-4, 2e-4),
 +    gyro_bias_tau=(500.0, 500.0, 500.0),
 +    gyro_random_walk_sigma=(9.9e-4, 9.9e-4, 6.7e-5),
++    accel_bias_initial_sigma=(0.072, 0.072, 0.072),
++    gyro_bias_initial_sigma=(0.003, 0.003, 0.003),
 +)
  my_config = [
      LcmLogTransportConfig(
          input_file=EXAMPLE_LCM_LOG,
-@@ -50,73 +62,78 @@ my_config = [
+@@ -50,73 +64,78 @@ my_config = [
          output_version=AspnVersion.V23,
          group='config/lcm_log_transport',
      ),

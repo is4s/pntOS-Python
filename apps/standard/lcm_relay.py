@@ -49,6 +49,8 @@ imu_model = ImuConfig(
     gyro_bias_sigma=(2e-4, 2e-4, 2e-4),
     gyro_bias_tau=(500.0, 500.0, 500.0),
     gyro_random_walk_sigma=(9.9e-4, 9.9e-4, 6.7e-5),
+    accel_bias_initial_sigma=(0.072, 0.072, 0.072),
+    gyro_bias_initial_sigma=(0.003, 0.003, 0.003),
 )
 my_config = [
     LcmTransportConfig(output_version=AspnVersion.V23, group='config/lcm_transport'),

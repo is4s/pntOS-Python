@@ -38,8 +38,8 @@ index f41b96bb..35af88d4 100755
  
  # Config setup
  C_imu_to_platform = (
-@@ -56,12 +51,7 @@ imu_model = ImuConfig(
-     gyro_random_walk_sigma=(9.9e-4, 9.9e-4, 6.7e-5),
+@@ -58,12 +53,7 @@ imu_model = ImuConfig(
+     gyro_bias_initial_sigma=(0.003, 0.003, 0.003),
  )
  my_config = [
 -    LcmLogTransportConfig(

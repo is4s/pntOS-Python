@@ -39,3 +39,15 @@ class ImuConfig(BaseConfig):
 
     gyro_random_walk_sigma: tuple[float, float, float]
     """The sigma for the gyro random walk process in rad/s^(1/2)"""
+
+    accel_bias_initial_sigma: tuple[float, float, float] = (0.0, 0.0, 0.0)
+    """The one-sigma used to initialize a state covariance associated with accelerometer biases in m/s^2
+
+    This field is necessary when used with an initialization plugin. This field is unused when used
+    with a state modeling plugin."""
+
+    gyro_bias_initial_sigma: tuple[float, float, float] = (0.0, 0.0, 0.0)
+    """The one-sigma used to initialize a state covariance associated with gyroscope biases in rad/s
+
+    This field is necessary when used with an initialization plugin. This field is unused when used
+    with a state modeling plugin."""
