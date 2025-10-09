@@ -288,17 +288,17 @@ class TestRegistry(unittest.TestCase):
             callbacked_group = group
 
         # Register callback
-        assert self.reg.request_notify_new_group(
-            test_callback
-        ), 'Failed to register notify new group.'
+        assert self.reg.request_notify_new_group(test_callback), (
+            'Failed to register notify new group.'
+        )
 
         # Make group
         kv: KeyValueStore = self.reg.batch_start(self.test_group)
 
         # See if callback happened
-        assert (
-            callbacked_group != ''
-        ), 'Callback for request notify new group not called.'
+        assert callbacked_group != '', (
+            'Callback for request notify new group not called.'
+        )
         assert callbacked_group == self.test_group, 'Request notify new group failed.'
 
     def test_any_value_to_str(self) -> None:
@@ -375,9 +375,9 @@ class TestRegistry(unittest.TestCase):
         kv.batch_end()
 
         kv.batch_restart()
-        assert (
-            kv.get_value('array1', float) is None
-        ), 'Got an unexpected return for ndarray->float conversion.'
+        assert kv.get_value('array1', float) is None, (
+            'Got an unexpected return for ndarray->float conversion.'
+        )
         out_1 = kv.get_value('array1', np.ndarray)
         out_2 = kv.get_value('array2', np.ndarray)
         out_3 = kv.get_value('array3', np.ndarray)
@@ -511,9 +511,9 @@ class TestRegistry(unittest.TestCase):
         test_kv.batch_end()
 
         test_kv.batch_restart()
-        assert test_kv.request_notify(
-            None, test_callback
-        ), 'Unable to register callback.'
+        assert test_kv.request_notify(None, test_callback), (
+            'Unable to register callback.'
+        )
 
         for k in test_keys:
             test_kv.set_value(k, 1)
@@ -556,9 +556,9 @@ class TestRegistry(unittest.TestCase):
 
         test_kv.batch_restart()
         for k in test_keys:
-            assert test_kv.request_notify(
-                k, test_callback
-            ), 'Unable to register callback.'
+            assert test_kv.request_notify(k, test_callback), (
+                'Unable to register callback.'
+            )
 
         for k in test_keys:
             test_kv.set_value(k, 1)
@@ -589,9 +589,9 @@ class TestRegistry(unittest.TestCase):
         test_kv.batch_end()
 
         test_kv.batch_restart()
-        assert test_kv.request_notify(
-            None, test_callback
-        ), 'Unable to register callback.'
+        assert test_kv.request_notify(None, test_callback), (
+            'Unable to register callback.'
+        )
 
         for k in test_keys:
             test_kv.set_value(k, 1)
@@ -638,9 +638,9 @@ class TestRegistry(unittest.TestCase):
 
         test_kv.batch_restart()
         for k in test_keys:
-            assert test_kv.request_notify(
-                k, test_callback
-            ), 'Unable to register callback.'
+            assert test_kv.request_notify(k, test_callback), (
+                'Unable to register callback.'
+            )
 
         for k in test_keys:
             test_kv.set_value(k, 1)
@@ -886,18 +886,18 @@ class TestRegistry(unittest.TestCase):
         kv_permanent = reg.batch_start(permanent_batch)
         kv_not_permanent = reg.batch_start(not_permanent_batch)
         assert len(kv_not_permanent) == 0, 'Non-permanent group persisted unexpectedly.'
-        assert len(kv_permanent) == len(
-            permanent_keys
-        ), 'Wrong number of permanent keys persisted.'
+        assert len(kv_permanent) == len(permanent_keys), (
+            'Wrong number of permanent keys persisted.'
+        )
 
         # Make sure the wrong keys are not there and the right ones are
         for key in self.test_keys:
-            assert (
-                key + '_np' not in kv_permanent
-            ), f'Unexpected key {key} in permanent store.'
-            assert (
-                key + '_p' in kv_permanent
-            ), f'Expected key {key}, but could not find in store.'
+            assert key + '_np' not in kv_permanent, (
+                f'Unexpected key {key} in permanent store.'
+            )
+            assert key + '_p' in kv_permanent, (
+                f'Expected key {key}, but could not find in store.'
+            )
 
         # See if get_type is enabled
         get_type_enabled = False

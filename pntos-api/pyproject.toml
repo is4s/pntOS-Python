@@ -1,22 +1,30 @@
+[build-system]
+build-backend = "hatchling.build"
+requires = [ "hatchling" ]
+
 [project]
 name = "pntos-api"
 version = "0.1.0.dev0"
 description = "The API specification for pntOS, ported into pure Python."
-authors = [{ name = "IS4S", email = "pntos@is4s.com" }]
+readme = "README.md"
+authors = [ { name = "IS4S", email = "pntos@is4s.com" } ]
+requires-python = ">=3.10"
+
+classifiers = [
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
 dependencies = [
-    "numpy",
     # firehose-outputs main branch - committed 12 June 2025
     "aspn23 @ git+ssh://git@git.aspn.us/pntos/firehose-outputs.git@d425e26330e62371038f14ad12a8d8b4374698a6#subdirectory=aspn-py",
+    "numpy",
 ]
-readme = "README.md"
-requires-python = ">= 3.10"
-
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
 
 [tool.hatch.metadata]
 allow-direct-references = true
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/pntos"]
+packages = [ "src/pntos" ]

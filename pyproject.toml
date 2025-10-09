@@ -2,77 +2,93 @@
 name = "pntos-python"
 version = "0.1.0.dev0"
 description = "A meta package for pntOS that contains the components of pntOS."
-authors = [{ name = "IS4S", email = "pntos@is4s.com" }]
+readme = "README.md"
+authors = [ { name = "IS4S", email = "pntos@is4s.com" } ]
+requires-python = ">=3.10"
+
+classifiers = [
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
 dependencies = [
-    "pntos-cobra",
-    "pntos-api",
-    # Generated from branch v3.1 on 13 Aug 2025
-    "pntos-python-datasets==0.3.1",
-    "matplotlib",
     "analysis-lcm @ git+ssh://git@git.aspn.us/pntos/analysis-scripts.git@8e56a7ca9722f5ac803c80901e57241c1b016796#subdirectory=analysis-lcm",
     "analysis-ros @ git+ssh://git@git.aspn.us/pntos/analysis-scripts.git@8e56a7ca9722f5ac803c80901e57241c1b016796#subdirectory=analysis-ros",
+    "matplotlib",
+    "pntos-api",
+    "pntos-cobra",
+    # Generated from branch v3.1 on 13 Aug 2025
+    "pntos-python-datasets==0.3.1",
 ]
-readme = "README.md"
-requires-python = ">= 3.10"
+
+[dependency-groups]
+dev = [
+    "gitpython>=3.1.44",
+    "ipython>=8.24",
+    "libclang>=18.1.1",
+    "mypy==1.18.2",
+    "myst-parser>=4",
+    "pip>=24",
+    # Generated from commit a44dac604ec22c200e092e65dfe0d62cb9fe32c3 on 19 May 2025
+    "pntos-python-docs-data==0.1.5",
+    "pyproject-fmt>=2.7",
+    "pytest>=8.2",
+    "pytest-cov>=6",
+    "ruff==0.13.2",
+    "sphinx>=7.3.7",
+    "sphinx-copybutton",
+    "sphinx-design",
+    "sphinx-rtd-theme>=3.0.2",
+]
+
+[tool.ruff]
+format.quote-style = "single"
+lint.select = [
+    "COM",
+    "D",
+    "DTZ",
+    "FA",
+    "FLY",
+    "FURB",
+    "G",
+    "I",
+    "ICN",
+    "INT",
+    "LOG",
+    "PERF",
+    "SLOT",
+    "T10",
+    "TID",
+]
+lint.ignore = [ "COM812", "D212", "D417" ]
+lint.per-file-ignores."*/tests/*" = [ "D100", "D101", "D102" ]
+lint.per-file-ignores."apps/*" = [ "D" ]
+lint.per-file-ignores."docs/*" = [ "D" ]
+lint.per-file-ignores."pntos-cobra/*" = [ "D" ]
+lint.per-file-ignores."postprocessing/*" = [ "D" ]
+lint.isort.combine-as-imports = true
+lint.pydocstyle.convention = "google"
+
+[tool.pytest.ini_options]
+addopts = "-p no:launch_ros -p no:launch_testing"
+
+[tool.mypy]
+strict = true
+disable_error_code = [ "import-untyped", "no-untyped-call" ]
+warn_unreachable = true
 
 [tool.uv]
 package = false
 
 [tool.uv.workspace]
-members = ["pntos-api", "pntos-cobra"]
-
-[tool.uv.sources]
-pntos-api = { workspace = true }
-pntos-cobra = { workspace = true }
+members = [ "pntos-api", "pntos-cobra" ]
 
 [[tool.uv.index]]
 url = "https://git.aspn.us/api/v4/projects/94/packages/pypi/simple"
 cache-control = { api = "max-age=600", files = "max-age=365000000, immutable" }
 
-[dependency-groups]
-dev = [
-    "pytest>=8.2.0",
-    "pytest-cov>=6.0.0",
-    "sphinx>=7.3.7",
-    "ipython>=8.24.0",
-    "ruff==0.7.0",
-    "mypy==1.10.0",
-    "pip>=24.0",
-    "myst_parser>=4.0.0",
-    "sphinx_rtd_theme>=3.0.2",
-    "sphinx-design",
-    "sphinx-copybutton",
-    # Generated from commit a44dac604ec22c200e092e65dfe0d62cb9fe32c3 on 19 May 2025
-    "pntos-python-docs-data==0.1.5",
-    "GitPython>=3.1.44",
-    "libclang>=18.1.1",
-]
-
-[tool.ruff.lint]
-extend-select = ["I"]
-select = ["D", "D213"]
-ignore = ["D212", "D417"]
-
-[tool.ruff.lint.per-file-ignores]
-"pntos-cobra/*" = ["D"]
-"apps/*" = ["D"]
-"docs/*" = ["D"]
-"postprocessing/*" = ["D"]
-"*/tests/*" = ["D100", "D101", "D102"]
-
-[tool.ruff.lint.isort]
-combine-as-imports = true
-
-[tool.ruff.lint.pydocstyle]
-convention = "google"
-
-[tool.ruff.format]
-quote-style = "single"
-
-[tool.mypy]
-strict = true
-disable_error_code = ["import-untyped", "no-untyped-call"]
-warn_unreachable = true
-
-[tool.pytest.ini_options]
-addopts = "-p no:launch_ros -p no:launch_testing"
+[tool.uv.sources]
+pntos-api = { workspace = true }
+pntos-cobra = { workspace = true }

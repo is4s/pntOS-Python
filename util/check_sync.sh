@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
 set +xe
 # Warning: This file expects to be run from the root level directory
 # This script will determine if there are any conflicts when applying the patches

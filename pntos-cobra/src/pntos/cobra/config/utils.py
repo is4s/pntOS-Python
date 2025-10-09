@@ -174,14 +174,14 @@ def config_from_registry(
                         val = val.astype(int)
                     val = list(val)
                 elif p_type is np.ndarray:
-                    if np.dtype[np.int_] in param.type.__args__:
+                    if np.dtype[np.int_] in param.type.__args__:  # type: ignore[union-attr]
                         # Convert to np array of ints
                         val = val.astype(int)
         # Special case: enum. Convert integer back to enum type.
         elif isclass(param.type) and issubclass(param.type, Enum):
             val = param.type(val)
 
-        if not _confirm_types(val, param.type):
+        if not _confirm_types(val, param.type):  # type: ignore[arg-type]
             mediator.log_message(
                 LoggingLevel.ERROR,
                 f'Expected field {param.name} in {config_type} to have type '
@@ -214,7 +214,7 @@ def config_to_registry(config: BaseConfig, mediator: Mediator) -> None:
     kv = mediator.registry.batch_start(config.group)
 
     for param in conf_params:
-        if not _is_type_supported(param.type):
+        if not _is_type_supported(param.type):  # type: ignore[arg-type]
             mediator.log_message(
                 LoggingLevel.ERROR,
                 f'Support for converting {param.type} to a registry type does not exist. Support must be added or a different type must be used on the config class {type(config)}',
@@ -226,7 +226,7 @@ def config_to_registry(config: BaseConfig, mediator: Mediator) -> None:
         if isinstance(val_to_store, int) and param.type is float:
             val_to_store = float(val_to_store)
         # compare user provided type with the validated config type hint
-        if not _confirm_types(val_to_store, param.type):
+        if not _confirm_types(val_to_store, param.type):  # type: ignore[arg-type]
             mediator.log_message(
                 LoggingLevel.ERROR,
                 f'Expected field {param.name} in {type(config)} to have type {param.type} '

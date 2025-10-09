@@ -385,7 +385,7 @@ class CtoPyApiComparator:
         c_mod_name = c_module.name.split('/')[-1]
         py_mod_name = py_module.name.split('/')[-1]
         print(
-            f"FINAL RESULT: The C module {c_mod_name} is {'NOT ' if self.mismatch else ''}"
-            f"semantically equivalent with the Python module {py_mod_name}"
+            f'FINAL RESULT: The C module {c_mod_name} is {"NOT " if self.mismatch else ""}'
+            f'semantically equivalent with the Python module {py_mod_name}'
         )
         return self.mismatch

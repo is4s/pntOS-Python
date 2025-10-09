@@ -265,9 +265,9 @@ def test(capsys: Any) -> None:
         # Get the date
         captured_datetime = captured.split('] [')[0]
 
-    assert (
-        captured_datetime == expected_datetime
-    ), f'Logger datetime log failed.\nExpected: {expected_datetime}, Received: {captured_datetime}.'
+    assert captured_datetime == expected_datetime, (
+        f'Logger datetime log failed.\nExpected: {expected_datetime}, Received: {captured_datetime}.'
+    )
 
 
 if __name__ == '__main__':
