@@ -1,3 +1,4 @@
+from analysis.lcm.conversions import pressure_to_alt
 from aspn23 import (
     AspnBase,
     MeasurementAltitude,
@@ -43,15 +44,11 @@ class BarometerToAltitudePreprocessor(Preprocessor):
         self._channel = channel
         self._mediator = mediator
 
-    def _convert_pressure(self, pressure: float) -> float:
-        pwm1: float = pow(pressure / 101325, 8314.32 * 0.0065 / (9.80665 * 28.9644)) - 1
-        return -(self._deg_k / 0.0065) * pwm1
-
     def process_pntos_message(self, message: Message) -> list[Message]:
         if message.source_identifier == self._channel:
             msg = message.wrapped_message
             if isinstance(msg, MeasurementBarometer):
-                altitude = self._convert_pressure(msg.pressure)
+                altitude = pressure_to_alt(msg.pressure, self._deg_k)
                 sf = altitude / msg.pressure
                 altitude_variance = msg.variance * (sf**2)
                 return [
