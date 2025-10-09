@@ -66,7 +66,7 @@ class BarometerToAltitudePreprocessor(Preprocessor):
                             msg.error_model_params,
                             msg.integrity,
                         ),
-                        message.source_identifier,
+                        message.source_identifier.replace('baro_pressure', 'altitude'),
                     )
                 ]
             self._mediator.log_message(
