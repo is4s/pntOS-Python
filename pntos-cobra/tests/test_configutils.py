@@ -227,9 +227,9 @@ class TestConfigUtils(unittest.TestCase):
             ),
             additional_sb_configs=(
                 StateBlockConfig(
-                    group='config/fogm_block',
+                    group='config/pos_fogm_block',
                     identifier='fogm',
-                    label='pos_fogm',
+                    label='pos_sensor_error',
                 ),
             ),
             mp_configs=(
@@ -238,7 +238,7 @@ class TestConfigUtils(unittest.TestCase):
                     identifier='pinson_with_ned_fogm_position',
                     label='gps',
                     channel='/sensor/ublox-ZED-F9T/position',
-                    state_block_labels=('pinson15', 'pos_fogm'),
+                    state_block_labels=('pinson15', 'pos_sensor_error'),
                     sensor_config=SensorConfig(
                         CONFIG_TEST_GROUP,
                         (0.7, 0.8, 0.9),

@@ -55,7 +55,7 @@ IMU_SOL_CHANNEL = '/solution/pntos-imu/pva'
 
 # State block parameters
 FOGM_STATE_BLOCK_ID = 'fogm'
-FOGM_STATE_BLOCK_LABEL = 'pos_fogm'
+FOGM_STATE_BLOCK_LABEL = 'pos_sensor_error'
 FOGM_STATE_BLOCK_CONFIG_GROUP = 'config/pos_sensor_error'
 
 STATE_BLOCK_ID = STATE_BLOCK_LABEL = 'pinson15'

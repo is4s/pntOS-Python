@@ -77,7 +77,7 @@ my_config = [
         ),
         additional_sb_configs=(
             FogmStateBlockConfig(
-                group='config/fogm_block1',
+                group='config/pos_fogm_block',
                 identifier='fogm',
                 label='pos_sensor_error',
                 estimate_with_covariance=EstimateWithCovariance(
@@ -92,7 +92,7 @@ my_config = [
                 ),
             ),
             FogmStateBlockConfig(
-                group='config/fogm_block2',
+                group='config/lever_arm_fogm_block',
                 identifier='fogm',
                 label='pos_sensor_lever_arm',
                 estimate_with_covariance=EstimateWithCovariance(

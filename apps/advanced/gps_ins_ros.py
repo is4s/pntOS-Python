@@ -64,9 +64,9 @@ my_config = [
         ),
         additional_sb_configs=(
             FogmStateBlockConfig(
-                group='config/fogm_block',
+                group='config/pos_fogm_block',
                 identifier='fogm',
-                label='pos_fogm',
+                label='pos_sensor_error',
                 estimate_with_covariance=EstimateWithCovariance(
                     type=EstimateWithCovarianceType.EWC_GENERIC,
                     estimate=np.zeros((3,)),
@@ -85,7 +85,7 @@ my_config = [
                 identifier='pinson_with_ned_fogm_position',
                 label='gps',
                 channel='/sensor/ublox_ZED_F9T/position',
-                state_block_labels=('pinson15', 'pos_fogm'),
+                state_block_labels=('pinson15', 'pos_sensor_error'),
                 sensor_config=SensorConfig(
                     group='config/gp3d_state_modeling',
                     lever_arm=(-0.50, 0.38, -0.05),

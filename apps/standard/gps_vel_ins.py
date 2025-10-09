@@ -85,9 +85,9 @@ my_config = [
         ),
         additional_sb_configs=(
             FogmStateBlockConfig(
-                group='config/fogm_block',
+                group='config/pos_fogm_block',
                 identifier='fogm',
-                label='pos_fogm',
+                label='pos_sensor_error',
                 estimate_with_covariance=EstimateWithCovariance(
                     type=EstimateWithCovarianceType.EWC_GENERIC,
                     estimate=np.zeros((3,)),
