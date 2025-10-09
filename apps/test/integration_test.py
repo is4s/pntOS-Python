@@ -290,6 +290,26 @@ def test_standard_posvel_ins_app() -> None:
     )
 
 
+def test_standard_gps_ins_baro_app() -> None:
+    run_pntos_with_log_transport(
+        Path('apps/standard/gps_ins_baro.py'), OUTPUT_LOG, validate=True
+    )
+    log_data = read_pva(OUTPUT_LOG, read_all=True)
+    validate_results(
+        log_data.data[SOLUTION_CHANNEL],
+        log_data.data[TRUTH_CHANNEL],
+        num_points=2584,
+        pos_err_limits=ErrorLimits(std_thresh=1.7, max_thresh=4.3, pct_below_1sigma=64),
+        vel_err_limits=ErrorLimits(
+            std_thresh=0.1, max_thresh=0.8, pct_below_2sigma=91, pct_below_3sigma=98
+        ),
+        tilt_err_limits=ErrorLimits(
+            std_thresh=0.82, max_thresh=3.5, pct_below_3sigma=98
+        ),
+        expected_start_time_offset=10.0,
+    )
+
+
 def test_advanced_gps_ins_ros_app() -> None:
     import pytest  # noqa: PLC0415
 

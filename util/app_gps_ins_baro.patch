@@ -1,0 +1,67 @@
+diff --git a/apps/standard/gps_ins.py b/apps/standard/gps_ins_baro.py
+index 10bbbf4c..43e775a7 100755
+--- a/apps/standard/gps_ins.py
++++ b/apps/standard/gps_ins_baro.py
+@@ -23,6 +23,7 @@ from pntos.cobra import (
+ )
+ from pntos.cobra.config import (
+     AspnVersion,
++    BarometerToAltitudeConfig,
+     FogmConfig,
+     FogmStateBlockConfig,
+     ImuConfig,
+@@ -91,6 +92,21 @@ my_config = [
+                     tau=(300.0, 300.0, 200.0),
+                 ),
+             ),
++            FogmStateBlockConfig(
++                group='config/alt_fogm_block',
++                identifier='fogm',
++                label='alt_fogm',
++                estimate_with_covariance=EstimateWithCovariance(
++                    type=EstimateWithCovarianceType.EWC_GENERIC,
++                    estimate=np.zeros((1,)),
++                    covariance=(np.array([[25.0]])),
++                ),
++                fogm_model=FogmConfig(
++                    group='config/alt_sensor_error',
++                    sigma=(10.0,),
++                    tau=(3600.0,),
++                ),
++            ),
+         ),
+         mp_configs=(
+             SensorMeasurementProcessorConfig(
+@@ -106,6 +122,19 @@ my_config = [
+                     sensor_name='position',
+                 ),
+             ),
++            SensorMeasurementProcessorConfig(
++                group='config/alt_measurement_processor',
++                identifier='pinson_altitude',
++                label='alt',
++                channel='/sensor/bmp388/altitude',
++                state_block_labels=('pinson15', 'alt_fogm'),
++                sensor_config=SensorConfig(
++                    group='config/alt_state_modeling',
++                    lever_arm=(0.0, 0.0, 0.0),
++                    orientation=(0.0, 0.0, 0.0, 0.0),
++                    sensor_name='altitude',
++                ),
++            ),
+         ),
+         inertial_config=InertialConfig(
+             group='config/inertial',
+@@ -140,6 +169,12 @@ my_config = [
+                 channels_to_correct=('/sensor/ublox-ZED-F9T/position',),
+                 time_bias=int(0.15 * 1e9),
+             ),
++            BarometerToAltitudeConfig(
++                group='config/pressure_to_alt',
++                identifier='baro_converter',
++                channel='/sensor/bmp388/baro_pressure',
++                alt_sigma=3.0,
++            ),
+         ),
+         group='config/orchestration',
+     ),

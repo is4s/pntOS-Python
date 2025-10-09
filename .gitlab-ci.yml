@@ -236,6 +236,15 @@ Standard PosVel INS App:
         - docker exec pntos-python uv sync
         - docker exec pntos-python pytest apps -k test_standard_posvel_ins_app -s
 
+Standard GPS INS Baro App:
+    stage: check
+    tags:
+        - linux-light-runner
+    script:
+        - docker run --rm -dit -v $(pwd):/work -v $HOME/.ccache:/root/.cache/uv --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
+        - docker exec pntos-python uv sync
+        - docker exec pntos-python pytest apps -k test_standard_gps_ins_baro_app -s
+
 Advanced GPS INS ROS App:
     stage: check
     tags:
