@@ -253,7 +253,7 @@ class TutorialGpsVelOrchestrationPlugin(OrchestrationPlugin):
             return
 
         # Give the fusion engine a strategy
-        fusion_engine.strategy = self.fusion_strategy_plugin.new_fusion_strategy(
+        fusion_engine.strategy = self.fusion_strategy_plugin.new_fusion_strategy(  # type: ignore[assignment]
             StandardFusionStrategy
         )
 

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Warning: This file expects to be run from the root level directory
 # Generates .patch files for apps and tutorial orchestration plugins

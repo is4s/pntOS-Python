@@ -66,9 +66,9 @@ class SimpleMediator(Mediator):
 
     @property
     def filter_description_list(self) -> list[str]:
-        assert (
-            self._orchestration_plugin is not None
-        ), 'Orchestration plugin used before initialized and passed to mediator.'
+        assert self._orchestration_plugin is not None, (
+            'Orchestration plugin used before initialized and passed to mediator.'
+        )
         return self._orchestration_plugin.filter_description_list
 
     def request_solutions(
@@ -76,17 +76,17 @@ class SimpleMediator(Mediator):
         solution_times: list[TypeTimestamp],
         filter_description: str | None = None,
     ) -> list[Message] | None:
-        assert (
-            self._orchestration_plugin is not None
-        ), 'Orchestration plugin used before initialized and passed to mediator.'
+        assert self._orchestration_plugin is not None, (
+            'Orchestration plugin used before initialized and passed to mediator.'
+        )
         return self._orchestration_plugin.request_solutions(
             solution_times, filter_description
         )
 
     def process_pntos_message(self, message: Message) -> None:
-        assert (
-            self._orchestration_plugin is not None
-        ), 'Orchestration plugin used before initialized and passed to mediator.'
+        assert self._orchestration_plugin is not None, (
+            'Orchestration plugin used before initialized and passed to mediator.'
+        )
         if self._stream_config._is_sequenced(type(message.wrapped_message)):
             bisect.insort(self._messages, message, key=_get_time)
         else:
@@ -135,9 +135,9 @@ class SimpleMediator(Mediator):
         transport: str | None = None,
         destination_identifier: str | None = None,
     ) -> None:
-        assert (
-            len(self._transport_plugins) != 0
-        ), 'Transport plugin used before initialized and passed to mediator.'
+        assert len(self._transport_plugins) != 0, (
+            'Transport plugin used before initialized and passed to mediator.'
+        )
         sent = False
         for transport_plugin in self._transport_plugins:
             if transport is None or transport_plugin.identifier == transport:
