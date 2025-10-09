@@ -22,7 +22,7 @@ SOLUTION_CHANNEL = '/solution/pntos/pva'
 TRUTH_CHANNEL = '/sensor/ins-d/pva'
 
 # Use non-GUI backend for any plots that apps generate, since we just want to
-# programatically validate the filter solution
+# programmatically validate the filter solution
 os.environ['MPLBACKEND'] = 'Agg'
 
 
@@ -83,7 +83,7 @@ def validate_results(
     # Rotate INS-D rpy since there's a bug in the smartcable (TODO: #236)
     truth.rpy = np.column_stack([truth.rpy[:, 1], truth.rpy[:, 0], -truth.rpy[:, 2]])
 
-    # Interpolate truth onto solution times so that we can calulate the solution error
+    # Interpolate truth onto solution times so that we can calculate the solution error
     interp_truth_pva = interpolate_pva(pva, truth)
     ned_err = pva.ned - interp_truth_pva.ned
     vel_err = pva.vel - interp_truth_pva.vel
