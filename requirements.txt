@@ -151,7 +151,7 @@ pluggy==1.6.0
     # via
     #   pytest
     #   pytest-cov
-pntos-python-datasets==0.3.1
+pntos-python-datasets==0.4.0
     # via pntos-python
 pntos-python-docs-data==0.1.5
 prompt-toolkit==3.0.51

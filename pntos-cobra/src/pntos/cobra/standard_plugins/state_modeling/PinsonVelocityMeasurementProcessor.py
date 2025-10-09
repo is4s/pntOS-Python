@@ -58,7 +58,7 @@ class PinsonVelocityMeasurementProcessor(StandardMeasurementProcessor):
 
         if len(aux) > 1:
             self._mediator.log_message(
-                LoggingLevel.WARN,
+                LoggingLevel.DEBUG,
                 f'PinsonVelocityMeasurementProcessor expected a single MeasurementPositionVelocityAttitude aux message, but received {len(aux)} aux messages. Ignoring all except the first message.',
             )
 

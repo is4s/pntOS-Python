@@ -199,6 +199,23 @@ def test_standard_gps_ins_leverarm_app():
     )
 
 
+def test_standard_gps_bodyvel_ins_app():
+    run_pntos_with_log_transport(
+        'apps/standard/gps_ins_bodyvel.py', OUTPUT_LOG, validate=True
+    )
+    log_data = read_pva(OUTPUT_LOG, read_all=True)
+    validate_results(
+        log_data.data[SOLUTION_CHANNEL],
+        log_data.data[TRUTH_CHANNEL],
+        num_points=2593,
+        pos_err_limits=ErrorLimits(std_thresh=1.4, max_thresh=4.0, pct_below_1sigma=59),
+        vel_err_limits=ErrorLimits(std_thresh=0.11, max_thresh=1.0),
+        tilt_err_limits=ErrorLimits(
+            std_thresh=0.8, max_thresh=2.3, pct_below_1sigma=46
+        ),
+    )
+
+
 def test_advanced_gps_ins_ros_app():
     import pytest
 

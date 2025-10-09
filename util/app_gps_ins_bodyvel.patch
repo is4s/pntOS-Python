@@ -1,0 +1,24 @@
+diff --git a/apps/standard/gps_ins.py b/apps/standard/gps_ins_bodyvel.py
+index 9be4a11e..8fb0e5c9 100755
+--- a/apps/standard/gps_ins.py
++++ b/apps/standard/gps_ins_bodyvel.py
+@@ -102,6 +102,19 @@ my_config = [
+                     sensor_name='position',
+                 ),
+             ),
++            SensorMeasurementProcessorConfig(
++                group='config/bodyvel_measurement_processor',
++                identifier='pinson_body_velocity',
++                label='body_vel',
++                channel='/sensor/velocity_body',
++                state_block_labels=['pinson15'],
++                sensor_config=SensorConfig(
++                    group='config/bv3d_state_modeling',
++                    lever_arm=(0.0, 0.0, 0.0),
++                    orientation=(0.0, 0.0, 0.0, 0.0),
++                    sensor_name='velocity',
++                ),
++            ),
+         ],
+         inertial_config=InertialConfig(
+             group='config/inertial',
