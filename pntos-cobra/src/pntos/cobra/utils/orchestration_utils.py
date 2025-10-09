@@ -111,7 +111,17 @@ def send_inertial_aux_to_measurement_processor(
             f'Cannot send inertial aux to measurement processor. Solution not available at time {time.elapsed_nsec / 1e9:.9f}s',
         )
         return
-    fusion_engine.give_measurement_processor_aux_data(mp_label, [pva_message])
+    imu = inertial.request_forces_and_rates(time)
+    if imu is None:
+        log_func(
+            LoggingLevel.ERROR,
+            f'Cannot send inertial aux to measurement processor. Forces and rates not available at time {time}',
+        )
+        return
+    imu_message = Message(imu.forces_and_rates, 'Orchestration forces and rates')
+    fusion_engine.give_measurement_processor_aux_data(
+        mp_label, [pva_message, imu_message]
+    )
 
 
 def send_inertial_aux_to_pinson(

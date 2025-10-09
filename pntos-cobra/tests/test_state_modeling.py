@@ -45,6 +45,7 @@ from pntos.cobra.config import (
 from pntos.cobra.internal import (
     AltitudeMeasurementProcessor,
     Pinson15NedBlock,
+    PinsonBodyVelocityMeasurementProcessor,
     PinsonPositionMeasurementProcessor,
     PinsonVelocityMeasurementProcessor,
     PinsonWithLeverArmPositionMeasurementProcessor,
@@ -52,10 +53,14 @@ from pntos.cobra.internal import (
     SimpleMediator,
 )
 from pntos.cobra.utils.navigation import (
+    OMEGA_E,
     delta_lat_to_north,
     delta_lon_to_east,
+    meridian_radius,
+    north_to_delta_lat,
     quat_to_dcm,
     skew,
+    transverse_radius,
 )
 
 _lever_arm = (-2.0, 3.0, 5.0)
@@ -218,6 +223,19 @@ def altitude_mp(
 
 
 @pytest.fixture
+def body_velocity_mp(
+    state_model_provider: StateModelProviderType,
+) -> StandardMeasurementProcessor:
+    out = state_model_provider.new_processor(
+        5, None, 'body_velocity', ['pinson'], 'config/test'
+    )
+    assert isinstance(out, StandardMeasurementProcessor)
+    assert isinstance(out, PinsonBodyVelocityMeasurementProcessor)
+
+    return out
+
+
+@pytest.fixture
 def pva_aux_data() -> Message:
     return Message(
         MeasurementPositionVelocityAttitude(
@@ -298,6 +316,25 @@ def vel_meas() -> Message:
             [],
         ),
         'gps_velocity',
+    )
+
+
+@pytest.fixture
+def bodyvel_meas() -> Message:
+    return Message(
+        MeasurementVelocity(
+            TypeHeader(0, 0, 0, 0),
+            TypeTimestamp(1_000_000_000),
+            MeasurementVelocityReferenceFrame.SENSOR,
+            4.4,
+            3.3,
+            2.2,
+            np.diag([0.5, 0.5, 0.5]),
+            MeasurementVelocityErrorModel.NONE,
+            np.array([]),
+            [],
+        ),
+        'body_velocity',
     )
 
 
@@ -618,6 +655,81 @@ def test_generate_model_vel(
     assert np.array_equal(mm.R, exp_R)
     assert np.array_equal(mm.h(x_and_p.estimate), np.zeros(3))
     assert np.allclose(mm.z, exp_z)
+
+
+def test_generate_model_bodyvel(
+    body_velocity_mp: PinsonBodyVelocityMeasurementProcessor,
+    pva_aux_data: Message,
+    force_and_rate_aux_data: Message,
+    bodyvel_meas: Message,
+) -> None:
+    inertial_pva = pva_aux_data.wrapped_message
+    assert isinstance(inertial_pva, MeasurementPositionVelocityAttitude)
+    force_and_rate = force_and_rate_aux_data.wrapped_message
+    assert isinstance(force_and_rate, MeasurementImu)
+    bodyvel = bodyvel_meas.wrapped_message
+    assert isinstance(bodyvel, MeasurementVelocity)
+    body_velocity_mp.receive_aux_data([pva_aux_data, force_and_rate_aux_data])
+    assert body_velocity_mp._inertial_pva is not None
+    assert body_velocity_mp._force_and_rate_aux is not None
+
+    x_and_p = EstimateWithCovariance(
+        EstimateWithCovarianceType.EWC_GENERIC, np.zeros((15, 1)), np.eye(15)
+    )
+    mm = body_velocity_mp.generate_model(bodyvel_meas, x_and_p)
+    assert mm is not None
+    x = x_and_p.estimate
+    inertial_vel = np.array([inertial_pva.v1, inertial_pva.v2, inertial_pva.v3])
+    C_sensor_to_platform = np.eye(3)
+    C_platform_to_sensor = C_sensor_to_platform.T
+    assert inertial_pva.quaternion is not None
+    uncorr_C_ned_to_imu = quat_to_dcm(inertial_pva.quaternion).T
+    att_error = x[6:9, 0]
+    corr_C_ned_to_imu = uncorr_C_ned_to_imu @ (np.eye(3) + skew(att_error))
+    C_ned_to_sensor = C_platform_to_sensor @ corr_C_ned_to_imu
+    uncorr_C_ned_to_sensor = C_platform_to_sensor @ uncorr_C_ned_to_imu
+    inertial_vel_error = x[3:6, 0]
+    corr_inertial_vel_ned = inertial_vel + inertial_vel_error
+    C_ned_to_sensor_der = -uncorr_C_ned_to_sensor @ skew(corr_inertial_vel_ned)
+    exp_z = np.array([[bodyvel.x], [bodyvel.y], [bodyvel.z]])
+    exp_H = np.zeros((3, 15))
+    exp_H[:, 3:6] = C_ned_to_sensor
+    exp_H[:, 6:9] = C_ned_to_sensor_der
+
+    rotation_rate = force_and_rate.meas_gyro
+    assert inertial_pva is not None and inertial_pva.p1 is not None
+    alt = inertial_pva.p3 - x[2, 0]
+    lat = inertial_pva.p1 + north_to_delta_lat(x[0, 0], inertial_pva.p1, alt)
+    gyro_bias = x[12:15, 0]
+    rn = meridian_radius(lat)
+    re = transverse_radius(lat)
+    w_en_n = np.array(
+        [
+            corr_inertial_vel_ned[1] / (re + alt),
+            -corr_inertial_vel_ned[0] / (rn + alt),
+            -corr_inertial_vel_ned[1] * np.tan(lat) / (re + alt),
+        ]
+    )
+    w_ie_n = np.array(
+        [
+            OMEGA_E * np.cos(lat),
+            0.0,
+            -OMEGA_E * np.sin(lat),
+        ]
+    )
+    # Remove remaining biases (additive error states), earth and transport rates
+    rotation_rate = rotation_rate + gyro_bias - corr_C_ned_to_imu @ (w_ie_n - w_en_n)
+    la_as_array = np.array([_lever_arm[0], _lever_arm[1], _lever_arm[2]])
+    tan_vel_imu = np.cross(rotation_rate, la_as_array)
+    tan_vel_sensor = C_platform_to_sensor @ tan_vel_imu
+    inertial_vel_sensor = C_ned_to_sensor @ corr_inertial_vel_ned
+    exp_pred = inertial_vel_sensor + tan_vel_sensor
+    exp_R = bodyvel.covariance
+    assert np.allclose(mm.H, exp_H)
+    assert np.array_equal(mm.R, exp_R)
+    pred = mm.h(x_and_p.estimate).flatten()
+    assert np.allclose(pred, exp_pred)
+    assert np.array_equal(mm.z, exp_z)
 
 
 def test_generate_model_alt(

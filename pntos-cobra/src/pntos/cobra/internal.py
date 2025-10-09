@@ -30,6 +30,9 @@ from .standard_plugins.state_modeling.FogmBlock import (
 from .standard_plugins.state_modeling.Pinson15NedBlock import (
     Pinson15NedBlock as Pinson15NedBlock,
 )
+from .standard_plugins.state_modeling.PinsonBodyVelocityMeasurementProcessor import (
+    PinsonBodyVelocityMeasurementProcessor as PinsonBodyVelocityMeasurementProcessor,
+)
 from .standard_plugins.state_modeling.PinsonPositionMeasurementProcessor import (
     PinsonPositionMeasurementProcessor as PinsonPositionMeasurementProcessor,
 )

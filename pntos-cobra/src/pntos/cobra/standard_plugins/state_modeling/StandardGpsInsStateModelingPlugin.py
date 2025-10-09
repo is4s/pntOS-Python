@@ -18,6 +18,9 @@ from pntos.cobra.config import (
 from .AltitudeMeasurementProcessor import AltitudeMeasurementProcessor
 from .FogmBlock import FogmBlock
 from .Pinson15NedBlock import Pinson15NedBlock
+from .PinsonBodyVelocityMeasurementProcessor import (
+    PinsonBodyVelocityMeasurementProcessor,
+)
 from .PinsonPositionMeasurementProcessor import PinsonPositionMeasurementProcessor
 from .PinsonVelocityMeasurementProcessor import PinsonVelocityMeasurementProcessor
 from .PinsonWithLeverArmPositionMeasurementProcessor import (
@@ -49,6 +52,7 @@ class StandardGpsInsStateModelProvider(StandardStateModelProvider):
             'pinson_with_ned_fogm_position',
             'pinson_altitude',
             'pinson_with_lever_arm_position',
+            'pinson_body_velocity',
         ]
         self.block_identifiers: list[str] = ['pinson15', 'fogm']
         self.virtual_block_identifiers = None
@@ -66,6 +70,7 @@ class StandardGpsInsStateModelProvider(StandardStateModelProvider):
         | PinsonVelocityMeasurementProcessor
         | AltitudeMeasurementProcessor
         | PinsonWithLeverArmPositionMeasurementProcessor
+        | PinsonBodyVelocityMeasurementProcessor
         | None
     ):
         """
@@ -79,6 +84,7 @@ class StandardGpsInsStateModelProvider(StandardStateModelProvider):
                 - Index 2 corresponds to a :class:`PinsonWithNedFogmPositionMeasurementProcessor`.
                 - Index 3 corresponds to a :class:`AltitudeMeasurementProcessor`.
                 - Index 4 corresponds to a :class:`PinsonWithLeverArmPositionMeasurementProcessor`.
+                - Index 5 corresponds to a :class:`PinsonBodyVelocityMeasurementProcessor`.
                 - All other indices will result in a return value of None.
             engine (StandardFusionEngine | None): An optional parameter that may be provided to the
                 new processor, such that the processor may interact with the fusion engine it
@@ -181,7 +187,29 @@ class StandardGpsInsStateModelProvider(StandardStateModelProvider):
                     self._mediator,
                     np.array(sensor_config.sensor_config.lever_arm),
                 )
-
+            case 5:
+                if config_group is None:
+                    self._mediator.log_message(
+                        LoggingLevel.ERROR,
+                        f'A config group is required for processor {self.processor_identifiers[processor_index]}',
+                    )
+                    return None
+                sensor_mp_config = config_from_registry(
+                    SensorMeasurementProcessorConfig, self._mediator, config_group
+                )
+                if sensor_mp_config is None:
+                    self._mediator.log_message(
+                        LoggingLevel.ERROR,
+                        f'Could not get body velocity sensor config from registry.',
+                    )
+                    return None
+                return PinsonBodyVelocityMeasurementProcessor(
+                    label,
+                    state_block_labels,
+                    self._mediator,
+                    np.array(sensor_mp_config.sensor_config.lever_arm),
+                    np.array(sensor_mp_config.sensor_config.orientation),
+                )
         self._mediator.log_message(
             LoggingLevel.ERROR,
             f'Invalid processor index of {processor_index}. StandardGpsInsStateModelProvider provides {len(self.processor_identifiers)} processors.',
