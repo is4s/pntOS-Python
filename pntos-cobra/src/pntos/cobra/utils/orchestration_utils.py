@@ -115,7 +115,7 @@ def send_inertial_aux_to_measurement_processor(
     if imu is None:
         log_func(
             LoggingLevel.ERROR,
-            f'Cannot send inertial aux to measurement processor. Forces and rates not available at time {time}',
+            f'Cannot send inertial aux to measurement processor. Forces and rates not available at time {time.elapsed_nsec / 1e9:.9f}s',
         )
         return
     imu_message = Message(imu.forces_and_rates, 'Orchestration forces and rates')
