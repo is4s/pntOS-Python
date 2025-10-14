@@ -216,7 +216,7 @@ def config_to_registry(config: BaseConfig, mediator: Mediator) -> None:
     kv = mediator.registry.batch_start(config.group)
 
     for param in conf_params:
-        if not _is_type_supported(param.type):
+        if not _is_type_supported(param.type):  # type: ignore[arg-type]
             mediator.log_message(
                 LoggingLevel.ERROR,
                 f'Support for converting {param.type} to a registry type does not exist. Support must be added or a different type must be used on the config class {type(config)}.',
@@ -242,7 +242,7 @@ def config_to_registry(config: BaseConfig, mediator: Mediator) -> None:
         # compare user provided type with the validated config type hint
         if not isinstance(
             val_to_store, (tuple, list, np.ndarray)
-        ) and not _confirm_types(val_to_store, param.type):
+        ) and not _confirm_types(val_to_store, param.type):  # type: ignore[arg-type]
             mediator.log_message(
                 LoggingLevel.ERROR,
                 f'Expected field {param.name} in {type(config)} to have type {param.type} '
