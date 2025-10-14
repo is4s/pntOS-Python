@@ -1,3 +1,5 @@
+from typing import Any
+
 import aspn23_xtensor
 import numpy as np
 from aspn23 import (
@@ -391,3 +393,19 @@ def convert_alignment(
         inertial_error_covariance=covariance,
         status=status,
     )
+def convert_ndarray_to_tuple(arr: NDArray[np.number], target_type: type[Any]) -> tuple:  # type: ignore[type-arg]
+    """
+    Convert from an NDArray with a numerical ``dtype`` to a tuple of ``target_type``. Multi-dimensional arrays
+    will be converted and their structure will be preserved in the output tuple.
+
+    Args:
+        arr (NDArray[int | float]): The array to convert.
+        target_type (type[Any]): The data type to convert to.
+
+    Returns:
+        tuple[``target_type``]
+    """
+    if arr.ndim == 1:
+        return tuple(target_type(x) for x in arr)
+    else:
+        return tuple(convert_ndarray_to_tuple(sub, target_type) for sub in arr)
