@@ -61,6 +61,8 @@ lint.select = [
     "LOG",
     "PERF",
     "PGH",
+    "RET",
+    "RSE",
     "RUF",
     "SIM",
     "SLOT",

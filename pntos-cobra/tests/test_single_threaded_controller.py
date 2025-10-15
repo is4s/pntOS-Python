@@ -77,8 +77,7 @@ class DummyInitializationPlugin(InitializationPlugin):
     ) -> InitializationType | None:
         if issubclass(type, InertialInitializationStrategy):
             return DummyInertialInitializationStrategy()
-        else:
-            return None
+        return None
 
 
 class DummyInertialPlugin(InertialPlugin):
@@ -129,8 +128,7 @@ class DummyFusionPlugin(FusionPlugin):
     ) -> FusionEngineType | None:
         if issubclass(type, StandardFusionStrategy):
             return DummyStandardFusionEngine()
-        else:
-            return None
+        return None
 
 
 class DummyStandardFusionEngine(StandardFusionEngine):

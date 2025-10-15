@@ -172,6 +172,5 @@ class TutorialInitializationPlugin(InitializationPlugin):
     ) -> InitializationType | None:
         if issubclass(initialization_type, InertialInitializationStrategy):
             return ManualInitialization(config_group, self.mediator)  # type: ignore[arg-type]
-        else:
-            self.mediator.log_message(LoggingLevel.ERROR, 'Unsupported type requested.')
-            return None
+        self.mediator.log_message(LoggingLevel.ERROR, 'Unsupported type requested.')
+        return None

@@ -50,7 +50,7 @@ class TutorialFogmBlock(StandardStateBlock):
         Args:
             aux (list[Message]): List of messages.
         """
-        return None
+        return
 
     def generate_dynamics(
         self,

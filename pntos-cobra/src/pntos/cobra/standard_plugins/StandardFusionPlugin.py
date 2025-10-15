@@ -121,7 +121,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
                     insert an estimate with covariance of type \
                         {initial_estimate_covariance.type}.',
             )
-            return None  # Abort adding
+            return  # Abort adding
 
         ###########################################################################
         # First, generate the new stateblock descriptor for the states we're adding
@@ -259,7 +259,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
                 f'block label ({block_label}) requested in \
                     set_state_block_estimate does not exist. No action taken.',
             )
-            return None
+            return
 
         # Get the desired stateblock descriptor
         this_sb = self._sb[block_label]
@@ -271,7 +271,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
                     ({block_label}) is {this_sb.num_states}, but the provided new \
                     estimate is of length {this_sb.num_states}. No action taken.',
             )
-            return None
+            return
 
         # Make the change
         self._strategy.set_estimate_slice(estimate, this_sb.start_index)
@@ -286,10 +286,9 @@ class StandardFusionEngine(api.StandardFusionEngine):
                 f'block label ({block_label}) requested in \
                 set_state_block_covariance does not exist. No action taken.',
             )
-            return None
-        else:
-            # Get the desired stateblock descriptor
-            this_sb = self._sb[block_label]
+            return
+        # Get the desired stateblock descriptor
+        this_sb = self._sb[block_label]
 
         validate_array(
             covariance,
@@ -315,10 +314,9 @@ class StandardFusionEngine(api.StandardFusionEngine):
                 f'block_label1 ({block_label1}) requested in \
                 set_state_block_cross_covariance does not exist. No action taken.',
             )
-            return None
-        else:
-            # Get the desired stateblock descriptor
-            sb1 = self._sb[block_label1]
+            return
+        # Get the desired stateblock descriptor
+        sb1 = self._sb[block_label1]
 
         if block_label2 not in self._sb:
             self._mediator.log_message(
@@ -326,10 +324,9 @@ class StandardFusionEngine(api.StandardFusionEngine):
                 f'block_label2 ({block_label2}) requested in \
                 set_state_block_cross_covariance does not exist. No action taken.',
             )
-            return None
-        else:
-            # Get the desired stateblock descriptor
-            sb2 = self._sb[block_label2]
+            return
+        # Get the desired stateblock descriptor
+        sb2 = self._sb[block_label2]
 
         validate_array(
             covariance, self._mediator, dims=2, rows=sb1.num_states, cols=sb2.num_states
@@ -356,7 +353,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
                 LoggingLevel.WARN,
                 f'Stateblock to be removed ({block_label}) does not exist.  No action taken.',
             )
-            return None
+            return
 
         # Remove the states from the fusion engine
         self._strategy.remove_states(
@@ -400,7 +397,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
                 LoggingLevel.WARN,
                 f'Stateblock to be added ({processor.label}) already exists.  No action taken.',
             )
-            return None
+            return
 
         self._mp[processor.label] = processor
 
@@ -411,7 +408,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
                 f'Measurement processor to be removed ({processor_label}) \
                 does not exist.  No action taken.',
             )
-            return None
+            return
 
         del self._mp[processor_label]
 
@@ -423,18 +420,18 @@ class StandardFusionEngine(api.StandardFusionEngine):
                 f'Attempted to propagate backwards in time.  propagate_time = {time.elapsed_nsec / 1e9:.9f}, \
                     filter_time = {self.time.elapsed_nsec / 1e9:.9f}s.  No action taken.',
             )
-            return None
+            return
 
-        elif time.elapsed_nsec == self.time.elapsed_nsec:
+        if time.elapsed_nsec == self.time.elapsed_nsec:
             # No action needed, but we expect this to happen often, so no logging needed.
-            return None
+            return
 
-        elif self._num_states == 0:
+        if self._num_states == 0:
             self._mediator.log_message(
                 LoggingLevel.WARN,
                 f'Attempted to propagate a filter with zero states. No action taken.',
             )
-            return None
+            return
 
         # Generate the large matrices to be populated
         big_Phi = np.zeros([self._num_states, self._num_states])
@@ -449,7 +446,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
                     LoggingLevel.ERROR,
                     'Unable to generate estimate with covariance during propagate.',
                 )
-                return None
+                return
             dynamics = self._sb[label].block.generate_dynamics(
                 x_and_p=ewc, time_from=self.time, time_to=time
             )
@@ -458,7 +455,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
                     LoggingLevel.ERROR,
                     'Unable to generate dynamics model during propagate.',
                 )
-                return None
+                return
             dynamics_model[label] = dynamics
 
             # Populate the big_Phi portion
@@ -501,7 +498,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
                 f'Attempted process measurement, but measurement processor \
                       ({processor_label}) does not exist. No action taken.',
             )
-            return None
+            return
 
         # Call propagate, which handles the error handling and figures out if
         # propagation is needed
@@ -518,7 +515,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
                 LoggingLevel.ERROR,
                 'Unable to generate estimate with covariance during update.',
             )
-            return None
+            return
 
         measurement_model = self._mp[processor_label].generate_model(
             message=message, x_and_p=x_and_p
@@ -528,7 +525,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
                 LoggingLevel.ERROR,
                 'Unable to generate measurement model during update.',
             )
-            return None
+            return
 
         # Make full size H matrix
         big_H = np.zeros([measurement_model.H.shape[0], self._num_states])
@@ -559,9 +556,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
                 start_index += self._sb[label].num_states
 
             # Calculate and return the h(x) output
-            h_out = measurement_model.h(x_mp)
-
-            return h_out
+            return measurement_model.h(x_mp)
 
         # From the above, generate the measurement model that operates on all of the states
         big_measurement_model = StandardMeasurementModel(
@@ -664,7 +659,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
                 f'State block ({block_label}) identified in give_state_block_aux_data() \
                     does not exist .',
             )
-            return None
+            return
 
         self._sb[block_label].block.receive_aux_data(aux)
 
@@ -677,7 +672,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
                 f'State block ({processor_label}) identified in \
                     give_measurement_processor_aux_data() does not exist .',
             )
-            return None
+            return
 
         self._mp[processor_label].receive_aux_data(aux)
 
@@ -723,11 +718,10 @@ class StandardFusionPlugin(FusionPlugin):
     ) -> FusionEngineType | None:
         if self.is_fusion_type_supported(fusion_type):
             return StandardFusionEngine(mediator=self._mediator)
-        else:
-            self._mediator.log_message(
-                LoggingLevel.ERROR,
-                f'Fusion strategy type {fusion_type.__name__} not currently supported. '
-                + 'Make sure to call FusionPlugin.is_fusion_type_supported before '
-                + 'requesting a new fusion strategy.',
-            )
-            return None
+        self._mediator.log_message(
+            LoggingLevel.ERROR,
+            f'Fusion strategy type {fusion_type.__name__} not currently supported. '
+            + 'Make sure to call FusionPlugin.is_fusion_type_supported before '
+            + 'requesting a new fusion strategy.',
+        )
+        return None

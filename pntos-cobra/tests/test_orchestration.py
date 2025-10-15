@@ -257,7 +257,7 @@ class Test_Orchestration(unittest.TestCase):
         self.preprocessor_plugin: StandardPreprocessorPlugin = (
             StandardPreprocessorPlugin('StandardPreprocessorPlugin')
         )
-        plugins = [
+        return [
             self.initialization_plugin,
             self.inertial_plugin,
             self.fusion_plugin,
@@ -265,8 +265,6 @@ class Test_Orchestration(unittest.TestCase):
             self.registry_plugin,
             self.preprocessor_plugin,
         ]
-
-        return plugins
 
     def init_all_plugins(self, plugins) -> None:  # type: ignore[no-untyped-def]
         mediator = SimpleMediator(self.registry_plugin.identifier, RegistryPlugin)
@@ -412,10 +410,9 @@ class Test_Orchestration(unittest.TestCase):
                     if not self.compare_messages(value1, value2, depth + 1):
                         return False
             return True
-        else:
-            print('m1 {}'.format(m1))
-            print('m2 {}'.format(m2))
-            return m1 == m2
+        print('m1 {}'.format(m1))
+        print('m2 {}'.format(m2))
+        return m1 == m2
 
     def init_orchestration_plugin(self) -> None:
         stream_config = SimpleMessageStreamConfig()

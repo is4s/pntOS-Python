@@ -44,7 +44,7 @@ class FogmBlock(StandardStateBlock):
                     sigmas.shape, taus.shape
                 ),
             )
-            raise RuntimeError()
+            raise RuntimeError
 
         if sigmas.shape != taus.shape:
             mediator.log_message(
@@ -53,14 +53,14 @@ class FogmBlock(StandardStateBlock):
                     sigmas.shape, taus.shape
                 ),
             )
-            raise RuntimeError()
+            raise RuntimeError
 
         if any(taus <= 0):
             mediator.log_message(
                 LoggingLevel.ERROR,
                 'FogmBlock taus arguments must be positive, got {}.'.format(taus),
             )
-            raise RuntimeError()
+            raise RuntimeError
 
         self.label = label
         self.num_states = taus.size

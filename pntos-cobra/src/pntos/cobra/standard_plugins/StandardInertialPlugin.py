@@ -246,6 +246,5 @@ class StandardInertialPlugin(InertialPlugin):
             return None
         if self.is_inertial_type_supported(inertial_type):
             return StandardInertial(config_group, self.mediator, solution)
-        else:
-            self.mediator.log_message(LoggingLevel.ERROR, 'Unsupported type requested.')
-            return None
+        self.mediator.log_message(LoggingLevel.ERROR, 'Unsupported type requested.')
+        return None

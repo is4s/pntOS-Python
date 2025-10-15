@@ -87,19 +87,19 @@ def validate_manual_ewc(
             f'Estimate could not be converted to column vector. Expected 1 or 2 dimensions but got {est.ndim}.',
         )
         return None
-    elif len(est) != num_states:
+    if len(est) != num_states:
         mediator.log_message(
             LoggingLevel.ERROR,
             f'Expected estimate to have {num_states} states but got {len(est)}.',
         )
         return None
-    elif est.ndim == 2 and est.shape[1] != 1:
+    if est.ndim == 2 and est.shape[1] != 1:
         mediator.log_message(
             LoggingLevel.ERROR,
             f'Expected estimate to be a column vector but got a matrix of shape {est.shape}.',
         )
         return None
-    elif est.ndim == 1:
+    if est.ndim == 1:
         est = est.reshape(-1, 1)  # convert to column vector
 
     # validate and convert covariance
@@ -109,19 +109,19 @@ def validate_manual_ewc(
             f'Covariance could not be converted to square matrix. Expected 1 or 2 dimensions but got {cov.ndim}.',
         )
         return None
-    elif len(cov) != num_states:
+    if len(cov) != num_states:
         mediator.log_message(
             LoggingLevel.ERROR,
             f'Expected covariance to correspond to {num_states} states but it instead corresponds to {len(est)} states.',
         )
         return None
-    elif cov.ndim == 2 and cov.shape[0] != cov.shape[1]:
+    if cov.ndim == 2 and cov.shape[0] != cov.shape[1]:
         mediator.log_message(
             LoggingLevel.ERROR,
             f'Expected covariance to be a square matrix but got shape {cov.shape}.',
         )
         return None
-    elif cov.ndim == 1:
+    if cov.ndim == 1:
         cov = eye(num_states) * cov
 
     return EstimateWithCovariance(ewc.type, est, cov)

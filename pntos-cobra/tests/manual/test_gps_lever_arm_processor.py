@@ -87,7 +87,7 @@ def gen_force_rate(
     fned = array([pva1.v1 - pva0.v1, pva1.v2 - pva0.v2, pva1.v3 - pva0.v3]) / dt
     fned[2] += calculate_gravity_schwartz(sin(pva1.p1), pva1.p3)
 
-    wrapped_message = MeasurementImu(
+    return MeasurementImu(
         pva1.header,
         pva1.time_of_validity,
         imu_type=MeasurementImuImuType.SAMPLED,
@@ -95,7 +95,6 @@ def gen_force_rate(
         meas_gyro=wb1b0,
         integrity=[],
     )
-    return wrapped_message
 
 
 my_config: list[BaseConfig] = [
