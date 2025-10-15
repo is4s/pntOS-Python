@@ -1,6 +1,6 @@
 from abc import ABC
 
-import pntos.api as api
+from pntos import api
 
 
 def assert_is_only_instance(plugin: api.CommonPlugin, expected_type: type[ABC]) -> None:

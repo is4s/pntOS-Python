@@ -955,9 +955,8 @@ class TestRegistry(unittest.TestCase):
                 if isinstance(value1, np.ndarray) and isinstance(value2, np.ndarray):
                     if not np.array_equal(value1, value2):
                         return False
-                else:
-                    if not self.compare_messages(value1, value2, depth + 1):
-                        return False
+                elif not self.compare_messages(value1, value2, depth + 1):
+                    return False
             return True
         return m1 == m2
 

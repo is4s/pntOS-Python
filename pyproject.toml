@@ -62,8 +62,10 @@ lint.select = [
     "ICN",
     "INT",
     "LOG",
+    "NPY",
     "PERF",
     "PGH",
+    "PL",
     "RET",
     "RSE",
     "RUF",
@@ -73,7 +75,7 @@ lint.select = [
     "TID",
     "W",
 ]
-lint.ignore = [ "COM812", "D212", "D417", "E501" ]
+lint.ignore = [ "COM812", "D212", "D417", "E501", "PLR0911", "PLR0912", "PLR0913" ]
 lint.per-file-ignores."*/tests/*" = [
     "ANN001",
     "B008",
@@ -81,10 +83,17 @@ lint.per-file-ignores."*/tests/*" = [
     "D101",
     "D102",
     "D107",
+    "NPY",
     "PGH003",
+    "PLC0415",
+    "PLR0915",
+    "PLR2004",
+    "PLW0602",
+    "PLW0603",
 ]
 lint.per-file-ignores."apps/*" = [ "D" ]
 lint.per-file-ignores."docs/*" = [ "D" ]
+lint.per-file-ignores."internal.py" = [ "PLC0414" ]
 lint.per-file-ignores."pntos-cobra/*" = [ "D" ]
 lint.per-file-ignores."postprocessing/*" = [ "D" ]
 lint.isort.combine-as-imports = true

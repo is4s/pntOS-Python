@@ -75,7 +75,7 @@ class UiLogPlottingPlugin(UiPlugin):
     def _harvest_data(self, channels: list[str]) -> LogData[PvaData]:
         # ROS bagfile
         if self.logfile.endswith('.db3') or self.logfile.endswith('.mcap'):
-            from analysis.ros import RosBagReader
+            from analysis.ros import RosBagReader  # noqa: PLC0415
 
             return RosBagReader(self.logfile).harvest_topics(channels)
 

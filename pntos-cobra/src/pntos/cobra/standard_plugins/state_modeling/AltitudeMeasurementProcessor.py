@@ -149,7 +149,7 @@ class AltitudeMeasurementProcessor(StandardMeasurementProcessor):
             )
             return None
 
-        if abs(self._inertial_solution_time_nsec - time.elapsed_nsec) > 1000:
+        if self._inertial_solution_time_nsec != time.elapsed_nsec:
             self._mediator.log_message(
                 LoggingLevel.ERROR,
                 f'AltitudeMeasurementProcessor cannot process message at time {time.elapsed_nsec / 1e9:.9f}s as inertial PVA aux data is at a different time (t={self._inertial_solution_time_nsec / 1e9:.9f}s).',

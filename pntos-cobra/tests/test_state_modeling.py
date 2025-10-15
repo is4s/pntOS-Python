@@ -522,7 +522,7 @@ def test_invalid_aux_proc(
 
 
 def test_no_aux_block(pinson_block: Pinson15NedBlock) -> None:
-    x_and_p = x_and_p = gxp(15)
+    x_and_p = gxp(15)
     dm = pinson_block.generate_dynamics(x_and_p, TypeTimestamp(0), TypeTimestamp(1))
     assert dm is None
 

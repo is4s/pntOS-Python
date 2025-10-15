@@ -153,7 +153,7 @@ def ecef_to_llh(ecef: NDArray[float64]) -> NDArray[float64]:
     count = 0
     max_iterations = 5
 
-    while (abs(dp0) > 7e-6 or abs(dp1) > 1e-6) and count <= max_iterations:
+    while (abs(dp0) > 7e-6 or abs(dp1) > 1e-6) and count <= max_iterations:  # noqa: PLR2004
         slat = sin(phi0)
         clat = cos(phi0)
         s2lat = slat * slat
@@ -219,11 +219,11 @@ def dcm_to_rpy(dcm: NDArray[float64]) -> NDArray[float64]:
     p = -np.arcsin(asin_arg)
     y = np.arctan2(dcm[1, 0], dcm[0, 0])
 
-    if asin_arg <= -0.999:
+    if asin_arg <= -0.999:  # noqa: PLR2004
         y_min_r = np.arctan2(dcm[1, 2] - dcm[0, 1], dcm[0, 2] + dcm[1, 1])
         y = y_min_r + r
 
-    if asin_arg >= 0.999:
+    if asin_arg >= 0.999:  # noqa: PLR2004
         y_pls_r = np.arctan2(dcm[1, 2] + dcm[0, 1], dcm[0, 2] - dcm[1, 1]) + np.pi
         y = np.remainder((y_pls_r - r), 2.0 * np.pi)
 

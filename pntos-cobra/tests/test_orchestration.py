@@ -406,9 +406,8 @@ class Test_Orchestration(unittest.TestCase):
                 if isinstance(value1, np.ndarray) and isinstance(value2, np.ndarray):
                     if not np.allclose(value1, value2):
                         return False
-                else:
-                    if not self.compare_messages(value1, value2, depth + 1):
-                        return False
+                elif not self.compare_messages(value1, value2, depth + 1):
+                    return False
             return True
         print('m1 {}'.format(m1))
         print('m2 {}'.format(m2))

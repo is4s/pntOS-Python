@@ -100,7 +100,7 @@ class PinsonVelocityMeasurementProcessor(StandardMeasurementProcessor):
             return None
 
         pva_aux_time = self._inertial_pva.time_of_validity
-        if abs(pva_aux_time.elapsed_nsec - time.elapsed_nsec) > 1000:
+        if pva_aux_time.elapsed_nsec != time.elapsed_nsec:
             self._mediator.log_message(
                 LoggingLevel.ERROR,
                 f'PinsonVelocityMeasurementProcessor cannot process message at time {time.elapsed_nsec / 1e9:.9f}s as inertial PVA aux data is at a different time (t={pva_aux_time.elapsed_nsec / 1e9:.9f}s).',

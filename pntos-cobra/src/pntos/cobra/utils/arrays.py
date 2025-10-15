@@ -65,7 +65,7 @@ def is_symmetric(
         bool
     """
     shape = mat.shape
-    if len(shape) == 2 and shape[0] == shape[1]:
+    if len(shape) == 2 and shape[0] == shape[1]:  # noqa: PLR2004
         return allclose(mat, mat.T, rtol, atol)
     mediator.log_message(
         LoggingLevel.ERROR,
@@ -81,7 +81,7 @@ def validate_manual_ewc(
     cov = ewc.covariance
 
     # validate and convert estimate
-    if est.ndim < 1 or est.ndim > 2:
+    if est.ndim < 1 or est.ndim > 2:  # noqa: PLR2004
         mediator.log_message(
             LoggingLevel.ERROR,
             f'Estimate could not be converted to column vector. Expected 1 or 2 dimensions but got {est.ndim}.',
@@ -93,7 +93,7 @@ def validate_manual_ewc(
             f'Expected estimate to have {num_states} states but got {len(est)}.',
         )
         return None
-    if est.ndim == 2 and est.shape[1] != 1:
+    if est.ndim == 2 and est.shape[1] != 1:  # noqa: PLR2004
         mediator.log_message(
             LoggingLevel.ERROR,
             f'Expected estimate to be a column vector but got a matrix of shape {est.shape}.',
@@ -103,7 +103,7 @@ def validate_manual_ewc(
         est = est.reshape(-1, 1)  # convert to column vector
 
     # validate and convert covariance
-    if cov.ndim < 1 or cov.ndim > 2:
+    if cov.ndim < 1 or cov.ndim > 2:  # noqa: PLR2004
         mediator.log_message(
             LoggingLevel.ERROR,
             f'Covariance could not be converted to square matrix. Expected 1 or 2 dimensions but got {cov.ndim}.',
@@ -115,7 +115,7 @@ def validate_manual_ewc(
             f'Expected covariance to correspond to {num_states} states but it instead corresponds to {len(est)} states.',
         )
         return None
-    if cov.ndim == 2 and cov.shape[0] != cov.shape[1]:
+    if cov.ndim == 2 and cov.shape[0] != cov.shape[1]:  # noqa: PLR2004
         mediator.log_message(
             LoggingLevel.ERROR,
             f'Expected covariance to be a square matrix but got shape {cov.shape}.',

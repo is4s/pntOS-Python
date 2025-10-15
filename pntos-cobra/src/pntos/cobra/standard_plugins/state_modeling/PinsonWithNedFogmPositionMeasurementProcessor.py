@@ -184,7 +184,7 @@ class PinsonWithNedFogmPositionMeasurementProcessor(StandardMeasurementProcessor
             return None
 
         pva_aux_time = self._inertial_pva.time_of_validity
-        if abs(pva_aux_time.elapsed_nsec - time.elapsed_nsec) > 1000:
+        if pva_aux_time.elapsed_nsec != time.elapsed_nsec:
             self._mediator.log_message(
                 LoggingLevel.ERROR,
                 f'PinsonWithNedFogmPositionMeasurementProcessor cannot process message at time\

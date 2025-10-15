@@ -1,3 +1,4 @@
+import sys
 from threading import Event
 from typing import ClassVar
 
@@ -289,6 +290,6 @@ class SimpleControllerPlugin(ControllerPlugin):
 
         self.shutdown_plugin()
         if SimpleMediator._logging_error_event.is_set():
-            exit(1)
+            sys.exit(1)
         else:
-            exit(0)
+            sys.exit(0)

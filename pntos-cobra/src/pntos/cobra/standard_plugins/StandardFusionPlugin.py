@@ -4,10 +4,10 @@ import copy
 from dataclasses import dataclass
 
 import numpy as np
-import pntos.api as api
 from aspn23 import TypeTimestamp
 from numpy import float64
 from numpy.typing import NDArray
+from pntos import api
 from pntos.api import (
     CrossCovariances,
     EstimateWithCovariance,
