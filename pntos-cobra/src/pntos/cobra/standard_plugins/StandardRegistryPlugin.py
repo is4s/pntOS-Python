@@ -251,7 +251,7 @@ class StandardKeyValueStore(KeyValueStore):
         """Utility function for type conversion"""
         try:
             return str(val)
-        except:
+        except ValueError:
             return None
 
     def _return_list_str(self, val: Any) -> list[str] | None:
@@ -261,7 +261,7 @@ class StandardKeyValueStore(KeyValueStore):
                 out = val.tolist()
                 return [str(x) for x in out]
             return [str(val)]
-        except:
+        except ValueError:
             pass
         return None
 
@@ -269,21 +269,21 @@ class StandardKeyValueStore(KeyValueStore):
         """Utility function for type conversion"""
         try:
             return int(val)
-        except:
+        except ValueError:
             return None
 
     def _return_bool(self, val: Any) -> bool | None:
         """Utility function for type conversion"""
         try:
             return bool(val)
-        except:
+        except ValueError:
             return None
 
     def _return_float(self, val: Any) -> float | None:
         """Utility function for type conversion"""
         try:
             return float(val)
-        except:
+        except ValueError:
             return None
 
     def _return_array(self, val: Any) -> NDArray[float64] | None:
@@ -299,7 +299,7 @@ class StandardKeyValueStore(KeyValueStore):
             try:
                 numbers = [float(x) for x in val]
                 return np.array(numbers, dtype=float64)
-            except:
+            except ValueError:
                 pass
         return None
 

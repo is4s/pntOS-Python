@@ -192,7 +192,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
 
     def get_state_block_estimate(self, block_label: str) -> NDArray[float64] | None:
         assert self._strategy is not None, 'FusionStrategy has not been set'
-        if not block_label in self._sb:
+        if block_label not in self._sb:
             return None
 
         # Get the full state vector and extract the part needed

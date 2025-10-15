@@ -47,10 +47,12 @@ dev = [
 format.quote-style = "single"
 lint.select = [
     "B",
+    "BLE",
     "C4",
     "COM",
     "D",
     "DTZ",
+    "E",
     "FA",
     "FLY",
     "FURB",
@@ -68,8 +70,9 @@ lint.select = [
     "SLOT",
     "T10",
     "TID",
+    "W",
 ]
-lint.ignore = [ "COM812", "D212", "D417" ]
+lint.ignore = [ "COM812", "D212", "D417", "E501" ]
 lint.per-file-ignores."*/tests/*" = [ "B008", "D100", "D101", "D102", "D107", "PGH003" ]
 lint.per-file-ignores."apps/*" = [ "D" ]
 lint.per-file-ignores."docs/*" = [ "D" ]

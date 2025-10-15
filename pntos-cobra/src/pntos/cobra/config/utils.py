@@ -114,7 +114,7 @@ def config_from_registry(
             param.type == EstimateWithCovariance | None
             or param.type == EstimateWithCovariance
         ):
-            if not '_ewc_type' in kv:
+            if '_ewc_type' not in kv:
                 out[param.name] = None
                 continue
             val = EstimateWithCovariance(

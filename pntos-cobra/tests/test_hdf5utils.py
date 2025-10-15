@@ -79,9 +79,9 @@ def test_hdf5_to_and_from() -> None:
     for test_key, test_val in test_dict.items():
         assert test_key in res_dict
         res_val = res_dict[test_key]
-        assert type(test_val) == type(res_val)
+        assert type(test_val) is type(res_val)
         assert len(test_val) == len(res_val)
-        assert type(test_val[0]) == type(res_val[0])
+        assert type(test_val[0]) is type(res_val[0])
         if isinstance(test_val[0], Message):
             for test_v, res_v in zip(test_val, res_val, strict=True):
                 assert compare_messages(test_v, res_v)

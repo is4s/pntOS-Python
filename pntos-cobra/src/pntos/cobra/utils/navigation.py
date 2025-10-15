@@ -202,7 +202,7 @@ def correct_dcm_with_tilt(
     sum_squares = np.sum(np.square(tilt))
     if sum_squares > 0:
         m = sqrt(sum_squares)
-        I = np.eye(3)
+        I = np.eye(3)  # noqa: E741
         s = skew(tilt)
         # Below is equivalent to I - sin(m) * s / m + dot((1 - cos(m)) * s, s) / pow(m, 2)
         # B is an approximation of rpy_to_dcm(-tilt) and/or I - skew(tilt)
