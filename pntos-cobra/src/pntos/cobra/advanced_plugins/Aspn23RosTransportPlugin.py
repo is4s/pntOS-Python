@@ -56,22 +56,18 @@ class Aspn23RosTransportPlugin(TransportPlugin):
             self.mediator = mediator
         if not rclpy.ok():
             rclpy.init()
-        try:
-            self.executor
-            self.aspn_ros_node
-            self.thread
-        except AttributeError:
-            self.executor = SingleThreadedExecutor()
-            self.aspn_ros_node = AspnRosNode('aspn23_ros_transport')
-            self.executor.add_node(self.aspn_ros_node)
 
-            def execute() -> None:
-                try:
-                    self.executor.spin()
-                except ExternalShutdownException:
-                    pass
+        self.executor = SingleThreadedExecutor()
+        self.aspn_ros_node = AspnRosNode('aspn23_ros_transport')
+        self.executor.add_node(self.aspn_ros_node)
 
-            self.thread = Thread(target=execute)
+        def execute() -> None:
+            try:
+                self.executor.spin()
+            except ExternalShutdownException:
+                pass
+
+        self.thread = Thread(target=execute)
 
     def shutdown_plugin(self) -> None:
         """

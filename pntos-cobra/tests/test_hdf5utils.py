@@ -84,13 +84,13 @@ def test_hdf5_to_and_from() -> None:
         assert len(test_val) == len(res_val)
         assert type(test_val[0]) == type(res_val[0])
         if isinstance(test_val[0], Message):
-            for test_v, res_v in zip(test_val, res_val):
+            for test_v, res_v in zip(test_val, res_val, strict=True):
                 assert compare_messages(test_v, res_v)
         elif isinstance(test_val[0], np.ndarray):
-            for test_v, res_v in zip(test_val, res_val):
+            for test_v, res_v in zip(test_val, res_val, strict=True):
                 assert np.array_equal(test_v, res_v)  # type: ignore[arg-type]
         else:
-            for test_v, res_v in zip(test_val, res_val):
+            for test_v, res_v in zip(test_val, res_val, strict=True):
                 assert test_v == res_v
 
     os.remove(TEST_FILE)
