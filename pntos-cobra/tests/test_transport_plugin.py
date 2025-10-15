@@ -46,14 +46,12 @@ class DummyMediator(Mediator):
 def mediator() -> DummyMediator:
     registry = StandardRegistry(dummy_log)
     DummyMediator.registry = registry
-    mediator = DummyMediator()
-    return mediator
+    return DummyMediator()
 
 
 @pytest.fixture
 def transport_plugin() -> LcmTransportPlugin:
-    plugin = LcmTransportPlugin('python-transport-lcm23-plugin')
-    return plugin
+    return LcmTransportPlugin('python-transport-lcm23-plugin')
 
 
 def test_initialize_plugin(

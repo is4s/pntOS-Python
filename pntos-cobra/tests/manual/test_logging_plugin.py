@@ -123,8 +123,7 @@ def remove_decimal_numbers(input_string: str) -> str:
     # Regular expression to match decimal numbers before or after / or :
     pattern = r'(?<=[:/])\d*\.?\d+|\d*\.?\d+(?=[:/])'
     # Substitute the matched decimal numbers with an empty string
-    result = re.sub(pattern, '', input_string)
-    return result
+    return re.sub(pattern, '', input_string)
 
 
 def test(capsys: Any) -> None:

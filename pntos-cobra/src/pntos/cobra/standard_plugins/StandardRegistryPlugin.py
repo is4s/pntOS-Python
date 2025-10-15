@@ -175,8 +175,7 @@ class StandardKeyValueStore(KeyValueStore):
         keys = self._store.keys()
         if len(keys) == 0:
             return None
-        else:
-            return list(keys)
+        return list(keys)
 
     def __contains__(self, key: str) -> bool:
         """Wrapper function for dictionary-like kvstore."""
@@ -225,25 +224,24 @@ class StandardKeyValueStore(KeyValueStore):
             val = self._store[key]
             if isinstance(val, value_type):  # Conversion not necessary - just return
                 return val
-            else:  # Conversion necessary
-                convert = self.type_conversion[builtins.type(val)][value_type]
-                if convert is not None:
-                    out = convert(val)
-                    if isinstance(out, value_type):
-                        return out
-                    else:
-                        self._log(
-                            LoggingLevel.WARN,
-                            'Unable to convert from type '
-                            + f'{builtins.type(val)}'
-                            + f' to type {value_type}.',
-                        )
-                else:
-                    self._log(
-                        LoggingLevel.WARN,
-                        f'Conversion from type {builtins.type(val)}'
-                        + f' to type {value_type} unsupported.',
-                    )
+            # Conversion necessary
+            convert = self.type_conversion[builtins.type(val)][value_type]
+            if convert is not None:
+                out = convert(val)
+                if isinstance(out, value_type):
+                    return out
+                self._log(
+                    LoggingLevel.WARN,
+                    'Unable to convert from type '
+                    + f'{builtins.type(val)}'
+                    + f' to type {value_type}.',
+                )
+            else:
+                self._log(
+                    LoggingLevel.WARN,
+                    f'Conversion from type {builtins.type(val)}'
+                    + f' to type {value_type} unsupported.',
+                )
 
             return None
         self._log(LoggingLevel.WARN, f'Key error - key {key} not in store.')
@@ -262,8 +260,7 @@ class StandardKeyValueStore(KeyValueStore):
             if isinstance(val, np.ndarray):
                 out = val.tolist()
                 return [str(x) for x in out]
-            else:
-                return [str(val)]
+            return [str(val)]
         except:
             pass
         return None
@@ -317,18 +314,17 @@ class StandardKeyValueStore(KeyValueStore):
         out = self.get_value(key, str)
         if isinstance(out, str):
             return out.encode(self._encoding)
+        if key not in self._store:
+            self._log(
+                LoggingLevel.WARN,
+                f'Key {key} does not exist in group {self._group}.',
+            )
         else:
-            if key not in self._store:
-                self._log(
-                    LoggingLevel.WARN,
-                    f'Key {key} does not exist in group {self._group}.',
-                )
-            else:
-                self._log(
-                    LoggingLevel.ERROR,
-                    f'Value at key {key} cannot be converted to string.',
-                )
-            return None
+            self._log(
+                LoggingLevel.ERROR,
+                f'Value at key {key} cannot be converted to string.',
+            )
+        return None
 
     def set_value(self, key: str, value: RegistryValueTypeUnion) -> None:
         self._check_batch_operation()
@@ -438,8 +434,7 @@ class StandardKeyValueStore(KeyValueStore):
                 self._callbacks[key].remove(callback)
                 removed_any = True
             return removed_any
-        else:
-            return False
+        return False
 
     def __iter__(self) -> Iterator[str]:
         self._check_batch_operation()
@@ -473,15 +468,13 @@ class StandardKeyValueStore(KeyValueStore):
             if self._check_valid_type(val):
                 if isinstance(val, list):
                     return list[str]
-                elif isinstance(val, np.ndarray):
+                if isinstance(val, np.ndarray):
                     return NDArray[float64]
-                else:
-                    return out_type
-            else:
-                self._log(
-                    LoggingLevel.ERROR,
-                    f'Invalid type {out_type} detected in the registry.',
-                )
+                return out_type
+            self._log(
+                LoggingLevel.ERROR,
+                f'Invalid type {out_type} detected in the registry.',
+            )
         return None
 
     def _check_batch_operation(self) -> None:
@@ -542,8 +535,7 @@ class StandardRegistry(Registry):
     def group_array(self) -> list[str] | None:
         if len(self.groups) == 0:
             return None
-        else:
-            return list(self.groups.keys())
+        return list(self.groups.keys())
 
     def has_group(self, group: str) -> bool:
         return group in self.groups

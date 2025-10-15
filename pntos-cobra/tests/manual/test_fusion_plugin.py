@@ -96,7 +96,7 @@ class GenerateDeltaPosMeasurement:
     def generate_measurement(self, time: TypeTimestamp) -> MeasurementDeltaPosition:
         header = TypeHeader(vendor_id=0, device_id=0, context_id=0, sequence_id=0)
         delta_time = (time.elapsed_nsec - self.init_time.elapsed_nsec) / 1e9
-        measurement = MeasurementDeltaPosition(
+        return MeasurementDeltaPosition(
             header=header,
             time_of_validity=time,
             reference_frame=MeasurementDeltaPositionReferenceFrame.NED,
@@ -109,7 +109,6 @@ class GenerateDeltaPosMeasurement:
             error_model_params=np.array([]),
             integrity=[],
         )
-        return measurement
 
 
 def dummy_log(level: LoggingLevel, message: str) -> None:

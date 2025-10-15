@@ -222,7 +222,7 @@ def config_to_registry(config: BaseConfig, mediator: Mediator) -> None:
                 f'Support for converting {param.type} to a registry type does not exist. Support must be added or a different type must be used on the config class {type(config)}',
             )
             kv.batch_end()
-            return None
+            return
         val_to_store = getattr(config, param.name)
         # internally convert int to float if type is supposed to be float
         if isinstance(val_to_store, int) and param.type is float:
@@ -235,7 +235,7 @@ def config_to_registry(config: BaseConfig, mediator: Mediator) -> None:
                 + f'but received {type(val_to_store)} from registry.',
             )
             kv.batch_end()
-            return None
+            return
         if isinstance(val_to_store, tuple):
             val_to_store = np.array(val_to_store, dtype=np.float64)
         elif isinstance(val_to_store, (list, np.ndarray)):
@@ -338,7 +338,7 @@ def _is_type_supported(field_type: type[Any]) -> bool:
     if origin is tuple:
         return _validate_tuple_type(type_to_compare)
     # we support lists of one of the following types: int, str, float, BaseConfig
-    elif origin is list:
+    if origin is list:
         args = get_args(type_to_compare)
         if len(args) != 1:
             return False

@@ -68,11 +68,10 @@ class BarometerToAltitudePreprocessor(Preprocessor):
                         message.source_identifier,
                     )
                 ]
-            else:
-                self._mediator.log_message(
-                    LoggingLevel.WARN,
-                    f'BarometerToAltitudePreprocessor expected barometer message, but got {type(message.wrapped_message)}. Cannot convert.',
-                )
+            self._mediator.log_message(
+                LoggingLevel.WARN,
+                f'BarometerToAltitudePreprocessor expected barometer message, but got {type(message.wrapped_message)}. Cannot convert.',
+            )
         return [message]
 
 
@@ -202,7 +201,7 @@ class TimeAdjusterPreprocessor(Preprocessor):
                 LoggingLevel.ERROR,
                 f'Failed to populate TimeAdjusterConfig in TimeAdjusterPreprocessor.',
             )
-            return None
+            return
         self._channel_to_correct = config.channel_to_correct
         self._last_nsec = None
         self._expected_dt_nsec = config.expected_dt_nsec

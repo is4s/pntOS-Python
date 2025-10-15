@@ -959,8 +959,7 @@ class TestRegistry(unittest.TestCase):
                     if not self.compare_messages(value1, value2, depth + 1):
                         return False
             return True
-        else:
-            return m1 == m2
+        return m1 == m2
 
 
 def suite() -> unittest.TestSuite:

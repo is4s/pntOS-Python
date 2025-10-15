@@ -71,8 +71,7 @@ def compare_messages(m1: object, m2: object, depth: int = 0) -> bool:
                 if not compare_messages(value1, value2, depth + 1):
                     return False
         return True
-    else:
-        return m1 == m2
+    return m1 == m2
 
 
 def test_diagnostic_log_plugin() -> None:

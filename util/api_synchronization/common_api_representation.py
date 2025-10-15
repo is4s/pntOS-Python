@@ -265,7 +265,7 @@ class CtoPyApiComparator:
                     f'Attribute {attr_name} was found in exceptions list. Skipping attribute...'
                 )
                 continue
-            elif attr_name not in py_attrs:
+            if attr_name not in py_attrs:
                 print(
                     f'ERROR: C struct {c_class.name} has attribute {attr_name} not present '
                     f'in Python class {py_class.name}. Skipping attribute...'
@@ -295,7 +295,7 @@ class CtoPyApiComparator:
                     f'Method "{meth_name}" was found in exceptions list. Skipping method...'
                 )
                 continue
-            elif meth_name not in py_method_types:
+            if meth_name not in py_method_types:
                 print(
                     f'ERROR: C struct {c_class.name} has method {meth_name} not present '
                     f'in Python class {py_class.name}. Skipping method...'
@@ -323,7 +323,7 @@ class CtoPyApiComparator:
                         f'Parameter "{param_name}" was found in exceptions list. Skipping parameter...'
                     )
                     continue
-                elif param_name not in py_params:
+                if param_name not in py_params:
                     print(
                         f'ERROR: C struct {c_class.name} method {meth_name} has '
                         f'parameter "{param_name}" not present in '

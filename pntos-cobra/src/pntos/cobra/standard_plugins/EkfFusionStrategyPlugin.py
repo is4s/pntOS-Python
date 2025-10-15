@@ -115,8 +115,7 @@ class EkfFusionStrategy(StandardFusionStrategy):
     def estimate(self) -> NDArray[np.float64] | None:
         if self._num_states == 0:
             return None
-        else:
-            return self._x
+        return self._x
 
     def set_estimate_slice(
         self, new_estimate: NDArray[np.float64], first_index: int
@@ -136,8 +135,7 @@ class EkfFusionStrategy(StandardFusionStrategy):
     def covariance(self) -> NDArray[np.float64] | None:
         if self._num_states == 0:
             return None
-        else:
-            return self._P
+        return self._P
 
     def set_covariance_slice(
         self,
@@ -269,11 +267,10 @@ class EkfFusionStrategyPlugin(FusionStrategyPlugin):
     ) -> FusionStrategyType | None:
         if self.is_fusion_type_supported(fusion_type):
             return EkfFusionStrategy(self._mediator)
-        else:
-            self._mediator.log_message(
-                LoggingLevel.ERROR,
-                f'Fusion strategy type {fusion_type.__name__} not currently supported. '
-                + 'Make sure to call FusionStrategyPlugin.is_fusion_type_supported before '
-                + 'requesting a new fusion strategy.',
-            )
-            return None
+        self._mediator.log_message(
+            LoggingLevel.ERROR,
+            f'Fusion strategy type {fusion_type.__name__} not currently supported. '
+            + 'Make sure to call FusionStrategyPlugin.is_fusion_type_supported before '
+            + 'requesting a new fusion strategy.',
+        )
+        return None

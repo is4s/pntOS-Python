@@ -172,6 +172,5 @@ class StaticAlignInitializationPlugin(InitializationPlugin):
             return None
         if issubclass(initialization_type, InertialInitializationStrategy):
             return StaticAlign(config_group, self.mediator)
-        else:
-            self.mediator.log_message(LoggingLevel.ERROR, 'Unsupported type requested')
-            return None
+        self.mediator.log_message(LoggingLevel.ERROR, 'Unsupported type requested')
+        return None

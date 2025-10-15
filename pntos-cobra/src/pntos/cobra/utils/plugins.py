@@ -163,36 +163,33 @@ def find_base_plugin_type(plugin: CommonPlugin) -> PluginType:
     """
     if isinstance(plugin, ControllerPlugin):
         return ControllerPlugin
-    elif isinstance(plugin, FusionPlugin):
+    if isinstance(plugin, FusionPlugin):
         return FusionPlugin
-    elif isinstance(plugin, FusionStrategyPlugin):
+    if isinstance(plugin, FusionStrategyPlugin):
         return FusionStrategyPlugin
-    elif isinstance(plugin, InertialPlugin):
+    if isinstance(plugin, InertialPlugin):
         return InertialPlugin
-    elif isinstance(plugin, InitializationPlugin):
+    if isinstance(plugin, InitializationPlugin):
         return InitializationPlugin
-    elif isinstance(plugin, LoggingPlugin):
+    if isinstance(plugin, LoggingPlugin):
         return LoggingPlugin
-    elif isinstance(plugin, OrchestrationPlugin):
+    if isinstance(plugin, OrchestrationPlugin):
         return OrchestrationPlugin
-    elif isinstance(plugin, PlatformIntegrationPlugin):
+    if isinstance(plugin, PlatformIntegrationPlugin):
         return PlatformIntegrationPlugin
-    elif isinstance(plugin, PreprocessorPlugin):
+    if isinstance(plugin, PreprocessorPlugin):
         return PreprocessorPlugin
-    elif isinstance(plugin, RegistryPlugin):
+    if isinstance(plugin, RegistryPlugin):
         return RegistryPlugin
-    elif isinstance(plugin, StateModelingPlugin):
+    if isinstance(plugin, StateModelingPlugin):
         return StateModelingPlugin
-    elif isinstance(plugin, TransportPlugin):
+    if isinstance(plugin, TransportPlugin):
         return TransportPlugin
-    elif isinstance(plugin, UiPlugin):
+    if isinstance(plugin, UiPlugin):
         return UiPlugin
-    elif isinstance(plugin, UtilityPlugin):
+    if isinstance(plugin, UtilityPlugin):
         return UtilityPlugin
-    else:
-        raise TypeError(
-            f'Plugin of type {type(plugin).__name__} has no base plugin type.'
-        )
+    raise TypeError(f'Plugin of type {type(plugin).__name__} has no base plugin type.')
 
 
 def camel_to_snake(name: str) -> str:

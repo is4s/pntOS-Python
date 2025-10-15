@@ -26,12 +26,11 @@ def replace_macros(file_contents: str) -> str:
         '_Nullable*',
         file_contents,
     )
-    file_contents = re.sub(
+    return re.sub(
         'PNTOS_ASSUME_NONNULL_END|PNTOS_ASSUME_NONNULL_BEGIN',
         '',
         file_contents,
     )
-    return file_contents
 
 
 def remove_directives(file_contents: str) -> str:
@@ -42,10 +41,7 @@ def remove_directives(file_contents: str) -> str:
     file_contents = re.sub(
         r'#ifdef __cplusplus.*{\n#endif', '', file_contents, flags=re.DOTALL
     )
-    file_contents = re.sub(
-        r'#ifdef __cplusplus.*#endif', '', file_contents, flags=re.DOTALL
-    )
-    return file_contents
+    return re.sub(r'#ifdef __cplusplus.*#endif', '', file_contents, flags=re.DOTALL)
 
 
 def preprocess_file(in_file: str) -> str:
@@ -53,8 +49,7 @@ def preprocess_file(in_file: str) -> str:
     with open(in_file, 'r', encoding='utf-8') as file:
         header = file.read()
         header = replace_macros(header)
-        header = remove_directives(header)
-    return header
+        return remove_directives(header)
 
 
 def create_temp_file(file_contents: str) -> str:
@@ -67,8 +62,7 @@ def create_temp_file(file_contents: str) -> str:
 def generate_file_for_parsing(in_file: str) -> str:
     """Preprocesses input file and returns a temp file with those changes."""
     contents = preprocess_file(in_file)
-    temp_file = create_temp_file(contents)
-    return temp_file
+    return create_temp_file(contents)
 
 
 def generate_type_list(type_decl: str) -> list[str]:

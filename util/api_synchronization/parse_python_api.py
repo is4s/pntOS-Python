@@ -95,8 +95,7 @@ class ApiVisitor(ast.NodeVisitor):
         conv_type = PY_TO_C.get(read_type)
         if conv_type is not None:
             return conv_type
-        else:
-            return read_type
+        return read_type
 
     def _parse_callback_param(self, arg: ast.arg, func_name: str):
         """Parses ``callback`` parameter and stores it as its own function."""

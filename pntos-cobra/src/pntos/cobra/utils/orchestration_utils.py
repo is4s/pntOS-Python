@@ -178,21 +178,20 @@ def has_valid_time(
         message_time = measurement.time_of_validity.elapsed_nsec
         if fusion_engine.time.elapsed_nsec <= message_time:
             return True
-        else:  # Discard old messages
-            log_func(
-                LoggingLevel.DEBUG,
-                f'Received old message at time {message_time * 1e-9:.9f}s on channel'
-                + f' {message.source_identifier}. Filter is at time '
-                + f'{fusion_engine.time.elapsed_nsec * 1e-9:.9f}s. Discarding message',
-            )
-            return False
-    else:
+        # Discard old messages
         log_func(
-            LoggingLevel.ERROR,
-            f'Measurement of type {type(measurement)} does not contain '
-            + '"time_of_validity" field.',
+            LoggingLevel.DEBUG,
+            f'Received old message at time {message_time * 1e-9:.9f}s on channel'
+            + f' {message.source_identifier}. Filter is at time '
+            + f'{fusion_engine.time.elapsed_nsec * 1e-9:.9f}s. Discarding message',
         )
         return False
+    log_func(
+        LoggingLevel.ERROR,
+        f'Measurement of type {type(measurement)} does not contain '
+        + '"time_of_validity" field.',
+    )
+    return False
 
 
 def get_dead_reckoning_solution(
@@ -208,13 +207,12 @@ def get_dead_reckoning_solution(
     message = inertial.request_solution(time)
     if message is not None:
         return Message(message.wrapped_message, imu_sol_chan)
-    else:
-        log_func(
-            LoggingLevel.ERROR,
-            'Unable to get PVA message from inertial.'
-            + ' Cannot generate DEAD_RECKONING solution.',
-        )
-        return None
+    log_func(
+        LoggingLevel.ERROR,
+        'Unable to get PVA message from inertial.'
+        + ' Cannot generate DEAD_RECKONING solution.',
+    )
+    return None
 
 
 def get_best_solution(
@@ -341,7 +339,7 @@ def preprocess_message(
         messages = preprocessor.process_pntos_message(message)
         if not messages:
             return None
-        elif len(messages) > 1:
+        if len(messages) > 1:
             log_func(
                 LoggingLevel.WARN,
                 f'Preprocessor {preprocessor} returned {len(messages)} messages. Ignoring all but the first.',
