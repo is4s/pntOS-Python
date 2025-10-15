@@ -65,9 +65,8 @@ def is_symmetric(
         bool
     """
     shape = mat.shape
-    if len(shape) == 2:
-        if shape[0] == shape[1]:
-            return allclose(mat, mat.T, rtol, atol)
+    if len(shape) == 2 and shape[0] == shape[1]:
+        return allclose(mat, mat.T, rtol, atol)
     mediator.log_message(
         LoggingLevel.ERROR,
         f'Expected matrix to be 2D and square but got shape {shape}',

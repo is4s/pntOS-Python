@@ -1,3 +1,4 @@
+import contextlib
 import unittest
 from typing import List
 
@@ -598,10 +599,9 @@ class Test_SimpleControllerPlugin(unittest.TestCase):
         self.set_up_plugins()
         mediator = DummyMediator()
         self.controller.init_plugin(mediator=mediator)
-        try:
+        # Catch ExitThread exception thrown inside DummyUiPlugin.run_main_thread
+        with contextlib.suppress(ExitThread):
             self.controller.take_control(self.plugins_list)
-        except ExitThread:  # Thrown inside DummyUiPlugin.run_main_thread
-            pass
 
     def test_mediator_filter_description_list(self) -> None:
         expected_filter_description_list: list[str] = []

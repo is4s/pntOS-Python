@@ -129,7 +129,7 @@ def clang_parse_file(
     )
     for cursor in tu.cursor.get_children():
         if (
-            not cursor.kind == CursorKind.STRUCT_DECL
+            cursor.kind != CursorKind.STRUCT_DECL
             or cursor.displayname[0] == '_'
             or not cursor.is_definition()
         ):

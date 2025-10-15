@@ -136,16 +136,17 @@ class SimpleControllerPlugin(ControllerPlugin):
         ]
 
         # We need to make sure we got a valid plugin_resources_locations
-        if plugin_resources_locations is not None:
-            if len(plugin_resources_locations) != len(self._plugins):
-                self._log(
-                    LoggingLevel.ERROR,
-                    'Length of plugin_resources_location '
-                    + f'({len(plugin_resources_locations)}) does not equal the '
-                    + f'number of plugins ({len(self._plugins)}). Passing '
-                    + 'None to all plugins instead.',
-                )
-                plugin_resources_locations = None
+        if plugin_resources_locations is not None and len(
+            plugin_resources_locations
+        ) != len(self._plugins):
+            self._log(
+                LoggingLevel.ERROR,
+                'Length of plugin_resources_location '
+                + f'({len(plugin_resources_locations)}) does not equal the '
+                + f'number of plugins ({len(self._plugins)}). Passing '
+                + 'None to all plugins instead.',
+            )
+            plugin_resources_locations = None
 
         # Initialize registry plugin first thing
         reg_i = self._plugins.index(self._registry_plugin)
@@ -174,7 +175,7 @@ class SimpleControllerPlugin(ControllerPlugin):
 
         # call init_plugin() on all the other plugins
         for i, plugin in enumerate(self._plugins):
-            if i == reg_i or i == log_i:
+            if i in (reg_i, log_i):
                 continue
             plugin.init_plugin(
                 plugin_resources_location=None

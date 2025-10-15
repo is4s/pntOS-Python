@@ -113,7 +113,7 @@ class PreprocessorDownsampler(Preprocessor):
         chan_len = len(channels)
         fac_len = len(factors)
 
-        if not chan_len == fac_len:
+        if chan_len != fac_len:
             self.mediator.log_message(
                 LoggingLevel.WARN,
                 f'Channels to downsample has {chan_len} elements, '
@@ -147,7 +147,7 @@ class PreprocessorDownsampler(Preprocessor):
         count = self._update_counters[identifier]
         self._update_counters[identifier] = (count + 1) % factor
 
-        if not self._update_counters[identifier] == 0:
+        if self._update_counters[identifier] != 0:
             return None
 
         return [message]
