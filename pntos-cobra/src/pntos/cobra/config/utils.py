@@ -19,7 +19,7 @@ from .ImuConfig import ImuConfig
 
 ConfigType = TypeVar('ConfigType', bound=BaseConfig)
 SUPPORTED_TYPES = set(
-    get_args(RegistryValueTypeUnion) + (tuple[float, ...], Enum, EstimateWithCovariance)
+    (*get_args(RegistryValueTypeUnion), tuple[float, ...], Enum, EstimateWithCovariance)
 )
 
 

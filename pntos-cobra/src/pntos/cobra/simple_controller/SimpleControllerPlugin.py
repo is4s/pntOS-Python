@@ -1,4 +1,5 @@
 from threading import Event
+from typing import ClassVar
 
 from pntos.api import (
     CommonPlugin,
@@ -52,12 +53,6 @@ class SimpleControllerPlugin(ControllerPlugin):
     """
 
     _plugin_resources_location: str | None
-    _log_levels: dict[LoggingLevel, str] = {
-        LoggingLevel.DEBUG: 'DEBUG: ',
-        LoggingLevel.ERROR: 'ERROR: ',
-        LoggingLevel.INFO: 'INFO: ',
-        LoggingLevel.WARN: 'WARNING: ',
-    }
 
     def __init__(self, identifier: str) -> None:
         """
@@ -73,6 +68,13 @@ class SimpleControllerPlugin(ControllerPlugin):
         self._transport_plugins: list[TransportPlugin] = []
         self._ui_plugin: UiPlugin | None = None
         self._registry_plugin: RegistryPlugin | None = None
+
+        self._log_levels = {
+            LoggingLevel.DEBUG: 'DEBUG: ',
+            LoggingLevel.ERROR: 'ERROR: ',
+            LoggingLevel.INFO: 'INFO: ',
+            LoggingLevel.WARN: 'WARNING: ',
+        }
 
     def init_plugin(
         self,

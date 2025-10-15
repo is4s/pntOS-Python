@@ -26,8 +26,6 @@ class DiagnosticLogPlugin(UtilityPlugin):
     length must not change each update of the value at that key.
     """
 
-    _store: dict[str, list[RegistryValueTypeUnion]] = {}
-
     def __init__(self, identifier: str, output_file: str = './OUTPUT.hdf5') -> None:
         """
         Diagnostic-Logging Utility Plugin
@@ -38,6 +36,7 @@ class DiagnosticLogPlugin(UtilityPlugin):
         """
         self.identifier = identifier
         self._output_file = output_file
+        self._store: dict[str, list[RegistryValueTypeUnion]] = {}
 
     def init_plugin(
         self,

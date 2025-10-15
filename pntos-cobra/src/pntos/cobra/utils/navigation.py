@@ -256,8 +256,8 @@ ECC_SQUARE = F * (2 - F)
 
 class EarthModel:
     def __init__(self, pos: NDArray[float64], vel: NDArray[float64]) -> None:
-        lat, lon, alt_msl = pos
-        vn, ve, vd = vel
+        lat, _lon, alt_msl = pos
+        vn, ve, _vd = vel
 
         self.sin_l = sin(lat)
         self.cos_l = cos(lat)
@@ -292,24 +292,24 @@ class EarthModel:
 
 # Explicitly define exports so that we can exclude symbols imported by this file when doing `from navutils import *`.
 __all__ = [
-    'skew',
-    'meridian_radius',
-    'transverse_radius',
+    'ECC_SQUARE',
+    'OMEGA_E',
+    'RAD_E',
+    'EarthModel',
+    'F',
+    'calculate_gravity_schwartz',
+    'correct_dcm_with_tilt',
+    'dcm_to_quat',
+    'dcm_to_rpy',
     'delta_lat_to_north',
     'delta_lon_to_east',
-    'north_to_delta_lat',
     'east_to_delta_lon',
-    'EarthModel',
-    'quat_to_dcm',
-    'dcm_to_quat',
-    'llh_to_ecef',
     'ecef_to_llh',
     'llh_to_cen',
-    'RAD_E',
-    'OMEGA_E',
-    'F',
-    'ECC_SQUARE',
-    'correct_dcm_with_tilt',
-    'dcm_to_rpy',
-    'calculate_gravity_schwartz',
+    'llh_to_ecef',
+    'meridian_radius',
+    'north_to_delta_lat',
+    'quat_to_dcm',
+    'skew',
+    'transverse_radius',
 ]

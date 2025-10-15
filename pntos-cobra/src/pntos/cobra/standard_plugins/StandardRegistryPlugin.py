@@ -5,7 +5,7 @@ from copy import copy
 from typing import (
     Any,
     Callable,
-    Dict,
+    ClassVar,
     ItemsView,
     Iterator,
     KeysView,
@@ -502,7 +502,7 @@ class StandardRegistry(Registry):
     A registry that maps group names to objects storing all the key/values in that group.
     """
 
-    groups: Dict[str, StandardKeyValueStore]
+    groups: dict[str, StandardKeyValueStore]
     callbacks: list[Callable[[str], None]]
     _log: Callable[[LoggingLevel, str], None]
     _plugin_resources_location: str | None
@@ -560,12 +560,6 @@ class StandardRegistryPlugin(RegistryPlugin):
 
     config: list[BaseConfig]
     registries: list[StandardRegistry]
-    log_levels: Dict[LoggingLevel, str] = {
-        LoggingLevel.ERROR: 'ERROR',
-        LoggingLevel.WARN: 'WARN',
-        LoggingLevel.INFO: 'INFO',
-        LoggingLevel.DEBUG: 'DEBUG',
-    }
     _plugin_resources_location: str | None = None
     mediator: Mediator
 
@@ -581,6 +575,13 @@ class StandardRegistryPlugin(RegistryPlugin):
         self.identifier = identifier
         self.registries = []
         self.config = config if config is not None else []
+
+        self._log_levels = {
+            LoggingLevel.ERROR: 'ERROR',
+            LoggingLevel.WARN: 'WARN',
+            LoggingLevel.INFO: 'INFO',
+            LoggingLevel.DEBUG: 'DEBUG',
+        }
 
     def init_plugin(
         self,
@@ -640,4 +641,4 @@ class StandardRegistryPlugin(RegistryPlugin):
         if self.mediator is not None:
             self.mediator.log_message(level, message)
         else:
-            print(f'[RegistryPlugin] {self.log_levels[level]} {message}.')  # type: ignore[unreachable]
+            print(f'[RegistryPlugin] {self._log_levels[level]} {message}.')  # type: ignore[unreachable]
