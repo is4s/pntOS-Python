@@ -1,4 +1,4 @@
-from typing import Callable
+from typing import Callable, ClassVar
 
 from aspn23 import AspnBase
 from pntos.api import MessageStreamConfig
@@ -13,8 +13,8 @@ class SimpleMessageStreamConfig(MessageStreamConfig):
     """
 
     # _message_lookup[type(AspnMessage)][source_identifier] -> is_sequenced?
-    _override_to_immediate: set[type[AspnBase]] = set([])
-    _override_to_sequenced: set[type[AspnBase]] = set([])
+    _override_to_immediate: ClassVar[set[type[AspnBase]]] = set([])
+    _override_to_sequenced: ClassVar[set[type[AspnBase]]] = set([])
     _default_is_sequenced: bool = False  # True -> sequenced, False -> immediate
 
     def __init__(self) -> None:
@@ -51,8 +51,8 @@ class SimpleMessageStreamConfig(MessageStreamConfig):
 
     def sequenced_stream_all(self, enable: bool) -> None:
         # TODO: Implement `enable` parameter - currently ambiguous (#66)
-        self._override_to_sequenced = set([])
-        self._override_to_immediate = set([])
+        SimpleMessageStreamConfig._override_to_sequenced = set([])
+        SimpleMessageStreamConfig._override_to_immediate = set([])
         self._default_is_sequenced = True
 
     def immediate_stream_add(
@@ -74,8 +74,8 @@ class SimpleMessageStreamConfig(MessageStreamConfig):
 
     def immediate_stream_all(self, enable: bool) -> None:
         # TODO: Implement `enable` parameter - currently ambiguous (#66)
-        self._override_to_sequenced = set([])
-        self._override_to_immediate = set([])
+        SimpleMessageStreamConfig._override_to_sequenced = set([])
+        SimpleMessageStreamConfig._override_to_immediate = set([])
         self._default_is_sequenced = False
 
     def _is_sequenced(

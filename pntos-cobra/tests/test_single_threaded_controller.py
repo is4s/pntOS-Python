@@ -302,9 +302,10 @@ class DummyStateModelingPlugin(StateModelingPlugin):
 
 
 class DummyStandardStateModelProvider(StandardStateModelProvider):
-    processor_identifiers = []
-    block_identifiers = []
-    virtual_block_identifiers = []
+    def __init__(self) -> None:
+        self.processor_identifiers = []
+        self.block_identifiers = []
+        self.virtual_block_identifiers = []
 
     def new_processor(
         self,

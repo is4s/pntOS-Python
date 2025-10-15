@@ -1,5 +1,6 @@
 import bisect
 from threading import Event
+from typing import ClassVar
 
 from aspn23 import TypeTimestamp
 from pntos.api import (
@@ -30,21 +31,15 @@ class SimpleMediator(Mediator):
     """
 
     _logging_plugin: LoggingPlugin | None = None
-    _transport_plugins: list[TransportPlugin] = []
+    _transport_plugins: ClassVar[list[TransportPlugin]] = []
     _orchestration_plugin: OrchestrationPlugin | None = None
     _controller_plugin: ControllerPlugin | None = None
     _stream_config: SimpleMessageStreamConfig
     _logging_error_event: Event = Event()
     registry: Registry
-    _messages: list[Message] = []
+    _messages: ClassVar[list[Message]] = []
     _buffer_time_nsec: int = 2_000_000_000
     _last_solution_time: TypeTimestamp | None
-    _log_levels: dict[LoggingLevel, str] = {
-        LoggingLevel.DEBUG: 'DEBUG: ',
-        LoggingLevel.ERROR: 'ERROR: ',
-        LoggingLevel.INFO: 'INFO: ',
-        LoggingLevel.WARN: 'WARNING: ',
-    }
 
     def __init__(
         self,
@@ -63,6 +58,13 @@ class SimpleMediator(Mediator):
         self._attached_plugin_type: PluginType = attached_plugin_type
         self._attached_plugin_identifier: str = attached_plugin_identifier
         self._last_solution_time = None
+
+        self._log_levels = {
+            LoggingLevel.DEBUG: 'DEBUG: ',
+            LoggingLevel.ERROR: 'ERROR: ',
+            LoggingLevel.INFO: 'INFO: ',
+            LoggingLevel.WARN: 'WARNING: ',
+        }
 
     @property
     def filter_description_list(self) -> list[str]:
@@ -100,7 +102,7 @@ class SimpleMediator(Mediator):
         )
         for m in self._messages[:process_until_index]:
             self._orchestration_plugin.process_pntos_message(m, True)
-        self._messages = self._messages[process_until_index:]
+        SimpleMediator._messages = self._messages[process_until_index:]
 
         # Need to make sure the orchestration has received some messages before we
         # start requesting solutions.

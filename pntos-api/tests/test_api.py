@@ -238,13 +238,14 @@ class MockPlatformIntegrationPlugin(api.PlatformIntegrationPlugin):
 class MockPreprocessorPlugin(api.PreprocessorPlugin):
     identifier = ''
 
+    def __init__(self) -> None:
+        self.preprocessor_identifiers = ['']
+
     def init_plugin(self, plugin_resources_location=None, mediator=None):  # type: ignore
         return
 
     def shutdown_plugin(self):  # type: ignore
         return
-
-    preprocessor_identifiers = ['']
 
     def new_preprocessor(self, preprocessor_index, config_group=None):  # type: ignore
         return None
