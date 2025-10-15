@@ -385,7 +385,7 @@ def marshal_to_aspn2_lcm(msg: aspn23.AspnBase) -> Aspn2LcmMeasurement | None:
     marshal_func = marshaler_to_aspn2_lcm[msg_type]  # type: ignore[index]
     try:
         return marshal_func(msg)
-    except Exception as e:
+    except KeyError as e:
         print(e)
         return None
 

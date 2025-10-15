@@ -21,7 +21,7 @@ class StateBlockConfig(BaseConfig):
     identifier: str
     """
     An identifier that determines the type of state block to use.
-    
+
     This field will be matched against the `block_identifiers` field on the state model provider.
     """
 

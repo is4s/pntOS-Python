@@ -128,7 +128,7 @@ def test_diagnostic_log_plugin() -> None:
         # Make sure there is a corresponding value in our test dictionary
         assert key in test_dict
         test_val = test_dict[key]
-        assert type(received_val) == type(test_val)
+        assert type(received_val) is type(test_val)
 
         # Make sure values are the same
         if isinstance(received_val, np.ndarray):

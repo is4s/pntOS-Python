@@ -80,7 +80,7 @@ def dummy_log(level: LoggingLevel, message: str) -> None:
     global DUMMY_LOG_OUT, ERROR_DETECTED
     DUMMY_LOG_OUT = message
     if level == LoggingLevel.ERROR and message != EXPECTED_LOG_OUTPUT:
-        assert ERROR_DETECTED == True, DUMMY_LOG_OUT
+        assert ERROR_DETECTED, DUMMY_LOG_OUT
 
 
 class DummyMediator(Mediator):
@@ -262,8 +262,8 @@ class TestRegistry(unittest.TestCase):
                 if not expected_attr.startswith('__'):  # Don't check dunders
                     exp_val = getattr(expected, expected_attr)
                     col_val = getattr(collected, collected_attr)
-                    assert type(exp_val) == type(col_val)
-                    if type(exp_val) == np.ndarray:
+                    assert type(exp_val) is type(col_val)
+                    if type(exp_val) is np.ndarray:
                         assert np.all(exp_val == col_val)
                     else:
                         assert exp_val == col_val
@@ -383,9 +383,9 @@ class TestRegistry(unittest.TestCase):
         out_1 = kv.get_value('array1', np.ndarray)
         out_2 = kv.get_value('array2', np.ndarray)
         out_3 = kv.get_value('array3', np.ndarray)
-        assert type(out_1) == np.ndarray, 'Did not receive a np array back.'
-        assert type(out_2) == np.ndarray, 'Did not receive a np array back.'
-        assert type(out_3) == np.ndarray, 'Did not receive a np array back.'
+        assert type(out_1) is np.ndarray, 'Did not receive a np array back.'
+        assert type(out_2) is np.ndarray, 'Did not receive a np array back.'
+        assert type(out_3) is np.ndarray, 'Did not receive a np array back.'
         assert (out_1 == test_array_1).all(), 'One-dimensional numpy array failed.'
         assert (out_2 == test_array_2).all(), 'Two-dimensional numpy array failed.'
         assert (out_3 == test_array_3).all(), 'Three-dimensional numpy array failed.'
@@ -432,8 +432,8 @@ class TestRegistry(unittest.TestCase):
 
         kv.batch_restart()
         thing = kv.get_value('message', str)
-        assert kv.get_value('message', str) == None, m_message
-        assert kv.get_value('message', int) == None, m_message
+        assert kv.get_value('message', str) is None, m_message
+        assert kv.get_value('message', int) is None, m_message
         assert kv.get_value('message', Message) == self.test_message, m_message
 
     def test_raw_string(self) -> None:
@@ -809,7 +809,7 @@ class TestRegistry(unittest.TestCase):
         # Test items which should return tuple (key, value) pairs
         for i, (key, val) in enumerate(test_kv.items()):
             assert key == self.test_keys[i], 'items() key ' + self.test_err[i]
-            if type(val) == np.ndarray:
+            if type(val) is np.ndarray:
                 assert np.all(val == self.test_vals[i]), (
                     'items() value ' + self.test_err[i]
                 )
@@ -821,7 +821,7 @@ class TestRegistry(unittest.TestCase):
 
         # Test values, which should return an iterable of the values
         for i, val in enumerate(test_kv.values()):
-            if type(val) == np.ndarray:
+            if type(val) is np.ndarray:
                 assert np.all(val == self.test_vals[i]), (
                     'items() value ' + self.test_err[i]
                 )
