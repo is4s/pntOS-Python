@@ -18,9 +18,12 @@ from .BaseConfig import BaseConfig
 from .ImuConfig import ImuConfig
 
 ConfigType = TypeVar('ConfigType', bound=BaseConfig)
-SUPPORTED_TYPES = set(
-    (*get_args(RegistryValueTypeUnion), tuple[float, ...], Enum, EstimateWithCovariance)
-)
+SUPPORTED_TYPES = {
+    *get_args(RegistryValueTypeUnion),
+    tuple[float, ...],
+    Enum,
+    EstimateWithCovariance,
+}
 
 
 def imu_model_to_config(model: ImuModel, group: str) -> ImuConfig:
