@@ -908,9 +908,9 @@ def test_copy_block(pinson_block: Pinson15NedBlock) -> None:
     )
     # modify new block and re-compare with original block
     new_pinson_block._imu_model.accel_bias_sigma = (1.0, 2.0, 3.0)
-    assert not (
+    assert (
         new_pinson_block._imu_model.accel_bias_sigma
-        == pinson_block._imu_model.accel_bias_sigma
+        != pinson_block._imu_model.accel_bias_sigma
     )
 
 
@@ -930,4 +930,4 @@ def test_copy_proc(
         assert new_position_mp._inertial_pva.p1 == m[0]._inertial_pva.p1
         # modify new MP and re-compare with original MP
         new_position_mp._inertial_pva.p1 = 3
-        assert not (new_position_mp._inertial_pva.p1 == m[0]._inertial_pva.p1)
+        assert new_position_mp._inertial_pva.p1 != m[0]._inertial_pva.p1

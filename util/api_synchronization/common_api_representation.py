@@ -226,16 +226,15 @@ class CtoPyApiComparator:
                 )
             else:
                 converted_type += type_piece
-                if type_piece.startswith('list'):
-                    if (index + 1) == length:
-                        converted_type += ']'
-                    elif not type_list[index + 1] == '_Nullable**':
-                        converted_type += ']'
+                if (
+                    type_piece.startswith('list') and (index + 1) == length
+                ) or type_list[index + 1] != '_Nullable**':
+                    converted_type += ']'
         return converted_type
 
     def _compare_classname(self, c_class: ApiClass, py_class: ApiClass):
         temp = c_class.name.removeprefix('Pntos')
-        if not temp == py_class.name:
+        if temp != py_class.name:
             print(
                 f'WARNING: The C struct name {c_class.name} does not match the Python class name '
                 f'{py_class.name} after removing the "Pntos" prefix. Comparison will continue, '

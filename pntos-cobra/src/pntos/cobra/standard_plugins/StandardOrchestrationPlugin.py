@@ -399,14 +399,17 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
         num_states: int,
         ewc: EstimateWithCovariance | None = None,
     ) -> EstimateWithCovariance | None:
-        if state_block_id == 'pinson15':
-            # use alignment for pinson if manual is not provided
-            if ewc is None and self.init_pinson_cov is not None:
-                return EstimateWithCovariance(
-                    EstimateWithCovarianceType.EWC_GENERIC,
-                    estimate=np.zeros((num_states, 1)),
-                    covariance=self.init_pinson_cov,
-                )
+        # use alignment for pinson if manual is not provided
+        if (
+            state_block_id == 'pinson15'
+            and ewc is None
+            and self.init_pinson_cov is not None
+        ):
+            return EstimateWithCovariance(
+                EstimateWithCovarianceType.EWC_GENERIC,
+                estimate=np.zeros((num_states, 1)),
+                covariance=self.init_pinson_cov,
+            )
         if ewc is not None:
             # manual EWC config was provided
             return validate_manual_ewc(ewc, num_states, self.mediator)

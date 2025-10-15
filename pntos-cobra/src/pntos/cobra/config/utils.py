@@ -176,10 +176,9 @@ def config_from_registry(
                         # Convert to list of ints
                         val = val.astype(int)
                     val = list(val)
-                elif p_type is np.ndarray:
-                    if np.dtype[np.int_] in param.type.__args__:  # type: ignore[union-attr]
-                        # Convert to np array of ints
-                        val = val.astype(int)
+                elif p_type is np.ndarray and np.dtype[np.int_] in param.type.__args__:  # type: ignore[union-attr]
+                    # Convert to np array of ints
+                    val = val.astype(int)
         # Special case: enum. Convert integer back to enum type.
         elif isclass(param.type) and issubclass(param.type, Enum):
             val = param.type(val)
@@ -239,7 +238,7 @@ def config_to_registry(config: BaseConfig, mediator: Mediator) -> None:
             return None
         if isinstance(val_to_store, tuple):
             val_to_store = np.array(val_to_store, dtype=np.float64)
-        elif isinstance(val_to_store, list) or isinstance(val_to_store, np.ndarray):
+        elif isinstance(val_to_store, (list, np.ndarray)):
             if len(val_to_store) > 0:
                 if isinstance(val_to_store[0], (int, float, np.int_)):
                     val_to_store = np.array(val_to_store, dtype=float)
@@ -294,10 +293,7 @@ def _confirm_types(out_val: Any, expected_type: type[Any]) -> bool:
                 return out_type is get_origin(t)
             if out_type is t:
                 valid_type = True
-        if valid_type:
-            return True
-        else:
-            return False
+        return bool(valid_type)
 
     # Check if expected_type is generic alias (list[str], tuple[float], etc...)
     if hasattr(expected_type, '__origin__'):
@@ -320,10 +316,7 @@ def _is_type_optional(field_type: type[Any] | str) -> bool:
     if isinstance(field_type, type):
         return False
     types = get_args(field_type)
-    for t in types:
-        if t is type(None):
-            return True
-    return False
+    return any(t is type(None) for t in types)
 
 
 def _is_type_supported(field_type: type[Any]) -> bool:

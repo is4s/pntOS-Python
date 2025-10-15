@@ -17,6 +17,8 @@ except ImportError as e:
         'the documentation.'
     ) from e
 
+import contextlib
+
 from rclpy.executors import (  # type: ignore[import-not-found]
     ExternalShutdownException,
     SingleThreadedExecutor,
@@ -62,10 +64,8 @@ class Aspn23RosTransportPlugin(TransportPlugin):
         self.executor.add_node(self.aspn_ros_node)
 
         def execute() -> None:
-            try:
+            with contextlib.suppress(ExternalShutdownException):
                 self.executor.spin()
-            except ExternalShutdownException:
-                pass
 
         self.thread = Thread(target=execute)
 

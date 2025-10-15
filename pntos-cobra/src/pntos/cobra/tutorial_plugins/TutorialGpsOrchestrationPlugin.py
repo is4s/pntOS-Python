@@ -260,35 +260,35 @@ class TutorialGpsOrchestrationPlugin(OrchestrationPlugin):
             provider: StandardStateModelProvider | None = (
                 plugin.new_state_model_provider(StandardStateModelProvider)
             )
-            if provider is not None:
-                if (
-                    provider.block_identifiers is not None
-                    and provider.processor_identifiers is not None
-                ):
-                    if STATE_BLOCK_ID in provider.block_identifiers:
-                        pinson_block = provider.new_block(
-                            provider.block_identifiers.index(STATE_BLOCK_ID),
-                            fusion_engine,
-                            STATE_BLOCK_LABEL,
-                            STATE_BLOCK_CONFIG_GROUP,
-                        )
-                    if FOGM_STATE_BLOCK_ID in provider.block_identifiers:
-                        fogm_block = provider.new_block(
-                            provider.block_identifiers.index(FOGM_STATE_BLOCK_ID),
-                            fusion_engine,
-                            FOGM_STATE_BLOCK_LABEL,
-                            FOGM_STATE_BLOCK_CONFIG_GROUP,
-                        )
-                    if GPS_MEASUREMENT_PROCESSOR_ID in provider.processor_identifiers:
-                        gps_processor = provider.new_processor(
-                            provider.processor_identifiers.index(
-                                GPS_MEASUREMENT_PROCESSOR_ID
-                            ),
-                            fusion_engine,
-                            GPS_MEASUREMENT_PROCESSOR_LABEL,
-                            GPS_MP_STATE_BLOCK_LABELS,
-                            GPS_MEASUREMENT_PROCESSOR_CONFIG_GROUP,
-                        )
+            if (
+                provider is None
+                or provider.block_identifiers is None
+                or provider.processor_identifiers is None
+            ):
+                continue
+
+            if STATE_BLOCK_ID in provider.block_identifiers:
+                pinson_block = provider.new_block(
+                    provider.block_identifiers.index(STATE_BLOCK_ID),
+                    fusion_engine,
+                    STATE_BLOCK_LABEL,
+                    STATE_BLOCK_CONFIG_GROUP,
+                )
+            if FOGM_STATE_BLOCK_ID in provider.block_identifiers:
+                fogm_block = provider.new_block(
+                    provider.block_identifiers.index(FOGM_STATE_BLOCK_ID),
+                    fusion_engine,
+                    FOGM_STATE_BLOCK_LABEL,
+                    FOGM_STATE_BLOCK_CONFIG_GROUP,
+                )
+            if GPS_MEASUREMENT_PROCESSOR_ID in provider.processor_identifiers:
+                gps_processor = provider.new_processor(
+                    provider.processor_identifiers.index(GPS_MEASUREMENT_PROCESSOR_ID),
+                    fusion_engine,
+                    GPS_MEASUREMENT_PROCESSOR_LABEL,
+                    GPS_MP_STATE_BLOCK_LABELS,
+                    GPS_MEASUREMENT_PROCESSOR_CONFIG_GROUP,
+                )
 
         # Make state blocks
         if pinson_block is None:

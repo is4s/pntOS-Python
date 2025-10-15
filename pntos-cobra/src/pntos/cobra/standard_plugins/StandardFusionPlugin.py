@@ -152,7 +152,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
             for j in range(len(cross_covariances.block_labels)):
                 cc_sb_label = cross_covariances.block_labels[j]
 
-                if cc_sb_label in self._sb.keys():
+                if cc_sb_label in self._sb:
                     # Get stateblock descriptor for cross covariance stateblock
                     cross_sb = self._sb[cc_sb_label]
 
@@ -192,7 +192,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
 
     def get_state_block_estimate(self, block_label: str) -> NDArray[float64] | None:
         assert self._strategy is not None, 'FusionStrategy has not been set'
-        if not block_label in self._sb.keys():
+        if not block_label in self._sb:
             return None
 
         # Get the full state vector and extract the part needed
@@ -209,7 +209,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
 
     def get_state_block_covariance(self, block_label: str) -> NDArray[float64] | None:
         assert self._strategy is not None, 'FusionStrategy has not been set'
-        if block_label not in self._sb.keys():
+        if block_label not in self._sb:
             return None
 
         # Get the full state vector and extract the part needed
@@ -230,7 +230,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
         self, block_label1: str, block_label2: str
     ) -> NDArray[float64] | None:
         assert self._strategy is not None, 'FusionStrategy has not been set'
-        if not (block_label1 in self._sb.keys() and block_label2 in self._sb.keys()):
+        if not (block_label1 in self._sb and block_label2 in self._sb):
             return None
 
         # Get the full state vector and extract the part needed
@@ -253,7 +253,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
         assert self._strategy is not None, 'FusionStrategy has not been set'
         validate_array(estimate, self._mediator, dims=2, cols=1)
 
-        if block_label not in self._sb.keys():
+        if block_label not in self._sb:
             self._mediator.log_message(
                 LoggingLevel.WARN,
                 f'block label ({block_label}) requested in \
@@ -280,7 +280,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
         self, block_label: str, covariance: NDArray[float64]
     ) -> None:
         assert self._strategy is not None, 'FusionStrategy has not been set'
-        if block_label not in self._sb.keys():
+        if block_label not in self._sb:
             self._mediator.log_message(
                 LoggingLevel.WARN,
                 f'block label ({block_label}) requested in \
@@ -309,7 +309,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
         self, block_label1: str, block_label2: str, covariance: NDArray[float64]
     ) -> None:
         assert self._strategy is not None, 'FusionStrategy has not been set'
-        if block_label1 not in self._sb.keys():
+        if block_label1 not in self._sb:
             self._mediator.log_message(
                 LoggingLevel.WARN,
                 f'block_label1 ({block_label1}) requested in \
@@ -320,7 +320,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
             # Get the desired stateblock descriptor
             sb1 = self._sb[block_label1]
 
-        if block_label2 not in self._sb.keys():
+        if block_label2 not in self._sb:
             self._mediator.log_message(
                 LoggingLevel.WARN,
                 f'block_label2 ({block_label2}) requested in \
@@ -351,7 +351,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
 
     def remove_state_block(self, block_label: str) -> None:
         assert self._strategy is not None, 'FusionStrategy has not been set'
-        if block_label not in self._sb.keys():
+        if block_label not in self._sb:
             self._mediator.log_message(
                 LoggingLevel.WARN,
                 f'Stateblock to be removed ({block_label}) does not exist.  No action taken.',
@@ -395,7 +395,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
     def add_measurement_processor(
         self, processor: StandardMeasurementProcessor
     ) -> None:
-        if processor.label in self._mp.keys():
+        if processor.label in self._mp:
             self._mediator.log_message(
                 LoggingLevel.WARN,
                 f'Stateblock to be added ({processor.label}) already exists.  No action taken.',
@@ -405,7 +405,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
         self._mp[processor.label] = processor
 
     def remove_measurement_processor(self, processor_label: str) -> None:
-        if processor_label not in self._mp.keys():
+        if processor_label not in self._mp:
             self._mediator.log_message(
                 LoggingLevel.WARN,
                 f'Measurement processor to be removed ({processor_label}) \
@@ -495,7 +495,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
     def update(self, processor_label: str, message: Message) -> None:
         assert self._strategy is not None, 'FusionStrategy has not been set'
         # Verify processor exists
-        if processor_label not in self._mp.keys():
+        if processor_label not in self._mp:
             self._mediator.log_message(
                 LoggingLevel.ERROR,
                 f'Attempted process measurement, but measurement processor \
@@ -593,7 +593,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
         # Verify that all of the block labels correspond to a state block that has been
         # added to the fusion engine
         for label in block_labels:
-            if label not in self._sb.keys():
+            if label not in self._sb:
                 self._mediator.log_message(
                     LoggingLevel.WARN,
                     f'In peek_ahead(), the state block label "{label}" does not match any \
@@ -624,7 +624,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
         # Verify that all of the block labels correspond to a state block that has been
         # added to the fusion engine
         for label in block_labels:
-            if label not in self._sb.keys():
+            if label not in self._sb:
                 self._mediator.log_message(
                     LoggingLevel.WARN,
                     f'In generate_x_and_p(), the state block label "{label}" does not match any \
@@ -658,7 +658,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
         )
 
     def give_state_block_aux_data(self, block_label: str, aux: list[Message]) -> None:
-        if block_label not in self._sb.keys():
+        if block_label not in self._sb:
             self._mediator.log_message(
                 LoggingLevel.WARN,
                 f'State block ({block_label}) identified in give_state_block_aux_data() \
@@ -671,7 +671,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
     def give_measurement_processor_aux_data(
         self, processor_label: str, aux: list[Message]
     ) -> None:
-        if processor_label not in self._mp.keys():
+        if processor_label not in self._mp:
             self._mediator.log_message(
                 LoggingLevel.WARN,
                 f'State block ({processor_label}) identified in \
