@@ -632,7 +632,7 @@ class Test_Orchestration(unittest.TestCase):
         ]
         expected_solutions = [self.expected_pva_best, self.expected_pva_dead_reckoning]
         assert descriptions == expected_descriptions
-        for expected, description in zip(expected_solutions, descriptions):
+        for expected, description in zip(expected_solutions, descriptions, strict=True):
             solutions = self.orchestration_plugin.request_solutions(
                 solution_times, description
             )
@@ -650,7 +650,7 @@ class Test_Orchestration(unittest.TestCase):
         ]
         expected_solutions = [self.expected_pva_best, self.expected_pva_dead_reckoning]
         assert descriptions == expected_descriptions
-        for expected, description in zip(expected_solutions, descriptions):
+        for expected, description in zip(expected_solutions, descriptions, strict=True):
             solutions = self.orchestration_plugin.request_solutions(
                 solution_times, description
             )
@@ -728,7 +728,10 @@ class Test_Orchestration(unittest.TestCase):
                     self.generate_position(time), False
                 )
 
-        self.orchestration_plugin.initializer.request_current_status() == InitializationStatus.INITIALIZED_GOOD
+        assert (
+            self.orchestration_plugin.initializer.request_current_status()
+            == InitializationStatus.INITIALIZED_GOOD
+        )
 
 
 def suite() -> unittest.TestSuite:

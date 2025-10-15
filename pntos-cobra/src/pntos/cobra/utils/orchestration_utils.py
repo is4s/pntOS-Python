@@ -51,7 +51,9 @@ def set_up_preprocessors(
         list[Preprocessor]
     """
     preprocessors = []
-    for identifier, config_group in zip(preprocessor_ids, preprocessor_groups):
+    for identifier, config_group in zip(
+        preprocessor_ids, preprocessor_groups, strict=True
+    ):
         for plugin in sorted_plugins.preprocessor_plugins:
             for idx in range(len(plugin.preprocessor_identifiers)):
                 if plugin.preprocessor_identifiers[idx] == identifier:

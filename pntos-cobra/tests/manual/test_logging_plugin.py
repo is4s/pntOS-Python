@@ -183,7 +183,7 @@ def test(capsys: Any) -> None:
     set_expected_str(ll.ERROR, error_str)
     set_expected_str(ll.DEBUG, info_str + debug_str + warn_str + error_str)
 
-    capsys.readouterr().out  # clear any previous output
+    capsys.readouterr()  # clear any previous output
 
     ### Test all colorized and non-colorized logging levels
 

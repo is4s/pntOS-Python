@@ -409,7 +409,7 @@ class TestConfigUtils(unittest.TestCase):
         test_fields = fields(test_conf)
         result_fields = fields(result_conf)
         assert test_fields == result_fields
-        for test_field, result_field in zip(test_fields, result_fields):
+        for test_field, result_field in zip(test_fields, result_fields, strict=True):
             assert test_field.name == result_field.name
             test_val = getattr(test_conf, test_field.name)
             result_val = getattr(result_conf, result_field.name)

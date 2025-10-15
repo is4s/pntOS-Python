@@ -249,14 +249,16 @@ class TestRegistry(unittest.TestCase):
     def test_initial_config(self) -> None:
         global EXPECTED_LOG_OUTPUT
         EXPECTED_LOG_OUTPUT = ''
-        registry = StandardRegistryPlugin('Standard registry', config=my_config)
-        registry.init_plugin(mediator=DummyMediator())
-        reg = registry.new_registry(None)
+        registry_plugin = StandardRegistryPlugin('Standard registry', config=my_config)
+        registry_plugin.init_plugin(mediator=DummyMediator())
+        DummyMediator.registry = registry_plugin.new_registry(None)
         for expected in my_config:
             collected = config_from_registry(
-                type(expected), registry.mediator, self.test_group
+                type(expected), registry_plugin.mediator, expected.group
             )
-            for expected_attr, collected_attr in zip(dir(expected), dir(collected)):
+            for expected_attr, collected_attr in zip(
+                dir(expected), dir(collected), strict=True
+            ):
                 if not expected_attr.startswith('__'):  # Don't check dunders
                     exp_val = getattr(expected, expected_attr)
                     col_val = getattr(collected, collected_attr)
@@ -797,7 +799,7 @@ class TestRegistry(unittest.TestCase):
         test_kv = self.set_up_store_with_all_types()
 
         # Test __delitem__
-        for i, key in enumerate(self.test_keys):
+        for _i, key in enumerate(self.test_keys):
             del test_kv[key]
             assert key not in test_kv
 
