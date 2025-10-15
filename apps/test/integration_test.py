@@ -78,8 +78,8 @@ def validate_results(
     assert not np.isnan(pva.tilt_sig).any()
 
     # ensure solution starts and ends within 3 seconds of truth start and end
-    assert abs(filter_time[0] - truth_time[0]) < 3
-    assert abs(filter_time[-1] - truth_time[-1]) < 3
+    assert abs(filter_time[0] - truth_time[0]) < 3  # noqa: PLR2004
+    assert abs(filter_time[-1] - truth_time[-1]) < 3  # noqa: PLR2004
 
     # Rotate INS-D rpy since there's a bug in the smartcable (TODO: #236)
     truth.rpy = np.column_stack([truth.rpy[:, 1], truth.rpy[:, 0], -truth.rpy[:, 2]])
@@ -217,7 +217,7 @@ def test_standard_gps_bodyvel_ins_app() -> None:
 
 
 def test_advanced_gps_ins_ros_app() -> None:
-    import pytest
+    import pytest  # noqa: PLC0415
 
     # Only run this test if ros is installed
     pytest.importorskip('rosbag2_py')

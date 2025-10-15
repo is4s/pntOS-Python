@@ -390,12 +390,11 @@ class StandardKeyValueStore(KeyValueStore):
                     else:
                         keys_per_callback[callback] = [k]
 
-        for callback in keys_per_callback:
-            callback(self._group, keys_per_callback[callback], self)
+        for callback, keys in keys_per_callback.items():
+            callback(self._group, keys, self)
 
         self._modified_keys = set()
         self._batch_live = False
-        return
 
     def batch_restart(self) -> None:
         if self._batch_live:

@@ -68,7 +68,7 @@ def imu_model_from_config(config: ImuConfig) -> ImuModel:
     )
 
 
-def config_from_registry(
+def config_from_registry(  # noqa: PLR0915
     config_type: type[ConfigType], mediator: Mediator, config_group: str
 ) -> ConfigType | None:
     """

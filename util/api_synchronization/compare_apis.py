@@ -3,6 +3,7 @@
 
 import argparse as ap
 import os
+import sys
 import tempfile
 
 from common_api_representation import CtoPyApiComparator
@@ -68,7 +69,7 @@ def main(file_name: str, revision: str) -> None:
         print(f'FAILURE: Unexpected issues were encountered in {bad_mods}')
     else:
         print('SUCCESS: No unexpected issues were encountered.')
-    exit(exit_val)
+    sys.exit(exit_val)
 
 
 if __name__ == '__main__':

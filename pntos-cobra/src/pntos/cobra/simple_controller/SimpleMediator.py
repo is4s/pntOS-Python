@@ -1,4 +1,5 @@
 import bisect
+import sys
 from threading import Event
 from typing import ClassVar
 
@@ -16,6 +17,8 @@ from pntos.api import (
 )
 
 from .SimpleMessageStreamConfig import SimpleMessageStreamConfig
+
+SEC_NS = 1_000_000_000
 
 
 def _get_time(msg: Message) -> int:
@@ -111,10 +114,7 @@ class SimpleMediator(Mediator):
             return
 
         # Print the current solution every second in message time
-        if (
-            cur_time.elapsed_nsec - self._last_solution_time.elapsed_nsec
-            > 1_000_000_000
-        ):
+        if cur_time.elapsed_nsec - self._last_solution_time.elapsed_nsec > SEC_NS:
             solution = self.request_solutions([cur_time])
             if solution is not None:
                 self.log_message(LoggingLevel.DEBUG, f'Got a solution! {solution}')
@@ -164,4 +164,4 @@ class SimpleMediator(Mediator):
         # This implementation shuts down pntos if an error is detected.
         if level is LoggingLevel.ERROR and self._controller_plugin is not None:
             self._logging_error_event.set()
-            exit(1)
+            sys.exit(1)

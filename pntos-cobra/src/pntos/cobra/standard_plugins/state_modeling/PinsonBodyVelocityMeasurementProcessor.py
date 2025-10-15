@@ -26,6 +26,8 @@ from pntos.cobra.utils import (
     transverse_radius,
 )
 
+NUM_PINSON_STATES = 15
+
 
 class PinsonBodyVelocityMeasurementProcessor(StandardMeasurementProcessor):
     """
@@ -76,14 +78,14 @@ class PinsonBodyVelocityMeasurementProcessor(StandardMeasurementProcessor):
             )
             return
 
-        if len(aux) < 2:
+        if len(aux) < 2:  # noqa: PLR2004
             self._mediator.log_message(
                 LoggingLevel.ERROR,
                 f'PinsonBodyVelocityMeasurementProcessor expected two aux messages: MeasurementPositionVelocityAttitude and MeasurementImu, but received {len(aux)} aux messages.',
             )
             return
 
-        if len(aux) > 2:
+        if len(aux) > 2:  # noqa: PLR2004
             self._mediator.log_message(
                 LoggingLevel.DEBUG,
                 f'PinsonBodyVelocityMeasurementProcessor expected two aux messages: MeasurementPositionVelocityAttitude and MeasurementImu, but received {len(aux)} aux messages. Ignoring all except the first two messages.',
@@ -136,7 +138,7 @@ class PinsonBodyVelocityMeasurementProcessor(StandardMeasurementProcessor):
             return None
 
         pva_aux_time = self._inertial_pva.time_of_validity
-        if abs(pva_aux_time.elapsed_nsec - time.elapsed_nsec) > 1000:
+        if pva_aux_time.elapsed_nsec != time.elapsed_nsec:
             self._mediator.log_message(
                 LoggingLevel.ERROR,
                 f'PinsonBodyVelocityMeasurementProcessor cannot process message at time {time.elapsed_nsec / 1e9:.9f}s as inertial PVA aux data is at a different time (t={pva_aux_time.elapsed_nsec / 1e9:.9f}s).',
@@ -195,7 +197,7 @@ class PinsonBodyVelocityMeasurementProcessor(StandardMeasurementProcessor):
             )
 
             # Get gyro bias from state vector otherwise set to zeros
-            gyro_bias = x[12:15, 0] if num_states >= 15 else np.zeros(3)
+            gyro_bias = x[12:15, 0] if num_states >= NUM_PINSON_STATES else np.zeros(3)
 
             if np.any(z):
                 tan_vel_sensor = self._calc_tan_vel(

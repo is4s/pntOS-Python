@@ -13,7 +13,7 @@ from pntos.cobra.utils import plot_pva
 def harvest_data(logfile: str, channels: list[str]) -> LogData[PvaData]:
     # ROS bagfile
     if logfile.endswith('.db3') or logfile.endswith('.mcap'):
-        from analysis.ros import RosBagReader
+        from analysis.ros import RosBagReader  # noqa: PLC0415
 
         return RosBagReader(logfile).harvest_topics(channels)
 

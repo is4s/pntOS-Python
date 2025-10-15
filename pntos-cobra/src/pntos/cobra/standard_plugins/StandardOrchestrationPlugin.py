@@ -431,8 +431,8 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
                 return None
             tmp_list = out_list.copy()
             out_list = []
-            for message in tmp_list:
-                new_messages = preprocessor.process_pntos_message(message)
+            for out_message in tmp_list:
+                new_messages = preprocessor.process_pntos_message(out_message)
                 if new_messages is not None:
                     out_list.extend(new_messages)
 
@@ -475,11 +475,11 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
             # Message dropped in preprocessing
             return
 
-        for message in preprocessed_messages:
+        for preprocessed_message in preprocessed_messages:
             # If filter solution is not initialized, send messages to the initializer.
             if not initialization_ready(self.initialization_state, self.initializer):
-                if message.source_identifier in self.alignment_channels:
-                    self.initializer.process_pntos_message(message)
+                if preprocessed_message.source_identifier in self.alignment_channels:
+                    self.initializer.process_pntos_message(preprocessed_message)
                     if initialization_ready(
                         self.initialization_state, self.initializer
                     ):
@@ -498,13 +498,13 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
             ):
                 continue
             # If aligned, send messages to IMU or filter
-            if message.source_identifier == self.inertial_channel:
+            if preprocessed_message.source_identifier == self.inertial_channel:
                 self.inertial.process_pntos_message(message)
-            elif message.source_identifier in self.measurement_channels:
+            elif preprocessed_message.source_identifier in self.measurement_channels:
                 dispatch_to_fusion_engine(
                     self.inertial,
                     self.fusion_engine,
-                    message,
+                    preprocessed_message,
                     self.pinson_sb_config.label,
                     self.measurement_channels,
                     self._log,

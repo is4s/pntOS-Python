@@ -56,9 +56,8 @@ def compare_messages(m1: object, m2: object, depth: int = 0) -> bool:
             if isinstance(value1, np.ndarray) and isinstance(value2, np.ndarray):
                 if not np.allclose(value1, value2):
                     return False
-            else:
-                if not compare_messages(value1, value2, depth + 1):
-                    return False
+            elif not compare_messages(value1, value2, depth + 1):
+                return False
         return True
     return m1 == m2
 
