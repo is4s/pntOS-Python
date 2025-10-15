@@ -47,6 +47,7 @@ dev = [
 format.quote-style = "single"
 lint.select = [
     "B",
+    "C4",
     "COM",
     "D",
     "DTZ",

@@ -366,7 +366,7 @@ class TestRegistry(unittest.TestCase):
         assert kv.get_value('str2', int) is None, 'Expected None, did not receive None.'
 
     def test_np_array_to_np_array(self) -> None:
-        test_array_1 = np.array([i for i in range(20)], dtype=float64)
+        test_array_1 = np.array(list(range(20)), dtype=float64)
         test_array_2 = np.array([[0, 1], [2, 3]], dtype=float64)
         test_array_3 = np.array([[[0, 1], [2, 3]], [[4, 5], [6, 7]]], dtype=float64)
 

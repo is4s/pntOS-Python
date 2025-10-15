@@ -42,7 +42,7 @@ def save_to_hdf5_file(
             if val_list:
                 # Need to guarantee that all elements of val_list are the same type
                 start_type = type(val_list[0])
-                if not all([isinstance(val, start_type) for val in val_list]):
+                if not all(isinstance(val, start_type) for val in val_list):
                     mediator.log_message(
                         LoggingLevel.WARN,
                         f'Multiple types within list is not supported.',
@@ -116,7 +116,7 @@ def load_from_hdf5_file(
                 ):
                     output[key] = [[i.decode() for i in v] for v in val]
                 elif isinstance(val[0], np.ndarray):
-                    output[key] = [i for i in val]
+                    output[key] = list(val)
                 else:
                     mediator.log_message(
                         LoggingLevel.WARN,

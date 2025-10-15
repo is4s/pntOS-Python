@@ -80,9 +80,9 @@ class StandardKeyValueStore(KeyValueStore):
         super().__init__()
         self._group = group
         self._set_permanent = False
-        self._permanent_keys = set([])
+        self._permanent_keys = set()
         self._callbacks = {}
-        self._modified_keys = set([])
+        self._modified_keys = set()
         self._log = log_func
         self._plugin_resources_location = plugin_resources_location
         self.type_conversion: dict[Any, dict[Any, Any]] = {
@@ -397,7 +397,7 @@ class StandardKeyValueStore(KeyValueStore):
         for callback in keys_per_callback:
             callback(self._group, keys_per_callback[callback], self)
 
-        self._modified_keys = set([])
+        self._modified_keys = set()
         self._batch_live = False
         return
 
@@ -409,7 +409,7 @@ class StandardKeyValueStore(KeyValueStore):
             )
             return
         self._batch_live = True
-        self._modified_keys = set([])
+        self._modified_keys = set()
         return
 
     def request_notify(
@@ -449,8 +449,8 @@ class StandardKeyValueStore(KeyValueStore):
         self._check_batch_operation()
         self._store.clear()
         self._callbacks = {}
-        self._modified_keys = set([])
-        self._permanent_keys = set([])
+        self._modified_keys = set()
+        self._permanent_keys = set()
 
     def values(self) -> ValuesView[RegistryValueTypeUnion]:
         self._check_batch_operation()
@@ -491,7 +491,7 @@ class StandardKeyValueStore(KeyValueStore):
 
     def _check_valid_type(self, value: Any) -> bool:
         if isinstance(value, list):
-            return all([isinstance(i, str) for i in value])
+            return all(isinstance(i, str) for i in value)
         if isinstance(value, np.ndarray):
             return bool(value.dtype == np.float64)
         return isinstance(value, (int, bool, float, Message, str))
