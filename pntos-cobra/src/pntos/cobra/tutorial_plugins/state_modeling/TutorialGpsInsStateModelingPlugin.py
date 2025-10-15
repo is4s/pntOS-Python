@@ -92,10 +92,10 @@ class TutorialGpsInsStateModelProvider(StandardStateModelProvider):
                     self._mediator,
                 )
             case 1:
-                sensor_config: SensorConfig = config_from_registry(
+                sensor_config: SensorConfig = config_from_registry(  # type: ignore[assignment]
                     SensorConfig,
                     self._mediator,
-                    config_group,  # type: ignore
+                    config_group,  # type: ignore[arg-type]
                 )
                 return TutorialPinsonWithNedFogmPositionMeasurementProcessor(
                     label,
@@ -142,17 +142,17 @@ class TutorialGpsInsStateModelProvider(StandardStateModelProvider):
         """
         match block_index:
             case 0:
-                imu_config: ImuConfig = config_from_registry(
+                imu_config: ImuConfig = config_from_registry(  # type: ignore[assignment]
                     ImuConfig,
                     self._mediator,
-                    config_group,  # type: ignore
+                    config_group,  # type: ignore[arg-type]
                 )
                 return TutorialPinson15NedBlock(label, self._mediator, imu_config)
             case 1:
-                fogm_config: FogmConfig = config_from_registry(
+                fogm_config: FogmConfig = config_from_registry(  # type: ignore[assignment]
                     FogmConfig,
                     self._mediator,
-                    config_group,  # type: ignore
+                    config_group,  # type: ignore[arg-type]
                 )
                 return TutorialFogmBlock(
                     label,
@@ -185,7 +185,7 @@ class TutorialGpsInsStateModelingPlugin(StateModelingPlugin):
         plugin_resources_location: str | None = None,
         mediator: Mediator | None = None,
     ) -> None:
-        self._mediator = mediator  # type: ignore
+        self._mediator = mediator  # type: ignore[assignment]
 
     def shutdown_plugin(self) -> None:
         pass
