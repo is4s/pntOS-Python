@@ -1,6 +1,4 @@
 import sys
-from threading import Event
-from typing import ClassVar
 
 from pntos.api import (
     CommonPlugin,
@@ -286,7 +284,6 @@ class SimpleControllerPlugin(ControllerPlugin):
                 SimpleMediator._logging_error_event.wait()
             except KeyboardInterrupt:
                 self._log(LoggingLevel.INFO, 'Keyboard Interrupt Detected.')
-                pass
 
         self.shutdown_plugin()
         if SimpleMediator._logging_error_event.is_set():

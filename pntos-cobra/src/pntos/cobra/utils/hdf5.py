@@ -45,7 +45,7 @@ def save_to_hdf5_file(
                 if not all(isinstance(val, start_type) for val in val_list):
                     mediator.log_message(
                         LoggingLevel.WARN,
-                        f'Multiple types within list is not supported.',
+                        'Multiple types within list is not supported.',
                     )
                     return
 

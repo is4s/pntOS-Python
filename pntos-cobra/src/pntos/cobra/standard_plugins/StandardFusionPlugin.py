@@ -429,7 +429,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
         if self._num_states == 0:
             self._mediator.log_message(
                 LoggingLevel.WARN,
-                f'Attempted to propagate a filter with zero states. No action taken.',
+                'Attempted to propagate a filter with zero states. No action taken.',
             )
             return
 
@@ -581,7 +581,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
         # Make sure there is at least one block_label
         if len(block_labels) == 0:
             self._mediator.log_message(
-                LoggingLevel.WARN, f'No block labels for peek_ahead().'
+                LoggingLevel.WARN, 'No block labels for peek_ahead().'
             )
             return None
 
@@ -612,7 +612,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
         # Make sure there is at least one block_label
         if len(block_labels) == 0:
             self._mediator.log_message(
-                LoggingLevel.WARN, f'No block labels for generate_x_and_p().'
+                LoggingLevel.WARN, 'No block labels for generate_x_and_p().'
             )
             return None
 

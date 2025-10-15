@@ -1,6 +1,5 @@
 from shutil import copytree, rmtree
 from site import getsitepackages
-from typing import Any
 
 from sphinx.application import Sphinx
 
@@ -60,7 +59,6 @@ autodoc_default_options = {
     'show-inheritance': True,
     'members': True,
     'imported-members': True,
-    'show-inheritance': True,
 }
 autodoc_preserve_defaults = True
 autodoc_typehints = 'none'

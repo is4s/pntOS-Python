@@ -483,7 +483,6 @@ def test_bad_meas_inputs(
     assert isinstance(mp, PinsonPositionMeasurementProcessor)
     mp2 = state_model_provider.new_processor(2, None, 'l', ['p', 'f'], 'config/test')
     assert isinstance(mp2, PinsonWithNedFogmPositionMeasurementProcessor)
-    ms = [mp, mp2]
     pv2 = deepcopy(pva_aux_data)
     assert isinstance(pv2.wrapped_message, MeasurementPositionVelocityAttitude)
     pv2.wrapped_message.quaternion = None

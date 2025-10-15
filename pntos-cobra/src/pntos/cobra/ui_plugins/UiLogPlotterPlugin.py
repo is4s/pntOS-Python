@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from analysis.lcm.data import LogData, PvaData
 from analysis.lcm.log_readers import read_pva
-from pntos.api import LoggingLevel, Mediator, Message, UiPlugin
+from pntos.api import LoggingLevel, Mediator, UiPlugin
 from pntos.cobra.config import UiLogPlottingConfig, config_from_registry
 from pntos.cobra.utils import plot_pva
 

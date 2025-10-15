@@ -1,5 +1,3 @@
-from math import cos, sin
-
 import numpy as np
 from aspn23 import (
     MeasurementImu,
@@ -19,8 +17,6 @@ from pntos.cobra.config import ImuConfig
 from pntos.cobra.utils import (
     OMEGA_E,
     EarthModel,
-    delta_lat_to_north,
-    delta_lon_to_east,
     quat_to_dcm,
     skew,
 )
@@ -309,7 +305,7 @@ class TutorialPinson15NedBlock(StandardStateBlock):
         F[6:9, 12:15] = -C_sensor_to_ned  # Add in gyro bias to tiltdot
 
         # Accelerometer FOGM bias and Gyro FOGM bias
-        for ii in range(0, 3):
+        for ii in range(3):
             F[ii + 9, ii + 9] = -1.0 / self._imu_model.accel_bias_tau[ii]
             F[ii + 12, ii + 12] = -1.0 / self._imu_model.gyro_bias_tau[ii]
 

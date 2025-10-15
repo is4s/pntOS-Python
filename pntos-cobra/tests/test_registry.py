@@ -303,6 +303,8 @@ class TestRegistry(unittest.TestCase):
         )
         assert callbacked_group == self.test_group, 'Request notify new group failed.'
 
+        kv.batch_end()
+
     def test_any_value_to_str(self) -> None:
         """NOTE: Message types are treated differently - not converted to str."""
         global EXPECTED_LOG_OUTPUT
@@ -345,6 +347,7 @@ class TestRegistry(unittest.TestCase):
         assert kv.get_value('float', str) == test_s_float, m_float
         EXPECTED_LOG_OUTPUT = "Conversion from type <class 'numpy.ndarray'> to type <class 'str'> unsupported."
         assert kv.get_value('np_array', str) == test_s_np_array, m_np_array
+        kv.batch_end()
 
     def test_str_to_int(self) -> None:
         global EXPECTED_LOG_OUTPUT
@@ -364,6 +367,7 @@ class TestRegistry(unittest.TestCase):
             "Unable to convert from type <class 'str'> to type <class 'int'>."
         )
         assert kv.get_value('str2', int) is None, 'Expected None, did not receive None.'
+        kv.batch_end()
 
     def test_np_array_to_np_array(self) -> None:
         test_array_1 = np.array(list(range(20)), dtype=float64)
@@ -389,6 +393,7 @@ class TestRegistry(unittest.TestCase):
         assert (out_1 == test_array_1).all(), 'One-dimensional numpy array failed.'
         assert (out_2 == test_array_2).all(), 'Two-dimensional numpy array failed.'
         assert (out_3 == test_array_3).all(), 'Three-dimensional numpy array failed.'
+        kv.batch_end()
 
     def test_str_to_list(self) -> None:
         test_str_1 = 'Hello there'
@@ -400,6 +405,7 @@ class TestRegistry(unittest.TestCase):
 
         kv.batch_restart()
         assert kv.get_value('str1', list) == test_list_1, 'Str to list failed.'
+        kv.batch_end()
 
     def test_number_to_list(self) -> None:
         test_num_1 = 42
@@ -419,22 +425,22 @@ class TestRegistry(unittest.TestCase):
         kv.batch_restart()
         assert kv.get_value('t1', list) == test_list_1, m_1
         assert kv.get_value('t2', list) == test_list_2, m_2
+        kv.batch_end()
 
     def test_messages(self) -> None:
         """Message types in registry should just stay as Messages."""
 
         m_message = 'Saving and retrieving Message failed.'
-        expected_str = str(self.test_message)
 
         kv = self.reg.batch_start(self.test_group)
         kv.set_value('message', self.test_message)
         kv.batch_end()
 
         kv.batch_restart()
-        thing = kv.get_value('message', str)
         assert kv.get_value('message', str) is None, m_message
         assert kv.get_value('message', int) is None, m_message
         assert kv.get_value('message', Message) == self.test_message, m_message
+        kv.batch_end()
 
     def test_raw_string(self) -> None:
         test_string = 'test string'
@@ -697,9 +703,6 @@ class TestRegistry(unittest.TestCase):
 
     def test___setitem__(self) -> None:
         test_kv = self.set_up_store_with_all_types()
-
-        # Make sure all key/value pairs are in there
-        types = [str, list, int, bool, float, np.ndarray, Message]
 
         # test str
         val0 = test_kv.get_value(self.test_keys[0], str)

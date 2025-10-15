@@ -1,5 +1,3 @@
-from typing import Callable
-
 from pntos.api import (
     KeyValueStore,
     LoggingLevel,

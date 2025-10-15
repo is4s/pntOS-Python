@@ -10,7 +10,6 @@ from pntos.api.plugins.state_modeling import (
 from pntos.cobra.config import (
     FogmStateBlockConfig,
     PinsonStateBlockConfig,
-    SensorConfig,
     SensorMeasurementProcessorConfig,
     config_from_registry,
 )
@@ -122,7 +121,7 @@ class StandardGpsInsStateModelProvider(StandardStateModelProvider):
                 if sensor_mp_config is None:
                     self._mediator.log_message(
                         LoggingLevel.ERROR,
-                        f'Could not get position sensor config from registry.',
+                        'Could not get position sensor config from registry.',
                     )
                     return None
                 return PinsonPositionMeasurementProcessor(
@@ -150,7 +149,7 @@ class StandardGpsInsStateModelProvider(StandardStateModelProvider):
                 if sensor_mp_config is None:
                     self._mediator.log_message(
                         LoggingLevel.ERROR,
-                        f'Could not get position sensor config from registry.',
+                        'Could not get position sensor config from registry.',
                     )
                     return None
                 return PinsonWithNedFogmPositionMeasurementProcessor(
@@ -178,7 +177,7 @@ class StandardGpsInsStateModelProvider(StandardStateModelProvider):
                 if sensor_config is None:
                     self._mediator.log_message(
                         LoggingLevel.ERROR,
-                        f'Could not get position sensor config from registry.',
+                        'Could not get position sensor config from registry.',
                     )
                     return None
                 return PinsonWithLeverArmPositionMeasurementProcessor(
@@ -200,7 +199,7 @@ class StandardGpsInsStateModelProvider(StandardStateModelProvider):
                 if sensor_mp_config is None:
                     self._mediator.log_message(
                         LoggingLevel.ERROR,
-                        f'Could not get body velocity sensor config from registry.',
+                        'Could not get body velocity sensor config from registry.',
                     )
                     return None
                 return PinsonBodyVelocityMeasurementProcessor(
@@ -264,7 +263,7 @@ class StandardGpsInsStateModelProvider(StandardStateModelProvider):
             if pinson_sb_config is None:
                 self._mediator.log_message(
                     LoggingLevel.ERROR,
-                    f'Could not get IMU config from registry.',
+                    'Could not get IMU config from registry.',
                 )
                 return None
 
@@ -283,7 +282,7 @@ class StandardGpsInsStateModelProvider(StandardStateModelProvider):
             if fogm_sb_config is None:
                 self._mediator.log_message(
                     LoggingLevel.ERROR,
-                    f'Could not get fogm config from registry.',
+                    'Could not get fogm config from registry.',
                 )
                 return None
 
