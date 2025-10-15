@@ -59,13 +59,14 @@ lint.select = [
     "INT",
     "LOG",
     "PERF",
+    "PGH",
     "RUF",
     "SLOT",
     "T10",
     "TID",
 ]
 lint.ignore = [ "COM812", "D212", "D417" ]
-lint.per-file-ignores."*/tests/*" = [ "B008", "D100", "D101", "D102", "D107" ]
+lint.per-file-ignores."*/tests/*" = [ "B008", "D100", "D101", "D102", "D107", "PGH003" ]
 lint.per-file-ignores."apps/*" = [ "D" ]
 lint.per-file-ignores."docs/*" = [ "D" ]
 lint.per-file-ignores."pntos-cobra/*" = [ "D" ]

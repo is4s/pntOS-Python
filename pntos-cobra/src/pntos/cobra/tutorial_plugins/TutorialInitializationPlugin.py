@@ -49,9 +49,9 @@ class ManualInitialization(InertialInitializationStrategy):
         """
         self.config_group = config_group
         self.mediator = mediator
-        config: ManualAlignmentConfig = config_from_registry(
+        config: ManualAlignmentConfig = config_from_registry(  # type: ignore[assignment]
             ManualAlignmentConfig, mediator, config_group
-        )  # type: ignore
+        )
         self.solution = Message(self._create_pva(config), 'Cobra simple initialization')
         self.imu_errors = self._create_imu_errors(config)
         self.covariance = np.diag(
@@ -155,7 +155,7 @@ class TutorialInitializationPlugin(InitializationPlugin):
         plugin_resources_location: str | None = None,
         mediator: Mediator | None = None,
     ) -> None:
-        self.mediator = mediator  # type: ignore
+        self.mediator = mediator  # type: ignore[assignment]
 
     def shutdown_plugin(self) -> None:
         return
