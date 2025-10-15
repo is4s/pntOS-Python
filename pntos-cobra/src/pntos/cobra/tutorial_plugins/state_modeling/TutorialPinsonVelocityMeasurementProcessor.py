@@ -27,7 +27,7 @@ class TutorialPinsonVelocityMeasurementProcessor(StandardMeasurementProcessor):
         label: str,
         state_block_labels: list[str],
         mediator: Mediator,
-    ):
+    ) -> None:
         """
         A Pinson Velocity Measurement Processor
 

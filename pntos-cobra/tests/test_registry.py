@@ -115,7 +115,7 @@ class DummyMediator(Mediator):
 class DummyControllerPlugin(ControllerPlugin):
     plugins: list[CommonPlugin]
 
-    def __init__(self, identifier: str):
+    def __init__(self, identifier: str) -> None:
         self.identifier = identifier
 
     def init_plugin(
@@ -145,7 +145,7 @@ class TestRegistry(unittest.TestCase):
     reg: Registry
     test_message: Message
 
-    def __init__(self, name: str):
+    def __init__(self, name: str) -> None:
         self.registry = StandardRegistryPlugin('Standard registry 1')
         self.registry.init_plugin(mediator=DummyMediator())
         self.reg = self.registry.new_registry(None)

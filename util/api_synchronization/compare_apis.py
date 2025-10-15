@@ -14,7 +14,7 @@ PNTOS_URL = 'git@git.aspn.us:pntos/pntos.git'
 FIREHOSE_URL = 'git@git.aspn.us:pntos/firehose-outputs.git'
 
 
-def main(file_name: str, revision: str):
+def main(file_name: str, revision: str) -> None:
     """Main script."""
     exit_val = False
     with tempfile.TemporaryDirectory() as tmp_dir:

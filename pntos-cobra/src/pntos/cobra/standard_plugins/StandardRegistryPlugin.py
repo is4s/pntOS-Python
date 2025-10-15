@@ -247,14 +247,14 @@ class StandardKeyValueStore(KeyValueStore):
         self._log(LoggingLevel.WARN, f'Key error - key {key} not in store.')
         return None
 
-    def _return_str(self, val: Any) -> str | None:
+    def _return_str(self, val: Any) -> str | None:  # noqa: ANN401
         """Utility function for type conversion"""
         try:
             return str(val)
         except ValueError:
             return None
 
-    def _return_list_str(self, val: Any) -> list[str] | None:
+    def _return_list_str(self, val: Any) -> list[str] | None:  # noqa: ANN401
         """Utility function for type conversion"""
         try:
             if isinstance(val, np.ndarray):
@@ -265,28 +265,28 @@ class StandardKeyValueStore(KeyValueStore):
             pass
         return None
 
-    def _return_int(self, val: Any) -> int | None:
+    def _return_int(self, val: Any) -> int | None:  # noqa: ANN401
         """Utility function for type conversion"""
         try:
             return int(val)
         except ValueError:
             return None
 
-    def _return_bool(self, val: Any) -> bool | None:
+    def _return_bool(self, val: Any) -> bool | None:  # noqa: ANN401
         """Utility function for type conversion"""
         try:
             return bool(val)
         except ValueError:
             return None
 
-    def _return_float(self, val: Any) -> float | None:
+    def _return_float(self, val: Any) -> float | None:  # noqa: ANN401
         """Utility function for type conversion"""
         try:
             return float(val)
         except ValueError:
             return None
 
-    def _return_array(self, val: Any) -> NDArray[float64] | None:
+    def _return_array(self, val: Any) -> NDArray[float64] | None:  # noqa: ANN401
         """Utility function for type conversion"""
         # First see if it's one of the number types - return as array with length 1
         if isinstance(val, (int, bool, float)):
@@ -482,7 +482,7 @@ class StandardKeyValueStore(KeyValueStore):
         if not self._batch_live:
             self._log(LoggingLevel.ERROR, self._batch_err)
 
-    def _check_valid_type(self, value: Any) -> bool:
+    def _check_valid_type(self, value: Any) -> bool:  # noqa: ANN401
         if isinstance(value, list):
             return all(isinstance(i, str) for i in value)
         if isinstance(value, np.ndarray):

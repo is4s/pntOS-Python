@@ -46,6 +46,7 @@ dev = [
 [tool.ruff]
 format.quote-style = "single"
 lint.select = [
+    "ANN",
     "B",
     "BLE",
     "C4",
@@ -73,7 +74,15 @@ lint.select = [
     "W",
 ]
 lint.ignore = [ "COM812", "D212", "D417", "E501" ]
-lint.per-file-ignores."*/tests/*" = [ "B008", "D100", "D101", "D102", "D107", "PGH003" ]
+lint.per-file-ignores."*/tests/*" = [
+    "ANN001",
+    "B008",
+    "D100",
+    "D101",
+    "D102",
+    "D107",
+    "PGH003",
+]
 lint.per-file-ignores."apps/*" = [ "D" ]
 lint.per-file-ignores."docs/*" = [ "D" ]
 lint.per-file-ignores."pntos-cobra/*" = [ "D" ]

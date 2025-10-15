@@ -45,7 +45,7 @@ class PinsonPositionMeasurementProcessor(StandardMeasurementProcessor):
         state_block_labels: list[str],
         mediator: Mediator,
         l_ps_p: NDArray[float64],
-    ):
+    ) -> None:
         """
         A Pinson Position Measurement Processor
 

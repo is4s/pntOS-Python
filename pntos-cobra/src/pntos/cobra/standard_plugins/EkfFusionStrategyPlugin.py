@@ -238,7 +238,7 @@ class EkfFusionStrategyPlugin(FusionStrategyPlugin):
 
     _mediator: Mediator
 
-    def __init__(self, identifier: str):
+    def __init__(self, identifier: str) -> None:
         """
         An Extended Kalman Filter Fusion Strategy Plugin
 

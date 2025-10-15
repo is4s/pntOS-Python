@@ -38,7 +38,7 @@ class Aspn23RosTransportPlugin(TransportPlugin):
     executor: SingleThreadedExecutor
     thread: Thread
 
-    def __init__(self, identifier: str):
+    def __init__(self, identifier: str) -> None:
         self.identifier = identifier
         self._subs: List[Subscription] = []
         self._topics: List[str] = []

@@ -24,7 +24,7 @@ class TutorialLcmTransportPlugin(TransportPlugin):
     _lcm: LCM
     _channels: set[str]
 
-    def __init__(self, identifier: str):
+    def __init__(self, identifier: str) -> None:
         """
         LCM Log Transport Plugin
 

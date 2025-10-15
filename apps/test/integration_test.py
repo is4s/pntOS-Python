@@ -39,7 +39,7 @@ class ErrorLimits:
 
 def validate_error(
     error: NDArray[np.float64], sigma: NDArray[np.float64], limits: ErrorLimits
-):
+) -> None:
     abs_error = np.abs(error)
 
     # ensure specific percentage of error below 1-sigma, 2-sigma, and 3-sigma
@@ -62,7 +62,7 @@ def validate_results(
     pos_err_limits: ErrorLimits,
     vel_err_limits: ErrorLimits,
     tilt_err_limits: ErrorLimits,
-):
+) -> None:
     filter_time: NDArray[np.float64] = pva.time
     truth_time: NDArray[np.float64] = truth.time
 
@@ -98,7 +98,7 @@ def validate_results(
     validate_error(tilt_err, pva.tilt_sig, limits=tilt_err_limits)
 
 
-def test_tutorial_gps_ins_app():
+def test_tutorial_gps_ins_app() -> None:
     run_pntos_with_log_transport('apps/tutorial/gps_ins.py', OUTPUT_LOG, validate=True)
     log_data = read_pva(OUTPUT_LOG, read_all=True)
     validate_results(
@@ -113,7 +113,7 @@ def test_tutorial_gps_ins_app():
     )
 
 
-def test_standard_gps_ins_app():
+def test_standard_gps_ins_app() -> None:
     run_pntos_with_log_transport('apps/standard/gps_ins.py', OUTPUT_LOG, validate=True)
     log_data = read_pva(OUTPUT_LOG, read_all=True)
     validate_results(
@@ -128,7 +128,7 @@ def test_standard_gps_ins_app():
     )
 
 
-def test_standard_gps_ins_network_app():
+def test_standard_gps_ins_network_app() -> None:
     run_pntos_with_network_transport(
         'apps/standard/lcm_relay.py',
         EXAMPLE_LCM_LOG,
@@ -148,7 +148,7 @@ def test_standard_gps_ins_network_app():
     )
 
 
-def test_tutorial_gps_ins_vel_app():
+def test_tutorial_gps_ins_vel_app() -> None:
     run_pntos_with_log_transport(
         'apps/tutorial/gps_vel_ins.py', OUTPUT_LOG, validate=True
     )
@@ -182,7 +182,7 @@ def test_tutorial_gps_ins_vel_app():
     )
 
 
-def test_standard_gps_ins_leverarm_app():
+def test_standard_gps_ins_leverarm_app() -> None:
     run_pntos_with_log_transport(
         'apps/standard/gps_ins_leverarm.py', OUTPUT_LOG, validate=True
     )
@@ -199,7 +199,7 @@ def test_standard_gps_ins_leverarm_app():
     )
 
 
-def test_standard_gps_bodyvel_ins_app():
+def test_standard_gps_bodyvel_ins_app() -> None:
     run_pntos_with_log_transport(
         'apps/standard/gps_ins_bodyvel.py', OUTPUT_LOG, validate=True
     )
@@ -216,7 +216,7 @@ def test_standard_gps_bodyvel_ins_app():
     )
 
 
-def test_advanced_gps_ins_ros_app():
+def test_advanced_gps_ins_ros_app() -> None:
     import pytest
 
     # Only run this test if ros is installed

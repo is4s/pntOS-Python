@@ -21,7 +21,7 @@ def harvest_data(logfile: str, channels: list[str]) -> LogData[PvaData]:
     return read_pva(logfile=logfile, read_all=True)
 
 
-def plot_results(logfile: str, solution_channel: str, truth_channel: str):
+def plot_results(logfile: str, solution_channel: str, truth_channel: str) -> None:
     log_data = harvest_data(logfile, [solution_channel, truth_channel])
 
     solution = log_data.data[solution_channel]

@@ -29,7 +29,7 @@ from pntos.cobra.internal import SimpleMediator, StandardRegistry
 
 # Test Sensor plugin
 class _TestStateBlock(StandardStateBlock):
-    def __init__(self, label: str):
+    def __init__(self, label: str) -> None:
         self.label = label
         self.num_states = 4
 
@@ -55,7 +55,7 @@ class _TestStateBlock(StandardStateBlock):
 
 
 class _TestMeasurementProcessor(StandardMeasurementProcessor):
-    def __init__(self, label: str, state_block_labels: list[str]):
+    def __init__(self, label: str, state_block_labels: list[str]) -> None:
         self.label = label
         self.state_block_labels = state_block_labels
 

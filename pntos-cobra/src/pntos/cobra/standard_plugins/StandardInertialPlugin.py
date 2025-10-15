@@ -39,7 +39,9 @@ class StandardInertial(StandardInertialMechanization):
     mediator: Mediator
     identifier: str = 'Cobra standard inertial'
 
-    def __init__(self, config_group: str, mediator: Mediator, solution: Message):
+    def __init__(
+        self, config_group: str, mediator: Mediator, solution: Message
+    ) -> None:
         """
         An Inertial Mechanization Object
 
@@ -197,7 +199,7 @@ class StandardInertialPlugin(InertialPlugin):
 
     mediator: Mediator | None
 
-    def __init__(self, identifier: str):
+    def __init__(self, identifier: str) -> None:
         """
         An Inertial Plugin
 

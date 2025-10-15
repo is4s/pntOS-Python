@@ -22,7 +22,7 @@ class LcmTransportPlugin(TransportPlugin):
     _shutdown_threads: threading.Event
     _channels: set[str]
 
-    def __init__(self, identifier: str):
+    def __init__(self, identifier: str) -> None:
         """
         ASPN-LCM Transport Plugin
 

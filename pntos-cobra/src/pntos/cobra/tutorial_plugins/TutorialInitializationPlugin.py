@@ -39,7 +39,7 @@ class ManualInitialization(InertialInitializationStrategy):
     imu_errors: StandardInertialErrors | None
     covariance: NDArray[np.float64] | None
 
-    def __init__(self, config_group: str, mediator: Mediator):
+    def __init__(self, config_group: str, mediator: Mediator) -> None:
         """
         A Simple Initialization Strategy
 
@@ -140,7 +140,7 @@ class TutorialInitializationPlugin(InitializationPlugin):
 
     mediator: Mediator
 
-    def __init__(self, identifier: str):
+    def __init__(self, identifier: str) -> None:
         """
         Cobra Simple Initialization Plugin
 

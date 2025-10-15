@@ -38,7 +38,7 @@ class StandardGpsInsStateModelProvider(StandardStateModelProvider):
 
     _mediator: Mediator
 
-    def __init__(self, mediator: Mediator):
+    def __init__(self, mediator: Mediator) -> None:
         """
         Standard GPS and INS State Model Provider
 
@@ -324,7 +324,7 @@ class StandardGpsInsStateModelingPlugin(StateModelingPlugin):
 
     _mediator: Mediator
 
-    def __init__(self, identifier: str):
+    def __init__(self, identifier: str) -> None:
         self.identifier = identifier
 
     def init_plugin(

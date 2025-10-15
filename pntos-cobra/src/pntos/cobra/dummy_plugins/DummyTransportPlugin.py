@@ -20,7 +20,7 @@ class DummyTransportPlugin(TransportPlugin):
     WARNING: This implementation is for demonstration purposes only, it is not fully functional.
     """
 
-    def __init__(self, identifier: str):
+    def __init__(self, identifier: str) -> None:
         """
         Cobra Simple Transport Plugin
 

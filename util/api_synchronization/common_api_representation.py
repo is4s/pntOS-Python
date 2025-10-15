@@ -28,11 +28,11 @@ class ApiClass:
     methods: list[ApiFunction] = field(default_factory=list)
     attributes: list[ApiAttribute] = field(default_factory=list)
 
-    def add_method(self, new_function: ApiFunction):
+    def add_method(self, new_function: ApiFunction) -> None:
         """Adds method to class method list."""
         self.methods.append(new_function)
 
-    def add_attribute(self, new_attribute: ApiAttribute):
+    def add_attribute(self, new_attribute: ApiAttribute) -> None:
         """Adds attribute to class attribute list."""
         self.attributes.append(new_attribute)
 
@@ -44,7 +44,7 @@ class ApiModule:
     name: str
     classes: list[ApiClass] = field(default_factory=list)
 
-    def add_class(self, new_class: ApiClass):
+    def add_class(self, new_class: ApiClass) -> None:
         """Adds class to module class list."""
         self.classes.append(new_class)
 
@@ -57,7 +57,7 @@ class CtoPyApiComparator:
     exceptions: set[str]
     mismatch: bool
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Default constructor. Setup common types dict."""
         self.common_types = {
             # Generic
@@ -232,7 +232,7 @@ class CtoPyApiComparator:
                     converted_type += ']'
         return converted_type
 
-    def _compare_classname(self, c_class: ApiClass, py_class: ApiClass):
+    def _compare_classname(self, c_class: ApiClass, py_class: ApiClass) -> None:
         temp = c_class.name.removeprefix('Pntos')
         if temp != py_class.name:
             print(
@@ -340,7 +340,7 @@ class CtoPyApiComparator:
                     ret_val = False
         return ret_val
 
-    def compare_classes(self, c_class: ApiClass, py_class: ApiClass):
+    def compare_classes(self, c_class: ApiClass, py_class: ApiClass) -> None:
         """Compares two classes for semantic equivalence."""
         self._compare_classname(c_class, py_class)
 

@@ -27,7 +27,7 @@ class TutorialFogmBlock(StandardStateBlock):
         mediator: Mediator,
         sigmas: NDArray[float64],
         taus: NDArray[float64],
-    ):
+    ) -> None:
         """
         Constructor
 
