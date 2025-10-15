@@ -1,7 +1,7 @@
 import re
 import time
-from typing import Any
 
+import pytest
 from pntos.api import (
     CommonPlugin,
     LoggingLevel as ll,
@@ -126,7 +126,7 @@ def remove_decimal_numbers(input_string: str) -> str:
     return re.sub(pattern, '', input_string)
 
 
-def test(capsys: Any) -> None:
+def test(capsys: pytest.CaptureFixture[str]) -> None:
     # Initialize registry through mediator to have config values for logger
     dummy_plugin = DummyPlugin('dummy plugin')
     registry = StandardRegistry(dummy_log)

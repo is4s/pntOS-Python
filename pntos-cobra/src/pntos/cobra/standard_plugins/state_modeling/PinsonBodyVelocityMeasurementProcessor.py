@@ -45,7 +45,7 @@ class PinsonBodyVelocityMeasurementProcessor(StandardMeasurementProcessor):
         mediator: Mediator,
         l_ps_p: NDArray[float64],
         orientation_ps_p: NDArray[float64],
-    ):
+    ) -> None:
         """
         A Pinson Body/Sensor Velocity Measurement Processor
 

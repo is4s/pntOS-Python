@@ -85,10 +85,10 @@ def test_type_parameters() -> None:
 class MockControllerPlugin(api.ControllerPlugin):
     identifier = ''
 
-    def init_plugin(self, plugin_resources_location=None, mediator=None):  # type: ignore
+    def init_plugin(self, plugin_resources_location=None, mediator=None) -> None:  # type: ignore
         return
 
-    def shutdown_plugin(self):  # type: ignore
+    def shutdown_plugin(self) -> None:
         return
 
     def take_control(  # type: ignore
@@ -96,17 +96,17 @@ class MockControllerPlugin(api.ControllerPlugin):
         plugins,
         plugin_resources_locations=None,
         initial_config=None,
-    ):
+    ) -> None:
         return
 
 
 class MockFusionPlugin(api.FusionPlugin):
     identifier = ''
 
-    def init_plugin(self, plugin_resources_location=None, mediator=None):  # type: ignore
+    def init_plugin(self, plugin_resources_location=None, mediator=None) -> None:  # type: ignore
         return
 
-    def shutdown_plugin(self):  # type: ignore
+    def shutdown_plugin(self) -> None:
         return
 
     def is_fusion_type_supported(self, type: type[api.FusionEngineType]) -> bool:
@@ -121,10 +121,10 @@ class MockFusionPlugin(api.FusionPlugin):
 class MockFusionStrategyPlugin(api.FusionStrategyPlugin):
     identifier = ''
 
-    def init_plugin(self, plugin_resources_location=None, mediator=None):  # type: ignore
+    def init_plugin(self, plugin_resources_location=None, mediator=None) -> None:  # type: ignore
         return
 
-    def shutdown_plugin(self):  # type: ignore
+    def shutdown_plugin(self) -> None:
         return
 
     def is_fusion_type_supported(
@@ -141,10 +141,10 @@ class MockFusionStrategyPlugin(api.FusionStrategyPlugin):
 class MockInertialPlugin(api.InertialPlugin):
     identifier = ''
 
-    def init_plugin(self, plugin_resources_location=None, mediator=None):  # type: ignore
+    def init_plugin(self, plugin_resources_location=None, mediator=None) -> None:  # type: ignore
         return
 
-    def shutdown_plugin(self):  # type: ignore
+    def shutdown_plugin(self) -> None:
         return
 
     def is_inertial_type_supported(self, type: type[api.InertialType]) -> bool:
@@ -162,10 +162,10 @@ class MockInertialPlugin(api.InertialPlugin):
 class MockInitializationPlugin(api.InitializationPlugin):
     identifier = ''
 
-    def init_plugin(self, plugin_resources_location=None, mediator=None):  # type: ignore
+    def init_plugin(self, plugin_resources_location=None, mediator=None) -> None:  # type: ignore
         return
 
-    def shutdown_plugin(self):  # type: ignore
+    def shutdown_plugin(self) -> None:
         return
 
     def is_initialization_type_supported(
@@ -182,10 +182,10 @@ class MockInitializationPlugin(api.InitializationPlugin):
 class MockLoggingPlugin(api.LoggingPlugin):
     identifier = ''
 
-    def init_plugin(self, plugin_resources_location=None, mediator=None):  # type: ignore
+    def init_plugin(self, plugin_resources_location=None, mediator=None) -> None:  # type: ignore
         return
 
-    def shutdown_plugin(self):  # type: ignore
+    def shutdown_plugin(self) -> None:
         return
 
     def log(
@@ -201,37 +201,37 @@ class MockLoggingPlugin(api.LoggingPlugin):
 class MockOrchestrationPlugin(api.OrchestrationPlugin):
     identifier = ''
 
-    def init_plugin(self, plugin_resources_location=None, mediator=None):  # type: ignore
+    def init_plugin(self, plugin_resources_location=None, mediator=None) -> None:  # type: ignore
         return
 
-    def shutdown_plugin(self):  # type: ignore
+    def shutdown_plugin(self) -> None:
         return
 
-    def init_orchestration_plugin(self, plugins, stream_config):  # type: ignore
+    def init_orchestration_plugin(self, plugins, stream_config) -> None:  # type: ignore
         return
 
-    def filter_description_list(self):  # type: ignore
+    def filter_description_list(self) -> None:  # type: ignore
         return None
 
-    def process_pntos_message(self, message, sequenced):  # type: ignore
+    def process_pntos_message(self, message, sequenced) -> None:  # type: ignore
         return
 
-    def request_solutions(self, solution_times, filter_description=None):  # type: ignore
+    def request_solutions(self, solution_times, filter_description=None) -> None:  # type: ignore
         return None
 
 
 class MockPlatformIntegrationPlugin(api.PlatformIntegrationPlugin):
     identifier = ''
 
-    def init_plugin(self, plugin_resources_location=None, mediator=None):  # type: ignore
+    def init_plugin(self, plugin_resources_location=None, mediator=None) -> None:  # type: ignore
         return
 
-    def shutdown_plugin(self):  # type: ignore
+    def shutdown_plugin(self) -> None:
         return
 
     def take_control(  # type: ignore
         self, plugins, plugin_resources_locations=None, initial_config=None
-    ):
+    ) -> None:
         return
 
 
@@ -241,77 +241,77 @@ class MockPreprocessorPlugin(api.PreprocessorPlugin):
     def __init__(self) -> None:
         self.preprocessor_identifiers = ['']
 
-    def init_plugin(self, plugin_resources_location=None, mediator=None):  # type: ignore
+    def init_plugin(self, plugin_resources_location=None, mediator=None) -> None:  # type: ignore
         return
 
-    def shutdown_plugin(self):  # type: ignore
+    def shutdown_plugin(self) -> None:
         return
 
-    def new_preprocessor(self, preprocessor_index, config_group=None):  # type: ignore
+    def new_preprocessor(self, preprocessor_index, config_group=None) -> None:  # type: ignore
         return None
 
 
 class MockRegistryPlugin(api.RegistryPlugin):
     identifier = ''
 
-    def init_plugin(self, plugin_resources_location=None, mediator=None):  # type: ignore
+    def init_plugin(self, plugin_resources_location=None, mediator=None) -> None:  # type: ignore
         return
 
-    def shutdown_plugin(self):  # type: ignore
+    def shutdown_plugin(self) -> None:
         return
 
-    def new_registry(self, initial_config=None):  # type: ignore
+    def new_registry(self, initial_config=None) -> None:  # type: ignore
         return None
 
 
 class MockStateModelingPlugin(api.StateModelingPlugin):
     identifier = ''
 
-    def init_plugin(self, plugin_resources_location=None, mediator=None):  # type: ignore
+    def init_plugin(self, plugin_resources_location=None, mediator=None) -> None:  # type: ignore
         return
 
-    def shutdown_plugin(self):  # type: ignore
+    def shutdown_plugin(self) -> None:
         return
 
-    def is_fusion_type_supported(self, type):  # type: ignore
+    def is_fusion_type_supported(self, type) -> bool:  # type: ignore
         return False
 
-    def new_state_model_provider(self, type):  # type: ignore
+    def new_state_model_provider(self, type) -> None:  # type: ignore
         return None
 
 
 class MockTransportPlugin(api.TransportPlugin):
     identifier = ''
 
-    def init_plugin(self, plugin_resources_location=None, mediator=None):  # type: ignore
+    def init_plugin(self, plugin_resources_location=None, mediator=None) -> None:  # type: ignore
         return
 
-    def shutdown_plugin(self):  # type: ignore
+    def shutdown_plugin(self) -> None:
         return
 
-    def broadcast_message(self, message, channel_name=None):  # type: ignore
+    def broadcast_message(self, message, channel_name=None) -> None:  # type: ignore
         return
 
-    def start_listening(self):  # type: ignore
+    def start_listening(self) -> None:
         return
 
-    def stop_listening(self):  # type: ignore
+    def stop_listening(self) -> None:
         return
 
 
 class MockUiPlugin(api.UiPlugin):
     identifier = ''
 
-    def init_plugin(self, plugin_resources_location=None, mediator=None):  # type: ignore
+    def init_plugin(self, plugin_resources_location=None, mediator=None) -> None:  # type: ignore
         return
 
-    def shutdown_plugin(self):  # type: ignore
+    def shutdown_plugin(self) -> None:
         return
 
-    def requires_main_thread(self):  # type: ignore
+    def requires_main_thread(self) -> bool:
         return False
 
-    def run_main_thread(self):  # type: ignore
+    def run_main_thread(self) -> None:
         return
 
 

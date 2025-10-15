@@ -34,7 +34,7 @@ class BarometerToAltitudePreprocessor(Preprocessor):
     _channel: str
     _mediator: Mediator
 
-    def __init__(self, channel: str, mediator: Mediator):
+    def __init__(self, channel: str, mediator: Mediator) -> None:
         """
         Cobra Barometer to Altitude Preprocessor
         """
@@ -87,7 +87,7 @@ class PreprocessorDownsampler(Preprocessor):
     _downsampling_factors: dict[str, int]
     _update_counters: dict[str, int]
 
-    def __init__(self, config_group: str, mediator: Mediator):
+    def __init__(self, config_group: str, mediator: Mediator) -> None:
         """
         Cobra Downsampler Preprocessor
 
@@ -162,7 +162,7 @@ class ImuRotationPreprocessor(Preprocessor):
         mediator: Mediator,
         imu_channel: str,
         C_imu_to_platform: NDArray[float64],
-    ):
+    ) -> None:
         self._mediator = mediator
         self._imu_channel = imu_channel
         self._C_imu_to_platform = C_imu_to_platform
@@ -193,7 +193,7 @@ class TimeAdjusterPreprocessor(Preprocessor):
         self,
         config_group: str,
         mediator: Mediator,
-    ):
+    ) -> None:
         self._mediator = mediator
         config = config_from_registry(TimeAdjusterConfig, self._mediator, config_group)
         if config is None:
@@ -251,7 +251,7 @@ class StandardPreprocessorPlugin(PreprocessorPlugin):
 
     mediator: Mediator | None
 
-    def __init__(self, identifier: str):
+    def __init__(self, identifier: str) -> None:
         """Constructor.
 
         Args:

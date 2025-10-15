@@ -31,7 +31,7 @@ class ApiVisitor(ast.NodeVisitor):
     module: ApiModule
     curr_class: ApiClass | None
 
-    def __init__(self, module_name: str):
+    def __init__(self, module_name: str) -> None:
         """Initializes class attributes."""
         self.module = ApiModule(name=module_name)
         self.curr_class = None
@@ -90,14 +90,14 @@ class ApiVisitor(ast.NodeVisitor):
             attr = ApiAttribute(name=attr_name, type=attr_type)
             self.curr_class.add_attribute(attr)
 
-    def _convert_type(self, read_type: str):
+    def _convert_type(self, read_type: str) -> str:
         read_type = read_type.replace("'", '')
         conv_type = PY_TO_C.get(read_type)
         if conv_type is not None:
             return conv_type
         return read_type
 
-    def _parse_callback_param(self, arg: ast.arg, func_name: str):
+    def _parse_callback_param(self, arg: ast.arg, func_name: str) -> None:
         """Parses ``callback`` parameter and stores it as its own function."""
         callback_spelling = ast.unparse(arg.annotation)
         sep = callback_spelling.rfind(',')

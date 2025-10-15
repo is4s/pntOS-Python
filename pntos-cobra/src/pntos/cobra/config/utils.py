@@ -270,7 +270,7 @@ def config_to_registry(config: BaseConfig, mediator: Mediator) -> None:
     kv.batch_end()
 
 
-def _confirm_types(out_val: Any, expected_type: type[Any]) -> bool:
+def _confirm_types(out_val: Any, expected_type: type[Any]) -> bool:  # noqa: ANN401
     """
     A helper function which determines if the type of ``out_val`` is equivalent to ``expected_type``.
     If equivalent, returns true otherwise returns false.

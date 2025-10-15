@@ -33,7 +33,7 @@ class StaticAlign(InertialInitializationStrategy):
     aligner: AlignBase
     mediator: Mediator
 
-    def __init__(self, config_group: str, mediator: Mediator):
+    def __init__(self, config_group: str, mediator: Mediator) -> None:
         """
         Cobra Static Alignment Strategy
 
@@ -132,7 +132,7 @@ class StaticAlignInitializationPlugin(InitializationPlugin):
 
     mediator: Mediator
 
-    def __init__(self, identifier: str):
+    def __init__(self, identifier: str) -> None:
         """
         Cobra Static Alignment Initialization Plugin
 

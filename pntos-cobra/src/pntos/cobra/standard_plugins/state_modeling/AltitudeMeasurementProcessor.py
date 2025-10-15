@@ -39,7 +39,7 @@ class AltitudeMeasurementProcessor(StandardMeasurementProcessor):
         label: str,
         state_block_labels: list[str],
         mediator: Mediator,
-    ):
+    ) -> None:
         """
         An Altitude Measurement Processor.
 

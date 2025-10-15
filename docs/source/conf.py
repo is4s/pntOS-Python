@@ -1,5 +1,8 @@
 from shutil import copytree, rmtree
 from site import getsitepackages
+from typing import Any
+
+from sphinx.application import Sphinx
 
 # Configuration file for the Sphinx documentation builder.
 #
@@ -135,6 +138,6 @@ linkcheck_allowed_redirects = {
 linkcheck_anchors_ignore = [r'L\d*']
 
 
-def setup(app):
+def setup(app: Sphinx) -> None:
     app.add_css_file('pntos.css')
     app.add_css_file('hk-grotesk.css')

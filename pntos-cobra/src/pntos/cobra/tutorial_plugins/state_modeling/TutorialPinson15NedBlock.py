@@ -110,7 +110,7 @@ class TutorialPinson15NedBlock(StandardStateBlock):
     _force_and_rate_aux: MeasurementImu | None
     _pre_Q: NDArray[float64]
 
-    def __init__(self, label: str, mediator: Mediator, imu_model: ImuConfig):
+    def __init__(self, label: str, mediator: Mediator, imu_model: ImuConfig) -> None:
         """
         A Pinson15 NED Standard State Block
 
