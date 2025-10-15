@@ -77,7 +77,7 @@ class FogmBlock(StandardStateBlock):
         """
 
         self._mediator.log_message(
-            LoggingLevel.WARN, f'FogmBlock does not require aux data.'
+            LoggingLevel.WARN, 'FogmBlock does not require aux data.'
         )
 
     def generate_dynamics(

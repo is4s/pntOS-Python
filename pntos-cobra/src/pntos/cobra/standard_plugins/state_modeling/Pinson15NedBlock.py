@@ -370,7 +370,7 @@ class Pinson15NedBlock(StandardStateBlock):
         F[6:9, 12:15] = -C_sensor_to_ned  # Add in gyro bias to tiltdot
 
         # Accelerometer FOGM bias and Gyro FOGM bias
-        for ii in range(0, 3):
+        for ii in range(3):
             F[ii + 9, ii + 9] = -1.0 / self._imu_model.accel_bias_tau[ii]
             F[ii + 12, ii + 12] = -1.0 / self._imu_model.gyro_bias_tau[ii]
 

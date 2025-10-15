@@ -63,7 +63,7 @@ class AltitudeMeasurementProcessor(StandardMeasurementProcessor):
         if not aux:
             self._mediator.log_message(
                 LoggingLevel.ERROR,
-                f'AltitudeMeasurementProcessor expected aux data of type MeasurementPositionVelocityAttitude, but received empty list.',
+                'AltitudeMeasurementProcessor expected aux data of type MeasurementPositionVelocityAttitude, but received empty list.',
             )
             return
 
@@ -115,7 +115,7 @@ class AltitudeMeasurementProcessor(StandardMeasurementProcessor):
         if self._inertial_solution_time_nsec is None:
             self._mediator.log_message(
                 LoggingLevel.ERROR,
-                f'AltitudeMeasurementProcessor cannot process message as it has not received inertial PVA aux data.',
+                'AltitudeMeasurementProcessor cannot process message as it has not received inertial PVA aux data.',
             )
             return None
 

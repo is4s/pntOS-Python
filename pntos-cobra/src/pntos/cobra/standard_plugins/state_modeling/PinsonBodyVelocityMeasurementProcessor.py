@@ -74,7 +74,7 @@ class PinsonBodyVelocityMeasurementProcessor(StandardMeasurementProcessor):
         if not aux:
             self._mediator.log_message(
                 LoggingLevel.ERROR,
-                f'PinsonBodyVelocityMeasurementProcessor expected aux data of type MeasurementPositionVelocityAttitude, but received empty list.',
+                'PinsonBodyVelocityMeasurementProcessor expected aux data of type MeasurementPositionVelocityAttitude, but received empty list.',
             )
             return
 

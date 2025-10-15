@@ -1,5 +1,3 @@
-from typing import cast
-
 import numpy as np
 from aspn23 import (
     MeasurementPosition,
@@ -96,7 +94,7 @@ class PinsonWithLeverArmPositionMeasurementProcessor(StandardMeasurementProcesso
         if not aux:
             self._mediator.log_message(
                 LoggingLevel.ERROR,
-                f'PinsonWithLeverArmPositionMeasurementProcessor expected aux data of type \
+                'PinsonWithLeverArmPositionMeasurementProcessor expected aux data of type \
                 MeasurementPositionVelocityAttitude, but received empty list.',
             )
             return

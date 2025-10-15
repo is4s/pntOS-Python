@@ -54,6 +54,7 @@ lint.select = [
     "D",
     "DTZ",
     "E",
+    "F",
     "FA",
     "FLY",
     "FURB",
@@ -65,6 +66,7 @@ lint.select = [
     "NPY",
     "PERF",
     "PGH",
+    "PIE",
     "PL",
     "RET",
     "RSE",
@@ -94,6 +96,7 @@ lint.per-file-ignores."*/tests/*" = [
 lint.per-file-ignores."apps/*" = [ "D" ]
 lint.per-file-ignores."docs/*" = [ "D" ]
 lint.per-file-ignores."internal.py" = [ "PLC0414" ]
+lint.per-file-ignores."pntos-api/*" = [ "PIE" ]
 lint.per-file-ignores."pntos-cobra/*" = [ "D" ]
 lint.per-file-ignores."postprocessing/*" = [ "D" ]
 lint.isort.combine-as-imports = true

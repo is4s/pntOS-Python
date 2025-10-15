@@ -62,7 +62,7 @@ class DummyMediator(Mediator):
         pass
 
     def log_message(self, level: LoggingLevel, message: str) -> None:
-        DEBUG_LOG = message
+        pass
 
 
 class TestConfigUtils(unittest.TestCase):

@@ -14,7 +14,6 @@ from aspn23 import (
     TypeTimestamp,
 )
 from pntos.api import Message, Preprocessor, RegistryPlugin
-from pntos.api.plugins.preprocessor import Preprocessor
 from pntos.cobra import (
     StandardPreprocessorPlugin,
     StandardRegistryPlugin,

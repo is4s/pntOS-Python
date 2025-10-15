@@ -5,10 +5,8 @@ from copy import copy
 from typing import (
     Any,
     Callable,
-    ClassVar,
     ItemsView,
     Iterator,
-    KeysView,
     ValuesView,
 )
 

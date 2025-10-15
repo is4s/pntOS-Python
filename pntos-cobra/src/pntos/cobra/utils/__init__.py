@@ -36,7 +36,7 @@ from .lcm import (
     run_pntos_with_network_transport as run_pntos_with_network_transport,
     run_tcp_relay as run_tcp_relay,
 )
-from .navigation import *
+from .navigation import *  # noqa: F403
 from .orchestration_utils import (
     apply_error_states as apply_error_states,
     dispatch_to_fusion_engine as dispatch_to_fusion_engine,

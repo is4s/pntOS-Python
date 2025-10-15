@@ -7,7 +7,6 @@ from typing import (
     Callable,
     ItemsView,
     Iterator,
-    KeysView,
     TypeVar,
     ValuesView,
 )

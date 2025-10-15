@@ -23,7 +23,6 @@ class SimpleMessageStreamConfig(MessageStreamConfig):
 
         By default, all messages are immediately streamed.
         """
-        pass
 
     def _handle_source_identifier(self, source_identifier: str | None) -> None:
         if source_identifier is not None:

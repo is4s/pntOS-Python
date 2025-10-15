@@ -199,7 +199,7 @@ class TimeAdjusterPreprocessor(Preprocessor):
         if config is None:
             self._mediator.log_message(
                 LoggingLevel.ERROR,
-                f'Failed to populate TimeAdjusterConfig in TimeAdjusterPreprocessor.',
+                'Failed to populate TimeAdjusterConfig in TimeAdjusterPreprocessor.',
             )
             return
         self._channel_to_correct = config.channel_to_correct

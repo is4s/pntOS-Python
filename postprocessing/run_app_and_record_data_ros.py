@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-import os
 from sys import argv
 
 from plot_results import plot_results

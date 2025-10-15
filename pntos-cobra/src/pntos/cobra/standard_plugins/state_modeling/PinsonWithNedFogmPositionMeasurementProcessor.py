@@ -1,5 +1,3 @@
-from typing import cast
-
 import numpy as np
 from aspn23 import (
     MeasurementPosition,
@@ -79,7 +77,7 @@ class PinsonWithNedFogmPositionMeasurementProcessor(StandardMeasurementProcessor
         if not aux:
             self._mediator.log_message(
                 LoggingLevel.ERROR,
-                f'PinsonWithNedFogmPositionMeasurementProcessor expected aux data of type\
+                'PinsonWithNedFogmPositionMeasurementProcessor expected aux data of type\
                 MeasurementPositionVelocityAttitude, but received empty list.',
             )
             return
@@ -160,7 +158,7 @@ class PinsonWithNedFogmPositionMeasurementProcessor(StandardMeasurementProcessor
         if len(self.state_block_labels) != self._num_required_blocks:
             self._mediator.log_message(
                 LoggingLevel.ERROR,
-                f'PinsonWithNedFogmPositionMeasurementProcessor has wrong number of state blocks. Cannot generate model.',
+                'PinsonWithNedFogmPositionMeasurementProcessor has wrong number of state blocks. Cannot generate model.',
             )
             return None
 

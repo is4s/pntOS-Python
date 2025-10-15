@@ -151,7 +151,7 @@ def test_neg_sig(mediator: SimpleMediator) -> None:
 
 
 def test_neg_sig2(mediator: SimpleMediator) -> None:
-    blk = FogmBlock('bk', mediator, array([-1.0, -2.0]), array([3.0, 4.0]))
+    FogmBlock('bk', mediator, array([-1.0, -2.0]), array([3.0, 4.0]))
 
 
 # Aux data does nothing in this class

@@ -20,7 +20,6 @@ from pntos.api import (
     InitializationPlugin,
     InitializationStatus,
     LoggingLevel,
-    Mediator,
     Message,
 )
 from pntos.cobra import StaticAlignInitializationPlugin
@@ -133,7 +132,6 @@ def _test_aligner(
 
     # Check PVA covariance
     covariance = pva.covariance
-    variances = np.copy(np.diag(covariance))
     np.fill_diagonal(covariance, 0)
     assert np.allclose(covariance, np.zeros((9, 9)))
 
