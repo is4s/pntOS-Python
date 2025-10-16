@@ -1,5 +1,5 @@
 diff --git a/apps/tutorial/gps_ins.py b/apps/standard/gps_ins.py
-index 645d9adc..5692eebf 100755
+index dc971c5f..190c4b95 100755
 --- a/apps/tutorial/gps_ins.py
 +++ b/apps/standard/gps_ins.py
 @@ -2,37 +2,40 @@
@@ -69,7 +69,7 @@ index 645d9adc..5692eebf 100755
  my_config = [
      LcmLogTransportConfig(
          input_file=EXAMPLE_LCM_LOG,
-@@ -51,81 +65,86 @@ my_config = [
+@@ -51,80 +65,85 @@ my_config = [
          output_version=AspnVersion.V23,
          group='config/lcm_log_transport',
      ),
@@ -228,7 +228,7 @@ index 645d9adc..5692eebf 100755
      ),
  ]
  # End Config
-@@ -136,17 +155,16 @@ plugins = [
+@@ -135,17 +154,18 @@ plugins = [
      LcmLogTransportPlugin('Cobra LCM Log Transport Plugin'),
      EkfFusionStrategyPlugin('Cobra EKF Fusion Strategy Plugin'),
      StandardFusionPlugin('Cobra Standard Fusion Plugin'),

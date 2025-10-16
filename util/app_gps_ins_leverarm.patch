@@ -1,5 +1,5 @@
 diff --git a/apps/standard/gps_ins.py b/apps/standard/gps_ins_leverarm.py
-index 5692eebf..b89f9d30 100755
+index 190c4b95..4b0cc504 100755
 --- a/apps/standard/gps_ins.py
 +++ b/apps/standard/gps_ins_leverarm.py
 @@ -77,9 +77,9 @@ my_config = [

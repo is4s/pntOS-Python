@@ -1,5 +1,5 @@
 diff --git a/apps/tutorial/gps_ins.py b/apps/tutorial/gps_vel_ins.py
-index 645d9adc..79c36fd0 100755
+index dc971c5f..c1011f9e 100755
 --- a/apps/tutorial/gps_ins.py
 +++ b/apps/tutorial/gps_vel_ins.py
 @@ -16,7 +16,7 @@ from pntos.cobra import (
