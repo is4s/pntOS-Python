@@ -68,6 +68,7 @@ lint.select = [
     "PGH",
     "PIE",
     "PL",
+    "PTH",
     "RET",
     "RSE",
     "RUF",

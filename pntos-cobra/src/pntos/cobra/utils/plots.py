@@ -1,4 +1,4 @@
-import os
+from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -12,7 +12,7 @@ from numpy.typing import NDArray
 
 
 def plot_pva(
-    pva: PvaData, truth_pva: PvaData, t0: float, save_dir: str | None = None
+    pva: PvaData, truth_pva: PvaData, t0: float, save_dir: Path | None = None
 ) -> None:
     """Generate position, velocity and attitude plots, as well as error plots.
 
@@ -23,7 +23,7 @@ def plot_pva(
         save_dir: Directory to save plots to, if desired. If None, will not save plots.
     """
     if save_dir:
-        os.makedirs(save_dir, exist_ok=True)
+        Path(save_dir).mkdir(parents=True, exist_ok=True)
 
     leg = [pva.label, truth_pva.label]
     leg_w_sigma = [pva.label, truth_pva.label, '+/- 1 sigma']
@@ -97,7 +97,7 @@ def plot_trajectory(
     truth_time: NDArray[float64],
     leg: list[str],
     drms_str: str,
-    plot_dir: str | None = None,
+    plot_dir: Path | None = None,
 ) -> None:
     """Plot trajectory as Northing vs Easting in meters.
 
@@ -108,7 +108,7 @@ def plot_trajectory(
         truth_time (NDArray[float64]): Timestamps associated with ``truth_ned`` position.
         leg (list[str]): Legend to use for plot.
         drms_str (str): String containing 2DRMS error of ``ned`` solution, for displaying on plot.
-        plot_dir (str | None, optional): Optional directory to which plot should be saved, if desired. Defaults to None.
+        plot_dir (pathlib.Path | None, optional): Optional directory to which plot should be saved, if desired. Defaults to None.
     """
     fig = plt.figure('Trajectory')
     plt.suptitle('Northing vs. Easting')
@@ -149,7 +149,7 @@ def plot_trajectory(
         fontsize=10,
     )
     if plot_dir:
-        filename = os.path.join(plot_dir, 'ne_trajectory')
+        filename = plot_dir / 'ne_trajectory'
         plt.savefig(f'{filename}.png', dpi=300)
 
 
@@ -161,7 +161,7 @@ def plot_llh(
     truth_time: NDArray[float64],
     t0: float,
     leg: list[str],
-    plot_dir: str | None = None,
+    plot_dir: Path | None = None,
 ) -> None:
     """Plot LLH position in units of radians, radians, meters, respectively.
 
@@ -173,7 +173,7 @@ def plot_llh(
         truth_time (NDArray[float64]): Timestamps associated with ``truth_llh`` position.
         t0: Initial time (in seconds). Timestamps of ``time`` and ``truth_time`` are relative to this.
         leg (list[str]): Legend to use for plot.
-        plot_dir (str | None, optional): Optional directory to which plot should be saved, if desired. Defaults to None.
+        plot_dir (pathlib.Path | None, optional): Optional directory to which plot should be saved, if desired. Defaults to None.
     """
     plt.figure('LLA Pos')
     plt.suptitle('LLA Position and Uncertainty vs. Time')
@@ -198,7 +198,7 @@ def plot_llh(
     plt.xlabel(f'Relative time (sec), t0 = {t0}')
     plt.legend(leg)
     if plot_dir:
-        filename = os.path.join(plot_dir, 'lla_position')
+        filename = plot_dir / 'lla_position'
         plt.savefig(f'{filename}.png', dpi=300)
 
 
@@ -210,7 +210,7 @@ def plot_ned(
     truth_time: NDArray[float64],
     t0: float,
     leg: list[str],
-    plot_dir: str | None = None,
+    plot_dir: Path | None = None,
 ) -> None:
     """Plot NED position in meters.
 
@@ -222,7 +222,7 @@ def plot_ned(
         truth_time (NDArray[float64]): Timestamps associated with ``truth_ned`` position.
         t0: Initial time (in seconds). Timestamps of ``time`` and ``truth_time`` are relative to this.
         leg (list[str]): Legend to use for plot.
-        plot_dir (str | None, optional): Optional directory to which plot should be saved, if desired. Defaults to None.
+        plot_dir (pathlib.Path | None, optional): Optional directory to which plot should be saved, if desired. Defaults to None.
     """
     plt.figure('NED Pos')
     plt.suptitle('NED Position vs. Time')
@@ -247,7 +247,7 @@ def plot_ned(
     plt.xlabel(f'Relative time (sec), t0 = {t0}')
     plt.legend(leg)
     if plot_dir:
-        filename = os.path.join(plot_dir, 'ned_position')
+        filename = plot_dir / 'ned_position'
         plt.savefig(f'{filename}.png', dpi=300)
 
 
@@ -257,7 +257,7 @@ def plot_ned_err(
     time: NDArray[float64],
     t0: float,
     solution_label: str,
-    plot_dir: str | None = None,
+    plot_dir: Path | None = None,
 ) -> None:
     """Plot NED position error in meters.
 
@@ -267,7 +267,7 @@ def plot_ned_err(
         time (NDArray[float64]): Timestamps associated with ``ned_err``.
         t0: Initial time (in seconds). Timestamps of ``time`` are relative to this.
         solution_label (str): Label of solution for which error was calculated. Used for plot title.
-        plot_dir (str | None, optional): Optional directory to which plot should be saved, if desired. Defaults to None.
+        plot_dir (pathlib.Path | None, optional): Optional directory to which plot should be saved, if desired. Defaults to None.
     """
     fig = plt.figure('NED Pos Error')
     plt.suptitle(f'{solution_label} NED Position Error vs. Time')
@@ -292,7 +292,7 @@ def plot_ned_err(
     plt.xlabel(f'Relative time (sec), t0 = {t0}')
     plt.legend(['Error', '+/- 1-sigma'])
     if plot_dir:
-        filename = os.path.join(plot_dir, 'ned_position_error')
+        filename = plot_dir / 'ned_position_error'
         plt.savefig(f'{filename}.png', dpi=300)
 
 
@@ -304,7 +304,7 @@ def plot_vel(
     truth_time: NDArray[float64],
     t0: float,
     leg: list[str],
-    plot_dir: str | None = None,
+    plot_dir: Path | None = None,
 ) -> None:
     """Plot NED velocity in m/s.
 
@@ -316,7 +316,7 @@ def plot_vel(
         truth_time (NDArray[float64]): Timestamps associated with ``truth_vel``.
         t0: Initial time (in seconds). Timestamps of ``time`` and ``truth_time`` are relative to this.
         leg (list[str]): Legend to use for plot.
-        plot_dir (str | None, optional): Optional directory to which plot should be saved, if desired. Defaults to None.
+        plot_dir (pathlib.Path | None, optional): Optional directory to which plot should be saved, if desired. Defaults to None.
     """
     plt.figure('Vel')
     plt.suptitle('Velocity and Uncertainty vs. Time')
@@ -341,7 +341,7 @@ def plot_vel(
     plt.xlabel(f'Relative time (sec), t0 = {t0}')
     plt.legend(leg)
     if plot_dir:
-        filename = os.path.join(plot_dir, 'ned_velocity')
+        filename = plot_dir / 'ned_velocity'
         plt.savefig(f'{filename}.png', dpi=300)
 
 
@@ -351,7 +351,7 @@ def plot_vel_err(
     time: NDArray[float64],
     t0: float,
     solution_label: str,
-    plot_dir: str | None = None,
+    plot_dir: Path | None = None,
 ) -> None:
     """Plot NED velocity error in m/s.
 
@@ -361,7 +361,7 @@ def plot_vel_err(
         time (NDArray[float64]): Timestamps associated with ``vel_err``.
         t0: Initial time (in seconds). Timestamps of ``time`` are relative to this.
         solution_label (str): Label of solution for which error was calculated. Used for plot title.
-        plot_dir (str | None, optional): Optional directory to which plot should be saved, if desired. Defaults to None.
+        plot_dir (pathlib.Path | None, optional): Optional directory to which plot should be saved, if desired. Defaults to None.
     """
     fig = plt.figure('NED Vel Error')
     plt.suptitle(f'{solution_label} NED Velocity Error vs. Time')
@@ -386,7 +386,7 @@ def plot_vel_err(
     plt.xlabel(f'Relative time (sec), t0 = {t0}')
     plt.legend(['Error', '+/- 1-sigma'])
     if plot_dir:
-        filename = os.path.join(plot_dir, 'ned_velocity_error')
+        filename = plot_dir / 'ned_velocity_error'
         plt.savefig(f'{filename}.png', dpi=300)
 
 
@@ -398,7 +398,7 @@ def plot_rpy(
     truth_time: NDArray[float64],
     t0: float,
     leg: list[str],
-    plot_dir: str | None = None,
+    plot_dir: Path | None = None,
 ) -> None:
     """Plot RPY attitude about NED frame over time in degrees.
 
@@ -410,7 +410,7 @@ def plot_rpy(
         truth_time (NDArray[float64]): Timestamps associated with ``truth_rpy``.
         t0: Initial time (in seconds). Timestamps of ``time`` and ``truth_time`` are relative to this.
         leg (list[str]): Legend to use for plot.
-        plot_dir (str | None, optional): Optional directory to which plot should be saved, if desired. Defaults to None.
+        plot_dir (pathlib.Path | None, optional): Optional directory to which plot should be saved, if desired. Defaults to None.
     """
     plt.figure('RPY')
     plt.suptitle('RPY and (tilt) Uncertainty vs. Time')
@@ -435,7 +435,7 @@ def plot_rpy(
     plt.xlabel(f'Relative time (sec), t0 = {t0}')
     plt.legend(leg)
     if plot_dir:
-        filename = os.path.join(plot_dir, 'rpy')
+        filename = plot_dir / 'rpy'
         plt.savefig(f'{filename}.png', dpi=300)
 
 
@@ -445,7 +445,7 @@ def plot_tilt_err(
     time: NDArray[float64],
     t0: float,
     solution_label: str,
-    plot_dir: str | None = None,
+    plot_dir: Path | None = None,
 ) -> None:
     """Plot NED tilt error in degrees.
 
@@ -455,7 +455,7 @@ def plot_tilt_err(
         time (NDArray[float64]): Timestamps associated with ``tilt_err``.
         t0: Initial time (in seconds). Timestamps of ``time`` are relative to this.
         solution_label (str): Label of solution for which error was calculated. Used for plot title.
-        plot_dir (str | None, optional): Optional directory to which plot should be saved, if desired. Defaults to None.
+        plot_dir (pathlib.Path | None, optional): Optional directory to which plot should be saved, if desired. Defaults to None.
     """
     fig = plt.figure('NED Tilt Error')
     plt.suptitle(f'{solution_label} NED Tilt Error vs. Time')
@@ -480,5 +480,5 @@ def plot_tilt_err(
     plt.xlabel(f'Relative time (sec), t0 = {t0}')
     plt.legend(['Error', '+/- 1-sigma'])
     if plot_dir:
-        filename = os.path.join(plot_dir, 'ned_tilt_error')
+        filename = plot_dir / 'ned_tilt_error'
         plt.savefig(f'{filename}.png', dpi=300)

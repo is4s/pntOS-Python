@@ -2,9 +2,9 @@
 """Main API comparison script."""
 
 import argparse as ap
-import os
 import sys
 import tempfile
+from pathlib import Path
 
 from common_api_representation import CtoPyApiComparator
 from git import Repo
@@ -19,10 +19,10 @@ def main(file_name: str, revision: str) -> None:
     """Main script."""
     exit_val = False
     with tempfile.TemporaryDirectory() as tmp_dir:
-        pntos_path = os.path.join(tmp_dir, 'pntos')
-        firehose_path = os.path.join(tmp_dir, 'firehose-outputs')
-        c_api_path = os.path.join(pntos_path, 'api/include/')
-        aspn_path = os.path.join(firehose_path, 'aspn-c/src/')
+        pntos_path = Path(tmp_dir) / 'pntos'
+        firehose_path = Path(tmp_dir) / 'firehose-outputs'
+        c_api_path = Path(pntos_path) / 'api/include/'
+        aspn_path = Path(firehose_path) / 'aspn-c/src/'
         print(f'Cloning pntOS repo to {pntos_path}')
         pntos = Repo.clone_from(PNTOS_URL, pntos_path, depth=1)
         if revision:
@@ -31,12 +31,12 @@ def main(file_name: str, revision: str) -> None:
             pntos.git.checkout(revision)
         print(f'Cloning firehose-outputs to {firehose_path}')
         Repo.clone_from(FIREHOSE_URL, firehose_path, depth=1)
-        c_path = os.path.join(c_api_path, 'pntos/plugins/')
-        py_path = 'pntos-api/src/pntos/api/plugins/'
+        c_path = c_api_path / 'pntos/plugins/'
+        py_path = Path('pntos-api/src/pntos/api/plugins/')
 
         if file_name:
-            c_full_path = os.path.join(c_path, file_name + '.h')
-            py_full_path = os.path.join(py_path, file_name + '.py')
+            c_full_path = c_path / file_name + '.h'
+            py_full_path = py_path / file_name + '.py'
 
             comparator = CtoPyApiComparator()
             c_module = clang_parse_file(c_full_path, c_api_path, aspn_path)
@@ -48,11 +48,12 @@ def main(file_name: str, revision: str) -> None:
             return
 
         bad_mods = []
-        for c_fn in os.listdir(c_path):
+        for c_fn in c_path.iterdir():
             fn = c_fn.split('.')[0]
             py_fn = fn + '.py'
-            c_full_path = os.path.join(c_path, c_fn)
-            py_full_path = os.path.join(py_path, py_fn)
+
+            c_full_path = c_path / c_fn
+            py_full_path = py_path / py_fn
 
             comparator = CtoPyApiComparator()
             c_module = clang_parse_file(c_full_path, c_api_path, aspn_path)

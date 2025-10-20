@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from pntos.api import (
     KeyValueStore,
     LoggingLevel,
@@ -8,7 +10,7 @@ from pntos.api import (
 from pntos.cobra.utils import save_to_hdf5_file
 
 GROUP_TO_WATCH = 'diagnostics'
-OUTPUT_FILE = './OUTPUT.hdf5'
+OUTPUT_FILE = Path('./OUTPUT.hdf5')
 
 
 class DiagnosticLogPlugin(UtilityPlugin):
@@ -24,7 +26,7 @@ class DiagnosticLogPlugin(UtilityPlugin):
     length must not change each update of the value at that key.
     """
 
-    def __init__(self, identifier: str, output_file: str = './OUTPUT.hdf5') -> None:
+    def __init__(self, identifier: str, output_file: Path | None = None) -> None:
         """
         Diagnostic-Logging Utility Plugin
 
@@ -33,7 +35,7 @@ class DiagnosticLogPlugin(UtilityPlugin):
                 :meth:`pntos.api.CommonPlugin.identifier` field.
         """
         self.identifier = identifier
-        self._output_file = output_file
+        self._output_file = output_file if output_file is not None else OUTPUT_FILE
         self._store: dict[str, list[RegistryValueTypeUnion]] = {}
 
     def init_plugin(

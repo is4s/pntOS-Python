@@ -1,4 +1,4 @@
-import os
+from pathlib import Path
 
 import numpy as np
 from aspn23 import (
@@ -23,7 +23,7 @@ from pntos.cobra import (
 from pntos.cobra.internal import SimpleMediator
 from pntos.cobra.utils import load_from_hdf5_file
 
-TEST_FILE = './DELETEME.hdf5'
+TEST_FILE = Path('./DELETEME.hdf5')
 
 
 def generate_random_pva_message(source_identifier: str = 'source') -> Message:
@@ -108,13 +108,13 @@ def test_diagnostic_log_plugin() -> None:
     kv.batch_end()
 
     # Make sure the output file doesn't exist
-    if os.path.exists(TEST_FILE):
-        os.remove(TEST_FILE)
+    if TEST_FILE.exists():
+        TEST_FILE.unlink()
 
     # Shutdown the plugin to see if the output file is generated
     plugin.shutdown_plugin()
 
-    assert os.path.exists(TEST_FILE)
+    assert TEST_FILE.exists()
 
     # Load in the file and make sure it's all correct
     result_dict = load_from_hdf5_file(TEST_FILE, mediator)
@@ -138,4 +138,4 @@ def test_diagnostic_log_plugin() -> None:
             assert test_val == received_val
 
     # Don't forget to remove the file
-    os.remove(TEST_FILE)
+    TEST_FILE.unlink()

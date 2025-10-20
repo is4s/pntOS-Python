@@ -1,4 +1,4 @@
-import os
+from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -49,20 +49,20 @@ class UiLogPlottingPlugin(UiPlugin):
                 'Unable to retrieve config from registry. No config given or incorrect config group given. Expects config group "config/ui_logfile_plotting".',
             )
             return
-        self.logfile = config.logfile
+        self.logfile = Path(config.logfile)
         self.solution_channel = config.solution_channel
         self.truth_channel = config.truth_channel
 
     def shutdown_plugin(self) -> None:
         # Check if log file exist and is valid before plotting or skip and log a warning otherwise.
         # This check allows for a clean pntOS shutdown even if a log file doesn't exist or it is invalid.
-        if not os.path.exists(self.logfile):
+        if not self.logfile.exists():
             self.mediator.log_message(
                 LoggingLevel.WARN,
                 f'[{self.logfile}] file does not exist. No results will be plotted.',
             )
             return
-        with open(self.logfile, 'rb') as f:
+        with self.logfile.open('rb') as f:
             if f.read(4) != b'\xed\xa1\xda\x01':  # LCM log file magic bytes
                 self.mediator.log_message(
                     LoggingLevel.WARN,
@@ -74,13 +74,13 @@ class UiLogPlottingPlugin(UiPlugin):
 
     def _harvest_data(self, channels: list[str]) -> LogData[PvaData]:
         # ROS bagfile
-        if self.logfile.endswith('.db3') or self.logfile.endswith('.mcap'):
+        if self.logfile.suffix in {'.db3', '.mcap'}:
             from analysis.ros import RosBagReader  # noqa: PLC0415
 
-            return RosBagReader(self.logfile).harvest_topics(channels)
+            return RosBagReader(self.logfile.as_posix()).harvest_topics(channels)
 
         # LCM logfile
-        return read_pva(logfile=self.logfile, read_all=True)
+        return read_pva(logfile=self.logfile.as_posix(), read_all=True)
 
     def _plot_results(
         self,
@@ -98,10 +98,7 @@ class UiLogPlottingPlugin(UiPlugin):
             np.stack((truth_rpy[:, 1], truth_rpy[:, 0], -truth_rpy[:, 2]))
         )
         plt.rcParams['figure.figsize'] = (10, 6)
-        save_dir = os.path.join(
-            os.path.dirname(self.logfile),
-            os.path.splitext(os.path.basename(self.logfile))[0],
-        )
+        save_dir = self.logfile.parent / self.logfile.stem
         self.mediator.log_message(
             LoggingLevel.INFO,
             'Plotting results. Close all windows to continue shutdown.',

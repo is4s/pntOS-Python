@@ -2,6 +2,7 @@
 
 import os
 from dataclasses import dataclass
+from pathlib import Path
 
 import numpy as np
 from analysis.lcm.data import PvaData
@@ -16,8 +17,8 @@ from pntos.cobra.utils import (
 )
 from pntos_python_datasets import EXAMPLE_LCM_LOG, EXAMPLE_ROS_LOG
 
-OUTPUT_LOG = 'pntos_output.log'
-OUTPUT_BAG = os.path.splitext(OUTPUT_LOG)[0]
+OUTPUT_LOG = Path('pntos_output.log')
+OUTPUT_BAG = OUTPUT_LOG.parent / OUTPUT_LOG.stem
 SOLUTION_CHANNEL = '/solution/pntos/pva'
 TRUTH_CHANNEL = '/sensor/ins-d/pva'
 
@@ -97,8 +98,10 @@ def validate_results(
 
 
 def test_tutorial_gps_ins_app() -> None:
-    run_pntos_with_log_transport('apps/tutorial/gps_ins.py', OUTPUT_LOG, validate=True)
-    log_data = read_pva(OUTPUT_LOG, read_all=True)
+    run_pntos_with_log_transport(
+        Path('apps/tutorial/gps_ins.py'), OUTPUT_LOG, validate=True
+    )
+    log_data = read_pva(OUTPUT_LOG.as_posix(), read_all=True)
     validate_results(
         log_data.data[SOLUTION_CHANNEL],
         log_data.data[TRUTH_CHANNEL],
@@ -112,7 +115,9 @@ def test_tutorial_gps_ins_app() -> None:
 
 
 def test_standard_gps_ins_app() -> None:
-    run_pntos_with_log_transport('apps/standard/gps_ins.py', OUTPUT_LOG, validate=True)
+    run_pntos_with_log_transport(
+        Path('apps/standard/gps_ins.py'), OUTPUT_LOG, validate=True
+    )
     log_data = read_pva(OUTPUT_LOG, read_all=True)
     validate_results(
         log_data.data[SOLUTION_CHANNEL],
@@ -128,12 +133,12 @@ def test_standard_gps_ins_app() -> None:
 
 def test_standard_gps_ins_network_app() -> None:
     run_pntos_with_network_transport(
-        'apps/standard/lcm_relay.py',
-        EXAMPLE_LCM_LOG,
+        Path('apps/standard/lcm_relay.py'),
+        Path(EXAMPLE_LCM_LOG),
         OUTPUT_LOG,
         validate=True,
     )
-    log_data = read_pva(OUTPUT_LOG, read_all=True)
+    log_data = read_pva(OUTPUT_LOG.as_posix(), read_all=True)
     validate_results(
         log_data.data[SOLUTION_CHANNEL],
         log_data.data[TRUTH_CHANNEL],
@@ -148,7 +153,7 @@ def test_standard_gps_ins_network_app() -> None:
 
 def test_tutorial_gps_ins_vel_app() -> None:
     run_pntos_with_log_transport(
-        'apps/tutorial/gps_vel_ins.py', OUTPUT_LOG, validate=True
+        Path('apps/tutorial/gps_vel_ins.py'), OUTPUT_LOG, validate=True
     )
     log_data = read_pva(OUTPUT_LOG, read_all=True)
     validate_results(
@@ -182,7 +187,7 @@ def test_tutorial_gps_ins_vel_app() -> None:
 
 def test_standard_gps_ins_leverarm_app() -> None:
     run_pntos_with_log_transport(
-        'apps/standard/gps_ins_leverarm.py', OUTPUT_LOG, validate=True
+        Path('apps/standard/gps_ins_leverarm.py'), OUTPUT_LOG, validate=True
     )
     log_data = read_pva(OUTPUT_LOG, read_all=True)
     validate_results(
@@ -199,7 +204,7 @@ def test_standard_gps_ins_leverarm_app() -> None:
 
 def test_standard_gps_bodyvel_ins_app() -> None:
     run_pntos_with_log_transport(
-        'apps/standard/gps_ins_bodyvel.py', OUTPUT_LOG, validate=True
+        Path('apps/standard/gps_ins_bodyvel.py'), OUTPUT_LOG, validate=True
     )
     log_data = read_pva(OUTPUT_LOG, read_all=True)
     validate_results(
@@ -223,5 +228,8 @@ def test_advanced_gps_ins_ros_app() -> None:
     # Just run the app and ensure it doesn't crash. Don't validate the results, as the
     # ROS transport is not consistent enough.
     run_pntos_with_ros_transport(
-        'apps/advanced/gps_ins_ros.py', EXAMPLE_ROS_LOG, OUTPUT_BAG, validate=True
+        Path('apps/advanced/gps_ins_ros.py'),
+        Path(EXAMPLE_ROS_LOG),
+        OUTPUT_BAG,
+        validate=True,
     )

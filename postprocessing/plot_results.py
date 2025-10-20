@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import argparse
-import os
+from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -10,9 +10,9 @@ from analysis.lcm.log_readers import read_pva
 from pntos.cobra.utils import plot_pva
 
 
-def harvest_data(logfile: str, channels: list[str]) -> LogData[PvaData]:
+def harvest_data(logfile: Path, channels: list[str]) -> LogData[PvaData]:
     # ROS bagfile
-    if logfile.endswith(('.db3', '.mcap')):
+    if logfile.suffix in {'.db3', '.mcap'}:
         from analysis.ros import RosBagReader  # noqa: PLC0415
 
         return RosBagReader(logfile).harvest_topics(channels)
@@ -21,7 +21,7 @@ def harvest_data(logfile: str, channels: list[str]) -> LogData[PvaData]:
     return read_pva(logfile=logfile, read_all=True)
 
 
-def plot_results(logfile: str, solution_channel: str, truth_channel: str) -> None:
+def plot_results(logfile: Path, solution_channel: str, truth_channel: str) -> None:
     log_data = harvest_data(logfile, [solution_channel, truth_channel])
 
     solution = log_data.data[solution_channel]
@@ -34,9 +34,8 @@ def plot_results(logfile: str, solution_channel: str, truth_channel: str) -> Non
 
     print('Plotting results...')
     plt.rcParams['figure.figsize'] = (10, 6)
-    save_dir = os.path.join(
-        os.path.dirname(logfile), os.path.splitext(os.path.basename(logfile))[0]
-    )
+    logfile = Path(logfile)
+    save_dir = logfile.parent / logfile.stem
     plot_pva(solution, truth, log_data.t0, save_dir=save_dir)
     print(f'Plots saved to {save_dir}.')
     plt.show()
