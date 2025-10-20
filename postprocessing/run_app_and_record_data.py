@@ -1,21 +1,21 @@
 #!/usr/bin/env python3
 
-import os
+from pathlib import Path
 from sys import argv
 
 from plot_results import plot_results
 from pntos.cobra.utils.lcm import run_pntos_with_log_transport
 
-OUTPUT_LOG = 'pntos_output.log'
+OUTPUT_LOG = Path('pntos_output.log')
 
 
 if __name__ == '__main__':
     app_to_run = argv[1] if len(argv) > 1 else 'apps/standard/gps_ins.py'
-    run_pntos_with_log_transport(app_to_run, OUTPUT_LOG)
+    run_pntos_with_log_transport(Path(app_to_run), OUTPUT_LOG)
 
     # Tutorial apps include UI plugin which automatically plots upon shutdown, so no need to plot again
     if 'tutorial' not in app_to_run:
-        if os.path.exists(OUTPUT_LOG):
+        if OUTPUT_LOG.exists():
             plot_results(OUTPUT_LOG, '/solution/pntos/pva', '/sensor/ins-d/pva')
         else:
             print(

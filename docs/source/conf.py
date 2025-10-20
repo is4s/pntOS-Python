@@ -125,6 +125,7 @@ nitpick_ignore = [
     ('py:obj', 'pntos.api.RegistryValueTypeUnion'),
     ('py:class', 'RegistryValueType'),
     ('py:class', 'RegistryValueTypeUnion'),
+    ('py:class', 'pathlib.Path'),
 ]
 
 # Linkcheck builder options.

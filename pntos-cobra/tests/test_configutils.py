@@ -1,6 +1,7 @@
 import unittest
 from dataclasses import fields
 from enum import Enum
+from pathlib import Path
 
 import numpy as np
 from aspn23 import TypeTimestamp
@@ -34,7 +35,7 @@ from pntos.cobra.config import (
 )
 from pntos.cobra.utils import validate_manual_ewc
 
-DEBUG_LOG: str = ''
+DEBUG_LOG: Path = Path()
 CONFIG_TEST_GROUP = 'config_test_group'
 
 
@@ -421,4 +422,4 @@ class TestConfigUtils(unittest.TestCase):
                 assert test_val == result_val
 
         # Make sure there weren't any error messages:
-        assert DEBUG_LOG == ''
+        assert Path() == DEBUG_LOG

@@ -1,4 +1,4 @@
-import os
+from pathlib import Path
 
 import numpy as np
 from aspn23 import (
@@ -12,7 +12,7 @@ from pntos.api import Message, RegistryValueTypeUnion, UtilityPlugin
 from pntos.cobra.internal import SimpleMediator
 from pntos.cobra.utils import load_from_hdf5_file, save_to_hdf5_file
 
-TEST_FILE = './DELETEME.hdf5'
+TEST_FILE = Path('./DELETEME.hdf5')
 
 
 def generate_random_pva_message(source_identifier: str = 'source') -> Message:
@@ -91,4 +91,4 @@ def test_hdf5_to_and_from() -> None:
             for test_v, res_v in zip(test_val, res_val, strict=True):
                 assert test_v == res_v
 
-    os.remove(TEST_FILE)
+    TEST_FILE.unlink()

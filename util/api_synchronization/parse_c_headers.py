@@ -1,8 +1,8 @@
 """Parses C/C++ headers."""
 
-import os
 import re
 import tempfile
+from pathlib import Path
 
 import clang.cindex
 from clang.cindex import CursorKind
@@ -44,9 +44,9 @@ def remove_directives(file_contents: str) -> str:
     return re.sub(r'#ifdef __cplusplus.*#endif', '', file_contents, flags=re.DOTALL)
 
 
-def preprocess_file(in_file: str) -> str:
+def preprocess_file(in_file: Path) -> str:
     """Preprocesses header file by removing macros and directives."""
-    with open(in_file, 'r', encoding='utf-8') as file:
+    with in_file.open('r', encoding='utf-8') as file:
         header = file.read()
         header = replace_macros(header)
         return remove_directives(header)
@@ -59,7 +59,7 @@ def create_temp_file(file_contents: str) -> str:
     return tmp_file.name
 
 
-def generate_file_for_parsing(in_file: str) -> str:
+def generate_file_for_parsing(in_file: Path) -> str:
     """Preprocesses input file and returns a temp file with those changes."""
     contents = preprocess_file(in_file)
     return create_temp_file(contents)
@@ -103,7 +103,7 @@ def parse_callback_param(cursor: clang.cindex.Cursor) -> dict[str, list[str]]:
 
 
 def clang_parse_file(
-    in_file: str, c_api_path: str, firehose_outputs_path: str
+    in_file: Path, c_api_path: Path, firehose_outputs_path: Path
 ) -> ApiModule:
     """Uses clang to parse a C/C++ header file."""
     module = ApiModule(name=in_file)
@@ -159,5 +159,5 @@ def clang_parse_file(
                 new_field = ApiAttribute(name=field_name, type=field_type)
                 new_class.add_attribute(new_field)
         module.add_class(new_class)
-    os.remove(tmp_file_path)
+    Path(tmp_file_path).unlink()
     return module

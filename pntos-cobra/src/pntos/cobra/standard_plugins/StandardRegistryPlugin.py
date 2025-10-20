@@ -1,7 +1,7 @@
 import builtins
-import os
 import pickle
 from copy import copy
+from pathlib import Path
 from typing import (
     Any,
     Callable,
@@ -28,7 +28,7 @@ from pntos.cobra.config import BaseConfig, config_to_registry
 
 REGISTRY_DATA_FORMAT = KeyValueStoreDataFormat.UNSPECIFIED
 REGISTRY_SEPARATOR = ', '
-DEFAULT_PERMANENCY_DIR = './registry_permanency_files/'
+DEFAULT_PERMANENCY_DIR = Path('./registry_permanency_files')
 
 
 class StandardKeyValueStore(KeyValueStore):
@@ -49,8 +49,8 @@ class StandardKeyValueStore(KeyValueStore):
     data_format: KeyValueStoreDataFormat = REGISTRY_DATA_FORMAT
     _plugin_resources_location: str | None
     _group: str
-    _permanency_file: str
-    _permanency_dir: str
+    _permanency_file: Path
+    _permanency_dir: Path
     _batch_live: bool
     _log: Callable[[LoggingLevel, str], None]
     _batch_err: str = (
@@ -154,16 +154,18 @@ class StandardKeyValueStore(KeyValueStore):
 
         # Set up permanency
         if self._plugin_resources_location is not None:
-            self._permanency_file = (
-                self._plugin_resources_location + self._group + '.pkl'
+            self._permanency_file = Path(
+                self._plugin_resources_location + f'/{self._group}.pkl'
             )
         else:
-            self._permanency_file = DEFAULT_PERMANENCY_DIR + self._group + '.pkl'
-        self._permanency_dir = os.path.dirname(self._permanency_file)
-        if not os.path.exists(self._permanency_dir):
-            os.makedirs(self._permanency_dir)
-        if os.path.exists(self._permanency_file):
-            with open(self._permanency_file, 'rb') as file:
+            self._permanency_file = Path(
+                DEFAULT_PERMANENCY_DIR.as_posix() + f'/{self._group}.pkl'
+            )
+        self._permanency_dir = self._permanency_file.parent
+        if not self._permanency_dir.exists():
+            self._permanency_dir.mkdir(parents=True)
+        if self._permanency_file.exists():
+            with self._permanency_file.open('rb') as file:
                 self._store = pickle.load(file)
         else:
             self._store = {}
@@ -365,7 +367,7 @@ class StandardKeyValueStore(KeyValueStore):
             permanent_dict = {}
             for key in self._permanent_keys:
                 permanent_dict[key] = self._store[key]
-            with open(self._permanency_file, 'wb') as file:
+            with self._permanency_file.open('wb') as file:
                 pickle.dump(permanent_dict, file)
 
         # Turn off permanency (so that a restart doesn't keep writing permanent)

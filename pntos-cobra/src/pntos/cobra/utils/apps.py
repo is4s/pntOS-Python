@@ -1,5 +1,6 @@
 import os
 import time
+from pathlib import Path
 from signal import SIGINT
 from subprocess import PIPE, Popen
 from threading import Thread
@@ -29,7 +30,7 @@ def monitor_app_output(
 
 
 def wait_until_file_stable(
-    file: str, stable_secs: int = 3, check_interval: int = 1
+    file: Path, stable_secs: int = 3, check_interval: int = 1
 ) -> None:
     """Wait until file stops growing for `stable_secs` seconds.
 
@@ -40,8 +41,8 @@ def wait_until_file_stable(
     stable_time = 0.0
 
     while True:
-        if os.path.exists(file):
-            size = os.path.getsize(file)
+        if file.exists():
+            size = file.stat().st_size
 
         if size == last_size:
             stable_time += check_interval
@@ -55,14 +56,14 @@ def wait_until_file_stable(
 
 
 def run_app(
-    app: str,
-    output_log: str | None = None,
+    app: Path,
+    output_log: Path | None = None,
     monitor: bool = False,
     validate: bool = False,
 ) -> Popen[str]:
-    cmd = ['python3', '-u', app]
+    cmd = ['python3', '-u', app.as_posix()]
     if output_log is not None:
-        cmd.append(output_log)
+        cmd.append(output_log.as_posix())
 
     # Set unbuffered flag so the subprocess standard output can be read in real time
     app_process = Popen(cmd, stdout=PIPE, text=True, bufsize=1, start_new_session=True)

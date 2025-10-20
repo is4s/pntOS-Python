@@ -1,6 +1,7 @@
 """Parses Python Files."""
 
 import ast
+from pathlib import Path
 
 from common_api_representation import (
     ApiAttribute,
@@ -120,9 +121,9 @@ class ApiVisitor(ast.NodeVisitor):
         self.curr_class.add_method(callback_func)
 
 
-def parse_python_file(in_file: str) -> ApiModule:
+def parse_python_file(in_file: Path) -> ApiModule:
     """Parses Python file."""
-    with open(in_file, 'r', encoding='utf-8') as file:
+    with in_file.open('r', encoding='utf-8') as file:
         contents = file.read()
     tree = ast.parse(contents)
 

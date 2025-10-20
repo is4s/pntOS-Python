@@ -1,4 +1,5 @@
 import pickle
+from pathlib import Path
 
 import h5py
 import numpy as np
@@ -8,7 +9,7 @@ from pntos.api import LoggingLevel, Mediator, Message, RegistryValueTypeUnion
 
 
 def save_to_hdf5_file(
-    file: str,
+    file: Path,
     store: dict[str, list[RegistryValueTypeUnion]],
     mediator: Mediator,
 ) -> None:
@@ -32,12 +33,12 @@ def save_to_hdf5_file(
         dump objects, packed inside a ``numpy.void()`` object.
 
     Args:
-        file (str): Path to ``.hdf5`` file.
+        file (pathlib.Path): Path to ``.hdf5`` file.
         store (dict[str, list[RegistryValueTypeUnion]]): The dictionary to write to the
             HDF5 file, subject to the above assumptions.
         mediator (Mediator): A :class:`pntos.api.Mediator` instance.
     """
-    with h5py.File(file, 'w') as hdf5_file:
+    with h5py.File(file.as_posix(), 'w') as hdf5_file:
         for key, val_list in store.items():
             if val_list:
                 # Need to guarantee that all elements of val_list are the same type
@@ -81,7 +82,7 @@ def save_to_hdf5_file(
 
 
 def load_from_hdf5_file(
-    file: str, mediator: Mediator
+    file: Path, mediator: Mediator
 ) -> dict[str, list[RegistryValueTypeUnion]]:
     """
     Utility function for loading data from an HDF5 file into python.
@@ -91,14 +92,14 @@ def load_from_hdf5_file(
     See :func:`save_to_hdf5_file` for more information.
 
     Args:
-        file (str): Path to ``.hdf5`` file.
+        file (pathlib.Path): Path to ``.hdf5`` file.
         mediator (Mediator): A :class:`pntos.api.Mediator` instance.
 
     Returns:
        dict[str, list[RegistryValueTypeUnion]]
     """
     output: dict[str, list[RegistryValueTypeUnion]] = {}
-    with h5py.File(file, 'r') as hdf5_file:
+    with h5py.File(file.as_posix(), 'r') as hdf5_file:
         for key, val in hdf5_file.items():
             if isinstance(val, h5py.Dataset):
                 if val.ndim == 0:  # list[Message] is just pickled, so len = 0

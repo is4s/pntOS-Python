@@ -1,5 +1,5 @@
-import os
 import re
+from pathlib import Path
 from site import getsitepackages
 from subprocess import PIPE, Popen
 from typing import Callable
@@ -460,12 +460,12 @@ def create_lcm_message(
 
 
 def run_tcp_relay() -> Popen[str]:  # pragma: no cover
-    sitepackages_dir = getsitepackages()[0]
+    sitepackages_dir = Path(getsitepackages()[0])
     process = Popen(
         [
             'java',
             '-classpath',
-            os.path.join(sitepackages_dir, 'share', 'java', 'lcm.jar'),
+            sitepackages_dir / 'share' / 'java' / 'lcm.jar',
             'lcm.lcm.TCPService',
         ],
         text=True,
@@ -477,33 +477,33 @@ def run_tcp_relay() -> Popen[str]:  # pragma: no cover
     return process
 
 
-def run_lcm_logger(output_file: str) -> Popen[bytes]:  # pragma: no cover
+def run_lcm_logger(output_file: Path) -> Popen[bytes]:  # pragma: no cover
     # Remove any pre-existing output
-    if os.path.exists(output_file):
-        os.remove(output_file)
+    if output_file.exists():
+        output_file.unlink()
     return Popen(
-        ['lcm-logger', '--lcm-url=tcpq://', '-q', output_file],
+        ['lcm-logger', '--lcm-url=tcpq://', '-q', output_file.as_posix()],
         start_new_session=True,
     )
 
 
-def run_lcm_logplayer(logfile: str) -> Popen[bytes]:  # pragma: no cover
+def run_lcm_logplayer(logfile: Path) -> Popen[bytes]:  # pragma: no cover
     return Popen(
-        ['lcm-logplayer', '--lcm-url=tcpq://', '--speed=1000', logfile],
+        ['lcm-logplayer', '--lcm-url=tcpq://', '--speed=1000', logfile.as_posix()],
         start_new_session=True,
     )
 
 
 def run_pntos_with_log_transport(
-    app: str,
-    output_log: str,
+    app: Path,
+    output_log: Path,
     validate: bool = False,
 ) -> None:  # pragma: no cover
     """Spin up app, process log, then shut down.
 
     Args:
-        app (str): Path to app to run.
-        output_log (str): LCM log to which output should be recorded.
+        app (pathlib.Path): Path to app to run.
+        output_log (pathlib.Path): LCM log to which output should be recorded.
         validate (bool): Whether to validate the app's output, ensuring there are no
             warnings or errors. Defaults to False.
     """
@@ -523,17 +523,17 @@ def run_pntos_with_log_transport(
 
 
 def run_pntos_with_network_transport(
-    app: str,
-    input_log: str,
-    output_log: str,
+    app: Path,
+    input_log: Path,
+    output_log: Path,
     validate: bool = False,
 ) -> None:  # pragma: no cover
     """Spin up app and network tools necessary to run it, process log, then shut down.
 
     Args:
-        app (str): Path to app to run.
-        input_log (str): LCM log containing the measurements to be processed.
-        output_log (str): LCM log to which output should be recorded.
+        app (pathlib.Path): Path to app to run.
+        input_log (pathlib.Path): LCM log containing the measurements to be processed.
+        output_log (pathlib.Path): LCM log to which output should be recorded.
         validate (bool): Whether to validate the app's output, ensuring there are no
             warnings or errors. Defaults to False.
     """

@@ -1,4 +1,4 @@
-from os import path
+from pathlib import Path
 from site import getsitepackages
 
 from aspn23 import (
@@ -195,9 +195,9 @@ def open_log() -> EventLog:
     """Log opening code yoinked from the postprocessing folder"""
     log_filename = None
     for site in getsitepackages():
-        candidate = f'{site}/pntos_python_datasets/cobra_gps_ins_example_data.log'
-        if path.exists(candidate):
-            log_filename = candidate
+        candidate = Path(f'{site}/pntos_python_datasets/cobra_gps_ins_example_data.log')
+        if candidate.exists():
+            log_filename = candidate.as_posix()
             break
     if log_filename is None:
         raise Exception('Could not find log file.')
