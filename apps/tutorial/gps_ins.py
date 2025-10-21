@@ -133,7 +133,7 @@ plugins = [
     LcmLogTransportPlugin('Cobra LCM Log Transport Plugin'),
     EkfFusionStrategyPlugin('Cobra EKF Fusion Strategy Plugin'),
     StandardFusionPlugin('Cobra Standard Fusion Plugin'),
-    TutorialGpsInsStateModelingPlugin('Cobra Simple State Modeling Plugin'),
+    TutorialGpsInsStateModelingPlugin('Cobra Tutorial State Modeling Plugin'),
     StandardInertialPlugin('Cobra Standard Inertial Plugin'),
     TutorialInitializationPlugin('Cobra Manual Initialization Plugin'),
     StandardLoggingPlugin(

@@ -286,7 +286,7 @@ class Test_Orchestration(unittest.TestCase):
             'TutorialGpsOrchestrationPlugin'
         )
         self.state_modeling_plugin: StateModelingPlugin = (
-            TutorialGpsInsStateModelingPlugin('Cobra Simple State Modeling Plugin')
+            TutorialGpsInsStateModelingPlugin('Cobra Tutorial State Modeling Plugin')
         )
         plugins.append(self.orchestration_plugin)
         plugins.append(self.state_modeling_plugin)
