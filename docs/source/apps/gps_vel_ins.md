@@ -11,7 +11,7 @@ Begin by updating the import to bring in the new Orchestration plugin:
 ```diff
      LcmLogTransportPlugin,
      StandardControllerPlugin,
-     SimpleGpsInsStateModelingPlugin,
+     TutorialGpsInsStateModelingPlugin,
      StandardFusionPlugin,
      StandardInertialPlugin,
      StandardLoggingPlugin,
