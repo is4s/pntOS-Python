@@ -29,7 +29,7 @@ def _get_time(msg: Message) -> int:
 
 class StandardMediator(Mediator):
     """
-    This is a simple mediator implementation. It was designed to be used in conjuction with the
+    This is a simple mediator implementation. It was designed to be used in conjunction with the
     :class:`pntos.cobra.StandardControllerPlugin` which is why this controller directly access private members.
     It has one public member ``registry`` that other plugins are allowed to access.
     """
