@@ -76,8 +76,8 @@ INERTIAL_GROUP = 'config/inertial'
 
 # Config groups
 ALIGNMENT_CONFIG_GROUP = 'config/default/alignment'
-PREPROCESSOR_IDS = ['imu_rotator', 'time_adjuster']
-PREPROCESSOR_GROUPS = ['config/imu_rotator', 'config/time_adjuster']
+PREPROCESSOR_IDS = ['imu_rotator', 'time_adjuster', 'time_bias']
+PREPROCESSOR_GROUPS = ['config/imu_rotator', 'config/time_adjuster', 'config/time_bias']
 
 
 class TutorialGpsVelOrchestrationPlugin(OrchestrationPlugin):

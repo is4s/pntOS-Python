@@ -1,4 +1,4 @@
-from navtk.inertial import StaticAlignment
+from navtk.inertial import ManualHeadingAlignment
 from pntos.api import (
     InertialInitializationStrategy,
     InitialInertialSolution,
@@ -11,40 +11,48 @@ from pntos.api import (
     Message,
 )
 from pntos.cobra.config import config_from_registry, imu_model_from_config
-from pntos.cobra.config.StaticAlignmentConfig import (
-    StaticAlignmentConfig,
+from pntos.cobra.config.ManualHeadingAlignmentConfig import (
+    ManualHeadingAlignmentConfig,
 )
 from pntos.cobra.utils import convert_alignment, convert_message, convert_status
 
 
-class StaticAlign(InertialInitializationStrategy):
+class ManualHeadingAlign(InertialInitializationStrategy):
     """
-    Static alignment for an inertial.
+    Static alignment for an inertial, requiring a user-provided heading.
 
     This initialization strategy can be used to produce an initial PVA to initialize an inertial
-    mechanization. It requires position and IMU data, performing gyrocompassing to estimate an
-    initial attitude from the IMU data. It does not estimate initial inertial errors.
+    mechanization. It requires both position and IMU measurements, as well as an initial heading
+    provided via config. It is also capable of estimating inertial biases.
     """
 
-    aligner: StaticAlignment
+    aligner: ManualHeadingAlignment
     mediator: Mediator
 
     def __init__(self, config_group: str, mediator: Mediator) -> None:
         """
         Args:
-            config_group (str): A :class:`pntos.cobra.config.StaticAlignmentConfig` config group.
+            config_group (str): A :class:`pntos.cobra.config.ManualHeadingAlignmentConfig` config group.
             mediator (Mediator): A :class:`pntos.api.Mediator` instance.
         """
         self.mediator = mediator
-        config = config_from_registry(StaticAlignmentConfig, mediator, config_group)
+        config = config_from_registry(
+            ManualHeadingAlignmentConfig, mediator, config_group
+        )
         if config is None:
             self.mediator.log_message(
                 LoggingLevel.ERROR,
-                f'Failed to populate config from registry to config type StaticAlignmentConfig and group {config_group}.',
+                f'Failed to populate config from registry to config type ManualHeadingAlignmentConfig and group {config_group}.',
             )
             return
         imu_model = imu_model_from_config(config.imu_model)
-        self.aligner = StaticAlignment(imu_model, config.static_time)
+
+        self.aligner = ManualHeadingAlignment(
+            config.heading,
+            config.heading_sigma,
+            imu_model,
+            config.static_time,
+        )
 
     def request_motion_needed(self) -> InitializationMotionNeeded:
         return InitializationMotionNeeded.NO_MOTION
@@ -69,9 +77,9 @@ class StaticAlign(InertialInitializationStrategy):
         )
 
 
-class StaticAlignInitializationPlugin(InitializationPlugin):
+class ManualHeadingAlignInitializationPlugin(InitializationPlugin):
     """
-    A static alignment initialization plugin that provides the :class:`internal.StaticAlign` strategy.
+    A static alignment initialization plugin that provides the :class:`internal.ManualHeadingAlign` strategy.
     """
 
     mediator: Mediator
@@ -115,6 +123,6 @@ class StaticAlignInitializationPlugin(InitializationPlugin):
             )
             return None
         if issubclass(initialization_type, InertialInitializationStrategy):
-            return StaticAlign(config_group, self.mediator)
+            return ManualHeadingAlign(config_group, self.mediator)
         self.mediator.log_message(LoggingLevel.ERROR, 'Unsupported type requested')
         return None

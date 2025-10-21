@@ -1,5 +1,5 @@
 diff --git a/pntos-cobra/src/pntos/cobra/tutorial_plugins/TutorialGpsOrchestrationPlugin.py b/pntos-cobra/src/pntos/cobra/tutorial_plugins/TutorialGpsVelOrchestrationPlugin.py
-index 4ee8dc07..c5db52c0 100644
+index 0a621bf3..abac824b 100644
 --- a/pntos-cobra/src/pntos/cobra/tutorial_plugins/TutorialGpsOrchestrationPlugin.py
 +++ b/pntos-cobra/src/pntos/cobra/tutorial_plugins/TutorialGpsVelOrchestrationPlugin.py
 @@ -66,6 +66,10 @@ GPS_MEASUREMENT_PROCESSOR_ID = 'pinson_with_ned_fogm_position'
@@ -13,8 +13,8 @@ index 4ee8dc07..c5db52c0 100644
  
  # Inertial parameters
  INERTIAL_GROUP = 'config/inertial'
-@@ -76,10 +80,10 @@ PREPROCESSOR_IDS = ['imu_rotator', 'time_adjuster']
- PREPROCESSOR_GROUPS = ['config/imu_rotator', 'config/time_adjuster']
+@@ -76,10 +80,10 @@ PREPROCESSOR_IDS = ['imu_rotator', 'time_adjuster', 'time_bias']
+ PREPROCESSOR_GROUPS = ['config/imu_rotator', 'config/time_adjuster', 'config/time_bias']
  
  
 -class TutorialGpsOrchestrationPlugin(OrchestrationPlugin):

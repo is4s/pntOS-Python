@@ -44,6 +44,8 @@ def imu_model_to_config(model: ImuModel, group: str) -> ImuConfig:
         gyro_bias_sigma=tuple(model.gyro_bias_sigma),
         gyro_bias_tau=tuple(model.gyro_bias_tau),
         gyro_random_walk_sigma=tuple(model.gyro_random_walk_sigma),
+        accel_bias_initial_sigma=tuple(model.accel_bias_initial_sigma),
+        gyro_bias_initial_sigma=tuple(model.gyro_bias_initial_sigma),
         group=group,
     )
 
@@ -65,6 +67,8 @@ def imu_model_from_config(config: ImuConfig) -> ImuModel:
         gyro_bias_sigma=np.array(config.gyro_bias_sigma),
         gyro_bias_tau=np.array(config.gyro_bias_tau),
         gyro_random_walk_sigma=np.array(config.gyro_random_walk_sigma),
+        accel_bias_initial_sigma=np.array(config.accel_bias_initial_sigma),
+        gyro_bias_initial_sigma=np.array(config.gyro_bias_initial_sigma),
     )
 
 

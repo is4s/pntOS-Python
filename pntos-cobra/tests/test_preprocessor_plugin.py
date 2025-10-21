@@ -87,7 +87,7 @@ def test_plugin_constructor(
     preprocessor_plugin: StandardPreprocessorPlugin,
 ) -> None:
     assert preprocessor_plugin.identifier == 'preprocessor_plugin'
-    assert len(preprocessor_plugin.preprocessor_identifiers) == 4
+    assert len(preprocessor_plugin.preprocessor_identifiers) == 5
 
 
 def test_invalid_mediator() -> None:

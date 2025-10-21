@@ -30,6 +30,7 @@ from pntos.cobra.config import (
     ManualAlignmentConfig,
     SensorConfig,
     TimeAdjusterConfig,
+    TimeBiasConfig,
     TutorialOrchestrationConfig,
     UiLogPlottingConfig,
 )
@@ -39,9 +40,9 @@ OUTPUT_LOG = sys.argv[1] if len(sys.argv) > 1 else 'pntos_output.log'
 
 # Config setup
 C_imu_to_platform = (
-    (0.99776363, 0.01784622, 0.06441467),
-    (-0.01741603, 0.99982216, -0.00723391),
-    (-0.06453231, 0.00609588, 0.997897),
+    (0.99802515, 0.01772605, 0.06026269),
+    (-0.01742059, 0.99983262, -0.00559042),
+    (-0.0603517, 0.00452957, 0.9981669),
 )
 my_config = [
     LcmLogTransportConfig(
@@ -116,6 +117,14 @@ my_config = [
         identifier='imu_rotator',
         C_imu_to_platform=C_imu_to_platform,
         channel='/sensor/vn-100/imu',
+    ),
+    TimeBiasConfig(
+        group='config/time_bias',
+        identifier='time_bias',
+        channels_to_correct=[
+            '/sensor/ublox-ZED-F9T/position',
+        ],
+        time_bias=int(0.15 * 1e9),
     ),
 ]
 # End Config

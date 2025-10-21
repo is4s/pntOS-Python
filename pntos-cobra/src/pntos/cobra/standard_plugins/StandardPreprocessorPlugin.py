@@ -21,6 +21,7 @@ from pntos.cobra.config import (
     DownsamplerConfig,
     ImuRotatorConfig,
     TimeAdjusterConfig,
+    TimeBiasConfig,
     config_from_registry,
 )
 
@@ -238,6 +239,57 @@ class TimeAdjusterPreprocessor(Preprocessor):
         return [message]
 
 
+class TimeBiasPreprocessor(Preprocessor):
+    """Corrects timestamps for a constant bias.
+
+    This preprocessor is useful when a specific sensor produces timestamps with a constant bias. It
+    is configured with a list of channels as well as a constant time bias. Any message whose source
+    identifier matches one of the configured channels will have its timestamp subtracted by the bias
+    amount.
+    """
+
+    _mediator: Mediator
+    _channels_to_correct: list[str]
+    _time_bias: int
+
+    def __init__(
+        self,
+        config_group: str,
+        mediator: Mediator,
+    ) -> None:
+        """
+        Args:
+            config_group (str): The group in the registry which holds config information for this preprocessor.
+            mediator (Mediator): Used to get config information and to perform logging.
+        """
+        self._mediator = mediator
+        config = config_from_registry(TimeBiasConfig, self._mediator, config_group)
+        if config is None:
+            self._mediator.log_message(
+                LoggingLevel.ERROR,
+                'Failed to populate TimeBiasConfig in TimeBiasPreprocessor.',
+            )
+            return
+        self._channels_to_correct = config.channels_to_correct
+        self._time_bias = config.time_bias
+
+    def process_pntos_message(self, message: Message) -> list[Message] | None:
+        if message.source_identifier not in self._channels_to_correct:
+            return [message]
+
+        aspn_message: AspnBase = message.wrapped_message
+        if not hasattr(aspn_message, 'time_of_validity'):
+            self._mediator.log_message(
+                LoggingLevel.WARN,
+                f'TimeBiasPreprocessor received a message from channel {message.source_identifier} with no time of validity. Ignoring message.',
+            )
+            return [message]
+
+        aspn_message.time_of_validity.elapsed_nsec -= self._time_bias
+
+        return [message]
+
+
 class StandardPreprocessorPlugin(PreprocessorPlugin):
     """A preprocessor plugin that provides the standard-level set of preprocessors.
 
@@ -247,6 +299,7 @@ class StandardPreprocessorPlugin(PreprocessorPlugin):
     2. ImuRotationPreprocessor - Rotated IMU measurements from IMU to platform frame.
     3. TimeAdjusterPreprocessor - Synthesizes timestamps to compensate for erroneous hardware.
     4. BarometerToAltitudePreprocessor - Converts pressure measurements to altitude measurements.
+    5. TimeBiasPreprocessor - Applies an offset to timestamps to correct for a constant time bias.
     """
 
     mediator: Mediator | None
@@ -264,6 +317,7 @@ class StandardPreprocessorPlugin(PreprocessorPlugin):
             'imu_rotator',
             'time_adjuster',
             'baro_converter',
+            'time_bias',
         ]
 
     def init_plugin(
@@ -358,6 +412,17 @@ class StandardPreprocessorPlugin(PreprocessorPlugin):
                 return BarometerToAltitudePreprocessor(
                     bta_config.channel, self.mediator
                 )
+
+            case 4:
+                if config_group is None:
+                    preproc_id = self.preprocessor_identifiers[preprocessor_index]
+                    self.mediator.log_message(
+                        LoggingLevel.ERROR,
+                        f'config_group is a required parameter for preprocessor "{preproc_id}" and cannot be None.',
+                    )
+                    return None
+
+                return TimeBiasPreprocessor(config_group, self.mediator)
 
             case _:
                 self.mediator.log_message(

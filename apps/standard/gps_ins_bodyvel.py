@@ -11,6 +11,7 @@ from pntos.api import EstimateWithCovariance, EstimateWithCovarianceType, Loggin
 from pntos.cobra import (
     EkfFusionStrategyPlugin,
     LcmLogTransportPlugin,
+    ManualHeadingAlignInitializationPlugin,
     SimpleControllerPlugin,
     StandardFusionPlugin,
     StandardGpsInsStateModelingPlugin,
@@ -19,7 +20,6 @@ from pntos.cobra import (
     StandardOrchestrationPlugin,
     StandardPreprocessorPlugin,
     StandardRegistryPlugin,
-    TutorialInitializationPlugin,
 )
 from pntos.cobra.config import (
     AspnVersion,
@@ -29,12 +29,13 @@ from pntos.cobra.config import (
     ImuRotatorConfig,
     InertialConfig,
     LcmLogTransportConfig,
-    ManualAlignmentConfig,
+    ManualHeadingAlignmentConfig,
     PinsonStateBlockConfig,
     SensorConfig,
     SensorMeasurementProcessorConfig,
     StandardOrchestrationConfig,
     TimeAdjusterConfig,
+    TimeBiasConfig,
 )
 from pntos_python_datasets import EXAMPLE_LCM_LOG
 
@@ -42,9 +43,20 @@ OUTPUT_LOG = sys.argv[1] if len(sys.argv) > 1 else 'pntos_output.log'
 
 # Config setup
 C_imu_to_platform = (
-    (0.99776363, 0.01784622, 0.06441467),
-    (-0.01741603, 0.99982216, -0.00723391),
-    (-0.06453231, 0.00609588, 0.997897),
+    (0.99802515, 0.01772605, 0.06026269),
+    (-0.01742059, 0.99983262, -0.00559042),
+    (-0.0603517, 0.00452957, 0.9981669),
+)
+imu_model = ImuConfig(
+    group='config/inertial_state',
+    accel_bias_sigma=(2.4e-3, 2.4e-3, 2.4e-3),
+    accel_bias_tau=(300.0, 300.0, 300.0),
+    accel_random_walk_sigma=(3.887e-6, 3.887e-6, 3.887e-6),
+    gyro_bias_sigma=(2e-4, 2e-4, 2e-4),
+    gyro_bias_tau=(500.0, 500.0, 500.0),
+    gyro_random_walk_sigma=(9.9e-4, 9.9e-4, 6.7e-5),
+    accel_bias_initial_sigma=(0.072, 0.072, 0.072),
+    gyro_bias_initial_sigma=(0.003, 0.003, 0.003),
 )
 my_config = [
     LcmLogTransportConfig(
@@ -61,15 +73,7 @@ my_config = [
             group='config/pinson_block',
             identifier='pinson15',
             label='pinson15',
-            imu_model=ImuConfig(
-                group='config/inertial_state',
-                accel_bias_sigma=(2.4e-3, 2.4e-3, 2.4e-3),
-                accel_bias_tau=(300.0, 300.0, 300.0),
-                accel_random_walk_sigma=(3.887e-6, 3.887e-6, 3.887e-6),
-                gyro_bias_sigma=(2e-4, 2e-4, 2e-4),
-                gyro_bias_tau=(500.0, 500.0, 500.0),
-                gyro_random_walk_sigma=(9.9e-4, 9.9e-4, 6.7e-5),
-            ),
+            imu_model=imu_model,
         ),
         additional_sb_configs=[
             FogmStateBlockConfig(
@@ -123,27 +127,12 @@ my_config = [
             C_imu_to_platform=C_imu_to_platform,
             inertial_buffer_length=10.0,
         ),
-        alignment_config=ManualAlignmentConfig(
+        alignment_config=ManualHeadingAlignmentConfig(
             group='config/default/alignment',
-            initial_pos_var=(0.1, 0.1, 0.1),
-            initial_vel_var=(1e-3, 1e-3, 1e-3),
-            initial_tilt_var=(5e-4, 5e-4, 5e-4),
-            initial_accel_bias_var=(5.2e-3, 5.2e-3, 5.2e-3),
-            initial_gyro_bias_var=(9e-6, 9e-6, 9e-6),
-            initial_accel_bias=(-0.0023383, 0.00085563, -0.05412892),
-            initial_accel_scale_factor=(0.0, 0.0, 0.0),
-            initial_accel_scale_factor_var=(0.0, 0.0, 0.0),
-            initial_gyro_bias=(-0.00160958, -0.00204483, -0.00267885),
-            initial_gyro_scale_factor=(0.0, 0.0, 0.0),
-            initial_gyro_scale_factor_var=(0.0, 0.0, 0.0),
-            initial_pos=(0.6938996038254822, -1.4679920679462133, 225.493),
-            initial_rpy=(
-                -0.014713125594312194,
-                -0.040718531449027706,
-                0.06895795874629593,
-            ),
-            initial_time=1747680879.539799718,
-            initial_vel=(0.0, 0.0, 0.0),
+            static_time=10.0,
+            imu_model=imu_model,
+            heading=0.06895795874629593,
+            heading_sigma=0.02236067977,
         ),
         preprocessor_configs=[
             ImuRotatorConfig(
@@ -157,6 +146,14 @@ my_config = [
                 identifier='time_adjuster',
                 channel_to_correct='/sensor/vn-100/imu',
                 expected_dt_nsec=int(0.01 * 1e9),
+            ),
+            TimeBiasConfig(
+                group='config/time_bias',
+                identifier='time_bias',
+                channels_to_correct=[
+                    '/sensor/ublox-ZED-F9T/position',
+                ],
+                time_bias=int(0.15 * 1e9),
             ),
         ],
         group='config/orchestration',
@@ -172,7 +169,9 @@ plugins = [
     StandardFusionPlugin('Cobra Standard Fusion Plugin'),
     StandardGpsInsStateModelingPlugin('Cobra Standard State Modeling Plugin'),
     StandardInertialPlugin('Cobra Standard Inertial Plugin'),
-    TutorialInitializationPlugin('Cobra Manual Initialization Plugin'),
+    ManualHeadingAlignInitializationPlugin(
+        'Cobra Manual Heading Static Align Initialization Plugin'
+    ),
     StandardLoggingPlugin(
         'Cobra Standard Logging Plugin',
         global_log_level=LoggingLevel.INFO,  # Switch to `DEBUG` for more informative log output

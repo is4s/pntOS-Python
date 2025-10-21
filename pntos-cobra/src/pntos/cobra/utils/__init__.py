@@ -7,6 +7,7 @@ from .arrays import (
     validate_manual_ewc as validate_manual_ewc,
 )
 from .conversions import (
+    convert_alignment as convert_alignment,
     convert_header_from_cpp as convert_header_from_cpp,
     convert_header_to_cpp as convert_header_to_cpp,
     convert_imu_from_cpp as convert_imu_from_cpp,
@@ -16,6 +17,7 @@ from .conversions import (
     convert_message as convert_message,
     convert_pva_from_cpp as convert_pva_from_cpp,
     convert_pva_to_cpp as convert_pva_to_cpp,
+    convert_status as convert_status,
     convert_timestamp_from_cpp as convert_timestamp_from_cpp,
     convert_timestamp_to_cpp as convert_timestamp_to_cpp,
 )

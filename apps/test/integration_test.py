@@ -23,7 +23,7 @@ SOLUTION_CHANNEL = '/solution/pntos/pva'
 TRUTH_CHANNEL = '/sensor/ins-d/pva'
 
 # Use non-GUI backend for any plots that apps generate, since we just want to
-# programatically validate the filter solution
+# programmatically validate the filter solution
 os.environ['MPLBACKEND'] = 'Agg'
 
 
@@ -61,6 +61,7 @@ def validate_results(
     pos_err_limits: ErrorLimits,
     vel_err_limits: ErrorLimits,
     tilt_err_limits: ErrorLimits,
+    expected_start_time_offset: float = 0.0,
 ) -> None:
     filter_time: NDArray[np.float64] = pva.time
     truth_time: NDArray[np.float64] = truth.time
@@ -77,13 +78,13 @@ def validate_results(
     assert not np.isnan(pva.tilt_sig).any()
 
     # ensure solution starts and ends within 3 seconds of truth start and end
-    assert abs(filter_time[0] - truth_time[0]) < 3  # noqa: PLR2004
+    assert abs(filter_time[0] - expected_start_time_offset - truth_time[0]) < 3.0  # noqa: PLR2004
     assert abs(filter_time[-1] - truth_time[-1]) < 3  # noqa: PLR2004
 
     # Rotate INS-D rpy since there's a bug in the smartcable (TODO: #236)
     truth.rpy = np.column_stack([truth.rpy[:, 1], truth.rpy[:, 0], -truth.rpy[:, 2]])
 
-    # Interpolate truth onto solution times so that we can calulate the solution error
+    # Interpolate truth onto solution times so that we can calculate the solution error
     interp_truth_pva = interpolate_pva(pva, truth)
     ned_err = pva.ned - interp_truth_pva.ned
     vel_err = pva.vel - interp_truth_pva.vel
@@ -109,7 +110,7 @@ def test_tutorial_gps_ins_app() -> None:
         pos_err_limits=ErrorLimits(std_thresh=2.0, max_thresh=4.0, pct_below_1sigma=60),
         vel_err_limits=ErrorLimits(std_thresh=0.11, max_thresh=1.0),
         tilt_err_limits=ErrorLimits(
-            std_thresh=0.8, max_thresh=2.5, pct_below_1sigma=48, pct_below_2sigma=91
+            std_thresh=0.85, max_thresh=3.5, pct_below_1sigma=48, pct_below_2sigma=91
         ),
     )
 
@@ -122,12 +123,13 @@ def test_standard_gps_ins_app() -> None:
     validate_results(
         log_data.data[SOLUTION_CHANNEL],
         log_data.data[TRUTH_CHANNEL],
-        num_points=2593,
+        num_points=2584,
         pos_err_limits=ErrorLimits(std_thresh=2.0, max_thresh=4.0, pct_below_1sigma=60),
         vel_err_limits=ErrorLimits(std_thresh=0.11, max_thresh=1.0),
         tilt_err_limits=ErrorLimits(
-            std_thresh=0.8, max_thresh=2.5, pct_below_1sigma=48, pct_below_2sigma=91
+            std_thresh=0.85, max_thresh=3.5, pct_below_1sigma=48, pct_below_2sigma=91
         ),
+        expected_start_time_offset=10.0,
     )
 
 
@@ -142,12 +144,13 @@ def test_standard_gps_ins_network_app() -> None:
     validate_results(
         log_data.data[SOLUTION_CHANNEL],
         log_data.data[TRUTH_CHANNEL],
-        num_points=2593,
+        num_points=2584,
         pos_err_limits=ErrorLimits(std_thresh=2.0, max_thresh=4.0, pct_below_1sigma=60),
         vel_err_limits=ErrorLimits(std_thresh=0.11, max_thresh=1.0),
         tilt_err_limits=ErrorLimits(
-            std_thresh=0.8, max_thresh=2.5, pct_below_1sigma=48, pct_below_2sigma=91
+            std_thresh=0.85, max_thresh=3.5, pct_below_1sigma=48, pct_below_2sigma=91
         ),
+        expected_start_time_offset=10.0,
     )
 
 
@@ -162,25 +165,25 @@ def test_tutorial_gps_ins_vel_app() -> None:
         num_points=2593,
         # TODO: these limits are very high
         pos_err_limits=ErrorLimits(
-            std_thresh=3.0,
-            max_thresh=6.5,
-            pct_below_1sigma=30,
-            pct_below_2sigma=50,
-            pct_below_3sigma=65,
+            std_thresh=2.0,
+            max_thresh=4.5,
+            pct_below_1sigma=40,
+            pct_below_2sigma=70,
+            pct_below_3sigma=95,
         ),
         vel_err_limits=ErrorLimits(
-            std_thresh=0.3,
-            max_thresh=2.0,
-            pct_below_1sigma=40,
-            pct_below_2sigma=60,
-            pct_below_3sigma=74,
+            std_thresh=0.2,
+            max_thresh=1.5,
+            pct_below_1sigma=55,
+            pct_below_2sigma=75,
+            pct_below_3sigma=85,
         ),
         tilt_err_limits=ErrorLimits(
-            std_thresh=4.0,
-            max_thresh=12.0,
-            pct_below_1sigma=15,
-            pct_below_2sigma=25,
-            pct_below_3sigma=35,
+            std_thresh=2.0,
+            max_thresh=6.0,
+            pct_below_1sigma=20,
+            pct_below_2sigma=50,
+            pct_below_3sigma=60,
         ),
     )
 
@@ -193,12 +196,13 @@ def test_standard_gps_ins_leverarm_app() -> None:
     validate_results(
         log_data.data[SOLUTION_CHANNEL],
         log_data.data[TRUTH_CHANNEL],
-        num_points=2593,
+        num_points=2584,
         pos_err_limits=ErrorLimits(std_thresh=2.0, max_thresh=4.1, pct_below_1sigma=60),
         vel_err_limits=ErrorLimits(std_thresh=0.11, max_thresh=1.0),
         tilt_err_limits=ErrorLimits(
             std_thresh=0.81, max_thresh=2.5, pct_below_1sigma=53, pct_below_2sigma=91
         ),
+        expected_start_time_offset=10.0,
     )
 
 

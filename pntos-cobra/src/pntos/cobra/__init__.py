@@ -16,6 +16,9 @@ from .standard_plugins.LcmLogTransportPlugin import (
 from .standard_plugins.LcmTransportPlugin import (
     LcmTransportPlugin as LcmTransportPlugin,
 )
+from .standard_plugins.ManualHeadingAlignInitializationPlugin import (
+    ManualHeadingAlignInitializationPlugin as ManualHeadingAlignInitializationPlugin,
+)
 from .standard_plugins.StandardFusionPlugin import (
     StandardFusionPlugin as StandardFusionPlugin,
 )

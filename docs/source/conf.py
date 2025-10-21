@@ -113,6 +113,7 @@ nitpick_ignore = [
     ('py:class', 'aspn23_xtensor.TypeTimestamp'),
     # A NavToolkit class which automodule automatically tries to link to.
     ('py:class', 'ImuModel'),
+    ('py:class', 'AlignBase.AlignmentStatus'),
     # Potentially caused by #49.
     ('py:class', 'PluginType'),
     ('py:class', 'ConfigType'),

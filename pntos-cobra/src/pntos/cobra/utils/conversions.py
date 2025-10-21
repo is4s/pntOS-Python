@@ -12,7 +12,19 @@ from aspn23 import (
     TypeHeader,
     TypeTimestamp,
 )
+from navtk.filtering import NavSolution
+from navtk.inertial import AlignBase, ImuErrors
+from navtk.utils import to_positionvelocityattitude
 from numpy.typing import NDArray
+
+from pntos.api import (
+    InitialInertialSolution,
+    InitializationStatus,
+    LoggingLevel,
+    Mediator,
+    Message,
+    StandardInertialErrors,
+)
 
 
 def convert_header_to_cpp(
@@ -317,3 +329,65 @@ def convert_message(message: AspnBase) -> aspn23_xtensor.TypeHeader | None:
         return convert_position_to_cpp(message)
     # Support more types as-needed.
     return None
+
+
+def convert_status(
+    status: AlignBase.AlignmentStatus, mediator: Mediator
+) -> InitializationStatus:
+    """
+    Convert a NavToolkit ``AlignmentStatus`` to its corresponding ``InitializationStatus``.
+
+    Args:
+        status (AlignBase.AlignmentStatus): The NavToolkit status to convert.
+        mediator (Mediator): A mediator used to log errors, if necessary.
+
+    Returns:
+        InitializationStatus
+    """
+    match status:
+        case AlignBase.AlignmentStatus.ALIGNING_COARSE:
+            return InitializationStatus.INITIALIZING_COARSE
+        case AlignBase.AlignmentStatus.ALIGNING_FINE:
+            return InitializationStatus.INITIALIZING_FINE
+        case AlignBase.AlignmentStatus.ALIGNED_GOOD:
+            return InitializationStatus.INITIALIZED_GOOD
+    mediator.log_message(LoggingLevel.ERROR, 'Could not convert alignment status')
+    return InitializationStatus.INITIALIZATION_FAILED
+
+
+def _convert_imu_errors(imu_errors: ImuErrors) -> StandardInertialErrors:
+    return StandardInertialErrors(
+        accel_biases=imu_errors.accel_biases,
+        gyro_biases=imu_errors.gyro_biases,
+        accel_scale_factors=imu_errors.accel_scale_factors,
+        gyro_scale_factors=imu_errors.gyro_scale_factors,
+    )
+
+
+def convert_alignment(
+    unchecked_solution: tuple[bool, NavSolution],
+    unchecked_covariance: tuple[bool, NDArray[np.float64]],
+    unchecked_imu_errors: tuple[bool, ImuErrors],
+    status: InitializationStatus,
+) -> InitialInertialSolution:
+    message = None
+    if unchecked_solution[0]:
+        navtk_solution = unchecked_solution[1]
+        pva_cpp = to_positionvelocityattitude(navtk_solution)
+        pva_covariance = None
+        if unchecked_covariance[0]:
+            pva_covariance = unchecked_covariance[1][0:9, 0:9]
+        pva = convert_pva_from_cpp(pva_cpp, pva_covariance)
+        message = Message(pva, 'Cobra initializer')
+    covariance = None
+    if unchecked_covariance[0]:
+        covariance = unchecked_covariance[1][9:, 9:]
+    imu_errors = None
+    if unchecked_imu_errors[0]:
+        imu_errors = _convert_imu_errors(unchecked_imu_errors[1])
+    return InitialInertialSolution(
+        solution=message,
+        inertial_errors=imu_errors,
+        inertial_error_covariance=covariance,
+        status=status,
+    )

@@ -107,3 +107,30 @@ class TimeAdjusterConfig(PreprocessorConfig):
     For example, a 100 Hz sensor sends 100 messages per second which is 0.01 seconds per message (interval in seconds).
     Convert that to nanoseconds like so `int(0.01 * 1e9)`.
     """
+
+
+@dataclass
+class TimeBiasConfig(PreprocessorConfig):
+    """
+    Configuration for the time bias preprocessor.
+    """
+
+    # INHERITED FIELDS
+    group: str
+
+    identifier: str
+
+    # UNIQUE FIELDS
+    channels_to_correct: list[str]
+    """
+    The names of the channels to correct.
+    """
+
+    time_bias: int
+    """
+    The amount the timestamps are biased by in nanoseconds.
+
+    For example, if a given channel has timestamps which are 0.1s in the future then this should be
+    set to 100'000'000 and the preprocessor will return messages with a timestamp of
+    `original - 100'000'000`.
+    """
