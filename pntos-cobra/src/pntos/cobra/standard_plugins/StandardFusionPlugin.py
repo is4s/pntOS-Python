@@ -37,13 +37,11 @@ class stateblock_info:
 
 class StandardFusionEngine(api.StandardFusionEngine):
     """
-    A simple fusion engine designed to use data from multiple sensors and output a unified state estimate.
+    A fusion engine designed to use data from multiple sensors and output a unified state estimate.
     """
 
     def __init__(self, mediator: Mediator) -> None:
         """
-        A Simple Fusion Engine
-
         Args:
             mediator (Mediator): A :class:`pntos.api.Mediator` instance.
         """
