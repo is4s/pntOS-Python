@@ -17,7 +17,7 @@ index d6ad2c8d..10bbbf4c 100755
      EkfFusionStrategyPlugin,
      LcmLogTransportPlugin,
 +    ManualHeadingAlignInitializationPlugin,
-     SimpleControllerPlugin,
+     StandardControllerPlugin,
      StandardFusionPlugin,
 +    StandardGpsInsStateModelingPlugin,
      StandardInertialPlugin,

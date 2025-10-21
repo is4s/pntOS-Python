@@ -9,7 +9,7 @@ from pntos.api import (
     Mediator,
 )
 from pntos.cobra import StandardLoggingPlugin
-from pntos.cobra.internal import SimpleMediator, StandardRegistry
+from pntos.cobra.internal import StandardMediator, StandardRegistry
 
 expected_results: dict[ll, str] = {
     ll.DEBUG: '',
@@ -84,8 +84,8 @@ def test_manual() -> None:
     # Initialize registry through mediator to have config values for logger
     dummy_plugin = DummyPlugin('dummy plugin')
     registry = StandardRegistry(dummy_log)
-    mediator = SimpleMediator(dummy_plugin.identifier, LoggingPlugin)
-    SimpleMediator.registry = registry
+    mediator = StandardMediator(dummy_plugin.identifier, LoggingPlugin)
+    StandardMediator.registry = registry
     config_group = 'config/logging/all'
     colorize_key = 'force_colorize'
     global_log_level_key = 'default_log_level'
@@ -130,8 +130,8 @@ def test(capsys: pytest.CaptureFixture[str]) -> None:
     # Initialize registry through mediator to have config values for logger
     dummy_plugin = DummyPlugin('dummy plugin')
     registry = StandardRegistry(dummy_log)
-    mediator = SimpleMediator(dummy_plugin.identifier, LoggingPlugin)
-    SimpleMediator.registry = registry
+    mediator = StandardMediator(dummy_plugin.identifier, LoggingPlugin)
+    StandardMediator.registry = registry
 
     # Initialize StandardLoggingPlugin and hand it the ready-made registry
     logging_plugin = StandardLoggingPlugin(identifier='my_logger')

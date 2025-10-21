@@ -20,7 +20,7 @@ from pntos.cobra import (
     StandardLoggingPlugin,
     StandardRegistryPlugin,
 )
-from pntos.cobra.internal import SimpleMediator
+from pntos.cobra.internal import StandardMediator
 from pntos.cobra.utils import load_from_hdf5_file
 
 TEST_FILE = Path('./DELETEME.hdf5')
@@ -75,19 +75,19 @@ def compare_messages(m1: object, m2: object, depth: int = 0) -> bool:
 
 def test_diagnostic_log_plugin() -> None:
     plugin = DiagnosticLogPlugin('Diagnostic Log Plugin', output_file=TEST_FILE)
-    mediator = SimpleMediator(plugin.identifier, UtilityPlugin)
+    mediator = StandardMediator(plugin.identifier, UtilityPlugin)
 
     registry_plugin = StandardRegistryPlugin('Registry Plugin')
-    registry_mediator = SimpleMediator(registry_plugin.identifier, RegistryPlugin)
+    registry_mediator = StandardMediator(registry_plugin.identifier, RegistryPlugin)
     registry_plugin.init_plugin(mediator=registry_mediator)
 
-    SimpleMediator.registry = registry_plugin.new_registry()
+    StandardMediator.registry = registry_plugin.new_registry()
 
     logging_plugin = StandardLoggingPlugin('Logging Plugin')
-    logging_mediator = SimpleMediator(logging_plugin.identifier, LoggingPlugin)
+    logging_mediator = StandardMediator(logging_plugin.identifier, LoggingPlugin)
     logging_plugin.init_plugin(mediator=logging_mediator)
 
-    SimpleMediator._logging_plugin = logging_plugin
+    StandardMediator._logging_plugin = logging_plugin
 
     plugin.init_plugin(mediator=mediator)
 
@@ -102,7 +102,7 @@ def test_diagnostic_log_plugin() -> None:
     }
 
     # Set a set of values in the registry under the diagnostics key
-    kv = SimpleMediator.registry.batch_start('diagnostics')
+    kv = StandardMediator.registry.batch_start('diagnostics')
     for key, val in test_dict.items():
         kv[key] = val
     kv.batch_end()

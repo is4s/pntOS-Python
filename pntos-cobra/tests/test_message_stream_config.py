@@ -9,7 +9,7 @@ from aspn23 import (
     MeasurementSatnav,
 )
 from pntos.cobra.internal import (
-    SimpleMessageStreamConfig,
+    StandardMessageStreamConfig,
 )
 
 
@@ -24,26 +24,26 @@ class Test_MessageStreamConfig(unittest.TestCase):
             MeasurementSatnav,
         ]
 
-    def test_SimpleMessageStreamConfig_immediate_stream_all_no_stream_conf(
+    def test_StandardMessageStreamConfig_immediate_stream_all_no_stream_conf(
         self,
     ) -> None:
-        conf = SimpleMessageStreamConfig()
+        conf = StandardMessageStreamConfig()
         conf.immediate_stream_all(True)
         for message_type in self.message_types:
             assert not conf._is_sequenced(message_type)
 
-    def test_SimpleMessageStreamConfig_sequenced_stream_all_no_stream_conf(
+    def test_StandardMessageStreamConfig_sequenced_stream_all_no_stream_conf(
         self,
     ) -> None:
-        conf = SimpleMessageStreamConfig()
+        conf = StandardMessageStreamConfig()
         conf.sequenced_stream_all(True)
         for message_type in self.message_types:
             assert conf._is_sequenced(message_type)
 
-    def test_SimpleMessageStreamConfig_immediate_stream_add_no_stream_conf(
+    def test_StandardMessageStreamConfig_immediate_stream_add_no_stream_conf(
         self,
     ) -> None:
-        conf = SimpleMessageStreamConfig()
+        conf = StandardMessageStreamConfig()
         conf.sequenced_stream_all(True)  # Start with all sequenced
         n = 3
         for i in range(n):
@@ -53,10 +53,10 @@ class Test_MessageStreamConfig(unittest.TestCase):
         for message_type in self.message_types[n:]:
             assert conf._is_sequenced(message_type)
 
-    def test_SimpleMessageStreamConfig_sequenced_stream_add_no_stream_conf(
+    def test_StandardMessageStreamConfig_sequenced_stream_add_no_stream_conf(
         self,
     ) -> None:
-        conf = SimpleMessageStreamConfig()
+        conf = StandardMessageStreamConfig()
         conf.immediate_stream_all(True)  # Start with all immediate
         n = 3
         for i in range(n):
@@ -66,10 +66,10 @@ class Test_MessageStreamConfig(unittest.TestCase):
         for message_type in self.message_types[n:]:
             assert not conf._is_sequenced(message_type)
 
-    def test_SimpleMessageStreamConfig_immediate_stream_remove_no_stream_conf(
+    def test_StandardMessageStreamConfig_immediate_stream_remove_no_stream_conf(
         self,
     ) -> None:
-        conf = SimpleMessageStreamConfig()
+        conf = StandardMessageStreamConfig()
         conf.sequenced_stream_all(True)  # Start with all sequenced
         n = 3
 
@@ -87,10 +87,10 @@ class Test_MessageStreamConfig(unittest.TestCase):
         for message_type in self.message_types:
             assert conf._is_sequenced(message_type)
 
-    def test_SimpleMessageStreamConfig_sequenced_stream_remove_no_stream_conf(
+    def test_StandardMessageStreamConfig_sequenced_stream_remove_no_stream_conf(
         self,
     ) -> None:
-        conf = SimpleMessageStreamConfig()
+        conf = StandardMessageStreamConfig()
         conf.immediate_stream_all(True)  # Start with all immediate
         n = 3
 
@@ -108,10 +108,10 @@ class Test_MessageStreamConfig(unittest.TestCase):
         for message_type in self.message_types:
             assert not conf._is_sequenced(message_type)
 
-    def test_SimpleMessageStreamConfig_immediate_add_after_sequenced_add(
+    def test_StandardMessageStreamConfig_immediate_add_after_sequenced_add(
         self,
     ) -> None:
-        conf = SimpleMessageStreamConfig()
+        conf = StandardMessageStreamConfig()
         conf.immediate_stream_all(True)  # Start with all immediate
         n = 3
 
@@ -129,10 +129,10 @@ class Test_MessageStreamConfig(unittest.TestCase):
         for message_type in self.message_types:
             assert not conf._is_sequenced(message_type)
 
-    def test_SimpleMessageStreamConfig_sequenced_add_after_immediate_add(
+    def test_StandardMessageStreamConfig_sequenced_add_after_immediate_add(
         self,
     ) -> None:
-        conf = SimpleMessageStreamConfig()
+        conf = StandardMessageStreamConfig()
         conf.sequenced_stream_all(True)  # Start with all sequenced
         n = 3
 

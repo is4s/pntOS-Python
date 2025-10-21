@@ -26,8 +26,8 @@ from pntos.cobra import (
     StandardFusionPlugin,
 )
 from pntos.cobra.internal import (
-    SimpleMediator,
     StandardFusionEngine as CobraStandardFusionEngine,
+    StandardMediator,
     StandardRegistry,
 )
 
@@ -132,15 +132,15 @@ def create_state_block(label: str) -> tuple[_TestStateBlock, EstimateWithCovaria
 
 
 @pytest.fixture
-def mediator() -> SimpleMediator:
+def mediator() -> StandardMediator:
     registry = StandardRegistry(dummy_log)
-    mediator = SimpleMediator('Fusion Plugin', FusionPlugin)
-    SimpleMediator.registry = registry
+    mediator = StandardMediator('Fusion Plugin', FusionPlugin)
+    StandardMediator.registry = registry
     return mediator
 
 
 @pytest.fixture
-def fusion_engine(mediator: SimpleMediator) -> StandardFusionEngine:
+def fusion_engine(mediator: StandardMediator) -> StandardFusionEngine:
     # initialize the fusion plugin
     fusion_plugin = StandardFusionPlugin(identifier='test_fusion_plugin')
     fusion_plugin.init_plugin('test', mediator=mediator)

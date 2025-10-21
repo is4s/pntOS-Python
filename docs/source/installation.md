@@ -111,9 +111,9 @@ modules in the Python interpreter:
 ```shell
     $ python
     >>> from pntos.api import ControllerPlugin
-    >>> from pntos.cobra import SimpleControllerPlugin
-    >>> SimpleControllerPlugin
-    <class 'pntos.cobra.simple_controller.SimpleControllerPlugin.SimpleControllerPlugin'>
+    >>> from pntos.cobra import StandardControllerPlugin
+    >>> StandardControllerPlugin
+    <class 'pntos.cobra.simple_controller.StandardControllerPlugin.StandardControllerPlugin'>
     >>> ControllerPlugin
     <class 'pntos.api.plugins.controller.ControllerPlugin'>
 ```
@@ -121,7 +121,7 @@ modules in the Python interpreter:
 If you are able to access these classes successfully, then congratulations, you are ready to
 start using Cobra! Your next steps are to try running a sample Cobra app, or start the tutorial
 on how Cobra works. If you'd like to try running a sample app, you should head over to
-[running your first app](first_app.md). If you'd like to learn more about how Cobra works first, 
+[running your first app](first_app.md). If you'd like to learn more about how Cobra works first,
 head over to the [introduction to Cobra](introduction.md).
 
 

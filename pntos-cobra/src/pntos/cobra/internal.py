@@ -1,6 +1,8 @@
-from .simple_controller.SimpleMediator import SimpleMediator as SimpleMediator
-from .simple_controller.SimpleMessageStreamConfig import (
-    SimpleMessageStreamConfig as SimpleMessageStreamConfig,
+from .standard_plugins.controller.StandardMediator import (
+    StandardMediator as StandardMediator,
+)
+from .standard_plugins.controller.StandardMessageStreamConfig import (
+    StandardMessageStreamConfig as StandardMessageStreamConfig,
 )
 from .standard_plugins.EkfFusionStrategyPlugin import (
     EkfFusionStrategy as EkfFusionStrategy,

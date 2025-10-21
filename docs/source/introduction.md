@@ -158,7 +158,7 @@ from pntos.cobra import (
     DummyTransportPlugin,
     StandardRegistryPlugin,
     StandardLoggingPlugin,
-    SimpleControllerPlugin,
+    StandardControllerPlugin,
 )
 
 # Define our own OrchestrationPlugin (sensor data in, solution out)
@@ -173,7 +173,7 @@ my_orchestration = MyOrchestrationPlugin("My Orchestration Name")
 my_transport = DummyTransportPlugin("My Transport Name")
 my_registry = StandardRegistryPlugin("My Registry Name")
 my_logging = StandardLoggingPlugin("My Logger Name")
-my_controller = SimpleControllerPlugin("My Controller Name")
+my_controller = StandardControllerPlugin("My Controller Name")
 other_plugin_list = [my_orchestration, my_transport, my_registry, my_logging]
 
 # Give the controller control, and pass it the list of other plugins
@@ -183,7 +183,7 @@ my_controller.take_control(plugins=other_plugin_list)
 ...and thats it! Once our {term}`App` calls
 {py:obj}`my_controller.take_control()<pntos.api.ControllerPlugin.take_control>`, passing in
 the `other_plugin_list` as the `plugins` parameter, our app is done. The rest of the work is done
-inside the {py:obj}`SimpleControllerPlugin<pntos.api.ControllerPlugin>` implementation, which is the
+inside the {py:obj}`StandardControllerPlugin<pntos.api.ControllerPlugin>` implementation, which is the
 next stop on our tour.
 
 
@@ -491,27 +491,27 @@ And thats it! we've now set up a pipeline that forwards all data received by a
 
 ### A Simple Controller Plugin Example
 
-The {py:obj}`SimpleControllerPlugin<pntos.cobra.SimpleControllerPlugin>` is designed to be a simple implementation
+The {py:obj}`StandardControllerPlugin<pntos.cobra.StandardControllerPlugin>` is designed to be a simple implementation
 of a {py:obj}`Controller Plugin<pntos.api.ControllerPlugin>` to demonstrate the concepts
 above, which is why it was chosen as the controller for our [custom app](#implementing-our-own-custom-app).
-The source code of the {py:obj}`SimpleControllerPlugin<pntos.cobra.SimpleControllerPlugin>` can be
-[found here](https://git.aspn.us/pntos/pntos-python/-/blob/main/pntos-cobra/src/pntos/cobra/simple_controller/SimpleControllerPlugin.py),
-along with its {py:obj}`SimpleMediator<pntos.cobra.internal.SimpleMediator>`
-[here](https://git.aspn.us/pntos/pntos-python/-/blob/main/pntos-cobra/src/pntos/cobra/simple_controller/SimpleMediator.py).
+The source code of the {py:obj}`StandardControllerPlugin<pntos.cobra.StandardControllerPlugin>` can be
+[found here](https://git.aspn.us/pntos/pntos-python/-/blob/main/pntos-cobra/src/pntos/cobra/standard_plugins/controller/StandardControllerPlugin.py),
+along with its {py:obj}`StandardMediator<pntos.cobra.internal.StandardMediator>`
+[here](https://git.aspn.us/pntos/pntos-python/-/blob/main/pntos-cobra/src/pntos/cobra/standard_plugins/controller/StandardMediator.py).
 
-We can see from the source code that the {py:obj}`SimpleMediator<pntos.cobra.internal.SimpleMediator>`
+We can see from the source code that the {py:obj}`StandardMediator<pntos.cobra.internal.StandardMediator>`
 is similar to the approach we've described above, namely:
 
-- In the [take_control](https://git.aspn.us/pntos/pntos-python/-/blob/main/pntos-cobra/src/pntos/cobra/simple_controller/SimpleControllerPlugin.py?ref_type=heads#L101)
+- In the [take_control](https://git.aspn.us/pntos/pntos-python/-/blob/main/pntos-cobra/src/pntos/cobra/standard_plugins/controller/StandardControllerPlugin.py?ref_type=heads#L101)
   implementation, the controller first
-  [calls init_plugin](https://git.aspn.us/pntos/pntos-python/-/blob/main/pntos-cobra/src/pntos/cobra/simple_controller/SimpleControllerPlugin.py?ref_type=heads#L174)
+  [calls init_plugin](https://git.aspn.us/pntos/pntos-python/-/blob/main/pntos-cobra/src/pntos/cobra/standard_plugins/controller/StandardControllerPlugin.py?ref_type=heads#L174)
   on each plugin before using them, which is our Step 0 above.
-- In the [take_control](https://git.aspn.us/pntos/pntos-python/-/blob/main/pntos-cobra/src/pntos/cobra/simple_controller/SimpleControllerPlugin.py?ref_type=heads#L101)
-  implementation, the controller tells [all the transport plugins to start listening](https://git.aspn.us/pntos/pntos-python/-/blob/main/pntos-cobra/src/pntos/cobra/simple_controller/SimpleControllerPlugin.py?ref_type=heads#L284),
+- In the [take_control](https://git.aspn.us/pntos/pntos-python/-/blob/main/pntos-cobra/src/pntos/cobra/standard_plugins/controller/StandardControllerPlugin.py?ref_type=heads#L101)
+  implementation, the controller tells [all the transport plugins to start listening](https://git.aspn.us/pntos/pntos-python/-/blob/main/pntos-cobra/src/pntos/cobra/standard_plugins/controller/StandardControllerPlugin.py?ref_type=heads#L284),
   which is our Step 1 above.
-- The [implementation of SimpleMediator.process_pntos_message](https://git.aspn.us/pntos/pntos-python/-/blob/main/pntos-cobra/src/pntos/cobra/simple_controller/SimpleMediator.py#L74)
+- The [implementation of StandardMediator.process_pntos_message](https://git.aspn.us/pntos/pntos-python/-/blob/main/pntos-cobra/src/pntos/cobra/standard_plugins/controller/StandardMediator.py#L74)
   does some simple error checking and then
-  [passes messages received from the transport plugin into the orchestration plugin's process_pntos_message](https://git.aspn.us/pntos/pntos-python/-/blob/main/pntos-cobra/src/pntos/cobra/simple_controller/SimpleMediator.py#L91),
+  [passes messages received from the transport plugin into the orchestration plugin's process_pntos_message](https://git.aspn.us/pntos/pntos-python/-/blob/main/pntos-cobra/src/pntos/cobra/standard_plugins/controller/StandardMediator.py#L91),
   which is our Step 2 above.
 
 <!-- TODO: Break out TutorialXPlugin plugins, and dont use the Simple plugins here, which don't track what we're trying to do -->

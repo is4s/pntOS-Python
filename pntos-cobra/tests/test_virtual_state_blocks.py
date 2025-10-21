@@ -27,7 +27,7 @@ from pntos.api import (
 from pntos.cobra import StandardRegistryPlugin
 from pntos.cobra.internal import (
     PinsonErrorToStandard,
-    SimpleMediator,
+    StandardMediator,
     StateExtractor,
     VirtualStateBlockManager,
 )
@@ -99,13 +99,13 @@ class PinsonErrorToStandardWrapped(VirtualStateBlock):
 
 
 @pytest.fixture
-def mediator() -> SimpleMediator:
+def mediator() -> StandardMediator:
     registry_plugin = StandardRegistryPlugin('Standard registry')
-    mediator = SimpleMediator(registry_plugin.identifier, RegistryPlugin)
+    mediator = StandardMediator(registry_plugin.identifier, RegistryPlugin)
     registry_plugin.init_plugin(mediator=mediator)
     registry = registry_plugin.new_registry()
-    SimpleMediator.registry = registry
-    SimpleMediator._controller_plugin = None
+    StandardMediator.registry = registry
+    StandardMediator._controller_plugin = None
     return mediator
 
 
@@ -142,7 +142,7 @@ def ewc(est: NDArray[float64]) -> EstimateWithCovariance:
     return EstimateWithCovariance(EstimateWithCovarianceType.EWC_GENERIC, est, eye(3))
 
 
-def test_valid_state_extractor(mediator: SimpleMediator) -> None:
+def test_valid_state_extractor(mediator: StandardMediator) -> None:
     vsb = StateExtractor(mediator, VSB_SOURCE, 'first_three_outta_five', 5, [0, 1, 2])
     ewc = EstimateWithCovariance(
         EstimateWithCovarianceType.EWC_GENERIC, array([0, 1, 2, 3, 4]), eye(5)
@@ -160,7 +160,7 @@ def test_valid_state_extractor(mediator: SimpleMediator) -> None:
     )
 
 
-def test_invalid_state_extractors(mediator: SimpleMediator) -> None:
+def test_invalid_state_extractors(mediator: StandardMediator) -> None:
     failed_to_catch = False
     try:
         vsb = StateExtractor(mediator, VSB_SOURCE, 'bad_state_size', 0, [1, 2, 3])
@@ -204,7 +204,7 @@ def test_invalid_state_extractors(mediator: SimpleMediator) -> None:
     assert not failed_to_catch
 
 
-def test_pinson_error_to_standard(mediator: SimpleMediator) -> None:
+def test_pinson_error_to_standard(mediator: StandardMediator) -> None:
     pes = PinsonErrorToStandard(mediator, VSB_SOURCE, 'pinson_direct')
     pesw = PinsonErrorToStandardWrapped(mediator, VSB_SOURCE, 'pinson_direct_wrapped')
     for i in range(1000):
@@ -262,7 +262,7 @@ def test_pinson_error_to_standard(mediator: SimpleMediator) -> None:
 
 
 def test_invalid_pinson_error_to_standard(
-    mediator: SimpleMediator, pva: Message
+    mediator: StandardMediator, pva: Message
 ) -> None:
     failed_to_catch = False
     pes = PinsonErrorToStandard(mediator, VSB_SOURCE, 'pinson_direct')
@@ -323,7 +323,7 @@ def test_invalid_pinson_error_to_standard(
 
 
 def test_valid_vsb_manager_ops(
-    mediator: SimpleMediator, est: NDArray[float64], ewc: EstimateWithCovariance
+    mediator: StandardMediator, est: NDArray[float64], ewc: EstimateWithCovariance
 ) -> None:
     vsbm = VirtualStateBlockManager(mediator)
     vsbs = []
@@ -370,7 +370,7 @@ def test_valid_vsb_manager_ops(
     vsbm.remove_virtual_state_block(targets[targ_index])
 
 
-def test_give_aux_data(mediator: SimpleMediator, pva: Message) -> None:
+def test_give_aux_data(mediator: StandardMediator, pva: Message) -> None:
     vsbm = VirtualStateBlockManager(mediator)
     vsb = PinsonErrorToStandard(mediator, VSB_SOURCE, 'give_data')
     vsbm.add_virtual_state_block(vsb)
@@ -381,7 +381,7 @@ def test_give_aux_data(mediator: SimpleMediator, pva: Message) -> None:
 
 
 def test_invalid_vsb_manager_ops(
-    mediator: SimpleMediator, est: NDArray[float64], ewc: EstimateWithCovariance
+    mediator: StandardMediator, est: NDArray[float64], ewc: EstimateWithCovariance
 ) -> None:
     # vsb target and source cannot match
     vsbm = VirtualStateBlockManager(mediator)

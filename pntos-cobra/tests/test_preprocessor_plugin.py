@@ -28,7 +28,7 @@ from pntos.cobra.config import (
 from pntos.cobra.internal import (
     BarometerToAltitudePreprocessor,
     ImuRotationPreprocessor,
-    SimpleMediator,
+    StandardMediator,
     TimeAdjusterPreprocessor,
 )
 
@@ -65,18 +65,18 @@ config_list: list[BaseConfig] = [
 
 
 @pytest.fixture
-def mediator() -> SimpleMediator:
+def mediator() -> StandardMediator:
     registry_plugin = StandardRegistryPlugin('Standard registry', config=config_list)
-    mediator = SimpleMediator(registry_plugin.identifier, RegistryPlugin)
+    mediator = StandardMediator(registry_plugin.identifier, RegistryPlugin)
     registry_plugin.init_plugin(mediator=mediator)
     registry = registry_plugin.new_registry()
-    SimpleMediator.registry = registry
+    StandardMediator.registry = registry
     return mediator
 
 
 @pytest.fixture
 def preprocessor_plugin(
-    mediator: SimpleMediator,
+    mediator: StandardMediator,
 ) -> StandardPreprocessorPlugin:
     ds_plugin = StandardPreprocessorPlugin('preprocessor_plugin')
     ds_plugin.init_plugin(mediator=mediator)

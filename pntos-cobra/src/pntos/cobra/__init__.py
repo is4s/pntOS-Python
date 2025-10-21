@@ -1,8 +1,8 @@
 from .dummy_plugins.DummyTransportPlugin import (
     DummyTransportPlugin as DummyTransportPlugin,
 )
-from .simple_controller.SimpleControllerPlugin import (
-    SimpleControllerPlugin as SimpleControllerPlugin,
+from .standard_plugins.controller.StandardControllerPlugin import (
+    StandardControllerPlugin as StandardControllerPlugin,
 )
 from .standard_plugins.DiagnosticLogPlugin import (
     DiagnosticLogPlugin as DiagnosticLogPlugin,

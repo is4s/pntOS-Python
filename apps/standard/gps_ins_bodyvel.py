@@ -12,7 +12,7 @@ from pntos.cobra import (
     EkfFusionStrategyPlugin,
     LcmLogTransportPlugin,
     ManualHeadingAlignInitializationPlugin,
-    SimpleControllerPlugin,
+    StandardControllerPlugin,
     StandardFusionPlugin,
     StandardGpsInsStateModelingPlugin,
     StandardInertialPlugin,
@@ -160,7 +160,7 @@ my_config = [
 # End Config
 
 # Instantiate all of our plugins
-controller = SimpleControllerPlugin('Cobra Simple Controller Plugin')
+controller = StandardControllerPlugin('Cobra Standard Controller Plugin')
 plugins = [
     LcmLogTransportPlugin('Cobra LCM Log Transport Plugin'),
     EkfFusionStrategyPlugin('Cobra EKF Fusion Strategy Plugin'),

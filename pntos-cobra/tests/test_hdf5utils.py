@@ -9,7 +9,7 @@ from aspn23 import (
     TypeTimestamp,
 )
 from pntos.api import Message, RegistryValueTypeUnion, UtilityPlugin
-from pntos.cobra.internal import SimpleMediator
+from pntos.cobra.internal import StandardMediator
 from pntos.cobra.utils import load_from_hdf5_file, save_to_hdf5_file
 
 TEST_FILE = Path('./DELETEME.hdf5')
@@ -72,7 +72,7 @@ def test_hdf5_to_and_from() -> None:
         'ndarray': [np.array([i, i**2, i**3]) for i in range(3, 7)],
         'message': [generate_random_pva_message() for i in range(20)],
     }
-    mediator = SimpleMediator('testing', UtilityPlugin)
+    mediator = StandardMediator('testing', UtilityPlugin)
     save_to_hdf5_file(TEST_FILE, test_dict, mediator)
     res_dict = load_from_hdf5_file(TEST_FILE, mediator)
     for test_key, test_val in test_dict.items():

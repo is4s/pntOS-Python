@@ -29,7 +29,7 @@ from pntos.cobra import (
     StandardRegistryPlugin,
 )
 from pntos.cobra.config import BaseConfig, FogmConfig, ImuConfig, SensorConfig
-from pntos.cobra.internal import SimpleMediator, StandardGpsInsStateModelProvider
+from pntos.cobra.internal import StandardGpsInsStateModelProvider, StandardMediator
 from pntos.cobra.utils import decode_aspn_lcm_msg, marshal_from_lcm
 from pntos.cobra.utils.navigation import (
     calculate_gravity_schwartz,
@@ -139,12 +139,12 @@ def fusion(la_guess: NDArray[float64]) -> StandardFusionEngine:
     assert isinstance(my_config[-1], SensorConfig)
     my_config[-1].lever_arm = (la_guess[0, 0], la_guess[1, 0], la_guess[2, 0])
     registry_plugin = StandardRegistryPlugin('Standard registry', config=my_config)
-    mediator = SimpleMediator(
+    mediator = StandardMediator(
         attached_plugin_type=FusionPlugin, attached_plugin_identifier='Fusion Plugin'
     )
     registry_plugin.init_plugin(mediator=mediator)
     registry = registry_plugin.new_registry()
-    SimpleMediator.registry = registry
+    StandardMediator.registry = registry
     fusion_plugin = StandardFusionPlugin(identifier='test_fusion_plugin')
     fusion_plugin.init_plugin('test', mediator=mediator)
 

@@ -22,7 +22,7 @@ from pntos.api import (
     Mediator,
     Message,
 )
-from pntos.cobra.internal import SimpleMediator, StandardRegistry
+from pntos.cobra.internal import StandardMediator, StandardRegistry
 
 
 def generate_header() -> TypeHeader:
@@ -150,6 +150,6 @@ def dummy_log(level: LoggingLevel, message: str) -> None:
 
 def set_up_mediator() -> Mediator:
     registry = StandardRegistry(dummy_log)
-    mediator = SimpleMediator('', InitializationPlugin)
-    SimpleMediator.registry = registry
+    mediator = StandardMediator('', InitializationPlugin)
+    StandardMediator.registry = registry
     return mediator

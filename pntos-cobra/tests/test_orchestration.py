@@ -64,7 +64,7 @@ from pntos.cobra.config import (
     TimeBiasConfig,
     TutorialOrchestrationConfig,
 )
-from pntos.cobra.internal import SimpleMediator, SimpleMessageStreamConfig
+from pntos.cobra.internal import StandardMediator, StandardMessageStreamConfig
 
 # Test globals
 FOUND_ERROR = False
@@ -271,11 +271,11 @@ class Test_Orchestration(unittest.TestCase):
         ]
 
     def init_all_plugins(self, plugins) -> None:  # type: ignore[no-untyped-def]
-        mediator = SimpleMediator(self.registry_plugin.identifier, RegistryPlugin)
+        mediator = StandardMediator(self.registry_plugin.identifier, RegistryPlugin)
         self.registry_plugin.init_plugin(mediator=mediator)
         registry = self.registry_plugin.new_registry()
-        SimpleMediator.registry = registry
-        SimpleMediator._controller_plugin = None
+        StandardMediator.registry = registry
+        StandardMediator._controller_plugin = None
         # Run init_plugin on all the plugins
         for plugin in plugins:
             plugin.init_plugin(mediator=mediator)
@@ -418,7 +418,7 @@ class Test_Orchestration(unittest.TestCase):
         return m1 == m2
 
     def init_orchestration_plugin(self) -> None:
-        stream_config = SimpleMessageStreamConfig()
+        stream_config = StandardMessageStreamConfig()
         plugins = [
             self.initialization_plugin,
             self.inertial_plugin,
@@ -709,7 +709,7 @@ class Test_Orchestration(unittest.TestCase):
         plugins.append(self.state_modeling_plugin)
         self.init_all_plugins(plugins)
         self.orchestration_plugin.init_orchestration_plugin(
-            plugins, SimpleMessageStreamConfig()
+            plugins, StandardMessageStreamConfig()
         )
         # Process messages until alignment
         pos_dt_centiseconds = 100  # 1 Hz
