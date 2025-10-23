@@ -21,6 +21,7 @@ from .PinsonBodyVelocityMeasurementProcessor import (
     PinsonBodyVelocityMeasurementProcessor,
 )
 from .PinsonPositionMeasurementProcessor import PinsonPositionMeasurementProcessor
+from .PinsonPosVelMeasurementProcessor import PinsonPosVelMeasurementProcessor
 from .PinsonVelocityMeasurementProcessor import PinsonVelocityMeasurementProcessor
 from .PinsonWithLeverArmPositionMeasurementProcessor import (
     PinsonWithLeverArmPositionMeasurementProcessor,
@@ -52,6 +53,7 @@ class StandardGpsInsStateModelProvider(StandardStateModelProvider):
             'pinson_altitude',
             'pinson_with_lever_arm_position',
             'pinson_body_velocity',
+            'pinson_posvel',
         ]
         self.block_identifiers: list[str] = ['pinson15', 'fogm']
         self.virtual_block_identifiers = None
@@ -70,6 +72,7 @@ class StandardGpsInsStateModelProvider(StandardStateModelProvider):
         | AltitudeMeasurementProcessor
         | PinsonWithLeverArmPositionMeasurementProcessor
         | PinsonBodyVelocityMeasurementProcessor
+        | PinsonPosVelMeasurementProcessor
         | None
     ):
         """
@@ -84,6 +87,7 @@ class StandardGpsInsStateModelProvider(StandardStateModelProvider):
                 - Index 3 corresponds to a :class:`AltitudeMeasurementProcessor`.
                 - Index 4 corresponds to a :class:`PinsonWithLeverArmPositionMeasurementProcessor`.
                 - Index 5 corresponds to a :class:`PinsonBodyVelocityMeasurementProcessor`.
+                - Index 6 corresponds to a :class:`PinsonPosVelMeasurementProcessor`.
                 - All other indices will result in a return value of None.
             engine (StandardFusionEngine | None): An optional parameter that may be provided to the
                 new processor, such that the processor may interact with the fusion engine it
@@ -208,6 +212,28 @@ class StandardGpsInsStateModelProvider(StandardStateModelProvider):
                     self._mediator,
                     np.array(sensor_mp_config.sensor_config.lever_arm),
                     np.array(sensor_mp_config.sensor_config.orientation),
+                )
+            case 6:
+                if config_group is None:
+                    self._mediator.log_message(
+                        LoggingLevel.ERROR,
+                        f'A config group is required for processor {self.processor_identifiers[processor_index]}',
+                    )
+                    return None
+                sensor_mp_config = config_from_registry(
+                    SensorMeasurementProcessorConfig, self._mediator, config_group
+                )
+                if sensor_mp_config is None:
+                    self._mediator.log_message(
+                        LoggingLevel.ERROR,
+                        'Could not get position sensor config from registry.',
+                    )
+                    return None
+                return PinsonPosVelMeasurementProcessor(
+                    label,
+                    state_block_labels,
+                    self._mediator,
+                    np.array(sensor_mp_config.sensor_config.lever_arm),
                 )
         self._mediator.log_message(
             LoggingLevel.ERROR,
