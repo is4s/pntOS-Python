@@ -249,7 +249,7 @@ class TimeBiasPreprocessor(Preprocessor):
     """
 
     _mediator: Mediator
-    _channels_to_correct: list[str]
+    _channels_to_correct: tuple[str, ...]
     _time_bias: int
 
     def __init__(

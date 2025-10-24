@@ -393,6 +393,8 @@ def convert_alignment(
         inertial_error_covariance=covariance,
         status=status,
     )
+
+
 def convert_ndarray_to_tuple(arr: NDArray[np.number], target_type: type[Any]) -> tuple:  # type: ignore[type-arg]
     """
     Convert from an NDArray with a numerical ``dtype`` to a tuple of ``target_type``. Multi-dimensional arrays
@@ -407,5 +409,4 @@ def convert_ndarray_to_tuple(arr: NDArray[np.number], target_type: type[Any]) ->
     """
     if arr.ndim == 1:
         return tuple(target_type(x) for x in arr)
-    else:
-        return tuple(convert_ndarray_to_tuple(sub, target_type) for sub in arr)
+    return tuple(convert_ndarray_to_tuple(sub, target_type) for sub in arr)

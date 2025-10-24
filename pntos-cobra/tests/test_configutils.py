@@ -49,22 +49,20 @@ class DummyEnum(Enum):
 
 DEBUG_LOG: Path = Path()
 CONFIG_TEST_GROUP = 'config_test_group'
-SUPPORTED_TYPES = list(
-    (
-        int,
-        float,
-        str,
-        bool,
-        BaseConfig,
-        tuple[int, ...],
-        tuple[str, ...],
-        tuple[float, ...],
-        tuple[BaseConfig, ...],
-        tuple[tuple[float, ...], ...],
-        DummyEnum,
-        EstimateWithCovariance,
-    )
-)
+SUPPORTED_TYPES = [
+    int,
+    float,
+    str,
+    bool,
+    BaseConfig,
+    tuple[int, ...],
+    tuple[str, ...],
+    tuple[float, ...],
+    tuple[BaseConfig, ...],
+    tuple[tuple[float, ...], ...],
+    DummyEnum,
+    EstimateWithCovariance,
+]
 
 
 class DummyMediator(Mediator):
@@ -487,7 +485,7 @@ class TestConfigUtils(unittest.TestCase):
         )
         return dynamic_class
 
-    def _create_dummy_value(self, in_type: type[Any]) -> Any:
+    def _create_dummy_value(self, in_type: type[Any]) -> Any:  # noqa: ANN401
         origin = get_origin(in_type)
 
         if origin is tuple:
@@ -519,7 +517,7 @@ class TestConfigUtils(unittest.TestCase):
                 source_identifier='dummy',
             )
         if issubclass(in_type, Enum):
-            return list(in_type)[0]
+            return next(iter(in_type))
         if issubclass(in_type, EstimateWithCovariance):
             return in_type(
                 type=EstimateWithCovarianceType.EWC_GENERIC,
@@ -535,10 +533,7 @@ class TestConfigUtils(unittest.TestCase):
                 dynamic_group = f'dynamic_test_{i}{j}'
                 DynConf = self._make_config('dynamic_field', t, optional=bool(i))
                 # test with dummy value when type hint is and isn't optional; test with None
-                if i == 0 or i == 3:
-                    val = self._create_dummy_value(t)
-                else:
-                    val = None
+                val = self._create_dummy_value(t) if i in {0, 3} else None
                 conf = DynConf(  # type: ignore[call-arg]
                     dynamic_field=val,
                     group=dynamic_group,
@@ -583,7 +578,7 @@ class TestConfigUtils(unittest.TestCase):
         config_to_registry(conf, self.mediator)
         out_conf = config_from_registry(DynConf, self.mediator, group)
         assert out_conf is not None
-        for e1, e2 in zip(conf.dynamic_field, out_conf.dynamic_field):  # type: ignore[attr-defined]
+        for e1, e2 in zip(conf.dynamic_field, out_conf.dynamic_field, strict=False):  # type: ignore[attr-defined]
             assert e1 == e2
 
     def test_ndarray_to_tuple_conversion(self) -> None:

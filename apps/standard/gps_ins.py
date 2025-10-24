@@ -137,9 +137,7 @@ my_config = [
             TimeBiasConfig(
                 group='config/time_bias',
                 identifier='time_bias',
-                channels_to_correct=[
-                    '/sensor/ublox-ZED-F9T/position',
-                ],
+                channels_to_correct=('/sensor/ublox-ZED-F9T/position',),
                 time_bias=int(0.15 * 1e9),
             ),
         ),

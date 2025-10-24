@@ -121,7 +121,7 @@ class TimeBiasConfig(PreprocessorConfig):
     identifier: str
 
     # UNIQUE FIELDS
-    channels_to_correct: list[str]
+    channels_to_correct: tuple[str, ...]
     """
     The names of the channels to correct.
     """

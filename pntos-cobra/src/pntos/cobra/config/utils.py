@@ -5,7 +5,6 @@ from typing import Any, TypeVar, get_args, get_origin
 
 import numpy as np
 from navtk.filtering import ImuModel
-from numpy.typing import NDArray
 
 from pntos.api import (
     EstimateWithCovariance,
@@ -20,10 +19,17 @@ from .BaseConfig import BaseConfig
 from .ImuConfig import ImuConfig
 
 ConfigType = TypeVar('ConfigType', bound=BaseConfig)
-SUPPORTED_TYPES = set(
-    (int, float, str, bool, BaseConfig, tuple, Enum, EstimateWithCovariance)
-)
-SupportedTupleTypes = set((int, float, str, BaseConfig))
+SUPPORTED_TYPES = {
+    int,
+    float,
+    str,
+    bool,
+    BaseConfig,
+    tuple,
+    Enum,
+    EstimateWithCovariance,
+}
+SupportedTupleTypes = {int, float, str, BaseConfig}
 
 
 def imu_model_to_config(model: ImuModel, group: str) -> ImuConfig:
@@ -249,7 +255,7 @@ def config_to_registry(config: BaseConfig, mediator: Mediator) -> None:
                 + f'but received {type(val_to_store)} from registry.',
             )
             kv.batch_end()
-            return None
+            return
         if isinstance(val_to_store, (tuple, list, np.ndarray)):
             if len(val_to_store) > 0:
                 # convert numerical tuples to ndarray; we only support multi dimensional numerical tuples
@@ -344,15 +350,12 @@ def _confirm_types(out_val: Any, expected_type: type[Any]) -> bool:  # noqa: ANN
 
     if _is_type_optional(expected_type):
         types = get_args(expected_type)
-        for t in types:
-            if compare_type(out_type, t):
-                return True
-        return False
+        return any(compare_type(out_type, t) for t in types)
 
     return compare_type(out_type, expected_type)
 
 
-def _get_verbose_type(obj: Any) -> Any:
+def _get_verbose_type(obj: Any) -> Any:  # noqa: ANN401
     if isinstance(obj, tuple):
         inner_types = tuple(_get_verbose_type(item) for item in obj)
         return tuple[inner_types]  # type: ignore[valid-type]
@@ -394,7 +397,7 @@ def _is_type_supported(field_type: type[Any]) -> bool:
     if origin is tuple:
         return _validate_tuple_type(type_to_compare)
     # we support lists of one of the following types: int, str, float, BaseConfig
-    elif origin is not None:
+    if origin is not None:
         return False
     return type_to_compare in SUPPORTED_TYPES or issubclass(
         type_to_compare, (Enum, BaseConfig)
@@ -425,13 +428,12 @@ def _validate_tuple_type(tuple_type: type[Any], rec_call: bool = False) -> bool:
             if rec_call:
                 if arg not in {int, float, Ellipsis}:
                     return False
-            else:
-                if (
-                    arg not in SupportedTupleTypes
-                    and arg is not Ellipsis
-                    and not issubclass(arg, BaseConfig)
-                ):
-                    return False
+            elif (
+                arg not in SupportedTupleTypes
+                and arg is not Ellipsis
+                and not issubclass(arg, BaseConfig)
+            ):
+                return False
         else:
             return False
     return True

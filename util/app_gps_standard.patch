@@ -1,5 +1,5 @@
 diff --git a/apps/tutorial/gps_ins.py b/apps/standard/gps_ins.py
-index dc971c5f..6ca964a0 100755
+index d6ad2c8d..12295587 100755
 --- a/apps/tutorial/gps_ins.py
 +++ b/apps/standard/gps_ins.py
 @@ -2,37 +2,40 @@
@@ -69,7 +69,7 @@ index dc971c5f..6ca964a0 100755
  my_config = [
      LcmLogTransportConfig(
          input_file=EXAMPLE_LCM_LOG,
-@@ -51,81 +65,86 @@ my_config = [
+@@ -51,79 +65,84 @@ my_config = [
          output_version=AspnVersion.V23,
          group='config/lcm_log_transport',
      ),
@@ -192,9 +192,7 @@ index dc971c5f..6ca964a0 100755
 +            TimeBiasConfig(
 +                group='config/time_bias',
 +                identifier='time_bias',
-+                channels_to_correct=[
-+                    '/sensor/ublox-ZED-F9T/position',
-+                ],
++                channels_to_correct=('/sensor/ublox-ZED-F9T/position',),
 +                time_bias=int(0.15 * 1e9),
 +            ),
 +        ),
@@ -221,15 +219,13 @@ index dc971c5f..6ca964a0 100755
 -    TimeBiasConfig(
 -        group='config/time_bias',
 -        identifier='time_bias',
--        channels_to_correct=[
--            '/sensor/ublox-ZED-F9T/position',
--        ],
+-        channels_to_correct=('/sensor/ublox-ZED-F9T/position',),
 -        time_bias=int(0.15 * 1e9),
 -    ),
  ]
  # End Config
  
-@@ -135,17 +154,18 @@ plugins = [
+@@ -133,17 +152,18 @@ plugins = [
      LcmLogTransportPlugin('Cobra LCM Log Transport Plugin'),
      EkfFusionStrategyPlugin('Cobra EKF Fusion Strategy Plugin'),
      StandardFusionPlugin('Cobra Standard Fusion Plugin'),
