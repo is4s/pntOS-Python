@@ -55,14 +55,14 @@ my_config = [
     StandardOrchestrationConfig(
         best_sol_channel='/solution/pntos/pva',
         imu_sol_channel='/solution/pntos-imu/pva',
-        alignment_channels=['/sensor/ublox_ZED_F9T/position', '/sensor/vn_100/imu'],
+        alignment_channels=('/sensor/ublox_ZED_F9T/position', '/sensor/vn_100/imu'),
         pinson_sb_config=PinsonStateBlockConfig(
             group='config/pinson_block',
             identifier='pinson15',
             label='pinson15',
             imu_model=imu_model,
         ),
-        additional_sb_configs=[
+        additional_sb_configs=(
             FogmStateBlockConfig(
                 group='config/fogm_block',
                 identifier='fogm',
@@ -78,14 +78,14 @@ my_config = [
                     tau=(300.0, 300.0, 200.0),
                 ),
             ),
-        ],
-        mp_configs=[
+        ),
+        mp_configs=(
             SensorMeasurementProcessorConfig(
                 group='config/gps_measurement_processor',
                 identifier='pinson_with_ned_fogm_position',
                 label='gps',
                 channel='/sensor/ublox_ZED_F9T/position',
-                state_block_labels=['pinson15', 'pos_fogm'],
+                state_block_labels=('pinson15', 'pos_fogm'),
                 sensor_config=SensorConfig(
                     group='config/gp3d_state_modeling',
                     lever_arm=(-0.50, 0.38, -0.05),
@@ -93,7 +93,7 @@ my_config = [
                     sensor_name='position',
                 ),
             ),
-        ],
+        ),
         inertial_config=InertialConfig(
             group='config/inertial',
             expected_dt=0.01,
@@ -108,7 +108,7 @@ my_config = [
             heading=0.06895795874629593,
             heading_sigma=0.02236067977,
         ),
-        preprocessor_configs=[
+        preprocessor_configs=(
             ImuRotatorConfig(
                 group='config/imu_rotator',
                 identifier='imu_rotator',
@@ -124,12 +124,10 @@ my_config = [
             TimeBiasConfig(
                 group='config/time_bias',
                 identifier='time_bias',
-                channels_to_correct=[
-                    '/sensor/ublox-ZED-F9T/position',
-                ],
+                channels_to_correct=('/sensor/ublox-ZED-F9T/position',),
                 time_bias=int(0.15 * 1e9),
             ),
-        ],
+        ),
         group='config/orchestration',
     ),
 ]

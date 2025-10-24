@@ -40,7 +40,7 @@ Within Cobra, there are a set of existing configuration files that are used in s
         group: str,
         bar_config: BaseConfig,
     ```
-    Notice that the field `FooConfig.bar_config` is a `BaseConfig` rather than `BarConfig`. This results in `FooPlugin` expecting a `BaseConfig` so when it attemps to access the fields only `group` would appear accessible.
+    Notice that the field `FooConfig.bar_config` is a `BaseConfig` rather than `BarConfig`. This results in `FooPlugin` expecting a `BaseConfig` so when it attempts to access the fields only `group` would appear accessible.
 
     Now, if `FooPlugin` wanted to do something with the unique fields on `BarConfig` (such as `qaz`), it should type hint a `BarConfig` like so:
     ```Python
@@ -52,9 +52,14 @@ Within Cobra, there are a set of existing configuration files that are used in s
 There is also a set of utility functions in `pntos-cobra/src/pntos/cobra/config/utils.py` that are used throughout Cobra to make storing and retrieving these config objects easier. In order to simplify some of the utility functions, namely `config_to_registry` and `config_from_registry`, some conventions were designed which are as follows:
 
 - No field within a config class should start with an underscore `_`. Following this convention ensures there will be no key-value store collisions with internal entries created and stored in the registry.
+- A series of data on a config class should be stored as a `tuple`. Type hinting another series will result in an error.
+    - A uniform type is expected and required i.e. `tuple[float, float]` will be accepted but `tuple[float, int]` will not.
+    - Supported tuple types include `int`, `str`, `float`, and `BaseConfig`.
+    - Multi-dimensional tuples are supported but come with additional constraints:
+        - Uniformity is still expected across tuple arguments i.e. `tuple[tuple[float, ...], tuple[float, ...]]` will be accepted but `tuple[tuple[float, ...], tuple[float, float]]` will not be.
+        - Tuples are expected to be rectangular which means every row must have the same number of elements. So `((1, 2), (3,4))` would be accepted whereas `((1, 2), (3, 4, 5))` would not be.
+        - Supported types are restricted to only numerical values. So, `tuple[tuple[int, ...], tuple[int, ...]]` would be accepted whereas `tuple[tuple[str, ...], tuple[str, ...]]` would not be.
 - The functions support the following types:
-    - Registry types denoted by `RegistryTypeValueUnion`
-    - Any data class in `pntos-cobra/src/pntos/cobra/config/` as well as lists of these classes (i.e. `list[BaseConfig]`)
-    - `Enum`'s
-    - Stand-alone and nested `tuple[float, ...]`
+    - The native Python types `int`, `str`, `float`, `bool`, `tuple`, and `Enum`.
+    - Any data class in `pntos-cobra/src/pntos/cobra/config/` as well as tuples of these classes (i.e. `tuple[BaseConfig, ...]`)
     - The {py:obj}`EstimateWithCovariance<pntos.api.EstimateWithCovariance>` data class.

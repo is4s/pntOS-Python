@@ -13,17 +13,23 @@ from pntos.api import (
     Mediator,
     RegistryValueTypeUnion,
 )
+from pntos.cobra.utils import convert_ndarray_to_tuple
 
 from .BaseConfig import BaseConfig
 from .ImuConfig import ImuConfig
 
 ConfigType = TypeVar('ConfigType', bound=BaseConfig)
 SUPPORTED_TYPES = {
-    *get_args(RegistryValueTypeUnion),
-    tuple[float, ...],
+    int,
+    float,
+    str,
+    bool,
+    BaseConfig,
+    tuple,
     Enum,
     EstimateWithCovariance,
 }
+SupportedTupleTypes = {int, float, str, BaseConfig}
 
 
 def imu_model_to_config(model: ImuModel, group: str) -> ImuConfig:
@@ -126,7 +132,7 @@ def config_from_registry(  # noqa: PLR0915
                 estimate=kv['_estimate'],  # type: ignore[arg-type]
                 covariance=kv['_covariance'],  # type: ignore[arg-type]
             )
-        # Special case: nested config or list of nested configs
+        # Special case: nested config or a series of nested configs
         else:
             group_key = '_' + param.name + '_groups'
             if group_key not in kv:
@@ -155,7 +161,7 @@ def config_from_registry(  # noqa: PLR0915
                     conf_type = get_args(conf_type)[0]
                 for group in groups:
                     conf = config_from_registry(conf_type, mediator, group)
-                    if not conf:
+                    if conf is None:
                         fail = True
                         break
                     val.append(conf)
@@ -170,19 +176,16 @@ def config_from_registry(  # noqa: PLR0915
             continue
 
         if isinstance(val, np.ndarray):
-            if hasattr(param.type, '__origin__'):
-                p_type = get_origin(param.type)
-                if p_type is tuple:
-                    val = tuple(val)
-                elif p_type is list:
-                    # Convert numpy array to list
-                    if str(param.type) == 'list[int]':
-                        # Convert to list of ints
-                        val = val.astype(int)
-                    val = list(val)
-                elif p_type is np.ndarray and np.dtype[np.int_] in param.type.__args__:  # type: ignore[union-attr]
-                    # Convert to np array of ints
-                    val = val.astype(int)
+            dtype = None
+            p_args = get_args(param.type)
+            p_org = get_origin(p_args[0])
+            while p_org is not None:
+                p_args = get_args(p_args[0])
+                p_org = get_origin(p_org)
+            dtype = p_args[0]
+            val = convert_ndarray_to_tuple(val, dtype)
+        elif isinstance(val, list):
+            val = tuple(val)  # type: ignore[arg-type]
         # Special case: enum. Convert integer back to enum type.
         elif isclass(param.type) and issubclass(param.type, Enum):
             val = param.type(val)
@@ -207,8 +210,7 @@ def config_to_registry(config: BaseConfig, mediator: Mediator) -> None:
     """
     A utility function that inserts a config into the registry.
 
-    This function will convert certain types (list[float], list|nd.array[int], Enum, tuple[float])
-    unsupported by the registry to the corresponding supported type represented by ``RegistryValueType``.
+    This function verifies that all series of data are within tuples and converts them to a registry equivalent.
     It will convert an ``int`` to a ``float`` if the field is type hinted as a ``float``.
     It also supports storing nested config objects and the API defined :class:`pntos.api.EstimateWithCovariance`.
 
@@ -223,16 +225,30 @@ def config_to_registry(config: BaseConfig, mediator: Mediator) -> None:
         if not _is_type_supported(param.type):  # type: ignore[arg-type]
             mediator.log_message(
                 LoggingLevel.ERROR,
-                f'Support for converting {param.type} to a registry type does not exist. Support must be added or a different type must be used on the config class {type(config)}',
+                f'Support for converting {param.type} to a registry type does not exist. Support must be added or a different type must be used on the config class {type(config)}.',
             )
             kv.batch_end()
             return
         val_to_store = getattr(config, param.name)
         # internally convert int to float if type is supposed to be float
         if isinstance(val_to_store, int) and param.type is float:
+            mediator.log_message(
+                LoggingLevel.WARN,
+                f'Expected field {param.name} in {type(config)} to have type {param.type} '
+                + f'but received {type(val_to_store)} from registry. Converting to {param.type}.',
+            )
             val_to_store = float(val_to_store)
+        # log warning if user provided a non-tuple series
+        if isinstance(val_to_store, (list, np.ndarray)):
+            mediator.log_message(
+                LoggingLevel.WARN,
+                f'Expected series to be a tuple but received a {type(val_to_store)}. '
+                + 'Conversion to a supported registry type will be attempted.',
+            )
         # compare user provided type with the validated config type hint
-        if not _confirm_types(val_to_store, param.type):  # type: ignore[arg-type]
+        if not isinstance(
+            val_to_store, (tuple, list, np.ndarray)
+        ) and not _confirm_types(val_to_store, param.type):  # type: ignore[arg-type]
             mediator.log_message(
                 LoggingLevel.ERROR,
                 f'Expected field {param.name} in {type(config)} to have type {param.type} '
@@ -240,12 +256,15 @@ def config_to_registry(config: BaseConfig, mediator: Mediator) -> None:
             )
             kv.batch_end()
             return
-        if isinstance(val_to_store, tuple):
-            val_to_store = np.array(val_to_store, dtype=np.float64)
-        elif isinstance(val_to_store, (list, np.ndarray)):
+        if isinstance(val_to_store, (tuple, list, np.ndarray)):
             if len(val_to_store) > 0:
-                if isinstance(val_to_store[0], (int, float, np.int_)):
+                # convert numerical tuples to ndarray; we only support multi dimensional numerical tuples
+                if np.issubdtype(type(val_to_store[0]), np.number) or isinstance(
+                    val_to_store[0], (tuple, list, np.ndarray)
+                ):
                     val_to_store = np.array(val_to_store, dtype=float)
+                elif isinstance(val_to_store[0], str):
+                    val_to_store = list(val_to_store)
                 elif isinstance(val_to_store[0], BaseConfig):
                     nested_groups = []
                     for nested_config in val_to_store:
@@ -287,24 +306,60 @@ def _confirm_types(out_val: Any, expected_type: type[Any]) -> bool:  # noqa: ANN
     Returns:
         bool
     """
-    out_type = type(out_val)
+
+    def compare_tuples(tuple1: type[Any], tuple2: type[Any]) -> bool:
+        args1, args2 = (get_args(tuple1), get_args(tuple2))
+        for i, arg1 in enumerate(args1):
+            # if at the end of tuple2, iterate over the rest of tuple1
+            if i < len(args2):
+                arg2 = args2[i]
+            org1, org2 = (get_origin(arg1), get_origin(arg2))
+            if org1 is tuple and org2 is tuple:
+                if not compare_tuples(arg1, arg2):
+                    return False
+            elif org1 is None and org2 is None:
+                if arg1 == arg2:
+                    continue
+                if arg2 is Ellipsis:
+                    continue
+                return False
+            elif org1 is tuple and org2 is None:
+                if not _validate_tuple_type(arg1):
+                    return False
+                continue
+            else:
+                return False
+        return True
+
+    def compare_type(type_to_compare: type[Any], expected_type: type[Any]) -> bool:
+        if str(type_to_compare) == str(expected_type):
+            return True
+
+        exp_org = get_origin(expected_type)
+        ret_org = get_origin(type_to_compare)
+        if exp_org != ret_org:
+            return False
+        # Check if expected_type is series
+        if exp_org is tuple:
+            return compare_tuples(type_to_compare, expected_type)
+
+        # Otherwise, just see if it's the same type
+        return issubclass(type_to_compare, expected_type)
+
+    out_type = _get_verbose_type(out_val)
 
     if _is_type_optional(expected_type):
         types = get_args(expected_type)
-        valid_type = False
-        for t in types:
-            if hasattr(t, '__origin__'):
-                return out_type is get_origin(t)
-            if out_type is t:
-                valid_type = True
-        return bool(valid_type)
+        return any(compare_type(out_type, t) for t in types)
 
-    # Check if expected_type is generic alias (list[str], tuple[float], etc...)
-    if hasattr(expected_type, '__origin__'):
-        return out_type is get_origin(expected_type)
+    return compare_type(out_type, expected_type)
 
-    # Otherwise, just see if it's the same type
-    return issubclass(out_type, expected_type)
+
+def _get_verbose_type(obj: Any) -> Any:  # noqa: ANN401
+    if isinstance(obj, tuple):
+        inner_types = tuple(_get_verbose_type(item) for item in obj)
+        return tuple[inner_types]  # type: ignore[valid-type]
+    return type(obj)
 
 
 def _is_type_optional(field_type: type[Any] | str) -> bool:
@@ -342,18 +397,14 @@ def _is_type_supported(field_type: type[Any]) -> bool:
     if origin is tuple:
         return _validate_tuple_type(type_to_compare)
     # we support lists of one of the following types: int, str, float, BaseConfig
-    if origin is list:
-        args = get_args(type_to_compare)
-        if len(args) != 1:
-            return False
-        if issubclass(args[0], (int, str, float, BaseConfig)):
-            return True
+    if origin is not None:
+        return False
     return type_to_compare in SUPPORTED_TYPES or issubclass(
         type_to_compare, (Enum, BaseConfig)
     )
 
 
-def _validate_tuple_type(tuple_type: type[Any]) -> bool:
+def _validate_tuple_type(tuple_type: type[Any], rec_call: bool = False) -> bool:
     """
     A recursive function that checks each type of the input ``tuple`` and determines
     if they are supported by ``config_from_registry`` and ``config_to_registry``.
@@ -365,13 +416,23 @@ def _validate_tuple_type(tuple_type: type[Any]) -> bool:
         bool
     """
     args = get_args(tuple_type)
+    first_arg = args[0]
     for arg in args:
+        if arg != first_arg and arg is not Ellipsis:
+            return False
         arg_org = get_origin(arg)
         if arg_org is tuple:
-            if not _validate_tuple_type(arg):
+            if not _validate_tuple_type(arg, True):
                 return False
         elif arg_org is None:
-            if arg is not float and arg is not Ellipsis:
+            if rec_call:
+                if arg not in {int, float, Ellipsis}:
+                    return False
+            elif (
+                arg not in SupportedTupleTypes
+                and arg is not Ellipsis
+                and not issubclass(arg, BaseConfig)
+            ):
                 return False
         else:
             return False

@@ -1,10 +1,17 @@
 import unittest
-from dataclasses import fields
+from dataclasses import dataclass, field, fields
 from enum import Enum
 from pathlib import Path
+from typing import Any, get_args, get_origin
 
 import numpy as np
-from aspn23 import TypeTimestamp
+from aspn23 import (
+    MeasurementAltitude,
+    MeasurementAltitudeErrorModel,
+    MeasurementAltitudeReference,
+    TypeHeader,
+    TypeTimestamp,
+)
 from pntos.api import (
     EstimateWithCovariance,
     EstimateWithCovarianceType,
@@ -25,6 +32,7 @@ from pntos.cobra.config import (
     PinsonStateBlockConfig,
     PreprocessorConfig,
     SensorConfig,
+    SensorMeasurementProcessorConfig,
     StandardOrchestrationConfig,
     StateBlockConfig,
     StaticAlignmentConfig,
@@ -34,8 +42,27 @@ from pntos.cobra.config import (
 )
 from pntos.cobra.utils import validate_manual_ewc
 
+
+class DummyEnum(Enum):
+    RED = 0
+
+
 DEBUG_LOG: Path = Path()
 CONFIG_TEST_GROUP = 'config_test_group'
+SUPPORTED_TYPES = [
+    int,
+    float,
+    str,
+    bool,
+    BaseConfig,
+    tuple[int, ...],
+    tuple[str, ...],
+    tuple[float, ...],
+    tuple[BaseConfig, ...],
+    tuple[tuple[float, ...], ...],
+    DummyEnum,
+    EstimateWithCovariance,
+]
 
 
 class DummyMediator(Mediator):
@@ -150,7 +177,7 @@ class TestConfigUtils(unittest.TestCase):
 
     def test_DownsamplerConfig_to_from_registry(self) -> None:
         test_conf = DownsamplerConfig(
-            CONFIG_TEST_GROUP, 'downsampler', ['chan1', 'chan2', 'chan3'], [1, 2, 3]
+            CONFIG_TEST_GROUP, 'downsampler', ('chan1', 'chan2', 'chan3'), (1, 2, 3)
         )
         # Test config_to_registry
         config_to_registry(test_conf, self.mediator)
@@ -183,7 +210,7 @@ class TestConfigUtils(unittest.TestCase):
         test_conf = StandardOrchestrationConfig(
             best_sol_channel='/solution/pntos/best',
             imu_sol_channel='/solution/pntos/imu',
-            alignment_channels=['/sensor/ublox-ZED-F9T/position', '/sensor/vn-100/imu'],
+            alignment_channels=('/sensor/ublox-ZED-F9T/position', '/sensor/vn-100/imu'),
             pinson_sb_config=PinsonStateBlockConfig(
                 group='config/pinson_block',
                 identifier='pinson15',
@@ -198,29 +225,35 @@ class TestConfigUtils(unittest.TestCase):
                     gyro_random_walk_sigma=(9.9e-4, 9.9e-4, 6.7e-5),
                 ),
             ),
-            additional_sb_configs=[
+            additional_sb_configs=(
                 StateBlockConfig(
                     group='config/fogm_block',
                     identifier='fogm',
                     label='pos_fogm',
                 ),
-            ],
-            mp_configs=[
-                MeasurementProcessorConfig(
+            ),
+            mp_configs=(
+                SensorMeasurementProcessorConfig(
                     group='config/gps_measurement_processor',
                     identifier='pinson_with_ned_fogm_position',
                     label='gps',
                     channel='/sensor/ublox-ZED-F9T/position',
-                    state_block_labels=['pinson15', 'pos_fogm'],
+                    state_block_labels=('pinson15', 'pos_fogm'),
+                    sensor_config=SensorConfig(
+                        CONFIG_TEST_GROUP,
+                        (0.7, 0.8, 0.9),
+                        (1.1, 2.2, 3.3, 4.4),
+                        'NCC-1701',
+                    ),
                 ),
                 MeasurementProcessorConfig(
                     group='config/vel_measurement_processor',
                     identifier='pinson_velocity',
                     label='vel',
                     channel='/sensor/ublox-ZED-F9T/velocity',
-                    state_block_labels=['pinson15'],
+                    state_block_labels=('pinson15',),
                 ),
-            ],
+            ),
             inertial_config=InertialConfig(
                 group='config/inertial',
                 expected_dt=0.01,
@@ -250,7 +283,7 @@ class TestConfigUtils(unittest.TestCase):
                 initial_time=1747680879.539799718,
                 initial_vel=(0.0, 0.0, 0.0),
             ),
-            preprocessor_configs=[
+            preprocessor_configs=(
                 ImuRotatorConfig(
                     group='config/imu_rotator',
                     identifier='imu_rotator',
@@ -263,7 +296,7 @@ class TestConfigUtils(unittest.TestCase):
                     channel_to_correct='/sensor/vn-100/imu',
                     expected_dt_nsec=int(0.01 * 1e9),
                 ),
-            ],
+            ),
             group=CONFIG_TEST_GROUP,
         )
 
@@ -273,10 +306,7 @@ class TestConfigUtils(unittest.TestCase):
             StandardOrchestrationConfig, self.mediator, CONFIG_TEST_GROUP
         )
         assert result_config is not None
-        assert result_config.additional_sb_configs is not None
-        assert result_config.mp_configs is not None
-        assert result_config.inertial_config is not None
-        assert result_config.preprocessor_configs is not None
+        self._validate_conf_from_registry(test_conf, result_config)
 
     def test_static_align_config_to_from_registry(self) -> None:
         imu_model = ImuConfig(
@@ -391,12 +421,16 @@ class TestConfigUtils(unittest.TestCase):
         kv = self.mediator.registry.batch_start(CONFIG_TEST_GROUP)
         conf_fields = [f for f in fields(test_conf) if f.name != 'group']
         for conf_field in conf_fields:
-            val: RegistryValueTypeUnion | Enum | None = kv[conf_field.name]
+            val: RegistryValueTypeUnion | tuple[Any, ...] | Enum | None = kv[
+                conf_field.name
+            ]
             conf_val = getattr(test_conf, conf_field.name)
             if isinstance(val, np.ndarray):
                 assert np.all(val == conf_val)
             elif isinstance(conf_val, Enum):
                 val = type(conf_val)(val)
+            elif isinstance(val, list):
+                val = tuple(val)
             else:
                 assert val == conf_val
 
@@ -411,12 +445,174 @@ class TestConfigUtils(unittest.TestCase):
             assert test_field.name == result_field.name
             test_val = getattr(test_conf, test_field.name)
             result_val = getattr(result_conf, result_field.name)
-            assert type(test_val) is type(result_val)
+            assert issubclass(type(test_val), type(result_val))
             if isinstance(test_val, np.ndarray):
                 assert np.all(test_val == result_val)
                 assert test_val.dtype == result_val.dtype
+            elif isinstance(test_val, EstimateWithCovariance):
+                self._compare_ewc(test_val, result_val)
+            elif isinstance(test_val, tuple):
+                assert len(test_val) > 0
+                if isinstance(test_val[0], BaseConfig):
+                    for i in range(len(test_val)):
+                        assert issubclass(type(test_val[i]), type(result_val[i]))
+                        assert test_val[i].group == result_val[i].group
+            elif isinstance(test_val, BaseConfig):
+                assert test_val.group == result_val.group
             else:
                 assert test_val == result_val
 
         # Make sure there weren't any error messages:
         assert Path() == DEBUG_LOG
+
+    def _make_config(
+        self, field_name: str, field_type: type, optional: bool = False
+    ) -> type[BaseConfig]:
+        annotations: dict[str, Any] = {}
+
+        actual_type = field_type | None if optional else field_type
+        annotations['group'] = str
+        annotations[field_name] = actual_type
+
+        fields_dict = {
+            '__annotations__': annotations,
+            'group': field(default='dynamic_test'),
+            field_name: field(default=None if optional else ...),
+        }
+
+        dynamic_class: type[BaseConfig] = dataclass(
+            type('DynamicConfigClass', (BaseConfig,), fields_dict)
+        )
+        return dynamic_class
+
+    def _create_dummy_value(self, in_type: type[Any]) -> Any:  # noqa: ANN401
+        origin = get_origin(in_type)
+
+        if origin is tuple:
+            val = self._create_dummy_value(get_args(in_type)[0])
+            return (val, val)
+
+        if in_type is bool:
+            return True
+        if issubclass(in_type, (int, np.int_)):
+            return 1
+        if issubclass(in_type, (float, np.floating)):
+            return 1.23
+        if in_type is str:
+            return 'test'
+        if issubclass(in_type, BaseConfig):
+            return in_type(group='dummy_val_test')
+        if issubclass(in_type, Message):
+            return in_type(
+                wrapped_message=MeasurementAltitude(
+                    header=TypeHeader(0, 0, 0, 0),
+                    time_of_validity=TypeTimestamp(0),
+                    reference=MeasurementAltitudeReference.HAE,
+                    altitude=1.0,
+                    variance=0.1,
+                    error_model=MeasurementAltitudeErrorModel.NONE,
+                    error_model_params=np.array([]),
+                    integrity=[],
+                ),
+                source_identifier='dummy',
+            )
+        if issubclass(in_type, Enum):
+            return next(iter(in_type))
+        if issubclass(in_type, EstimateWithCovariance):
+            return in_type(
+                type=EstimateWithCovarianceType.EWC_GENERIC,
+                estimate=np.zeros((3, 1)),
+                covariance=np.eye(3),
+            )
+
+        raise ValueError(f"Don't know how to create dummy value for {in_type}")
+
+    def test_supported_types(self) -> None:
+        for i in range(3):
+            for j, t in enumerate(SUPPORTED_TYPES):
+                dynamic_group = f'dynamic_test_{i}{j}'
+                DynConf = self._make_config('dynamic_field', t, optional=bool(i))
+                # test with dummy value when type hint is and isn't optional; test with None
+                val = self._create_dummy_value(t) if i in {0, 3} else None
+                conf = DynConf(  # type: ignore[call-arg]
+                    dynamic_field=val,
+                    group=dynamic_group,
+                )
+                config_to_registry(conf, self.mediator)
+                out_conf = config_from_registry(DynConf, self.mediator, dynamic_group)
+                assert out_conf is not None
+                self._validate_conf_from_registry(conf, out_conf)
+
+    def test_int_to_float_conversion(self) -> None:
+        group = 'itfconv'
+        DynConf = self._make_config('dynamic_field', float)
+        val = 1
+        conf = DynConf(  # type: ignore[call-arg]
+            dynamic_field=val, group=group
+        )
+        config_to_registry(conf, self.mediator)
+        out_conf = config_from_registry(DynConf, self.mediator, group)
+        assert out_conf is not None
+        assert conf.dynamic_field == out_conf.dynamic_field  # type: ignore[attr-defined]
+
+    def test_list_to_tuple_conversion(self) -> None:
+        group = 'md_list_to_tuple'
+        DynConf = self._make_config(
+            'dynamic_field', tuple[tuple[float, float], tuple[float, float]]
+        )
+        val = [[1, 2], [3, 4]]
+        conf = DynConf(  # type: ignore[call-arg]
+            dynamic_field=val, group=group
+        )
+        config_to_registry(conf, self.mediator)
+        out_conf = config_from_registry(DynConf, self.mediator, group)
+        assert out_conf is not None
+        assert np.allclose(conf.dynamic_field, out_conf.dynamic_field)  # type: ignore[attr-defined]
+
+        group = 'str_list_to_tuple'
+        DynConf = self._make_config('dynamic_field', tuple[str, ...])
+        new_val = ['hello', 'world']
+        conf = DynConf(  # type: ignore[call-arg]
+            dynamic_field=new_val, group=group
+        )
+        config_to_registry(conf, self.mediator)
+        out_conf = config_from_registry(DynConf, self.mediator, group)
+        assert out_conf is not None
+        for e1, e2 in zip(conf.dynamic_field, out_conf.dynamic_field, strict=False):  # type: ignore[attr-defined]
+            assert e1 == e2
+
+    def test_ndarray_to_tuple_conversion(self) -> None:
+        group = 'md_ndarray_to_tuple'
+        DynConf = self._make_config(
+            'dynamic_field', tuple[tuple[float, float], tuple[float, float]]
+        )
+        val = np.array(((1, 2), (3, 4)))
+        conf = DynConf(  # type: ignore[call-arg]
+            dynamic_field=val, group=group
+        )
+        config_to_registry(conf, self.mediator)
+        out_conf = config_from_registry(DynConf, self.mediator, group)
+        assert out_conf is not None
+        assert np.allclose(conf.dynamic_field, out_conf.dynamic_field)  # type: ignore[attr-defined]
+
+    def test_non_uniform_tuple(self) -> None:
+        group = 'non_uniform'
+        DynConf = self._make_config(
+            'dynamic_field', tuple[tuple[float, ...], tuple[float, float]]
+        )
+        val = ((1, 2, 3, 4, 5), (6, 7))
+        conf = DynConf(dynamic_field=val, group=group)  # type: ignore[call-arg]
+        config_to_registry(conf, self.mediator)
+        out_conf = config_from_registry(DynConf, self.mediator, group)
+        assert out_conf is None
+
+    def test_multi_dim_str_tuple(self) -> None:
+        group = 'md_tuple_of_str'
+        DynConf = self._make_config(
+            'dynamic_field', tuple[tuple[str, ...], tuple[str, ...]]
+        )
+        val = (('hello', 'world'), ('2001', 'a space odyssey'))
+        conf = DynConf(dynamic_field=val, group=group)  # type: ignore[call-arg]
+        config_to_registry(conf, self.mediator)
+        out_conf = config_from_registry(DynConf, self.mediator, group)
+        assert out_conf is None

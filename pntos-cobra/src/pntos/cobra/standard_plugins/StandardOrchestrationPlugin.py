@@ -75,7 +75,7 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
     fusion_engine: StandardFusionEngine
     measurement_channels: dict[str, str]
     pinson_config: PinsonStateBlockConfig
-    alignment_channels: list[str]
+    alignment_channels: tuple[str, ...]
     inertial_drift_prop_dt: int
     prop_interval: int
 
@@ -201,14 +201,14 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
     def _set_up_preprocessors(
         self,
         sorted_plugins: SortedPlugins,
-        preprocessor_configs: list[PreprocessorConfig],
+        preprocessor_configs: tuple[PreprocessorConfig, ...],
     ) -> list[Preprocessor]:
         """
         Finds and creates a list of preprocessors based on the information from ``preprocessor_configs``.
 
         Args:
             sorted_plugins (SortedPlugins): A `SortedPlugins` instance.
-            preprocessor_configs (list[PreprocessorConfig]):
+            preprocessor_configs (tuple[PreprocessorConfig, ...]):
 
         Returns:
             list[Preprocessor]
@@ -335,7 +335,7 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
                     mp_ids.index(mp_config.identifier),
                     self.fusion_engine,
                     mp_config.label,
-                    mp_config.state_block_labels,
+                    list(mp_config.state_block_labels),
                     mp_config.group,
                 )
                 if processor is None:
@@ -349,8 +349,8 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
 
     def _set_up_fusion_engine(
         self,
-        sb_configs: list[StateBlockConfig] | None,
-        mp_configs: list[MeasurementProcessorConfig] | None,
+        sb_configs: tuple[StateBlockConfig, ...] | None,
+        mp_configs: tuple[MeasurementProcessorConfig, ...] | None,
     ) -> None:
         """
         Utility function to assemble the components of and create a fusion engine.

@@ -1,10 +1,10 @@
 diff --git a/apps/standard/gps_ins.py b/apps/standard/gps_ins_leverarm.py
-index 190c4b95..4b0cc504 100755
+index 12295587..eab6763d 100755
 --- a/apps/standard/gps_ins.py
 +++ b/apps/standard/gps_ins_leverarm.py
 @@ -77,9 +77,9 @@ my_config = [
          ),
-         additional_sb_configs=[
+         additional_sb_configs=(
              FogmStateBlockConfig(
 -                group='config/fogm_block',
 +                group='config/fogm_block1',
@@ -33,20 +33,20 @@ index 190c4b95..4b0cc504 100755
 +                    tau=(1e5, 1e5, 1e5),
 +                ),
 +            ),
-         ],
-         mp_configs=[
+         ),
+         mp_configs=(
              SensorMeasurementProcessorConfig(
                  group='config/gps_measurement_processor',
 -                identifier='pinson_with_ned_fogm_position',
 +                identifier='pinson_with_lever_arm_position',
                  label='gps',
                  channel='/sensor/ublox-ZED-F9T/position',
--                state_block_labels=['pinson15', 'pos_fogm'],
-+                state_block_labels=[
+-                state_block_labels=('pinson15', 'pos_fogm'),
++                state_block_labels=(
 +                    'pinson15',
 +                    'pos_sensor_error',
 +                    'pos_sensor_lever_arm',
-+                ],
++                ),
                  sensor_config=SensorConfig(
                      group='config/gp3d_state_modeling',
 -                    lever_arm=(-0.50, 0.38, -0.05),

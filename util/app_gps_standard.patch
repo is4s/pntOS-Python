@@ -1,5 +1,5 @@
 diff --git a/apps/tutorial/gps_ins.py b/apps/standard/gps_ins.py
-index dc971c5f..190c4b95 100755
+index d6ad2c8d..12295587 100755
 --- a/apps/tutorial/gps_ins.py
 +++ b/apps/standard/gps_ins.py
 @@ -2,37 +2,40 @@
@@ -69,7 +69,7 @@ index dc971c5f..190c4b95 100755
  my_config = [
      LcmLogTransportConfig(
          input_file=EXAMPLE_LCM_LOG,
-@@ -51,80 +65,85 @@ my_config = [
+@@ -51,79 +65,84 @@ my_config = [
          output_version=AspnVersion.V23,
          group='config/lcm_log_transport',
      ),
@@ -120,8 +120,84 @@ index dc971c5f..190c4b95 100755
 -    ),
 -    TutorialOrchestrationConfig(
 -        gps_channel='/sensor/ublox-ZED-F9T/position',
--        group='config/orchestration',
--    ),
++    StandardOrchestrationConfig(
++        best_sol_channel='/solution/pntos/pva',
++        imu_sol_channel='/solution/pntos-imu/pva',
++        alignment_channels=('/sensor/ublox-ZED-F9T/position', '/sensor/vn-100/imu'),
++        pinson_sb_config=PinsonStateBlockConfig(
++            group='config/pinson_block',
++            identifier='pinson15',
++            label='pinson15',
++            imu_model=imu_model,
++        ),
++        additional_sb_configs=(
++            FogmStateBlockConfig(
++                group='config/fogm_block',
++                identifier='fogm',
++                label='pos_fogm',
++                estimate_with_covariance=EstimateWithCovariance(
++                    type=EstimateWithCovarianceType.EWC_GENERIC,
++                    estimate=np.zeros((3,)),
++                    covariance=(np.eye(3) * 9.0),
++                ),
++                fogm_model=FogmConfig(
++                    group='config/pos_sensor_error',
++                    sigma=(1.5, 1.5, 2.0),
++                    tau=(300.0, 300.0, 200.0),
++                ),
++            ),
++        ),
++        mp_configs=(
++            SensorMeasurementProcessorConfig(
++                group='config/gps_measurement_processor',
++                identifier='pinson_with_ned_fogm_position',
++                label='gps',
++                channel='/sensor/ublox-ZED-F9T/position',
++                state_block_labels=('pinson15', 'pos_fogm'),
++                sensor_config=SensorConfig(
++                    group='config/gp3d_state_modeling',
++                    lever_arm=(-0.50, 0.38, -0.05),
++                    orientation=(0.0, 0.0, 0.0, 0.0),
++                    sensor_name='position',
++                ),
++            ),
++        ),
++        inertial_config=InertialConfig(
++            group='config/inertial',
++            expected_dt=0.01,
++            channel='/sensor/vn-100/imu',
++            C_imu_to_platform=C_imu_to_platform,
++            inertial_buffer_length=10.0,
++        ),
++        alignment_config=ManualHeadingAlignmentConfig(
++            group='config/default/alignment',
++            static_time=10.0,
++            imu_model=imu_model,
++            heading=0.06895795874629593,
++            heading_sigma=0.02236067977,
++        ),
++        preprocessor_configs=(
++            ImuRotatorConfig(
++                group='config/imu_rotator',
++                identifier='imu_rotator',
++                channel='/sensor/vn-100/imu',
++                C_imu_to_platform=C_imu_to_platform,
++            ),
++            TimeAdjusterConfig(
++                group='config/time_adjuster',
++                identifier='time_adjuster',
++                channel_to_correct='/sensor/vn-100/imu',
++                expected_dt_nsec=int(0.01 * 1e9),
++            ),
++            TimeBiasConfig(
++                group='config/time_bias',
++                identifier='time_bias',
++                channels_to_correct=('/sensor/ublox-ZED-F9T/position',),
++                time_bias=int(0.15 * 1e9),
++            ),
++        ),
+         group='config/orchestration',
+     ),
 -    TimeAdjusterConfig(
 -        group='config/time_adjuster',
 -        identifier='time_adjuster',
@@ -143,92 +219,13 @@ index dc971c5f..190c4b95 100755
 -    TimeBiasConfig(
 -        group='config/time_bias',
 -        identifier='time_bias',
--        channels_to_correct=[
--            '/sensor/ublox-ZED-F9T/position',
-+    StandardOrchestrationConfig(
-+        best_sol_channel='/solution/pntos/pva',
-+        imu_sol_channel='/solution/pntos-imu/pva',
-+        alignment_channels=['/sensor/ublox-ZED-F9T/position', '/sensor/vn-100/imu'],
-+        pinson_sb_config=PinsonStateBlockConfig(
-+            group='config/pinson_block',
-+            identifier='pinson15',
-+            label='pinson15',
-+            imu_model=imu_model,
-+        ),
-+        additional_sb_configs=[
-+            FogmStateBlockConfig(
-+                group='config/fogm_block',
-+                identifier='fogm',
-+                label='pos_fogm',
-+                estimate_with_covariance=EstimateWithCovariance(
-+                    type=EstimateWithCovarianceType.EWC_GENERIC,
-+                    estimate=np.zeros((3,)),
-+                    covariance=(np.eye(3) * 9.0),
-+                ),
-+                fogm_model=FogmConfig(
-+                    group='config/pos_sensor_error',
-+                    sigma=(1.5, 1.5, 2.0),
-+                    tau=(300.0, 300.0, 200.0),
-+                ),
-+            ),
-         ],
+-        channels_to_correct=('/sensor/ublox-ZED-F9T/position',),
 -        time_bias=int(0.15 * 1e9),
-+        mp_configs=[
-+            SensorMeasurementProcessorConfig(
-+                group='config/gps_measurement_processor',
-+                identifier='pinson_with_ned_fogm_position',
-+                label='gps',
-+                channel='/sensor/ublox-ZED-F9T/position',
-+                state_block_labels=['pinson15', 'pos_fogm'],
-+                sensor_config=SensorConfig(
-+                    group='config/gp3d_state_modeling',
-+                    lever_arm=(-0.50, 0.38, -0.05),
-+                    orientation=(0.0, 0.0, 0.0, 0.0),
-+                    sensor_name='position',
-+                ),
-+            ),
-+        ],
-+        inertial_config=InertialConfig(
-+            group='config/inertial',
-+            expected_dt=0.01,
-+            channel='/sensor/vn-100/imu',
-+            C_imu_to_platform=C_imu_to_platform,
-+            inertial_buffer_length=10.0,
-+        ),
-+        alignment_config=ManualHeadingAlignmentConfig(
-+            group='config/default/alignment',
-+            static_time=10.0,
-+            imu_model=imu_model,
-+            heading=0.06895795874629593,
-+            heading_sigma=0.02236067977,
-+        ),
-+        preprocessor_configs=[
-+            ImuRotatorConfig(
-+                group='config/imu_rotator',
-+                identifier='imu_rotator',
-+                channel='/sensor/vn-100/imu',
-+                C_imu_to_platform=C_imu_to_platform,
-+            ),
-+            TimeAdjusterConfig(
-+                group='config/time_adjuster',
-+                identifier='time_adjuster',
-+                channel_to_correct='/sensor/vn-100/imu',
-+                expected_dt_nsec=int(0.01 * 1e9),
-+            ),
-+            TimeBiasConfig(
-+                group='config/time_bias',
-+                identifier='time_bias',
-+                channels_to_correct=[
-+                    '/sensor/ublox-ZED-F9T/position',
-+                ],
-+                time_bias=int(0.15 * 1e9),
-+            ),
-+        ],
-+        group='config/orchestration',
-     ),
+-    ),
  ]
  # End Config
-@@ -135,17 +154,18 @@ plugins = [
+ 
+@@ -133,17 +152,18 @@ plugins = [
      LcmLogTransportPlugin('Cobra LCM Log Transport Plugin'),
      EkfFusionStrategyPlugin('Cobra EKF Fusion Strategy Plugin'),
      StandardFusionPlugin('Cobra Standard Fusion Plugin'),

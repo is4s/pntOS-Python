@@ -33,9 +33,9 @@ from pntos.cobra.internal import (
 )
 
 downsampler_config = DownsamplerConfig(
-    channels_to_downsample=['test1', 'test2', 'test3'],
+    channels_to_downsample=('test1', 'test2', 'test3'),
     identifier='downsampler',
-    downsampling_factors=[2, 3, -1],
+    downsampling_factors=(2, 3, -1),
     group='test',
 )
 inertial_config = ImuRotatorConfig(

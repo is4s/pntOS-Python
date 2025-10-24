@@ -47,14 +47,14 @@ class DownsamplerConfig(PreprocessorConfig):
     identifier: str
 
     # UNIQUE FIELDS
-    channels_to_downsample: list[str]
+    channels_to_downsample: tuple[str, ...]
     """
-    A list of channels to downsample
+    A series of channels to downsample
     """
 
-    downsampling_factors: list[int]
+    downsampling_factors: tuple[int, ...]
     """
-    List of downsampling factors to apply to the channels
+    A series of downsampling factors to apply to the channels
     """
 
 
@@ -121,7 +121,7 @@ class TimeBiasConfig(PreprocessorConfig):
     identifier: str
 
     # UNIQUE FIELDS
-    channels_to_correct: list[str]
+    channels_to_correct: tuple[str, ...]
     """
     The names of the channels to correct.
     """
