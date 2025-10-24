@@ -4,7 +4,6 @@ import argparse
 from pathlib import Path
 
 import matplotlib.pyplot as plt
-import numpy as np
 from analysis.lcm.data import LogData, PvaData
 from analysis.lcm.log_readers import read_pva
 from pntos.cobra.utils import plot_pva
@@ -28,9 +27,6 @@ def plot_results(logfile: Path, solution_channel: str, truth_channel: str) -> No
     solution.label = 'Cobra Solution'
     truth = log_data.data[truth_channel]
     truth.label = 'Truth'
-
-    # Flip truth RPY, as there is a bug in the smartcable (TODO: #236)
-    truth.rpy = np.column_stack([truth.rpy[:, 1], truth.rpy[:, 0], -truth.rpy[:, 2]])
 
     print('Plotting results...')
     plt.rcParams['figure.figsize'] = (10, 6)

@@ -81,9 +81,6 @@ def validate_results(
     assert abs(filter_time[0] - expected_start_time_offset - truth_time[0]) < 3.0  # noqa: PLR2004
     assert abs(filter_time[-1] - truth_time[-1]) < 3  # noqa: PLR2004
 
-    # Rotate INS-D rpy since there's a bug in the smartcable (TODO: #236)
-    truth.rpy = np.column_stack([truth.rpy[:, 1], truth.rpy[:, 0], -truth.rpy[:, 2]])
-
     # Interpolate truth onto solution times so that we can calculate the solution error
     interp_truth_pva = interpolate_pva(pva, truth)
     ned_err = pva.ned - interp_truth_pva.ned

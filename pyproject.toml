@@ -19,8 +19,8 @@ dependencies = [
     "matplotlib",
     "pntos-api",
     "pntos-cobra",
-    # Generated from branch v0.4.0
-    "pntos-python-datasets==0.4",
+    # Generated from branch v0.4.1 on 23 Oct 2025
+    "pntos-python-datasets==0.4.1",
 ]
 
 [dependency-groups]
