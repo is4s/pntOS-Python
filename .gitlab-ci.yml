@@ -218,6 +218,24 @@ Standard GPS INS App w/ Network-based Transport:
         - docker exec pntos-python uv sync
         - docker exec pntos-python pytest apps -k test_standard_gps_ins_network_app -s
 
+Standard GPS INS Lever Arm App:
+    stage: check
+    tags:
+        - linux-light-runner
+    script:
+        - docker run --rm -dit -v $(pwd):/work -v $HOME/.ccache:/root/.cache/uv --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
+        - docker exec pntos-python uv sync
+        - docker exec pntos-python pytest apps -k test_standard_gps_ins_leverarm_app -s
+
+Standard GPS INS Body Velocity App:
+    stage: check
+    tags:
+        - linux-light-runner
+    script:
+        - docker run --rm -dit -v $(pwd):/work -v $HOME/.ccache:/root/.cache/uv --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
+        - docker exec pntos-python uv sync
+        - docker exec pntos-python pytest apps -k test_standard_gps_bodyvel_ins_app -s
+
 Standard GPS INS NED Velocity App:
     stage: check
     tags:
