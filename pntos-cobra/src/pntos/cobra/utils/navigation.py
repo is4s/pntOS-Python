@@ -1,6 +1,7 @@
 from math import atan2, cos, sin, sqrt
 
 import numpy as np
+from aspn23 import MeasurementPositionVelocityAttitude as MeasurementPVA
 from numpy import float64
 from numpy.typing import NDArray
 
@@ -230,6 +231,21 @@ def dcm_to_rpy(dcm: NDArray[float64]) -> NDArray[float64]:
     return np.array([r, p, y])
 
 
+def extract_pos_and_vel(
+    pva: MeasurementPVA,
+) -> tuple[tuple[float, float, float], tuple[float, float, float]] | None:
+    if (
+        pva.p1 is None
+        or pva.p2 is None
+        or pva.p3 is None
+        or pva.v1 is None
+        or pva.v2 is None
+        or pva.v3 is None
+    ):
+        return None
+    return ((pva.p1, pva.p2, pva.p3), (pva.v1, pva.v2, pva.v3))
+
+
 def calculate_gravity_schwartz(sin_l: float, alt_msl: float) -> float:
     A1 = 9.7803267715
     A2 = 0.0052790414
@@ -305,6 +321,7 @@ __all__ = [
     'delta_lon_to_east',
     'east_to_delta_lon',
     'ecef_to_llh',
+    'extract_pos_and_vel',
     'llh_to_cen',
     'llh_to_ecef',
     'meridian_radius',
