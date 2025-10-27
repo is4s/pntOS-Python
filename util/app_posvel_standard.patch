@@ -1,0 +1,67 @@
+diff --git a/apps/standard/gps_vel_ins.py b/apps/standard/posvel_ins.py
+index aae1f7ee..bf7529aa 100755
+--- a/apps/standard/gps_vel_ins.py
++++ b/apps/standard/posvel_ins.py
+@@ -1,5 +1,11 @@
+ #!/usr/bin/env python3
+ 
++"""App to process IMU, position and velocity measurements.
++
++Note this is the same data as the gps_vel_ins tutorial app, but with the GPS position
++and NED velocity measurements combined into a PVA measurement to be processed as a
++single measurement."""
++
+ import sys
+ 
+ import numpy as np
+@@ -30,7 +36,6 @@ from pntos.cobra.config import (
+     InertialConfig,
+     LcmLogTransportConfig,
+     ManualHeadingAlignmentConfig,
+-    MeasurementProcessorConfig,
+     PinsonStateBlockConfig,
+     SensorConfig,
+     SensorMeasurementProcessorConfig,
+@@ -95,25 +100,18 @@ my_config = [
+         ),
+         mp_configs=(
+             SensorMeasurementProcessorConfig(
+-                group='config/gps_measurement_processor',
+-                identifier='pinson_position',
+-                label='gps',
+-                channel='/sensor/ublox-ZED-F9T/position',
++                group='config/posvel_measurement_processor',
++                identifier='pinson_posvel',
++                label='posvel',
++                channel='/sensor/ublox-ZED-F9T/pva',
+                 state_block_labels=('pinson15',),
+                 sensor_config=SensorConfig(
+                     group='config/gp3d_state_modeling',
+                     lever_arm=(-0.50, 0.38, -0.05),
+                     orientation=(0.0, 0.0, 0.0, 0.0),
+-                    sensor_name='position',
++                    sensor_name='posvel',
+                 ),
+             ),
+-            MeasurementProcessorConfig(
+-                group='config/vel_measurement_processor',
+-                identifier='pinson_velocity',
+-                label='vel',
+-                channel='/sensor/ublox-ZED-F9T/velocity',
+-                state_block_labels=('pinson15',),
+-            ),
+         ),
+         inertial_config=InertialConfig(
+             group='config/inertial',
+@@ -145,10 +143,7 @@ my_config = [
+             TimeBiasConfig(
+                 group='config/time_bias',
+                 identifier='time_bias',
+-                channels_to_correct=(
+-                    '/sensor/ublox-ZED-F9T/position',
+-                    '/sensor/ublox-ZED-F9T/velocity',
+-                ),
++                channels_to_correct=('/sensor/ublox-ZED-F9T/pva',),
+                 time_bias=int(0.15 * 1e9),
+             ),
+         ),

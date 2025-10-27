@@ -1,0 +1,51 @@
+diff --git a/apps/standard/gps_ins.py b/apps/standard/gps_vel_ins.py
+index 12295587..aae1f7ee 100755
+--- a/apps/standard/gps_ins.py
++++ b/apps/standard/gps_vel_ins.py
+@@ -30,6 +30,7 @@ from pntos.cobra.config import (
+     InertialConfig,
+     LcmLogTransportConfig,
+     ManualHeadingAlignmentConfig,
++    MeasurementProcessorConfig,
+     PinsonStateBlockConfig,
+     SensorConfig,
+     SensorMeasurementProcessorConfig,
+@@ -95,10 +96,10 @@ my_config = [
+         mp_configs=(
+             SensorMeasurementProcessorConfig(
+                 group='config/gps_measurement_processor',
+-                identifier='pinson_with_ned_fogm_position',
++                identifier='pinson_position',
+                 label='gps',
+                 channel='/sensor/ublox-ZED-F9T/position',
+-                state_block_labels=('pinson15', 'pos_fogm'),
++                state_block_labels=('pinson15',),
+                 sensor_config=SensorConfig(
+                     group='config/gp3d_state_modeling',
+                     lever_arm=(-0.50, 0.38, -0.05),
+@@ -106,6 +107,13 @@ my_config = [
+                     sensor_name='position',
+                 ),
+             ),
++            MeasurementProcessorConfig(
++                group='config/vel_measurement_processor',
++                identifier='pinson_velocity',
++                label='vel',
++                channel='/sensor/ublox-ZED-F9T/velocity',
++                state_block_labels=('pinson15',),
++            ),
+         ),
+         inertial_config=InertialConfig(
+             group='config/inertial',
+@@ -137,7 +145,10 @@ my_config = [
+             TimeBiasConfig(
+                 group='config/time_bias',
+                 identifier='time_bias',
+-                channels_to_correct=('/sensor/ublox-ZED-F9T/position',),
++                channels_to_correct=(
++                    '/sensor/ublox-ZED-F9T/position',
++                    '/sensor/ublox-ZED-F9T/velocity',
++                ),
+                 time_bias=int(0.15 * 1e9),
+             ),
+         ),
