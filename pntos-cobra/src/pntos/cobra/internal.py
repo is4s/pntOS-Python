@@ -51,6 +51,15 @@ from .standard_plugins.state_modeling.PinsonWithNedFogmPositionMeasurementProces
 from .standard_plugins.state_modeling.StandardGpsInsStateModelingPlugin import (
     StandardGpsInsStateModelProvider as StandardGpsInsStateModelProvider,
 )
+from .standard_plugins.state_modeling.virtual_state_blocks.PinsonErrorToStandard import (
+    PinsonErrorToStandard as PinsonErrorToStandard,
+)
+from .standard_plugins.state_modeling.virtual_state_blocks.StateExtractor import (
+    StateExtractor as StateExtractor,
+)
+from .standard_plugins.state_modeling.virtual_state_blocks.VirtualStateBlockManager import (
+    VirtualStateBlockManager as VirtualStateBlockManager,
+)
 from .standard_plugins.StaticAlignInitializationPlugin import StaticAlign as StaticAlign
 from .tutorial_plugins.state_modeling.TutorialFogmBlock import (
     TutorialFogmBlock as TutorialFogmBlock,
