@@ -41,7 +41,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description='Generates plots from LCM or ROS log file.'
     )
-    parser.add_argument('filename', help='Path to LCM or ROS log file')
+    parser.add_argument('filename', help='Path to LCM or ROS log file', type=Path)
     parser.add_argument(
         '-s', '--solution', default='/solution/pntos/pva', help='Solution channel name'
     )
