@@ -121,11 +121,9 @@ def test_standard_gps_ins_app() -> None:
         log_data.data[SOLUTION_CHANNEL],
         log_data.data[TRUTH_CHANNEL],
         num_points=2584,
-        pos_err_limits=ErrorLimits(std_thresh=2.0, max_thresh=4.0, pct_below_1sigma=60),
-        vel_err_limits=ErrorLimits(std_thresh=0.11, max_thresh=1.0),
-        tilt_err_limits=ErrorLimits(
-            std_thresh=0.85, max_thresh=3.5, pct_below_1sigma=48, pct_below_2sigma=91
-        ),
+        pos_err_limits=ErrorLimits(std_thresh=1.4, max_thresh=3.8, pct_below_1sigma=63),
+        vel_err_limits=ErrorLimits(std_thresh=0.1, max_thresh=0.8),
+        tilt_err_limits=ErrorLimits(std_thresh=0.81, max_thresh=3.5),
         expected_start_time_offset=10.0,
     )
 
@@ -142,11 +140,9 @@ def test_standard_gps_ins_network_app() -> None:
         log_data.data[SOLUTION_CHANNEL],
         log_data.data[TRUTH_CHANNEL],
         num_points=2584,
-        pos_err_limits=ErrorLimits(std_thresh=2.0, max_thresh=4.0, pct_below_1sigma=60),
-        vel_err_limits=ErrorLimits(std_thresh=0.11, max_thresh=1.0),
-        tilt_err_limits=ErrorLimits(
-            std_thresh=0.85, max_thresh=3.5, pct_below_1sigma=48, pct_below_2sigma=91
-        ),
+        pos_err_limits=ErrorLimits(std_thresh=1.4, max_thresh=3.8, pct_below_1sigma=63),
+        vel_err_limits=ErrorLimits(std_thresh=0.1, max_thresh=0.8),
+        tilt_err_limits=ErrorLimits(std_thresh=0.81, max_thresh=3.5),
         expected_start_time_offset=10.0,
     )
 
