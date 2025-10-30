@@ -21,6 +21,12 @@ class PreprocessorConfig(BaseConfig):
 class BarometerToAltitudeConfig(PreprocessorConfig):
     """
     Configuration for the barometer to altitude preprocessor.
+
+    Attributes:
+        group (str): Inherited from PreprocessorConfig. Registry group in which to store this config.
+        identifier (str): Inherited from PreprocessorConfig. Identifier associated with the desired type of preprocessor.
+        channel (str): Name of the barometric pressure channel to convert to altitude. Assumed to end in `baro_pressure`. Altitude measurements will be output on this channel, with `baro_pressure` replaced with `altitude`.
+        alt_sigma (float | None): Optional value used to override altitude measurement variance. If not specified baro pressure variance will be converted to altitude variance using the scale factor necessary to convert the pressure measurement to altitude.
     """
 
     # INHERITED FIELDS
@@ -30,9 +36,8 @@ class BarometerToAltitudeConfig(PreprocessorConfig):
 
     # UNIQUE FIELDS
     channel: str
-    """
-    The name of the channel to convert.
-    """
+
+    alt_sigma: float | None = None
 
 
 @dataclass

@@ -35,22 +35,29 @@ class BarometerToAltitudePreprocessor(Preprocessor):
     _deg_k: float
     _channel: str
     _mediator: Mediator
+    _alt_sigma: float | None
 
-    def __init__(self, channel: str, mediator: Mediator) -> None:
+    def __init__(
+        self, channel: str, mediator: Mediator, alt_sigma: float | None
+    ) -> None:
         """
         Cobra Barometer to Altitude Preprocessor
         """
         self._deg_k = 288.15
         self._channel = channel
         self._mediator = mediator
+        self._alt_sigma = alt_sigma
 
     def process_pntos_message(self, message: Message) -> list[Message]:
         if message.source_identifier == self._channel:
             msg = message.wrapped_message
             if isinstance(msg, MeasurementBarometer):
                 altitude = pressure_to_alt(msg.pressure, self._deg_k)
-                sf = altitude / msg.pressure
-                altitude_variance = msg.variance * (sf**2)
+                altitude_variance = (
+                    self._alt_sigma**2
+                    if self._alt_sigma is not None
+                    else msg.variance * (altitude / msg.pressure) ** 2
+                )
                 return [
                     Message(
                         MeasurementAltitude(
@@ -407,7 +414,7 @@ class StandardPreprocessorPlugin(PreprocessorPlugin):
                     )
                     return None
                 return BarometerToAltitudePreprocessor(
-                    bta_config.channel, self.mediator
+                    bta_config.channel, self.mediator, bta_config.alt_sigma
                 )
 
             case 4:
