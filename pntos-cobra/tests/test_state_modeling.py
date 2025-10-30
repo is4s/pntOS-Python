@@ -47,6 +47,7 @@ from pntos.cobra.internal import (
     Pinson15NedBlock,
     PinsonBodyVelocityMeasurementProcessor,
     PinsonPositionMeasurementProcessor,
+    PinsonPosVelMeasurementProcessor,
     PinsonVelocityMeasurementProcessor,
     PinsonWithLeverArmPositionMeasurementProcessor,
     PinsonWithNedFogmPositionMeasurementProcessor,
@@ -236,6 +237,19 @@ def body_velocity_mp(
 
 
 @pytest.fixture
+def posvel_mp(
+    state_model_provider: StateModelProviderType,
+) -> StandardMeasurementProcessor:
+    out = state_model_provider.new_processor(
+        6, None, 'posvel', ['pinson'], 'config/test'
+    )
+    assert isinstance(out, StandardMeasurementProcessor)
+    assert isinstance(out, PinsonPosVelMeasurementProcessor)
+
+    return out
+
+
+@pytest.fixture
 def pva_aux_data() -> Message:
     return Message(
         MeasurementPositionVelocityAttitude(
@@ -316,6 +330,29 @@ def vel_meas() -> Message:
             [],
         ),
         'gps_velocity',
+    )
+
+
+@pytest.fixture
+def posvel_meas() -> Message:
+    return Message(
+        MeasurementPositionVelocityAttitude(
+            TypeHeader(0, 0, 0, 0),
+            TypeTimestamp(1_000_000_000),
+            MeasurementPositionVelocityAttitudeReferenceFrame.GEODETIC,
+            np.deg2rad(39.00001),
+            np.deg2rad(-84.00001),
+            1005,
+            2.2,
+            3.3,
+            4.4,
+            None,
+            np.diag([25, 25, 100, 1, 4, 0.5]),
+            MeasurementPositionVelocityAttitudeErrorModel.NONE,
+            np.array([]),
+            [],
+        ),
+        'gps_posvel',
     )
 
 
@@ -654,6 +691,61 @@ def test_generate_model_vel(
     assert np.array_equal(mm.R, exp_R)
     assert np.array_equal(mm.h(x_and_p.estimate), np.zeros(3))
     assert np.allclose(mm.z, exp_z)
+
+
+def test_generate_model_posvel(
+    posvel_mp: PinsonPosVelMeasurementProcessor,
+    pva_aux_data: Message,
+    posvel_meas: Message,
+) -> None:
+    inertial_pva = pva_aux_data.wrapped_message
+    assert isinstance(inertial_pva, MeasurementPositionVelocityAttitude)
+    assert inertial_pva.quaternion is not None
+    posvel = posvel_meas.wrapped_message
+    assert isinstance(posvel, MeasurementPositionVelocityAttitude)
+    posvel_mp.receive_aux_data([pva_aux_data])
+    assert posvel_mp._inertial_pva is not None
+    x_and_p = EstimateWithCovariance(
+        EstimateWithCovarianceType.EWC_GENERIC,
+        np.array([0.1, 0.1, 0.1, 0, 0, 0, 0.1, 0.1, 0.1, 0, 0, 0, 0, 0, 0]).reshape(
+            (15, 1)
+        ),
+        np.eye(15),
+    )
+    mm = posvel_mp.generate_model(posvel_meas, x_and_p)
+    assert mm is not None
+
+    exp_H = np.zeros((6, 15))
+    exp_H[:3, :3] = np.eye(3)
+    la_as_array = np.array([_lever_arm[0], _lever_arm[1], _lever_arm[2]])
+    C = quat_to_dcm(inertial_pva.quaternion)
+    c_cor = (np.eye(3) - skew(x_and_p.estimate[6:9, 0])) @ C
+    exp_H[:3, 6:9] = skew(C @ la_as_array)
+    exp_H[3:, 3:6] = np.eye(3)
+
+    exp_R = posvel.covariance
+
+    meas_pos = np.array([posvel.p1, posvel.p2, posvel.p3])
+    meas_vel = np.array([posvel.v1, posvel.v2, posvel.v3])
+    inertial_pos = np.array([inertial_pva.p1, inertial_pva.p2, inertial_pva.p3])
+    inertial_vel = np.array([inertial_pva.v1, inertial_pva.v2, inertial_pva.v3])
+    delta_pos = meas_pos - inertial_pos
+    lat_factor = delta_lat_to_north(1, meas_pos[0], meas_pos[2])
+    lon_factor = delta_lon_to_east(1, meas_pos[0], meas_pos[2])
+    delta_pos[0] *= lat_factor
+    delta_pos[1] *= lon_factor
+    delta_pos[2] *= -1
+    delta_vel = meas_vel - inertial_vel
+    exp_z = np.concatenate((delta_pos, delta_vel))
+
+    exp_pred_pos = x_and_p.estimate[0:3, 0] + c_cor @ la_as_array
+    exp_pred_vel = np.zeros(3)
+    exp_pred = np.concatenate((exp_pred_pos, exp_pred_vel))
+
+    assert np.array_equal(mm.H, exp_H)
+    assert np.array_equal(mm.R, exp_R)
+    assert np.array_equal(mm.h(x_and_p.estimate).flatten(), exp_pred)
+    assert np.allclose(mm.z.flatten(), exp_z)
 
 
 def test_generate_model_bodyvel(

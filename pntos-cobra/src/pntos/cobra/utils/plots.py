@@ -28,7 +28,7 @@ def plot_pva(
     leg = [pva.label, truth_pva.label]
     leg_w_sigma = [pva.label, truth_pva.label, '+/- 1 sigma']
 
-    # Interpolate truth onto solution times so that we can calulate the solution error
+    # Interpolate truth onto solution times so that we can calculate the solution error
     interp_truth_pva = interpolate_pva(pva, truth_pva)
     ned_err = pva.ned - interp_truth_pva.ned
     vel_err = pva.vel - interp_truth_pva.vel

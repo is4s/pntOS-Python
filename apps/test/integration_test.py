@@ -81,9 +81,6 @@ def validate_results(
     assert abs(filter_time[0] - expected_start_time_offset - truth_time[0]) < 3.0  # noqa: PLR2004
     assert abs(filter_time[-1] - truth_time[-1]) < 3  # noqa: PLR2004
 
-    # Rotate INS-D rpy since there's a bug in the smartcable (TODO: #236)
-    truth.rpy = np.column_stack([truth.rpy[:, 1], truth.rpy[:, 0], -truth.rpy[:, 2]])
-
     # Interpolate truth onto solution times so that we can calculate the solution error
     interp_truth_pva = interpolate_pva(pva, truth)
     ned_err = pva.ned - interp_truth_pva.ned
@@ -220,6 +217,77 @@ def test_standard_gps_bodyvel_ins_app() -> None:
         tilt_err_limits=ErrorLimits(
             std_thresh=0.8, max_thresh=2.3, pct_below_1sigma=46
         ),
+    )
+
+
+def test_standard_gps_ins_vel_app() -> None:
+    run_pntos_with_log_transport(
+        Path('apps/standard/gps_vel_ins.py'), OUTPUT_LOG, validate=True
+    )
+    log_data = read_pva(OUTPUT_LOG, read_all=True)
+    validate_results(
+        log_data.data[SOLUTION_CHANNEL],
+        log_data.data[TRUTH_CHANNEL],
+        num_points=2584,
+        # TODO: these limits are very high
+        pos_err_limits=ErrorLimits(
+            std_thresh=1.4,
+            max_thresh=4.7,
+            pct_below_1sigma=5,
+            pct_below_2sigma=12,
+            pct_below_3sigma=24,
+        ),
+        vel_err_limits=ErrorLimits(
+            std_thresh=0.14,
+            max_thresh=1.1,
+            pct_below_1sigma=48,
+            pct_below_2sigma=77,
+            pct_below_3sigma=87,
+        ),
+        tilt_err_limits=ErrorLimits(
+            std_thresh=1.6,
+            max_thresh=5.1,
+            pct_below_1sigma=30,
+            pct_below_2sigma=52,
+            pct_below_3sigma=68,
+        ),
+        expected_start_time_offset=10.0,
+    )
+
+
+def test_standard_posvel_ins_app() -> None:
+    run_pntos_with_log_transport(
+        Path('apps/standard/posvel_ins.py'), OUTPUT_LOG, validate=True
+    )
+    log_data = read_pva(OUTPUT_LOG, read_all=True)
+
+    validate_results(
+        log_data.data[SOLUTION_CHANNEL],
+        log_data.data[TRUTH_CHANNEL],
+        num_points=2584,
+        # TODO: these limits are very high
+        pos_err_limits=ErrorLimits(
+            std_thresh=1.4,
+            max_thresh=4.7,
+            pct_below_1sigma=5,
+            pct_below_2sigma=12,
+            pct_below_3sigma=24,
+        ),
+        vel_err_limits=ErrorLimits(
+            std_thresh=0.14,
+            max_thresh=1.1,
+            pct_below_1sigma=48,
+            pct_below_2sigma=77,
+            pct_below_3sigma=87,
+        ),
+        tilt_err_limits=ErrorLimits(
+            std_thresh=1.6,
+            max_thresh=5.1,
+            pct_below_1sigma=30,
+            pct_below_2sigma=52,
+            pct_below_3sigma=68,
+        ),
+        expected_start_time_offset=10.0,
     )
 
 

@@ -39,6 +39,9 @@ from .standard_plugins.state_modeling.PinsonBodyVelocityMeasurementProcessor imp
 from .standard_plugins.state_modeling.PinsonPositionMeasurementProcessor import (
     PinsonPositionMeasurementProcessor as PinsonPositionMeasurementProcessor,
 )
+from .standard_plugins.state_modeling.PinsonPosVelMeasurementProcessor import (
+    PinsonPosVelMeasurementProcessor as PinsonPosVelMeasurementProcessor,
+)
 from .standard_plugins.state_modeling.PinsonVelocityMeasurementProcessor import (
     PinsonVelocityMeasurementProcessor as PinsonVelocityMeasurementProcessor,
 )

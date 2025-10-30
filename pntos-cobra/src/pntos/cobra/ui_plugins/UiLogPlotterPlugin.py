@@ -1,7 +1,6 @@
 from pathlib import Path
 
 import matplotlib.pyplot as plt
-import numpy as np
 from analysis.lcm.data import LogData, PvaData
 from analysis.lcm.log_readers import read_pva
 from pntos.api import LoggingLevel, Mediator, UiPlugin
@@ -92,11 +91,6 @@ class UiLogPlottingPlugin(UiPlugin):
         truth = log_data.data[self.truth_channel]
         truth.label = 'Truth'
 
-        # Flip truth RPY, as there is a bug in the smartcable (TODO: #236)
-        truth_rpy = log_data.data[self.truth_channel].rpy
-        log_data.data[self.truth_channel].rpy = np.transpose(
-            np.stack((truth_rpy[:, 1], truth_rpy[:, 0], -truth_rpy[:, 2]))
-        )
         plt.rcParams['figure.figsize'] = (10, 6)
         save_dir = self.logfile.parent / self.logfile.stem
         self.mediator.log_message(
