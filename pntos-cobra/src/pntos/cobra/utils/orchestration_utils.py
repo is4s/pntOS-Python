@@ -1,4 +1,4 @@
-from typing import Callable, Tuple, Union
+from collections.abc import Callable
 
 from aspn23 import (
     MeasurementPositionVelocityAttitude,
@@ -270,7 +270,7 @@ def set_up_inertial_mechanization(
     inertial_plugin: InertialPlugin,
     inertial_group: str,
     log_func: Callable[[LoggingLevel, str], None],
-) -> Union[Tuple[StandardInertialMechanization, InitialInertialSolution] | None]:
+) -> tuple[StandardInertialMechanization, InitialInertialSolution] | None:
     """Get initial inertial solution and use it to set up the inertial."""
     init_solution = initializer.request_solution()
 

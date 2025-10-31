@@ -68,9 +68,7 @@ class PinsonWithNedFogmPositionMeasurementProcessor(StandardMeasurementProcessor
         if len(state_block_labels) != self._num_required_blocks:
             self._mediator.log_message(
                 LoggingLevel.ERROR,
-                'PinsonWithNedFogmPositionMeasurementProcessor requires {} state blocks, got {}.'.format(
-                    self._num_required_blocks, state_block_labels
-                ),
+                f'PinsonWithNedFogmPositionMeasurementProcessor requires {self._num_required_blocks} state blocks, got {state_block_labels}.',
             )
 
     def receive_aux_data(self, aux: list[Message]) -> None:

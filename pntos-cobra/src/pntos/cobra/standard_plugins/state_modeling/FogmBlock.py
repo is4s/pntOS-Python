@@ -40,25 +40,21 @@ class FogmBlock(StandardStateBlock):
         if sigmas.size == 0 or taus.size == 0:
             mediator.log_message(
                 LoggingLevel.ERROR,
-                'FogmBlock sigmas (shape {}) or taus (shape {}) arguments are empty.'.format(
-                    sigmas.shape, taus.shape
-                ),
+                f'FogmBlock sigmas (shape {sigmas.shape}) or taus (shape {taus.shape}) arguments are empty.',
             )
             raise RuntimeError
 
         if sigmas.shape != taus.shape:
             mediator.log_message(
                 LoggingLevel.ERROR,
-                'FogmBlock sigmas {} and taus {} arguments have a size mismatch.'.format(
-                    sigmas.shape, taus.shape
-                ),
+                f'FogmBlock sigmas {sigmas.shape} and taus {taus.shape} arguments have a size mismatch.',
             )
             raise RuntimeError
 
         if any(taus <= 0):
             mediator.log_message(
                 LoggingLevel.ERROR,
-                'FogmBlock taus arguments must be positive, got {}.'.format(taus),
+                f'FogmBlock taus arguments must be positive, got {taus}.',
             )
             raise RuntimeError
 
