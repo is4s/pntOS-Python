@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+import sys
+
 import numpy as np
 
 # API imports
@@ -8,7 +10,7 @@ from pntos.api import EstimateWithCovariance, EstimateWithCovarianceType, Loggin
 # Import Cobra plugins and config structs
 from pntos.cobra import (
     EkfFusionStrategyPlugin,
-    LcmTransportPlugin,
+    LcmLogTransportPlugin,
     ManualHeadingAlignInitializationPlugin,
     SimpleControllerPlugin,
     StandardFusionPlugin,
@@ -21,12 +23,13 @@ from pntos.cobra import (
 )
 from pntos.cobra.config import (
     AspnVersion,
+    BarometerToAltitudeConfig,
     FogmConfig,
     FogmStateBlockConfig,
     ImuConfig,
     ImuRotatorConfig,
     InertialConfig,
-    LcmTransportConfig,
+    LcmLogTransportConfig,
     ManualHeadingAlignmentConfig,
     PinsonStateBlockConfig,
     SensorConfig,
@@ -35,6 +38,9 @@ from pntos.cobra.config import (
     TimeAdjusterConfig,
     TimeBiasConfig,
 )
+from pntos_python_datasets import EXAMPLE_LCM_LOG
+
+OUTPUT_LOG = sys.argv[1] if len(sys.argv) > 1 else 'pntos_output.log'
 
 # Config setup
 C_imu_to_platform = (
@@ -54,7 +60,12 @@ imu_model = ImuConfig(
     gyro_bias_initial_sigma=(0.003, 0.003, 0.003),
 )
 my_config = [
-    LcmTransportConfig(output_version=AspnVersion.V23, group='config/lcm_transport'),
+    LcmLogTransportConfig(
+        input_file=EXAMPLE_LCM_LOG,
+        output_file=OUTPUT_LOG,
+        output_version=AspnVersion.V23,
+        group='config/lcm_log_transport',
+    ),
     StandardOrchestrationConfig(
         best_sol_channel='/solution/pntos/pva',
         imu_sol_channel='/solution/pntos-imu/pva',
@@ -81,6 +92,21 @@ my_config = [
                     tau=(300.0, 300.0, 200.0),
                 ),
             ),
+            FogmStateBlockConfig(
+                group='config/alt_fogm_block',
+                identifier='fogm',
+                label='alt_fogm',
+                estimate_with_covariance=EstimateWithCovariance(
+                    type=EstimateWithCovarianceType.EWC_GENERIC,
+                    estimate=np.zeros((1,)),
+                    covariance=(np.array([[25.0]])),
+                ),
+                fogm_model=FogmConfig(
+                    group='config/alt_sensor_error',
+                    sigma=(10.0,),
+                    tau=(3600.0,),
+                ),
+            ),
         ),
         mp_configs=(
             SensorMeasurementProcessorConfig(
@@ -94,6 +120,19 @@ my_config = [
                     lever_arm=(-0.50, 0.38, -0.05),
                     orientation=(0.0, 0.0, 0.0, 0.0),
                     sensor_name='position',
+                ),
+            ),
+            SensorMeasurementProcessorConfig(
+                group='config/alt_measurement_processor',
+                identifier='pinson_altitude',
+                label='alt',
+                channel='/sensor/bmp388/altitude',
+                state_block_labels=('pinson15', 'alt_fogm'),
+                sensor_config=SensorConfig(
+                    group='config/alt_state_modeling',
+                    lever_arm=(0.0, 0.0, 0.0),
+                    orientation=(0.0, 0.0, 0.0, 0.0),
+                    sensor_name='altitude',
                 ),
             ),
         ),
@@ -130,6 +169,12 @@ my_config = [
                 channels_to_correct=('/sensor/ublox-ZED-F9T/position',),
                 time_bias=int(0.15 * 1e9),
             ),
+            BarometerToAltitudeConfig(
+                group='config/pressure_to_alt',
+                identifier='baro_converter',
+                channel='/sensor/bmp388/baro_pressure',
+                alt_sigma=3.0,
+            ),
         ),
         group='config/orchestration',
     ),
@@ -139,7 +184,7 @@ my_config = [
 # Instantiate all of our plugins
 controller = SimpleControllerPlugin('Cobra Simple Controller Plugin')
 plugins = [
-    LcmTransportPlugin('Cobra LCM Transport Plugin'),
+    LcmLogTransportPlugin('Cobra LCM Log Transport Plugin'),
     EkfFusionStrategyPlugin('Cobra EKF Fusion Strategy Plugin'),
     StandardFusionPlugin('Cobra Standard Fusion Plugin'),
     StandardGpsInsStateModelingPlugin('Cobra Standard State Modeling Plugin'),

@@ -1,5 +1,5 @@
 diff --git a/apps/standard/gps_ins.py b/apps/standard/lcm_relay.py
-index 12295587..c898c224 100755
+index 10bbbf4c..0393e45c 100755
 --- a/apps/standard/gps_ins.py
 +++ b/apps/standard/lcm_relay.py
 @@ -1,7 +1,5 @@

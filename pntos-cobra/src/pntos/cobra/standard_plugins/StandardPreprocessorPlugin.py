@@ -1,3 +1,4 @@
+from analysis.lcm.conversions import pressure_to_alt
 from aspn23 import (
     AspnBase,
     MeasurementAltitude,
@@ -34,26 +35,29 @@ class BarometerToAltitudePreprocessor(Preprocessor):
     _deg_k: float
     _channel: str
     _mediator: Mediator
+    _alt_sigma: float | None
 
-    def __init__(self, channel: str, mediator: Mediator) -> None:
+    def __init__(
+        self, channel: str, mediator: Mediator, alt_sigma: float | None
+    ) -> None:
         """
         Cobra Barometer to Altitude Preprocessor
         """
         self._deg_k = 288.15
         self._channel = channel
         self._mediator = mediator
-
-    def _convert_pressure(self, pressure: float) -> float:
-        pwm1: float = pow(pressure / 101325, 8314.32 * 0.0065 / (9.80665 * 28.9644)) - 1
-        return -(self._deg_k / 0.0065) * pwm1
+        self._alt_sigma = alt_sigma
 
     def process_pntos_message(self, message: Message) -> list[Message]:
         if message.source_identifier == self._channel:
             msg = message.wrapped_message
             if isinstance(msg, MeasurementBarometer):
-                altitude = self._convert_pressure(msg.pressure)
-                sf = altitude / msg.pressure
-                altitude_variance = msg.variance * (sf**2)
+                altitude = pressure_to_alt(msg.pressure, self._deg_k)
+                altitude_variance = (
+                    self._alt_sigma**2
+                    if self._alt_sigma is not None
+                    else msg.variance * (altitude / msg.pressure) ** 2
+                )
                 return [
                     Message(
                         MeasurementAltitude(
@@ -66,7 +70,7 @@ class BarometerToAltitudePreprocessor(Preprocessor):
                             msg.error_model_params,
                             msg.integrity,
                         ),
-                        message.source_identifier,
+                        message.source_identifier.replace('baro_pressure', 'altitude'),
                     )
                 ]
             self._mediator.log_message(
@@ -410,7 +414,7 @@ class StandardPreprocessorPlugin(PreprocessorPlugin):
                     )
                     return None
                 return BarometerToAltitudePreprocessor(
-                    bta_config.channel, self.mediator
+                    bta_config.channel, self.mediator, bta_config.alt_sigma
                 )
 
             case 4:
