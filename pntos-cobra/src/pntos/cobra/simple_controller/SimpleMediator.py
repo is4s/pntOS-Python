@@ -117,7 +117,7 @@ class SimpleMediator(Mediator):
         if cur_time.elapsed_nsec - self._last_solution_time.elapsed_nsec > SEC_NS:
             solution = self.request_solutions([cur_time])
             if solution is not None:
-                self.log_message(LoggingLevel.DEBUG, f'Got a solution! {solution}')
+                self._log_message(LoggingLevel.DEBUG, f'Got a solution! {solution}')
                 for transport in self._transport_plugins:
                     self.broadcast_aspn_message(
                         solution[0],
@@ -125,7 +125,7 @@ class SimpleMediator(Mediator):
                         destination_identifier=solution[0].source_identifier,
                     )
             else:
-                self.log_message(
+                self._log_message(
                     LoggingLevel.DEBUG,
                     'Could not receive solution from orchestration.',
                 )
@@ -146,17 +146,25 @@ class SimpleMediator(Mediator):
                 transport_plugin.broadcast_message(message, destination_identifier)
                 sent = True
         if not sent:
-            self.log_message(
+            self._log_message(
                 LoggingLevel.WARN,
                 f'Transport "{transport}" not found. Unable to broadcast message.',
             )
 
     def log_message(self, level: LoggingLevel, message: str) -> None:
+        self._log_message(level, message, self._attached_plugin_type)
+
+    def _log_message(
+        self,
+        level: LoggingLevel,
+        message: str,
+        plugin_type: PluginType = ControllerPlugin,
+    ) -> None:
         if self._logging_plugin is None:
-            print(f'[{self._attached_plugin_type}] {self._log_levels[level]} {message}')
+            print(f'[{plugin_type.__name__}] {self._log_levels[level]} {message}')
         else:
             self._logging_plugin.log(
-                self._attached_plugin_type,
+                plugin_type,
                 self._attached_plugin_identifier,
                 level,
                 message,
