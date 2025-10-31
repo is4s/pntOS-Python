@@ -1,20 +1,25 @@
 diff --git a/apps/standard/gps_vel_ins.py b/apps/standard/posvel_ins.py
-index aae1f7ee..bf7529aa 100755
+index 1a27dd88..b37873f0 100755
 --- a/apps/standard/gps_vel_ins.py
 +++ b/apps/standard/posvel_ins.py
-@@ -1,5 +1,11 @@
+@@ -1,11 +1,13 @@
  #!/usr/bin/env python3
  
+-"""App to process IMU, position, and velocity measurements.
+-
 +"""App to process IMU, position and velocity measurements.
+ 
+ Note: This app uses a simpler position measurement model than some of the other apps.
+ Thus, the filter solution is less accurate than those apps.
+-"""
 +
-+Note this is the same data as the gps_vel_ins tutorial app, but with the GPS position
++Note: This is the same data as the gps_vel_ins tutorial app, but with the GPS position
 +and NED velocity measurements combined into a PVA measurement to be processed as a
 +single measurement."""
-+
+ 
  import sys
  
- import numpy as np
-@@ -30,7 +36,6 @@ from pntos.cobra.config import (
+@@ -37,7 +39,6 @@ from pntos.cobra.config import (
      InertialConfig,
      LcmLogTransportConfig,
      ManualHeadingAlignmentConfig,
@@ -22,7 +27,7 @@ index aae1f7ee..bf7529aa 100755
      PinsonStateBlockConfig,
      SensorConfig,
      SensorMeasurementProcessorConfig,
-@@ -95,25 +100,18 @@ my_config = [
+@@ -102,25 +103,18 @@ my_config = [
          ),
          mp_configs=(
              SensorMeasurementProcessorConfig(
@@ -53,7 +58,7 @@ index aae1f7ee..bf7529aa 100755
          ),
          inertial_config=InertialConfig(
              group='config/inertial',
-@@ -145,10 +143,7 @@ my_config = [
+@@ -152,10 +146,7 @@ my_config = [
              TimeBiasConfig(
                  group='config/time_bias',
                  identifier='time_bias',

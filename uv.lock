@@ -1436,7 +1436,7 @@ requires-dist = [
     { name = "matplotlib" },
     { name = "pntos-api", editable = "pntos-api" },
     { name = "pntos-cobra", editable = "pntos-cobra" },
-    { name = "pntos-python-datasets", specifier = "==0.4.1" },
+    { name = "pntos-python-datasets", specifier = "==0.4.2" },
 ]
 
 [package.metadata.requires-dev]
@@ -1460,10 +1460,10 @@ dev = [
 
 [[package]]
 name = "pntos-python-datasets"
-version = "0.4.1"
+version = "0.4.2"
 source = { registry = "https://git.aspn.us/api/v4/projects/94/packages/pypi/simple" }
 wheels = [
-    { url = "https://git.aspn.us/api/v4/projects/94/packages/pypi/files/374f6d0fa1734b6e55dd1a7e4219e707e3aaa05103901a7319ac163d0d0544d7/pntos_python_datasets-0.4.1-py2.py3-none-any.whl", hash = "sha256:374f6d0fa1734b6e55dd1a7e4219e707e3aaa05103901a7319ac163d0d0544d7" },
+    { url = "https://git.aspn.us/api/v4/projects/94/packages/pypi/files/42e7ec617753e7467a264ec3958fa96fdb6aa25ef2e931aa891927c812e56b66/pntos_python_datasets-0.4.2-py2.py3-none-any.whl", hash = "sha256:42e7ec617753e7467a264ec3958fa96fdb6aa25ef2e931aa891927c812e56b66" },
 ]
 
 [[package]]

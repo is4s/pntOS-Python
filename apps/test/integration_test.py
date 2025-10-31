@@ -211,12 +211,11 @@ def test_standard_gps_bodyvel_ins_app() -> None:
     validate_results(
         log_data.data[SOLUTION_CHANNEL],
         log_data.data[TRUTH_CHANNEL],
-        num_points=2593,
-        pos_err_limits=ErrorLimits(std_thresh=1.4, max_thresh=4.0, pct_below_1sigma=59),
+        num_points=2584,
+        pos_err_limits=ErrorLimits(std_thresh=1.4, max_thresh=4.0, pct_below_1sigma=64),
         vel_err_limits=ErrorLimits(std_thresh=0.11, max_thresh=1.0),
-        tilt_err_limits=ErrorLimits(
-            std_thresh=0.8, max_thresh=2.3, pct_below_1sigma=46
-        ),
+        tilt_err_limits=ErrorLimits(std_thresh=0.8, max_thresh=3.5),
+        expected_start_time_offset=10.0,
     )
 
 
