@@ -1,13 +1,10 @@
 import builtins
 import pickle
+from collections.abc import Callable, ItemsView, Iterator, ValuesView
 from copy import copy
 from pathlib import Path
 from typing import (
     Any,
-    Callable,
-    ItemsView,
-    Iterator,
-    ValuesView,
 )
 
 import numpy as np

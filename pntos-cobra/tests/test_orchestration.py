@@ -413,8 +413,8 @@ class Test_Orchestration(unittest.TestCase):
                 elif not self.compare_messages(value1, value2, depth + 1):
                     return False
             return True
-        print('m1 {}'.format(m1))
-        print('m2 {}'.format(m2))
+        print(f'm1 {m1}')
+        print(f'm2 {m2}')
         return m1 == m2
 
     def init_orchestration_plugin(self) -> None:

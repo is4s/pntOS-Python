@@ -1,8 +1,8 @@
 import re
+from collections.abc import Callable
 from pathlib import Path
 from site import getsitepackages
 from subprocess import PIPE, Popen
-from typing import Callable
 
 import aspn2_translations
 import aspn23

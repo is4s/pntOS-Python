@@ -1,6 +1,5 @@
 import contextlib
 import unittest
-from typing import List
 
 from aspn23 import (
     TypeTimestamp,
@@ -156,7 +155,7 @@ class DummyStandardFusionEngine(StandardFusionEngine):
         return 0
 
     @property
-    def state_block_labels(self) -> List[str] | None:
+    def state_block_labels(self) -> list[str] | None:
         pass
 
     def add_state_block(
@@ -197,7 +196,7 @@ class DummyStandardFusionEngine(StandardFusionEngine):
         pass
 
     @property
-    def virtual_state_block_target_labels(self) -> List[str] | None:
+    def virtual_state_block_target_labels(self) -> list[str] | None:
         pass
 
     def has_virtual_state_block(self, vsb_target_label: str) -> bool:
@@ -210,7 +209,7 @@ class DummyStandardFusionEngine(StandardFusionEngine):
         pass
 
     @property
-    def measurement_processor_labels(self) -> List[str] | None:
+    def measurement_processor_labels(self) -> list[str] | None:
         pass
 
     def add_measurement_processor(
@@ -228,25 +227,25 @@ class DummyStandardFusionEngine(StandardFusionEngine):
         pass
 
     def peek_ahead(
-        self, time: TypeTimestamp, block_labels: List[str]
+        self, time: TypeTimestamp, block_labels: list[str]
     ) -> EstimateWithCovariance | None:
         pass
 
     def generate_x_and_p(
-        self, block_labels: List[str]
+        self, block_labels: list[str]
     ) -> EstimateWithCovariance | None:
         pass
 
-    def give_state_block_aux_data(self, block_label: str, aux: List[Message]) -> None:
+    def give_state_block_aux_data(self, block_label: str, aux: list[Message]) -> None:
         pass
 
     def give_measurement_processor_aux_data(
-        self, processor_label: str, aux: List[Message]
+        self, processor_label: str, aux: list[Message]
     ) -> None:
         pass
 
     def give_virtual_state_block_aux_data(
-        self, target_label: str, aux: List[Message]
+        self, target_label: str, aux: list[Message]
     ) -> None:
         pass
 
@@ -498,7 +497,7 @@ class DummyOrchestrationPlugin(OrchestrationPlugin):
         return
 
     def init_orchestration_plugin(
-        self, plugins: List[CommonPlugin] | None, stream_config: MessageStreamConfig
+        self, plugins: list[CommonPlugin] | None, stream_config: MessageStreamConfig
     ) -> None:
         pass
 
@@ -506,14 +505,14 @@ class DummyOrchestrationPlugin(OrchestrationPlugin):
         pass
 
     @property
-    def filter_description_list(self) -> List[str]:
+    def filter_description_list(self) -> list[str]:
         return []
 
     def request_solutions(
         self,
-        solution_times: List[TypeTimestamp],
+        solution_times: list[TypeTimestamp],
         filter_description: str | None = None,
-    ) -> List[Message] | None:
+    ) -> list[Message] | None:
         return None
 
 

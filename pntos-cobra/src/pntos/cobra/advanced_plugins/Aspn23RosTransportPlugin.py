@@ -1,5 +1,4 @@
 from threading import Thread
-from typing import List
 
 try:
     import rclpy  # type: ignore[import-not-found]
@@ -40,8 +39,8 @@ class Aspn23RosTransportPlugin(TransportPlugin):
 
     def __init__(self, identifier: str) -> None:
         self.identifier = identifier
-        self._subs: List[Subscription] = []
-        self._topics: List[str] = []
+        self._subs: list[Subscription] = []
+        self._topics: list[str] = []
         self._scan_timer: Timer
 
     def init_plugin(

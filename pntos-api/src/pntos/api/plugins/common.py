@@ -1,14 +1,11 @@
 """Python API of pntOS."""
 
 from abc import ABC, abstractmethod
+from collections.abc import Callable, ItemsView, Iterator, ValuesView
 from dataclasses import dataclass
 from enum import Enum
 from typing import (
-    Callable,
-    ItemsView,
-    Iterator,
     TypeVar,
-    ValuesView,
 )
 
 from aspn23 import AspnBase, TypeTimestamp

@@ -3,8 +3,9 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Callable, TypeVar
+from typing import TYPE_CHECKING, Any, TypeVar
 
 from aspn23 import TypeTimestamp
 from numpy import float64
@@ -371,7 +372,7 @@ class StandardStateModelProvider(ABC):
     def new_processor(
         self,
         processor_index: int,
-        engine: 'StandardFusionEngine' | None,
+        engine: StandardFusionEngine | None,
         label: str,
         state_block_labels: list[str],
         config_group: str | None,
@@ -422,7 +423,7 @@ class StandardStateModelProvider(ABC):
     def new_block(
         self,
         block_index: int,
-        engine: 'StandardFusionEngine' | None,
+        engine: StandardFusionEngine | None,
         label: str,
         config_group: str | None,
     ) -> StandardStateBlock | None:
