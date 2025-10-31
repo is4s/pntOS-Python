@@ -7,6 +7,7 @@ from pntos.api import EstimateWithCovariance, LoggingLevel, Mediator
 def validate_array(
     arr: NDArray[float64],
     mediator: Mediator,
+    name: str,
     dims: int | None = None,
     rows: int | None = None,
     cols: int | None = None,
@@ -18,6 +19,8 @@ def validate_array(
 
     Args:
         arr (NDArray[float64]): The array to validate.
+        mediator (Mediator): Mediator to use for logging any error messages.
+        name (str): Name of array to be included in any error messages.
         dims (int | None, optional): Expected number of dimensions, or None to ignore dimensions. Defaults to None.
         rows (int | None, optional): Expected number of rows, or None to ignore rows. Defaults to None.
         cols (int | None, optional): Expected number of cols, or None to ignore cols. Defaults to None.
@@ -25,7 +28,7 @@ def validate_array(
     if dims is not None and arr.ndim != dims:
         mediator.log_message(
             LoggingLevel.ERROR,
-            f'Expected {dims} dimensions, but got {arr.ndim}',
+            f'Expected {dims} dimensions for {name}, but got {arr.ndim}',
         )
 
     if rows is not None and cols is not None:
@@ -33,17 +36,17 @@ def validate_array(
         if arr.shape != expected_shape:
             mediator.log_message(
                 LoggingLevel.ERROR,
-                f'Expected shape {expected_shape}, but got {arr.shape}',
+                f'Expected shape {expected_shape} for {name}, but got {arr.shape}',
             )
     elif rows is not None and arr.shape[0] != rows:
         mediator.log_message(
             LoggingLevel.ERROR,
-            f'Expected {rows} rows, but got {arr.shape[0]}.',
+            f'Expected {rows} rows for {name}, but got {arr.shape[0]}.',
         )
     elif cols is not None and arr.shape[1] != cols:
         mediator.log_message(
             LoggingLevel.ERROR,
-            f'Expected {cols} rows, but got {arr.shape[1]}.',
+            f'Expected {cols} cols for {name}, but got {arr.shape[1]}.',
         )
 
 
