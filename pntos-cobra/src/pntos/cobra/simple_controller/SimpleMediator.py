@@ -15,6 +15,7 @@ from pntos.api import (
     Registry,
     TransportPlugin,
 )
+from pntos.cobra.utils import print_message
 
 from .SimpleMessageStreamConfig import SimpleMessageStreamConfig
 
@@ -61,13 +62,6 @@ class SimpleMediator(Mediator):
         self._attached_plugin_type: PluginType = attached_plugin_type
         self._attached_plugin_identifier: str = attached_plugin_identifier
         self._last_solution_time = None
-
-        self._log_levels = {
-            LoggingLevel.DEBUG: 'DEBUG: ',
-            LoggingLevel.ERROR: 'ERROR: ',
-            LoggingLevel.INFO: 'INFO: ',
-            LoggingLevel.WARN: 'WARNING: ',
-        }
 
     @property
     def filter_description_list(self) -> list[str]:
@@ -161,7 +155,7 @@ class SimpleMediator(Mediator):
         plugin_type: PluginType = ControllerPlugin,
     ) -> None:
         if self._logging_plugin is None:
-            print(f'[{plugin_type.__name__}] {self._log_levels[level]} {message}')
+            print_message(level, plugin_type.__name__, message)
         else:
             self._logging_plugin.log(
                 plugin_type,

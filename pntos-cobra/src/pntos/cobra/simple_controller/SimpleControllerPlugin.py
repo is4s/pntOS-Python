@@ -14,6 +14,7 @@ from pntos.api import (
 from pntos.cobra.utils import (
     SortedPlugins,
     find_base_plugin_type,
+    print_message,
     sort_plugins_dataclass,
     validate_plugins,
 )
@@ -67,13 +68,6 @@ class SimpleControllerPlugin(ControllerPlugin):
         self._transport_plugins: list[TransportPlugin] = []
         self._ui_plugin: UiPlugin | None = None
         self._registry_plugin: RegistryPlugin | None = None
-
-        self._log_levels = {
-            LoggingLevel.DEBUG: 'DEBUG: ',
-            LoggingLevel.ERROR: 'ERROR: ',
-            LoggingLevel.INFO: 'INFO: ',
-            LoggingLevel.WARN: 'WARNING: ',
-        }
 
     def init_plugin(
         self,
@@ -260,7 +254,7 @@ class SimpleControllerPlugin(ControllerPlugin):
         controller.
         """
         if self._logging_plugin is None:
-            print(self._log_levels[level] + ' [Controller] ' + message)
+            print_message(level, ControllerPlugin.__name__, message)
         else:
             self._logging_plugin.log(ControllerPlugin, self.identifier, level, message)
 

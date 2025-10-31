@@ -25,6 +25,7 @@ from pntos.api import (
     RegistryValueTypeUnion,
 )
 from pntos.cobra.config import BaseConfig, config_to_registry
+from pntos.cobra.utils import print_message
 
 REGISTRY_DATA_FORMAT = KeyValueStoreDataFormat.UNSPECIFIED
 REGISTRY_SEPARATOR = ', '
@@ -567,13 +568,6 @@ class StandardRegistryPlugin(RegistryPlugin):
         self.registries = []
         self.config = config if config is not None else []
 
-        self._log_levels = {
-            LoggingLevel.ERROR: 'ERROR',
-            LoggingLevel.WARN: 'WARN',
-            LoggingLevel.INFO: 'INFO',
-            LoggingLevel.DEBUG: 'DEBUG',
-        }
-
     def init_plugin(
         self,
         plugin_resources_location: str | None = None,
@@ -632,4 +626,4 @@ class StandardRegistryPlugin(RegistryPlugin):
         if self.mediator is not None:
             self.mediator.log_message(level, message)
         else:
-            print(f'[RegistryPlugin] {self._log_levels[level]} {message}.')  # type: ignore[unreachable]
+            print_message(level, RegistryPlugin.__name__, message)  # type: ignore[unreachable]
