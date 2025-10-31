@@ -2,7 +2,7 @@
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from enum import Enum
+from enum import Enum, IntEnum
 from typing import (
     Callable,
     ItemsView,
@@ -80,7 +80,7 @@ class EstimateWithCovariance:
     """A covariance matrix, describing the errors in the estimate."""
 
 
-class LoggingLevel(Enum):
+class LoggingLevel(IntEnum):
     """An enumeration of the types of log outs that are available in pntOS."""
 
     ERROR = 0
