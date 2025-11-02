@@ -50,6 +50,7 @@ default:
 
 stages:
     - check
+    - run
     - deploy
 
 ruff check:
@@ -183,7 +184,8 @@ link check:
         - docker exec -e TZ=UTC pntos-python sphinx-build -b linkcheck --exception-on-warning docs/source/ docs/build/
 
 Tutorial GPS INS App:
-    stage: check
+    stage: run
+    needs: []
     tags:
         - linux-light-runner
     script:
@@ -192,7 +194,8 @@ Tutorial GPS INS App:
         - docker exec pntos-python pytest apps -k test_tutorial_gps_ins_app -s
 
 Tutorial GPS INS Velocity App:
-    stage: check
+    stage: run
+    needs: []
     tags:
         - linux-light-runner
     script:
@@ -201,7 +204,8 @@ Tutorial GPS INS Velocity App:
         - docker exec pntos-python pytest apps -k test_tutorial_gps_ins_vel_app -s
 
 Standard GPS INS App w/ Log-based Transport:
-    stage: check
+    stage: run
+    needs: []
     tags:
         - linux-light-runner
     script:
@@ -210,7 +214,8 @@ Standard GPS INS App w/ Log-based Transport:
         - docker exec pntos-python pytest apps -k test_standard_gps_ins_app -s
 
 Standard GPS INS App w/ Network-based Transport:
-    stage: check
+    stage: run
+    needs: []
     tags:
         - linux-light-runner
     script:
@@ -237,7 +242,8 @@ Standard GPS INS Body Velocity App:
         - docker exec pntos-python pytest apps -k test_standard_gps_bodyvel_ins_app -s
 
 Standard GPS INS NED Velocity App:
-    stage: check
+    stage: run
+    needs: []
     tags:
         - linux-light-runner
     script:
@@ -246,7 +252,8 @@ Standard GPS INS NED Velocity App:
         - docker exec pntos-python pytest apps -k test_standard_gps_ins_vel_app -s
 
 Standard PosVel INS App:
-    stage: check
+    stage: run
+    needs: []
     tags:
         - linux-light-runner
     script:
@@ -255,7 +262,8 @@ Standard PosVel INS App:
         - docker exec pntos-python pytest apps -k test_standard_posvel_ins_app -s
 
 Standard GPS INS Baro App:
-    stage: check
+    stage: run
+    needs: []
     tags:
         - linux-light-runner
     script:
@@ -264,7 +272,8 @@ Standard GPS INS Baro App:
         - docker exec pntos-python pytest apps -k test_standard_gps_ins_baro_app -s
 
 Advanced GPS INS ROS App:
-    stage: check
+    stage: run
+    needs: []
     tags:
         - linux-light-runner
     script:
@@ -278,7 +287,8 @@ Advanced GPS INS ROS App:
                                             pytest apps -k test_advanced_gps_ins_ros_app -s"
 
 pip workflow check:
-    stage: check
+    stage: run
+    needs: []
     tags:
         - linux-light-runner
     script:
