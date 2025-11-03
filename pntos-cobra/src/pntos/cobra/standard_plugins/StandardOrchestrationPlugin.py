@@ -43,6 +43,7 @@ from pntos.cobra.utils import (
     get_dead_reckoning_solution,
     has_valid_time,
     initialization_ready,
+    print_message,
     send_inertial_aux_to_pinson,
     set_up_inertial_mechanization,
     set_up_initializer,
@@ -88,12 +89,6 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
                 :meth:`pntos.api.CommonPlugin.identifier` field.
         """
         self.identifier: str = identifier
-        self.log_level_strings: dict[LoggingLevel, str] = {
-            LoggingLevel.INFO: 'INFO:',
-            LoggingLevel.DEBUG: 'DEBUG:',
-            LoggingLevel.ERROR: 'ERROR:',
-            LoggingLevel.WARN: 'WARNING:',
-        }
         self.initialization_state = InitializationStatus.WAITING
         self.init_solution = None
         self.preprocessors = []
@@ -128,7 +123,7 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
         if self.mediator is not None:
             self.mediator.log_message(level, message)
         else:
-            print(f'[{self.identifier}] {self.log_level_strings[level]} {message}')  # type: ignore[unreachable]
+            print_message(level, OrchestrationPlugin.__name__, message)  # type: ignore[unreachable]
 
     def init_orchestration_plugin(
         self, plugins: list[CommonPlugin] | None, stream_config: MessageStreamConfig

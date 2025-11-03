@@ -95,6 +95,7 @@ nitpick_ignore = [
     ('py:class', 'abc.ABC'),
     ('py:class', 'optional'),
     ('py:class', 'enum.Enum'),
+    ('py:class', 'enum.IntEnum'),
     # numpy classes which automodule automatically tries to link to.
     ('py:class', 'float64'),
     ('py:class', 'NDArray'),

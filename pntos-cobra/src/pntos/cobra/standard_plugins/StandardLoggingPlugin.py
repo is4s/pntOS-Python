@@ -1,24 +1,5 @@
-import time
-
 from pntos.api import CommonPlugin, LoggingLevel, LoggingPlugin, Mediator
-
-
-class fmts:
-    """Formats for printing to terminal"""
-
-    HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
-    OKCYAN = '\033[96m'
-    OKGREEN = '\033[92m'
-    DRKGRAY = '\033[90m'
-    LTGRAY = '\033[37m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
-    ENDC = '\033[0m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
-    TAN = '\033[2m'
-    WHITE = '\033[97m'
+from pntos.cobra.utils import print_message
 
 
 class StandardLoggingPlugin(LoggingPlugin):
@@ -97,68 +78,8 @@ class StandardLoggingPlugin(LoggingPlugin):
         -global level: DEBUG - shows ERROR, WARN, INFO, or DEBUG
         """
         plugin_id = source_plugin_type.__name__
-        INFO = LoggingLevel.INFO
-        DEBUG = LoggingLevel.DEBUG
-        WARN = LoggingLevel.WARN
 
-        match level:
-            case LoggingLevel.INFO:
-                if self.global_log_level is INFO or self.global_log_level is DEBUG:
-                    self._output_time()
-                    self._output_plugin_id(plugin_id)
-                    if self.colorize:
-                        print(fmts.OKGREEN + ' [INFO] ' + fmts.ENDC, end='')
-                    else:
-                        print(' [INFO] ', end='')
-                    print(message)
-            case LoggingLevel.WARN:
-                if (
-                    self.global_log_level is INFO
-                    or self.global_log_level is DEBUG
-                    or self.global_log_level is WARN
-                ):
-                    self._output_time()
-                    self._output_plugin_id(plugin_id)
-                    if self.colorize:
-                        print(fmts.WARNING + ' [WARN] ' + fmts.ENDC, end='')
-                    else:
-                        print(' [WARN] ', end='')
-                    print(message)
-            case LoggingLevel.DEBUG:
-                if self.global_log_level is DEBUG:
-                    self._output_time()
-                    self._output_plugin_id(plugin_id)
-                    if self.colorize:
-                        print(fmts.OKBLUE + ' [DEBUG] ' + fmts.ENDC, end='')
-                    else:
-                        print(' [DEBUG] ', end='')
-                    print(message)
-            case LoggingLevel.ERROR:
-                self._output_time()
-                self._output_plugin_id(plugin_id)
-                if self.colorize:
-                    print(fmts.FAIL + ' [ERROR] ' + fmts.ENDC, end='')
-                else:
-                    print(' [ERROR] ', end='')
-                print(message)
-
-    def _output_time(self) -> None:
-        """Prints out the current system time using the date-time format provided at construction."""
-        if self.colorize:
-            print(
-                fmts.LTGRAY
-                + '['
-                + time.strftime(self.date_time_format)
-                + ']'
-                + fmts.ENDC,
-                end='',
+        if self.global_log_level >= level:
+            print_message(
+                level, plugin_id, message, self.colorize, self.date_time_format
             )
-        else:
-            print('[' + time.strftime(self.date_time_format) + ']', end='')
-
-    def _output_plugin_id(self, plugin_id: str) -> None:
-        """Prints out the name of the plugin from which the message originated (e.g. ORCHESTRATION)."""
-        if self.colorize:
-            print(fmts.DRKGRAY + ' [' + plugin_id + ']' + fmts.ENDC, end='')
-        else:
-            print(' [' + plugin_id + ']', end='')
