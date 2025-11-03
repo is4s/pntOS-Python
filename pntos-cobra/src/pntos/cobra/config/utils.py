@@ -1,4 +1,4 @@
-from dataclasses import fields
+from dataclasses import Field, fields
 from enum import Enum
 from inspect import isclass
 from typing import Any, TypeVar, get_args, get_origin
@@ -9,6 +9,7 @@ from navtk.filtering import ImuModel
 from pntos.api import (
     EstimateWithCovariance,
     EstimateWithCovarianceType,
+    KeyValueStore,
     LoggingLevel,
     Mediator,
     RegistryValueTypeUnion,
@@ -30,6 +31,9 @@ SUPPORTED_TYPES = {
     EstimateWithCovariance,
 }
 SupportedTupleTypes = {int, float, str, BaseConfig}
+SupportedRegistryTypeUnion = (
+    RegistryValueTypeUnion | tuple[Any, ...] | Enum | EstimateWithCovariance | None
+)
 
 
 def imu_model_to_config(model: ImuModel, group: str) -> ImuConfig:
@@ -78,7 +82,7 @@ def imu_model_from_config(config: ImuConfig) -> ImuModel:
     )
 
 
-def config_from_registry(  # noqa: PLR0915
+def config_from_registry(
     config_type: type[ConfigType], mediator: Mediator, config_group: str
 ) -> ConfigType | None:
     """
@@ -102,70 +106,24 @@ def config_from_registry(  # noqa: PLR0915
     """
     conf_params = [f for f in fields(config_type) if f.name != 'group']
     kv = mediator.registry.batch_start(config_group)
-    out: dict[
-        str,
-        RegistryValueTypeUnion
-        | tuple[float, ...]
-        | Enum
-        | EstimateWithCovariance
-        | None,
-    ] = {}
+    out: dict[str, SupportedRegistryTypeUnion] = {}
+    val: SupportedRegistryTypeUnion
     fail = False
     for param in conf_params:
-        if param.name in kv:
-            val: (
-                RegistryValueTypeUnion
-                | tuple[float, ...]
-                | Enum
-                | EstimateWithCovariance
-                | None
-            ) = kv[param.name]
-        elif (
-            param.type == EstimateWithCovariance | None
-            or param.type == EstimateWithCovariance
-        ):
-            if '_ewc_type' not in kv:
-                out[param.name] = None
-                continue
+        dtype = _get_dtype(param)
+        if _is_type_optional(param.type) and not _exists(kv, param.name, dtype):
+            continue
+        if issubclass(dtype, EstimateWithCovariance):
             val = EstimateWithCovariance(
                 type=EstimateWithCovarianceType(kv['_ewc_type']),
                 estimate=kv['_estimate'],  # type: ignore[arg-type]
                 covariance=kv['_covariance'],  # type: ignore[arg-type]
             )
         # Special case: nested config or a series of nested configs
+        elif issubclass(dtype, BaseConfig):
+            val = _nested_config_from_registry(kv, mediator, param)
         else:
-            group_key = '_' + param.name + '_groups'
-            if group_key not in kv:
-                if _is_type_optional(param.type):
-                    out[param.name] = None
-                    continue
-                mediator.log_message(
-                    LoggingLevel.WARN,
-                    f'Could not retrieve {param.name} from store',
-                )
-                fail = True
-                continue
-
-            groups = kv[group_key]
-            val = []
-            kv.batch_end()
-            if isinstance(groups, str):
-                if _is_type_optional(param.type):
-                    conf_type = get_args(param.type)[0]
-                else:
-                    conf_type = param.type
-                val = config_from_registry(conf_type, mediator, groups)
-            elif isinstance(groups, list):
-                conf_type = get_args(param.type)[0]
-                if _is_type_optional(param.type):
-                    conf_type = get_args(conf_type)[0]
-                for group in groups:
-                    conf = config_from_registry(conf_type, mediator, group)
-                    if conf is None:
-                        fail = True
-                        break
-                    val.append(conf)
-            kv.batch_restart()
+            val = kv[param.name]
 
         if val is None:
             mediator.log_message(
@@ -176,16 +134,9 @@ def config_from_registry(  # noqa: PLR0915
             continue
 
         if isinstance(val, np.ndarray):
-            dtype = None
-            p_args = get_args(param.type)
-            p_org = get_origin(p_args[0])
-            while p_org is not None:
-                p_args = get_args(p_args[0])
-                p_org = get_origin(p_org)
-            dtype = p_args[0]
             val = convert_ndarray_to_tuple(val, dtype)
         elif isinstance(val, list):
-            val = tuple(val)  # type: ignore[arg-type]
+            val = tuple(val)
         # Special case: enum. Convert integer back to enum type.
         elif isclass(param.type) and issubclass(param.type, Enum):
             val = param.type(val)
@@ -204,6 +155,90 @@ def config_from_registry(  # noqa: PLR0915
     if fail:
         return None
     return config_type(**out, group=config_group)
+
+
+def _exists(kv: KeyValueStore, pname: str, ptype: type[Any]) -> bool:
+    """
+    Determines if a parameter exists in the :class:`pntos.api.KeyValueStore`
+
+    Args:
+        kv (KeyValueStore): The KeyValueStore to search in.
+        pname (str): The name of the parameter.
+        ptype (type[Any]): The type of the parameter.
+    """
+    if issubclass(ptype, EstimateWithCovariance):
+        if '_ewc_type' not in kv:
+            return False
+    elif issubclass(ptype, BaseConfig):
+        group_key = '_' + pname + '_groups'
+        if group_key not in kv:
+            return False
+    elif pname not in kv:
+        return False
+    return True
+
+
+def _get_dtype(param: Field[Any]) -> type[Any]:
+    """
+    Utility function that returns the most internal data type of a field.
+
+    Args:
+        param (Field[Any]): The parameter to examine.
+
+    Returns:
+        type[Any]
+    """
+    dtype = param.type
+    args = get_args(param.type)
+    while len(args) != 0:
+        dtype = args[0]
+        args = get_args(dtype)
+    assert isinstance(dtype, type)
+    return dtype
+
+
+def _nested_config_from_registry(
+    kv: KeyValueStore,
+    mediator: Mediator,
+    param: Field[Any],
+) -> ConfigType | list[ConfigType] | None:
+    """
+    Utility function used to handle the instance where the target nested config
+    could be singular or a series of config.
+
+    Args:
+        kv (KeyValueStore): The KeyValueStore to search in.
+        mediator (Mediator): A :class:`pntos.api.Mediator` instance
+        param (Field[Any]): The parameter that contains typing information about the original type
+
+    Returns:
+        ConfigType | list[ConfigType] | None
+    """
+    group_key = '_' + param.name + '_groups'
+    if group_key not in kv:
+        return None
+    groups = kv[group_key]
+    val = None
+    kv.batch_end()
+    if isinstance(groups, str):
+        if _is_type_optional(param.type):
+            conf_type = get_args(param.type)[0]
+        else:
+            conf_type = param.type
+        val = config_from_registry(conf_type, mediator, groups)
+    elif isinstance(groups, list):
+        conf_type = get_args(param.type)[0]
+        if _is_type_optional(param.type):
+            conf_type = get_args(conf_type)[0]
+        val = []
+        for group in groups:
+            conf = config_from_registry(conf_type, mediator, group)
+            if conf is None:
+                val = None
+                break
+            val.append(conf)
+    kv.batch_restart()
+    return val
 
 
 def config_to_registry(config: BaseConfig, mediator: Mediator) -> None:
@@ -230,35 +265,17 @@ def config_to_registry(config: BaseConfig, mediator: Mediator) -> None:
             kv.batch_end()
             return
         val_to_store = getattr(config, param.name)
-        # internally convert int to float if type is supposed to be float
-        if isinstance(val_to_store, int) and param.type is float:
-            mediator.log_message(
-                LoggingLevel.WARN,
-                f'Expected field {param.name} in {type(config)} to have type {param.type} '
-                + f'but received {type(val_to_store)} from registry. Converting to {param.type}.',
-            )
-            val_to_store = float(val_to_store)
-        # log warning if user provided a non-tuple series
-        if isinstance(val_to_store, (list, np.ndarray)):
-            mediator.log_message(
-                LoggingLevel.WARN,
-                f'Expected series to be a tuple but received a {type(val_to_store)}. '
-                + 'Conversion to a supported registry type will be attempted.',
-            )
-        # compare user provided type with the validated config type hint
-        if not isinstance(
-            val_to_store, (tuple, list, np.ndarray)
-        ) and not _confirm_types(val_to_store, param.type):  # type: ignore[arg-type]
-            mediator.log_message(
-                LoggingLevel.ERROR,
-                f'Expected field {param.name} in {type(config)} to have type {param.type} '
-                + f'but received {type(val_to_store)} from registry.',
-            )
+
+        result, val_to_store = _validate_config_value(
+            val_to_store, param, type(config), mediator
+        )
+        if not result:
             kv.batch_end()
             return
+
         if isinstance(val_to_store, (tuple, list, np.ndarray)):
             if len(val_to_store) > 0:
-                # convert numerical tuples to ndarray; we only support multi dimensional numerical tuples
+                # convert numerical tuples to ndarray; we only support numerical multi dimensional tuples
                 if np.issubdtype(type(val_to_store[0]), np.number) or isinstance(
                     val_to_store[0], (tuple, list, np.ndarray)
                 ):
@@ -293,14 +310,64 @@ def config_to_registry(config: BaseConfig, mediator: Mediator) -> None:
     kv.batch_end()
 
 
-def _confirm_types(out_val: Any, expected_type: type[Any]) -> bool:  # noqa: ANN401
+def _validate_config_value(
+    val: SupportedRegistryTypeUnion,
+    param: Field[Any],
+    config_type: type[Any],
+    mediator: Mediator,
+) -> tuple[bool, Any]:
+    """
+    A helper function that handles some necessary logic to ensure ``val`` can be stored in the registry.
+
+    Args:
+        val (SupportedRegistryTypeUnion): The config value to be examined.
+        param (Field[Any]): The config parameter that contains information about what ``val`` should be.
+        config_type (type[Any]): The type of config ``val`` and ``param`` originate from, only used for logging.
+        mediator (Mediator): A :class:`pntos.api.Mediator` instance.
+
+    Returns:
+        A `tuple[bool, Any]` where the first value indicates if the validation was successful and the second value
+        is ``val`` or what it gets converted to.
+    """
+    # internally convert int to float if type is supposed to be float
+    if isinstance(val, int) and param.type is float:
+        mediator.log_message(
+            LoggingLevel.WARN,
+            f'Expected field {param.name} in {config_type} to have type {param.type} '
+            + f'but received {type(val)} from registry. Converting to {param.type}.',
+        )
+        val = float(val)
+    # log warning if user provided a non-tuple series
+    if isinstance(val, (list, np.ndarray)):
+        mediator.log_message(
+            LoggingLevel.WARN,
+            f'Expected series to be a tuple but received a {type(val)}. '
+            + 'Conversion to a supported registry type will be attempted.',
+        )
+    # compare user provided type with the validated config type hint
+    if not isinstance(val, (tuple, list, np.ndarray)) and not _confirm_types(
+        val,
+        param.type,  # type: ignore[arg-type]
+    ):
+        mediator.log_message(
+            LoggingLevel.ERROR,
+            f'Expected field {param.name} in {config_type} to have type {param.type} '
+            + f'but received {type(val)} from registry.',
+        )
+        return (False, val)
+    return (True, val)
+
+
+def _confirm_types(
+    out_val: SupportedRegistryTypeUnion, expected_type: type[Any]
+) -> bool:
     """
     A helper function which determines if the type of ``out_val`` is equivalent to ``expected_type``.
     If equivalent, returns true otherwise returns false.
     This function supports the case where ``expected_type`` is a generic alias.
 
     Args:
-        out_val (Any): Object whose type is to be validated.
+        out_val (SupportedRegistryTypeUnion): Object whose type is to be validated.
         expected_type (type[Any]): The expected type of `out_val`.
 
     Returns:
@@ -355,7 +422,7 @@ def _confirm_types(out_val: Any, expected_type: type[Any]) -> bool:  # noqa: ANN
     return compare_type(out_type, expected_type)
 
 
-def _get_verbose_type(obj: Any) -> Any:  # noqa: ANN401
+def _get_verbose_type(obj: SupportedRegistryTypeUnion) -> type[Any]:
     if isinstance(obj, tuple):
         inner_types = tuple(_get_verbose_type(item) for item in obj)
         return tuple[inner_types]  # type: ignore[valid-type]
