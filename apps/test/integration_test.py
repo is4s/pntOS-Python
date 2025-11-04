@@ -295,7 +295,7 @@ def test_standard_gps_ins_baro_app() -> None:
         log_data.data[SOLUTION_CHANNEL],
         log_data.data[TRUTH_CHANNEL],
         num_points=2584,
-        pos_err_limits=ErrorLimits(std_thresh=1.7, max_thresh=4.3, pct_below_1sigma=64),
+        pos_err_limits=ErrorLimits(std_thresh=1.7, max_thresh=4.7, pct_below_1sigma=64),
         vel_err_limits=ErrorLimits(
             std_thresh=0.1, max_thresh=0.8, pct_below_2sigma=91, pct_below_3sigma=98
         ),

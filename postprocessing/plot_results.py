@@ -9,7 +9,9 @@ from analysis.lcm.log_readers import read_pva
 from pntos.cobra.utils import plot_pva
 
 
-def harvest_data(logfile: Path, channels: list[str]) -> LogData[PvaData]:
+def harvest_data(
+    logfile: Path, channels: list[str], truth_channel: str
+) -> LogData[PvaData]:
     # ROS bagfile
     if logfile.suffix in {'.db3', '.mcap'}:
         from analysis.ros import RosBagReader  # noqa: PLC0415
@@ -17,11 +19,13 @@ def harvest_data(logfile: Path, channels: list[str]) -> LogData[PvaData]:
         return RosBagReader(logfile).harvest_topics(channels)
 
     # LCM logfile
-    return read_pva(logfile=logfile, read_all=True)
+    return read_pva(logfile=logfile, read_all=True, truth_channel=truth_channel)
 
 
 def plot_results(logfile: Path, solution_channel: str, truth_channel: str) -> None:
-    log_data = harvest_data(logfile, [solution_channel, truth_channel])
+    log_data = harvest_data(
+        logfile, [solution_channel, truth_channel], truth_channel=truth_channel
+    )
 
     solution = log_data.data[solution_channel]
     solution.label = 'Cobra Solution'
