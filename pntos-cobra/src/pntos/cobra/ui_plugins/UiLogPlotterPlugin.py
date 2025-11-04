@@ -71,7 +71,9 @@ class UiLogPlottingPlugin(UiPlugin):
 
         self._plot_results()
 
-    def _harvest_data(self, channels: list[str]) -> LogData[PvaData]:
+    def _harvest_data(
+        self, channels: list[str], truth_channel: str
+    ) -> LogData[PvaData]:
         # ROS bagfile
         if self.logfile.suffix in {'.db3', '.mcap'}:
             from analysis.ros import RosBagReader  # noqa: PLC0415
@@ -79,12 +81,16 @@ class UiLogPlottingPlugin(UiPlugin):
             return RosBagReader(self.logfile.as_posix()).harvest_topics(channels)
 
         # LCM logfile
-        return read_pva(logfile=self.logfile.as_posix(), read_all=True)
+        return read_pva(
+            logfile=self.logfile.as_posix(), read_all=True, truth_channel=truth_channel
+        )
 
     def _plot_results(
         self,
     ) -> None:
-        log_data = self._harvest_data([self.solution_channel, self.truth_channel])
+        log_data = self._harvest_data(
+            [self.solution_channel, self.truth_channel], self.truth_channel
+        )
 
         solution = log_data.data[self.solution_channel]
         solution.label = 'Cobra Solution'
