@@ -224,7 +224,8 @@ Standard GPS INS App w/ Network-based Transport:
         - docker exec pntos-python pytest apps -k test_standard_gps_ins_network_app -s
 
 Standard GPS INS Lever Arm App:
-    stage: check
+    stage: run
+    needs: []
     tags:
         - linux-light-runner
     script:
@@ -233,7 +234,8 @@ Standard GPS INS Lever Arm App:
         - docker exec pntos-python pytest apps -k test_standard_gps_ins_leverarm_app -s
 
 Standard GPS INS Body Velocity App:
-    stage: check
+    stage: run
+    needs: []
     tags:
         - linux-light-runner
     script:
