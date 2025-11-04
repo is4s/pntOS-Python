@@ -342,7 +342,7 @@ def _validate_config_value(
     if isinstance(val, (list, np.ndarray)):
         mediator.log_message(
             LoggingLevel.WARN,
-            f'Expected series to be a tuple but received a {type(val)}. '
+            f'Expected field {param.name} to be a tuple but received a {type(val)}. '
             + 'Conversion to a supported registry type will be attempted.',
         )
     # compare user provided type with the validated config type hint
