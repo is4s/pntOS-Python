@@ -90,7 +90,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
         i_next = 0
         for this_key in sb_list:
             self._sb[this_key].start_index = i_next
-            self._sb[this_key].stop_index = i_next + self._sb[this_key].num_states - 1
+            self._sb[this_key].stop_index = i_next + self._sb[this_key].num_states
             i_next = i_next + self._sb[this_key].num_states
 
     @property

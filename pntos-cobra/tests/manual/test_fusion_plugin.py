@@ -1,4 +1,5 @@
 import numpy as np
+import pytest
 from aspn23 import (
     MeasurementDeltaPosition,
     MeasurementDeltaPositionErrorModel,
@@ -24,7 +25,11 @@ from pntos.cobra import (
     EkfFusionStrategyPlugin,
     StandardFusionPlugin,
 )
-from pntos.cobra.internal import SimpleMediator, StandardRegistry
+from pntos.cobra.internal import (
+    SimpleMediator,
+    StandardFusionEngine as CobraStandardFusionEngine,
+    StandardRegistry,
+)
 
 
 # Test Sensor plugin
@@ -115,40 +120,57 @@ def dummy_log(level: LoggingLevel, message: str) -> None:
     pass
 
 
-def test_manual() -> None:
-    """User test for the Fusion Plugin."""
+def create_state_block(label: str) -> tuple[_TestStateBlock, EstimateWithCovariance]:
+    sb = _TestStateBlock(label=label)
+    X0 = np.array([[0, 0, 1, 1]]).reshape(4, 1)
+    P0 = np.array([[25, 0, 0, 0], [0, 25, 0, 0], [0, 0, 25, 0], [0, 0, 0, 25]])
+    x_and_p = EstimateWithCovariance(
+        type=EstimateWithCovarianceType.EWC_GENERIC, estimate=X0, covariance=P0
+    )
+
+    return sb, x_and_p
+
+
+@pytest.fixture
+def mediator() -> SimpleMediator:
     registry = StandardRegistry(dummy_log)
     mediator = SimpleMediator('Fusion Plugin', FusionPlugin)
     SimpleMediator.registry = registry
+    return mediator
 
+
+@pytest.fixture
+def fusion_engine(mediator: SimpleMediator) -> StandardFusionEngine:
     # initialize the fusion plugin
     fusion_plugin = StandardFusionPlugin(identifier='test_fusion_plugin')
     fusion_plugin.init_plugin('test', mediator=mediator)
-    fusion_engine = fusion_plugin.new_fusion_engine(StandardFusionEngine)
+    fusion_engine: StandardFusionEngine | None = fusion_plugin.new_fusion_engine(
+        StandardFusionEngine
+    )
     assert fusion_engine is not None
     fusion_strategy_plugin = EkfFusionStrategyPlugin(identifier='test_strategy_plugin')
     fusion_strategy_plugin.init_plugin('test_strategy', mediator=mediator)
-    fusion_strategy = fusion_strategy_plugin.new_fusion_strategy(StandardFusionStrategy)
+    fusion_strategy: StandardFusionStrategy | None = (
+        fusion_strategy_plugin.new_fusion_strategy(StandardFusionStrategy)
+    )
+    assert fusion_strategy is not None
 
     # Set the strategy
     fusion_engine.strategy = fusion_strategy
 
-    # create MP and SB
-    track_sb = _TestStateBlock(label='track_sb')
-    X0 = np.array([[0, 0, 1, 1]]).reshape(4, 1)
-    P0 = np.array([[25, 0, 0, 0], [0, 25, 0, 0], [0, 0, 25, 0], [0, 0, 0, 25]])
-    track_sb_x0_p0 = EstimateWithCovariance(
-        type=EstimateWithCovarianceType.EWC_GENERIC, estimate=X0, covariance=P0
-    )
-    delta_pos_mp = _TestMeasurementProcessor(
-        label='track_mp', state_block_labels=['track_sb']
-    )
-
-    # Add state block
-    fusion_engine.add_state_block(
-        block=track_sb, initial_estimate_covariance=track_sb_x0_p0
-    )
+    # Add MP and 2 SBs to fusion engine
+    sb1, x_and_p1 = create_state_block('sb1')
+    sb2, x_and_p2 = create_state_block('sb2')
+    fusion_engine.add_state_block(block=sb1, initial_estimate_covariance=x_and_p1)
+    fusion_engine.add_state_block(block=sb2, initial_estimate_covariance=x_and_p2)
+    delta_pos_mp = _TestMeasurementProcessor(label='mp', state_block_labels=['sb1'])
     fusion_engine.add_measurement_processor(processor=delta_pos_mp)
+
+    return fusion_engine
+
+
+def test_manual(fusion_engine: CobraStandardFusionEngine) -> None:
+    """User test for the Fusion Plugin."""
 
     delta_pos_generator = GenerateDeltaPosMeasurement()
 
@@ -165,5 +187,12 @@ def test_manual() -> None:
         fusion_engine.update(processor_label='track_mp', message=pntos_message)
 
 
-if __name__ == '__main__':
-    test_manual()
+def test_remove_state_block(fusion_engine: CobraStandardFusionEngine) -> None:
+    assert fusion_engine._sb['sb1'].start_index == 0
+    assert fusion_engine._sb['sb1'].stop_index == 4
+    assert fusion_engine._sb['sb2'].start_index == 4
+    assert fusion_engine._sb['sb2'].stop_index == 8
+
+    fusion_engine.remove_state_block('sb1')
+    assert fusion_engine._sb['sb2'].start_index == 0
+    assert fusion_engine._sb['sb2'].stop_index == 4
