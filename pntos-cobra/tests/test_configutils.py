@@ -616,3 +616,26 @@ class TestConfigUtils(unittest.TestCase):
         config_to_registry(conf, self.mediator)
         out_conf = config_from_registry(DynConf, self.mediator, group)
         assert out_conf is None
+
+    def test_optional_config(self) -> None:
+        # Test optional config when field defaults to None
+        @dataclass
+        class Foo(BaseConfig):
+            foo: int | None = None
+
+        in_foo = Foo(group='foo', foo=None)
+        config_to_registry(in_foo, self.mediator)
+        out_foo = config_from_registry(Foo, self.mediator, 'foo')
+        assert out_foo is not None
+        self._validate_conf_from_registry(in_foo, out_foo)
+
+        # Test optional config when field doesn't default to None
+        @dataclass
+        class Bar(BaseConfig):
+            bar: int | None
+
+        in_bar = Bar(group='bar', bar=None)
+        config_to_registry(in_bar, self.mediator)
+        out_bar = config_from_registry(Bar, self.mediator, 'bar')
+        assert out_bar is not None
+        self._validate_conf_from_registry(in_bar, out_bar)

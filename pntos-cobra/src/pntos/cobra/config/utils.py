@@ -112,6 +112,7 @@ def config_from_registry(
     for param in conf_params:
         dtype = _get_dtype(param)
         if _is_type_optional(param.type) and not _exists(kv, param.name, dtype):
+            out[param.name] = None
             continue
         if issubclass(dtype, EstimateWithCovariance):
             val = EstimateWithCovariance(
