@@ -45,13 +45,16 @@ class EkfFusionStrategy(StandardFusionStrategy):
         initial_covariance: NDArray[np.float64],
         cross_covariance: NDArray[np.float64] | None = None,
     ) -> int:
-        validate_array(initial_estimate, self._mediator, dims=2, cols=1)
+        validate_array(
+            initial_estimate, self._mediator, 'initial_estimate', dims=2, cols=1
+        )
 
         num_new_states = initial_estimate.shape[0]
 
         validate_array(
             initial_covariance,
             self._mediator,
+            'initial_covariance',
             dims=2,
             rows=num_new_states,
             cols=num_new_states,
@@ -78,6 +81,7 @@ class EkfFusionStrategy(StandardFusionStrategy):
             validate_array(
                 cross_covariance,
                 self._mediator,
+                'cross_covariance',
                 dims=2,
                 rows=self._num_states,
                 cols=num_new_states,
@@ -120,7 +124,7 @@ class EkfFusionStrategy(StandardFusionStrategy):
     def set_estimate_slice(
         self, new_estimate: NDArray[np.float64], first_index: int
     ) -> None:
-        validate_array(new_estimate, self._mediator, dims=2, cols=1)
+        validate_array(new_estimate, self._mediator, 'new_estiamte', dims=2, cols=1)
 
         n = new_estimate.shape[0]
         if first_index + n > self._num_states:
@@ -145,7 +149,7 @@ class EkfFusionStrategy(StandardFusionStrategy):
     ) -> None:
         if first_col is None:
             first_col = first_row
-        validate_array(new_covariance, self._mediator, dims=2)
+        validate_array(new_covariance, self._mediator, 'new_covariance', dims=2)
 
         last_row = first_row + new_covariance.shape[0]
         last_col = first_col + new_covariance.shape[1]
@@ -171,6 +175,7 @@ class EkfFusionStrategy(StandardFusionStrategy):
         validate_array(
             dynamics_model.Phi,
             self._mediator,
+            'Phi',
             dims=2,
             rows=self._P.shape[0],
             cols=self._P.shape[1],
@@ -178,6 +183,7 @@ class EkfFusionStrategy(StandardFusionStrategy):
         validate_array(
             dynamics_model.Qd,
             self._mediator,
+            'Qd',
             dims=2,
             rows=self._P.shape[0],
             cols=self._P.shape[1],
@@ -192,12 +198,13 @@ class EkfFusionStrategy(StandardFusionStrategy):
         )
 
     def update(self, measurement_model: StandardMeasurementModel) -> None:
-        validate_array(measurement_model.z, self._mediator, dims=2, cols=1)
+        validate_array(measurement_model.z, self._mediator, 'z', dims=2, cols=1)
         num_meas = measurement_model.z.shape[0]
 
         validate_array(
             measurement_model.H,
             self._mediator,
+            'H',
             dims=2,
             rows=num_meas,
             cols=self._num_states,
@@ -205,6 +212,7 @@ class EkfFusionStrategy(StandardFusionStrategy):
         validate_array(
             measurement_model.R,
             self._mediator,
+            'R',
             dims=2,
             rows=num_meas,
             cols=num_meas,
@@ -212,7 +220,7 @@ class EkfFusionStrategy(StandardFusionStrategy):
 
         # Calculate residual(s)
         h_x = measurement_model.h(self._x)
-        validate_array(h_x, self._mediator, dims=2, rows=num_meas, cols=1)
+        validate_array(h_x, self._mediator, 'h(x)', dims=2, rows=num_meas, cols=1)
         resid = measurement_model.z - h_x
 
         # Calculate residual covariance

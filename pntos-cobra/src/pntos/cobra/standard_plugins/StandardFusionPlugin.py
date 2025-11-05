@@ -251,7 +251,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
         self, block_label: str, estimate: NDArray[float64]
     ) -> None:
         assert self._strategy is not None, 'FusionStrategy has not been set'
-        validate_array(estimate, self._mediator, dims=2, cols=1)
+        validate_array(estimate, self._mediator, 'estimate', dims=2, cols=1)
 
         if block_label not in self._sb:
             self._mediator.log_message(
@@ -293,6 +293,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
         validate_array(
             covariance,
             self._mediator,
+            'covariance',
             dims=2,
             rows=this_sb.num_states,
             cols=this_sb.num_states,
@@ -329,7 +330,12 @@ class StandardFusionEngine(api.StandardFusionEngine):
         sb2 = self._sb[block_label2]
 
         validate_array(
-            covariance, self._mediator, dims=2, rows=sb1.num_states, cols=sb2.num_states
+            covariance,
+            self._mediator,
+            'covariance',
+            dims=2,
+            rows=sb1.num_states,
+            cols=sb2.num_states,
         )
 
         # Change the part that is the shape of the covariance matrix
