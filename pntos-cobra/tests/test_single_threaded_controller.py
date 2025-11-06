@@ -236,16 +236,18 @@ class DummyStandardFusionEngine(StandardFusionEngine):
     ) -> EstimateWithCovariance | None:
         pass
 
-    def give_state_block_aux_data(self, block_label: str, aux: list[Message]) -> None:
+    def give_state_block_aux_data(
+        self, block_label: str, aux: list[Message | None]
+    ) -> None:
         pass
 
     def give_measurement_processor_aux_data(
-        self, processor_label: str, aux: list[Message]
+        self, processor_label: str, aux: list[Message | None]
     ) -> None:
         pass
 
     def give_virtual_state_block_aux_data(
-        self, target_label: str, aux: list[Message]
+        self, target_label: str, aux: list[Message | None]
     ) -> None:
         pass
 
@@ -434,7 +436,7 @@ class DummyMediator(Mediator):
         self,
         solution_times: list[TypeTimestamp],
         filter_description: str | None = None,
-    ) -> list[Message] | None:
+    ) -> list[Message | None] | None:
         return None
 
     def process_pntos_message(self, message: Message) -> None:
@@ -512,7 +514,7 @@ class DummyOrchestrationPlugin(OrchestrationPlugin):
         self,
         solution_times: list[TypeTimestamp],
         filter_description: str | None = None,
-    ) -> list[Message] | None:
+    ) -> list[Message | None] | None:
         return None
 
 

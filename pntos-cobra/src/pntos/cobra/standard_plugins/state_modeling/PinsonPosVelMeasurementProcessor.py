@@ -73,8 +73,8 @@ class PinsonPosVelMeasurementProcessor(StandardMeasurementProcessor):
                 f'PinsonPosVelMeasurementProcessor requires {self._num_required_blocks} state blocks, got {state_block_labels}.',
             )
 
-    def receive_aux_data(self, aux: list[Message]) -> None:
-        if not aux:
+    def receive_aux_data(self, aux: list[Message | None]) -> None:
+        if not aux or aux[0] is None:
             self._mediator.log_message(
                 LoggingLevel.ERROR,
                 'PinsonPosVelMeasurementProcessor expected aux data of type MeasurementPositionVelocityAttitude, but received empty list.',

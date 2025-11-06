@@ -75,10 +75,11 @@ class PinsonErrorToStandard(VirtualStateBlock):
         self._dy = array(((0, 0, 1), (0, 0, 0), (-1, 0, 0)))
         self._dz = array(((0, -1, 0), (1, 0, 0), (0, 0, 0)))
 
-    def receive_aux_data(self, aux: list[Message]) -> None:
+    def receive_aux_data(self, aux: list[Message | None]) -> None:
         for msg in reversed(aux):
             if (
-                isinstance(msg.wrapped_message, MeasurementPVA)
+                msg is not None
+                and isinstance(msg.wrapped_message, MeasurementPVA)
                 and msg.wrapped_message.reference_frame
                 == MeasurementPositionVelocityAttitudeReferenceFrame.GEODETIC
             ):

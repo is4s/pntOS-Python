@@ -482,39 +482,41 @@ class StandardFusionEngine(ABC):
         pass
 
     @abstractmethod
-    def give_state_block_aux_data(self, block_label: str, aux: list[Message]) -> None:
+    def give_state_block_aux_data(
+        self, block_label: str, aux: list[Message | None]
+    ) -> None:
         """
         Route a list of messages of aux data to a :class:`pntos.api.StandardStateBlock`.
 
         Args:
             block_label (str)
-            aux (list[Message])
+            aux (list[Message | None])
         """
         pass
 
     @abstractmethod
     def give_measurement_processor_aux_data(
-        self, processor_label: str, aux: list[Message]
+        self, processor_label: str, aux: list[Message | None]
     ) -> None:
         """
         Route a list of messages of aux data to a :class:`pntos.api.StandardMeasurementProcessor`.
 
         Args:
             processor_label (str)
-            aux (list[Message])
+            aux (list[Message | None])
         """
         pass
 
     @abstractmethod
     def give_virtual_state_block_aux_data(
-        self, target_label: str, aux: list[Message]
+        self, target_label: str, aux: list[Message | None]
     ) -> None:
         """
         Route a list of messages of aux data to a :class:`pntos.api.VirtualStateBlock`.
 
         Args:
             target_label (str)
-            aux (list[Message])
+            aux (list[Message | None])
         """
         pass
 

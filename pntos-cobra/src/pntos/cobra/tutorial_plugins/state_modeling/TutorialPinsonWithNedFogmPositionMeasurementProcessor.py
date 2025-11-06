@@ -61,8 +61,8 @@ class TutorialPinsonWithNedFogmPositionMeasurementProcessor(
         self._l_ps_p = l_ps_p
         self._num_required_blocks = 2
 
-    def receive_aux_data(self, aux: list[Message]) -> None:
-        if not isinstance(aux[0].wrapped_message, MeasurementPVA):
+    def receive_aux_data(self, aux: list[Message | None]) -> None:
+        if aux[0] is None or not isinstance(aux[0].wrapped_message, MeasurementPVA):
             return
         pva = aux[0].wrapped_message
         self._inertial_pva = pva

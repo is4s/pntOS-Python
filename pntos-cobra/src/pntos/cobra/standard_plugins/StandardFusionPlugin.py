@@ -658,7 +658,9 @@ class StandardFusionEngine(api.StandardFusionEngine):
             covariance=P[i_keep, :][:, i_keep],
         )
 
-    def give_state_block_aux_data(self, block_label: str, aux: list[Message]) -> None:
+    def give_state_block_aux_data(
+        self, block_label: str, aux: list[Message | None]
+    ) -> None:
         if block_label not in self._sb:
             self._mediator.log_message(
                 LoggingLevel.WARN,
@@ -670,7 +672,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
         self._sb[block_label].block.receive_aux_data(aux)
 
     def give_measurement_processor_aux_data(
-        self, processor_label: str, aux: list[Message]
+        self, processor_label: str, aux: list[Message | None]
     ) -> None:
         if processor_label not in self._mp:
             self._mediator.log_message(
@@ -683,7 +685,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
         self._mp[processor_label].receive_aux_data(aux)
 
     def give_virtual_state_block_aux_data(
-        self, target_label: str, aux: list[Message]
+        self, target_label: str, aux: list[Message | None]
     ) -> None:
         pass
 

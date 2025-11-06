@@ -240,7 +240,11 @@ def test() -> None:
         [first_time, final_time], InertialSolutionRangeType.INERTIAL_BEST_KNOWN_SOLUTION
     )
     assert continuous_solutions is not None
+    assert continuous_solutions[0] is not None
+    assert continuous_solutions[1] is not None
     assert best_solutions is not None
+    assert best_solutions[0] is not None
+    assert best_solutions[1] is not None
     assert isinstance(
         continuous_solutions[0].wrapped_message, MeasurementPositionVelocityAttitude
     )

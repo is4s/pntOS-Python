@@ -143,13 +143,16 @@ class Pinson15NedBlock(StandardStateBlock):
         self._old_pva_aux = None
         self._force_and_rate_aux = None
 
-    def receive_aux_data(self, aux: list[Message]) -> None:
+    def receive_aux_data(self, aux: list[Message | None]) -> None:
         """Receive inertial PVA and forces as aux data.
 
         Args:
-            aux (list[Message]): List of messages. Assumed to contain inertial solution in a PVA message and forces in an IMU message.
+            aux (list[Message | None]): List of messages. Assumed to contain inertial solution in a PVA message and forces in an IMU message.
         """
         for message in aux:
+            if message is None:
+                continue
+
             if isinstance(message.wrapped_message, MeasurementPVA):
                 pva = message.wrapped_message
                 if pva.quaternion is None:

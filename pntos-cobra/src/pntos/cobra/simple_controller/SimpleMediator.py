@@ -74,7 +74,7 @@ class SimpleMediator(Mediator):
         self,
         solution_times: list[TypeTimestamp],
         filter_description: str | None = None,
-    ) -> list[Message] | None:
+    ) -> list[Message | None] | None:
         assert self._orchestration_plugin is not None, (
             'Orchestration plugin used before initialized and passed to mediator.'
         )
@@ -110,7 +110,7 @@ class SimpleMediator(Mediator):
         # Print the current solution every second in message time
         if cur_time.elapsed_nsec - self._last_solution_time.elapsed_nsec > SEC_NS:
             solution = self.request_solutions([cur_time])
-            if solution is not None:
+            if solution is not None and solution[0] is not None:
                 self._log_message(LoggingLevel.DEBUG, f'Got a solution! {solution}')
                 for transport in self._transport_plugins:
                     self.broadcast_aspn_message(

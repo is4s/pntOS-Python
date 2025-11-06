@@ -70,11 +70,11 @@ class PinsonBodyVelocityMeasurementProcessor(StandardMeasurementProcessor):
         self._l_ps_p = l_ps_p
         self._orientation_ps_p = orientation_ps_p
 
-    def receive_aux_data(self, aux: list[Message]) -> None:
+    def receive_aux_data(self, aux: list[Message | None]) -> None:
         if not aux:
             self._mediator.log_message(
                 LoggingLevel.ERROR,
-                'PinsonBodyVelocityMeasurementProcessor expected aux data of type MeasurementPositionVelocityAttitude, but received empty list.',
+                'PinsonBodyVelocityMeasurementProcessor expected aux data of type MeasurementPositionVelocityAttitude and MeasurementImu, but received empty list.',
             )
             return
 
@@ -87,9 +87,16 @@ class PinsonBodyVelocityMeasurementProcessor(StandardMeasurementProcessor):
 
         if len(aux) > 2:  # noqa: PLR2004
             self._mediator.log_message(
-                LoggingLevel.DEBUG,
+                LoggingLevel.WARN,
                 f'PinsonBodyVelocityMeasurementProcessor expected two aux messages: MeasurementPositionVelocityAttitude and MeasurementImu, but received {len(aux)} aux messages. Ignoring all except the first two messages.',
             )
+
+        if aux[0] is None or aux[1] is None:
+            self._mediator.log_message(
+                LoggingLevel.ERROR,
+                'PinsonBodyVelocityMeasurementProcessor received a NULL message as aux data.',
+            )
+            return
 
         if not isinstance(aux[0].wrapped_message, MeasurementPositionVelocityAttitude):
             self._mediator.log_message(

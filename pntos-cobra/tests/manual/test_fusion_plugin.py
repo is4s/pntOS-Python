@@ -38,7 +38,7 @@ class _TestStateBlock(StandardStateBlock):
         self.label = label
         self.num_states = 4
 
-    def receive_aux_data(self, aux: list[Message]) -> None:
+    def receive_aux_data(self, aux: list[Message | None]) -> None:
         pass
 
     def generate_dynamics(
@@ -64,7 +64,7 @@ class _TestMeasurementProcessor(StandardMeasurementProcessor):
         self.label = label
         self.state_block_labels = state_block_labels
 
-    def receive_aux_data(self, aux: list[Message]) -> None:
+    def receive_aux_data(self, aux: list[Message | None]) -> None:
         pass
 
     def generate_model(

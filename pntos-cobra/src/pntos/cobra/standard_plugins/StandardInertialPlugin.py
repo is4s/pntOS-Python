@@ -98,10 +98,10 @@ class StandardInertial(StandardInertialMechanization):
 
     def request_solutions(
         self, times: list[TypeTimestamp], solution_type: InertialSolutionRangeType
-    ) -> list[Message] | None:
+    ) -> list[Message | None] | None:
         if len(times) == 0:
             return None
-        solutions = []
+        solutions: list[Message | None] = []
         first_time = convert_timestamp_to_cpp(times[0])
         for time in times:
             cpp_time = convert_timestamp_to_cpp(time)

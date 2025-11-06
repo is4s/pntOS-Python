@@ -73,7 +73,7 @@ class StateExtractor(VirtualStateBlock):
         for i in range(ind_count):
             self._jac[i, indices[i]] = 1.0
 
-    def receive_aux_data(self, aux: list[Message]) -> None:
+    def receive_aux_data(self, aux: list[Message | None]) -> None:
         self._mediator.log_message(
             LoggingLevel.WARN,
             'StateExtractor does not require aux data. This method is unimplemented.',

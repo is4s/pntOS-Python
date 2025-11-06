@@ -229,7 +229,7 @@ class OrchestrationPlugin(CommonPlugin, ABC):
         self,
         solution_times: list[TypeTimestamp],
         filter_description: str | None = None,
-    ) -> list[Message] | None:
+    ) -> list[Message | None] | None:
         """
         Request filtering solutions at the times specified in the array ``solution_times``.
 
@@ -244,7 +244,7 @@ class OrchestrationPlugin(CommonPlugin, ABC):
                 endeavor to return its best solution.
 
         Returns:
-            list[Message] | None: An array of messages containing the filter solutions for the requested
+            list[Message | None] | None: An array of messages containing the filter solutions for the requested
             ``solution_times``. The number of solutions should equal the number of times in
             ``solution_times``, although some entries may be ``None`` if they are unavailable at the
             corresponding time in ``solution_times``. The returned :class:`pntos.api.Message` list may be

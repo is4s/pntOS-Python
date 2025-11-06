@@ -41,7 +41,7 @@ class ClockBiasStateBlock(StandardStateBlock):
         self._h_neg2 = h_neg2
         self._q3 = q3
 
-    def receive_aux_data(self, _: list[Message]) -> None:
+    def receive_aux_data(self, _: list[Message | None]) -> None:
         pass
 
     def generate_dynamics(

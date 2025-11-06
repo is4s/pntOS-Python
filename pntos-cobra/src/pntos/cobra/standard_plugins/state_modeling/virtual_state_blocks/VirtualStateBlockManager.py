@@ -215,14 +215,14 @@ class VirtualStateBlockManager:
         return out
 
     def give_virtual_state_block_aux_data(
-        self, target: str, aux: list[Message]
+        self, target: str, aux: list[Message | None]
     ) -> None:
         """
         Provides the :class:`pntos.api.VirtualStateBlock` with target label ``target`` with the data in ``aux``.
 
         Args:
             target (str): The unique label that identifies what :class:`pntos.api.VirtualStateBlock`
-            aux (list[Message]): The auxiliary data to give to the :class:`pntos.api.VirtualStateBlock`
+            aux (list[Message | None]): The auxiliary data to give to the :class:`pntos.api.VirtualStateBlock`
         """
         if target not in self._node_map:
             self.mediator.log_message(

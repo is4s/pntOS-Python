@@ -75,7 +75,7 @@ class PinsonWithLeverArmPositionMeasurementProcessor(StandardMeasurementProcesso
                 f'PinsonWithLeverArmPositionMeasurementProcessor requires {self._num_required_blocks} state blocks, got {state_block_labels}.',
             )
 
-    def receive_aux_data(self, aux: list[Message]) -> None:
+    def receive_aux_data(self, aux: list[Message | None]) -> None:
         """
         Receive aux data.
 
@@ -86,10 +86,10 @@ class PinsonWithLeverArmPositionMeasurementProcessor(StandardMeasurementProcesso
         represents the estimated errors in this nominal PVA.
 
         Args:
-            aux (list[Message]): Aux data to process. Expected to be length 1 and contain a
+            aux (list[Message | None]): Aux data to process. Expected to be length 1 and contain a
                 ``MeasurementPositionVelocityAttitude`` with a valid quaternion.
         """
-        if not aux:
+        if not aux or aux[0] is None:
             self._mediator.log_message(
                 LoggingLevel.ERROR,
                 'PinsonWithLeverArmPositionMeasurementProcessor expected aux data of type \

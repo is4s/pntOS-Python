@@ -656,7 +656,7 @@ class MyOrchestrationPlugin(OrchestrationPlugin):
 
     def request_solutions(
         self, solution_times: list[TypeTimestamp], filter_description: str | None = None
-    ) -> list[Message] | None:
+    ) -> list[Message | None] | None:
         # This method should use the solution computed in `process_pntos_message`
         # and stored away in `self` in order to return a solution at the requested time.
         return None
@@ -726,7 +726,7 @@ The next method is:
 ```Python
 def request_solutions(
     self, solution_times: list[TypeTimestamp], filter_description: str | None = None
-) -> list[Message] | None:
+) -> list[Message | None] | None:
     # This method should use the solution computed in `process_pntos_message`
     # and stored away in `self` in order to return a solution at the requested time.
     return None

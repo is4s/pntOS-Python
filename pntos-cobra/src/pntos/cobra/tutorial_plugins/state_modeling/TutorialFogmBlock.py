@@ -44,11 +44,11 @@ class TutorialFogmBlock(StandardStateBlock):
         self._Q = diagflat(2.0 * pow(sigmas, 2.0) / taus)
         self._I = eye(self.num_states)
 
-    def receive_aux_data(self, aux: list[Message]) -> None:
+    def receive_aux_data(self, aux: list[Message | None]) -> None:
         """Receive aux data. Unused for this class.
 
         Args:
-            aux (list[Message]): List of messages.
+            aux (list[Message | None]): List of messages.
         """
         return
 
