@@ -8,6 +8,7 @@ from pntos.api.plugins.state_modeling import (
     VirtualStateBlock,
 )
 from pntos.cobra.config import (
+    ClockBiasStateBlockConfig,
     FogmStateBlockConfig,
     PinsonStateBlockConfig,
     SensorMeasurementProcessorConfig,
@@ -15,6 +16,7 @@ from pntos.cobra.config import (
 )
 
 from .AltitudeMeasurementProcessor import AltitudeMeasurementProcessor
+from .ClockBiasStateBlock import ClockBiasStateBlock
 from .FogmBlock import FogmBlock
 from .Pinson15NedBlock import Pinson15NedBlock
 from .PinsonBodyVelocityMeasurementProcessor import (
@@ -55,7 +57,7 @@ class StandardGpsInsStateModelProvider(StandardStateModelProvider):
             'pinson_body_velocity',
             'pinson_posvel',
         ]
-        self.block_identifiers: list[str] = ['pinson15', 'fogm']
+        self.block_identifiers: list[str] = ['pinson15', 'fogm', 'clock_bias']
         self.virtual_block_identifiers = None
 
     def new_processor(
@@ -247,7 +249,7 @@ class StandardGpsInsStateModelProvider(StandardStateModelProvider):
         engine: StandardFusionEngine | None,
         label: str,
         config_group: str | None,
-    ) -> Pinson15NedBlock | FogmBlock | None:
+    ) -> Pinson15NedBlock | FogmBlock | ClockBiasStateBlock | None:
         """
         Generate a new StandardStateBlock that describes a set of states and how they propagate over time.
 
@@ -256,6 +258,7 @@ class StandardGpsInsStateModelProvider(StandardStateModelProvider):
 
                 - Index 0 corresponds to a Pinson15NedBlock.
                 - Index 1 corresponds to a FogmBlock.
+                - Index 2 corresponds to a ClockBiasStateBlock.
                 - All other indices will result in a return value of None.
             engine (StandardFusionEngine | None): An optional parameter that may be provided to the
                 new block, such that the block may interact with the fusion engine it
@@ -276,54 +279,79 @@ class StandardGpsInsStateModelProvider(StandardStateModelProvider):
             StandardStateBlock | None: The newly created StandardStateBlock or ``None`` when no state block can be produced
             with the given ``block_index``, ``engine``, and ``config_group``.
         """
-        if block_index == 0:
-            if config_group is None:
+        match block_index:
+            case 0:
+                if config_group is None:
+                    self._mediator.log_message(
+                        LoggingLevel.ERROR,
+                        f'A config group is required for state block {self.block_identifiers[block_index]}',
+                    )
+                    return None
+                pinson_sb_config = config_from_registry(
+                    PinsonStateBlockConfig, self._mediator, config_group
+                )
+                if pinson_sb_config is None:
+                    self._mediator.log_message(
+                        LoggingLevel.ERROR,
+                        'Could not get IMU config from registry.',
+                    )
+                    return None
+
+                return Pinson15NedBlock(
+                    label, self._mediator, pinson_sb_config.imu_model
+                )
+
+            case 1:
+                if config_group is None:
+                    self._mediator.log_message(
+                        LoggingLevel.ERROR,
+                        f'A config group is required for state block {self.block_identifiers[block_index]}',
+                    )
+                    return None
+                fogm_sb_config = config_from_registry(
+                    FogmStateBlockConfig, self._mediator, config_group
+                )
+                if fogm_sb_config is None:
+                    self._mediator.log_message(
+                        LoggingLevel.ERROR,
+                        'Could not get fogm config from registry.',
+                    )
+                    return None
+
+                return FogmBlock(
+                    label,
+                    self._mediator,
+                    np.array(fogm_sb_config.fogm_model.sigma),
+                    np.array(fogm_sb_config.fogm_model.tau),
+                )
+
+            case 2:
+                if config_group is None:
+                    self._mediator.log_message(
+                        LoggingLevel.ERROR,
+                        f'A config group is required for state block {self.block_identifiers[block_index]}',
+                    )
+                    return None
+                sb_config = config_from_registry(
+                    ClockBiasStateBlockConfig, self._mediator, config_group
+                )
+                if sb_config is None:
+                    self._mediator.log_message(
+                        LoggingLevel.ERROR,
+                        f'Could not get config for state block "{label}" from registry.',
+                    )
+                    return None
+
+                return ClockBiasStateBlock(
+                    self._mediator, sb_config.h_0, sb_config.h_neg2, sb_config.q3
+                )
+
+            case _:
                 self._mediator.log_message(
                     LoggingLevel.ERROR,
-                    f'A config group is required for state block {self.block_identifiers[block_index]}',
+                    f'Invalid block index of {block_index}. StandardGpsInsStateModelProvider provides {len(self.block_identifiers)} state blocks.',
                 )
                 return None
-            pinson_sb_config = config_from_registry(
-                PinsonStateBlockConfig, self._mediator, config_group
-            )
-            if pinson_sb_config is None:
-                self._mediator.log_message(
-                    LoggingLevel.ERROR,
-                    'Could not get IMU config from registry.',
-                )
-                return None
-
-            return Pinson15NedBlock(label, self._mediator, pinson_sb_config.imu_model)
-
-        if block_index == 1:
-            if config_group is None:
-                self._mediator.log_message(
-                    LoggingLevel.ERROR,
-                    f'A config group is required for state block {self.block_identifiers[block_index]}',
-                )
-                return None
-            fogm_sb_config = config_from_registry(
-                FogmStateBlockConfig, self._mediator, config_group
-            )
-            if fogm_sb_config is None:
-                self._mediator.log_message(
-                    LoggingLevel.ERROR,
-                    'Could not get fogm config from registry.',
-                )
-                return None
-
-            return FogmBlock(
-                label,
-                self._mediator,
-                np.array(fogm_sb_config.fogm_model.sigma),
-                np.array(fogm_sb_config.fogm_model.tau),
-            )
-
-        self._mediator.log_message(
-            LoggingLevel.ERROR,
-            f'Invalid block index of {block_index}. StandardGpsInsStateModelProvider provides {len(self.block_identifiers)} state blocks.',
-        )
-        return None
 
     def new_virtual_block(
         self,

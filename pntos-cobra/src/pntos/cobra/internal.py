@@ -27,6 +27,9 @@ from .standard_plugins.StandardRegistryPlugin import (
 from .standard_plugins.state_modeling.AltitudeMeasurementProcessor import (
     AltitudeMeasurementProcessor as AltitudeMeasurementProcessor,
 )
+from .standard_plugins.state_modeling.ClockBiasStateBlock import (
+    ClockBiasStateBlock as ClockBiasStateBlock,
+)
 from .standard_plugins.state_modeling.FogmBlock import (
     FogmBlock as FogmBlock,
 )
