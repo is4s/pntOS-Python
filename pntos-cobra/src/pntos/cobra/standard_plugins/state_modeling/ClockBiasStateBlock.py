@@ -28,12 +28,14 @@ class ClockBiasStateBlock(StandardStateBlock):
 
     def __init__(
         self,
+        label: str,
         mediator: Mediator,
         h_0: float,
         h_neg2: float,
         q3: float | None,
     ) -> None:
         self._mediator = mediator
+        self.label = label
         self.num_states = 2 if q3 is None else 3
         self._h_0 = h_0
         self._h_neg2 = h_neg2

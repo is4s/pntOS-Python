@@ -2,6 +2,9 @@ from .BaseConfig import BaseConfig as BaseConfig
 from .ClockBiasStateBlockConfig import (
     ClockBiasStateBlockConfig as ClockBiasStateBlockConfig,
 )
+from .ConstantStateBlockConfig import (
+    ConstantStateBlockConfig as ConstantStateBlockConfig,
+)
 from .FogmConfig import FogmConfig as FogmConfig
 from .ImuConfig import ImuConfig as ImuConfig
 from .InertialConfig import InertialConfig as InertialConfig

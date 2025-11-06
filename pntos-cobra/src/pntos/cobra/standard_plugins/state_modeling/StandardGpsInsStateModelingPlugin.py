@@ -9,6 +9,7 @@ from pntos.api.plugins.state_modeling import (
 )
 from pntos.cobra.config import (
     ClockBiasStateBlockConfig,
+    ConstantStateBlockConfig,
     FogmStateBlockConfig,
     PinsonStateBlockConfig,
     SensorMeasurementProcessorConfig,
@@ -17,6 +18,7 @@ from pntos.cobra.config import (
 
 from .AltitudeMeasurementProcessor import AltitudeMeasurementProcessor
 from .ClockBiasStateBlock import ClockBiasStateBlock
+from .ConstantStateBlock import ConstantStateBlock
 from .FogmBlock import FogmBlock
 from .Pinson15NedBlock import Pinson15NedBlock
 from .PinsonBodyVelocityMeasurementProcessor import (
@@ -57,7 +59,12 @@ class StandardGpsInsStateModelProvider(StandardStateModelProvider):
             'pinson_body_velocity',
             'pinson_posvel',
         ]
-        self.block_identifiers: list[str] = ['pinson15', 'fogm', 'clock_bias']
+        self.block_identifiers: list[str] = [
+            'pinson15',
+            'fogm',
+            'clock_bias',
+            'constant',
+        ]
         self.virtual_block_identifiers = None
 
     def new_processor(
@@ -249,7 +256,7 @@ class StandardGpsInsStateModelProvider(StandardStateModelProvider):
         engine: StandardFusionEngine | None,
         label: str,
         config_group: str | None,
-    ) -> Pinson15NedBlock | FogmBlock | ClockBiasStateBlock | None:
+    ) -> Pinson15NedBlock | FogmBlock | ClockBiasStateBlock | ConstantStateBlock | None:
         """
         Generate a new StandardStateBlock that describes a set of states and how they propagate over time.
 
@@ -259,6 +266,7 @@ class StandardGpsInsStateModelProvider(StandardStateModelProvider):
                 - Index 0 corresponds to a Pinson15NedBlock.
                 - Index 1 corresponds to a FogmBlock.
                 - Index 2 corresponds to a ClockBiasStateBlock.
+                - Index 3 corresponds to a ConstantStateBlock.
                 - All other indices will result in a return value of None.
             engine (StandardFusionEngine | None): An optional parameter that may be provided to the
                 new block, such that the block may interact with the fusion engine it
@@ -343,7 +351,37 @@ class StandardGpsInsStateModelProvider(StandardStateModelProvider):
                     return None
 
                 return ClockBiasStateBlock(
-                    self._mediator, sb_config.h_0, sb_config.h_neg2, sb_config.q3
+                    label, self._mediator, sb_config.h_0, sb_config.h_neg2, sb_config.q3
+                )
+            case 3:
+                if config_group is None:
+                    self._mediator.log_message(
+                        LoggingLevel.ERROR,
+                        f'A config group is required for state block {self.block_identifiers[block_index]}',
+                    )
+                    return None
+                constant_sb_config = config_from_registry(
+                    ConstantStateBlockConfig, self._mediator, config_group
+                )
+                if constant_sb_config is None:
+                    self._mediator.log_message(
+                        LoggingLevel.ERROR,
+                        f'Could not get config for state block "{label}" from registry.',
+                    )
+                    return None
+                x_and_p = constant_sb_config.estimate_with_covariance
+                if x_and_p is None:
+                    self._mediator.log_message(
+                        LoggingLevel.ERROR,
+                        f'Missing initial EstimateWithCovariance for state block "{label}". Cannot initialize block.',
+                    )
+                    return None
+
+                return ConstantStateBlock(
+                    label,
+                    self._mediator,
+                    num_states=x_and_p.estimate.shape[0],
+                    Q=np.array(constant_sb_config.Q),
                 )
 
             case _:

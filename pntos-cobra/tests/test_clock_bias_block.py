@@ -50,7 +50,9 @@ def block(mediator: SimpleMediator) -> ClockBiasStateBlock:
     )
     assert config is not None
 
-    return ClockBiasStateBlock(mediator, config.h_0, config.h_neg2, config.q3)
+    return ClockBiasStateBlock(
+        config.label, mediator, config.h_0, config.h_neg2, config.q3
+    )
 
 
 def test_generate_dynamics_2state(block: ClockBiasStateBlock) -> None:
