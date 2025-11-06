@@ -115,7 +115,7 @@ def validate_manual_ewc(
     if len(cov) != num_states:
         mediator.log_message(
             LoggingLevel.ERROR,
-            f'Expected covariance to correspond to {num_states} states but it instead corresponds to {len(est)} states.',
+            f'Expected covariance to correspond to {num_states} states but it instead corresponds to {len(cov)} states.',
         )
         return None
     if cov.ndim == 2 and cov.shape[0] != cov.shape[1]:  # noqa: PLR2004
