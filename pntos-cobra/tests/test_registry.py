@@ -94,7 +94,7 @@ class DummyMediator(Mediator):
         self,
         solution_times: list[TypeTimestamp],
         filter_description: str | None = None,
-    ) -> list[Message] | None:
+    ) -> list[Message | None] | None:
         return None
 
     def process_pntos_message(self, message: Message) -> None:

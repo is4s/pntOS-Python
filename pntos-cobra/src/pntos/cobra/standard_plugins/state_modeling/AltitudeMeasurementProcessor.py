@@ -58,9 +58,9 @@ class AltitudeMeasurementProcessor(StandardMeasurementProcessor):
         self._inertial_solution_time_nsec = None
         self._inertial_pos = np.zeros(3)
 
-    def receive_aux_data(self, aux: list[Message]) -> None:
+    def receive_aux_data(self, aux: list[Message | None]) -> None:
         # Receive and store estimated inertial solution
-        if not aux:
+        if not aux or aux[0] is None:
             self._mediator.log_message(
                 LoggingLevel.ERROR,
                 'AltitudeMeasurementProcessor expected aux data of type MeasurementPositionVelocityAttitude, but received empty list.',

@@ -48,8 +48,8 @@ class PinsonVelocityMeasurementProcessor(StandardMeasurementProcessor):
         self._mediator = mediator
         self._inertial_pva = None
 
-    def receive_aux_data(self, aux: list[Message]) -> None:
-        if not aux:
+    def receive_aux_data(self, aux: list[Message | None]) -> None:
+        if not aux or aux[0] is None:
             self._mediator.log_message(
                 LoggingLevel.ERROR,
                 'PinsonVelocityMeasurementProcessor expected aux data of type MeasurementPositionVelocityAttitude, but received empty list.',

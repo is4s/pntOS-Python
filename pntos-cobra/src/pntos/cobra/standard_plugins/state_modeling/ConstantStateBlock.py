@@ -34,7 +34,7 @@ class ConstantStateBlock(StandardStateBlock):
         self.num_states = num_states
         self._Q = Q if Q is not None else np.zeros((num_states, num_states))
 
-    def receive_aux_data(self, _: list[Message]) -> None:
+    def receive_aux_data(self, _: list[Message | None]) -> None:
         pass
 
     def generate_dynamics(

@@ -393,7 +393,7 @@ class TutorialGpsOrchestrationPlugin(OrchestrationPlugin):
         self,
         solution_times: list[TypeTimestamp],
         filter_description: str | None = None,
-    ) -> list[Message] | None:
+    ) -> list[Message | None] | None:
         if (
             not initialization_ready(self.initialization_state, self.initializer)
             or self.init_solution is None

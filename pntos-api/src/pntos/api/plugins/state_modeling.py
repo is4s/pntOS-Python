@@ -90,7 +90,7 @@ class StandardStateBlock(ABC):
     num_states: int
 
     @abstractmethod
-    def receive_aux_data(self, aux: list[Message]) -> None:
+    def receive_aux_data(self, aux: list[Message | None]) -> None:
         """
         Receive and use an arbitrary collection of aux data.
 
@@ -99,7 +99,7 @@ class StandardStateBlock(ABC):
         corresponding to this state block's ``label``.
 
         Args:
-            aux (list[Message])
+            aux (list[Message | None])
         """
         pass
 
@@ -163,7 +163,7 @@ class VirtualStateBlock(ABC):
     target: str
 
     @abstractmethod
-    def receive_aux_data(self, aux: list[Message]) -> None:
+    def receive_aux_data(self, aux: list[Message | None]) -> None:
         """
         Receive and use an arbitrary collection of aux data.
 
@@ -172,7 +172,7 @@ class VirtualStateBlock(ABC):
         label corresponding to this :class:`pntos.api.VirtualStateBlock` 's ``target``.
 
         Args:
-            aux (list[Message])
+            aux (list[Message | None])
         """
         pass
 
@@ -266,7 +266,7 @@ class StandardMeasurementProcessor(ABC):
     state_block_labels: list[str]
 
     @abstractmethod
-    def receive_aux_data(self, aux: list[Message]) -> None:
+    def receive_aux_data(self, aux: list[Message | None]) -> None:
         """
         Receive and use an arbitrary collection of aux data.
 
@@ -275,7 +275,7 @@ class StandardMeasurementProcessor(ABC):
         a label corresponding to this measurement processor's ``label``.
 
         Args:
-            aux (list[Message])
+            aux (list[Message | None])
         """
         pass
 

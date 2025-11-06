@@ -44,8 +44,10 @@ class TutorialPinsonVelocityMeasurementProcessor(StandardMeasurementProcessor):
         self._mediator = mediator
         self._inertial_pva = None
 
-    def receive_aux_data(self, aux: list[Message]) -> None:
-        if not isinstance(aux[0].wrapped_message, MeasurementPositionVelocityAttitude):
+    def receive_aux_data(self, aux: list[Message | None]) -> None:
+        if aux[0] is None or not isinstance(
+            aux[0].wrapped_message, MeasurementPositionVelocityAttitude
+        ):
             return
         pva = aux[0].wrapped_message
         self._inertial_pva = pva

@@ -829,7 +829,7 @@ class Mediator(ABC):
         self,
         solution_times: list[TypeTimestamp],
         filter_description: str | None = None,
-    ) -> list[Message] | None:
+    ) -> list[Message | None] | None:
         """
         Request filtering solutions at the times specified in the array ``solution_times``.
 
@@ -843,7 +843,7 @@ class Mediator(ABC):
                 the implementation should endeavor to return its best solution.
 
         Returns:
-            list[Message] | None: An array of messages containing the filter solutions for the requested
+            list[Message | None] | None: An array of messages containing the filter solutions for the requested
             ``solution_times``. Some entries may be ``None`` if they are unavailable at the corresponding time
             in ``solution_times``. The returned :class:`pntos.api.Message` array may be ``None`` if
             ``filter_description`` is invalid.

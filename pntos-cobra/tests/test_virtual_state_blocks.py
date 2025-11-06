@@ -65,9 +65,9 @@ class PinsonErrorToStandardWrapped(VirtualStateBlock):
             ),
         )
 
-    def receive_aux_data(self, aux: list[Message]) -> None:
+    def receive_aux_data(self, aux: list[Message | None]) -> None:
         for msg in reversed(aux):
-            if isinstance(msg.wrapped_message, MeasurementPVA):
+            if msg is not None and isinstance(msg.wrapped_message, MeasurementPVA):
                 self._pva = msg.wrapped_message
                 break
 
@@ -374,7 +374,7 @@ def test_give_aux_data(mediator: SimpleMediator, pva: Message) -> None:
     vsbm = VirtualStateBlockManager(mediator)
     vsb = PinsonErrorToStandard(mediator, VSB_SOURCE, 'give_data')
     vsbm.add_virtual_state_block(vsb)
-    aux = [pva]
+    aux: list[Message | None] = [pva]
     vsbm.give_virtual_state_block_aux_data('give_data', aux)
     node = vsbm._node_map['give_data']
     assert node.block._pva.p1 == pva.wrapped_message.p1  # type: ignore

@@ -150,7 +150,7 @@ class CommonInertial(ABC):
     @abstractmethod
     def request_solutions(
         self, times: list[TypeTimestamp], solution_type: InertialSolutionRangeType
-    ) -> list[Message] | None:
+    ) -> list[Message | None] | None:
         """
         Request solutions at multiple specific times.
 
@@ -159,7 +159,7 @@ class CommonInertial(ABC):
             solution_type (InertialSolutionRangeType): The type of solution requested.
 
         Returns:
-            list[Message] | None: An array of solutions. Returns ``None`` if ``solution_type`` is unsupported
+            list[Message | None] | None: An array of solutions. Returns ``None`` if ``solution_type`` is unsupported
             by this inertial or every instance of ``times`` is outside the valid range. Otherwise
             guaranteed to not be ``None``.
         """
