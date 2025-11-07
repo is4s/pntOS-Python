@@ -113,7 +113,7 @@ modules in the Python interpreter:
     >>> from pntos.api import ControllerPlugin
     >>> from pntos.cobra import StandardControllerPlugin
     >>> StandardControllerPlugin
-    <class 'pntos.cobra.simple_controller.StandardControllerPlugin.StandardControllerPlugin'>
+    <class 'pntos.cobra.standard_plugins.controller.StandardControllerPlugin.StandardControllerPlugin'>
     >>> ControllerPlugin
     <class 'pntos.api.plugins.controller.ControllerPlugin'>
 ```
