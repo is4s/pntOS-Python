@@ -18,6 +18,7 @@ class LcmTransportPlugin(TransportPlugin):
     subscription: LCMSubscription
     handler: Thread | None
     _url: str
+    _subscription_regex: str
     _shutdown_threads: threading.Event
     _channels: set[str]
 
@@ -58,6 +59,7 @@ class LcmTransportPlugin(TransportPlugin):
 
         self._output_version = config.output_version
         self._url = config.url
+        self._subscription_regex = config.subscribe_to
 
     def shutdown_plugin(self) -> None:
         """
@@ -82,10 +84,11 @@ class LcmTransportPlugin(TransportPlugin):
     def start_listening(self) -> None:
         self.lcm = LCM(self._url)
         self.subscription: LCMSubscription = self.lcm.subscribe(
-            '^((?!pntos).)*$', self._general_handler
+            self._subscription_regex, self._general_handler
         )
         self.mediator.log_message(
-            LoggingLevel.DEBUG, 'Subscribed to all available channels.'
+            LoggingLevel.DEBUG,
+            f'Subscribed to all channels matching the pattern: {self._subscription_regex}.',
         )
 
         self.handler = Thread(target=self._handler_thread, args=[])

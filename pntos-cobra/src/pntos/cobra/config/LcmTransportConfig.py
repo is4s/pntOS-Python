@@ -28,11 +28,13 @@ class LcmTransportConfig(BaseConfig):
         group (str): Inherited from BaseConfig. The registry group in which to store this config.
         output_version (AspnVersion): The version of ASPN messages to output.
         url (str): LCM URL to which the transport should connect. Will subscribe and publish to this address.
+        subscribe_to (str): A regex string indicating which channels to which the transport should subscribe.
     """
 
     group: str
     output_version: AspnVersion
     url: str = 'tcpq://'
+    subscribe_to: str = '^((?!pntos).)*$'
 
 
 @dataclass
