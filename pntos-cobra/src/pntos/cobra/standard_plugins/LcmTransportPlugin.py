@@ -6,8 +6,6 @@ from pntos.api import LoggingLevel, Mediator, Message, TransportPlugin
 from pntos.cobra.config import LcmTransportConfig, config_from_registry
 from pntos.cobra.utils import create_lcm_message, process_lcm_message
 
-LCM_URL = 'tcpq://localhost:7700'
-
 
 class LcmTransportPlugin(TransportPlugin):
     """A transport plugin which listens for LCM messages.
@@ -19,6 +17,7 @@ class LcmTransportPlugin(TransportPlugin):
     mediator: Mediator
     subscription: LCMSubscription
     handler: Thread | None
+    _url: str
     _shutdown_threads: threading.Event
     _channels: set[str]
 
@@ -58,6 +57,7 @@ class LcmTransportPlugin(TransportPlugin):
             return
 
         self._output_version = config.output_version
+        self._url = config.url
 
     def shutdown_plugin(self) -> None:
         """
@@ -80,11 +80,10 @@ class LcmTransportPlugin(TransportPlugin):
             self.lcm.handle_timeout(10)
 
     def start_listening(self) -> None:
-        self.lcm = LCM(LCM_URL)
+        self.lcm = LCM(self._url)
         self.subscription: LCMSubscription = self.lcm.subscribe(
             '^((?!pntos).)*$', self._general_handler
         )
-        self.mediator.log_message(LoggingLevel.DEBUG, 'LCM tcpq connected.')
         self.mediator.log_message(
             LoggingLevel.DEBUG, 'Subscribed to all available channels.'
         )
