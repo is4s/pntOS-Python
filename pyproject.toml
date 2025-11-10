@@ -14,8 +14,8 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
 ]
 dependencies = [
-    "analysis-lcm @ git+ssh://git@git.aspn.us/pntos/analysis-scripts.git@69c8f1b9336df140d5835f5ccd0a684aa4e29465#subdirectory=analysis-lcm",
-    "analysis-ros @ git+ssh://git@git.aspn.us/pntos/analysis-scripts.git@69c8f1b9336df140d5835f5ccd0a684aa4e29465#subdirectory=analysis-ros",
+    "analysis-lcm @ git+ssh://git@git.aspn.us/pntos/analysis-scripts.git@81156ca808b30743ebf63f6d1f712afa3620d9aa#subdirectory=analysis-lcm",
+    "analysis-ros @ git+ssh://git@git.aspn.us/pntos/analysis-scripts.git@81156ca808b30743ebf63f6d1f712afa3620d9aa#subdirectory=analysis-ros",
     "matplotlib",
     "pntos-api",
     "pntos-cobra",

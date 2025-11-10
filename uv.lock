@@ -25,7 +25,7 @@ wheels = [
 [[package]]
 name = "analysis-lcm"
 version = "0.1.0"
-source = { git = "ssh://git@git.aspn.us/pntos/analysis-scripts.git?subdirectory=analysis-lcm&rev=69c8f1b9336df140d5835f5ccd0a684aa4e29465#69c8f1b9336df140d5835f5ccd0a684aa4e29465" }
+source = { git = "ssh://git@git.aspn.us/pntos/analysis-scripts.git?subdirectory=analysis-lcm&rev=81156ca808b30743ebf63f6d1f712afa3620d9aa#81156ca808b30743ebf63f6d1f712afa3620d9aa" }
 dependencies = [
     { name = "inu" },
     { name = "tabulate" },
@@ -36,15 +36,15 @@ dependencies = [
 [[package]]
 name = "analysis-ros"
 version = "0.1.0"
-source = { git = "ssh://git@git.aspn.us/pntos/analysis-scripts.git?subdirectory=analysis-ros&rev=69c8f1b9336df140d5835f5ccd0a684aa4e29465#69c8f1b9336df140d5835f5ccd0a684aa4e29465" }
+source = { git = "ssh://git@git.aspn.us/pntos/analysis-scripts.git?subdirectory=analysis-ros&rev=81156ca808b30743ebf63f6d1f712afa3620d9aa#81156ca808b30743ebf63f6d1f712afa3620d9aa" }
 dependencies = [
     { name = "analysis-lcm" },
 ]
 
 [[package]]
-name = "aspn-lcm"
-version = "2.2"
-source = { git = "ssh://git@git.aspn.us/pntos/lcm-generated.git?subdirectory=python&rev=14045fe000e4395bf81708e963aea09948e52949#14045fe000e4395bf81708e963aea09948e52949" }
+name = "aspn2-lcm"
+version = "2.2.post1"
+source = { git = "ssh://git@git.aspn.us/pntos/lcm-generated.git?subdirectory=python&rev=831a7727bffab217b3de60491dc12b96b50887a1#831a7727bffab217b3de60491dc12b96b50887a1" }
 dependencies = [
     { name = "lcm" },
 ]
@@ -52,9 +52,9 @@ dependencies = [
 [[package]]
 name = "aspn2-translations"
 version = "0.1.0"
-source = { git = "ssh://git@git.aspn.us/pntos/firehose-outputs.git?subdirectory=aspn2_to_aspn_py_translations&rev=9e2a4f463ff4288bd40098ebf775304966a76393#9e2a4f463ff4288bd40098ebf775304966a76393" }
+source = { git = "ssh://git@git.aspn.us/pntos/firehose-outputs.git?subdirectory=aspn2_to_aspn_py_translations&rev=1cd02aa9bd7f9cd33a5ee7842c2f7ff2f31a3415#1cd02aa9bd7f9cd33a5ee7842c2f7ff2f31a3415" }
 dependencies = [
-    { name = "aspn-lcm" },
+    { name = "aspn2-lcm" },
     { name = "aspn23" },
     { name = "lcm" },
     { name = "numpy" },
@@ -62,16 +62,16 @@ dependencies = [
 
 [[package]]
 name = "aspn23"
-version = "0.0.0"
-source = { git = "ssh://git@git.aspn.us/pntos/firehose-outputs.git?subdirectory=aspn-py&rev=d425e26330e62371038f14ad12a8d8b4374698a6#d425e26330e62371038f14ad12a8d8b4374698a6" }
+version = "0.1.0"
+source = { git = "ssh://git@git.aspn.us/pntos/firehose-outputs.git?subdirectory=aspn-py&rev=b8a34d86cf501fff795ea1953b076c92abca2465#b8a34d86cf501fff795ea1953b076c92abca2465" }
 dependencies = [
     { name = "numpy" },
 ]
 
 [[package]]
 name = "aspn23-lcm"
-version = "0.0.0"
-source = { git = "ssh://git@git.aspn.us/pntos/firehose-outputs.git?subdirectory=lcm%2Fpython&rev=50b596d2c349ceb98b60ab6aecc91961424bcec8#50b596d2c349ceb98b60ab6aecc91961424bcec8" }
+version = "0.1.0"
+source = { git = "ssh://git@git.aspn.us/pntos/firehose-outputs.git?subdirectory=lcm%2Fpython&rev=b8a34d86cf501fff795ea1953b076c92abca2465#b8a34d86cf501fff795ea1953b076c92abca2465" }
 dependencies = [
     { name = "lcm" },
 ]
@@ -1351,7 +1351,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "aspn23", git = "ssh://git@git.aspn.us/pntos/firehose-outputs.git?subdirectory=aspn-py&rev=d425e26330e62371038f14ad12a8d8b4374698a6" },
+    { name = "aspn23", git = "ssh://git@git.aspn.us/pntos/firehose-outputs.git?subdirectory=aspn-py&rev=b8a34d86cf501fff795ea1953b076c92abca2465" },
     { name = "numpy" },
 ]
 
@@ -1362,7 +1362,7 @@ source = { editable = "pntos-cobra" }
 dependencies = [
     { name = "analysis-lcm" },
     { name = "analysis-ros" },
-    { name = "aspn-lcm" },
+    { name = "aspn2-lcm" },
     { name = "aspn2-translations" },
     { name = "aspn23" },
     { name = "aspn23-lcm" },
@@ -1379,16 +1379,16 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "analysis-lcm", git = "ssh://git@git.aspn.us/pntos/analysis-scripts.git?subdirectory=analysis-lcm&rev=69c8f1b9336df140d5835f5ccd0a684aa4e29465" },
-    { name = "analysis-ros", git = "ssh://git@git.aspn.us/pntos/analysis-scripts.git?subdirectory=analysis-ros&rev=69c8f1b9336df140d5835f5ccd0a684aa4e29465" },
-    { name = "aspn-lcm", git = "ssh://git@git.aspn.us/pntos/lcm-generated.git?subdirectory=python&rev=14045fe000e4395bf81708e963aea09948e52949" },
-    { name = "aspn2-translations", git = "ssh://git@git.aspn.us/pntos/firehose-outputs.git?subdirectory=aspn2_to_aspn_py_translations&rev=9e2a4f463ff4288bd40098ebf775304966a76393" },
-    { name = "aspn23", git = "ssh://git@git.aspn.us/pntos/firehose-outputs.git?subdirectory=aspn-py&rev=d425e26330e62371038f14ad12a8d8b4374698a6" },
-    { name = "aspn23-lcm", git = "ssh://git@git.aspn.us/pntos/firehose-outputs.git?subdirectory=lcm%2Fpython&rev=50b596d2c349ceb98b60ab6aecc91961424bcec8" },
-    { name = "h5py", specifier = ">1.0.0" },
-    { name = "lcm", specifier = "==1.5.1" },
+    { name = "analysis-lcm", git = "ssh://git@git.aspn.us/pntos/analysis-scripts.git?subdirectory=analysis-lcm&rev=81156ca808b30743ebf63f6d1f712afa3620d9aa" },
+    { name = "analysis-ros", git = "ssh://git@git.aspn.us/pntos/analysis-scripts.git?subdirectory=analysis-ros&rev=81156ca808b30743ebf63f6d1f712afa3620d9aa" },
+    { name = "aspn2-lcm", git = "ssh://git@git.aspn.us/pntos/lcm-generated.git?subdirectory=python&rev=831a7727bffab217b3de60491dc12b96b50887a1" },
+    { name = "aspn2-translations", git = "ssh://git@git.aspn.us/pntos/firehose-outputs.git?subdirectory=aspn2_to_aspn_py_translations&rev=1cd02aa9bd7f9cd33a5ee7842c2f7ff2f31a3415" },
+    { name = "aspn23", git = "ssh://git@git.aspn.us/pntos/firehose-outputs.git?subdirectory=aspn-py&rev=b8a34d86cf501fff795ea1953b076c92abca2465" },
+    { name = "aspn23-lcm", git = "ssh://git@git.aspn.us/pntos/firehose-outputs.git?subdirectory=lcm%2Fpython&rev=b8a34d86cf501fff795ea1953b076c92abca2465" },
+    { name = "h5py", specifier = ">1" },
+    { name = "lcm", specifier = ">=1.5.1,<2" },
     { name = "matplotlib" },
-    { name = "navtk", specifier = "==2.1.0.post3.dev0" },
+    { name = "navtk", specifier = "==2.1.post3.dev0" },
     { name = "numpy", specifier = "!=2.2" },
     { name = "pntos-api", editable = "pntos-api" },
     { name = "scipy", specifier = ">=1.15.2" },
@@ -1431,8 +1431,8 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "analysis-lcm", git = "ssh://git@git.aspn.us/pntos/analysis-scripts.git?subdirectory=analysis-lcm&rev=69c8f1b9336df140d5835f5ccd0a684aa4e29465" },
-    { name = "analysis-ros", git = "ssh://git@git.aspn.us/pntos/analysis-scripts.git?subdirectory=analysis-ros&rev=69c8f1b9336df140d5835f5ccd0a684aa4e29465" },
+    { name = "analysis-lcm", git = "ssh://git@git.aspn.us/pntos/analysis-scripts.git?subdirectory=analysis-lcm&rev=81156ca808b30743ebf63f6d1f712afa3620d9aa" },
+    { name = "analysis-ros", git = "ssh://git@git.aspn.us/pntos/analysis-scripts.git?subdirectory=analysis-ros&rev=81156ca808b30743ebf63f6d1f712afa3620d9aa" },
     { name = "matplotlib" },
     { name = "pntos-api", editable = "pntos-api" },
     { name = "pntos-cobra", editable = "pntos-cobra" },
@@ -1442,15 +1442,15 @@ requires-dist = [
 [package.metadata.requires-dev]
 dev = [
     { name = "gitpython", specifier = ">=3.1.44" },
-    { name = "ipython", specifier = ">=8.24.0" },
+    { name = "ipython", specifier = ">=8.24" },
     { name = "libclang", specifier = ">=18.1.1" },
     { name = "mypy", specifier = "==1.18.2" },
-    { name = "myst-parser", specifier = ">=4.0.0" },
-    { name = "pip", specifier = ">=24.0" },
+    { name = "myst-parser", specifier = ">=4" },
+    { name = "pip", specifier = ">=24" },
     { name = "pntos-python-docs-data", specifier = "==0.1.5" },
-    { name = "pyproject-fmt", specifier = ">=2.7.0" },
-    { name = "pytest", specifier = ">=8.2.0" },
-    { name = "pytest-cov", specifier = ">=6.0.0" },
+    { name = "pyproject-fmt", specifier = ">=2.7" },
+    { name = "pytest", specifier = ">=8.2" },
+    { name = "pytest-cov", specifier = ">=6" },
     { name = "ruff", specifier = "==0.13.2" },
     { name = "sphinx", specifier = ">=7.3.7" },
     { name = "sphinx-copybutton" },

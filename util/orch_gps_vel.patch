@@ -1,8 +1,8 @@
 diff --git a/pntos-cobra/src/pntos/cobra/tutorial_plugins/TutorialGpsOrchestrationPlugin.py b/pntos-cobra/src/pntos/cobra/tutorial_plugins/TutorialGpsVelOrchestrationPlugin.py
-index ebcf0ea0..a6fa3dad 100644
+index 2eebbe58..8f83d671 100644
 --- a/pntos-cobra/src/pntos/cobra/tutorial_plugins/TutorialGpsOrchestrationPlugin.py
 +++ b/pntos-cobra/src/pntos/cobra/tutorial_plugins/TutorialGpsVelOrchestrationPlugin.py
-@@ -66,6 +66,10 @@ GPS_MEASUREMENT_PROCESSOR_ID = 'pinson_with_ned_fogm_position'
+@@ -67,6 +67,10 @@ GPS_MEASUREMENT_PROCESSOR_ID = 'pinson_with_ned_fogm_position'
  GPS_MEASUREMENT_PROCESSOR_LABEL = 'gps'
  GPS_MEASUREMENT_PROCESSOR_CONFIG_GROUP = 'config/gp3d_state_modeling'
  GPS_MP_STATE_BLOCK_LABELS = [STATE_BLOCK_LABEL, FOGM_STATE_BLOCK_LABEL]
@@ -13,7 +13,7 @@ index ebcf0ea0..a6fa3dad 100644
  
  # Inertial parameters
  INERTIAL_GROUP = 'config/inertial'
-@@ -76,10 +80,10 @@ PREPROCESSOR_IDS = ['imu_rotator', 'time_adjuster', 'time_bias']
+@@ -77,10 +81,10 @@ PREPROCESSOR_IDS = ['imu_rotator', 'time_adjuster', 'time_bias']
  PREPROCESSOR_GROUPS = ['config/imu_rotator', 'config/time_adjuster', 'config/time_bias']
  
  
@@ -27,7 +27,7 @@ index ebcf0ea0..a6fa3dad 100644
      """
  
      mediator: Mediator
-@@ -136,9 +140,9 @@ class TutorialGpsOrchestrationPlugin(OrchestrationPlugin):
+@@ -131,9 +135,9 @@ class TutorialGpsOrchestrationPlugin(OrchestrationPlugin):
  
      def _log(self, level: LoggingLevel, message: str) -> None:
          """
@@ -39,7 +39,7 @@ index ebcf0ea0..a6fa3dad 100644
          through to the mediator's ``log_message`` method.
          """
          if self.mediator is not None:
-@@ -175,6 +179,7 @@ class TutorialGpsOrchestrationPlugin(OrchestrationPlugin):
+@@ -170,6 +174,7 @@ class TutorialGpsOrchestrationPlugin(OrchestrationPlugin):
  
          self.measurement_channels = {
              orch_config.gps_channel: GPS_MEASUREMENT_PROCESSOR_LABEL,
@@ -47,7 +47,7 @@ index ebcf0ea0..a6fa3dad 100644
          }
          self.alignment_channels = [
              orch_config.gps_channel,
-@@ -233,8 +238,8 @@ class TutorialGpsOrchestrationPlugin(OrchestrationPlugin):
+@@ -228,8 +233,8 @@ class TutorialGpsOrchestrationPlugin(OrchestrationPlugin):
          """
          Utility function to assemble the components of and create a fusion engine.
  
@@ -58,7 +58,7 @@ index ebcf0ea0..a6fa3dad 100644
          """
          # Make a fusion engine
          fusion_engine: StandardFusionEngine | None = (
-@@ -256,6 +261,7 @@ class TutorialGpsOrchestrationPlugin(OrchestrationPlugin):
+@@ -251,6 +256,7 @@ class TutorialGpsOrchestrationPlugin(OrchestrationPlugin):
          pinson_block = None
          fogm_block = None
          gps_processor = None
@@ -66,7 +66,7 @@ index ebcf0ea0..a6fa3dad 100644
          for plugin in self.state_modeling_plugins:
              provider: StandardStateModelProvider | None = (
                  plugin.new_state_model_provider(StandardStateModelProvider)
-@@ -289,6 +295,14 @@ class TutorialGpsOrchestrationPlugin(OrchestrationPlugin):
+@@ -284,6 +290,14 @@ class TutorialGpsOrchestrationPlugin(OrchestrationPlugin):
                      GPS_MP_STATE_BLOCK_LABELS,
                      GPS_MEASUREMENT_PROCESSOR_CONFIG_GROUP,
                  )
@@ -81,7 +81,7 @@ index ebcf0ea0..a6fa3dad 100644
  
          # Make state blocks
          if pinson_block is None:
-@@ -328,6 +342,16 @@ class TutorialGpsOrchestrationPlugin(OrchestrationPlugin):
+@@ -323,6 +337,16 @@ class TutorialGpsOrchestrationPlugin(OrchestrationPlugin):
              return
          fusion_engine.add_measurement_processor(gps_processor)
  
