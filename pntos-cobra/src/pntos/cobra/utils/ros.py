@@ -47,6 +47,11 @@ def run_pntos_with_ros_transport(
         validate (bool): Whether to validate the app's output, ensuring there are no
             warnings or errors. Defaults to False.
     """
+    # initialize process variables to avoid possibly unbound errors
+    logplayer_process = None
+    logger_process = None
+    app_process = None
+
     try:
         logger_process = run_ros_logger(output_log)
         app_process = run_app(app, validate=validate)
@@ -66,6 +71,9 @@ def run_pntos_with_ros_transport(
         wait_until_file_stable(actual_output_log)
 
     finally:
-        kill(logplayer_process)
-        kill(logger_process)
-        kill(app_process)
+        if app_process is not None:
+            kill(app_process)
+        if logger_process is not None:
+            kill(logger_process)
+        if logplayer_process is not None:
+            kill(logplayer_process)
