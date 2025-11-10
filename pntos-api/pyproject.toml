@@ -18,8 +18,8 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
 ]
 dependencies = [
-    # firehose-outputs main branch - committed 12 June 2025
-    "aspn23 @ git+ssh://git@git.aspn.us/pntos/firehose-outputs.git@d425e26330e62371038f14ad12a8d8b4374698a6#subdirectory=aspn-py",
+    # firehose-outputs main branch - committed 6 November 2025
+    "aspn23 @ git+ssh://git@git.aspn.us/pntos/firehose-outputs.git@b8a34d86cf501fff795ea1953b076c92abca2465#subdirectory=aspn-py",
     "numpy",
 ]
 
