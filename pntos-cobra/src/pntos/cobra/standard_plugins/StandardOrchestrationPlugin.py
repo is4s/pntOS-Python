@@ -82,8 +82,6 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
 
     def __init__(self, identifier: str) -> None:
         """
-        Simple orchestration plugin.
-
         Args:
             identifier (str): The plugin identifier passed to the
                 :meth:`pntos.api.CommonPlugin.identifier` field.

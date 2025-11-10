@@ -4,10 +4,10 @@ from aspn23 import AspnBase
 from pntos.api import MessageStreamConfig
 
 
-class SimpleMessageStreamConfig(MessageStreamConfig):
+class StandardMessageStreamConfig(MessageStreamConfig):
     """
-    This is a simple message stream config implementation. As with the :class:`SimpleMediator` it
-    is considered as apart of the :class:`pntos.cobra.SimpleControllerPlugin` implementation which allows the controller
+    This is a simple message stream config implementation. As with the :class:`StandardMediator` it
+    is considered as apart of the :class:`pntos.cobra.StandardControllerPlugin` implementation which allows the controller
     to access private members and functions when necessary. All other plugins should adhere to API
     compliant functions.
     """
@@ -19,7 +19,7 @@ class SimpleMessageStreamConfig(MessageStreamConfig):
 
     def __init__(self) -> None:
         """
-        Simple Cobra Message Stream Config
+        Standard Cobra Message Stream Config
 
         By default, all messages are immediately streamed.
         """
@@ -50,8 +50,8 @@ class SimpleMessageStreamConfig(MessageStreamConfig):
 
     def sequenced_stream_all(self, enable: bool) -> None:
         # TODO: Implement `enable` parameter - currently ambiguous (#66)
-        SimpleMessageStreamConfig._override_to_sequenced = set()
-        SimpleMessageStreamConfig._override_to_immediate = set()
+        StandardMessageStreamConfig._override_to_sequenced = set()
+        StandardMessageStreamConfig._override_to_immediate = set()
         self._default_is_sequenced = True
 
     def immediate_stream_add(
@@ -73,8 +73,8 @@ class SimpleMessageStreamConfig(MessageStreamConfig):
 
     def immediate_stream_all(self, enable: bool) -> None:
         # TODO: Implement `enable` parameter - currently ambiguous (#66)
-        SimpleMessageStreamConfig._override_to_sequenced = set()
-        SimpleMessageStreamConfig._override_to_immediate = set()
+        StandardMessageStreamConfig._override_to_sequenced = set()
+        StandardMessageStreamConfig._override_to_immediate = set()
 
         self._default_is_sequenced = False
 

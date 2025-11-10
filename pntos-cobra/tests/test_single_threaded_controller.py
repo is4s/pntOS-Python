@@ -44,11 +44,11 @@ from pntos.api import (
     VirtualStateBlock,
 )
 from pntos.cobra import (
-    SimpleControllerPlugin,
+    StandardControllerPlugin,
     StandardLoggingPlugin,
     StandardRegistryPlugin,
 )
-from pntos.cobra.internal import SimpleMediator
+from pntos.cobra.internal import StandardMediator
 
 FOUND_ERROR = False
 ERROR_MESSAGE = ''
@@ -518,7 +518,7 @@ class DummyOrchestrationPlugin(OrchestrationPlugin):
         return None
 
 
-class Test_SimpleControllerPlugin(unittest.TestCase):
+class Test_StandardControllerPlugin(unittest.TestCase):
     def __init__(self, name: str) -> None:
         super().__init__(name)
 
@@ -546,8 +546,8 @@ class Test_SimpleControllerPlugin(unittest.TestCase):
         self.logging_plugin: LoggingPlugin = StandardLoggingPlugin(
             'StandardLoggingPlugin'
         )
-        self.controller: ControllerPlugin = SimpleControllerPlugin(
-            'SimpleControllerPlugin'
+        self.controller: ControllerPlugin = StandardControllerPlugin(
+            'StandardControllerPlugin'
         )
         self.ui: UiPlugin = DummyUiPlugin('DummyUiPlugin')
         self.transport: TransportPlugin = DummyTransportPlugin('DummyTransportPlugin')
@@ -605,9 +605,9 @@ class Test_SimpleControllerPlugin(unittest.TestCase):
     def test_mediator_filter_description_list(self) -> None:
         expected_filter_description_list: list[str] = []
         self.set_up_plugins()
-        mediator = SimpleMediator(self.controller.identifier, ControllerPlugin)
+        mediator = StandardMediator(self.controller.identifier, ControllerPlugin)
         orchestration_plugin = DummyOrchestrationPlugin('Dummy orchestration')
-        SimpleMediator._orchestration_plugin = orchestration_plugin
+        StandardMediator._orchestration_plugin = orchestration_plugin
         filter_description_list = mediator.filter_description_list
         assert len(filter_description_list) == len(expected_filter_description_list)
         for i in range(len(filter_description_list)):
@@ -616,9 +616,9 @@ class Test_SimpleControllerPlugin(unittest.TestCase):
 
 def suite() -> unittest.TestSuite:
     suite = unittest.TestSuite()
-    tests = [m for m in dir(Test_SimpleControllerPlugin) if m.startswith('test_')]
+    tests = [m for m in dir(Test_StandardControllerPlugin) if m.startswith('test_')]
     for test in tests:
-        suite.addTest(Test_SimpleControllerPlugin(test))
+        suite.addTest(Test_StandardControllerPlugin(test))
     return suite
 
 

@@ -51,7 +51,7 @@ from pntos.cobra.internal import (
     PinsonVelocityMeasurementProcessor,
     PinsonWithLeverArmPositionMeasurementProcessor,
     PinsonWithNedFogmPositionMeasurementProcessor,
-    SimpleMediator,
+    StandardMediator,
 )
 from pntos.cobra.utils.navigation import (
     OMEGA_E,
@@ -107,19 +107,19 @@ my_config: list[BaseConfig] = [
 
 
 @pytest.fixture
-def mediator() -> SimpleMediator:
+def mediator() -> StandardMediator:
     registry_plugin = StandardRegistryPlugin('Standard registry', config=my_config)
-    mediator = SimpleMediator(registry_plugin.identifier, RegistryPlugin)
+    mediator = StandardMediator(registry_plugin.identifier, RegistryPlugin)
     registry_plugin.init_plugin(mediator=mediator)
     registry = registry_plugin.new_registry()
-    SimpleMediator.registry = registry
-    SimpleMediator._controller_plugin = None
+    StandardMediator.registry = registry
+    StandardMediator._controller_plugin = None
     return mediator
 
 
 @pytest.fixture
 def state_modeling_plugin(
-    mediator: SimpleMediator,
+    mediator: StandardMediator,
 ) -> StandardGpsInsStateModelingPlugin:
     sm_plugin = StandardGpsInsStateModelingPlugin('gps_ins_state_modeling')
     sm_plugin.init_plugin(mediator=mediator)

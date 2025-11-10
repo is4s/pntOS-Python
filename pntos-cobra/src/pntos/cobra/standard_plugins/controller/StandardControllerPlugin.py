@@ -19,11 +19,11 @@ from pntos.cobra.utils import (
     validate_plugins,
 )
 
-from .SimpleMediator import SimpleMediator
-from .SimpleMessageStreamConfig import SimpleMessageStreamConfig
+from .StandardMediator import StandardMediator
+from .StandardMessageStreamConfig import StandardMessageStreamConfig
 
 
-class SimpleControllerPlugin(ControllerPlugin):
+class StandardControllerPlugin(ControllerPlugin):
     """
     This is a simple single-threaded controller plugin.
 
@@ -56,7 +56,7 @@ class SimpleControllerPlugin(ControllerPlugin):
 
     def __init__(self, identifier: str) -> None:
         """
-        Cobra Simple Controller
+        Cobra Standard Controller
 
         Args:
             identifier (str): The plugin identifier passed to the
@@ -116,15 +116,15 @@ class SimpleControllerPlugin(ControllerPlugin):
 
         # Hand mediators controller plugin so that mediators can call "shutdown_plugin"
         # on error.
-        SimpleMediator._controller_plugin = self
+        StandardMediator._controller_plugin = self
 
         # initialize stream config and hand to mediator
-        stream_config = SimpleMessageStreamConfig()
-        SimpleMediator._stream_config = stream_config
+        stream_config = StandardMessageStreamConfig()
+        StandardMediator._stream_config = stream_config
 
         # Create separate mediators to pass to each plugin
         mediators = [
-            SimpleMediator(p.identifier, find_base_plugin_type(p))
+            StandardMediator(p.identifier, find_base_plugin_type(p))
             for p in self._plugins
         ]
 
@@ -151,7 +151,7 @@ class SimpleControllerPlugin(ControllerPlugin):
         )
 
         # Give mediators a registry
-        SimpleMediator.registry = self._registry_plugin.new_registry(initial_config)
+        StandardMediator.registry = self._registry_plugin.new_registry(initial_config)
 
         # Initialize logger second
         assert self._logging_plugin is not None
@@ -164,7 +164,7 @@ class SimpleControllerPlugin(ControllerPlugin):
         )
 
         # Give mediators a logging plugin
-        SimpleMediator._logging_plugin = self._logging_plugin
+        StandardMediator._logging_plugin = self._logging_plugin
 
         # call init_plugin() on all the other plugins
         for i, plugin in enumerate(self._plugins):
@@ -178,8 +178,8 @@ class SimpleControllerPlugin(ControllerPlugin):
             )
 
         # Give the mediators other needed plugins
-        SimpleMediator._transport_plugins = self._transport_plugins
-        SimpleMediator._orchestration_plugin = orchestration_plugin
+        StandardMediator._transport_plugins = self._transport_plugins
+        StandardMediator._orchestration_plugin = orchestration_plugin
 
         # Give the orchestration the plugins it needs
         orchestration_plugin.init_orchestration_plugin(
@@ -275,12 +275,12 @@ class SimpleControllerPlugin(ControllerPlugin):
                 'Press Ctrl + C at any time to shut down pntOS...',
             )
             try:
-                SimpleMediator._logging_error_event.wait()
+                StandardMediator._logging_error_event.wait()
             except KeyboardInterrupt:
                 self._log(LoggingLevel.INFO, 'Keyboard Interrupt Detected.')
 
         self.shutdown_plugin()
-        if SimpleMediator._logging_error_event.is_set():
+        if StandardMediator._logging_error_event.is_set():
             sys.exit(1)
         else:
             sys.exit(0)

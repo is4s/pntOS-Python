@@ -14,7 +14,7 @@ from pntos.cobra.config import (
     ClockBiasStateBlockConfig,
     config_from_registry,
 )
-from pntos.cobra.internal import ClockBiasStateBlock, SimpleMediator
+from pntos.cobra.internal import ClockBiasStateBlock, StandardMediator
 
 my_config: list[BaseConfig] = [
     ClockBiasStateBlockConfig(
@@ -33,18 +33,18 @@ my_config: list[BaseConfig] = [
 
 
 @pytest.fixture
-def mediator() -> SimpleMediator:
+def mediator() -> StandardMediator:
     registry_plugin = StandardRegistryPlugin('Standard registry', config=my_config)
-    mediator = SimpleMediator(registry_plugin.identifier, RegistryPlugin)
+    mediator = StandardMediator(registry_plugin.identifier, RegistryPlugin)
     registry_plugin.init_plugin(mediator=mediator)
     registry = registry_plugin.new_registry()
-    SimpleMediator.registry = registry
-    SimpleMediator._controller_plugin = None
+    StandardMediator.registry = registry
+    StandardMediator._controller_plugin = None
     return mediator
 
 
 @pytest.fixture
-def block(mediator: SimpleMediator) -> ClockBiasStateBlock:
+def block(mediator: StandardMediator) -> ClockBiasStateBlock:
     config = config_from_registry(
         ClockBiasStateBlockConfig, mediator, 'clock_bias_block'
     )

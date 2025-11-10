@@ -1,8 +1,8 @@
 from .dummy_plugins.DummyTransportPlugin import (
     DummyTransportPlugin as DummyTransportPlugin,
 )
-from .simple_controller.SimpleControllerPlugin import (
-    SimpleControllerPlugin as SimpleControllerPlugin,
+from .standard_plugins.controller.StandardControllerPlugin import (
+    StandardControllerPlugin as StandardControllerPlugin,
 )
 from .standard_plugins.DiagnosticLogPlugin import (
     DiagnosticLogPlugin as DiagnosticLogPlugin,
@@ -58,4 +58,6 @@ from .tutorial_plugins.TutorialInitializationPlugin import (
 from .tutorial_plugins.TutorialLcmTransportPlugin import (
     TutorialLcmTransportPlugin as TutorialLcmTransportPlugin,
 )
-from .ui_plugins.UiLogPlotterPlugin import UiLogPlottingPlugin as UiLogPlottingPlugin
+from .tutorial_plugins.UiLogPlotterPlugin import (
+    UiLogPlottingPlugin as UiLogPlottingPlugin,
+)

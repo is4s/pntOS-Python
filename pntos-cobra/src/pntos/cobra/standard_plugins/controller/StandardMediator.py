@@ -17,7 +17,7 @@ from pntos.api import (
 )
 from pntos.cobra.utils import print_message
 
-from .SimpleMessageStreamConfig import SimpleMessageStreamConfig
+from .StandardMessageStreamConfig import StandardMessageStreamConfig
 
 SEC_NS = 1_000_000_000
 
@@ -27,10 +27,10 @@ def _get_time(msg: Message) -> int:
     return int(msg.wrapped_message.time_of_validity.elapsed_nsec)  # type: ignore[attr-defined]
 
 
-class SimpleMediator(Mediator):
+class StandardMediator(Mediator):
     """
-    This is a simple mediator implementation. It was designed to be used in conjuction with the
-    :class:`pntos.cobra.SimpleControllerPlugin` which is why this controller directly access private members.
+    This is a simple mediator implementation. It was designed to be used in conjunction with the
+    :class:`pntos.cobra.StandardControllerPlugin` which is why this controller directly access private members.
     It has one public member ``registry`` that other plugins are allowed to access.
     """
 
@@ -38,7 +38,7 @@ class SimpleMediator(Mediator):
     _transport_plugins: ClassVar[list[TransportPlugin]] = []
     _orchestration_plugin: OrchestrationPlugin | None = None
     _controller_plugin: ControllerPlugin | None = None
-    _stream_config: SimpleMessageStreamConfig
+    _stream_config: StandardMessageStreamConfig
     _logging_error_event: Event = Event()
     registry: Registry
     _messages: ClassVar[list[Message]] = []
@@ -51,7 +51,7 @@ class SimpleMediator(Mediator):
         attached_plugin_type: PluginType,
     ) -> None:
         """
-        Simple Cobra Mediator
+        Standard Cobra Mediator
 
         Args:
             attached_plugin_identifier (str): The identifier field of the plugin this
@@ -99,7 +99,7 @@ class SimpleMediator(Mediator):
         )
         for m in self._messages[:process_until_index]:
             self._orchestration_plugin.process_pntos_message(m, True)
-        SimpleMediator._messages = self._messages[process_until_index:]
+        StandardMediator._messages = self._messages[process_until_index:]
 
         # Need to make sure the orchestration has received some messages before we
         # start requesting solutions.

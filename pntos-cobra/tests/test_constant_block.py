@@ -14,7 +14,7 @@ from pntos.cobra.config import (
     ConstantStateBlockConfig,
     config_from_registry,
 )
-from pntos.cobra.internal import ConstantStateBlock, SimpleMediator
+from pntos.cobra.internal import ConstantStateBlock, StandardMediator
 
 my_config: list[BaseConfig] = [
     ConstantStateBlockConfig(
@@ -42,18 +42,18 @@ my_config: list[BaseConfig] = [
 
 
 @pytest.fixture
-def mediator() -> SimpleMediator:
+def mediator() -> StandardMediator:
     registry_plugin = StandardRegistryPlugin('Standard registry', config=my_config)
-    mediator = SimpleMediator(registry_plugin.identifier, RegistryPlugin)
+    mediator = StandardMediator(registry_plugin.identifier, RegistryPlugin)
     registry_plugin.init_plugin(mediator=mediator)
     registry = registry_plugin.new_registry()
-    SimpleMediator.registry = registry
-    SimpleMediator._controller_plugin = None
+    StandardMediator.registry = registry
+    StandardMediator._controller_plugin = None
     return mediator
 
 
 @pytest.fixture
-def block(mediator: SimpleMediator) -> ConstantStateBlock:
+def block(mediator: StandardMediator) -> ConstantStateBlock:
     config = config_from_registry(ConstantStateBlockConfig, mediator, 'constant_block')
     assert config is not None
     assert config.estimate_with_covariance is not None
@@ -64,7 +64,7 @@ def block(mediator: SimpleMediator) -> ConstantStateBlock:
 
 
 @pytest.fixture
-def block_with_noise(mediator: SimpleMediator) -> ConstantStateBlock:
+def block_with_noise(mediator: StandardMediator) -> ConstantStateBlock:
     config = config_from_registry(
         ConstantStateBlockConfig, mediator, 'constant_block_with_noise'
     )
@@ -130,7 +130,7 @@ def test_generate_dynamics_with_noise(block_with_noise: ConstantStateBlock) -> N
     assert np.all(prop_x2 == prop_x)
 
 
-def test_various_sizes(mediator: SimpleMediator) -> None:
+def test_various_sizes(mediator: StandardMediator) -> None:
     t1 = TypeTimestamp(0)
     t2 = TypeTimestamp(1_000_000_000)
     for num_states in range(1, 101, 10):

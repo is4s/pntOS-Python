@@ -17,7 +17,7 @@ index 10bbbf4c..0393e45c 100755
 -    LcmLogTransportPlugin,
 +    LcmTransportPlugin,
      ManualHeadingAlignInitializationPlugin,
-     SimpleControllerPlugin,
+     StandardControllerPlugin,
      StandardFusionPlugin,
 @@ -28,7 +26,7 @@ from pntos.cobra.config import (
      ImuConfig,
@@ -54,7 +54,7 @@ index 10bbbf4c..0393e45c 100755
          imu_sol_channel='/solution/pntos-imu/pva',
 @@ -149,7 +139,7 @@ my_config = [
  # Instantiate all of our plugins
- controller = SimpleControllerPlugin('Cobra Simple Controller Plugin')
+ controller = StandardControllerPlugin('Cobra Standard Controller Plugin')
  plugins = [
 -    LcmLogTransportPlugin('Cobra LCM Log Transport Plugin'),
 +    LcmTransportPlugin('Cobra LCM Transport Plugin'),

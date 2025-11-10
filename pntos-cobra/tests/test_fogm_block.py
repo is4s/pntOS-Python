@@ -15,19 +15,19 @@ from pntos.api import (
 )
 from pntos.cobra import StandardRegistryPlugin
 from pntos.cobra.config import BaseConfig
-from pntos.cobra.internal import FogmBlock, SimpleMediator
+from pntos.cobra.internal import FogmBlock, StandardMediator
 
 my_config: list[BaseConfig] = []
 
 
 @pytest.fixture
-def mediator() -> SimpleMediator:
+def mediator() -> StandardMediator:
     registry_plugin = StandardRegistryPlugin('Standard registry', config=my_config)
-    mediator = SimpleMediator(registry_plugin.identifier, RegistryPlugin)
+    mediator = StandardMediator(registry_plugin.identifier, RegistryPlugin)
     registry_plugin.init_plugin(mediator=mediator)
     registry = registry_plugin.new_registry()
-    SimpleMediator.registry = registry
-    SimpleMediator._controller_plugin = None
+    StandardMediator.registry = registry
+    StandardMediator._controller_plugin = None
     return mediator
 
 
@@ -50,13 +50,13 @@ def pos_meas() -> Message:
     )
 
 
-def test_empty_init(mediator: SimpleMediator) -> None:
+def test_empty_init(mediator: StandardMediator) -> None:
     with pytest.raises(RuntimeError) as excinfo:
         FogmBlock('bk', mediator, array([]), array([]))
     assert excinfo.type is RuntimeError
 
 
-def test_single_init(mediator: SimpleMediator) -> None:
+def test_single_init(mediator: StandardMediator) -> None:
     blk = FogmBlock('bk', mediator, array([1.0]), array([2.0]))
     x_and_p = EstimateWithCovariance(
         EstimateWithCovarianceType.EWC_GENERIC, ones(1), eye(1)
@@ -69,7 +69,7 @@ def test_single_init(mediator: SimpleMediator) -> None:
     assert dyn.Qd.shape == (1, 1)
 
 
-def test_double_flat_init(mediator: SimpleMediator) -> None:
+def test_double_flat_init(mediator: StandardMediator) -> None:
     blk = FogmBlock('bk', mediator, array([1.0, 2.0]), array([3.0, 4.0]))
     x_and_p = EstimateWithCovariance(
         EstimateWithCovarianceType.EWC_GENERIC, ones(2), eye(2)
@@ -82,7 +82,7 @@ def test_double_flat_init(mediator: SimpleMediator) -> None:
     assert dyn.Qd.shape == (2, 2)
 
 
-def test_double_trans_init(mediator: SimpleMediator) -> None:
+def test_double_trans_init(mediator: StandardMediator) -> None:
     blk = FogmBlock('bk', mediator, array([[1.0], [2.0]]), array([[3.0], [4.0]]))
     x_and_p = EstimateWithCovariance(
         EstimateWithCovarianceType.EWC_GENERIC, ones(2), eye(2)
@@ -96,77 +96,77 @@ def test_double_trans_init(mediator: SimpleMediator) -> None:
 
 
 # Fail to create on all size mismatches
-def test_bad_size1(mediator: SimpleMediator) -> None:
+def test_bad_size1(mediator: StandardMediator) -> None:
     with pytest.raises(RuntimeError) as excinfo:
         FogmBlock('bk', mediator, array([1.0]), array([[3.0], [4.0]]))
     assert excinfo.type is RuntimeError
 
 
-def test_bad_size2(mediator: SimpleMediator) -> None:
+def test_bad_size2(mediator: StandardMediator) -> None:
     with pytest.raises(RuntimeError) as excinfo:
         FogmBlock('bk', mediator, array([1.0, 2.0, 3.0]), array([[3.0], [4.0]]))
     assert excinfo.type is RuntimeError
 
 
-def test_bad_size3(mediator: SimpleMediator) -> None:
+def test_bad_size3(mediator: StandardMediator) -> None:
     with pytest.raises(RuntimeError) as excinfo:
         FogmBlock('bk', mediator, array([1.0, 2.0]), array([3.0]))
     assert excinfo.type is RuntimeError
 
 
-def test_bad_size4(mediator: SimpleMediator) -> None:
+def test_bad_size4(mediator: StandardMediator) -> None:
     with pytest.raises(RuntimeError) as excinfo:
         FogmBlock('bk', mediator, array([1.0, 2.0]), array([3.0, 4.0, 5.0]))
     assert excinfo.type is RuntimeError
 
 
 # tau must be positive
-def test_neg_tau(mediator: SimpleMediator) -> None:
+def test_neg_tau(mediator: StandardMediator) -> None:
     with pytest.raises(RuntimeError) as excinfo:
         FogmBlock('bk', mediator, array([1.0, 2.0]), array([-3.0, 4.0]))
     assert excinfo.type is RuntimeError
 
 
-def test_neg_tau2(mediator: SimpleMediator) -> None:
+def test_neg_tau2(mediator: StandardMediator) -> None:
     with pytest.raises(RuntimeError) as excinfo:
         FogmBlock('bk', mediator, array([1.0, 2.0]), array([-3.0, -4.0]))
     assert excinfo.type is RuntimeError
 
 
-def test_0_tau(mediator: SimpleMediator) -> None:
+def test_0_tau(mediator: StandardMediator) -> None:
     with pytest.raises(RuntimeError) as excinfo:
         FogmBlock('bk', mediator, array([1.0, 2.0]), array([0, 4.0]))
     assert excinfo.type is RuntimeError
 
 
-def test_0_tau2(mediator: SimpleMediator) -> None:
+def test_0_tau2(mediator: StandardMediator) -> None:
     with pytest.raises(RuntimeError) as excinfo:
         FogmBlock('bk', mediator, array([1.0, 2.0]), array([0, 0]))
     assert excinfo.type is RuntimeError
 
 
 # Negative sigmas weird, but they get squared anyway, just log warning
-def test_neg_sig(mediator: SimpleMediator) -> None:
+def test_neg_sig(mediator: StandardMediator) -> None:
     FogmBlock('bk', mediator, array([-1.0, 2.0]), array([3.0, 4.0]))
 
 
-def test_neg_sig2(mediator: SimpleMediator) -> None:
+def test_neg_sig2(mediator: StandardMediator) -> None:
     FogmBlock('bk', mediator, array([-1.0, -2.0]), array([3.0, 4.0]))
 
 
 # Aux data does nothing in this class
-def test_empty_aux(mediator: SimpleMediator) -> None:
+def test_empty_aux(mediator: StandardMediator) -> None:
     blk = FogmBlock('bk', mediator, array([1.0]), array([3.0]))
     blk.receive_aux_data([])
 
 
-def test_some_aux(mediator: SimpleMediator, pos_meas: Message) -> None:
+def test_some_aux(mediator: StandardMediator, pos_meas: Message) -> None:
     blk = FogmBlock('bk', mediator, array([1.0]), array([3.0]))
     blk.receive_aux_data([Message(pos_meas, 'garbage')])
 
 
 # An actual model
-def test_gen_dyn(mediator: SimpleMediator) -> None:
+def test_gen_dyn(mediator: StandardMediator) -> None:
     blk = FogmBlock('bk', mediator, array([3.0]), array([1.0]))
     x_and_p = EstimateWithCovariance(
         EstimateWithCovarianceType.EWC_GENERIC, zeros(1), eye(1)
@@ -181,7 +181,7 @@ def test_gen_dyn(mediator: SimpleMediator) -> None:
 
 
 # Should be a no-op
-def test_gen_dyn_eq(mediator: SimpleMediator) -> None:
+def test_gen_dyn_eq(mediator: StandardMediator) -> None:
     blk = FogmBlock('bk', mediator, array([3.0]), array([1.0]))
     x_and_p = EstimateWithCovariance(
         EstimateWithCovarianceType.EWC_GENERIC, array([3.0]), eye(1) * 9.0
@@ -198,7 +198,7 @@ def test_gen_dyn_eq(mediator: SimpleMediator) -> None:
 
 
 # A negative dt likely incorrect but maybe allowable depending on context? No err here.
-def test_gen_dyn_neg(mediator: SimpleMediator) -> None:
+def test_gen_dyn_neg(mediator: StandardMediator) -> None:
     blk = FogmBlock('bk', mediator, array([1.0]), array([3.0]))
     x_and_p = EstimateWithCovariance(
         EstimateWithCovarianceType.EWC_GENERIC, zeros(1), eye(1)
@@ -210,7 +210,7 @@ def test_gen_dyn_neg(mediator: SimpleMediator) -> None:
     dyn.g(x_and_p.estimate)
 
 
-def test_gen_dyn_multi(mediator: SimpleMediator) -> None:
+def test_gen_dyn_multi(mediator: StandardMediator) -> None:
     sigmas = array([1.0, 1.0, 1.0])
     taus = array([1.0, 1.0, 1.0])
     blk = FogmBlock('bk', mediator, sigmas, taus)
