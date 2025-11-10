@@ -507,6 +507,9 @@ def run_pntos_with_log_transport(
         validate (bool): Whether to validate the app's output, ensuring there are no
             warnings or errors. Defaults to False.
     """
+    # initialize process variables to avoid possibly unbound errors
+    app_process = None
+
     try:
         app_process = run_app(app, output_log, validate=validate)
 
@@ -519,7 +522,8 @@ def run_pntos_with_log_transport(
         monitor_app_output(app_process.stdout, separate_thread=True)
 
     finally:
-        kill(app_process)
+        if app_process is not None:
+            kill(app_process)
 
 
 def run_pntos_with_network_transport(
@@ -537,6 +541,12 @@ def run_pntos_with_network_transport(
         validate (bool): Whether to validate the app's output, ensuring there are no
             warnings or errors. Defaults to False.
     """
+
+    # initialize process variables to avoid possibly unbound errors
+    relay_process = None
+    logger_process = None
+    app_process = None
+
     try:
         relay_process = run_tcp_relay()
         logger_process = run_lcm_logger(output_log)
@@ -555,6 +565,9 @@ def run_pntos_with_network_transport(
         wait_until_file_stable(output_log, stable_secs=5)
 
     finally:
-        kill(app_process)
-        kill(logger_process)
-        kill(relay_process)
+        if app_process is not None:
+            kill(app_process)
+        if logger_process is not None:
+            kill(logger_process)
+        if relay_process is not None:
+            kill(relay_process)
