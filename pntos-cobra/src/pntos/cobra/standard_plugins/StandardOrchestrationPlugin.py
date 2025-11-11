@@ -37,14 +37,16 @@ from pntos.cobra.config import (
 )
 from pntos.cobra.config.utils import config_from_registry
 from pntos.cobra.utils import (
+    Cache,
+    EstimateWithCovarianceEntry,
+    FilterSolutionEntry,
+    InertialSolutionEntry,
     SortedPlugins,
-    dispatch_to_fusion_engine,
     get_best_solution,
     get_dead_reckoning_solution,
     has_valid_time,
     initialization_ready,
     print_message,
-    send_inertial_aux_to_pinson,
     set_up_inertial_mechanization,
     set_up_initializer,
     sort_plugins_dataclass,
@@ -75,10 +77,10 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
     inertial: StandardInertialMechanization
     fusion_engine: StandardFusionEngine
     measurement_channels: dict[str, str]
-    pinson_config: PinsonStateBlockConfig
+    pinson_sb_config: PinsonStateBlockConfig
     alignment_channels: tuple[str, ...]
     inertial_drift_prop_dt: int
-    prop_interval: int
+    cache: Cache
 
     def __init__(self, identifier: str) -> None:
         """
@@ -92,7 +94,7 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
         self.preprocessors = []
         self.measurement_channels = {}
         self.inertial_drift_prop_dt = int(0.1 * 1e9)
-        self.prop_interval = int(0.25 * 1e9)
+        self.cache = Cache()
 
     def init_plugin(
         self,
@@ -184,12 +186,7 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
         if initialization_ready(self.initialization_state, self.initializer):
             self._generate_initial_inertial_solution()
             self._initialize_filter()
-            send_inertial_aux_to_pinson(
-                self.inertial,
-                self.fusion_engine,
-                self.pinson_sb_config.label,
-                self._log,
-            )
+            self._send_inertial_aux_to_pinson()
 
     def _set_up_preprocessors(
         self,
@@ -228,6 +225,7 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
             return
         self.inertial = inertial_info[0]
         self.init_solution = inertial_info[1]
+        assert self.init_solution.solution is not None
 
     def _store_config_data(self, orch_config: StandardOrchestrationConfig) -> None:
         """
@@ -247,6 +245,7 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
         # Inertial
         self.inertial_channel = orch_config.inertial_config.channel
         self.inertial_group = orch_config.inertial_config.group
+        self.max_prop_dt_ns = int(orch_config.max_prop_interval * 1e9)
 
     def _initialize_filter(self) -> None:
         """
@@ -272,6 +271,32 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
         # sync fusion engine and initial solution time
         init_time = self.init_solution.solution.wrapped_message.time_of_validity  # type: ignore[union-attr]
         self.fusion_engine.time = init_time
+
+        self.cache.set(
+            'inertial solution',
+            InertialSolutionEntry(
+                self.fusion_engine,
+                self.inertial,
+                self.imu_sol_channel,
+                self.mediator.log_message,
+            ),
+        )
+        self.cache.set(
+            'pinson',
+            EstimateWithCovarianceEntry(
+                self.fusion_engine, self.pinson_sb_config.label
+            ),
+        )
+        self.cache.set(
+            'filter solution',
+            FilterSolutionEntry(
+                self.fusion_engine,
+                self.best_sol_channel,
+                'inertial solution',
+                'pinson',
+            ),
+        )
+
         self._log(
             LoggingLevel.INFO, f'Aligned filter at {init_time.elapsed_nsec * 1e-9:.9f}s'
         )
@@ -434,21 +459,112 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
         return None
 
     def _propagate_to_time(self, target_time: TypeTimestamp) -> None:
+        """Propagate up to target time in max steps of self.max_prop_dt_ns"""
         filter_time = self.fusion_engine.time
         while filter_time.elapsed_nsec < target_time.elapsed_nsec:
-            send_inertial_aux_to_pinson(
-                self.inertial,
-                self.fusion_engine,
-                self.pinson_sb_config.label,
-                self._log,
-            )
-            fixed_prop_interval = filter_time.elapsed_nsec + self.prop_interval
-            if target_time.elapsed_nsec < fixed_prop_interval:
+            self._send_inertial_aux_to_pinson()
+            prop_time = TypeTimestamp(filter_time.elapsed_nsec + self.max_prop_dt_ns)
+            if target_time.elapsed_nsec < prop_time.elapsed_nsec:
                 prop_time = target_time
-            else:
-                prop_time = TypeTimestamp(fixed_prop_interval)
+
             self.fusion_engine.propagate(prop_time)
             filter_time = prop_time
+
+    def _get_inertial_aux(self, forces: bool = False) -> list[Message | None] | None:
+        """Get inertial solution and forces/rates at the current filter time."""
+        time = self.fusion_engine.time
+
+        pva = self.cache.get('inertial solution')
+        if pva is None:
+            self.mediator.log_message(
+                LoggingLevel.ERROR,
+                f'Cannot get inertial aux. Solution not available at time {time.elapsed_nsec / 1e9:.9f}s',
+            )
+            return None
+
+        if not forces:
+            return [pva]
+
+        self._inertial_forces = self.inertial.request_forces_and_rates(time)
+        if self._inertial_forces is None:
+            self.mediator.log_message(
+                LoggingLevel.ERROR,
+                f'Cannot get inertial aux. Forces not available at time {time.elapsed_nsec / 1e9:.9f}s',
+            )
+            return None
+        f_and_r_msg = Message(
+            self._inertial_forces.forces_and_rates, 'Orchestration forces and rates'
+        )
+
+        return [pva, f_and_r_msg]
+
+    def _send_inertial_aux_to_measurement_processor(self, mp_label: str) -> None:
+        """Send the current inertial solution to the specified measurement processor."""
+        aux = self._get_inertial_aux(forces=True)
+        if aux is not None:
+            self.fusion_engine.give_measurement_processor_aux_data(mp_label, aux)
+
+    def _send_inertial_aux_to_pinson(self) -> None:
+        """
+        Send the current inertial solution, forces, and rates to the pinson state block.
+        """
+        aux = self._get_inertial_aux(forces=True)
+        if aux is not None:
+            self.fusion_engine.give_state_block_aux_data(
+                self.pinson_sb_config.label, aux
+            )
+
+    def _apply_inertial_feedback(self) -> None:
+        """Correct inertial solution with pinson error states and reset states."""
+        solution = self.cache.get('filter solution')
+        if solution is None:
+            return
+
+        self.inertial.reset_solution(solution)
+
+        cur_time = self.fusion_engine.time
+        imu_errors = self.inertial.request_sensor_errors(cur_time)
+        if imu_errors is None:
+            self.mediator.log_message(
+                LoggingLevel.ERROR,
+                f'Unable to obtain sensor errors from inertial at time {cur_time.elapsed_nsec / 1e9:.9f}s.',
+            )
+            return
+
+        pinson_x_and_p: EstimateWithCovariance = self.cache.get('pinson')
+        imu_errors.accel_biases -= pinson_x_and_p.estimate[9:12, 0]
+        imu_errors.gyro_biases -= pinson_x_and_p.estimate[12:15, 0]
+        self.inertial.correct_sensor_errors(cur_time, imu_errors)
+
+        # Assume zero error in states after applying feedback
+        self.fusion_engine.set_state_block_estimate(
+            self.pinson_sb_config.label, np.zeros((15, 1))
+        )
+
+        # Inertial reset modified the solution at the current time, invalidating the
+        # cached solution
+        self.cache.clear('inertial solution')
+
+    def _perform_measurement_update(self, message: Message) -> None:
+        """
+        Send message to the fusion engine to update the filter.
+
+        After performing update, applies feedback to inertial solution and biases, and
+        resets pinson error states.
+        """
+        # Make sure measurement processor has most current aux data before update
+        mp_label = self.measurement_channels[message.source_identifier]
+        self._send_inertial_aux_to_measurement_processor(mp_label)
+
+        # Update filter.
+        self.fusion_engine.update(mp_label, message)
+
+        # Filter update modified the pinson states and filter solution at the current
+        # time, invalidating the cached solution.
+        self.cache.clear('filter solution')
+        self.cache.clear('pinson')
+
+        self._apply_inertial_feedback()
 
     def _propagate_during_outage(self) -> None:
         if initialization_ready(self.initialization_state, self.initializer):
@@ -468,22 +584,17 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
             # Message dropped in preprocessing
             return
 
-        for preprocessed_message in preprocessed_messages:
+        for msg in preprocessed_messages:
             # If filter solution is not initialized, send messages to the initializer.
             if not initialization_ready(self.initialization_state, self.initializer):
-                if preprocessed_message.source_identifier in self.alignment_channels:
-                    self.initializer.process_pntos_message(preprocessed_message)
+                if msg.source_identifier in self.alignment_channels:
+                    self.initializer.process_pntos_message(msg)
                     if initialization_ready(
                         self.initialization_state, self.initializer
                     ):
                         self._generate_initial_inertial_solution()
                         self._initialize_filter()
-                        send_inertial_aux_to_pinson(
-                            self.inertial,
-                            self.fusion_engine,
-                            self.pinson_sb_config.label,
-                            self._log,
-                        )
+                        self._send_inertial_aux_to_pinson()
                 continue
             # Don't use old, out-of-date messages
             if not has_valid_time(
@@ -491,17 +602,13 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
             ):
                 continue
             # If aligned, send messages to IMU or filter
-            if preprocessed_message.source_identifier == self.inertial_channel:
+            if msg.source_identifier == self.inertial_channel:
                 self.inertial.process_pntos_message(message)
-            elif preprocessed_message.source_identifier in self.measurement_channels:
-                dispatch_to_fusion_engine(
-                    self.inertial,
-                    self.fusion_engine,
-                    preprocessed_message,
-                    self.pinson_sb_config.label,
-                    self.measurement_channels,
-                    self._log,
-                )
+            elif msg.source_identifier in self.measurement_channels:
+                time = msg.wrapped_message.time_of_validity  # type: ignore[attr-defined]
+                self._propagate_to_time(time)
+                self._perform_measurement_update(msg)
+
         # Continue to propagate filter during outage
         self._propagate_during_outage()
 
@@ -559,12 +666,12 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
                 time,
                 self.pinson_sb_config.label,
                 self.best_sol_channel,
-                self._log,
+                self.mediator.log_message,
             )
 
         elif 'DEAD_RECKONING' in filter_description:
             solution_out = get_dead_reckoning_solution(
-                self.inertial, time, self.imu_sol_channel, self._log
+                self.inertial, time, self.imu_sol_channel, self.mediator.log_message
             )
 
         else:

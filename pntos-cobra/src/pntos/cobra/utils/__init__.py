@@ -42,6 +42,11 @@ from .lcm import (
 from .logging import print_message as print_message
 from .navigation import *  # noqa: F403
 from .orchestration_utils import (
+    Cache as Cache,
+    CacheEntry as CacheEntry,
+    EstimateWithCovarianceEntry as EstimateWithCovarianceEntry,
+    FilterSolutionEntry as FilterSolutionEntry,
+    InertialSolutionEntry as InertialSolutionEntry,
     apply_error_states as apply_error_states,
     dispatch_to_fusion_engine as dispatch_to_fusion_engine,
     get_best_solution as get_best_solution,

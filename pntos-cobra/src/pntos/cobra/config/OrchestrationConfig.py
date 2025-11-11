@@ -216,4 +216,10 @@ class StandardOrchestrationConfig(BaseConfig):
     A series of preprocessor configs to use. (optional)
     """
 
+    max_prop_interval: float = 2.0
+    """
+    Maximum interval in seconds over which to propagate states. Intervals longer than
+    this will be broken up into segments.
+    """
+
     group: str
