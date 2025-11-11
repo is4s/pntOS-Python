@@ -60,4 +60,9 @@ class LcmLogTransportConfig(BaseConfig):
     The version of ASPN messages broadcasted by the LcmLogTransportPlugin.
     """
 
+    channels_to_process: tuple[str, ...] | None = None
+    """
+    List of channels to process. If None, will process all channels.
+    """
+
     group: str
