@@ -1,7 +1,10 @@
+from abc import abstractmethod
 from collections.abc import Callable
+from typing import Any
 
 from aspn23 import (
     MeasurementPositionVelocityAttitude,
+    MeasurementPositionVelocityAttitude as PVA,
     MeasurementPositionVelocityAttitudeErrorModel,
     TypeHeader,
     TypeTimestamp,
@@ -504,3 +507,249 @@ def apply_error_states(
         array([]),
         [],
     )
+
+
+class CacheEntry:
+    """An entry in a cache storing a filter value at a specific time."""
+
+    _value: Any | None
+    _time_of_validity: TypeTimestamp | None
+    _fusion_engine: StandardFusionEngine
+
+    def __init__(self, fusion_engine: StandardFusionEngine) -> None:
+        """Constructor.
+
+        Args:
+            fusion_engine (pntos.api.StandardFusionEngine): Filter instance used to get current time.
+        """
+        self._value = None
+        self._time_of_validity = None
+        self._fusion_engine = fusion_engine
+
+    def is_valid(self) -> bool:
+        """Check if cache entry is valid.
+
+        Returns:
+            True if entry exists at the current filter time, False otherwise.
+        """
+        return (
+            self._time_of_validity is not None
+            and self._time_of_validity.elapsed_nsec
+            == self._fusion_engine.time.elapsed_nsec
+        )
+
+    @abstractmethod
+    def recalculate(self, cache: 'Cache') -> None:
+        """Recalculate the current cache entry.
+
+        Args:
+            cache (Cache): Cache in which this entry is stored. Can be used to grab entries that this entry is dependent on.
+        """
+
+    def clear(self) -> None:
+        """Clear the current cache entry.
+
+        Clearing an entry forces the stored value to be recalculated the next time it is requested.
+        """
+        self._value = None
+        self._time_of_validity = None
+
+    def get(self, cache: 'Cache') -> Any | None:  # noqa: ANN401
+        """Get the current cache entry, recalculating if needed.
+
+        Args:
+            cache (Cache): Cache in which this entry is stored. Can be used to grab entries that this entry is dependent on.
+
+        Returns:
+            The current cache entry if available, otherwise None.
+        """
+        if not self.is_valid():
+            self.recalculate(cache)
+        return self._value
+
+
+class InertialSolutionEntry(CacheEntry):
+    """Cache entry for inertial solution."""
+
+    _value: Message | None
+    _inertial: StandardInertialMechanization
+
+    def __init__(
+        self,
+        fusion_engine: StandardFusionEngine,
+        inertial: StandardInertialMechanization,
+        solution_channel: str,
+        log_func: Callable[[LoggingLevel, str], None],
+    ) -> None:
+        """Constructor.
+
+        Args:
+            fusion_engine (pntos.api.StandardFusionEngine): Filter instance used to get current time.
+            inertial (pntos.api.StandardInertialMechanization): Inertial instance used to get inertial solution at a specific time.
+            solution_channel (str): Source identifier to attach to inertial solution.
+            log_func (Callable[[LoggingLevel, str], None]): Function used for logging messages.
+        """
+        super().__init__(fusion_engine)
+        self._inertial = inertial
+        self._solution_channel = solution_channel
+        self._log_func = log_func
+
+    def recalculate(self, cache: 'Cache') -> None:
+        """
+        Calculate and store the inertial solution at the current filter time.
+
+        Args:
+            cache (Cache): Cache in which this entry is stored. Not needed for calculating inertial solution.
+
+        """
+        filter_time = self._fusion_engine.time
+        solution = get_dead_reckoning_solution(
+            self._inertial,
+            filter_time,
+            self._solution_channel,
+            self._log_func,
+        )
+
+        self._value = solution
+        self._time_of_validity = filter_time
+
+
+class EstimateWithCovarianceEntry(CacheEntry):
+    """Cache entry for state block estimate and covariance."""
+
+    _value: EstimateWithCovariance | None
+    _sb_label: str
+
+    def __init__(
+        self,
+        fusion_engine: StandardFusionEngine,
+        sb_label: str,
+    ) -> None:
+        """Constructor.
+
+        Args:
+            fusion_engine (pntos.api.StandardFusionEngine): Filter instance used to get current time and state block EstimateWithCovariance.
+            sb_label (str): Label associated with the state block.
+        """
+        super().__init__(fusion_engine)
+        self._sb_label = sb_label
+
+    def recalculate(self, cache: 'Cache') -> None:
+        """
+        Calculate and store the state block estimate at the given time.
+
+        Args:
+            cache (Cache): Cache in which this entry is stored. Not needed for calculating estimate.
+        """
+        x_and_p = self._fusion_engine.generate_x_and_p([self._sb_label])
+
+        if x_and_p is None:
+            return
+
+        self._value = x_and_p
+        self._time_of_validity = self._fusion_engine.time
+
+
+class FilterSolutionEntry(CacheEntry):
+    """Cache entry for filter solution."""
+
+    _value: Message | None
+    _inertial_solution_key: str
+    _pinson_x_and_p_key: str
+
+    def __init__(
+        self,
+        fusion_engine: StandardFusionEngine,
+        solution_channel: str,
+        inertial_solution_key: str,
+        pinson_x_and_p_key: str,
+    ) -> None:
+        """Constructor.
+
+        Args:
+            fusion_engine (pntos.api.StandardFusionEngine): Filter instance used to get current time.
+            solution_channel (str): Source identifier to attach to filter solution.
+            inertial_solution_key (str): Key associated with inertial solution cache entry.
+            pinson_x_and_p_key (str): Key associated with pinson state block EstimateWithCovariance entry.
+        """
+        super().__init__(fusion_engine)
+        self._solution_channel = solution_channel
+        self._inertial_solution_key = inertial_solution_key
+        self._pinson_x_and_p_key = pinson_x_and_p_key
+
+    def recalculate(self, cache: 'Cache') -> None:
+        """
+        Calculate and store the filter solution at the given time.
+
+        Args:
+            cache (Cache): Cache in which this entry is stored. Used to grab inertial solution and pinson state block estimate, which are used to calculate the filter solution.
+        """
+        x_and_p: EstimateWithCovariance | None = cache.get(self._pinson_x_and_p_key)
+        if x_and_p is None:
+            return
+
+        inertial_solution: Message | None = cache.get(self._inertial_solution_key)
+        if inertial_solution is None:
+            return
+
+        assert isinstance(inertial_solution.wrapped_message, PVA)
+
+        corr_pva = apply_error_states(
+            inertial_solution.wrapped_message, x_and_p.estimate
+        )
+        corr_pva.covariance = x_and_p.covariance[:9, :9]
+
+        self._value = Message(corr_pva, self._solution_channel)
+        self._time_of_validity = self._fusion_engine.time
+
+
+class Cache:
+    """A container for storing entries of type CacheEntry."""
+
+    def __init__(self) -> None:
+        """Constructor."""
+        self._entries: dict[str, CacheEntry] = {}
+
+    def set(self, key: str, entry: CacheEntry) -> None:
+        """Store cache entry.
+
+        Args:
+            key (str): Key associated with cache entry.
+            entry (CacheEntry): The entry to store.
+        """
+        self._entries[key] = entry
+
+    def get(self, key: str) -> Any:  # noqa: ANN401
+        """Get a cache entry, recalculating it if necessary.
+
+        Args:
+            key (str): Key associated with entry to get.
+
+        Raises:
+            KeyError: If key does not exist in cache.
+
+        Returns:
+            Any: The entry associated with key.
+        """
+        if key not in self._entries:
+            raise KeyError(f'Key "{key}" does not exist in cache.')
+
+        return self._entries[key].get(self)
+
+    def clear(self, key: str) -> None:
+        """Clear a cache entry.
+
+        Note that this doesn't remove the entry from the cache, but clears it such that
+        the stored value must be recalculated the next time it is requested.
+
+        Args:
+            key (str): The key associated with the entry to clear.
+
+        Raises:
+            KeyError: If key does not exist in cache.
+        """
+        if key not in self._entries:
+            raise KeyError(f'Key "{key}" does not exist in cache.')
+
+        entry = self._entries[key]
+        entry.clear()

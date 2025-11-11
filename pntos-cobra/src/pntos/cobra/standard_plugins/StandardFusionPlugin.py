@@ -582,6 +582,9 @@ class StandardFusionEngine(api.StandardFusionEngine):
             )
             return None
 
+        if time.elapsed_nsec == self.time.elapsed_nsec:
+            return self.generate_x_and_p(block_labels)
+
         # Make sure there is at least one block_label
         if len(block_labels) == 0:
             self._mediator.log_message(
