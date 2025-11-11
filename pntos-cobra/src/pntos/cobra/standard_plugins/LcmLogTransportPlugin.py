@@ -80,7 +80,7 @@ class LcmLogTransportPlugin(TransportPlugin):
     def read_log(self) -> None:
         """Process messages from LCM log"""
         log_size = self._input_log.size()
-        progressbar = tqdm(total=log_size)
+        progressbar = tqdm(total=log_size, unit='B', unit_scale=True)
         fpos = self._input_log.tell()
 
         # Read until end of log or until pntOS is shut down
