@@ -526,7 +526,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
         )
         if measurement_model is None:
             self._mediator.log_message(
-                LoggingLevel.ERROR,
+                LoggingLevel.WARN,
                 'Unable to generate measurement model during update.',
             )
             return
