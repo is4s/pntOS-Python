@@ -634,14 +634,6 @@ class StandardFusionEngine(api.StandardFusionEngine):
                 )
                 return None
 
-        # make an array of the indices that we want to keep
-        i_keep = np.zeros([0], dtype=int)
-        for label in block_labels:
-            i_to_add = np.arange(
-                self._sb[label].start_index, self._sb[label].stop_index
-            )
-            i_keep = np.append(i_keep, i_to_add)
-
         # Retrieve the full estimate (x) and covariance (P)
         x = self._strategy.estimate
         P = self._strategy.covariance
@@ -651,6 +643,27 @@ class StandardFusionEngine(api.StandardFusionEngine):
                 'Unable to generate estimate and covariance from current strategy.',
             )
             return None
+
+        # If requesting x and P for one state block, just return slice of full x and P
+        if len(block_labels) == 1:
+            start_index = self._sb[block_labels[0]].start_index
+            stop_index = self._sb[block_labels[0]].stop_index
+            return EstimateWithCovariance(
+                EstimateWithCovarianceType.EWC_GENERIC,
+                x[start_index:stop_index, :],
+                P[
+                    start_index:stop_index,
+                    start_index:stop_index,
+                ],
+            )
+
+        # make an array of the indices that we want to keep
+        i_keep = np.zeros([0], dtype=int)
+        for label in block_labels:
+            i_to_add = np.arange(
+                self._sb[label].start_index, self._sb[label].stop_index
+            )
+            i_keep = np.append(i_keep, i_to_add)
 
         # Use the i_keep index to extract and return the desired portions of the large x and P
         return EstimateWithCovariance(
