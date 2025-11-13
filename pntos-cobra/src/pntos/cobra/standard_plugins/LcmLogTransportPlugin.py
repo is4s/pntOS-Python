@@ -93,6 +93,11 @@ class LcmLogTransportPlugin(TransportPlugin):
         # Read until end of log or until pntOS is shut down
         msg: Event | None = self._input_log.read_next_event()
         while msg is not None and not self._shutdown_threads.is_set():
+            # write input messages to output log so that they can be analyzed along with
+            # any messages that are output via broadcast_message
+            time_microsec = int(time() * 1e6)
+            self._output_log.write_event(time_microsec, msg.channel, msg.data)
+
             if (
                 self._channels_to_process is not None
                 and msg.channel not in self._channels_to_process
@@ -110,11 +115,6 @@ class LcmLogTransportPlugin(TransportPlugin):
             process_lcm_message(
                 self.mediator, msg.channel, msg.data, self._channels_found
             )
-
-            # write input messages to output log so that they can be analyzed along with
-            # any messages that are output via broadcast_message
-            time_microsec = int(time() * 1e6)
-            self._output_log.write_event(time_microsec, msg.channel, msg.data)
 
             msg = self._input_log.read_next_event()
 
