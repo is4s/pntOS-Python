@@ -1,5 +1,5 @@
 diff --git a/pntos-cobra/src/pntos/cobra/tutorial_plugins/TutorialGpsOrchestrationPlugin.py b/pntos-cobra/src/pntos/cobra/tutorial_plugins/TutorialGpsVelOrchestrationPlugin.py
-index 2eebbe58..8f83d671 100644
+index 9a8ebff4..02b362f5 100644
 --- a/pntos-cobra/src/pntos/cobra/tutorial_plugins/TutorialGpsOrchestrationPlugin.py
 +++ b/pntos-cobra/src/pntos/cobra/tutorial_plugins/TutorialGpsVelOrchestrationPlugin.py
 @@ -67,6 +67,10 @@ GPS_MEASUREMENT_PROCESSOR_ID = 'pinson_with_ned_fogm_position'

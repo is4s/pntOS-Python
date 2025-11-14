@@ -22,7 +22,8 @@ class LcmLogTransportPlugin(TransportPlugin):
     _log_reader_thread: Thread | None
     _shutdown_threads: threading.Event
     _lcm: LCM
-    _channels: set[str]
+    _channels_found: set[str]
+    _channels_to_process: set[str] | None
 
     def __init__(self, identifier: str) -> None:
         """
@@ -35,7 +36,7 @@ class LcmLogTransportPlugin(TransportPlugin):
         self.identifier = identifier
         self._shutdown_threads = threading.Event()
         self.handler = None
-        self._channels = set()
+        self._channels_found = set()
 
     def init_plugin(
         self,
@@ -66,6 +67,12 @@ class LcmLogTransportPlugin(TransportPlugin):
             return
         self._output_log = EventLog(config.output_file, 'w', overwrite=True)
 
+        self._channels_to_process = (
+            set(config.channels_to_process)
+            if config.channels_to_process is not None
+            else None
+        )
+
     def shutdown_plugin(self) -> None:
         """
         PntOS plugin shutdown function
@@ -86,18 +93,28 @@ class LcmLogTransportPlugin(TransportPlugin):
         # Read until end of log or until pntOS is shut down
         msg: Event | None = self._input_log.read_next_event()
         while msg is not None and not self._shutdown_threads.is_set():
+            # write input messages to output log so that they can be analyzed along with
+            # any messages that are output via broadcast_message
+            time_microsec = int(time() * 1e6)
+            self._output_log.write_event(time_microsec, msg.channel, msg.data)
+
+            if (
+                self._channels_to_process is not None
+                and msg.channel not in self._channels_to_process
+            ):
+                # Skip to next message
+                msg = self._input_log.read_next_event()
+                continue
+
             # update progressbar
             new_fpos = self._input_log.tell()
             progressbar.update(new_fpos - fpos)
             fpos = new_fpos
 
             # process message
-            process_lcm_message(self.mediator, msg.channel, msg.data, self._channels)
-
-            # write input messages to output log so that they can be analyzed along with
-            # any messages that are output via broadcast_message
-            time_microsec = int(time() * 1e6)
-            self._output_log.write_event(time_microsec, msg.channel, msg.data)
+            process_lcm_message(
+                self.mediator, msg.channel, msg.data, self._channels_found
+            )
 
             msg = self._input_log.read_next_event()
 

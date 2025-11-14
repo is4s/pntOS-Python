@@ -120,7 +120,7 @@ def test_standard_gps_ins_app() -> None:
     validate_results(
         log_data.data[SOLUTION_CHANNEL],
         log_data.data[TRUTH_CHANNEL],
-        num_points=2584,
+        num_points=2570,
         pos_err_limits=ErrorLimits(std_thresh=1.4, max_thresh=3.8, pct_below_1sigma=63),
         vel_err_limits=ErrorLimits(std_thresh=0.1, max_thresh=0.8),
         tilt_err_limits=ErrorLimits(std_thresh=0.81, max_thresh=3.5),
@@ -189,7 +189,7 @@ def test_standard_gps_ins_leverarm_app() -> None:
     validate_results(
         log_data.data[SOLUTION_CHANNEL],
         log_data.data[TRUTH_CHANNEL],
-        num_points=2584,
+        num_points=2570,
         pos_err_limits=ErrorLimits(std_thresh=2.0, max_thresh=4.1, pct_below_1sigma=60),
         vel_err_limits=ErrorLimits(std_thresh=0.11, max_thresh=1.0),
         tilt_err_limits=ErrorLimits(
@@ -207,7 +207,7 @@ def test_standard_gps_bodyvel_ins_app() -> None:
     validate_results(
         log_data.data[SOLUTION_CHANNEL],
         log_data.data[TRUTH_CHANNEL],
-        num_points=2584,
+        num_points=2570,
         pos_err_limits=ErrorLimits(std_thresh=1.4, max_thresh=4.0, pct_below_1sigma=64),
         vel_err_limits=ErrorLimits(std_thresh=0.11, max_thresh=1.0),
         tilt_err_limits=ErrorLimits(std_thresh=0.8, max_thresh=3.5),
@@ -223,7 +223,7 @@ def test_standard_gps_ins_vel_app() -> None:
     validate_results(
         log_data.data[SOLUTION_CHANNEL],
         log_data.data[TRUTH_CHANNEL],
-        num_points=2584,
+        num_points=2570,
         # TODO: these limits are very high
         pos_err_limits=ErrorLimits(
             std_thresh=1.4,
@@ -235,7 +235,7 @@ def test_standard_gps_ins_vel_app() -> None:
         vel_err_limits=ErrorLimits(
             std_thresh=0.14,
             max_thresh=1.1,
-            pct_below_1sigma=48,
+            pct_below_1sigma=47,
             pct_below_2sigma=77,
             pct_below_3sigma=87,
         ),
@@ -259,7 +259,7 @@ def test_standard_posvel_ins_app() -> None:
     validate_results(
         log_data.data[SOLUTION_CHANNEL],
         log_data.data[TRUTH_CHANNEL],
-        num_points=2584,
+        num_points=2570,
         # TODO: these limits are very high
         pos_err_limits=ErrorLimits(
             std_thresh=1.4,
@@ -271,7 +271,7 @@ def test_standard_posvel_ins_app() -> None:
         vel_err_limits=ErrorLimits(
             std_thresh=0.14,
             max_thresh=1.1,
-            pct_below_1sigma=48,
+            pct_below_1sigma=47,
             pct_below_2sigma=77,
             pct_below_3sigma=87,
         ),
@@ -294,7 +294,7 @@ def test_standard_gps_ins_baro_app() -> None:
     validate_results(
         log_data.data[SOLUTION_CHANNEL],
         log_data.data[TRUTH_CHANNEL],
-        num_points=2584,
+        num_points=2570,
         pos_err_limits=ErrorLimits(std_thresh=1.7, max_thresh=4.7, pct_below_1sigma=64),
         vel_err_limits=ErrorLimits(
             std_thresh=0.1, max_thresh=0.8, pct_below_2sigma=91, pct_below_3sigma=98

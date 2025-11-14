@@ -1,5 +1,5 @@
 diff --git a/apps/standard/gps_vel_ins.py b/apps/standard/posvel_ins.py
-index 98b965ce..345672ae 100755
+index 95d74bbe..c4c9a755 100755
 --- a/apps/standard/gps_vel_ins.py
 +++ b/apps/standard/posvel_ins.py
 @@ -1,11 +1,13 @@
@@ -27,7 +27,17 @@ index 98b965ce..345672ae 100755
      PinsonStateBlockConfig,
      SensorConfig,
      SensorMeasurementProcessorConfig,
-@@ -102,25 +103,18 @@ my_config = [
+@@ -74,8 +75,7 @@ my_config = [
+         group='config/lcm_log_transport',
+         channels_to_process=(
+             '/sensor/vn-100/imu',
+-            '/sensor/ublox-ZED-F9T/position',
+-            '/sensor/ublox-ZED-F9T/velocity',
++            '/sensor/ublox-ZED-F9T/pva',
+         ),
+     ),
+     StandardOrchestrationConfig(
+@@ -107,25 +107,18 @@ my_config = [
          ),
          mp_configs=(
              SensorMeasurementProcessorConfig(
@@ -58,7 +68,7 @@ index 98b965ce..345672ae 100755
          ),
          inertial_config=InertialConfig(
              group='config/inertial',
-@@ -152,10 +146,7 @@ my_config = [
+@@ -157,10 +150,7 @@ my_config = [
              TimeBiasConfig(
                  group='config/time_bias',
                  identifier='time_bias',

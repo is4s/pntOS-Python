@@ -64,6 +64,10 @@ my_config = [
         output_file=OUTPUT_LOG,
         output_version=AspnVersion.V23,
         group='config/lcm_log_transport',
+        channels_to_process=(
+            '/sensor/vn-100/imu',
+            '/sensor/ublox-ZED-F9T/position',
+        ),
     ),
     StandardOrchestrationConfig(
         best_sol_channel='/solution/pntos/pva',
