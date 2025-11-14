@@ -1,5 +1,5 @@
 diff --git a/apps/tutorial/gps_ins.py b/apps/standard/gps_ins.py
-index d6ad2c8d..10bbbf4c 100755
+index 28dbe60a..bdcd118f 100755
 --- a/apps/tutorial/gps_ins.py
 +++ b/apps/standard/gps_ins.py
 @@ -2,37 +2,40 @@
@@ -51,7 +51,7 @@ index d6ad2c8d..10bbbf4c 100755
  )
  from pntos_python_datasets import EXAMPLE_LCM_LOG
  
-@@ -44,6 +47,17 @@ C_imu_to_platform = (
+@@ -44,86 +47,106 @@ C_imu_to_platform = (
      (-0.01742059, 0.99983262, -0.00559042),
      (-0.0603517, 0.00452957, 0.9981669),
  )
@@ -69,9 +69,13 @@ index d6ad2c8d..10bbbf4c 100755
  my_config = [
      LcmLogTransportConfig(
          input_file=EXAMPLE_LCM_LOG,
-@@ -51,79 +65,84 @@ my_config = [
+         output_file=OUTPUT_LOG,
          output_version=AspnVersion.V23,
          group='config/lcm_log_transport',
++        channels_to_process=(
++            '/sensor/vn-100/imu',
++            '/sensor/ublox-ZED-F9T/position',
++        ),
      ),
 -    ImuConfig(
 -        group='config/inertial_state',
@@ -225,7 +229,7 @@ index d6ad2c8d..10bbbf4c 100755
  ]
  # End Config
  
-@@ -133,17 +152,18 @@ plugins = [
+@@ -133,17 +156,18 @@ plugins = [
      LcmLogTransportPlugin('Cobra LCM Log Transport Plugin'),
      EkfFusionStrategyPlugin('Cobra EKF Fusion Strategy Plugin'),
      StandardFusionPlugin('Cobra Standard Fusion Plugin'),

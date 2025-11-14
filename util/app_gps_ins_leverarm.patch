@@ -1,8 +1,8 @@
 diff --git a/apps/standard/gps_ins.py b/apps/standard/gps_ins_leverarm.py
-index 10bbbf4c..92ce0e54 100755
+index bdcd118f..c0f851c4 100755
 --- a/apps/standard/gps_ins.py
 +++ b/apps/standard/gps_ins_leverarm.py
-@@ -91,17 +91,40 @@ my_config = [
+@@ -95,17 +95,40 @@ my_config = [
                      tau=(300.0, 300.0, 200.0),
                  ),
              ),
