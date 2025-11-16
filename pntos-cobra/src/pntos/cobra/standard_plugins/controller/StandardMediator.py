@@ -40,7 +40,7 @@ class StandardMediator(Mediator):
     _logging_error_event: Event = Event()
     registry: Registry
     _messages: ClassVar[list[Message]] = []
-    _buffer_time_nsec: int = 2_000_000_000
+    _buffer_time_nsec: int
     _last_solution_time: TypeTimestamp | None
     _publish_interval_ns: int | None = None
 
