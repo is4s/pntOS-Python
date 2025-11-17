@@ -20,6 +20,7 @@ from pntos.cobra import (
 )
 from pntos.cobra.advanced_plugins import Aspn23RosTransportPlugin
 from pntos.cobra.config import (
+    ControllerConfig,
     FogmConfig,
     FogmStateBlockConfig,
     ImuConfig,
@@ -52,6 +53,7 @@ imu_model = ImuConfig(
     gyro_bias_initial_sigma=(0.003, 0.003, 0.003),
 )
 my_config = [
+    ControllerConfig(group='controller'),
     StandardOrchestrationConfig(
         best_sol_channel='/solution/pntos/pva',
         imu_sol_channel='/solution/pntos-imu/pva',
@@ -148,7 +150,7 @@ plugins = [
         'Cobra Standard Logging Plugin',
         global_log_level=LoggingLevel.INFO,  # Switch to `DEBUG` for more informative log output
     ),
-    StandardRegistryPlugin('Cobra Standard Registry Plugin', config=my_config),  # type: ignore[arg-type]
+    StandardRegistryPlugin('Cobra Standard Registry Plugin', config=my_config),
     StandardPreprocessorPlugin('Cobra Standard Preprocessor Plugin'),
     StandardOrchestrationPlugin('Cobra Standard Orchestration Plugin'),
 ]

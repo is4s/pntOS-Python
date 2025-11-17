@@ -1,16 +1,16 @@
 diff --git a/apps/standard/gps_ins.py b/apps/standard/gps_ins_bodyvel.py
-index bdcd118f..08cda418 100755
+index 59c4d11a..15dab196 100755
 --- a/apps/standard/gps_ins.py
 +++ b/apps/standard/gps_ins_bodyvel.py
-@@ -67,6 +67,7 @@ my_config = [
+@@ -68,6 +68,7 @@ my_config = [
          channels_to_process=(
              '/sensor/vn-100/imu',
              '/sensor/ublox-ZED-F9T/position',
 +            '/sensor/simulated/velocity',
          ),
      ),
-     StandardOrchestrationConfig(
-@@ -110,6 +111,19 @@ my_config = [
+     ControllerConfig(group='controller'),
+@@ -112,6 +113,19 @@ my_config = [
                      sensor_name='position',
                  ),
              ),
