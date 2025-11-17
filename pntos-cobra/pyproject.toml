@@ -18,8 +18,8 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
 ]
 dependencies = [
-    "analysis-lcm @ git+ssh://git@git.aspn.us/pntos/analysis-scripts.git@81156ca808b30743ebf63f6d1f712afa3620d9aa#subdirectory=analysis-lcm",
-    "analysis-ros @ git+ssh://git@git.aspn.us/pntos/analysis-scripts.git@81156ca808b30743ebf63f6d1f712afa3620d9aa#subdirectory=analysis-ros",
+    "analysis-lcm @ git+ssh://git@git.aspn.us/pntos/analysis-scripts.git@6f4bc7c0c4b2c9efd1e428b5725612e6f934e6bd#subdirectory=analysis-lcm",
+    "analysis-ros @ git+ssh://git@git.aspn.us/pntos/analysis-scripts.git@6f4bc7c0c4b2c9efd1e428b5725612e6f934e6bd#subdirectory=analysis-ros",
     # lcm-generated aspn-2.2 branch - committed 10 November 2025
     "aspn2-lcm @ git+ssh://git@git.aspn.us/pntos/lcm-generated.git@831a7727bffab217b3de60491dc12b96b50887a1#subdirectory=python",
     # firehose-outputs main branch - committed 10 November 2025

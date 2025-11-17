@@ -66,7 +66,7 @@ class TutorialLcmTransportPlugin(TransportPlugin):
     def start_listening(self) -> None:
         """Process messages from LCM log"""
         log_size = self._input_log.size()
-        progressbar = tqdm(total=log_size)
+        progressbar = tqdm(total=log_size, unit='B', unit_scale=True)
         fpos = self._input_log.tell()
 
         # Read and process all messages in log

@@ -6,12 +6,12 @@
     #   pntos-python
 -e ./pntos-cobra
     # via pntos-python
-analysis-lcm @ git+ssh://git@git.aspn.us/pntos/analysis-scripts.git@81156ca808b30743ebf63f6d1f712afa3620d9aa#subdirectory=analysis-lcm
+analysis-lcm @ git+ssh://git@git.aspn.us/pntos/analysis-scripts.git@6f4bc7c0c4b2c9efd1e428b5725612e6f934e6bd#subdirectory=analysis-lcm
     # via
     #   analysis-ros
     #   pntos-cobra
     #   pntos-python
-analysis-ros @ git+ssh://git@git.aspn.us/pntos/analysis-scripts.git@81156ca808b30743ebf63f6d1f712afa3620d9aa#subdirectory=analysis-ros
+analysis-ros @ git+ssh://git@git.aspn.us/pntos/analysis-scripts.git@6f4bc7c0c4b2c9efd1e428b5725612e6f934e6bd#subdirectory=analysis-ros
     # via
     #   pntos-cobra
     #   pntos-python
