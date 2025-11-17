@@ -1,5 +1,5 @@
 diff --git a/apps/tutorial/gps_ins.py b/apps/tutorial/gps_vel_ins.py
-index 28dbe60a..3e6a30f7 100755
+index b3034afe..ed922c0e 100755
 --- a/apps/tutorial/gps_ins.py
 +++ b/apps/tutorial/gps_vel_ins.py
 @@ -16,7 +16,7 @@ from pntos.cobra import (
@@ -11,7 +11,7 @@ index 28dbe60a..3e6a30f7 100755
      TutorialInitializationPlugin,
      UiLogPlottingPlugin,
  )
-@@ -99,6 +99,7 @@ my_config = [
+@@ -101,6 +101,7 @@ my_config = [
      TutorialOrchestrationConfig(
          gps_channel='/sensor/ublox-ZED-F9T/position',
          group='config/orchestration',
@@ -19,7 +19,7 @@ index 28dbe60a..3e6a30f7 100755
      ),
      TimeAdjusterConfig(
          group='config/time_adjuster',
-@@ -121,7 +122,10 @@ my_config = [
+@@ -123,7 +124,10 @@ my_config = [
      TimeBiasConfig(
          group='config/time_bias',
          identifier='time_bias',
@@ -31,7 +31,7 @@ index 28dbe60a..3e6a30f7 100755
          time_bias=int(0.15 * 1e9),
      ),
  ]
-@@ -143,7 +147,7 @@ plugins = [
+@@ -145,7 +149,7 @@ plugins = [
      StandardRegistryPlugin('Cobra Standard Registry Plugin', config=my_config),
      StandardPreprocessorPlugin('Cobra Standard Preprocessor Plugin'),
      UiLogPlottingPlugin('Cobra UI Logfile Plotting Plugin'),

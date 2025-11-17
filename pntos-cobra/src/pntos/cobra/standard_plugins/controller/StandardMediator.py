@@ -19,8 +19,6 @@ from pntos.cobra.utils import print_message
 
 from .StandardMessageStreamConfig import StandardMessageStreamConfig
 
-SEC_NS = 1_000_000_000
-
 
 def _get_time(msg: Message) -> int:
     """Returns the time of the message in nanoseconds."""
@@ -44,6 +42,7 @@ class StandardMediator(Mediator):
     _messages: ClassVar[list[Message]] = []
     _buffer_time_nsec: int = 2_000_000_000
     _last_solution_time: TypeTimestamp | None
+    _publish_interval_ns: int | None = None
 
     def __init__(
         self,
@@ -108,7 +107,11 @@ class StandardMediator(Mediator):
             return
 
         # Print the current solution every second in message time
-        if cur_time.elapsed_nsec - self._last_solution_time.elapsed_nsec > SEC_NS:
+        if (
+            self._publish_interval_ns is not None
+            and cur_time.elapsed_nsec - self._last_solution_time.elapsed_nsec
+            > self._publish_interval_ns
+        ):
             solution = self.request_solutions([cur_time])
             if solution is not None and solution[0] is not None:
                 self._log_message(LoggingLevel.DEBUG, f'Got a solution! {solution}')

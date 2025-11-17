@@ -1,5 +1,5 @@
 diff --git a/apps/standard/gps_ins.py b/apps/standard/gps_ins_baro.py
-index bdcd118f..7fdf9d70 100755
+index 59c4d11a..617eb3e4 100755
 --- a/apps/standard/gps_ins.py
 +++ b/apps/standard/gps_ins_baro.py
 @@ -23,6 +23,7 @@ from pntos.cobra import (
@@ -7,18 +7,18 @@ index bdcd118f..7fdf9d70 100755
  from pntos.cobra.config import (
      AspnVersion,
 +    BarometerToAltitudeConfig,
+     ControllerConfig,
      FogmConfig,
      FogmStateBlockConfig,
-     ImuConfig,
-@@ -67,6 +68,7 @@ my_config = [
+@@ -68,6 +69,7 @@ my_config = [
          channels_to_process=(
              '/sensor/vn-100/imu',
              '/sensor/ublox-ZED-F9T/position',
 +            '/sensor/bmp388/baro_pressure',
          ),
      ),
-     StandardOrchestrationConfig(
-@@ -95,6 +97,21 @@ my_config = [
+     ControllerConfig(group='controller'),
+@@ -97,6 +99,21 @@ my_config = [
                      tau=(300.0, 300.0, 200.0),
                  ),
              ),
@@ -40,7 +40,7 @@ index bdcd118f..7fdf9d70 100755
          ),
          mp_configs=(
              SensorMeasurementProcessorConfig(
-@@ -110,6 +127,19 @@ my_config = [
+@@ -112,6 +129,19 @@ my_config = [
                      sensor_name='position',
                  ),
              ),
@@ -60,7 +60,7 @@ index bdcd118f..7fdf9d70 100755
          ),
          inertial_config=InertialConfig(
              group='config/inertial',
-@@ -144,6 +174,12 @@ my_config = [
+@@ -146,6 +176,12 @@ my_config = [
                  channels_to_correct=('/sensor/ublox-ZED-F9T/position',),
                  time_bias=int(0.15 * 1e9),
              ),

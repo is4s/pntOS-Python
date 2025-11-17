@@ -30,6 +30,7 @@ from pntos.cobra import (
 )
 from pntos.cobra.config import (
     AspnVersion,
+    ControllerConfig,
     FogmConfig,
     FogmStateBlockConfig,
     ImuConfig,
@@ -78,6 +79,7 @@ my_config = [
             '/sensor/ublox-ZED-F9T/velocity',
         ),
     ),
+    ControllerConfig(group='controller'),
     StandardOrchestrationConfig(
         best_sol_channel='/solution/pntos/pva',
         imu_sol_channel='/solution/pntos-imu/pva',

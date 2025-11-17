@@ -24,6 +24,7 @@ from pntos.cobra import (
 from pntos.cobra.config import (
     AspnVersion,
     BarometerToAltitudeConfig,
+    ControllerConfig,
     FogmConfig,
     FogmStateBlockConfig,
     ImuConfig,
@@ -71,6 +72,7 @@ my_config = [
             '/sensor/bmp388/baro_pressure',
         ),
     ),
+    ControllerConfig(group='controller'),
     StandardOrchestrationConfig(
         best_sol_channel='/solution/pntos/pva',
         imu_sol_channel='/solution/pntos-imu/pva',

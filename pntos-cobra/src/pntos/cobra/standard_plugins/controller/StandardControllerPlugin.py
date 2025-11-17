@@ -11,6 +11,7 @@ from pntos.api import (
     TransportPlugin,
     UiPlugin,
 )
+from pntos.cobra.config import ControllerConfig, config_from_registry
 from pntos.cobra.utils import (
     SortedPlugins,
     find_base_plugin_type,
@@ -185,6 +186,18 @@ class StandardControllerPlugin(ControllerPlugin):
         orchestration_plugin.init_orchestration_plugin(
             plugins_for_orchestration, stream_config
         )
+
+        # Extract controller-specific config
+        temp_mediator = StandardMediator(self.identifier, ControllerPlugin)
+        config = config_from_registry(ControllerConfig, temp_mediator, 'controller')
+        if config is None:
+            self._log(
+                LoggingLevel.ERROR,
+                'Could not extract ControllerConfig from group "controller". Cannot initialize controller plugin.',
+            )
+            return
+        if config.publish_interval is not None:
+            StandardMediator._publish_interval_ns = int(config.publish_interval * 1e9)
 
         # Pass off to main control loop
         self._main()

@@ -222,4 +222,26 @@ class StandardOrchestrationConfig(BaseConfig):
     this will be broken up into segments.
     """
 
+    publish_before_update: bool = False
+    """Whether to publish filter and inertial solution right before each update.
+
+    If True, will publish to registry and through transport.
+
+    NOTE: It is recommended when enabling this feature that you disable
+    `publish_interval` in ControllerConfig, otherwise filter solutions may be published
+    out of order.
+    """
+
+    publish_after_update: bool = False
+    """Whether to publish filter and inertial solution right after each update.
+
+    If True, will publish to registry and through transport. If inertial feedback is
+    enabled, it will be applied after the filter update, but before publishing the
+    solution.
+
+    NOTE: It is recommended when enabling this feature that you disable
+    `publish_interval` in ControllerConfig, otherwise filter solutions may be published
+    out of order.
+    """
+
     group: str

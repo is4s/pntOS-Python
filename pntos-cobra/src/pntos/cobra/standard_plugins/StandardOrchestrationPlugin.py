@@ -240,6 +240,8 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
         # pntOS Solution
         self.best_sol_channel = orch_config.best_sol_channel
         self.imu_sol_channel = orch_config.imu_sol_channel
+        self.publish_before_update = orch_config.publish_before_update
+        self.publish_after_update = orch_config.publish_after_update
         # Alignment
         self.alignment_channels = orch_config.alignment_channels
         # Inertial
@@ -470,6 +472,17 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
             self.fusion_engine.propagate(prop_time)
             filter_time = prop_time
 
+    def _publish_solution(self, solution: Message | None, group: str, key: str) -> None:
+        """Publish solution to registry and over transport."""
+        if solution is None:
+            return
+
+        kv = self.mediator.registry.batch_start(group)
+        kv[key] = solution
+        kv.batch_end()
+
+        self.mediator.broadcast_aspn_message(solution, None, solution.source_identifier)
+
     def _get_inertial_aux(self, forces: bool = False) -> list[Message | None] | None:
         """Get inertial solution and forces/rates at the current filter time."""
         time = self.fusion_engine.time
@@ -556,6 +569,18 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
         mp_label = self.measurement_channels[message.source_identifier]
         self._send_inertial_aux_to_measurement_processor(mp_label)
 
+        if self.publish_before_update:
+            self._publish_solution(
+                self.cache.get('inertial solution'),
+                group='inertial solution',
+                key='before feedback',
+            )
+            self._publish_solution(
+                self.cache.get('filter solution'),
+                group='filter solution',
+                key='before update',
+            )
+
         # Update filter.
         self.fusion_engine.update(mp_label, message)
 
@@ -565,6 +590,18 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
         self.cache.clear('pinson')
 
         self._apply_inertial_feedback()
+
+        if self.publish_after_update:
+            self._publish_solution(
+                self.cache.get('inertial solution'),
+                group='inertial solution',
+                key='after feedback',
+            )
+            self._publish_solution(
+                self.cache.get('filter solution'),
+                group='filter solution',
+                key='after update',
+            )
 
     def _propagate_during_outage(self) -> None:
         if initialization_ready(self.initialization_state, self.initializer):
