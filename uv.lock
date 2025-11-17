@@ -25,7 +25,7 @@ wheels = [
 [[package]]
 name = "analysis-lcm"
 version = "0.1.0"
-source = { git = "ssh://git@git.aspn.us/pntos/analysis-scripts.git?subdirectory=analysis-lcm&rev=81156ca808b30743ebf63f6d1f712afa3620d9aa#81156ca808b30743ebf63f6d1f712afa3620d9aa" }
+source = { git = "ssh://git@git.aspn.us/pntos/analysis-scripts.git?subdirectory=analysis-lcm&rev=6f4bc7c0c4b2c9efd1e428b5725612e6f934e6bd#6f4bc7c0c4b2c9efd1e428b5725612e6f934e6bd" }
 dependencies = [
     { name = "inu" },
     { name = "tabulate" },
@@ -36,7 +36,7 @@ dependencies = [
 [[package]]
 name = "analysis-ros"
 version = "0.1.0"
-source = { git = "ssh://git@git.aspn.us/pntos/analysis-scripts.git?subdirectory=analysis-ros&rev=81156ca808b30743ebf63f6d1f712afa3620d9aa#81156ca808b30743ebf63f6d1f712afa3620d9aa" }
+source = { git = "ssh://git@git.aspn.us/pntos/analysis-scripts.git?subdirectory=analysis-ros&rev=6f4bc7c0c4b2c9efd1e428b5725612e6f934e6bd#6f4bc7c0c4b2c9efd1e428b5725612e6f934e6bd" }
 dependencies = [
     { name = "analysis-lcm" },
 ]
@@ -1379,8 +1379,8 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "analysis-lcm", git = "ssh://git@git.aspn.us/pntos/analysis-scripts.git?subdirectory=analysis-lcm&rev=81156ca808b30743ebf63f6d1f712afa3620d9aa" },
-    { name = "analysis-ros", git = "ssh://git@git.aspn.us/pntos/analysis-scripts.git?subdirectory=analysis-ros&rev=81156ca808b30743ebf63f6d1f712afa3620d9aa" },
+    { name = "analysis-lcm", git = "ssh://git@git.aspn.us/pntos/analysis-scripts.git?subdirectory=analysis-lcm&rev=6f4bc7c0c4b2c9efd1e428b5725612e6f934e6bd" },
+    { name = "analysis-ros", git = "ssh://git@git.aspn.us/pntos/analysis-scripts.git?subdirectory=analysis-ros&rev=6f4bc7c0c4b2c9efd1e428b5725612e6f934e6bd" },
     { name = "aspn2-lcm", git = "ssh://git@git.aspn.us/pntos/lcm-generated.git?subdirectory=python&rev=831a7727bffab217b3de60491dc12b96b50887a1" },
     { name = "aspn2-translations", git = "ssh://git@git.aspn.us/pntos/firehose-outputs.git?subdirectory=aspn2_to_aspn_py_translations&rev=1cd02aa9bd7f9cd33a5ee7842c2f7ff2f31a3415" },
     { name = "aspn23", git = "ssh://git@git.aspn.us/pntos/firehose-outputs.git?subdirectory=aspn-py&rev=b8a34d86cf501fff795ea1953b076c92abca2465" },
@@ -1431,8 +1431,8 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "analysis-lcm", git = "ssh://git@git.aspn.us/pntos/analysis-scripts.git?subdirectory=analysis-lcm&rev=81156ca808b30743ebf63f6d1f712afa3620d9aa" },
-    { name = "analysis-ros", git = "ssh://git@git.aspn.us/pntos/analysis-scripts.git?subdirectory=analysis-ros&rev=81156ca808b30743ebf63f6d1f712afa3620d9aa" },
+    { name = "analysis-lcm", git = "ssh://git@git.aspn.us/pntos/analysis-scripts.git?subdirectory=analysis-lcm&rev=6f4bc7c0c4b2c9efd1e428b5725612e6f934e6bd" },
+    { name = "analysis-ros", git = "ssh://git@git.aspn.us/pntos/analysis-scripts.git?subdirectory=analysis-ros&rev=6f4bc7c0c4b2c9efd1e428b5725612e6f934e6bd" },
     { name = "matplotlib" },
     { name = "pntos-api", editable = "pntos-api" },
     { name = "pntos-cobra", editable = "pntos-cobra" },
