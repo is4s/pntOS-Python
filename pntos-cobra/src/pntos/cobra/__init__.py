@@ -19,6 +19,9 @@ from .standard_plugins.LcmTransportPlugin import (
 from .standard_plugins.ManualHeadingAlignInitializationPlugin import (
     ManualHeadingAlignInitializationPlugin as ManualHeadingAlignInitializationPlugin,
 )
+from .standard_plugins.preprocessor.StandardPreprocessorPlugin import (
+    StandardPreprocessorPlugin as StandardPreprocessorPlugin,
+)
 from .standard_plugins.StandardFusionPlugin import (
     StandardFusionPlugin as StandardFusionPlugin,
 )
@@ -30,9 +33,6 @@ from .standard_plugins.StandardLoggingPlugin import (
 )
 from .standard_plugins.StandardOrchestrationPlugin import (
     StandardOrchestrationPlugin as StandardOrchestrationPlugin,
-)
-from .standard_plugins.StandardPreprocessorPlugin import (
-    StandardPreprocessorPlugin as StandardPreprocessorPlugin,
 )
 from .standard_plugins.StandardRegistryPlugin import (
     StandardRegistryPlugin as StandardRegistryPlugin,
