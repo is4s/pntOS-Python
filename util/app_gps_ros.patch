@@ -1,5 +1,5 @@
 diff --git a/apps/standard/gps_ins.py b/apps/advanced/gps_ins_ros.py
-index 59c4d11a..3695b084 100755
+index 46f2a3b2..e08ca11c 100755
 --- a/apps/standard/gps_ins.py
 +++ b/apps/advanced/gps_ins_ros.py
 @@ -1,7 +1,5 @@
@@ -75,9 +75,9 @@ index 59c4d11a..3695b084 100755
 -                channel='/sensor/ublox-ZED-F9T/position',
 +                channel='/sensor/ublox_ZED_F9T/position',
                  state_block_labels=('pinson15', 'pos_sensor_error'),
+                 aux_channels=('INERTIAL_PVA',),
                  sensor_config=SensorConfig(
-                     group='config/gp3d_state_modeling',
-@@ -116,7 +99,7 @@ my_config = [
+@@ -117,7 +100,7 @@ my_config = [
          inertial_config=InertialConfig(
              group='config/inertial',
              expected_dt=0.01,
@@ -86,7 +86,7 @@ index 59c4d11a..3695b084 100755
              C_imu_to_platform=C_imu_to_platform,
              inertial_buffer_length=10.0,
          ),
-@@ -131,13 +114,13 @@ my_config = [
+@@ -132,13 +115,13 @@ my_config = [
              ImuRotatorConfig(
                  group='config/imu_rotator',
                  identifier='imu_rotator',
@@ -102,7 +102,7 @@ index 59c4d11a..3695b084 100755
                  expected_dt_nsec=int(0.01 * 1e9),
              ),
              TimeBiasConfig(
-@@ -155,7 +138,7 @@ my_config = [
+@@ -156,7 +139,7 @@ my_config = [
  # Instantiate all of our plugins
  controller = StandardControllerPlugin('Cobra Standard Controller Plugin')
  plugins = [

@@ -1,5 +1,5 @@
 diff --git a/apps/standard/gps_ins.py b/apps/standard/gps_ins_bodyvel.py
-index 59c4d11a..15dab196 100755
+index 46f2a3b2..4a7f3178 100755
 --- a/apps/standard/gps_ins.py
 +++ b/apps/standard/gps_ins_bodyvel.py
 @@ -68,6 +68,7 @@ my_config = [
@@ -10,7 +10,7 @@ index 59c4d11a..15dab196 100755
          ),
      ),
      ControllerConfig(group='controller'),
-@@ -112,6 +113,19 @@ my_config = [
+@@ -113,6 +114,20 @@ my_config = [
                      sensor_name='position',
                  ),
              ),
@@ -20,6 +20,7 @@ index 59c4d11a..15dab196 100755
 +                label='body_vel',
 +                channel='/sensor/simulated/velocity',
 +                state_block_labels=('pinson15',),
++                aux_channels=('INERTIAL_PVA', 'INERTIAL_FORCES_AND_RATES'),
 +                sensor_config=SensorConfig(
 +                    group='config/bv3d_state_modeling',
 +                    lever_arm=(0.0, 0.0, 0.0),

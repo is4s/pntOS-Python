@@ -114,6 +114,7 @@ my_config = [
                 label='gps',
                 channel='/sensor/ublox-ZED-F9T/position',
                 state_block_labels=('pinson15',),
+                aux_channels=('INERTIAL_PVA',),
                 sensor_config=SensorConfig(
                     group='config/gp3d_state_modeling',
                     lever_arm=(-0.50, 0.38, -0.05),
@@ -127,6 +128,7 @@ my_config = [
                 label='vel',
                 channel='/sensor/ublox-ZED-F9T/velocity',
                 state_block_labels=('pinson15',),
+                aux_channels=('INERTIAL_PVA',),
             ),
         ),
         inertial_config=InertialConfig(

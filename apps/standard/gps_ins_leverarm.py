@@ -124,6 +124,7 @@ my_config = [
                     'pos_sensor_error',
                     'pos_sensor_lever_arm',
                 ),
+                aux_channels=('INERTIAL_PVA',),
                 sensor_config=SensorConfig(
                     group='config/gp3d_state_modeling',
                     lever_arm=(

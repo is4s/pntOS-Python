@@ -1,5 +1,5 @@
 diff --git a/apps/standard/gps_ins.py b/apps/standard/gps_ins_baro.py
-index 59c4d11a..617eb3e4 100755
+index 46f2a3b2..0dc04414 100755
 --- a/apps/standard/gps_ins.py
 +++ b/apps/standard/gps_ins_baro.py
 @@ -23,6 +23,7 @@ from pntos.cobra import (
@@ -40,7 +40,7 @@ index 59c4d11a..617eb3e4 100755
          ),
          mp_configs=(
              SensorMeasurementProcessorConfig(
-@@ -112,6 +129,19 @@ my_config = [
+@@ -113,6 +130,20 @@ my_config = [
                      sensor_name='position',
                  ),
              ),
@@ -50,6 +50,7 @@ index 59c4d11a..617eb3e4 100755
 +                label='alt',
 +                channel='/sensor/bmp388/altitude',
 +                state_block_labels=('pinson15', 'alt_fogm'),
++                aux_channels=('INERTIAL_PVA',),
 +                sensor_config=SensorConfig(
 +                    group='config/alt_state_modeling',
 +                    lever_arm=(0.0, 0.0, 0.0),
@@ -60,7 +61,7 @@ index 59c4d11a..617eb3e4 100755
          ),
          inertial_config=InertialConfig(
              group='config/inertial',
-@@ -146,6 +176,12 @@ my_config = [
+@@ -147,6 +178,12 @@ my_config = [
                  channels_to_correct=('/sensor/ublox-ZED-F9T/position',),
                  time_bias=int(0.15 * 1e9),
              ),

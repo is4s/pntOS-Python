@@ -1,5 +1,5 @@
 diff --git a/apps/standard/gps_ins.py b/apps/standard/gps_vel_ins.py
-index 59c4d11a..7d0d1775 100755
+index 46f2a3b2..65040937 100755
 --- a/apps/standard/gps_ins.py
 +++ b/apps/standard/gps_vel_ins.py
 @@ -1,5 +1,12 @@
@@ -41,10 +41,10 @@ index 59c4d11a..7d0d1775 100755
                  channel='/sensor/ublox-ZED-F9T/position',
 -                state_block_labels=('pinson15', 'pos_sensor_error'),
 +                state_block_labels=('pinson15',),
+                 aux_channels=('INERTIAL_PVA',),
                  sensor_config=SensorConfig(
                      group='config/gp3d_state_modeling',
-                     lever_arm=(-0.50, 0.38, -0.05),
-@@ -112,6 +121,13 @@ my_config = [
+@@ -113,6 +122,14 @@ my_config = [
                      sensor_name='position',
                  ),
              ),
@@ -54,11 +54,12 @@ index 59c4d11a..7d0d1775 100755
 +                label='vel',
 +                channel='/sensor/ublox-ZED-F9T/velocity',
 +                state_block_labels=('pinson15',),
++                aux_channels=('INERTIAL_PVA',),
 +            ),
          ),
          inertial_config=InertialConfig(
              group='config/inertial',
-@@ -143,7 +159,10 @@ my_config = [
+@@ -144,7 +161,10 @@ my_config = [
              TimeBiasConfig(
                  group='config/time_bias',
                  identifier='time_bias',

@@ -18,7 +18,9 @@ class ClockBiasStateBlockConfig(StateBlockConfig):
         label (str):
             Inherited from StateBlockConfig. The unique label to associate with the instance of ClockBiasStateBlock added to the fusion engine.
         estimate_with_covariance (EstimateWithCovariance | None):
-            Inerhtied from StateBlockConfig. The initial estimate and covariance of the clock bias states.
+            Inherited from StateBlockConfig. The initial estimate and covariance of the clock bias states.
+        aux_channels (tuple[str, ...] | None):
+            Optional channels to map to this state block's `receive_aux_data` method.
         h_0 (float):
             White noise coefficient of allan deviation.
         h_neg2 (float):
@@ -33,6 +35,7 @@ class ClockBiasStateBlockConfig(StateBlockConfig):
     identifier: str
     label: str
     estimate_with_covariance: EstimateWithCovariance | None
+    aux_channels: tuple[str, ...] | None = None
 
     # UNIQUE FIELDS
     h_0: float

@@ -35,6 +35,11 @@ class StateBlockConfig(BaseConfig):
     An optional field that allows an initial estimate and covariance to be associated with the state block.
     """
 
+    aux_channels: tuple[str, ...] | None = None
+    """
+    Optional channels to map to this state block's `receive_aux_data` method.
+    """
+
 
 @dataclass(kw_only=True)
 class PinsonStateBlockConfig(StateBlockConfig):
@@ -50,6 +55,8 @@ class PinsonStateBlockConfig(StateBlockConfig):
     label: str
 
     estimate_with_covariance: EstimateWithCovariance | None = None
+
+    aux_channels: tuple[str, ...] | None = None
 
     # UNIQUE FIELDS
     imu_model: ImuConfig
@@ -74,6 +81,8 @@ class FogmStateBlockConfig(StateBlockConfig):
     label: str
 
     estimate_with_covariance: EstimateWithCovariance  # not optional on this block
+
+    aux_channels: tuple[str, ...] | None = None
 
     # UNIQUE FIELDS
     fogm_model: FogmConfig
@@ -104,6 +113,11 @@ class MeasurementProcessorConfig(BaseConfig):
     The name used to identify and track this processor through its lifecycle.
     """
 
+    state_block_labels: tuple[str, ...]
+    """
+    The labels of the state blocks this measurement processor will use.
+    """
+
     channel: str
     """
     The name of the channel from which the measurements originate.
@@ -111,13 +125,17 @@ class MeasurementProcessorConfig(BaseConfig):
     This corresponds to the `source_identifier` field on the ``pntos.api.Message`` class.
     """
 
-    state_block_labels: tuple[str, ...]
+    aux_channels: tuple[str, ...] | None = None
     """
-    The labels of the state blocks this measurement processor will use.
+    Optional channels to map to this measurement processor's `receive_aux_data` method.
+
+    The following channel strings are reserved:
+        - INERTIAL_PVA: Should be added to `aux_channels` if this measurement processor needs the inertial PVA as aux data.
+        - INERTIAL_FORCES_AND_RATES: Should be added to `aux_channels` if this measurement processor needs the inertial forces and/or rates as aux data.
     """
 
 
-@dataclass
+@dataclass(kw_only=True)
 class SensorMeasurementProcessorConfig(MeasurementProcessorConfig):
     """
     Configuration used to create a generic sensor measurement processor.
@@ -133,6 +151,8 @@ class SensorMeasurementProcessorConfig(MeasurementProcessorConfig):
     channel: str
 
     state_block_labels: tuple[str, ...]
+
+    aux_channels: tuple[str, ...] | None = None
 
     # UNIQUE FIELDS
     sensor_config: SensorConfig
