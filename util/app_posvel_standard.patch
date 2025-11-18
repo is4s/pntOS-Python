@@ -1,5 +1,5 @@
 diff --git a/apps/standard/gps_vel_ins.py b/apps/standard/posvel_ins.py
-index 7d0d1775..9bb56f63 100755
+index 65040937..1b52d9dc 100755
 --- a/apps/standard/gps_vel_ins.py
 +++ b/apps/standard/posvel_ins.py
 @@ -1,11 +1,13 @@
@@ -36,7 +36,7 @@ index 7d0d1775..9bb56f63 100755
          ),
      ),
      ControllerConfig(group='controller'),
-@@ -109,25 +110,18 @@ my_config = [
+@@ -109,27 +110,19 @@ my_config = [
          ),
          mp_configs=(
              SensorMeasurementProcessorConfig(
@@ -49,6 +49,7 @@ index 7d0d1775..9bb56f63 100755
 +                label='posvel',
 +                channel='/sensor/ublox-ZED-F9T/pva',
                  state_block_labels=('pinson15',),
+                 aux_channels=('INERTIAL_PVA',),
                  sensor_config=SensorConfig(
                      group='config/gp3d_state_modeling',
                      lever_arm=(-0.50, 0.38, -0.05),
@@ -63,11 +64,12 @@ index 7d0d1775..9bb56f63 100755
 -                label='vel',
 -                channel='/sensor/ublox-ZED-F9T/velocity',
 -                state_block_labels=('pinson15',),
+-                aux_channels=('INERTIAL_PVA',),
 -            ),
          ),
          inertial_config=InertialConfig(
              group='config/inertial',
-@@ -159,10 +153,7 @@ my_config = [
+@@ -161,10 +154,7 @@ my_config = [
              TimeBiasConfig(
                  group='config/time_bias',
                  identifier='time_bias',

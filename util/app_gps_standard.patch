@@ -1,5 +1,5 @@
 diff --git a/apps/tutorial/gps_ins.py b/apps/standard/gps_ins.py
-index b3034afe..59c4d11a 100755
+index b3034afe..46f2a3b2 100755
 --- a/apps/tutorial/gps_ins.py
 +++ b/apps/standard/gps_ins.py
 @@ -2,38 +2,41 @@
@@ -52,7 +52,7 @@ index b3034afe..59c4d11a 100755
  )
  from pntos_python_datasets import EXAMPLE_LCM_LOG
  
-@@ -45,87 +48,107 @@ C_imu_to_platform = (
+@@ -45,87 +48,108 @@ C_imu_to_platform = (
      (-0.01742059, 0.99983262, -0.00559042),
      (-0.0603517, 0.00452957, 0.9981669),
  )
@@ -160,6 +160,7 @@ index b3034afe..59c4d11a 100755
 +                label='gps',
 +                channel='/sensor/ublox-ZED-F9T/position',
 +                state_block_labels=('pinson15', 'pos_sensor_error'),
++                aux_channels=('INERTIAL_PVA',),
 +                sensor_config=SensorConfig(
 +                    group='config/gp3d_state_modeling',
 +                    lever_arm=(-0.50, 0.38, -0.05),
@@ -231,7 +232,7 @@ index b3034afe..59c4d11a 100755
  ]
  # End Config
  
-@@ -135,17 +158,18 @@ plugins = [
+@@ -135,17 +159,18 @@ plugins = [
      LcmLogTransportPlugin('Cobra LCM Log Transport Plugin'),
      EkfFusionStrategyPlugin('Cobra EKF Fusion Strategy Plugin'),
      StandardFusionPlugin('Cobra Standard Fusion Plugin'),

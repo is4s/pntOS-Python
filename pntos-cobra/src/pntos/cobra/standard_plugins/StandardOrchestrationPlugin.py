@@ -95,6 +95,10 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
         self.measurement_channels = {}
         self.inertial_drift_prop_dt = int(0.1 * 1e9)
         self.cache = Cache()
+        self.sb_aux_channels: dict[str, list[str]] = {}
+        self.mp_aux_channels: dict[str, list[str]] = {}
+        self.needs_inertial_pva: dict[str, bool] = {}
+        self.needs_inertial_f_and_r: dict[str, bool] = {}
 
     def init_plugin(
         self,
@@ -338,6 +342,11 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
                     return
                 self.fusion_engine.add_state_block(state_block, ewc, None)
 
+                if sb_config.aux_channels is not None:
+                    for channel in sb_config.aux_channels:
+                        sb_map = self.sb_aux_channels.setdefault(channel, [])
+                        sb_map.append(sb_config.label)
+
     def _add_measurement_processor(
         self,
         providers: list[StandardStateModelProvider],
@@ -366,6 +375,18 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
                     )
                     return
                 self.fusion_engine.add_measurement_processor(processor)
+
+                self.needs_inertial_pva[mp_config.label] = False
+                self.needs_inertial_f_and_r[mp_config.label] = False
+                if mp_config.aux_channels is not None:
+                    for channel in mp_config.aux_channels:
+                        mp_map = self.mp_aux_channels.setdefault(channel, [])
+                        mp_map.append(mp_config.label)
+
+                        if channel == 'INERTIAL_PVA':
+                            self.needs_inertial_pva[mp_config.label] = True
+                        elif channel == 'INERTIAL_FORCES_AND_RATES':
+                            self.needs_inertial_f_and_r[mp_config.label] = True
 
     def _set_up_fusion_engine(
         self,
@@ -483,20 +504,9 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
 
         self.mediator.broadcast_aspn_message(solution, None, solution.source_identifier)
 
-    def _get_inertial_aux(self, forces: bool = False) -> list[Message | None] | None:
-        """Get inertial solution and forces/rates at the current filter time."""
+    def _get_inertial_forces(self) -> Message | None:
+        """Get inertial foces at the current filter time."""
         time = self.fusion_engine.time
-
-        pva = self.cache.get('inertial solution')
-        if pva is None:
-            self.mediator.log_message(
-                LoggingLevel.ERROR,
-                f'Cannot get inertial aux. Solution not available at time {time.elapsed_nsec / 1e9:.9f}s',
-            )
-            return None
-
-        if not forces:
-            return [pva]
 
         self._inertial_forces = self.inertial.request_forces_and_rates(time)
         if self._inertial_forces is None:
@@ -505,27 +515,36 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
                 f'Cannot get inertial aux. Forces not available at time {time.elapsed_nsec / 1e9:.9f}s',
             )
             return None
-        f_and_r_msg = Message(
+        return Message(
             self._inertial_forces.forces_and_rates, 'Orchestration forces and rates'
         )
 
-        return [pva, f_and_r_msg]
-
     def _send_inertial_aux_to_measurement_processor(self, mp_label: str) -> None:
-        """Send the current inertial solution to the specified measurement processor."""
-        aux = self._get_inertial_aux(forces=True)
-        if aux is not None:
-            self.fusion_engine.give_measurement_processor_aux_data(mp_label, aux)
+        """Send the current inertial solution and/or forces to the specified measurement processor."""
+        needs_pva = self.needs_inertial_pva[mp_label]
+        needs_forces = self.needs_inertial_f_and_r[mp_label]
+        if not needs_pva and not needs_forces:
+            return
+
+        aux: list[Message | None] = []
+
+        if needs_pva:
+            pva = self.cache.get('inertial solution')
+            aux.append(pva)
+        if needs_forces:
+            forces = self._get_inertial_forces()
+            aux.append(forces)
+
+        self.fusion_engine.give_measurement_processor_aux_data(mp_label, aux)
 
     def _send_inertial_aux_to_pinson(self) -> None:
         """
         Send the current inertial solution, forces, and rates to the pinson state block.
         """
-        aux = self._get_inertial_aux(forces=True)
-        if aux is not None:
-            self.fusion_engine.give_state_block_aux_data(
-                self.pinson_sb_config.label, aux
-            )
+        pva = self.cache.get('inertial solution')
+        forces = self._get_inertial_forces()
+        aux: list[Message | None] = [pva, forces]
+        self.fusion_engine.give_state_block_aux_data(self.pinson_sb_config.label, aux)
 
     def _apply_inertial_feedback(self) -> None:
         """Correct inertial solution with pinson error states and reset states."""
@@ -615,6 +634,18 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
             else:
                 self._propagate_to_time(earliest_time)
 
+    def _send_message_as_aux_data(self, message: Message) -> None:
+        channel = message.source_identifier
+        if channel in self.sb_aux_channels:
+            sb_labels = self.sb_aux_channels[channel]
+            for label in sb_labels:
+                self.fusion_engine.give_state_block_aux_data(label, [message])
+
+        if channel in self.mp_aux_channels:
+            mp_labels = self.mp_aux_channels[channel]
+            for label in mp_labels:
+                self.fusion_engine.give_measurement_processor_aux_data(label, [message])
+
     def process_pntos_message(self, message: Message, sequenced: bool) -> None:
         preprocessed_messages = self._preprocess_message(message)
         if preprocessed_messages is None:
@@ -622,9 +653,11 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
             return
 
         for msg in preprocessed_messages:
+            channel = msg.source_identifier
+
             # If filter solution is not initialized, send messages to the initializer.
             if not initialization_ready(self.initialization_state, self.initializer):
-                if msg.source_identifier in self.alignment_channels:
+                if channel in self.alignment_channels:
                     self.initializer.process_pntos_message(msg)
                     if initialization_ready(
                         self.initialization_state, self.initializer
@@ -633,18 +666,23 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
                         self._initialize_filter()
                         self._send_inertial_aux_to_pinson()
                 continue
+
             # Don't use old, out-of-date messages
             if not has_valid_time(
                 self.init_solution, self.fusion_engine, message, self._log
             ):
                 continue
+
             # If aligned, send messages to IMU or filter
-            if msg.source_identifier == self.inertial_channel:
+            if channel == self.inertial_channel:
                 self.inertial.process_pntos_message(message)
-            elif msg.source_identifier in self.measurement_channels:
+            elif channel in self.measurement_channels:
                 time = msg.wrapped_message.time_of_validity  # type: ignore[attr-defined]
                 self._propagate_to_time(time)
                 self._perform_measurement_update(msg)
+            # Send message to any MPs or SBs that require it as aux data
+            if channel in self.sb_aux_channels or channel in self.mp_aux_channels:
+                self._send_message_as_aux_data(msg)
 
         # Continue to propagate filter during outage
         self._propagate_during_outage()

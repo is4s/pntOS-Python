@@ -99,7 +99,7 @@ class PinsonWithLeverArmPositionMeasurementProcessor(StandardMeasurementProcesso
 
         if len(aux) > 1:
             self._mediator.log_message(
-                LoggingLevel.DEBUG,
+                LoggingLevel.WARN,
                 f'PinsonWithLeverArmPositionMeasurementProcessor expected a single \
                 MeasurementPositionVelocityAttitude aux message, but received\
                 {len(aux)} aux messages. Ignoring all except the first message.',

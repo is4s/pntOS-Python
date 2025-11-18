@@ -1,8 +1,8 @@
 diff --git a/apps/standard/gps_ins.py b/apps/standard/gps_ins_leverarm.py
-index 59c4d11a..640a1f8c 100755
+index 46f2a3b2..bae00648 100755
 --- a/apps/standard/gps_ins.py
 +++ b/apps/standard/gps_ins_leverarm.py
-@@ -97,17 +97,40 @@ my_config = [
+@@ -97,18 +97,41 @@ my_config = [
                      tau=(300.0, 300.0, 200.0),
                  ),
              ),
@@ -35,6 +35,7 @@ index 59c4d11a..640a1f8c 100755
 +                    'pos_sensor_error',
 +                    'pos_sensor_lever_arm',
 +                ),
+                 aux_channels=('INERTIAL_PVA',),
                  sensor_config=SensorConfig(
                      group='config/gp3d_state_modeling',
 -                    lever_arm=(-0.50, 0.38, -0.05),

@@ -105,6 +105,7 @@ my_config = [
                 label='gps',
                 channel='/sensor/ublox-ZED-F9T/position',
                 state_block_labels=('pinson15', 'pos_sensor_error'),
+                aux_channels=('INERTIAL_PVA',),
                 sensor_config=SensorConfig(
                     group='config/gp3d_state_modeling',
                     lever_arm=(-0.50, 0.38, -0.05),
