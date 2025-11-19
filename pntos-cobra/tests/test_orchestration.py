@@ -82,9 +82,9 @@ GPS_CHANNEL = '/sensor/ublox-ZED-F9T/position'
 
 align_config = ManualAlignmentConfig(
     group='config/default/alignment',
-    initial_pos_var=(0, 0, 0),
-    initial_vel_var=(0, 0, 0),
-    initial_tilt_var=(0, 0, 0),
+    initial_pos_var=(0.1, 0.1, 0.1),
+    initial_vel_var=(1e-3, 1e-3, 1e-3),
+    initial_tilt_var=(5e-4, 5e-4, 5e-4),
     initial_accel_bias_var=(1e-10, 1e-10, 1e-10),
     initial_gyro_bias_var=(1e-15, 1e-15, 1e-15),
     initial_accel_bias=(-0.00212767, 0.00059081, -0.05242679),
@@ -141,7 +141,7 @@ tutorial_config = [
         expected_dt_nsec=int(0.01 * 1e9),
     ),
     ImuRotatorConfig(
-        group='config/rotator',
+        group='config/imu_rotator',
         identifier='imu_rotator',
         channel=IMU_CHANNEL,
         C_imu_to_platform=C_imu_to_platform,
@@ -153,7 +153,7 @@ tutorial_config = [
             '/sensor/ublox-ZED-F9T/position',
             '/sensor/ublox-ZED-F9T/velocity',
         ),
-        time_bias=int(0.2 * 1e9),
+        time_bias=int(0 * 1e9),
     ),
 ]
 
@@ -350,7 +350,9 @@ class Test_Orchestration(unittest.TestCase):
                         ]
                     )
                 ),
-                covariance=np.zeros([9, 9]),
+                covariance=np.diag(
+                    np.array([0.1, 0.1, 0.1, 1e-3, 1e-3, 1e-3, 5e-4, 5e-4, 5e-4])
+                ),
                 error_model=MeasurementPositionVelocityAttitudeErrorModel.NONE,
                 error_model_params=np.array([], dtype=float64),
                 integrity=[],
@@ -362,6 +364,8 @@ class Test_Orchestration(unittest.TestCase):
     def expected_pva_dead_reckoning(self) -> Message:
         ms = self.expected_pva_best
         ms.source_identifier = IMU_SOL_CHANNEL
+        assert isinstance(ms.wrapped_message, MeasurementPositionVelocityAttitude)
+        ms.wrapped_message.covariance = np.zeros((9, 9))
         return ms
 
     def generate_imu_message(self, source_identifier: str = 'source') -> Message:
@@ -390,7 +394,9 @@ class Test_Orchestration(unittest.TestCase):
                 v2=1.2,
                 v3=1.3,
                 quaternion=np.array([0.0, 0.1, 0.2, 0.3]),
-                covariance=np.zeros((9, 9)),
+                covariance=np.diag(
+                    np.array([0.1, 0.1, 0.1, 1e-3, 1e-3, 1e-3, 5e-4, 5e-4, 5e-4])
+                ),
                 error_model=MeasurementPositionVelocityAttitudeErrorModel.NONE,
                 error_model_params=np.array([]),
                 integrity=[],
@@ -420,10 +426,10 @@ class Test_Orchestration(unittest.TestCase):
     def init_orchestration_plugin(self) -> None:
         stream_config = StandardMessageStreamConfig()
         plugins = [
-            self.initialization_plugin,
-            self.inertial_plugin,
             self.fusion_plugin,
             self.fusion_strategy_plugin,
+            self.inertial_plugin,
+            self.initialization_plugin,
             self.state_modeling_plugin,
             self.preprocessor_plugin,
         ]
@@ -569,7 +575,6 @@ class Test_Orchestration(unittest.TestCase):
         filter_description_list = self.orchestration_plugin.filter_description_list
         expected_filter_description_list = [
             'GPS_INS_BEST_ASPN_MEASUREMENT_POSITION_VELOCITY_ATTITUDE_ESTIMATE',
-            'GPS_INS_DEAD_RECKONING_ASPN_MEASUREMENT_POSITION_VELOCITY_ATTITUDE_ESTIMATE',
         ]
         assert filter_description_list == expected_filter_description_list
 
@@ -603,7 +608,7 @@ class Test_Orchestration(unittest.TestCase):
         assert self.compare_messages(solutions[0], expected_solution)
 
     def test_request_solutions_post_alignment(self) -> None:
-        self.test_process_pntos_message_just_imu()
+        self.test_init_orchestration_plugin_tutorial()
         solution_times = [TypeTimestamp(0)]
         expected_solution = self.expected_pva_best
 
@@ -628,9 +633,8 @@ class Test_Orchestration(unittest.TestCase):
         descriptions = self.orchestration_plugin.filter_description_list
         expected_descriptions = [
             'GPS_INS_BEST_ASPN_MEASUREMENT_POSITION_VELOCITY_ATTITUDE_ESTIMATE',
-            'GPS_INS_DEAD_RECKONING_ASPN_MEASUREMENT_POSITION_VELOCITY_ATTITUDE_ESTIMATE',
         ]
-        expected_solutions = [self.expected_pva_best, self.expected_pva_dead_reckoning]
+        expected_solutions = [self.expected_pva_best]
         assert descriptions == expected_descriptions
         for expected, description in zip(expected_solutions, descriptions, strict=True):
             solutions = self.orchestration_plugin.request_solutions(

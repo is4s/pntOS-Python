@@ -3,8 +3,6 @@ from aspn23 import (
     MeasurementImu,
     TypeTimestamp,
 )
-from numpy import float64
-from numpy.typing import NDArray
 from pntos.api import (
     CommonPlugin,
     EstimateWithCovariance,
@@ -13,8 +11,6 @@ from pntos.api import (
     FusionStrategyPlugin,
     InertialInitializationStrategy,
     InertialPlugin,
-    InitialInertialSolution,
-    InitializationPlugin,
     InitializationStatus,
     LoggingLevel,
     Mediator,
@@ -26,430 +22,325 @@ from pntos.api import (
     StandardFusionStrategy,
     StandardInertialMechanization,
     StandardStateModelProvider,
-    StateModelingPlugin,
 )
 from pntos.cobra.config import (
     InertialConfig,
     TutorialOrchestrationConfig,
     config_from_registry,
 )
-from pntos.cobra.utils import (
-    dispatch_to_fusion_engine,
-    get_best_solution,
-    get_dead_reckoning_solution,
-    has_valid_time,
-    initialization_ready,
-    initialize_filter,
-    preprocess_message,
-    print_message,
-    send_inertial_aux_to_pinson,
-    set_up_inertial_mechanization,
-    set_up_initializer,
-    set_up_preprocessors,
-    sort_plugins_dataclass,
-    validate_plugins,
-)
-
-# Solution Channels
-BEST_SOL_CHANNEL = '/solution/pntos/pva'
-IMU_SOL_CHANNEL = '/solution/pntos-imu/pva'
-
-# State block parameters
-FOGM_STATE_BLOCK_ID = 'fogm'
-FOGM_STATE_BLOCK_LABEL = 'pos_sensor_error'
-FOGM_STATE_BLOCK_CONFIG_GROUP = 'config/pos_sensor_error'
-
-STATE_BLOCK_ID = STATE_BLOCK_LABEL = 'pinson15'
-STATE_BLOCK_CONFIG_GROUP = 'config/inertial_state'
-
-# Measurement processor parameters
-GPS_MEASUREMENT_PROCESSOR_ID = 'pinson_with_ned_fogm_position'
-GPS_MEASUREMENT_PROCESSOR_LABEL = 'gps'
-GPS_MEASUREMENT_PROCESSOR_CONFIG_GROUP = 'config/gp3d_state_modeling'
-GPS_MP_STATE_BLOCK_LABELS = [STATE_BLOCK_LABEL, FOGM_STATE_BLOCK_LABEL]
-
-# Inertial parameters
-INERTIAL_GROUP = 'config/inertial'
-
-# Config groups
-ALIGNMENT_CONFIG_GROUP = 'config/default/alignment'
-PREPROCESSOR_IDS = ['imu_rotator', 'time_adjuster', 'time_bias']
-PREPROCESSOR_GROUPS = ['config/imu_rotator', 'config/time_adjuster', 'config/time_bias']
+from pntos.cobra.utils import apply_error_states
 
 
 class TutorialGpsOrchestrationPlugin(OrchestrationPlugin):
-    """
-    A simple orchestration plugin that incorporates a position measurement processor and two state blocks.
-    It uses a Pinson15 state block as a model for state estimation and a FOGM state block for position bias states.
-    """
-
-    mediator: Mediator
-    init_solution: InitialInertialSolution | None
     fusion_plugin: FusionPlugin
     fusion_strategy_plugin: FusionStrategyPlugin
     inertial_plugin: InertialPlugin
-    state_modeling_plugins: list[StateModelingPlugin]
-    preprocessors: list[Preprocessor]
-    initialization_plugin: InitializationPlugin
-    initialization_state: InitializationStatus
-    initializer: InertialInitializationStrategy
-    inertial: StandardInertialMechanization
-    fusion_engine: StandardFusionEngine
+    preprocessor_time_adjust: Preprocessor
+    preprocessor_time_bias: Preprocessor
+    preprocessor_imu_rotator: Preprocessor
+    mediator: Mediator
     measurement_channels: dict[str, str]
-    alignment_channels: list[str]
-    C_inertial_to_platform: NDArray[float64]
+    inertial_channel: str
+    fusion_engine: StandardFusionEngine
+    inertial: StandardInertialMechanization
 
     def __init__(self, identifier: str) -> None:
         """
-        Simple orchestration plugin.
+        Tutorial orchestration plugin.
 
         Args:
             identifier (str): The plugin identifier passed to the
                 :meth:`pntos.api.CommonPlugin.identifier` field.
         """
-        self.identifier: str = identifier
-        self.initialization_state = InitializationStatus.WAITING
-        self.init_solution = None
-        self.preprocessors = []
+        self.identifier = identifier
 
     def init_plugin(
         self,
         plugin_resources_location: str | None = None,
         mediator: Mediator | None = None,
     ) -> None:
-        if mediator is None:
-            self._log(
-                LoggingLevel.ERROR,
-                'Orchestration was not handed a mediator. '
-                + 'Orchestration will be disabled.',
-            )
-            return
         self.mediator = mediator
 
     def shutdown_plugin(self) -> None:
         pass
 
-    def _log(self, level: LoggingLevel, message: str) -> None:
-        """
-        Send an informational log message to pntOS.
-
-        If no mediator is provided, manually print the message. Otherwise, pass
-        through to the mediator's ``log_message`` method.
-        """
-        if self.mediator is not None:
-            self.mediator.log_message(level, message)
-        else:
-            print_message(level, OrchestrationPlugin.__name__, message)  # type: ignore[unreachable]
-
     def init_orchestration_plugin(
-        self, plugins: list[CommonPlugin] | None, stream_config: MessageStreamConfig
+        self, plugins: list[CommonPlugin], stream_config: MessageStreamConfig
     ) -> None:
-        stream_config.sequenced_stream_all(True)
-        stream_config.immediate_stream_add(MeasurementImu)
+        stream_config.sequenced_stream_all(enable=True)
+        stream_config.immediate_stream_add(message_type=MeasurementImu)
 
-        orch_config = config_from_registry(
-            TutorialOrchestrationConfig, self.mediator, 'config/orchestration'
-        )
-        inertial_config = config_from_registry(
-            InertialConfig, self.mediator, INERTIAL_GROUP
-        )
-
-        if orch_config is None or inertial_config is None:
-            self._log(
-                LoggingLevel.ERROR,
-                'Unable to grab the orchestration config from the registry. Filter cannot be implemented.',
-            )
-            return
-
-        if plugins is None:
-            self._log(
-                LoggingLevel.ERROR,
-                'No plugins were provided. Filter cannot be implemented.',
-            )
-            return
-
-        self.measurement_channels = {
-            orch_config.gps_channel: GPS_MEASUREMENT_PROCESSOR_LABEL,
-        }
-        self.alignment_channels = [
-            orch_config.gps_channel,
-            inertial_config.channel,
-        ]
-        self.inertial_channel = inertial_config.channel
-
-        sorted_plugins = sort_plugins_dataclass(plugins)
-        if not validate_plugins(
-            sorted_plugins,
-            self._log,
-            fusion_plugins=(1, 1),
-            fusion_strategy_plugins=(1, 1),
-            inertial_plugins=(1, 1),
-            initialization_plugins=(1, 1),
-            state_modeling_plugins=(1, 1000),
-        ):
-            return
-        self.fusion_plugin = sorted_plugins.fusion_plugins[0]
-        self.fusion_strategy_plugin = sorted_plugins.fusion_strategy_plugins[0]
-        self.inertial_plugin = sorted_plugins.inertial_plugins[0]
-        self.initialization_plugin = sorted_plugins.initialization_plugins[0]
-        self.state_modeling_plugins = sorted_plugins.state_modeling_plugins
-
-        self.preprocessors = set_up_preprocessors(
-            sorted_plugins, PREPROCESSOR_IDS, PREPROCESSOR_GROUPS
-        )
+        # This example assumes that this exact list of plugins is sent in this order:
+        # FusionPlugin, FusionStrategyPlugin, InertialPlugin, InitializationPlugin, StateModelingPlugin,
+        # PreprocessorPlugin
+        self.fusion_plugin = plugins[0]
+        self.fusion_strategy_plugin = plugins[1]
+        self.inertial_plugin = plugins[2]
+        self.initialization_plugin = plugins[3]
+        self.state_modeling_plugin = plugins[4]
 
         self._set_up_fusion_engine()
-        initializer = set_up_initializer(
-            self.initialization_plugin, ALIGNMENT_CONFIG_GROUP, self._log
-        )
-        if initializer is None:
-            return
-        self.initializer = initializer
 
-        if initialization_ready(self.initialization_state, self.initializer):
-            inertial_info = set_up_inertial_mechanization(
-                self.initializer,
-                self.inertial_plugin,
-                INERTIAL_GROUP,
-                self._log,
-            )
-            if inertial_info is None:
-                return
-            self.inertial = inertial_info[0]
-            self.init_solution = inertial_info[1]
-            initialize_filter(
-                self.init_solution, self.fusion_engine, STATE_BLOCK_LABEL, self._log
-            )
-            send_inertial_aux_to_pinson(
-                self.inertial, self.fusion_engine, STATE_BLOCK_LABEL, self._log
-            )
+        self._initialize_inertial_and_fusion_engine()
 
-    def _set_up_fusion_engine(self) -> None:
-        """
-        Utility function to assemble the components of and create a fusion engine.
-
-        This function specifically creates a Pinson15 state block, a FOGM state block, and a position measurement processor.
-        If either of these components cannot created, an error will be logged and pntOS will shutdown.
-        """
-        # Make a fusion engine
-        fusion_engine: StandardFusionEngine | None = (
-            self.fusion_plugin.new_fusion_engine(StandardFusionEngine)
-        )
-        if fusion_engine is None:
-            self._log(
-                LoggingLevel.ERROR,
-                'Unable to make new fusion engine - cannot continue.',
-            )
-            return
-
-        # Give the fusion engine a strategy
-        fusion_engine.strategy = self.fusion_strategy_plugin.new_fusion_strategy(  # type: ignore[assignment]
-            StandardFusionStrategy
+        orch_config = config_from_registry(
+            TutorialOrchestrationConfig,
+            self.mediator,
+            'config/orchestration',
         )
 
-        # Get state blocks and measurement processor
-        pinson_block = None
-        fogm_block = None
-        gps_processor = None
-        for plugin in self.state_modeling_plugins:
-            provider: StandardStateModelProvider | None = (
-                plugin.new_state_model_provider(StandardStateModelProvider)
-            )
-            if (
-                provider is None
-                or provider.block_identifiers is None
-                or provider.processor_identifiers is None
-            ):
-                continue
+        # Associate incoming channels with measurement processor labels
+        self.measurement_channels = {
+            orch_config.gps_channel: 'gps',
+        }
 
-            if STATE_BLOCK_ID in provider.block_identifiers:
-                pinson_block = provider.new_block(
-                    provider.block_identifiers.index(STATE_BLOCK_ID),
-                    fusion_engine,
-                    STATE_BLOCK_LABEL,
-                    STATE_BLOCK_CONFIG_GROUP,
-                )
-            if FOGM_STATE_BLOCK_ID in provider.block_identifiers:
-                fogm_block = provider.new_block(
-                    provider.block_identifiers.index(FOGM_STATE_BLOCK_ID),
-                    fusion_engine,
-                    FOGM_STATE_BLOCK_LABEL,
-                    FOGM_STATE_BLOCK_CONFIG_GROUP,
-                )
-            if GPS_MEASUREMENT_PROCESSOR_ID in provider.processor_identifiers:
-                gps_processor = provider.new_processor(
-                    provider.processor_identifiers.index(GPS_MEASUREMENT_PROCESSOR_ID),
-                    fusion_engine,
-                    GPS_MEASUREMENT_PROCESSOR_LABEL,
-                    GPS_MP_STATE_BLOCK_LABELS,
-                    GPS_MEASUREMENT_PROCESSOR_CONFIG_GROUP,
-                )
-
-        # Make state blocks
-        if pinson_block is None:
-            self._log(
-                LoggingLevel.ERROR,
-                f'Unable to find state block "{STATE_BLOCK_LABEL}" - cannot initialize filter.',
-            )
-            return
-        ewc = EstimateWithCovariance(
-            EstimateWithCovarianceType.EWC_GENERIC,
-            estimate=np.zeros((pinson_block.num_states, 1)),
-            covariance=np.zeros((pinson_block.num_states, pinson_block.num_states)),
+        inertial_config = config_from_registry(
+            InertialConfig, self.mediator, 'config/inertial'
         )
-        fusion_engine.add_state_block(pinson_block, ewc, None)
 
-        if fogm_block is None:
-            self._log(
-                LoggingLevel.WARN,
-                f'Unable to find state block "{FOGM_STATE_BLOCK_LABEL}" - continuing.',
-            )
-        else:
-            # TODO how are configuring initial conditions for blocks
-            ewc = EstimateWithCovariance(
-                EstimateWithCovarianceType.EWC_GENERIC,
-                estimate=np.zeros((fogm_block.num_states, 1)),
-                covariance=(np.eye(fogm_block.num_states) * 9.0),
-            )
-            fusion_engine.add_state_block(fogm_block, ewc, None)
+        self.inertial_channel = inertial_config.channel
 
-        if gps_processor is None:
-            assert provider is not None
-            self._log(
-                LoggingLevel.ERROR,
-                f'Unable to find measurement processor "{GPS_MEASUREMENT_PROCESSOR_ID}" -'
-                + f' cannot initialize filter. Available measurement processors: {provider.processor_identifiers}',
-            )
-            return
-        fusion_engine.add_measurement_processor(gps_processor)
-
-        self.fusion_engine = fusion_engine
+        preprocessor_plugin = plugins[5]
+        idx = preprocessor_plugin.preprocessor_identifiers.index('time_adjuster')
+        self.preprocessor_time_adjust = preprocessor_plugin.new_preprocessor(
+            idx, 'config/time_adjuster'
+        )
+        idx = preprocessor_plugin.preprocessor_identifiers.index('time_bias')
+        self.preprocessor_time_bias = preprocessor_plugin.new_preprocessor(
+            idx, 'config/time_bias'
+        )
+        idx = preprocessor_plugin.preprocessor_identifiers.index('imu_rotator')
+        self.preprocessor_imu_rotator = preprocessor_plugin.new_preprocessor(
+            idx, 'config/imu_rotator'
+        )
 
     def process_pntos_message(self, message: Message, sequenced: bool) -> None:
-        preprocessed_message = preprocess_message(
-            message, self.preprocessors, self._log
-        )
-        if not preprocessed_message:
-            # Message dropped in preprocessing
-            return
-
-        message = preprocessed_message
-
-        if not has_valid_time(
-            self.init_solution, self.fusion_engine, message, self._log
-        ):
-            return
-
-        # If filter solution is not initialized, send messages to the initializer.
-        if not initialization_ready(self.initialization_state, self.initializer):
-            if message.source_identifier not in self.alignment_channels:
-                return
-
-            self.initializer.process_pntos_message(message)
-            if not initialization_ready(self.initialization_state, self.initializer):
-                inertial_info = set_up_inertial_mechanization(
-                    self.initializer,
-                    self.inertial_plugin,
-                    INERTIAL_GROUP,
-                    self._log,
-                )
-                if inertial_info is None:
-                    return
-                self.inertial = inertial_info[0]
-                self.init_solution = inertial_info[1]
-                initialize_filter(
-                    self.init_solution, self.fusion_engine, STATE_BLOCK_LABEL, self._log
-                )
-                send_inertial_aux_to_pinson(
-                    self.inertial, self.fusion_engine, STATE_BLOCK_LABEL, self._log
-                )
-            else:
-                return
-
-        # If aligned, send messages to IMU or filter
+        # Clean imu timestamps, rotate IMU measurements into platform frame, and send to inertial.
         if message.source_identifier == self.inertial_channel:
-            self.inertial.process_pntos_message(message)
-        elif message.source_identifier in self.measurement_channels:
-            dispatch_to_fusion_engine(
-                self.inertial,
-                self.fusion_engine,
-                message,
-                STATE_BLOCK_LABEL,
-                self.measurement_channels,
-                self._log,
+            message = self.preprocessor_time_adjust.process_pntos_message(message)[0]
+            message = self.preprocessor_imu_rotator.process_pntos_message(message)[0]
+            self.inertial.process_pntos_message(message=message)
+            return
+
+        if message.source_identifier in self.measurement_channels:
+            message = self.preprocessor_time_bias.process_pntos_message(message)[0]
+            cur_time = message.wrapped_message.time_of_validity
+            label = self.measurement_channels[message.source_identifier]
+            self._supply_aux(cur_time=cur_time, label=label)
+            self.fusion_engine.propagate(cur_time)
+            self.fusion_engine.update(processor_label=label, message=message)
+
+            # Feedback states to inertial, PVA first then sensor biases
+            corrected_solution = self._get_best_solution(time=cur_time)
+
+            self.inertial.reset_solution(message=corrected_solution)
+
+            estimate = self.fusion_engine.get_state_block_estimate(
+                block_label='pinson15'
+            )
+
+            imu_errors = self.inertial.request_sensor_errors(time=cur_time)
+
+            imu_errors.accel_biases -= estimate[9:12, 0]
+            imu_errors.gyro_biases -= estimate[12:15, 0]
+            self.inertial.correct_sensor_errors(time=cur_time, errors=imu_errors)
+
+            # Zero out error states after applying feedback
+            self.fusion_engine.set_state_block_estimate(
+                block_label='pinson15', estimate=np.zeros((15, 1))
             )
 
     @property
     def filter_description_list(self) -> list[str]:
-        descriptions = []
-        aspn_pva = 'ASPN_MEASUREMENT_POSITION_VELOCITY_ATTITUDE_ESTIMATE'
-        for label in ['GPS_INS']:
-            for solution_type in ['BEST', 'DEAD_RECKONING']:
-                descriptions += [f'{label}_{solution_type}_{aspn_pva}']
-
-        return descriptions
+        return ['GPS_INS_BEST_ASPN_MEASUREMENT_POSITION_VELOCITY_ATTITUDE_ESTIMATE']
 
     def request_solutions(
         self,
         solution_times: list[TypeTimestamp],
         filter_description: str | None = None,
-    ) -> list[Message | None] | None:
-        if (
-            not initialization_ready(self.initialization_state, self.initializer)
-            or self.init_solution is None
-        ):
-            self._log(
-                LoggingLevel.DEBUG,
-                'Unable to provide a solution - initialization not ready.',
-            )
-            return None
-
-        if len(solution_times) != 1:
-            self._log(
-                LoggingLevel.ERROR,
-                'This implementation of request_solutions requires a time array'
-                + f' of length one but received a time array of length {len(solution_times)}',
-            )
-            return None
-
-        time = solution_times[0]
-
-        if not self.inertial.is_time_in_range(time):
-            latest_time = self.inertial.request_latest_time()
-            earliest_time = self.inertial.request_earliest_time()
-            self._log(
-                LoggingLevel.DEBUG,
-                f'Requested time ({time.elapsed_nsec}) is outside inertial '
-                + f'time range ({earliest_time.elapsed_nsec} - '
-                + f'{latest_time.elapsed_nsec}). Replacing requested time with '
-                + 'the latest inertial time.',
-            )
-            time = latest_time
-
-        if filter_description is None or 'BEST' in filter_description:
-            solution_out = get_best_solution(
-                self.fusion_engine,
-                self.inertial,
-                time,
-                STATE_BLOCK_LABEL,
-                BEST_SOL_CHANNEL,
-                self._log,
-            )
-
-        elif 'DEAD_RECKONING' in filter_description:
-            solution_out = get_dead_reckoning_solution(
-                self.inertial, time, IMU_SOL_CHANNEL, self._log
-            )
-
-        else:
-            descriptions = ', '.join(self.filter_description_list)
-            self._log(
-                LoggingLevel.ERROR,
-                f'Solution {filter_description} was requested, but available solution '
-                + f'types are: {descriptions}',
-            )
-            return None
-
-        if solution_out is None:
-            return None
+    ) -> list[Message] | None:
+        time = self.inertial.request_latest_time()
+        solution_out = self._get_best_solution(time=time)
         return [solution_out]
+
+    def _set_up_fusion_engine(self) -> None:
+        fusion_engine = self.fusion_plugin.new_fusion_engine(
+            fusion_type=StandardFusionEngine
+        )
+
+        # Give the fusion engine a strategy
+        fusion_engine.strategy = self.fusion_strategy_plugin.new_fusion_strategy(
+            fusion_type=StandardFusionStrategy
+        )
+
+        # Get state modeling provider from state modeling plugin
+        provider = self.state_modeling_plugin.new_state_model_provider(
+            fusion_type=StandardStateModelProvider
+        )
+
+        # Create pinson15 stateblock and add to fusion engine
+        stateblock_index = provider.block_identifiers.index('pinson15')
+        stateblock = provider.new_block(
+            block_index=stateblock_index,
+            engine=fusion_engine,
+            label='pinson15',
+            config_group='config/inertial_state',
+        )
+        ewc = EstimateWithCovariance(
+            type=EstimateWithCovarianceType.EWC_GENERIC,
+            estimate=np.zeros((15, 1)),
+            covariance=np.diag(
+                np.array(
+                    [
+                        0.1,
+                        0.1,
+                        0.1,
+                        1e-3,
+                        1e-3,
+                        1e-3,
+                        5e-4,
+                        5e-4,
+                        5e-4,
+                        5.2e-3,
+                        5.2e-3,
+                        5.2e-3,
+                        9e-6,
+                        9e-6,
+                        9e-6,
+                    ]
+                )
+            ),
+        )
+
+        fusion_engine.add_state_block(
+            block=stateblock, initial_estimate_covariance=ewc, cross_covariances=None
+        )
+
+        # Create error fogm stateblock and add to fusion engine
+        fogmblock_index = provider.block_identifiers.index('fogm')
+        fogmblock = provider.new_block(
+            block_index=fogmblock_index,
+            engine=fusion_engine,
+            label='pos_fogm',
+            config_group='config/pos_sensor_error',
+        )
+        ewc = EstimateWithCovariance(
+            type=EstimateWithCovarianceType.EWC_GENERIC,
+            estimate=np.zeros((3, 1)),
+            covariance=np.eye(3) * 9.0,
+        )
+
+        fusion_engine.add_state_block(
+            block=fogmblock, initial_estimate_covariance=ewc, cross_covariances=None
+        )
+
+        # Create position measurement processor and add to fusion engine
+        processor_index = provider.processor_identifiers.index(
+            'pinson_with_ned_fogm_position'
+        )
+        processor = provider.new_processor(
+            processor_index=processor_index,
+            engine=fusion_engine,
+            label='gps',
+            state_block_labels=['pinson15', 'pos_fogm'],
+            config_group='config/gp3d_state_modeling',
+        )
+
+        fusion_engine.add_measurement_processor(processor=processor)
+
+        self.fusion_engine = fusion_engine
+
+    def _initialize_inertial_and_fusion_engine(self) -> None:
+        # Set up initializer
+        init_strategy = self.initialization_plugin.new_initialization_strategy(
+            initialization_type=InertialInitializationStrategy,
+            config_group='config/default/alignment',
+        )
+
+        # This example uses a hard-coded initializer, so it's ready at the start,
+        # but we'll check it anyway just to show how that's done
+        init_status = init_strategy.request_current_status()
+        if init_status is not InitializationStatus.INITIALIZED_GOOD:
+            self.mediator.log_message(
+                level=LoggingLevel.ERROR, message='Initializer not ready.'
+            )
+            return
+
+        # Get the initial solution and extract a few values
+        init_solution = init_strategy.request_solution()
+        init_pva_message = init_solution.solution
+        init_time = init_pva_message.wrapped_message.time_of_validity
+
+        # Initialize inertial mechanization with initial PVA
+        self.inertial = self.inertial_plugin.new_inertial(
+            inertial_type=StandardInertialMechanization,
+            solution=init_pva_message,
+            config_group='config/inertial',
+        )
+
+        # Pass estimated inertial sensor errors to the inertial for correction of raw measurements
+        self.inertial.correct_sensor_errors(
+            time=init_time,
+            errors=init_solution.inertial_errors,
+        )
+
+        # Set initial filter time to match the initialization time
+        self.fusion_engine.time = init_time
+        self._send_inertial_aux_to_pinson()
+
+        self.mediator.log_message(
+            LoggingLevel.INFO,
+            f'Aligned filter at {self.fusion_engine.time}.',
+        )
+
+    def _get_best_solution(self, time: TypeTimestamp) -> Message:
+        """
+        Utility function to generate the 'best' solution- raw inertial corrected with error estimates.
+        """
+        # Get predicted inertial error state and covariance at the requested time
+        x_and_p = self.fusion_engine.peek_ahead(time=time, block_labels=['pinson15'])
+
+        # Get the uncorrected inertial solution at the same time
+        inertial_solution = self.inertial.request_solution(time=time)
+
+        # Correct the inertial solution with estimated errors to generate best estimate
+        corrected_pva = apply_error_states(
+            pva=inertial_solution.wrapped_message, x=x_and_p.estimate
+        )
+
+        corrected_pva.covariance = x_and_p.covariance[:9, :9]
+
+        return Message(
+            wrapped_message=corrected_pva, source_identifier='/solution/pntos/pva'
+        )
+
+    def _send_inertial_aux_to_pinson(self) -> None:
+        """Send the current inertial solution and forces to the Pinson15 state-block."""
+        time = self.fusion_engine.time
+
+        pva_message = self.inertial.request_solution(time=time)
+
+        imu = self.inertial.request_forces_and_rates(time=time)
+
+        imu_message = Message(
+            wrapped_message=imu.forces_and_rates,
+            source_identifier='Orchestration forces and rates',
+        )
+
+        self.fusion_engine.give_state_block_aux_data(
+            block_label='pinson15', aux=[pva_message, imu_message]
+        )
+
+    def _send_inertial_aux_to_measurement_processor(
+        self, time: TypeTimestamp, label: str
+    ) -> None:
+        """Send the current inertial solution to the position measurement processor."""
+        pva_message = self.inertial.request_solution(time=time)
+
+        self.fusion_engine.give_measurement_processor_aux_data(
+            processor_label=label, aux=[pva_message]
+        )
+
+    def _supply_aux(self, cur_time: TypeTimestamp, label: str) -> None:
+        self._send_inertial_aux_to_measurement_processor(time=cur_time, label=label)
+        self._send_inertial_aux_to_pinson()

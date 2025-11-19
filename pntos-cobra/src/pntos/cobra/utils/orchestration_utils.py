@@ -9,9 +9,8 @@ from aspn23 import (
     TypeHeader,
     TypeTimestamp,
 )
-from numpy import array, float64, zeros
+from numpy import array, float64
 from numpy.typing import NDArray
-from scipy.linalg import block_diag
 
 from pntos.api import (
     EstimateWithCovariance,
@@ -22,7 +21,6 @@ from pntos.api import (
     InitializationStatus,
     LoggingLevel,
     Message,
-    Preprocessor,
     StandardFusionEngine,
     StandardInertialMechanization,
 )
@@ -34,36 +32,6 @@ from .navigation import (
     north_to_delta_lat,
     quat_to_dcm,
 )
-from .plugins import SortedPlugins
-
-
-def set_up_preprocessors(
-    sorted_plugins: SortedPlugins,
-    preprocessor_ids: list[str],
-    preprocessor_groups: list[str],
-) -> list[Preprocessor]:
-    """
-    Finds and creates a list of preprocessors based on the information in ``preprocessor_ids`` and ``preprocessor_groups``.
-
-    Args:
-        sorted_plugins (SortedPlugins): A `SortedPlugins` instance.
-        preprocessor_ids (list[str]): The identifiers for the desired preprocessors (e.g. imu_rotator).
-        preprocessor_groups (list[str]): Config groups that point to registry locations storing preprocessor information.
-
-    Returns:
-        list[Preprocessor]
-    """
-    preprocessors = []
-    for identifier, config_group in zip(
-        preprocessor_ids, preprocessor_groups, strict=True
-    ):
-        for plugin in sorted_plugins.preprocessor_plugins:
-            for idx in range(len(plugin.preprocessor_identifiers)):
-                if plugin.preprocessor_identifiers[idx] == identifier:
-                    preprocessor = plugin.new_preprocessor(idx, config_group)
-                    if preprocessor is not None:
-                        preprocessors.append(preprocessor)
-    return preprocessors
 
 
 def set_up_initializer(
@@ -99,66 +67,6 @@ def initialization_ready(
     """
     initialization_state = initializer.request_current_status()
     return initialization_state is InitializationStatus.INITIALIZED_GOOD
-
-
-def send_inertial_aux_to_measurement_processor(
-    inertial: StandardInertialMechanization,
-    fusion_engine: StandardFusionEngine,
-    time: TypeTimestamp,
-    mp_label: str,
-    log_func: Callable[[LoggingLevel, str], None],
-) -> None:
-    """Send the current inertial solution to the specified measurement processor."""
-    pva_message = inertial.request_solution(time)
-    if pva_message is None:
-        log_func(
-            LoggingLevel.ERROR,
-            f'Cannot send inertial aux to measurement processor. Solution not available at time {time.elapsed_nsec / 1e9:.9f}s',
-        )
-        return
-    imu = inertial.request_forces_and_rates(time)
-    if imu is None:
-        log_func(
-            LoggingLevel.ERROR,
-            f'Cannot send inertial aux to measurement processor. Forces and rates not available at time {time.elapsed_nsec / 1e9:.9f}s',
-        )
-        return
-    imu_message = Message(imu.forces_and_rates, 'Orchestration forces and rates')
-    fusion_engine.give_measurement_processor_aux_data(
-        mp_label, [pva_message, imu_message]
-    )
-
-
-def send_inertial_aux_to_pinson(
-    inertial: StandardInertialMechanization,
-    fusion_engine: StandardFusionEngine,
-    sb_label: str,
-    log_func: Callable[[LoggingLevel, str], None],
-) -> None:
-    """
-    Send the current inertial solution, forces, and rates to the state block with the specified label.
-
-    This aux data is needed by the Pinson15 state block to propagate.
-    """
-    time = fusion_engine.time
-
-    pva_message = inertial.request_solution(time)
-    if pva_message is None:
-        log_func(
-            LoggingLevel.ERROR,
-            f'Cannot send inertial aux to pinson block. Solution not available at time {time.elapsed_nsec / 1e9:.9f}s',
-        )
-        return
-    imu = inertial.request_forces_and_rates(time)
-    if imu is None:
-        log_func(
-            LoggingLevel.ERROR,
-            f'Cannot send inertial aux to pinson block. Forces not available at time {time.elapsed_nsec / 1e9:.9f}s',
-        )
-        return
-    imu_message = Message(imu.forces_and_rates, 'Orchestration forces and rates')
-
-    fusion_engine.give_state_block_aux_data(sb_label, [pva_message, imu_message])
 
 
 def has_valid_time(
@@ -320,148 +228,6 @@ def set_up_inertial_mechanization(
             init_solution.inertial_errors,
         )
     return inertial, init_solution
-
-
-def preprocess_message(
-    message: Message,
-    preprocessors: list[Preprocessor],
-    log_func: Callable[[LoggingLevel, str], None],
-) -> Message | None:
-    """Process the given message by the full chain of preprocessors.
-
-    Note: This function assumes all the preprocessors in the chain will either
-    return 0 or 1 messages. Any additional messages will be ignored.
-
-    Args:
-        message (Message): The message to process.
-
-    Returns:
-        Message | None: The output message, or None if one of the preprocessors dropped the input message.
-    """
-    for preprocessor in preprocessors:
-        messages = preprocessor.process_pntos_message(message)
-        if not messages:
-            return None
-        if len(messages) > 1:
-            log_func(
-                LoggingLevel.WARN,
-                f'Preprocessor {preprocessor} returned {len(messages)} messages. Ignoring all but the first.',
-            )
-        message = messages[0]
-
-    return message
-
-
-def initialize_filter(
-    init_solution: InitialInertialSolution,
-    fusion_engine: StandardFusionEngine,
-    sb_label: str,
-    log_func: Callable[[LoggingLevel, str], None],
-) -> None:
-    """Update the fusion engine with inertial information to initialize filter."""
-    # asserting because the error is handled in set_up_inertial_mechanization
-    assert isinstance(init_solution.solution, Message)
-    assert isinstance(
-        init_solution.solution.wrapped_message,
-        MeasurementPositionVelocityAttitude,
-    )
-    pva_cov = init_solution.solution.wrapped_message.covariance  # 9x9
-    bias_cov = init_solution.inertial_error_covariance  # 6x6
-    init_pinson_cov = block_diag(pva_cov, bias_cov)
-    fusion_engine.set_state_block_covariance(
-        sb_label,
-        init_pinson_cov,
-    )
-
-    init_time = init_solution.solution.wrapped_message.time_of_validity
-    fusion_engine.time = init_time
-
-    log_func(
-        LoggingLevel.INFO,
-        f'Aligned filter at {init_time.elapsed_nsec * 1e-9:.9f}s.',
-    )
-
-
-def dispatch_to_fusion_engine(
-    inertial: StandardInertialMechanization,
-    fusion_engine: StandardFusionEngine,
-    message: Message,
-    sb_label: str,
-    measurement_channels: dict[str, str],
-    log_func: Callable[[LoggingLevel, str], None],
-) -> None:
-    """
-    Send message to the fusion engine to update the filter.
-
-    Applies feedback to inertial solution and biases, and resets pinson error states
-    afterward.
-    """
-    meas_time = message.wrapped_message.time_of_validity  # type: ignore[attr-defined]
-    # Make sure measurement processor has most current aux data before update
-    mp_label = measurement_channels[message.source_identifier]
-    send_inertial_aux_to_measurement_processor(
-        inertial, fusion_engine, meas_time, mp_label, log_func
-    )
-    send_inertial_aux_to_pinson(inertial, fusion_engine, sb_label, log_func)
-
-    # Propagate to measurement time
-    fusion_engine.propagate(meas_time)
-
-    # Update filter.
-    fusion_engine.update(mp_label, message)
-
-    # Feedback states to inertial.
-    estimate = fusion_engine.get_state_block_estimate(sb_label)
-    if estimate is None:
-        log_func(
-            LoggingLevel.ERROR,
-            'Unable to obtain estimate from fusion engine.',
-        )
-        return
-
-    cur_time = fusion_engine.time
-    inertial_pva_message = inertial.request_solution(cur_time)
-
-    if inertial_pva_message is None:
-        log_func(
-            LoggingLevel.ERROR,
-            f'Unable to obtain solution from inertial at time {cur_time.elapsed_nsec / 1e9:.9f}s.',
-        )
-        return
-
-    if not isinstance(
-        inertial_pva_message.wrapped_message,
-        MeasurementPositionVelocityAttitude,
-    ):
-        log_func(
-            LoggingLevel.ERROR,
-            'Did not receive PVA message from inertial. Received '
-            + f'{type(inertial_pva_message.wrapped_message)} instead.',
-        )
-        return
-
-    inertial_pva = inertial_pva_message.wrapped_message
-
-    corrected_pva = apply_error_states(inertial_pva, estimate)
-
-    message = Message(corrected_pva, 'python orchestration')
-
-    inertial.reset_solution(message)
-
-    imu_errors = inertial.request_sensor_errors(cur_time)
-    if imu_errors is None:
-        log_func(
-            LoggingLevel.ERROR,
-            f'Unable to obtain sensor errors from inertial at time {cur_time.elapsed_nsec / 1e9:.9f}s.',
-        )
-        return
-
-    imu_errors.accel_biases -= estimate[9:12, 0]
-    imu_errors.gyro_biases -= estimate[12:15, 0]
-    inertial.correct_sensor_errors(cur_time, imu_errors)
-
-    # Assume zero error in states after applying feedback
-    fusion_engine.set_state_block_estimate(sb_label, zeros((15, 1)))
 
 
 def apply_error_states(
