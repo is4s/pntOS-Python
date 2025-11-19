@@ -31,6 +31,7 @@ from .PreprocessorConfig import (
     BarometerToAltitudeConfig as BarometerToAltitudeConfig,
     DownsamplerConfig as DownsamplerConfig,
     ImuRotatorConfig as ImuRotatorConfig,
+    OutageConfig as OutageConfig,
     PreprocessorConfig as PreprocessorConfig,
     TimeAdjusterConfig as TimeAdjusterConfig,
     TimeBiasConfig as TimeBiasConfig,

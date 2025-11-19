@@ -139,3 +139,28 @@ class TimeBiasConfig(PreprocessorConfig):
     set to 100'000'000 and the preprocessor will return messages with a timestamp of
     `original - 100'000'000`.
     """
+
+
+@dataclass
+class OutageConfig(PreprocessorConfig):
+    """Configuration for OutagePreprocessor.
+
+    Specifies a time period in which to discard messages on a given channel to simulate
+    a measurement outage. All measurements in the range [start_time, end_time) will be
+    discarded.
+
+    Attributes:
+
+        group (str): Inherited from PreprocessorConfig. Registry group in which to store this config.
+        identifier (str): Inherited from PreprocessorConfig. A string that specifies which preprocessor this config should be used in.
+        channel (str): Channel on which to induce an outage.
+        start_time (float): Time in seconds at which to begin the outage. This time is
+            relative to the timestamp of the first message received on the given channel.
+        end_time (float): Time in seconds at which to end the outage. This time is
+            relative to the timestamp of the first message received on the given channel.
+    """
+
+    group: str
+    channel: str
+    start_time: float
+    end_time: float

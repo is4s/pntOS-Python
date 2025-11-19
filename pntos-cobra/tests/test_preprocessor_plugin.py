@@ -23,11 +23,13 @@ from pntos.cobra.config import (
     BaseConfig,
     DownsamplerConfig,
     ImuRotatorConfig,
+    OutageConfig,
     TimeAdjusterConfig,
 )
 from pntos.cobra.internal import (
     BarometerToAltitudePreprocessor,
     ImuRotationPreprocessor,
+    OutagePreprocessor,
     StandardMediator,
     TimeAdjusterPreprocessor,
 )
@@ -53,12 +55,20 @@ time_adjuster_config = TimeAdjusterConfig(
 baro_to_alt_config = BarometerToAltitudeConfig(
     group='baro_test', identifier='baro_converter', channel='/sensor/barometer'
 )
+outage_config = OutageConfig(
+    group='outage',
+    identifier='outage',
+    channel='/sensor/imu',
+    start_time=2.0,
+    end_time=3.0,
+)
 
 config_list: list[BaseConfig] = [
     downsampler_config,
     inertial_config,
     time_adjuster_config,
     baro_to_alt_config,
+    outage_config,
 ]
 
 ########## Preprocessor Plugin Tests ###############
@@ -87,7 +97,7 @@ def test_plugin_constructor(
     preprocessor_plugin: StandardPreprocessorPlugin,
 ) -> None:
     assert preprocessor_plugin.identifier == 'preprocessor_plugin'
-    assert len(preprocessor_plugin.preprocessor_identifiers) == 5
+    assert len(preprocessor_plugin.preprocessor_identifiers) == 6
 
 
 def test_invalid_mediator() -> None:
@@ -106,6 +116,47 @@ def test_invalid_index(
         )
         is None
     )
+
+
+################## Shared Preprocessor Tests #################
+
+
+@pytest.mark.parametrize(
+    'preprocessor_id',
+    [
+        'downsampler',
+        'imu_rotator',
+        'time_adjuster',
+        'baro_converter',
+        'time_bias',
+        'outage',
+    ],
+)
+def test_bad_config_group(
+    preprocessor_plugin: StandardPreprocessorPlugin, preprocessor_id: str
+) -> None:
+    idx = preprocessor_plugin.preprocessor_identifiers.index(preprocessor_id)
+    preprocessor = preprocessor_plugin.new_preprocessor(idx, 'wrong_group')
+    assert preprocessor is None
+
+
+@pytest.mark.parametrize(
+    'preprocessor_id',
+    [
+        'downsampler',
+        'imu_rotator',
+        'time_adjuster',
+        'baro_converter',
+        'time_bias',
+        'outage',
+    ],
+)
+def test_no_config_group(
+    preprocessor_plugin: StandardPreprocessorPlugin, preprocessor_id: str
+) -> None:
+    idx = preprocessor_plugin.preprocessor_identifiers.index(preprocessor_id)
+    preprocessor = preprocessor_plugin.new_preprocessor(idx, None)
+    assert preprocessor is None
 
 
 ################## Downsampler Tests #################
@@ -139,30 +190,6 @@ def assert_aspn_alt_equal(alt1: MeasurementAltitude, alt2: MeasurementAltitude) 
     assert alt1.time_of_validity.elapsed_nsec == alt2.time_of_validity.elapsed_nsec
     assert alt1.altitude == alt2.altitude
     assert alt1.variance == alt2.variance
-
-
-def test_invalid_config_group(
-    preprocessor_plugin: StandardPreprocessorPlugin,
-) -> None:
-    # No config group
-    ds = preprocessor_plugin.new_preprocessor(0)
-    assert ds is None
-    # Wrong config group
-    ds = preprocessor_plugin.new_preprocessor(0, 'invalid')
-    assert ds is not None
-
-    t1 = create_aspn_altitude('test1')
-    t1_alt_meas = t1.wrapped_message
-    assert isinstance(t1_alt_meas, MeasurementAltitude)
-
-    msg_list = ds.process_pntos_message(t1)
-    assert msg_list is not None
-    assert len(msg_list) > 0
-    # Both messages should come through because of invalid config
-    assert isinstance(msg_list[0].wrapped_message, MeasurementAltitude)
-    assert_aspn_alt_equal(t1_alt_meas, msg_list[0].wrapped_message)
-    assert isinstance(msg_list[0].wrapped_message, MeasurementAltitude)
-    assert_aspn_alt_equal(t1_alt_meas, msg_list[0].wrapped_message)
 
 
 def test_bad_channel(
@@ -286,14 +313,6 @@ def imu_message() -> Message:
         ),
         '/sensor/imu',
     )
-
-
-def test_empty_config_group(
-    preprocessor_plugin: StandardPreprocessorPlugin,
-) -> None:
-    idx = preprocessor_plugin.preprocessor_identifiers.index('imu_rotator')
-    invalid_preprocessor = preprocessor_plugin.new_preprocessor(idx)
-    assert invalid_preprocessor is None
 
 
 def test_imu_rotation(
@@ -457,18 +476,6 @@ def baro_to_alt(
     return preprocessor
 
 
-def test_bad_config_group(preprocessor_plugin: StandardPreprocessorPlugin) -> None:
-    idx = preprocessor_plugin.preprocessor_identifiers.index('baro_converter')
-    preprocessor = preprocessor_plugin.new_preprocessor(idx, 'wrong_group')
-    assert preprocessor is None
-
-
-def test_no_config_group(preprocessor_plugin: StandardPreprocessorPlugin) -> None:
-    idx = preprocessor_plugin.preprocessor_identifiers.index('baro_converter')
-    preprocessor = preprocessor_plugin.new_preprocessor(idx, None)
-    assert preprocessor is None
-
-
 def test_baro_conversion(baro_message: Message, baro_to_alt: Preprocessor) -> None:
     msg_list = baro_to_alt.process_pntos_message(baro_message)
     assert msg_list is not None
@@ -486,3 +493,57 @@ def test_wrong_aspn_type(baro_to_alt: Preprocessor) -> None:
     out_msg = msg_list[0]
     assert isinstance(out_msg.wrapped_message, MeasurementImu)
     assert imu_msg == out_msg
+
+
+########### Outage Preprocessor Tests ##############
+
+
+@pytest.fixture
+def outage_preprocessor(
+    preprocessor_plugin: StandardPreprocessorPlugin,
+) -> OutagePreprocessor:
+    idx = preprocessor_plugin.preprocessor_identifiers.index('outage')
+    preprocessor = preprocessor_plugin.new_preprocessor(idx, 'outage')
+    assert preprocessor is not None
+    assert isinstance(preprocessor, OutagePreprocessor)
+    return preprocessor
+
+
+def test_irrelevant_channel(outage_preprocessor: OutagePreprocessor) -> None:
+    # No messages received yet on outage channel
+    assert outage_preprocessor.first_msg_time_ns is None
+    irrelevant_msg = create_aspn_altitude('irrelevant_channel')
+    outage_preprocessor.process_pntos_message(irrelevant_msg)
+    # Still no messages received on outage channel
+    assert outage_preprocessor.first_msg_time_ns is None
+
+
+def test_outage(outage_preprocessor: OutagePreprocessor) -> None:
+    # outage from 2->3 seconds, relative to first message time, since t0=10s, outage will be from 12-13s.
+
+    t0 = 10_000_000_000  # 10 seconds
+    msg0 = create_imu_message(t0)
+    out = outage_preprocessor.process_pntos_message(msg0)
+    assert out is not None
+    assert outage_preprocessor.first_msg_time_ns is not None
+    assert outage_preprocessor.first_msg_time_ns == t0
+
+    # outage not started yet
+    msg1 = create_imu_message(11_000_000_000)
+    out = outage_preprocessor.process_pntos_message(msg1)
+    assert out is not None
+
+    # outage started
+    msg2 = create_imu_message(12_000_000_000)
+    out = outage_preprocessor.process_pntos_message(msg2)
+    assert out is None
+
+    # outage still active
+    msg3 = create_imu_message(12_500_000_000)
+    out = outage_preprocessor.process_pntos_message(msg3)
+    assert out is None
+
+    # outage ended
+    msg4 = create_imu_message(13_000_000_000)
+    out = outage_preprocessor.process_pntos_message(msg4)
+    assert out is not None
