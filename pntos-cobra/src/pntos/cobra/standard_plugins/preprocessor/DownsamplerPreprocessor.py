@@ -11,7 +11,7 @@ from pntos.cobra.config import (
 )
 
 
-class PreprocessorDownsampler(Preprocessor):
+class DownsamplerPreprocessor(Preprocessor):
     """
     A downsampling preprocessor that periodically discards certain messages.
 

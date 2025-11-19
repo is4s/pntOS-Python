@@ -12,8 +12,8 @@ from pntos.cobra.config import (
 )
 
 from .BarometerToAltitudePreprocessor import BarometerToAltitudePreprocessor
+from .DownsamplerPreprocessor import DownsamplerPreprocessor
 from .ImuRotationPreprocessor import ImuRotationPreprocessor
-from .PreprocessorDownsampler import PreprocessorDownsampler
 from .TimeAdjusterPreprocessor import TimeAdjusterPreprocessor
 from .TimeBiasPreprocessor import TimeBiasPreprocessor
 
@@ -23,7 +23,7 @@ class StandardPreprocessorPlugin(PreprocessorPlugin):
 
     The preprocessors this plugin provides are:
 
-    1. PreprocessorDownsampler - Downsamples messages on a given list of channels.
+    1. DownsamplerPreprocessor - Downsamples messages on a given list of channels.
     2. ImuRotationPreprocessor - Rotated IMU measurements from IMU to platform frame.
     3. TimeAdjusterPreprocessor - Synthesizes timestamps to compensate for erroneous hardware.
     4. BarometerToAltitudePreprocessor - Converts pressure measurements to altitude measurements.
@@ -82,7 +82,7 @@ class StandardPreprocessorPlugin(PreprocessorPlugin):
                     )
                     return None
 
-                return PreprocessorDownsampler(config_group, self.mediator)
+                return DownsamplerPreprocessor(config_group, self.mediator)
 
             case 1:
                 if config_group is None:

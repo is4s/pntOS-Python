@@ -13,11 +13,11 @@ from .standard_plugins.ManualHeadingAlignInitializationPlugin import (
 from .standard_plugins.preprocessor.BarometerToAltitudePreprocessor import (
     BarometerToAltitudePreprocessor as BarometerToAltitudePreprocessor,
 )
+from .standard_plugins.preprocessor.DownsamplerPreprocessor import (
+    DownsamplerPreprocessor as DownsamplerPreprocessor,
+)
 from .standard_plugins.preprocessor.ImuRotationPreprocessor import (
     ImuRotationPreprocessor as ImuRotationPreprocessor,
-)
-from .standard_plugins.preprocessor.PreprocessorDownsampler import (
-    PreprocessorDownsampler as PreprocessorDownsampler,
 )
 from .standard_plugins.preprocessor.TimeAdjusterPreprocessor import (
     TimeAdjusterPreprocessor as TimeAdjusterPreprocessor,
