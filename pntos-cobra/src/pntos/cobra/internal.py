@@ -19,6 +19,9 @@ from .standard_plugins.preprocessor.DownsamplerPreprocessor import (
 from .standard_plugins.preprocessor.ImuRotationPreprocessor import (
     ImuRotationPreprocessor as ImuRotationPreprocessor,
 )
+from .standard_plugins.preprocessor.OutagePreprocessor import (
+    OutagePreprocessor as OutagePreprocessor,
+)
 from .standard_plugins.preprocessor.TimeAdjusterPreprocessor import (
     TimeAdjusterPreprocessor as TimeAdjusterPreprocessor,
 )

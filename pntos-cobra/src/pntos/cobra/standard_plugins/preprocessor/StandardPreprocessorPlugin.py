@@ -9,6 +9,7 @@ from pntos.cobra.config import (
     BarometerToAltitudeConfig,
     DownsamplerConfig,
     ImuRotatorConfig,
+    OutageConfig,
     TimeAdjusterConfig,
     TimeBiasConfig,
     config_from_registry,
@@ -17,6 +18,7 @@ from pntos.cobra.config import (
 from .BarometerToAltitudePreprocessor import BarometerToAltitudePreprocessor
 from .DownsamplerPreprocessor import DownsamplerPreprocessor
 from .ImuRotationPreprocessor import ImuRotationPreprocessor
+from .OutagePreprocessor import OutagePreprocessor
 from .TimeAdjusterPreprocessor import TimeAdjusterPreprocessor
 from .TimeBiasPreprocessor import TimeBiasPreprocessor
 
@@ -31,6 +33,7 @@ class StandardPreprocessorPlugin(PreprocessorPlugin):
     3. TimeAdjusterPreprocessor - Synthesizes timestamps to compensate for erroneous hardware.
     4. BarometerToAltitudePreprocessor - Converts pressure measurements to altitude measurements.
     5. TimeBiasPreprocessor - Applies an offset to timestamps to correct for a constant time bias.
+    6. OutagePreprocessor - Induces an outage on a specified channel.
     """
 
     mediator: Mediator | None
@@ -49,6 +52,7 @@ class StandardPreprocessorPlugin(PreprocessorPlugin):
             'time_adjuster',
             'baro_converter',
             'time_bias',
+            'outage',
         ]
 
     def init_plugin(
@@ -184,6 +188,23 @@ class StandardPreprocessorPlugin(PreprocessorPlugin):
                     return None
 
                 return TimeBiasPreprocessor(time_bias_cfg, self.mediator)
+
+            case 5:
+                preproc_id = self.preprocessor_identifiers[preprocessor_index]
+                if config_group is None:
+                    self.mediator.log_message(
+                        LoggingLevel.ERROR,
+                        f'config_group is a required parameter for preprocessor "{preproc_id}" and cannot be None.',
+                    )
+                    return None
+                outage = config_from_registry(OutageConfig, self.mediator, config_group)
+                if outage is None:
+                    self.mediator.log_message(
+                        LoggingLevel.ERROR,
+                        f'Failed to populate OutageConfig for preprocessor {preproc_id}.',
+                    )
+                    return None
+                return OutagePreprocessor(self.mediator, outage)
 
             case _:
                 self.mediator.log_message(
