@@ -10,7 +10,6 @@ from pntos.api import (
 )
 from pntos.cobra.config import (
     TimeAdjusterConfig,
-    config_from_registry,
 )
 
 
@@ -23,17 +22,10 @@ class TimeAdjusterPreprocessor(Preprocessor):
 
     def __init__(
         self,
-        config_group: str,
+        config: TimeAdjusterConfig,
         mediator: Mediator,
     ) -> None:
         self._mediator = mediator
-        config = config_from_registry(TimeAdjusterConfig, self._mediator, config_group)
-        if config is None:
-            self._mediator.log_message(
-                LoggingLevel.ERROR,
-                'Failed to populate TimeAdjusterConfig in TimeAdjusterPreprocessor.',
-            )
-            return
         self._channel_to_correct = config.channel_to_correct
         self._last_nsec = None
         self._expected_dt_nsec = config.expected_dt_nsec

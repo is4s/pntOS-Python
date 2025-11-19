@@ -7,7 +7,10 @@ from pntos.api import (
 )
 from pntos.cobra.config import (
     BarometerToAltitudeConfig,
+    DownsamplerConfig,
     ImuRotatorConfig,
+    TimeAdjusterConfig,
+    TimeBiasConfig,
     config_from_registry,
 )
 
@@ -74,15 +77,25 @@ class StandardPreprocessorPlugin(PreprocessorPlugin):
 
         match preprocessor_index:
             case 0:
+                preproc_id = self.preprocessor_identifiers[preprocessor_index]
                 if config_group is None:
-                    preproc_id = self.preprocessor_identifiers[preprocessor_index]
                     self.mediator.log_message(
                         LoggingLevel.ERROR,
                         f'config_group is a required parameter for preprocessor "{preproc_id}" and cannot be None.',
                     )
                     return None
 
-                return DownsamplerPreprocessor(config_group, self.mediator)
+                downsampler_config = config_from_registry(
+                    DownsamplerConfig, self.mediator, config_group
+                )
+
+                if downsampler_config is None:
+                    self.mediator.log_message(
+                        LoggingLevel.ERROR,
+                        f'Failed to populate DownsamplerConfig for preprocessor {preproc_id}.',
+                    )
+                    return None
+                return DownsamplerPreprocessor(downsampler_config, self.mediator)
 
             case 1:
                 if config_group is None:
@@ -110,15 +123,25 @@ class StandardPreprocessorPlugin(PreprocessorPlugin):
                 )
 
             case 2:
+                preproc_id = self.preprocessor_identifiers[preprocessor_index]
                 if config_group is None:
-                    preproc_id = self.preprocessor_identifiers[preprocessor_index]
                     self.mediator.log_message(
                         LoggingLevel.ERROR,
                         f'config_group is a required parameter for preprocessor "{preproc_id}" and cannot be None.',
                     )
                     return None
 
-                return TimeAdjusterPreprocessor(config_group, self.mediator)
+                time_adjuster_cfg = config_from_registry(
+                    TimeAdjusterConfig, self.mediator, config_group
+                )
+                if time_adjuster_cfg is None:
+                    self.mediator.log_message(
+                        LoggingLevel.ERROR,
+                        f'Failed to populate TimeAdjusterConfig for preprocessor {preproc_id}.',
+                    )
+                    return None
+
+                return TimeAdjusterPreprocessor(time_adjuster_cfg, self.mediator)
 
             case 3:
                 if config_group is None:
@@ -142,15 +165,25 @@ class StandardPreprocessorPlugin(PreprocessorPlugin):
                 )
 
             case 4:
+                preproc_id = self.preprocessor_identifiers[preprocessor_index]
                 if config_group is None:
-                    preproc_id = self.preprocessor_identifiers[preprocessor_index]
                     self.mediator.log_message(
                         LoggingLevel.ERROR,
                         f'config_group is a required parameter for preprocessor "{preproc_id}" and cannot be None.',
                     )
                     return None
 
-                return TimeBiasPreprocessor(config_group, self.mediator)
+                time_bias_cfg = config_from_registry(
+                    TimeBiasConfig, self.mediator, config_group
+                )
+                if time_bias_cfg is None:
+                    self.mediator.log_message(
+                        LoggingLevel.ERROR,
+                        f'Failed to populate TimeBiasConfig for preprocessor {preproc_id}.',
+                    )
+                    return None
+
+                return TimeBiasPreprocessor(time_bias_cfg, self.mediator)
 
             case _:
                 self.mediator.log_message(

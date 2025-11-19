@@ -9,7 +9,6 @@ from pntos.api import (
 )
 from pntos.cobra.config import (
     TimeBiasConfig,
-    config_from_registry,
 )
 
 
@@ -28,7 +27,7 @@ class TimeBiasPreprocessor(Preprocessor):
 
     def __init__(
         self,
-        config_group: str,
+        config: TimeBiasConfig,
         mediator: Mediator,
     ) -> None:
         """
@@ -37,13 +36,6 @@ class TimeBiasPreprocessor(Preprocessor):
             mediator (Mediator): Used to get config information and to perform logging.
         """
         self._mediator = mediator
-        config = config_from_registry(TimeBiasConfig, self._mediator, config_group)
-        if config is None:
-            self._mediator.log_message(
-                LoggingLevel.ERROR,
-                'Failed to populate TimeBiasConfig in TimeBiasPreprocessor.',
-            )
-            return
         self._channels_to_correct = config.channels_to_correct
         self._time_bias = config.time_bias
 

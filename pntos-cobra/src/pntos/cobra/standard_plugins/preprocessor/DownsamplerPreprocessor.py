@@ -7,7 +7,6 @@ from pntos.api import (
 )
 from pntos.cobra.config import (
     DownsamplerConfig,
-    config_from_registry,
 )
 
 
@@ -23,7 +22,7 @@ class DownsamplerPreprocessor(Preprocessor):
     _downsampling_factors: dict[str, int]
     _update_counters: dict[str, int]
 
-    def __init__(self, config_group: str, mediator: Mediator) -> None:
+    def __init__(self, config: DownsamplerConfig, mediator: Mediator) -> None:
         """
         Cobra Downsampler Preprocessor
 
@@ -34,14 +33,6 @@ class DownsamplerPreprocessor(Preprocessor):
         self._downsampling_factors = {}
         self._update_counters = {}
         self.mediator = mediator
-        config = config_from_registry(DownsamplerConfig, mediator, config_group)
-
-        if config is None:
-            self.mediator.log_message(
-                LoggingLevel.ERROR,
-                'Unable to retrieve config from registry.',
-            )
-            return
 
         channels = config.channels_to_downsample
         factors = array(config.downsampling_factors, dtype=int)

@@ -108,6 +108,33 @@ def test_invalid_index(
     )
 
 
+################## Shared Preprocessor Tests #################
+
+
+@pytest.mark.parametrize(
+    'preprocessor_id',
+    ['downsampler', 'imu_rotator', 'time_adjuster', 'baro_converter', 'time_bias'],
+)
+def test_bad_config_group(
+    preprocessor_plugin: StandardPreprocessorPlugin, preprocessor_id: str
+) -> None:
+    idx = preprocessor_plugin.preprocessor_identifiers.index(preprocessor_id)
+    preprocessor = preprocessor_plugin.new_preprocessor(idx, 'wrong_group')
+    assert preprocessor is None
+
+
+@pytest.mark.parametrize(
+    'preprocessor_id',
+    ['downsampler', 'imu_rotator', 'time_adjuster', 'baro_converter', 'time_bias'],
+)
+def test_no_config_group(
+    preprocessor_plugin: StandardPreprocessorPlugin, preprocessor_id: str
+) -> None:
+    idx = preprocessor_plugin.preprocessor_identifiers.index(preprocessor_id)
+    preprocessor = preprocessor_plugin.new_preprocessor(idx, None)
+    assert preprocessor is None
+
+
 ################## Downsampler Tests #################
 @pytest.fixture
 def downsampler(
@@ -139,30 +166,6 @@ def assert_aspn_alt_equal(alt1: MeasurementAltitude, alt2: MeasurementAltitude) 
     assert alt1.time_of_validity.elapsed_nsec == alt2.time_of_validity.elapsed_nsec
     assert alt1.altitude == alt2.altitude
     assert alt1.variance == alt2.variance
-
-
-def test_invalid_config_group(
-    preprocessor_plugin: StandardPreprocessorPlugin,
-) -> None:
-    # No config group
-    ds = preprocessor_plugin.new_preprocessor(0)
-    assert ds is None
-    # Wrong config group
-    ds = preprocessor_plugin.new_preprocessor(0, 'invalid')
-    assert ds is not None
-
-    t1 = create_aspn_altitude('test1')
-    t1_alt_meas = t1.wrapped_message
-    assert isinstance(t1_alt_meas, MeasurementAltitude)
-
-    msg_list = ds.process_pntos_message(t1)
-    assert msg_list is not None
-    assert len(msg_list) > 0
-    # Both messages should come through because of invalid config
-    assert isinstance(msg_list[0].wrapped_message, MeasurementAltitude)
-    assert_aspn_alt_equal(t1_alt_meas, msg_list[0].wrapped_message)
-    assert isinstance(msg_list[0].wrapped_message, MeasurementAltitude)
-    assert_aspn_alt_equal(t1_alt_meas, msg_list[0].wrapped_message)
 
 
 def test_bad_channel(
@@ -286,14 +289,6 @@ def imu_message() -> Message:
         ),
         '/sensor/imu',
     )
-
-
-def test_empty_config_group(
-    preprocessor_plugin: StandardPreprocessorPlugin,
-) -> None:
-    idx = preprocessor_plugin.preprocessor_identifiers.index('imu_rotator')
-    invalid_preprocessor = preprocessor_plugin.new_preprocessor(idx)
-    assert invalid_preprocessor is None
 
 
 def test_imu_rotation(
@@ -455,18 +450,6 @@ def baro_to_alt(
     assert preprocessor is not None
     assert isinstance(preprocessor, BarometerToAltitudePreprocessor)
     return preprocessor
-
-
-def test_bad_config_group(preprocessor_plugin: StandardPreprocessorPlugin) -> None:
-    idx = preprocessor_plugin.preprocessor_identifiers.index('baro_converter')
-    preprocessor = preprocessor_plugin.new_preprocessor(idx, 'wrong_group')
-    assert preprocessor is None
-
-
-def test_no_config_group(preprocessor_plugin: StandardPreprocessorPlugin) -> None:
-    idx = preprocessor_plugin.preprocessor_identifiers.index('baro_converter')
-    preprocessor = preprocessor_plugin.new_preprocessor(idx, None)
-    assert preprocessor is None
 
 
 def test_baro_conversion(baro_message: Message, baro_to_alt: Preprocessor) -> None:
