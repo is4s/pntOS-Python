@@ -1,4 +1,5 @@
 import threading
+from queue import Queue
 from threading import Thread
 
 from lcm import LCM, LCMSubscription
@@ -21,6 +22,7 @@ class LcmTransportPlugin(TransportPlugin):
     _subscription_regex: str
     _shutdown_threads: threading.Event
     _channels: set[str]
+    _output_queue: Queue[Message | None]
 
     def __init__(self, identifier: str) -> None:
         """
@@ -34,6 +36,7 @@ class LcmTransportPlugin(TransportPlugin):
         self._shutdown_threads = threading.Event()
         self.handler = None
         self._channels = set()
+        self._output_queue = Queue()
 
     def init_plugin(
         self,
@@ -61,6 +64,8 @@ class LcmTransportPlugin(TransportPlugin):
         self._url = config.url
         self._subscription_regex = config.subscribe_to
 
+        threading.Thread(target=self._send_thread).start()
+
     def shutdown_plugin(self) -> None:
         """
         PntOS plugin shutdown function
@@ -71,6 +76,24 @@ class LcmTransportPlugin(TransportPlugin):
         self.mediator.log_message(
             LoggingLevel.INFO, f'Shutdown plugin for {self.identifier}.'
         )
+
+    def _send_thread(self) -> None:
+        while not self._shutdown_threads.is_set():
+            message = self._output_queue.get()
+
+            if message is None:
+                break
+
+            lcm_msg = create_lcm_message(message, self._output_version)
+            if lcm_msg is None:
+                self.mediator.log_message(
+                    LoggingLevel.WARN,
+                    f'Cannot marshal message on channel {message.source_identifier} '
+                    + f'of type {type(message.wrapped_message)}. Ignoring message.',
+                )
+                continue
+
+            self.lcm.publish(message.source_identifier, lcm_msg.encode())
 
     def _general_handler(self, channel: str, data: bytes) -> None:
         process_lcm_message(self.mediator, channel, data, self._channels)
@@ -100,6 +123,7 @@ class LcmTransportPlugin(TransportPlugin):
 
         # This closes the handler thread
         self._shutdown_threads.set()
+        self._output_queue.put(None)
 
         self.mediator.log_message(LoggingLevel.INFO, 'LCM transport stopped.')
 
@@ -113,13 +137,11 @@ class LcmTransportPlugin(TransportPlugin):
                 'No channel name specified. This implementation requires a channel name.',
             )
             return
-
-        lcm_msg = create_lcm_message(message, self._output_version)
-        if lcm_msg is None:
-            self.mediator.log_message(
-                LoggingLevel.WARN,
-                f'Cannot marshal message on channel {channel_name} of type {type(message.wrapped_message)}. Ignoring message.',
-            )
-            return
-
-        self.lcm.publish(channel_name, lcm_msg.encode())
+        # if we were to publish here, multiple threads could call into
+        # lcm publish simultaneously, pushing interleaved and garbage
+        # data to the socket
+        #
+        # to prevent this, an output queue is used, with a single
+        # thread performing the publish operation
+        message.source_identifier = channel_name
+        self._output_queue.put(message)
