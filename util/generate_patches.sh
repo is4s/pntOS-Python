@@ -14,3 +14,4 @@ git diff --no-index $orch_path"TutorialGpsOrchestrationPlugin.py" $orch_path"Tut
 git diff --no-index apps/standard/gps_ins.py apps/standard/gps_vel_ins.py > util/app_gps_vel_standard.patch
 git diff --no-index apps/standard/gps_vel_ins.py apps/standard/posvel_ins.py > util/app_posvel_standard.patch
 git diff --no-index apps/standard/gps_ins.py apps/standard/gps_ins_baro.py > util/app_gps_ins_baro.patch
+git diff --no-index apps/standard/gps_ins.py apps/standard/gps_ins_vsb.py > util/app_gps_ins_vsb.patch

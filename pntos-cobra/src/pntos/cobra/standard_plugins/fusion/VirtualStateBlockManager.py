@@ -1,5 +1,5 @@
 from aspn23 import TypeTimestamp
-from numpy import float64
+from numpy import eye, float64
 from numpy.typing import NDArray
 from pntos.api import (
     EstimateWithCovariance,
@@ -95,7 +95,7 @@ class VirtualStateBlockManager:
         """
         if trans.source == trans.target:
             self.mediator.log_message(
-                LoggingLevel.WARN,
+                LoggingLevel.ERROR,
                 'Source and target tags should not be the same. Virtual state block will not be added.',
             )
             return
@@ -103,7 +103,7 @@ class VirtualStateBlockManager:
             targetNode = self._node_map[trans.target]
             if targetNode.parent is not None:
                 self.mediator.log_message(
-                    LoggingLevel.WARN,
+                    LoggingLevel.ERROR,
                     'Duplicate virtual state block. Target matches an existing block stored in the VirtualStateBlockManager. Virtual state block will not be added.',
                 )
                 return
@@ -139,10 +139,12 @@ class VirtualStateBlockManager:
         Returns:
             :class:`pntos.api.EstimateWithCovariance` if conversion is possible; otherwise returns `None`.
         """
+        ewc = orig
+        if start == target:
+            return ewc
         path = self._get_path(start, target)
         if path is None:
             return None
-        ewc = orig
         for node_id in path:
             node = self._node_map[node_id]
             if node.block is None:
@@ -165,10 +167,12 @@ class VirtualStateBlockManager:
         Returns:
             NDArray[float64] if conversion is possible; otherwise returns `None`.
         """
+        est = orig
+        if start == target:
+            return est
         path = self._get_path(start, target)
         if path is None:
             return None
-        est = orig
         for node_id in path:
             node = self._node_map[node_id]
             if node.block is None:
@@ -176,7 +180,7 @@ class VirtualStateBlockManager:
             est = node.block.convert_estimate(est, time)
         return est
 
-    def get_start_block_label(self, target: str) -> tuple[bool, str]:
+    def get_start_block_label(self, target: str) -> str | None:
         """
         Gets the state block label of the starting node which is assumed to be represent a 'real' state block.
 
@@ -184,25 +188,23 @@ class VirtualStateBlockManager:
             target (str): The :class:`pntos.api.VirtualStateBlock` unique identifier to get the starting label for.
 
         Returns:
-            A `tuple[bool, str]`. The boolean will be `True` if there is a valid path back to an assumed 'real' state block.
-                The string will be the unique label of that starting state block. Otherwise the boolean will be `False`
-                and the string will be empty.
+            str | None
         """
         if target not in self._node_map:
             self.mediator.log_message(
-                LoggingLevel.WARN,
+                LoggingLevel.ERROR,
                 f'Block {target} has not been added to the VirtualStateBlockManager. No valid starting label exists.',
             )
-            return (False, '')
+            return None
         if target in self._root_map:
             root = self._node_map[self._root_map[target]]
             if root.parent is None:
-                return (True, self._root_map[target])
+                return self._root_map[target]
         node = self._node_map[target]
         while node.parent is not None:
             node = self._node_map[node.parent]
         self._root_map[target] = node.id
-        return (True, node.id)
+        return node.id
 
     def get_virtual_state_block_labels(self) -> list[str] | None:
         """
@@ -226,14 +228,14 @@ class VirtualStateBlockManager:
         """
         if target not in self._node_map:
             self.mediator.log_message(
-                LoggingLevel.WARN,
+                LoggingLevel.ERROR,
                 f'Block {target} has not been added to or has already been removed from the VirtualStateBlockManager. Cannot give aux data.',
             )
             return
         node = self._node_map[target]
         if node.block is None:
             self.mediator.log_message(
-                LoggingLevel.WARN,
+                LoggingLevel.ERROR,
                 f'Target {target} does not have a VirtualStateBlock associated with it. It likely has not been added to the manager yet.',
             )
             return
@@ -254,6 +256,9 @@ class VirtualStateBlockManager:
         Returns:
             NDArray[float64] if conversion is possible; otherwise returns `None`.
         """
+        out = eye(orig.shape[0])
+        if start == target:
+            return out
         path = self._get_path(start, target)
         if path is None:
             return None
@@ -262,8 +267,10 @@ class VirtualStateBlockManager:
             node = self._node_map[node_id]
             if node.block is None:
                 continue
-            est = node.block.jacobian(est, time)
-        return est
+            jac = node.block.jacobian(est, time)
+            est = node.block.convert_estimate(est, time)
+            out = jac @ out
+        return out
 
     def remove_virtual_state_block(self, target: str) -> None:
         """
@@ -275,7 +282,7 @@ class VirtualStateBlockManager:
         """
         if target not in self._node_map:
             self.mediator.log_message(
-                LoggingLevel.WARN,
+                LoggingLevel.ERROR,
                 f'Block {target} has not been added to or has already been removed from the VirtualStateBlockManager. Cannot remove.',
             )
             return
@@ -306,7 +313,7 @@ class VirtualStateBlockManager:
         """
         if target not in self._node_map:
             self.mediator.log_message(
-                LoggingLevel.WARN,
+                LoggingLevel.ERROR,
                 f'Block {target} is not being tracked by the VirtualStateBlockManager.',
             )
             return None
@@ -319,7 +326,7 @@ class VirtualStateBlockManager:
         while node.id != start:
             if node.parent is None:
                 self.mediator.log_message(
-                    LoggingLevel.WARN,
+                    LoggingLevel.ERROR,
                     f'No path exists from source block {start} to target block {target}.',
                 )
                 return None

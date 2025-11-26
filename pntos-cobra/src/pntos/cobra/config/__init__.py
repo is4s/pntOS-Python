@@ -47,3 +47,7 @@ from .utils import (
     imu_model_from_config as imu_model_from_config,
     imu_model_to_config as imu_model_to_config,
 )
+from .VirtualStateBlockConfig import (
+    StateExtractorConfig as StateExtractorConfig,
+    VirtualStateBlockConfig as VirtualStateBlockConfig,
+)

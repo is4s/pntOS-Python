@@ -20,7 +20,13 @@ from aspn23 import (
     TypeHeader,
     TypeTimestamp,
 )
-from navtk.navutils import hae_to_msl
+from navtk.navutils import (
+    d_rpy_to_dcm_wrt_p,
+    d_rpy_to_dcm_wrt_r,
+    d_rpy_to_dcm_wrt_y,
+    hae_to_msl,
+    rpy_to_dcm,
+)
 from pntos.api import (
     EstimateWithCovariance,
     EstimateWithCovarianceType,
@@ -41,22 +47,27 @@ from pntos.cobra.config import (
     PinsonStateBlockConfig,
     SensorConfig,
     SensorMeasurementProcessorConfig,
+    StateExtractorConfig,
 )
 from pntos.cobra.internal import (
     AltitudeMeasurementProcessor,
     Pinson15NedBlock,
     PinsonBodyVelocityMeasurementProcessor,
+    PinsonErrorToStandard,
     PinsonPositionMeasurementProcessor,
     PinsonPosVelMeasurementProcessor,
     PinsonVelocityMeasurementProcessor,
     PinsonWithLeverArmPositionMeasurementProcessor,
     PinsonWithNedFogmPositionMeasurementProcessor,
+    PositionMeasurementProcessor,
     StandardMediator,
+    StateExtractor,
 )
 from pntos.cobra.utils.navigation import (
     OMEGA_E,
     delta_lat_to_north,
     delta_lon_to_east,
+    east_to_delta_lon,
     meridian_radius,
     north_to_delta_lat,
     quat_to_dcm,
@@ -102,6 +113,14 @@ my_config: list[BaseConfig] = [
             orientation=(1.0, 0.0, 0.0, 0.0),
             sensor_name='NA',
         ),
+    ),
+    StateExtractorConfig(
+        group='config/extractor',
+        identifier='state_extractor',
+        source='some_real_block',
+        target='extractor',
+        incoming_state_size=3,
+        indices_to_extract=(0, 1),
     ),
 ]
 
@@ -173,6 +192,18 @@ def position_mp3(
         4, None, 'position', ['pinson', 'fogm', 'fogm2'], 'config/test'
     )
     assert isinstance(out, StandardMeasurementProcessor)
+    return out
+
+
+@pytest.fixture
+def direct_pos(
+    state_model_provider: StateModelProviderType,
+) -> StandardMeasurementProcessor:
+    out = state_model_provider.new_processor(
+        7, None, 'position', ['pinson', 'fogm'], 'config/test'
+    )
+    assert isinstance(out, StandardMeasurementProcessor)
+    assert isinstance(out, PositionMeasurementProcessor)
     return out
 
 
@@ -505,6 +536,30 @@ def test_wrong_number_blocks(
         assert mod is None
 
 
+def test_vsb_instantiation(
+    state_model_provider: StateModelProviderType,
+) -> None:
+    pes = state_model_provider.new_virtual_block(
+        0, 'some_real_block', 'to_direct', None
+    )
+    assert isinstance(pes, PinsonErrorToStandard)
+
+    se = state_model_provider.new_virtual_block(
+        1, 'some_real_block', 'extractor', 'config/extractor'
+    )
+    assert isinstance(se, StateExtractor)
+
+    no_se = state_model_provider.new_virtual_block(
+        1, 'some_real_block', 'extractor', 'config/bad'
+    )
+    assert no_se is None
+
+    no_se = state_model_provider.new_virtual_block(
+        1, 'some_real_block', 'extractor', None
+    )
+    assert no_se is None
+
+
 def test_bad_meas_inputs(
     all_pos_processors: all_pos_proc_type,
     state_model_provider: StateModelProviderType,
@@ -613,6 +668,50 @@ def test_invalid_measurement(all_pos_processors: all_pos_proc_type) -> None:
         x_and_p = gxp(m[1])
         mm = m[0].generate_model(msg, x_and_p)
         assert mm is None
+
+
+def test_generate_model_direct_pos(
+    direct_pos: PositionMeasurementProcessor, pos_meas: Message
+) -> None:
+    x_and_p = EstimateWithCovariance(
+        EstimateWithCovarianceType.EWC_GENERIC, np.zeros((18, 1)), np.eye(18)
+    )
+    pos = pos_meas.wrapped_message
+    assert isinstance(pos, MeasurementPosition)
+    assert pos.term1 is not None
+    assert pos.term2 is not None
+    assert pos.term3 is not None
+    mm = direct_pos.generate_model(pos_meas, x_and_p)
+    assert mm is not None
+
+    conv = np.diag(
+        [
+            north_to_delta_lat(1, pos.term1, pos.term3),
+            east_to_delta_lon(1, pos.term1, pos.term3),
+            -1.0,
+        ]
+    )
+
+    rpy = np.zeros((3,))
+    exp_H = np.eye(3, 18)
+    exp_H[:, 6] = conv @ d_rpy_to_dcm_wrt_r(rpy) @ _lever_arm
+    exp_H[:, 7] = conv @ d_rpy_to_dcm_wrt_p(rpy) @ _lever_arm
+    exp_H[:, 8] = conv @ d_rpy_to_dcm_wrt_y(rpy) @ _lever_arm
+    exp_H[:, -3:] = -np.eye(3)
+    exp_R = conv @ pos.covariance @ conv
+    exp_z = np.array([[pos.term1], [pos.term2], [pos.term3]])
+    arm_ned = rpy_to_dcm(np.zeros((3,))) @ _lever_arm
+    exp_conv_meas = np.array(
+        [
+            [north_to_delta_lat(arm_ned[0], pos.term1, pos.term3)],
+            [east_to_delta_lon(arm_ned[1], pos.term1, pos.term3)],
+            [-arm_ned[2]],
+        ]
+    )
+    assert np.allclose(mm.H, exp_H)
+    assert np.allclose(mm.R, exp_R)
+    assert np.allclose(mm.h(x_and_p.estimate), exp_conv_meas)
+    assert np.allclose(mm.z, exp_z)
 
 
 def test_generate_model_gps_all(

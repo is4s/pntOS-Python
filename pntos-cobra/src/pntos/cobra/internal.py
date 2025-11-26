@@ -7,6 +7,12 @@ from .standard_plugins.controller.StandardMessageStreamConfig import (
 from .standard_plugins.EkfFusionStrategyPlugin import (
     EkfFusionStrategy as EkfFusionStrategy,
 )
+from .standard_plugins.fusion.StandardFusionPlugin import (
+    StandardFusionEngine as StandardFusionEngine,
+)
+from .standard_plugins.fusion.VirtualStateBlockManager import (
+    VirtualStateBlockManager as VirtualStateBlockManager,
+)
 from .standard_plugins.ManualHeadingAlignInitializationPlugin import (
     ManualHeadingAlign as ManualHeadingAlign,
 )
@@ -27,9 +33,6 @@ from .standard_plugins.preprocessor.TimeAdjusterPreprocessor import (
 )
 from .standard_plugins.preprocessor.TimeBiasPreprocessor import (
     TimeBiasPreprocessor as TimeBiasPreprocessor,
-)
-from .standard_plugins.StandardFusionPlugin import (
-    StandardFusionEngine as StandardFusionEngine,
 )
 from .standard_plugins.StandardInertialPlugin import (
     StandardInertial as StandardInertial,
@@ -71,6 +74,9 @@ from .standard_plugins.state_modeling.PinsonWithLeverArmPositionMeasurementProce
 from .standard_plugins.state_modeling.PinsonWithNedFogmPositionMeasurementProcessor import (
     PinsonWithNedFogmPositionMeasurementProcessor as PinsonWithNedFogmPositionMeasurementProcessor,
 )
+from .standard_plugins.state_modeling.PositionMeasurementProcessor import (
+    PositionMeasurementProcessor as PositionMeasurementProcessor,
+)
 from .standard_plugins.state_modeling.StandardGpsInsStateModelingPlugin import (
     StandardGpsInsStateModelProvider as StandardGpsInsStateModelProvider,
 )
@@ -79,9 +85,6 @@ from .standard_plugins.state_modeling.virtual_state_blocks.PinsonErrorToStandard
 )
 from .standard_plugins.state_modeling.virtual_state_blocks.StateExtractor import (
     StateExtractor as StateExtractor,
-)
-from .standard_plugins.state_modeling.virtual_state_blocks.VirtualStateBlockManager import (
-    VirtualStateBlockManager as VirtualStateBlockManager,
 )
 from .standard_plugins.StaticAlignInitializationPlugin import StaticAlign as StaticAlign
 from .tutorial_plugins.state_modeling.TutorialFogmBlock import (

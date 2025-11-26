@@ -8,6 +8,7 @@ from .ImuConfig import ImuConfig
 from .InertialConfig import InertialConfig
 from .PreprocessorConfig import PreprocessorConfig
 from .SensorConfig import SensorConfig
+from .VirtualStateBlockConfig import VirtualStateBlockConfig
 
 
 @dataclass(kw_only=True)
@@ -28,6 +29,9 @@ class StateBlockConfig(BaseConfig):
     label: str
     """
     The name used to identify and track this state block through its lifecycle.
+
+    This value should be unique from all other `pntos.cobra.config.StateBlockConfig.label`
+    and `pntos.cobra.config.VirtualStateBlockConfig.target` values.
     """
 
     estimate_with_covariance: EstimateWithCovariance | None = None
@@ -215,6 +219,11 @@ class StandardOrchestrationConfig(BaseConfig):
     additional_sb_configs: tuple[StateBlockConfig, ...] | None = None
     """
     A series of state block configs to use in addition to the core pinson state block.
+    """
+
+    vsb_configs: tuple[VirtualStateBlockConfig, ...] | None = None
+    """
+    A series of virtual state block configs to use in the fusion engine.
     """
 
     mp_configs: tuple[MeasurementProcessorConfig, ...] | None = None
