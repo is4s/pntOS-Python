@@ -13,6 +13,7 @@ from pntos.cobra.config import (
     FogmStateBlockConfig,
     PinsonStateBlockConfig,
     SensorMeasurementProcessorConfig,
+    StateExtractorConfig,
     config_from_registry,
 )
 
@@ -33,6 +34,9 @@ from .PinsonWithLeverArmPositionMeasurementProcessor import (
 from .PinsonWithNedFogmPositionMeasurementProcessor import (
     PinsonWithNedFogmPositionMeasurementProcessor,
 )
+from .PositionMeasurementProcessor import PositionMeasurementProcessor
+from .virtual_state_blocks.PinsonErrorToStandard import PinsonErrorToStandard
+from .virtual_state_blocks.StateExtractor import StateExtractor
 
 
 class StandardGpsInsStateModelProvider(StandardStateModelProvider):
@@ -58,6 +62,7 @@ class StandardGpsInsStateModelProvider(StandardStateModelProvider):
             'pinson_with_lever_arm_position',
             'pinson_body_velocity',
             'pinson_posvel',
+            'position',
         ]
         self.block_identifiers: list[str] = [
             'pinson15',
@@ -65,7 +70,10 @@ class StandardGpsInsStateModelProvider(StandardStateModelProvider):
             'clock_bias',
             'constant',
         ]
-        self.virtual_block_identifiers = None
+        self.virtual_block_identifiers: list[str] = [
+            'pinson_error_to_standard',
+            'state_extractor',
+        ]
 
     def new_processor(
         self,
@@ -82,6 +90,7 @@ class StandardGpsInsStateModelProvider(StandardStateModelProvider):
         | PinsonWithLeverArmPositionMeasurementProcessor
         | PinsonBodyVelocityMeasurementProcessor
         | PinsonPosVelMeasurementProcessor
+        | PositionMeasurementProcessor
         | None
     ):
         """
@@ -244,6 +253,28 @@ class StandardGpsInsStateModelProvider(StandardStateModelProvider):
                     self._mediator,
                     np.array(sensor_mp_config.sensor_config.lever_arm),
                 )
+            case 7:
+                if config_group is None:
+                    self._mediator.log_message(
+                        LoggingLevel.ERROR,
+                        f'A config group is required for processor {self.processor_identifiers[processor_index]}',
+                    )
+                    return None
+                sensor_mp_config = config_from_registry(
+                    SensorMeasurementProcessorConfig, self._mediator, config_group
+                )
+                if sensor_mp_config is None:
+                    self._mediator.log_message(
+                        LoggingLevel.ERROR,
+                        'Could not get position sensor config from registry.',
+                    )
+                    return None
+                return PositionMeasurementProcessor(
+                    label,
+                    state_block_labels,
+                    self._mediator,
+                    np.array(sensor_mp_config.sensor_config.lever_arm),
+                )
         self._mediator.log_message(
             LoggingLevel.ERROR,
             f'Invalid processor index of {processor_index}. StandardGpsInsStateModelProvider provides {len(self.processor_identifiers)} processors.',
@@ -398,14 +429,60 @@ class StandardGpsInsStateModelProvider(StandardStateModelProvider):
         target_label: str,
         config_group: str | None,
     ) -> VirtualStateBlock | None:
-        if self.virtual_block_identifiers is None:
-            virtual_block_count = 0
-        else:
-            virtual_block_count = len(self.virtual_block_identifiers)
+        """
+        Generate a new VirtualStateBlock that converts a set of states to another representation.
+
+        Args:
+            virtual_block_index (int): Index into self.virtual_block_identifiers used to select the desired type of state block.
+
+                - Index 0 corresponds to a PinsonErrorToStandard VSB.
+                - Index 1 corresponds to a StateExtractor VSB.
+                - All other indices will result in a return value of None.
+            source_label (str): A string which will be used to populate the ``source`` field
+                of the newly created virtual state block. This ``source_label`` should correspond
+                to either a different 'real' or virtual state block.
+            target_label (str): A string which will be used to populate the ``target`` field
+                of the newly create virtual state block. This ``target`` should be unique,
+                differing from all other targets on the other instances of :class:`pntos.api.VirtualStateBlock`.
+            config_group (str | None): Indicates which (if any) parameter group in the
+                registry may be used to obtain additional configuration values to
+                generate the new virtual state block. If the state block requires no
+                outside configuration, ``config_group`` may be ``None``.
+
+        Returns:
+            VirtualStateBlock | None: The newly created VirtualStateBlock or ``None`` when no virtual state block can be produced
+            with the given ``block_index``, ``engine``, and ``config_group``.
+        """
+        match virtual_block_index:
+            case 0:
+                return PinsonErrorToStandard(self._mediator, source_label, target_label)
+            case 1:
+                if config_group is None:
+                    self._mediator.log_message(
+                        LoggingLevel.ERROR,
+                        f'A config group is required for virtual state block {self.virtual_block_identifiers[virtual_block_index]}',
+                    )
+                    return None
+                se_config = config_from_registry(
+                    StateExtractorConfig, self._mediator, config_group
+                )
+                if se_config is None:
+                    self._mediator.log_message(
+                        LoggingLevel.ERROR,
+                        'Could not get StateExtractorConfig from registry.',
+                    )
+                    return None
+                return StateExtractor(
+                    self._mediator,
+                    source_label,
+                    target_label,
+                    se_config.incoming_state_size,
+                    list(se_config.indices_to_extract),
+                )
 
         self._mediator.log_message(
             LoggingLevel.ERROR,
-            f'Invalid virtual block index of {virtual_block_index}. StandardGpsInsStateModelProvider provides {virtual_block_count} virtual state blocks.',
+            f'Invalid virtual block index of {virtual_block_index}. StandardGpsInsStateModelProvider provides {len(self.virtual_block_identifiers)} virtual state blocks.',
         )
         return None
 

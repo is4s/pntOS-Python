@@ -77,7 +77,7 @@ class PinsonErrorToStandardWrapped(VirtualStateBlock):
         time: TypeTimestamp,
     ) -> EstimateWithCovariance:
         ewc = NavtkEWC(
-            estimate_with_covariance.estimate, estimate_with_covariance.covariance
+            estimate_with_covariance.estimate[:, 0], estimate_with_covariance.covariance
         )
         ewc = self._pes.convert(ewc, convert_timestamp_to_cpp(time))
         return EstimateWithCovariance(
@@ -134,7 +134,7 @@ def pva() -> Message:
 
 @pytest.fixture
 def est() -> NDArray[float64]:
-    return array([0, 1, 2])
+    return array([[0], [1], [2]])
 
 
 @pytest.fixture
@@ -145,12 +145,14 @@ def ewc(est: NDArray[float64]) -> EstimateWithCovariance:
 def test_valid_state_extractor(mediator: StandardMediator) -> None:
     vsb = StateExtractor(mediator, VSB_SOURCE, 'first_three_outta_five', 5, [0, 1, 2])
     ewc = EstimateWithCovariance(
-        EstimateWithCovarianceType.EWC_GENERIC, array([0, 1, 2, 3, 4]), eye(5)
+        EstimateWithCovarianceType.EWC_GENERIC,
+        array([[0], [1], [2], [3], [4]]),
+        eye(5),
     )
     ewc_out = vsb.convert(ewc, TypeTimestamp(0))
     assert ewc_out.type == ewc.type
-    assert len(ewc_out.estimate) == 3
-    assert allclose(ewc_out.estimate[:3], ewc.estimate[:3])
+    assert ewc_out.estimate.shape == (3, 1)
+    assert allclose(ewc_out.estimate[:3, 0], ewc.estimate[:3, 0])
     print(vsb._jac)
     print(ewc_out.covariance)
     assert allclose(ewc_out.covariance, eye(3))
@@ -230,7 +232,17 @@ def test_pinson_error_to_standard(mediator: StandardMediator) -> None:
         )
         pes.receive_aux_data([pva])
         est_in = array(
-            (i, i + 1, i + 2, i + 3, i + 4, i + 5, i * 1e-6, i * 1.1e-6, i * 1.2e-6)
+            [
+                [i],
+                [i + 1],
+                [i + 2],
+                [i + 3],
+                [i + 4],
+                [i + 5],
+                [i * 1e-6],
+                [i * 1.1e-6],
+                [i * 1.2e-6],
+            ]
         )
         cov = eye(9)
         fill_diagonal(
@@ -255,8 +267,8 @@ def test_pinson_error_to_standard(mediator: StandardMediator) -> None:
 
         pesw.receive_aux_data([pva])
         ewc2 = pesw.convert(ewc, time)
-        jac2 = pesw.jacobian(est_in, time)
-        assert allclose(ewc1.estimate, ewc2.estimate, equal_nan=True)
+        jac2 = pesw.jacobian(est_in[:, 0], time)
+        assert allclose(ewc1.estimate[:, 0], ewc2.estimate, equal_nan=True)
         assert allclose(ewc1.covariance, ewc2.covariance, equal_nan=True)
         assert allclose(jac1, jac2, equal_nan=True)
 
@@ -355,10 +367,12 @@ def test_valid_vsb_manager_ops(
     assert allclose(jac_out, eye(3))
 
     start = vsbm.get_start_block_label(targets[targ_index])
-    assert start[1] == VSB_SOURCE
+    assert start is not None
+    assert start == VSB_SOURCE
     # test caching
     start = vsbm.get_start_block_label(targets[targ_index])
-    assert start[1] == VSB_SOURCE
+    assert start is not None
+    assert start == VSB_SOURCE
 
     new_se = StateExtractor(mediator, 'new_source', 't25', 3, [0, 1, 2])
     targets.append(new_se.target)
@@ -408,7 +422,7 @@ def test_invalid_vsb_manager_ops(
     assert jac_out is None
 
     pair = vsbm.get_start_block_label('bad_targ')
-    assert pair[0] is False
+    assert pair is None
 
     vsbm.give_virtual_state_block_aux_data('bad_targ', [])
 

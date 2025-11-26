@@ -29,6 +29,7 @@ from pntos.cobra.internal import (
     StandardFusionEngine as CobraStandardFusionEngine,
     StandardMediator,
     StandardRegistry,
+    StateExtractor,
 )
 
 
@@ -144,16 +145,12 @@ def fusion_engine(mediator: StandardMediator) -> StandardFusionEngine:
     # initialize the fusion plugin
     fusion_plugin = StandardFusionPlugin(identifier='test_fusion_plugin')
     fusion_plugin.init_plugin('test', mediator=mediator)
-    fusion_engine: StandardFusionEngine | None = fusion_plugin.new_fusion_engine(
-        StandardFusionEngine
-    )
-    assert fusion_engine is not None
+    fusion_engine = fusion_plugin.new_fusion_engine(StandardFusionEngine)
+    assert isinstance(fusion_engine, StandardFusionEngine)
     fusion_strategy_plugin = EkfFusionStrategyPlugin(identifier='test_strategy_plugin')
     fusion_strategy_plugin.init_plugin('test_strategy', mediator=mediator)
-    fusion_strategy: StandardFusionStrategy | None = (
-        fusion_strategy_plugin.new_fusion_strategy(StandardFusionStrategy)
-    )
-    assert fusion_strategy is not None
+    fusion_strategy = fusion_strategy_plugin.new_fusion_strategy(StandardFusionStrategy)
+    assert isinstance(fusion_strategy, StandardFusionStrategy)
 
     # Set the strategy
     fusion_engine.strategy = fusion_strategy
@@ -169,7 +166,9 @@ def fusion_engine(mediator: StandardMediator) -> StandardFusionEngine:
     return fusion_engine
 
 
-def test_manual(fusion_engine: CobraStandardFusionEngine) -> None:
+def test_manual(
+    fusion_engine: CobraStandardFusionEngine, mediator: StandardMediator
+) -> None:
     """User test for the Fusion Plugin."""
 
     delta_pos_generator = GenerateDeltaPosMeasurement()
@@ -184,7 +183,30 @@ def test_manual(fusion_engine: CobraStandardFusionEngine) -> None:
         # propagate
         fusion_engine.propagate(time_tag)
         # update
-        fusion_engine.update(processor_label='track_mp', message=pntos_message)
+        fusion_engine.update(processor_label='mp', message=pntos_message)
+
+    # Test virtual state block usage
+    vsb = StateExtractor(mediator, 'sb1', 'first_two', 4, [0, 1])
+    fusion_engine.add_virtual_state_block(vsb)
+    est = fusion_engine.get_state_block_estimate('first_two')
+    cov = fusion_engine.get_state_block_covariance('first_two')
+    cross_cov = fusion_engine.get_state_block_cross_covariance('sb1', 'first_two')
+
+    # output validation
+    assert est is not None
+    assert cov is not None
+    assert cross_cov is not None
+    assert est.size == 2
+    assert np.allclose(est, 18.65357)
+    assert cov.shape == (2, 2)
+    assert np.allclose(cov, np.eye(2) * 108.93643)
+    assert cross_cov.shape == (4, 2)
+    assert fusion_engine.has_virtual_state_block('first_two')
+    vsb_labels = fusion_engine.virtual_state_block_target_labels
+    assert vsb_labels is not None
+    assert vsb_labels[0] == 'first_two'
+    fusion_engine.remove_virtual_state_block('first_two')
+    assert not fusion_engine.has_virtual_state_block('first_two')
 
 
 def test_remove_state_block(fusion_engine: CobraStandardFusionEngine) -> None:

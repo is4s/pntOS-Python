@@ -26,6 +26,10 @@ from pntos.api import (
 )
 from pntos.cobra.utils import validate_array
 
+from .VirtualStateBlockManager import (
+    VirtualStateBlockManager,
+)
+
 
 @dataclass
 class stateblock_info:
@@ -52,6 +56,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
         self._mp: dict[
             str, StandardMeasurementProcessor
         ] = {}  # Dictionary of measurement processors
+        self._vsb_manager = VirtualStateBlockManager(mediator)
         self._num_states = 0
         self._mediator = mediator
         self._strategy: StandardFusionStrategy | None = None
@@ -190,8 +195,23 @@ class StandardFusionEngine(api.StandardFusionEngine):
 
     def get_state_block_estimate(self, block_label: str) -> NDArray[float64] | None:
         assert self._strategy is not None, 'FusionStrategy has not been set'
-        if block_label not in self._sb:
-            return None
+        block_found = block_label in self._sb
+        if not block_found:
+            real_label = self._vsb_manager.get_start_block_label(block_label)
+            if not real_label:
+                self._mediator.log_message(
+                    LoggingLevel.ERROR,
+                    f'Unable to obtain the state block estimate for VirtualStateBlock "{block_label}".',
+                )
+                return None
+            if real_label not in self._sb:
+                self._mediator.log_message(
+                    LoggingLevel.ERROR,
+                    f'Unable to find the state block "{real_label}".',
+                )
+                return None
+        else:
+            real_label = block_label
 
         # Get the full state vector and extract the part needed
         full_estimate = self._strategy.estimate
@@ -201,14 +221,33 @@ class StandardFusionEngine(api.StandardFusionEngine):
             )
             return None
 
-        this_sb = self._sb[block_label]
-
-        return full_estimate[this_sb.start_index : this_sb.stop_index]
+        this_sb = self._sb[real_label]
+        est = full_estimate[this_sb.start_index : this_sb.stop_index]
+        if block_found:
+            return est
+        return self._vsb_manager.convert_estimate(
+            est, real_label, block_label, self.time
+        )
 
     def get_state_block_covariance(self, block_label: str) -> NDArray[float64] | None:
         assert self._strategy is not None, 'FusionStrategy has not been set'
-        if block_label not in self._sb:
-            return None
+        block_found = block_label in self._sb
+        if not block_found:
+            real_label = self._vsb_manager.get_start_block_label(block_label)
+            if not real_label:
+                self._mediator.log_message(
+                    LoggingLevel.ERROR,
+                    f'Unable to obtain the state block covariance for VirtualStateBlock "{block_label}".',
+                )
+                return None
+            if real_label not in self._sb:
+                self._mediator.log_message(
+                    LoggingLevel.ERROR,
+                    f'Unable to find the state block "{real_label}".',
+                )
+                return None
+        else:
+            real_label = block_label
 
         # Get the full state vector and extract the part needed
         full_covariance = self._strategy.covariance
@@ -218,18 +257,64 @@ class StandardFusionEngine(api.StandardFusionEngine):
             )
             return None
 
-        this_sb = self._sb[block_label]
-        return full_covariance[
+        this_sb = self._sb[real_label]
+        cov = full_covariance[
             this_sb.start_index : this_sb.stop_index,
             this_sb.start_index : this_sb.stop_index,
         ]
+        if block_found:
+            return cov
+
+        full_estimate = self._strategy.estimate
+        if full_estimate is None:
+            self._mediator.log_message(
+                LoggingLevel.ERROR, 'Unable to get estimate from strategy.'
+            )
+            return None
+        est = full_estimate[this_sb.start_index : this_sb.stop_index]
+        jac = self._vsb_manager.jacobian(est, real_label, block_label, self.time)
+        if jac is None:
+            return None
+        return (jac @ cov) @ jac.T
 
     def get_state_block_cross_covariance(
         self, block_label1: str, block_label2: str
     ) -> NDArray[float64] | None:
         assert self._strategy is not None, 'FusionStrategy has not been set'
-        if not (block_label1 in self._sb and block_label2 in self._sb):
-            return None
+        block1_found = block_label1 in self._sb
+        block2_found = block_label2 in self._sb
+        if not block1_found:
+            real_label1 = self._vsb_manager.get_start_block_label(block_label1)
+            if not real_label1:
+                self._mediator.log_message(
+                    LoggingLevel.ERROR,
+                    f'Unable to obtain the state block estimate for VirtualStateBlock "{block_label1}".',
+                )
+                return None
+            if real_label1 not in self._sb:
+                self._mediator.log_message(
+                    LoggingLevel.ERROR,
+                    f'Unable to find the state block "{real_label1}".',
+                )
+                return None
+        else:
+            real_label1 = block_label1
+        if not block2_found:
+            real_label2 = self._vsb_manager.get_start_block_label(block_label2)
+            if not real_label2:
+                self._mediator.log_message(
+                    LoggingLevel.ERROR,
+                    f'Unable to obtain the state block estimate for VirtualStateBlock "{block_label2}".',
+                )
+                return None
+            if real_label2 not in self._sb:
+                self._mediator.log_message(
+                    LoggingLevel.ERROR,
+                    f'Unable to find the state block "{real_label2}".',
+                )
+                return None
+        else:
+            real_label2 = block_label2
 
         # Get the full state vector and extract the part needed
         full_covariance = self._strategy.covariance
@@ -239,11 +324,27 @@ class StandardFusionEngine(api.StandardFusionEngine):
             )
             return None
 
-        sb1 = self._sb[block_label1]
-        sb2 = self._sb[block_label2]
-        return full_covariance[
+        sb1 = self._sb[real_label1]
+        sb2 = self._sb[real_label2]
+        cov = full_covariance[
             sb1.start_index : sb1.stop_index, sb2.start_index : sb2.stop_index
         ]
+        if block1_found and block2_found:
+            return cov
+
+        full_estimate = self._strategy.estimate
+        if full_estimate is None:
+            self._mediator.log_message(
+                LoggingLevel.ERROR, 'Unable to get estimate from strategy.'
+            )
+            return None
+        est1 = full_estimate[sb1.start_index : sb1.stop_index]
+        est2 = full_estimate[sb2.start_index : sb2.stop_index]
+        jac1 = self._vsb_manager.jacobian(est1, real_label1, block_label1, self.time)
+        jac2 = self._vsb_manager.jacobian(est2, real_label2, block_label2, self.time)
+        if jac1 is None or jac2 is None:
+            return None
+        return (jac1 @ cov) @ jac2.T
 
     def set_state_block_estimate(
         self, block_label: str, estimate: NDArray[float64]
@@ -376,16 +477,16 @@ class StandardFusionEngine(api.StandardFusionEngine):
 
     @property
     def virtual_state_block_target_labels(self) -> list[str] | None:
-        return None
+        return self._vsb_manager.get_virtual_state_block_labels()
 
     def has_virtual_state_block(self, vsb_target_label: str) -> bool:
-        return False
+        return vsb_target_label in self._vsb_manager._node_map
 
     def add_virtual_state_block(self, virtual_state_block: VirtualStateBlock) -> None:
-        pass
+        self._vsb_manager.add_virtual_state_block(virtual_state_block)
 
     def remove_virtual_state_block(self, vsb_target_label: str) -> None:
-        pass
+        self._vsb_manager.remove_virtual_state_block(vsb_target_label)
 
     @property
     def measurement_processor_labels(self) -> list[str] | None:
@@ -538,11 +639,38 @@ class StandardFusionEngine(api.StandardFusionEngine):
         # Also calculate the total number of states included in the measurement processor's
         # state_block_labels.
         mp_num_states = 0
+        vsb_labels = (
+            set(self.virtual_state_block_target_labels)
+            if self.virtual_state_block_target_labels is not None
+            else {}
+        )
         for label in self._mp[processor_label].state_block_labels:
-            stop_index = mp_num_states + self._sb[label].num_states
-            big_H[:, self._sb[label].start_index : self._sb[label].stop_index] = (
-                measurement_model.H[:, mp_num_states:stop_index]
-            )
+            real_to_virt = None
+            if label in vsb_labels:
+                real_label = self._vsb_manager.get_start_block_label(label)
+                if real_label is None:
+                    self._mediator.log_message(
+                        LoggingLevel.ERROR,
+                        f'Unable to populate H with the jacobian from the VirtualStateBlock "{label}"',
+                    )
+                    return
+                real_est = self.get_state_block_estimate(real_label)
+                if real_est is None:
+                    return
+                real_to_virt = self._vsb_manager.jacobian(
+                    real_est, real_label, label, self.time
+                )
+                if real_to_virt is None:
+                    return
+            else:
+                real_label = label
+            stop_index = mp_num_states + self._sb[real_label].num_states
+            real_to_meas = measurement_model.H[:, mp_num_states:stop_index]
+            if real_to_virt is not None:
+                real_to_meas = real_to_meas @ real_to_virt
+            big_H[
+                :, self._sb[real_label].start_index : self._sb[real_label].stop_index
+            ] = real_to_meas
             mp_num_states = stop_index
 
         # Make the h(x) function that operates on the full x rather than just the
@@ -552,12 +680,34 @@ class StandardFusionEngine(api.StandardFusionEngine):
             x_mp = np.zeros([mp_num_states, 1], dtype=float64)
             start_index = 0  # start index of the next stateblock
             for label in self._mp[processor_label].state_block_labels:
+                if label in vsb_labels:
+                    real_label = self._vsb_manager.get_start_block_label(label)
+                    if real_label is None:
+                        self._mediator.log_message(
+                            LoggingLevel.ERROR,
+                            f'Unable to obtain the set of states for the VirtualStateBlock "{label}".',
+                        )
+                        return x_mp
+                else:
+                    real_label = label
                 # Pull out the relevant portions of the full x matrix and insert
                 # them into the x_mp
-                x_mp[start_index : start_index + self._sb[label].num_states] = full_x[
-                    self._sb[label].start_index : self._sb[label].stop_index
+                est: NDArray[float64] = full_x[
+                    self._sb[real_label].start_index : self._sb[real_label].stop_index
                 ]
-                start_index += self._sb[label].num_states
+                if label != real_label:
+                    out = self._vsb_manager.convert_estimate(
+                        est, real_label, label, self.time
+                    )
+                    if out is None:
+                        self._mediator.log_message(
+                            LoggingLevel.ERROR,
+                            f'Unable to obtain the set of states for block "{real_label}".',
+                        )
+                        return x_mp
+                    est = out
+                x_mp[start_index : start_index + self._sb[real_label].num_states] = est
+                start_index += self._sb[real_label].num_states
 
             # Calculate and return the h(x) output
             return measurement_model.h(x_mp)
@@ -625,8 +775,13 @@ class StandardFusionEngine(api.StandardFusionEngine):
 
         # Verify that all of the block labels correspond to a state block that has been
         # added to the fusion engine
+        vsb_labels = (
+            set(self.virtual_state_block_target_labels)
+            if self.virtual_state_block_target_labels is not None
+            else {}
+        )
         for label in block_labels:
-            if label not in self._sb:
+            if label not in self._sb and label not in vsb_labels:
                 self._mediator.log_message(
                     LoggingLevel.WARN,
                     f'In generate_x_and_p(), the state block label "{label}" does not match any \
@@ -634,43 +789,51 @@ class StandardFusionEngine(api.StandardFusionEngine):
                 )
                 return None
 
-        # Retrieve the full estimate (x) and covariance (P)
-        x = self._strategy.estimate
-        P = self._strategy.covariance
-        if x is None or P is None:
-            self._mediator.log_message(
-                LoggingLevel.ERROR,
-                'Unable to generate estimate and covariance from current strategy.',
-            )
+        est = np.array([], dtype=float64)
+        for label in block_labels:
+            sub_est = self.get_state_block_estimate(label)
+            if sub_est is None:
+                return None
+            est = np.append(est, sub_est)
+        est.shape = (est.size, 1)
+        cov = self.build_joint_covariance(block_labels, len(est))
+        if cov is None:
             return None
 
-        # If requesting x and P for one state block, just return slice of full x and P
-        if len(block_labels) == 1:
-            start_index = self._sb[block_labels[0]].start_index
-            stop_index = self._sb[block_labels[0]].stop_index
-            return EstimateWithCovariance(
-                EstimateWithCovarianceType.EWC_GENERIC,
-                x[start_index:stop_index, :],
-                P[
-                    start_index:stop_index,
-                    start_index:stop_index,
-                ],
-            )
-
-        # make an array of the indices that we want to keep
-        i_keep = np.zeros([0], dtype=int)
-        for label in block_labels:
-            i_to_add = np.arange(
-                self._sb[label].start_index, self._sb[label].stop_index
-            )
-            i_keep = np.append(i_keep, i_to_add)
-
-        # Use the i_keep index to extract and return the desired portions of the large x and P
         return EstimateWithCovariance(
             type=EstimateWithCovarianceType.EWC_GENERIC,
-            estimate=x[i_keep],
-            covariance=P[i_keep, :][:, i_keep],
+            estimate=est,
+            covariance=cov,
         )
+
+    def build_joint_covariance(
+        self, block_labels: list[str], size: int
+    ) -> NDArray[float64] | None:
+        cov_out = np.zeros((size, size))
+        num_labels = len(block_labels)
+        start_index = np.array([0, 0])
+        for i in range(num_labels):
+            for j in range(i, num_labels):
+                if i == j:
+                    block = self.get_state_block_covariance(block_labels[i])
+                else:
+                    block = self.get_state_block_cross_covariance(
+                        block_labels[i], block_labels[j]
+                    )
+                if block is None:
+                    return None
+                end_index = start_index + block.shape
+                cov_out[start_index[0] : end_index[0]][
+                    :, start_index[1] : end_index[1]
+                ] = block
+                if i == j:
+                    next_index = end_index
+                else:
+                    cov_out[start_index[1] : end_index[1]][
+                        :, start_index[0] : end_index[0]
+                    ] = block.T
+            start_index = next_index
+        return cov_out
 
     def give_state_block_aux_data(
         self, block_label: str, aux: list[Message | None]
@@ -701,7 +864,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
     def give_virtual_state_block_aux_data(
         self, target_label: str, aux: list[Message | None]
     ) -> None:
-        pass
+        self._vsb_manager.give_virtual_state_block_aux_data(target_label, aux)
 
 
 class StandardFusionPlugin(FusionPlugin):

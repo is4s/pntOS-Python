@@ -34,6 +34,7 @@ from pntos.cobra.config import (
     PreprocessorConfig,
     StandardOrchestrationConfig,
     StateBlockConfig,
+    VirtualStateBlockConfig,
 )
 from pntos.cobra.config.utils import config_from_registry
 from pntos.cobra.utils import (
@@ -81,6 +82,7 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
     alignment_channels: tuple[str, ...]
     inertial_drift_prop_dt: int
     cache: Cache
+    vsb_labels: list[str]
 
     def __init__(self, identifier: str) -> None:
         """
@@ -97,8 +99,11 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
         self.cache = Cache()
         self.sb_aux_channels: dict[str, list[str]] = {}
         self.mp_aux_channels: dict[str, list[str]] = {}
+        self.vsb_aux_channels: dict[str, list[str]] = {}
         self.needs_inertial_pva: dict[str, bool] = {}
         self.needs_inertial_f_and_r: dict[str, bool] = {}
+        self.vsbs_needing_pva: dict[str, list[str]] = {}
+        self.vsbs_needing_f_and_r: dict[str, list[str]] = {}
 
     def init_plugin(
         self,
@@ -178,7 +183,9 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
                 sorted_plugins, orch_config.preprocessor_configs
             )
         self._set_up_fusion_engine(
-            orch_config.additional_sb_configs, orch_config.mp_configs
+            orch_config.additional_sb_configs,
+            orch_config.mp_configs,
+            orch_config.vsb_configs,
         )
         initializer = set_up_initializer(
             self.initialization_plugin, orch_config.alignment_config.group, self._log
@@ -388,10 +395,69 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
                         elif channel == 'INERTIAL_FORCES_AND_RATES':
                             self.needs_inertial_f_and_r[mp_config.label] = True
 
+    def _add_virtual_state_block(
+        self,
+        providers: list[StandardStateModelProvider],
+        vsb_config: VirtualStateBlockConfig,
+    ) -> None:
+        """
+        Utility function to add a virtual state block to the fusion engine.
+        """
+        for provider in providers:
+            vsb_ids = provider.virtual_block_identifiers
+            if vsb_ids is None:
+                continue
+            if vsb_config.identifier in vsb_ids:
+                vsb = provider.new_virtual_block(
+                    vsb_ids.index(vsb_config.identifier),
+                    vsb_config.source,
+                    vsb_config.target,
+                    vsb_config.group,
+                )
+                if vsb is None:
+                    self._log(
+                        LoggingLevel.ERROR,
+                        f'Unable to create virtual state block "{vsb_config.identifier}" from config group "{vsb_config.group}" - cannot set up fusion engine or initialize filter.',
+                    )
+                    return
+                self.fusion_engine.add_virtual_state_block(vsb)
+
+                self.needs_inertial_pva[vsb_config.target] = False
+                self.needs_inertial_f_and_r[vsb_config.target] = False
+                if vsb_config.aux_channels is not None:
+                    for channel in vsb_config.aux_channels:
+                        vsb_map = self.vsb_aux_channels.setdefault(channel, [])
+                        vsb_map.append(vsb_config.target)
+
+                        if channel == 'INERTIAL_PVA':
+                            self.needs_inertial_pva[vsb_config.target] = True
+                        elif channel == 'INERTIAL_FORCES_AND_RATES':
+                            self.needs_inertial_f_and_r[vsb_config.target] = True
+
+    def _map_vsb_inertial_needs(
+        self, mp_configs: tuple[MeasurementProcessorConfig, ...]
+    ) -> None:
+        """
+        Utility function that maps measurement processor labels to VSB labels
+        that need forces and rates or the inertial PVA prior to performing a
+        filter update using this measurement processor.
+        """
+        for mp_config in mp_configs:
+            sb_labels = mp_config.state_block_labels
+            needs_pva = [
+                label for label in sb_labels if self.needs_inertial_pva.get(label)
+            ]
+            needs_fnr = [
+                label for label in sb_labels if self.needs_inertial_f_and_r.get(label)
+            ]
+            self.vsbs_needing_pva[mp_config.label] = needs_pva
+            self.vsbs_needing_f_and_r[mp_config.label] = needs_fnr
+
     def _set_up_fusion_engine(
         self,
         sb_configs: tuple[StateBlockConfig, ...] | None,
         mp_configs: tuple[MeasurementProcessorConfig, ...] | None,
+        vsb_configs: tuple[VirtualStateBlockConfig, ...] | None,
     ) -> None:
         """
         Utility function to assemble the components of and create a fusion engine.
@@ -433,6 +499,14 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
                 self._add_measurement_processor(providers, mp_config)
                 # Measurement Channels used in fusion engine
                 self.measurement_channels[mp_config.channel] = mp_config.label
+
+        if vsb_configs is not None:
+            for vsb_config in vsb_configs:
+                self._add_virtual_state_block(providers, vsb_config)
+
+        # must be called after blocks and processors have been added
+        if mp_configs is not None:
+            self._map_vsb_inertial_needs(mp_configs)
 
     def _create_state_block_ewc(
         self,
@@ -546,6 +620,26 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
         aux: list[Message | None] = [pva, forces]
         self.fusion_engine.give_state_block_aux_data(self.pinson_sb_config.label, aux)
 
+    def _send_inertial_aux_to_vsbs(self, mp_label: str) -> None:
+        """
+        Send the current inertial solution, forces, and/or rates to any virtual blocks targeted by the given measurement processor that need it.
+        """
+        needs_pva = self.vsbs_needing_pva[mp_label]
+        needs_forces = self.vsbs_needing_f_and_r[mp_label]
+        if not needs_pva and not needs_forces:
+            return
+
+        if needs_pva:
+            pva = self.cache.get('inertial solution')
+            for vsb_label in needs_pva:
+                self.fusion_engine.give_virtual_state_block_aux_data(vsb_label, [pva])
+        if needs_forces:
+            forces = self._get_inertial_forces()
+            for vsb_label in needs_forces:
+                self.fusion_engine.give_virtual_state_block_aux_data(
+                    vsb_label, [forces]
+                )
+
     def _apply_inertial_feedback(self) -> None:
         """Correct inertial solution with pinson error states and reset states."""
         solution = self.cache.get('filter solution')
@@ -587,6 +681,7 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
         # Make sure measurement processor has most current aux data before update
         mp_label = self.measurement_channels[message.source_identifier]
         self._send_inertial_aux_to_measurement_processor(mp_label)
+        self._send_inertial_aux_to_vsbs(mp_label)
 
         if self.publish_before_update:
             self._publish_solution(
@@ -646,6 +741,11 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
             for label in mp_labels:
                 self.fusion_engine.give_measurement_processor_aux_data(label, [message])
 
+        if channel in self.vsb_aux_channels:
+            vsb_labels = self.vsb_aux_channels[channel]
+            for label in vsb_labels:
+                self.fusion_engine.give_virtual_state_block_aux_data(label, [message])
+
     def process_pntos_message(self, message: Message, sequenced: bool) -> None:
         preprocessed_messages = self._preprocess_message(message)
         if preprocessed_messages is None:
@@ -681,7 +781,11 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
                 self._propagate_to_time(time)
                 self._perform_measurement_update(msg)
             # Send message to any MPs or SBs that require it as aux data
-            if channel in self.sb_aux_channels or channel in self.mp_aux_channels:
+            if (
+                channel in self.sb_aux_channels
+                or channel in self.mp_aux_channels
+                or channel in self.vsb_aux_channels
+            ):
                 self._send_message_as_aux_data(msg)
 
         # Continue to propagate filter during outage

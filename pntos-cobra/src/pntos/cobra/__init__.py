@@ -10,6 +10,9 @@ from .standard_plugins.DiagnosticLogPlugin import (
 from .standard_plugins.EkfFusionStrategyPlugin import (
     EkfFusionStrategyPlugin as EkfFusionStrategyPlugin,
 )
+from .standard_plugins.fusion.StandardFusionPlugin import (
+    StandardFusionPlugin as StandardFusionPlugin,
+)
 from .standard_plugins.LcmLogTransportPlugin import (
     LcmLogTransportPlugin as LcmLogTransportPlugin,
 )
@@ -21,9 +24,6 @@ from .standard_plugins.ManualHeadingAlignInitializationPlugin import (
 )
 from .standard_plugins.preprocessor.StandardPreprocessorPlugin import (
     StandardPreprocessorPlugin as StandardPreprocessorPlugin,
-)
-from .standard_plugins.StandardFusionPlugin import (
-    StandardFusionPlugin as StandardFusionPlugin,
 )
 from .standard_plugins.StandardInertialPlugin import (
     StandardInertialPlugin as StandardInertialPlugin,

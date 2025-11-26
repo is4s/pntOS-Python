@@ -1,0 +1,58 @@
+diff --git a/apps/standard/gps_ins.py b/apps/standard/gps_ins_vsb.py
+index 46f2a3b2..f8e30ae8 100755
+--- a/apps/standard/gps_ins.py
++++ b/apps/standard/gps_ins_vsb.py
+@@ -37,6 +37,7 @@ from pntos.cobra.config import (
+     StandardOrchestrationConfig,
+     TimeAdjusterConfig,
+     TimeBiasConfig,
++    VirtualStateBlockConfig,
+ )
+ from pntos_python_datasets import EXAMPLE_LCM_LOG
+ 
+@@ -89,22 +90,24 @@ my_config = [
+                 estimate_with_covariance=EstimateWithCovariance(
+                     type=EstimateWithCovarianceType.EWC_GENERIC,
+                     estimate=np.zeros((3,)),
+-                    covariance=(np.eye(3) * 9.0),
++                    covariance=np.diag(
++                        [2.22e-13, 3.73e-13, 9.0]
++                    ),  # converted to radians-squared
+                 ),
+                 fogm_model=FogmConfig(
+                     group='config/pos_sensor_error',
+-                    sigma=(1.5, 1.5, 2.0),
++                    sigma=(2.515e-7, 3.259e-7, 2.0),  # converted to radians
+                     tau=(300.0, 300.0, 200.0),
+                 ),
+             ),
+         ),
+         mp_configs=(
+             SensorMeasurementProcessorConfig(
+-                group='config/gps_measurement_processor',
+-                identifier='pinson_with_ned_fogm_position',
++                group='config/position',
++                identifier='position',
+                 label='gps',
+                 channel='/sensor/ublox-ZED-F9T/position',
+-                state_block_labels=('pinson15', 'pos_sensor_error'),
++                state_block_labels=('platform_pva', 'pos_sensor_error'),
+                 aux_channels=('INERTIAL_PVA',),
+                 sensor_config=SensorConfig(
+                     group='config/gp3d_state_modeling',
+@@ -114,6 +117,15 @@ my_config = [
+                 ),
+             ),
+         ),
++        vsb_configs=(
++            VirtualStateBlockConfig(
++                group='config/pes',
++                identifier='pinson_error_to_standard',
++                source='pinson15',
++                target='platform_pva',
++                aux_channels=('INERTIAL_PVA',),
++            ),
++        ),
+         inertial_config=InertialConfig(
+             group='config/inertial',
+             expected_dt=0.01,

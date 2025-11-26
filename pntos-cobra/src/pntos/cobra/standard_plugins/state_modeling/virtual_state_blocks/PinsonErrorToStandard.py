@@ -126,9 +126,9 @@ class PinsonErrorToStandard(VirtualStateBlock):
             )
             raise RuntimeError
         pos, vel = pos_n_vel[0], pos_n_vel[1]
-        delta_lat = north_to_delta_lat(estimate[POS_START], pos[0], pos[2])
-        delta_lon = east_to_delta_lon(estimate[POS_START + 1], pos[0], pos[2])
-        delta_alt = -estimate[POS_START + 2]
+        delta_lat = north_to_delta_lat(estimate[POS_START, 0], pos[0], pos[2])
+        delta_lon = east_to_delta_lon(estimate[POS_START + 1, 0], pos[0], pos[2])
+        delta_alt = -estimate[POS_START + 2, 0]
         corr_llh = array(
             [
                 delta_lat + pos[0],
@@ -138,18 +138,20 @@ class PinsonErrorToStandard(VirtualStateBlock):
         )
         corr_vel_ned = array(
             [
-                vel[0] + estimate[VEL_START],
-                vel[1] + estimate[VEL_START + 1],
-                vel[2] + estimate[VEL_START + 2],
+                vel[0] + estimate[VEL_START, 0],
+                vel[1] + estimate[VEL_START + 1, 0],
+                vel[2] + estimate[VEL_START + 2, 0],
             ]
         )
 
         pva_dcm = quat_to_dcm(self._pva.quaternion).T
         corr_rpy = dcm_to_rpy(
-            ortho_dcm(dot(pva_dcm, self._eye3 + skew(estimate[ATT_START:ATT_END])).T)
+            ortho_dcm(dot(pva_dcm, self._eye3 + skew(estimate[ATT_START:ATT_END, 0])).T)
         )
-
-        return concatenate((corr_llh, corr_vel_ned, corr_rpy, estimate[ATT_END:]))
+        out: NDArray[float64] = concatenate(
+            (corr_llh, corr_vel_ned, corr_rpy, estimate[ATT_END:, 0])
+        ).reshape(-1, 1)
+        return out
 
     def jacobian(
         self, estimate: NDArray[float64], time: TypeTimestamp
@@ -191,11 +193,11 @@ class PinsonErrorToStandard(VirtualStateBlock):
         jac[POS_START:POS_END, POS_START:POS_END] = m2r
         pva_dcm = quat_to_dcm(self._pva.quaternion).T
 
-        ddx = d_ortho_dcm_wrt_tilt(pva_dcm, estimate[ATT_START:ATT_END], self._dx)
-        ddy = d_ortho_dcm_wrt_tilt(pva_dcm, estimate[ATT_START:ATT_END], self._dy)
-        ddz = d_ortho_dcm_wrt_tilt(pva_dcm, estimate[ATT_START:ATT_END], self._dz)
+        ddx = d_ortho_dcm_wrt_tilt(pva_dcm, estimate[ATT_START:ATT_END, 0], self._dx)
+        ddy = d_ortho_dcm_wrt_tilt(pva_dcm, estimate[ATT_START:ATT_END, 0], self._dy)
+        ddz = d_ortho_dcm_wrt_tilt(pva_dcm, estimate[ATT_START:ATT_END, 0], self._dz)
         corr_C_ned_to_s = ortho_dcm(
-            dot(pva_dcm, self._eye3 + skew(estimate[ATT_START:ATT_END]))
+            dot(pva_dcm, self._eye3 + skew(estimate[ATT_START:ATT_END, 0]))
         )
         z3 = zeros((3, 3))
 

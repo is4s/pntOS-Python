@@ -59,10 +59,12 @@ from pntos.cobra.config import (
     SensorConfig,
     SensorMeasurementProcessorConfig,
     StandardOrchestrationConfig,
+    StateExtractorConfig,
     StaticAlignmentConfig,
     TimeAdjusterConfig,
     TimeBiasConfig,
     TutorialOrchestrationConfig,
+    VirtualStateBlockConfig,
 )
 from pntos.cobra.internal import StandardMediator, StandardMessageStreamConfig
 
@@ -205,6 +207,22 @@ standard_config = [
                 label='vel',
                 channel='/sensor/ublox-ZED-F9T/velocity',
                 state_block_labels=('pinson15',),
+            ),
+        ),
+        vsb_configs=(
+            VirtualStateBlockConfig(
+                group='config/pes',
+                identifier='pinson_error_to_standard',
+                source='pinson15',
+                target='direct_pinson',
+            ),
+            StateExtractorConfig(
+                group='config/extractor',
+                identifier='state_extractor',
+                source='pinson15',
+                target='pos_out',
+                incoming_state_size=15,
+                indices_to_extract=(0, 1, 2),
             ),
         ),
         inertial_config=inertial_config,
