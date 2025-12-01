@@ -296,5 +296,3 @@ class StandardControllerPlugin(ControllerPlugin):
         self.shutdown_plugin()
         if StandardMediator._logging_error_event.is_set():
             sys.exit(1)
-        else:
-            sys.exit(0)
