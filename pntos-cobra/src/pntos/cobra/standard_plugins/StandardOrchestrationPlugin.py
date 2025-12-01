@@ -29,6 +29,7 @@ from pntos.api import (
     StateModelingPlugin,
 )
 from pntos.cobra.config import (
+    ControllerConfig,
     MeasurementProcessorConfig,
     PinsonStateBlockConfig,
     PreprocessorConfig,
@@ -55,8 +56,6 @@ from pntos.cobra.utils import (
     validate_plugins,
 )
 from scipy.linalg import block_diag
-
-BUFFER_TIME_NSEC = 2_000_000_000  # this value should match the number of seconds that sequenced messages are delayed by in the controller
 
 
 class StandardOrchestrationPlugin(OrchestrationPlugin):
@@ -147,7 +146,7 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
             )
             return
 
-        # Grab orchestration config
+        # Grab orchestration and controller configs
         orch_config = config_from_registry(
             StandardOrchestrationConfig, self.mediator, 'config/orchestration'
         )
@@ -157,8 +156,17 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
                 'Unable to grab the orchestration config from the registry. Filter cannot be implemented.',
             )
             return
+        controller_config = config_from_registry(
+            ControllerConfig, self.mediator, 'controller'
+        )
+        if controller_config is None:
+            self._log(
+                LoggingLevel.ERROR,
+                'Unable to grab the controller config from the registry. Filter cannot be implemented.',
+            )
+            return
         # Store orchestration config fields
-        self._store_config_data(orch_config)
+        self._store_config_data(orch_config, controller_config)
 
         sorted_plugins = sort_plugins_dataclass(plugins)
         if not validate_plugins(
@@ -238,12 +246,18 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
         self.init_solution = inertial_info[1]
         assert self.init_solution.solution is not None
 
-    def _store_config_data(self, orch_config: StandardOrchestrationConfig) -> None:
+    def _store_config_data(
+        self,
+        orch_config: StandardOrchestrationConfig,
+        controller_config: ControllerConfig,
+    ) -> None:
         """
         Utility function to store the orchestration config fields in easily accessible data structures.
 
         Args:
             orch_config (StandardOrchestrationConfig): The ``StandardOrchestrationConfig`` containing the data
+                to be stored.
+            controller_config (ControllerConfig): The ``ControllerConfig`` containing additional data
                 to be stored.
         """
         # Pinson state block
@@ -259,6 +273,7 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
         self.inertial_channel = orch_config.inertial_config.channel
         self.inertial_group = orch_config.inertial_config.group
         self.max_prop_dt_ns = int(orch_config.max_prop_interval * 1e9)
+        self.buffer_time_ns = int(controller_config.buffer_length_sec * 1e9)
 
     def _initialize_filter(self) -> None:
         """
@@ -724,7 +739,7 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
             prop_time = TypeTimestamp(
                 earliest_time.elapsed_nsec + self.inertial_drift_prop_dt
             )
-            if prop_time.elapsed_nsec < latest_time.elapsed_nsec - BUFFER_TIME_NSEC:
+            if prop_time.elapsed_nsec < latest_time.elapsed_nsec - self.buffer_time_ns:
                 self._propagate_to_time(prop_time)
             else:
                 self._propagate_to_time(earliest_time)

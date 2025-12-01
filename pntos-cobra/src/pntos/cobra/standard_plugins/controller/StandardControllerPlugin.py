@@ -196,6 +196,7 @@ class StandardControllerPlugin(ControllerPlugin):
                 'Could not extract ControllerConfig from group "controller". Cannot initialize controller plugin.',
             )
             return
+        StandardMediator._buffer_time_nsec = int(config.buffer_length_sec * 1e9)
         if config.publish_interval is not None:
             StandardMediator._publish_interval_ns = int(config.publish_interval * 1e9)
 
