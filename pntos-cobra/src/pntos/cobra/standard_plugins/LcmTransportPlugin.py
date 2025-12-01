@@ -93,7 +93,13 @@ class LcmTransportPlugin(TransportPlugin):
                 )
                 continue
 
-            self.lcm.publish(message.source_identifier, lcm_msg.encode())
+            try:
+                self.lcm.publish(message.source_identifier, lcm_msg.encode())
+            except OSError as e:
+                self.mediator.log_message(
+                    LoggingLevel.WARN,
+                    f'Failed to publish message over lcm: {e}',
+                )
 
     def _general_handler(self, channel: str, data: bytes) -> None:
         process_lcm_message(self.mediator, channel, data, self._channels)
@@ -105,7 +111,11 @@ class LcmTransportPlugin(TransportPlugin):
             self.lcm.handle_timeout(10)
 
     def start_listening(self) -> None:
-        self.lcm = LCM(self._url)
+        try:
+            self.lcm = LCM(self._url)
+        except RuntimeError as e:
+            self.mediator.log_message(LoggingLevel.ERROR, f'Failed to start lcm: {e}')
+            return
         self.subscription: LCMSubscription = self.lcm.subscribe(
             self._subscription_regex, self._general_handler
         )
