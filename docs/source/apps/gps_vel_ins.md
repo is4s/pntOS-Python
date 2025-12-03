@@ -1,4 +1,4 @@
-# 2. Fusion GPS Velocity INS App
+# GPS Velocity INS App
 
 The `tutorial/gps_vel_ins.py` app is very similar to the `tutorial/gps_ins.py` app. It's essentially a clone with one
 significant difference: the addition of a velocity update. This tutorial will demonstrate how to fit a Cobra app to your needs by transforming the `tutorial/gps_ins.py` app into the `tutorial/gps_vel_ins.py` app.
@@ -66,8 +66,8 @@ First, while not a functional difference, the two Orchestration plugins are name
 
 ```diff
  from scipy.linalg import block_diag
- 
- 
+
+
 -class TutorialGpsOrchestrationPlugin(OrchestrationPlugin):
 +class TutorialGpsVelOrchestrationPlugin(OrchestrationPlugin):
 ```
@@ -75,7 +75,7 @@ First, while not a functional difference, the two Orchestration plugins are name
 More interestingly, instead of always routing measurement data to one measurement processor, the
 Orchestration plugin will now need to decide which processor gets a measurement. To achieve this, we
 associate the channels from the orchestration configuration with the measurement processor labels.
-Add an entry for the velocity processor: 
+Add an entry for the velocity processor:
 
 ```diff
          # Associate incoming channels with measurement processor labels
@@ -90,7 +90,7 @@ Now we'll add an additional section to actually create the new velocity processo
 ```diff
 
          fusion_engine.add_measurement_processor(processor=processor)
- 
+
 +        # Create velocity measurement processor and add to fusion engine
 +        vel_processor_index = provider.processor_identifiers.index('pinson_velocity')
 +        vel_processor = provider.new_processor(

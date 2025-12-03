@@ -67,6 +67,8 @@ check_sync() {
 
 # Apply orchestration gps-velocity patch
 check_sync $orig_dir"/util/orch_gps_vel.patch"
+# Check sync between buscat controller plugin and standard controller plugin
+check_sync $orig_dir"/util/controller_buscat.patch"
 # Apply app gps-velocity patch
 check_sync $orig_dir"/util/app_gps_vel.patch"
 # Apply app add ROS patch

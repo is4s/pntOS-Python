@@ -1,3 +1,4 @@
+from .advanced_plugins.buscat.BuscatMediator import BuscatMediator as BuscatMediator
 from .standard_plugins.controller.StandardMediator import (
     StandardMediator as StandardMediator,
 )

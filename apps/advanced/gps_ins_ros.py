@@ -7,6 +7,7 @@ from pntos.api import EstimateWithCovariance, EstimateWithCovarianceType, Loggin
 
 # Import Cobra plugins and config structs
 from pntos.cobra import (
+    Aspn23RosTransportPlugin,
     EkfFusionStrategyPlugin,
     ManualHeadingAlignInitializationPlugin,
     StandardControllerPlugin,
@@ -18,7 +19,6 @@ from pntos.cobra import (
     StandardPreprocessorPlugin,
     StandardRegistryPlugin,
 )
-from pntos.cobra.advanced_plugins import Aspn23RosTransportPlugin
 from pntos.cobra.config import (
     ControllerConfig,
     FogmConfig,
