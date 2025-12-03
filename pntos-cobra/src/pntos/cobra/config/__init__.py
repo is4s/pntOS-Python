@@ -5,7 +5,10 @@ from .ClockBiasStateBlockConfig import (
 from .ConstantStateBlockConfig import (
     ConstantStateBlockConfig as ConstantStateBlockConfig,
 )
-from .ControllerConfig import ControllerConfig as ControllerConfig
+from .ControllerConfig import (
+    BuscatConfig as BuscatConfig,
+    ControllerConfig as ControllerConfig,
+)
 from .FogmConfig import FogmConfig as FogmConfig
 from .ImuConfig import ImuConfig as ImuConfig
 from .InertialConfig import InertialConfig as InertialConfig

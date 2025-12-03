@@ -1,4 +1,4 @@
-# 1. GPS INS Fusion App
+# GPS INS App
 
 Welcome to the first of the {term}`Cobra` tutorial {term}`apps <App>`!
 

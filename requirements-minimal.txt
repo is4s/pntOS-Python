@@ -72,7 +72,7 @@ packaging==25.0
     # via matplotlib
 pillow==11.3.0
     # via matplotlib
-pntos-python-datasets==0.4.2
+pntos-python-datasets==0.4.3
     # via pntos-python
 pyparsing==3.2.3
     # via matplotlib

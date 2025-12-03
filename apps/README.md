@@ -5,5 +5,5 @@ For instructions on how to run an app, see
 
 For more information about these apps, see the following docs pages:
 
-- [GPS INS Fusion App](https://pntos.pages.aspn.us/pntos-python/apps/gps_ins.html)
-- [GPS INS Velocity Fusion App](https://pntos.pages.aspn.us/pntos-python/apps/gps_vel_ins.html)
+- [GPS INS App](https://pntos.pages.aspn.us/pntos-python/apps/gps_ins.html)
+- [GPS INS Velocity App](https://pntos.pages.aspn.us/pntos-python/apps/gps_vel_ins.html)

@@ -1,5 +1,5 @@
 diff --git a/apps/standard/gps_ins.py b/apps/advanced/gps_ins_ros.py
-index 46f2a3b2..e08ca11c 100755
+index 46f2a3b2..12a8088d 100755
 --- a/apps/standard/gps_ins.py
 +++ b/apps/advanced/gps_ins_ros.py
 @@ -1,7 +1,5 @@
@@ -10,19 +10,19 @@ index 46f2a3b2..e08ca11c 100755
  import numpy as np
  
  # API imports
-@@ -10,7 +8,6 @@ from pntos.api import EstimateWithCovariance, EstimateWithCovarianceType, Loggin
+@@ -9,8 +7,8 @@ from pntos.api import EstimateWithCovariance, EstimateWithCovarianceType, Loggin
+ 
  # Import Cobra plugins and config structs
  from pntos.cobra import (
++    Aspn23RosTransportPlugin,
      EkfFusionStrategyPlugin,
 -    LcmLogTransportPlugin,
      ManualHeadingAlignInitializationPlugin,
      StandardControllerPlugin,
      StandardFusionPlugin,
-@@ -21,15 +18,14 @@ from pntos.cobra import (
-     StandardPreprocessorPlugin,
+@@ -22,14 +20,12 @@ from pntos.cobra import (
      StandardRegistryPlugin,
  )
-+from pntos.cobra.advanced_plugins import Aspn23RosTransportPlugin
  from pntos.cobra.config import (
 -    AspnVersion,
      ControllerConfig,

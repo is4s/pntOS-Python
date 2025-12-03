@@ -5,7 +5,7 @@ from .BaseConfig import BaseConfig
 
 @dataclass
 class ControllerConfig(BaseConfig):
-    """Config for SimpleControllerPlugin.
+    """Config for StandardControllerPlugin.
 
     Attributes:
         group (str): Inherited from BaseConfig. Registry group in which to store this config.
@@ -22,3 +22,19 @@ class ControllerConfig(BaseConfig):
     # UNIQUE FIELDS
     buffer_length_sec: float = 2.0
     publish_interval: float | None = 1.0
+
+
+@dataclass
+class BuscatConfig(BaseConfig):
+    """Config for BuscatControllerPlugin.
+
+    Attributes:
+        group (str): Inherited from BaseConfig. Registry group in which to store this config.
+        output_transport (str): Identifier of transport plugin through when to route output messages.
+    """
+
+    # INHERITED FIELDS
+    group: str
+
+    # UNIQUE FIELDS
+    output_transport: str

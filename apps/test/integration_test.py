@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import os
+import subprocess
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -15,7 +16,11 @@ from pntos.cobra.utils import (
     run_pntos_with_network_transport,
     run_pntos_with_ros_transport,
 )
-from pntos_python_datasets import EXAMPLE_LCM_LOG, EXAMPLE_ROS_LOG
+from pntos_python_datasets import (
+    ASPN2_EXAMPLE_LCM_LOG,
+    EXAMPLE_LCM_LOG,
+    EXAMPLE_ROS_LOG,
+)
 
 OUTPUT_LOG = Path('pntos_output.log')
 OUTPUT_BAG = OUTPUT_LOG.parent / OUTPUT_LOG.stem
@@ -320,6 +325,30 @@ def test_standard_gps_ins_vsb_app() -> None:
         tilt_err_limits=ErrorLimits(std_thresh=0.82, max_thresh=3.55),
         expected_start_time_offset=10.0,
     )
+
+
+def test_buscat_app() -> None:
+    run_pntos_with_log_transport(
+        Path('apps/advanced/buscat.py'), OUTPUT_LOG, validate=True
+    )
+    result = subprocess.run(
+        ['print_channels', ASPN2_EXAMPLE_LCM_LOG],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    input_channels = result.stdout.strip().replace('\t', '').split('\n')[1:]
+    result = subprocess.run(
+        ['print_channels', OUTPUT_LOG],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    output_channels = result.stdout.strip().replace('\t', '').split('\n')[1:]
+
+    for input_channel in input_channels:
+        assert input_channel in output_channels
+        assert f'/buscat/pntos{input_channel}' in output_channels
 
 
 def test_advanced_gps_ins_ros_app() -> None:

@@ -1,3 +1,12 @@
+import contextlib
+
+with contextlib.suppress(ImportError):
+    from .advanced_plugins.Aspn23RosTransportPlugin import (
+        Aspn23RosTransportPlugin as Aspn23RosTransportPlugin,
+    )
+from .advanced_plugins.buscat.BuscatControllerPlugin import (
+    BuscatControllerPlugin as BuscatControllerPlugin,
+)
 from .dummy_plugins.DummyTransportPlugin import (
     DummyTransportPlugin as DummyTransportPlugin,
 )
