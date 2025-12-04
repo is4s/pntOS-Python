@@ -18,6 +18,7 @@ FIREHOSE_URL = 'git@git.aspn.us:pntos/firehose-outputs.git'
 def main(file_name: str, revision: str) -> None:
     """Main script."""
     exit_val = False
+    bad_mods = []
     with tempfile.TemporaryDirectory() as tmp_dir:
         pntos_path = Path(tmp_dir) / 'pntos'
         firehose_path = Path(tmp_dir) / 'firehose-outputs'
@@ -45,24 +46,27 @@ def main(file_name: str, revision: str) -> None:
             print(f'\n{colored(f"COMPARING {file_name.upper()} MODULES...", BLUE)}')
             exit_val = comparator.compare_modules(c_module, py_module)
             bad_mods.append(file_name)
+        else:
+            for c_fn in c_path.iterdir():
+                fn = c_fn.name.split('.')[0]
+                py_fn = fn + '.py'
 
-        bad_mods = []
-        for c_fn in c_path.iterdir():
-            fn = c_fn.name.split('.')[0]
-            py_fn = fn + '.py'
+                c_full_path = c_path / c_fn
+                py_full_path = py_path / py_fn
 
-            c_full_path = c_path / c_fn
-            py_full_path = py_path / py_fn
+                comparator = CtoPyApiComparator()
+                c_module = clang_parse_file(c_full_path, c_api_path, aspn_path)
+                py_module = parse_python_file(py_full_path)
 
-            comparator = CtoPyApiComparator()
-            c_module = clang_parse_file(c_full_path, c_api_path, aspn_path)
-            py_module = parse_python_file(py_full_path)
+                comparator = CtoPyApiComparator()
+                c_module = clang_parse_file(c_full_path, c_api_path, aspn_path)
+                py_module = parse_python_file(py_full_path)
 
-            print(f'\n{colored(f"COMPARING {fn.upper()} MODULES...", BLUE)}')
-            ret_val = comparator.compare_modules(c_module, py_module)
-            if ret_val:
-                bad_mods.append(fn)
-                exit_val = ret_val
+                print(f'\n{colored(f"COMPARING {fn.upper()} MODULES...", BLUE)}')
+                ret_val = comparator.compare_modules(c_module, py_module)
+                if ret_val:
+                    bad_mods.append(fn)
+                    exit_val = ret_val
     print(f'\n{colored("Overall Result:", BLUE)}')
     if exit_val:
         print(
