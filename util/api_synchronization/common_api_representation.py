@@ -2,6 +2,25 @@
 
 from dataclasses import dataclass, field
 
+RED = '\033[91m'
+GREEN = '\033[92m'
+YELLOW = '\033[93m'
+BLUE = '\033[94m'
+
+
+def colored(msg: str, color: str) -> str:
+    """
+    Returns the colored version of an input string.
+
+    Args:
+        msg (str): Message to be colored.
+        color (str): The code of the color to use.
+
+    Returns:
+        str
+    """
+    return f'{color}{msg}\033[0m'
+
 
 @dataclass
 class ApiFunction:
@@ -267,14 +286,16 @@ class CtoPyApiComparator:
                 continue
             if attr_name not in py_attrs:
                 print(
-                    f'ERROR: C struct {c_class.name} has attribute {attr_name} not present '
+                    f'{colored("ERROR:", RED)} C struct {c_class.name} has attribute {attr_name} not present '
                     f'in Python class {py_class.name}. Skipping attribute...'
                 )
                 ret_val = False
                 continue
             py_type = py_attrs[attr_name]
             if not self._compare_type(
-                c_type, py_type, f'ERROR: For attribute "{attr_name}",'
+                c_type,
+                py_type,
+                f'{colored("ERROR:", RED)} For attribute "{attr_name}",',
             ):
                 ret_val = False
         return ret_val
@@ -297,14 +318,16 @@ class CtoPyApiComparator:
                 continue
             if meth_name not in py_method_types:
                 print(
-                    f'ERROR: C struct {c_class.name} has method {meth_name} not present '
+                    f'{colored("ERROR:", RED)} C struct {c_class.name} has method {meth_name} not present '
                     f'in Python class {py_class.name}. Skipping method...'
                 )
                 ret_val = False
                 continue
             py_type = py_method_types[meth_name]
             if not self._compare_type(
-                c_type, py_type, f'ERROR: Method "{meth_name}" return type mismatch.'
+                c_type,
+                py_type,
+                f'{colored("ERROR:", RED)} Method "{meth_name}" return type mismatch.',
             ):
                 ret_val = False
 
@@ -325,7 +348,7 @@ class CtoPyApiComparator:
                     continue
                 if param_name not in py_params:
                     print(
-                        f'ERROR: C struct {c_class.name} method {meth_name} has '
+                        f'{colored("ERROR:", RED)} C struct {c_class.name} method {meth_name} has '
                         f'parameter "{param_name}" not present in '
                         f'Python class {py_class.name}. Skipping...'
                     )
@@ -335,7 +358,7 @@ class CtoPyApiComparator:
                 if not self._compare_type(
                     c_param_type,
                     py_param_type,
-                    f'ERROR: Parameter "{param_name}" in method "{meth_name}" has type mismatch.',
+                    f'{colored("ERROR:", RED)} Parameter "{param_name}" in method "{meth_name}" has type mismatch.',
                 ):
                     ret_val = False
         return ret_val
@@ -347,7 +370,7 @@ class CtoPyApiComparator:
         if not self._compare_attributes(c_class, py_class):
             self.mismatch = True
             print(
-                f'RESULT: C struct {c_class.name} is NOT semantically '
+                f'{colored("RESULT:", YELLOW)} C struct {c_class.name} is NOT semantically '
                 f'equivalent with Python class {py_class.name}.'
             )
             return
@@ -356,13 +379,13 @@ class CtoPyApiComparator:
         if not self._compare_methods(c_class, py_class):
             self.mismatch = True
             print(
-                f'RESULT: C struct {c_class.name} is NOT semantically '
+                f'{colored("RESULT:", YELLOW)} C struct {c_class.name} is NOT semantically '
                 f'equivalent with Python class {py_class.name}.'
             )
             return
 
         print(
-            f'RESULT: C struct {c_class.name} is semantically equivalent with Python class {py_class.name}.'
+            f'{colored("RESULT:", YELLOW)} C struct {c_class.name} is semantically equivalent with Python class {py_class.name}.'
         )
 
     def compare_modules(self, c_module: ApiModule, py_module: ApiModule) -> bool:
@@ -376,15 +399,21 @@ class CtoPyApiComparator:
                 continue
             if c_class.name not in py_classes:
                 print(
-                    f'ERROR: C struct {c_class.name} not found in Python API module {py_module.name}. Skipping...'
+                    f'{colored("ERROR:", RED)} C struct {c_class.name} not found in Python API module {py_module.name}. Skipping...'
                 )
                 self.mismatch = True
                 continue
             self.compare_classes(c_class, py_classes[c_class.name])
         c_mod_name = c_module.name.split('/')[-1]
         py_mod_name = py_module.name.split('/')[-1]
-        print(
-            f'FINAL RESULT: The C module {c_mod_name} is {"NOT " if self.mismatch else ""}'
-            f'semantically equivalent with the Python module {py_mod_name}'
-        )
+        if self.mismatch:
+            print(
+                f'{colored("FINAL RESULT:", RED)} The C module {c_mod_name} is NOT '
+                f'semantically equivalent with the Python module {py_mod_name}'
+            )
+        else:
+            print(
+                f'{colored("FINAL RESULT:", GREEN)} The C module {c_mod_name} is '
+                f'semantically equivalent with the Python module {py_mod_name}'
+            )
         return self.mismatch
