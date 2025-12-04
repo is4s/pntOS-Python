@@ -226,9 +226,9 @@ class CtoPyApiComparator:
                 )
             else:
                 converted_type += type_piece
-                if (
-                    type_piece.startswith('list') and (index + 1) == length
-                ) or type_list[index + 1] != '_Nullable**':
+                if type_piece.startswith('list') and (
+                    index + 1 == length or type_list[index + 1] != '_Nullable**'
+                ):
                     converted_type += ']'
         return converted_type
 

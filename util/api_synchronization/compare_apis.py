@@ -35,8 +35,8 @@ def main(file_name: str, revision: str) -> None:
         py_path = Path('pntos-api/src/pntos/api/plugins/')
 
         if file_name:
-            c_full_path = c_path / file_name + '.h'
-            py_full_path = py_path / file_name + '.py'
+            c_full_path = c_path / (file_name + '.h')
+            py_full_path = py_path / (file_name + '.py')
 
             comparator = CtoPyApiComparator()
             c_module = clang_parse_file(c_full_path, c_api_path, aspn_path)
@@ -49,7 +49,7 @@ def main(file_name: str, revision: str) -> None:
 
         bad_mods = []
         for c_fn in c_path.iterdir():
-            fn = c_fn.split('.')[0]
+            fn = c_fn.name.split('.')[0]
             py_fn = fn + '.py'
 
             c_full_path = c_path / c_fn

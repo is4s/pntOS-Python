@@ -106,7 +106,7 @@ def clang_parse_file(
     in_file: Path, c_api_path: Path, firehose_outputs_path: Path
 ) -> ApiModule:
     """Uses clang to parse a C/C++ header file."""
-    module = ApiModule(name=in_file)
+    module = ApiModule(name=in_file.as_posix())
     tmp_file_path = generate_file_for_parsing(in_file)
 
     index = clang.cindex.Index.create()
