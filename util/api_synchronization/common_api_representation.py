@@ -92,8 +92,7 @@ class CtoPyApiComparator:
             'void*': 'Any',
             # Pntos Messages
             'PntosMessage*': 'Message',
-            'PntosMessage**': 'list[Message',
-            'PntosMessageArray*': 'list[Message',
+            'PntosMessageArray*': 'list[Message | None',
             'PntosMessageType': 'type[AspnBase]',
             'PntosMessageTypeArray*': 'list[type[AspnBase]',
             # Generic Pntos Managed Types
@@ -119,6 +118,8 @@ class CtoPyApiComparator:
             'memory': '',
             'length': '',
             'plugin_type': '',
+            'inertial_type': '',
+            'type': '',
             'num_covariances': '',
             'common': '',
             'num_preprocessors': '',
@@ -133,6 +134,7 @@ class CtoPyApiComparator:
             'clone': '',
             # KeyValueStore mapping
             'get_key_array': 'keys',
+            'get_group_array': 'group_array',
             'has_key': '__contains__',
             'get_str': 'get_value',
             'get_str_array': 'get_value',
@@ -174,7 +176,7 @@ class CtoPyApiComparator:
             'num_block_labels': '',
             'num_times': '',
             'num_state_block_labels': '',
-            'gen_x_and_p_func': 'x_and_p',  # semantically different but functionally equivalent
+            'gen_x_and_p_func': 'x_and_p',  # TODO: Remove exception once the semantic inequivalence is resolved. Related issue: https://git.aspn.us/pntos/pntos-python/-/issues/262
         }
         self.class_exceptions = {
             # Pntos Managed Memory => ''
@@ -194,6 +196,7 @@ class CtoPyApiComparator:
             'PntosCommonStateModelProvider': 'StateModelProviderType',
             # Actual Exceptions
             'PntosMessageStreamConfig': 'MessageStreamConfig',
+            'PntosPreprocessor': 'Preprocessor',
         }
         self.mismatch = False
 
