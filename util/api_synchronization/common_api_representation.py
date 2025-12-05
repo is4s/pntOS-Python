@@ -110,6 +110,7 @@ class CtoPyApiComparator:
             'AspnTypeTimestamp*': 'list[TypeTimestamp',
             'PntosStandardDynamicsModelCallback': 'Callable[[NDArray[float64]], NDArray[float64]]',
             'PntosStandardMeasurementModelCallback': 'Callable[[NDArray[float64]], NDArray[float64]]',
+            'PntosPluginTypes': 'PluginType',  # TODO: Remove exception once https://git.aspn.us/pntos/pntos/-/issues/970 has been resolved.
         }
         self.uncommon_types = {
             'unsigned char*': 'bytes',
@@ -127,6 +128,7 @@ class CtoPyApiComparator:
             'num_blocks': '',
             'num_virtual_blocks': '',
             'num_state_block_labels': '',
+            'inertial_errors': '',  # TODO: Remove exception once https://git.aspn.us/pntos/pntos/-/merge_requests/1090 has been merged.
         }
         self.method_exceptions = {
             'log_message_fmt': 'log_message',
@@ -177,6 +179,7 @@ class CtoPyApiComparator:
             'num_times': '',
             'num_state_block_labels': '',
             'gen_x_and_p_func': 'x_and_p',  # TODO: Remove exception once the semantic inequivalence is resolved. Related issue: https://git.aspn.us/pntos/pntos-python/-/issues/262
+            'type': '',  # TODO: Remove exception once https://git.aspn.us/pntos/pntos/-/merge_requests/1091 has been merged.
         }
         self.class_exceptions = {
             # Pntos Managed Memory => ''
