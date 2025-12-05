@@ -8,12 +8,12 @@
     # via pntos-python
 alabaster==1.0.0
     # via sphinx
-analysis-lcm @ git+ssh://git@git.aspn.us/pntos/analysis-scripts.git@6f4bc7c0c4b2c9efd1e428b5725612e6f934e6bd#subdirectory=analysis-lcm
+analysis-lcm @ git+ssh://git@git.aspn.us/pntos/analysis-scripts.git@6a457e6db086d3325b52a2ec5d379ece2a9c2c64#subdirectory=analysis-lcm
     # via
     #   analysis-ros
     #   pntos-cobra
     #   pntos-python
-analysis-ros @ git+ssh://git@git.aspn.us/pntos/analysis-scripts.git@6f4bc7c0c4b2c9efd1e428b5725612e6f934e6bd#subdirectory=analysis-ros
+analysis-ros @ git+ssh://git@git.aspn.us/pntos/analysis-scripts.git@6a457e6db086d3325b52a2ec5d379ece2a9c2c64#subdirectory=analysis-ros
     # via
     #   pntos-cobra
     #   pntos-python
