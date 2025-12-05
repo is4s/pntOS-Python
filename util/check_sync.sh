@@ -87,6 +87,8 @@ check_sync $orig_dir"/util/app_gps_ins_vsb.patch"
 # Cleanup and return
 popd > /dev/null
 cleanup
+# reverse `set +xe` call made at beginning of script
+set -xe
 if [[ "${BASH_SOURCE[0]}" != "${0}" ]]; then
     return $ret_val
 else
