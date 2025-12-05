@@ -94,6 +94,16 @@ app and orchestration synchronization:
         # Run sync check script
         - util/check_sync.sh
 
+API Synchronization:
+    stage: check
+    tags:
+        - linux-light-runner
+    script:
+        - docker run --rm -dit -v $(pwd):/work -v $HOME/.ccache:/root/.cache/uv --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
+        - docker exec pntos-python uv sync
+        # Run api sync check script
+        - docker exec pntos-python util/api_synchronization/compare_apis.py
+
 requirements up-to-date:
     stage: check
     tags:
