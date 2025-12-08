@@ -2,6 +2,25 @@
 
 from dataclasses import dataclass, field
 
+RED = '\033[91m'
+GREEN = '\033[92m'
+YELLOW = '\033[93m'
+BLUE = '\033[94m'
+
+
+def colored(msg: str, color: str) -> str:
+    """
+    Returns the colored version of an input string.
+
+    Args:
+        msg (str): Message to be colored.
+        color (str): The code of the color to use.
+
+    Returns:
+        str
+    """
+    return f'{color}{msg}\033[0m'
+
 
 @dataclass
 class ApiFunction:
@@ -73,8 +92,7 @@ class CtoPyApiComparator:
             'void*': 'Any',
             # Pntos Messages
             'PntosMessage*': 'Message',
-            'PntosMessage**': 'list[Message',
-            'PntosMessageArray*': 'list[Message',
+            'PntosMessageArray*': 'list[Message | None',
             'PntosMessageType': 'type[AspnBase]',
             'PntosMessageTypeArray*': 'list[type[AspnBase]',
             # Generic Pntos Managed Types
@@ -92,6 +110,7 @@ class CtoPyApiComparator:
             'AspnTypeTimestamp*': 'list[TypeTimestamp',
             'PntosStandardDynamicsModelCallback': 'Callable[[NDArray[float64]], NDArray[float64]]',
             'PntosStandardMeasurementModelCallback': 'Callable[[NDArray[float64]], NDArray[float64]]',
+            'PntosPluginTypes': 'PluginType',  # TODO: Remove exception once https://git.aspn.us/pntos/pntos/-/issues/970 has been resolved.
         }
         self.uncommon_types = {
             'unsigned char*': 'bytes',
@@ -100,6 +119,8 @@ class CtoPyApiComparator:
             'memory': '',
             'length': '',
             'plugin_type': '',
+            'inertial_type': '',
+            'type': '',
             'num_covariances': '',
             'common': '',
             'num_preprocessors': '',
@@ -107,6 +128,7 @@ class CtoPyApiComparator:
             'num_blocks': '',
             'num_virtual_blocks': '',
             'num_state_block_labels': '',
+            'inertial_errors': '',  # TODO: Remove exception once https://git.aspn.us/pntos/pntos/-/merge_requests/1090 has been merged.
         }
         self.method_exceptions = {
             'log_message_fmt': 'log_message',
@@ -114,6 +136,7 @@ class CtoPyApiComparator:
             'clone': '',
             # KeyValueStore mapping
             'get_key_array': 'keys',
+            'get_group_array': 'group_array',
             'has_key': '__contains__',
             'get_str': 'get_value',
             'get_str_array': 'get_value',
@@ -155,7 +178,8 @@ class CtoPyApiComparator:
             'num_block_labels': '',
             'num_times': '',
             'num_state_block_labels': '',
-            'gen_x_and_p_func': 'x_and_p',  # semantically different but functionally equivalent
+            'gen_x_and_p_func': 'x_and_p',  # TODO: Remove exception once the semantic inequivalence is resolved. Related issue: https://git.aspn.us/pntos/pntos-python/-/issues/262
+            'type': '',  # TODO: Remove exception once https://git.aspn.us/pntos/pntos/-/merge_requests/1091 has been merged.
         }
         self.class_exceptions = {
             # Pntos Managed Memory => ''
@@ -175,6 +199,7 @@ class CtoPyApiComparator:
             'PntosCommonStateModelProvider': 'StateModelProviderType',
             # Actual Exceptions
             'PntosMessageStreamConfig': 'MessageStreamConfig',
+            'PntosPreprocessor': 'Preprocessor',
         }
         self.mismatch = False
 
@@ -226,9 +251,9 @@ class CtoPyApiComparator:
                 )
             else:
                 converted_type += type_piece
-                if (
-                    type_piece.startswith('list') and (index + 1) == length
-                ) or type_list[index + 1] != '_Nullable**':
+                if type_piece.startswith('list') and (
+                    index + 1 == length or type_list[index + 1] != '_Nullable**'
+                ):
                     converted_type += ']'
         return converted_type
 
@@ -267,14 +292,16 @@ class CtoPyApiComparator:
                 continue
             if attr_name not in py_attrs:
                 print(
-                    f'ERROR: C struct {c_class.name} has attribute {attr_name} not present '
+                    f'{colored("ERROR:", RED)} C struct {c_class.name} has attribute {attr_name} not present '
                     f'in Python class {py_class.name}. Skipping attribute...'
                 )
                 ret_val = False
                 continue
             py_type = py_attrs[attr_name]
             if not self._compare_type(
-                c_type, py_type, f'ERROR: For attribute "{attr_name}",'
+                c_type,
+                py_type,
+                f'{colored("ERROR:", RED)} For attribute "{attr_name}",',
             ):
                 ret_val = False
         return ret_val
@@ -297,14 +324,16 @@ class CtoPyApiComparator:
                 continue
             if meth_name not in py_method_types:
                 print(
-                    f'ERROR: C struct {c_class.name} has method {meth_name} not present '
+                    f'{colored("ERROR:", RED)} C struct {c_class.name} has method {meth_name} not present '
                     f'in Python class {py_class.name}. Skipping method...'
                 )
                 ret_val = False
                 continue
             py_type = py_method_types[meth_name]
             if not self._compare_type(
-                c_type, py_type, f'ERROR: Method "{meth_name}" return type mismatch.'
+                c_type,
+                py_type,
+                f'{colored("ERROR:", RED)} Method "{meth_name}" return type mismatch.',
             ):
                 ret_val = False
 
@@ -325,7 +354,7 @@ class CtoPyApiComparator:
                     continue
                 if param_name not in py_params:
                     print(
-                        f'ERROR: C struct {c_class.name} method {meth_name} has '
+                        f'{colored("ERROR:", RED)} C struct {c_class.name} method {meth_name} has '
                         f'parameter "{param_name}" not present in '
                         f'Python class {py_class.name}. Skipping...'
                     )
@@ -335,7 +364,7 @@ class CtoPyApiComparator:
                 if not self._compare_type(
                     c_param_type,
                     py_param_type,
-                    f'ERROR: Parameter "{param_name}" in method "{meth_name}" has type mismatch.',
+                    f'{colored("ERROR:", RED)} Parameter "{param_name}" in method "{meth_name}" has type mismatch.',
                 ):
                     ret_val = False
         return ret_val
@@ -347,7 +376,7 @@ class CtoPyApiComparator:
         if not self._compare_attributes(c_class, py_class):
             self.mismatch = True
             print(
-                f'RESULT: C struct {c_class.name} is NOT semantically '
+                f'{colored("RESULT:", YELLOW)} C struct {c_class.name} is NOT semantically '
                 f'equivalent with Python class {py_class.name}.'
             )
             return
@@ -356,13 +385,13 @@ class CtoPyApiComparator:
         if not self._compare_methods(c_class, py_class):
             self.mismatch = True
             print(
-                f'RESULT: C struct {c_class.name} is NOT semantically '
+                f'{colored("RESULT:", YELLOW)} C struct {c_class.name} is NOT semantically '
                 f'equivalent with Python class {py_class.name}.'
             )
             return
 
         print(
-            f'RESULT: C struct {c_class.name} is semantically equivalent with Python class {py_class.name}.'
+            f'{colored("RESULT:", YELLOW)} C struct {c_class.name} is semantically equivalent with Python class {py_class.name}.'
         )
 
     def compare_modules(self, c_module: ApiModule, py_module: ApiModule) -> bool:
@@ -376,15 +405,21 @@ class CtoPyApiComparator:
                 continue
             if c_class.name not in py_classes:
                 print(
-                    f'ERROR: C struct {c_class.name} not found in Python API module {py_module.name}. Skipping...'
+                    f'{colored("ERROR:", RED)} C struct {c_class.name} not found in Python API module {py_module.name}. Skipping...'
                 )
                 self.mismatch = True
                 continue
             self.compare_classes(c_class, py_classes[c_class.name])
         c_mod_name = c_module.name.split('/')[-1]
         py_mod_name = py_module.name.split('/')[-1]
-        print(
-            f'FINAL RESULT: The C module {c_mod_name} is {"NOT " if self.mismatch else ""}'
-            f'semantically equivalent with the Python module {py_mod_name}'
-        )
+        if self.mismatch:
+            print(
+                f'{colored("FINAL RESULT:", RED)} The C module {c_mod_name} is NOT '
+                f'semantically equivalent with the Python module {py_mod_name}'
+            )
+        else:
+            print(
+                f'{colored("FINAL RESULT:", GREEN)} The C module {c_mod_name} is '
+                f'semantically equivalent with the Python module {py_mod_name}'
+            )
         return self.mismatch

@@ -23,7 +23,10 @@ ret_val=$?  # this must be set after check_sync to observe if it passed or not
 sphinx-build --exception-on-warning docs/source/ docs/build/
 pytest pntos-cobra --cov --cov-fail-under=75 --cov-report={term,html} --cov-config=.coveragerc
 pytest apps -s
+python3 util/api_synchronization/compare_apis.py
 
+# don't print the following commands
+set +x
 echo
 if [ "$ret_val" = 0 ]; then
     echo "🐍 All checks passed! 🐍"

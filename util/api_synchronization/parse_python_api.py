@@ -127,6 +127,6 @@ def parse_python_file(in_file: Path) -> ApiModule:
         contents = file.read()
     tree = ast.parse(contents)
 
-    visitor = ApiVisitor(in_file)
+    visitor = ApiVisitor(in_file.as_posix())
     visitor.visit(tree)
     return visitor.module
