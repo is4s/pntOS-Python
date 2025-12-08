@@ -23,7 +23,7 @@ def monitor_app_output(
         print(line, end='')
         if validate:
             # ensure there are no warnings or errors
-            assert 'WARN' not in line or 'UI plugin' in line  # TODO: # 214
+            assert 'WARN' not in line
             assert 'ERROR' not in line
         if wait_for_msg and wait_for_msg in line:
             break

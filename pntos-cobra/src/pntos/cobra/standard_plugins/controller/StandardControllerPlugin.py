@@ -39,7 +39,7 @@ class StandardControllerPlugin(ControllerPlugin):
     - OrchestrationPlugin - 1
     - RegistryPlugin - 1
     - TransportPlugin - at least 1
-    - UiPlugin - optional 1
+    - UiPlugin - any, but only 1 can require the main thread
 
     It checks for the expected plugins, sets up mediators, and then passes the mediators
     to each plugin in :meth:`pntos.api.CommonPlugin.init_plugin`, initializes the
@@ -67,7 +67,7 @@ class StandardControllerPlugin(ControllerPlugin):
         self._plugins: list[CommonPlugin] = []
         self._logging_plugin: LoggingPlugin | None = None
         self._transport_plugins: list[TransportPlugin] = []
-        self._ui_plugin: UiPlugin | None = None
+        self._ui_plugins: list[UiPlugin] = []
         self._registry_plugin: RegistryPlugin | None = None
 
     def init_plugin(
@@ -111,7 +111,7 @@ class StandardControllerPlugin(ControllerPlugin):
             self._logging_plugin,
             self._transport_plugins,
             orchestration_plugin,
-            self._ui_plugin,
+            self._ui_plugins,
             plugins_for_orchestration,
         ) = self._sort_and_validate_plugins(plugins)
 
@@ -210,7 +210,7 @@ class StandardControllerPlugin(ControllerPlugin):
         LoggingPlugin,
         list[TransportPlugin],
         OrchestrationPlugin,
-        UiPlugin | None,
+        list[UiPlugin],
         list[CommonPlugin],
     ]:
         """
@@ -233,14 +233,6 @@ class StandardControllerPlugin(ControllerPlugin):
         ):
             raise RuntimeError('Not enough plugins to run pntOS.')
 
-        # UI Plugin
-        if len(sorted_plugins.ui_plugins) != 1:
-            self._log(
-                LoggingLevel.WARN,
-                f'Expected one UiPlugin but received {len(sorted_plugins.ui_plugins)}.'
-                + ' Running without a UI plugin.',
-            )
-
         # Collect plugins to pass to orchestration
         plugins_for_orchestration.extend(sorted_plugins.fusion_plugins)
         plugins_for_orchestration.extend(sorted_plugins.fusion_strategy_plugins)
@@ -254,9 +246,7 @@ class StandardControllerPlugin(ControllerPlugin):
             sorted_plugins.logging_plugins[0],
             sorted_plugins.transport_plugins,
             sorted_plugins.orchestration_plugins[0],
-            None
-            if len(sorted_plugins.ui_plugins) != 1
-            else sorted_plugins.ui_plugins[0],
+            sorted_plugins.ui_plugins,
             plugins_for_orchestration,
         )
 
@@ -279,9 +269,15 @@ class StandardControllerPlugin(ControllerPlugin):
         for transport in self._transport_plugins:
             transport.start_listening()
 
-        if self._ui_plugin is not None and self._ui_plugin.requires_main_thread():
-            # See if UI needs to update
-            self._ui_plugin.run_main_thread()
+        # Run main thread from UI plugin, if needed
+        ui_needing_main_thrd = [p for p in self._ui_plugins if p.requires_main_thread()]
+        if len(ui_needing_main_thrd) > 1:
+            self._log(
+                LoggingLevel.ERROR,
+                f'Only 1 UiPlugin can require the main thread, but found {len(ui_needing_main_thrd)} needing the main thread. Cannot run pntOS.',
+            )
+        if ui_needing_main_thrd:
+            ui_needing_main_thrd[0].run_main_thread()
 
         else:  # wait for ctrl + c to exit
             self._log(
