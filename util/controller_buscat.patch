@@ -1,5 +1,5 @@
 diff --git a/pntos-cobra/src/pntos/cobra/standard_plugins//controller/StandardControllerPlugin.py b/pntos-cobra/src/pntos/cobra/advanced_plugins//buscat/BuscatControllerPlugin.py
-index e4469062..281ef040 100644
+index 2fdc67aa..07c0d3d7 100644
 --- a/pntos-cobra/src/pntos/cobra/standard_plugins//controller/StandardControllerPlugin.py
 +++ b/pntos-cobra/src/pntos/cobra/advanced_plugins//buscat/BuscatControllerPlugin.py
 @@ -6,12 +6,11 @@ from pntos.api import (
@@ -42,7 +42,7 @@ index e4469062..281ef040 100644
 -    - OrchestrationPlugin - 1
      - RegistryPlugin - 1
      - TransportPlugin - at least 1
-     - UiPlugin - optional 1
+     - UiPlugin - any, but only 1 can require the main thread
  
      It checks for the expected plugins, sets up mediators, and then passes the mediators
 -    to each plugin in :meth:`pntos.api.CommonPlugin.init_plugin`, initializes the
@@ -72,7 +72,7 @@ index e4469062..281ef040 100644
              self._logging_plugin,
              self._transport_plugins,
 -            orchestration_plugin,
-             self._ui_plugin,
+             self._ui_plugins,
 -            plugins_for_orchestration,
          ) = self._sort_and_validate_plugins(plugins)
  
@@ -116,13 +116,13 @@ index e4469062..281ef040 100644
          # Give the mediators other needed plugins
 -        StandardMediator._transport_plugins = self._transport_plugins
 -        StandardMediator._orchestration_plugin = orchestration_plugin
--
++        BuscatMediator._transport_plugins = self._transport_plugins
+ 
 -        # Give the orchestration the plugins it needs
 -        orchestration_plugin.init_orchestration_plugin(
 -            plugins_for_orchestration, stream_config
 -        )
-+        BuscatMediator._transport_plugins = self._transport_plugins
- 
+-
 -        # Extract controller-specific config
 -        temp_mediator = StandardMediator(self.identifier, ControllerPlugin)
 -        config = config_from_registry(ControllerConfig, temp_mediator, 'controller')
@@ -151,14 +151,14 @@ index e4469062..281ef040 100644
 -        LoggingPlugin,
 -        list[TransportPlugin],
 -        OrchestrationPlugin,
--        UiPlugin | None,
+-        list[UiPlugin],
 -        list[CommonPlugin],
 -    ]:
-+    ) -> tuple[RegistryPlugin, LoggingPlugin, list[TransportPlugin], UiPlugin | None]:
++    ) -> tuple[RegistryPlugin, LoggingPlugin, list[TransportPlugin], list[UiPlugin]]:
          """
          Utility function to ensure ``plugins`` contains enough plugins to run pntOS
          Cobra. Then assigns and dispatches them to the relevant fields on the
-@@ -220,44 +189,23 @@ class StandardControllerPlugin(ControllerPlugin):
+@@ -220,34 +189,21 @@ class StandardControllerPlugin(ControllerPlugin):
          not as expected.
          """
          sorted_plugins: SortedPlugins = sort_plugins_dataclass(plugins)
@@ -175,14 +175,6 @@ index e4469062..281ef040 100644
          ):
              raise RuntimeError('Not enough plugins to run pntOS.')
  
--        # UI Plugin
--        if len(sorted_plugins.ui_plugins) != 1:
--            self._log(
--                LoggingLevel.WARN,
--                f'Expected one UiPlugin but received {len(sorted_plugins.ui_plugins)}.'
--                + ' Running without a UI plugin.',
--            )
--
 -        # Collect plugins to pass to orchestration
 -        plugins_for_orchestration.extend(sorted_plugins.fusion_plugins)
 -        plugins_for_orchestration.extend(sorted_plugins.fusion_strategy_plugins)
@@ -196,14 +188,12 @@ index e4469062..281ef040 100644
              sorted_plugins.logging_plugins[0],
              sorted_plugins.transport_plugins,
 -            sorted_plugins.orchestration_plugins[0],
-             None
-             if len(sorted_plugins.ui_plugins) != 1
-             else sorted_plugins.ui_plugins[0],
+             sorted_plugins.ui_plugins,
 -            plugins_for_orchestration,
          )
  
      def _log(self, level: LoggingLevel, message: str) -> None:
-@@ -289,10 +237,10 @@ class StandardControllerPlugin(ControllerPlugin):
+@@ -285,10 +241,10 @@ class StandardControllerPlugin(ControllerPlugin):
                  'Press Ctrl + C at any time to shut down pntOS...',
              )
              try:
