@@ -545,6 +545,7 @@ def run_pntos_with_network_transport(
     # initialize process variables to avoid possibly unbound errors
     relay_process = None
     logger_process = None
+    logplayer_process = None
     app_process = None
 
     try:
@@ -559,7 +560,7 @@ def run_pntos_with_network_transport(
                 break
 
         # play log. note that logplayer process automatically terminates at end of log
-        run_lcm_logplayer(input_log)
+        logplayer_process = run_lcm_logplayer(input_log)
 
         # Wait until data is no longer being recorded to output log
         wait_until_file_stable(output_log, stable_secs=5)
@@ -569,5 +570,7 @@ def run_pntos_with_network_transport(
             kill(app_process)
         if logger_process is not None:
             kill(logger_process)
+        if logplayer_process is not None:
+            kill(logplayer_process)
         if relay_process is not None:
             kill(relay_process)
