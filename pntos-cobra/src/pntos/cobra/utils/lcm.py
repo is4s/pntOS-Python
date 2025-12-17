@@ -496,14 +496,14 @@ def run_lcm_logplayer(logfile: Path) -> Popen[bytes]:  # pragma: no cover
 
 def run_pntos_with_log_transport(
     app: Path,
-    output_log: Path,
+    args: list[str] | None = None,
     validate: bool = False,
 ) -> None:  # pragma: no cover
     """Spin up app, process log, then shut down.
 
     Args:
         app (pathlib.Path): Path to app to run.
-        output_log (pathlib.Path): LCM log to which output should be recorded.
+        args (list[str] | None): Optional command-line arguments to pass to app (e.g. output log).
         validate (bool): Whether to validate the app's output, ensuring there are no
             warnings or errors. Defaults to False.
     """
@@ -511,7 +511,7 @@ def run_pntos_with_log_transport(
     app_process = None
 
     try:
-        app_process = run_app(app, output_log, validate=validate)
+        app_process = run_app(app, args, validate=validate)
 
         # Wait until pntOS is done processing the LCM log
         done_msg = 'Done processing LCM log. Press Ctrl + C to shut down pntOS.'
@@ -530,6 +530,7 @@ def run_pntos_with_network_transport(
     app: Path,
     input_log: Path,
     output_log: Path,
+    args: list[str] | None = None,
     validate: bool = False,
 ) -> None:  # pragma: no cover
     """Spin up app and network tools necessary to run it, process log, then shut down.
@@ -538,6 +539,7 @@ def run_pntos_with_network_transport(
         app (pathlib.Path): Path to app to run.
         input_log (pathlib.Path): LCM log containing the measurements to be processed.
         output_log (pathlib.Path): LCM log to which output should be recorded.
+        args (list[str] | None): Optional command-line arguments to pass to app.
         validate (bool): Whether to validate the app's output, ensuring there are no
             warnings or errors. Defaults to False.
     """
@@ -551,7 +553,7 @@ def run_pntos_with_network_transport(
     try:
         relay_process = run_tcp_relay()
         logger_process = run_lcm_logger(output_log)
-        app_process = run_app(app, output_log, monitor=True, validate=validate)
+        app_process = run_app(app, args, monitor=True, validate=validate)
 
         # wait for cobra to connect to TCP relay
         for line in relay_process.stdout:  # type: ignore[union-attr]
