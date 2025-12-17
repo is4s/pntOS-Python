@@ -11,7 +11,7 @@ OUTPUT_LOG = Path('pntos_output.log')
 
 if __name__ == '__main__':
     app_to_run = argv[1] if len(argv) > 1 else 'apps/standard/gps_ins.py'
-    run_pntos_with_log_transport(Path(app_to_run), OUTPUT_LOG)
+    run_pntos_with_log_transport(Path(app_to_run), [OUTPUT_LOG.as_posix()])
 
     # Tutorial apps include UI plugin which automatically plots upon shutdown, so no need to plot again
     if 'tutorial' not in app_to_run:

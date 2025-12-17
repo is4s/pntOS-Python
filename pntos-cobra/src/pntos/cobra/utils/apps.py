@@ -57,13 +57,13 @@ def wait_until_file_stable(
 
 def run_app(
     app: Path,
-    output_log: Path | None = None,
+    args: list[str] | None = None,
     monitor: bool = False,
     validate: bool = False,
 ) -> Popen[str]:
     cmd = ['python3', '-u', app.as_posix()]
-    if output_log is not None:
-        cmd.append(output_log.as_posix())
+    if args is not None:
+        cmd.extend(args)
 
     # Set unbuffered flag so the subprocess standard output can be read in real time
     app_process = Popen(cmd, stdout=PIPE, text=True, bufsize=1, start_new_session=True)

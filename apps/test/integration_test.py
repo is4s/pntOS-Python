@@ -102,7 +102,7 @@ def validate_results(
 
 def test_tutorial_gps_ins_app() -> None:
     run_pntos_with_log_transport(
-        Path('apps/tutorial/gps_ins.py'), OUTPUT_LOG, validate=True
+        Path('apps/tutorial/gps_ins.py'), [OUTPUT_LOG.as_posix()], validate=True
     )
     log_data = read_pva(OUTPUT_LOG.as_posix(), read_all=True)
     validate_results(
@@ -119,7 +119,7 @@ def test_tutorial_gps_ins_app() -> None:
 
 def test_standard_gps_ins_app() -> None:
     run_pntos_with_log_transport(
-        Path('apps/standard/gps_ins.py'), OUTPUT_LOG, validate=True
+        Path('apps/standard/gps_ins.py'), [OUTPUT_LOG.as_posix()], validate=True
     )
     log_data = read_pva(OUTPUT_LOG, read_all=True)
     validate_results(
@@ -154,7 +154,7 @@ def test_standard_gps_ins_network_app() -> None:
 
 def test_tutorial_gps_ins_vel_app() -> None:
     run_pntos_with_log_transport(
-        Path('apps/tutorial/gps_vel_ins.py'), OUTPUT_LOG, validate=True
+        Path('apps/tutorial/gps_vel_ins.py'), [OUTPUT_LOG.as_posix()], validate=True
     )
     log_data = read_pva(OUTPUT_LOG, read_all=True)
     validate_results(
@@ -188,7 +188,9 @@ def test_tutorial_gps_ins_vel_app() -> None:
 
 def test_standard_gps_ins_leverarm_app() -> None:
     run_pntos_with_log_transport(
-        Path('apps/standard/gps_ins_leverarm.py'), OUTPUT_LOG, validate=True
+        Path('apps/standard/gps_ins_leverarm.py'),
+        [OUTPUT_LOG.as_posix()],
+        validate=True,
     )
     log_data = read_pva(OUTPUT_LOG, read_all=True)
     validate_results(
@@ -206,7 +208,7 @@ def test_standard_gps_ins_leverarm_app() -> None:
 
 def test_standard_gps_bodyvel_ins_app() -> None:
     run_pntos_with_log_transport(
-        Path('apps/standard/gps_ins_bodyvel.py'), OUTPUT_LOG, validate=True
+        Path('apps/standard/gps_ins_bodyvel.py'), [OUTPUT_LOG.as_posix()], validate=True
     )
     log_data = read_pva(OUTPUT_LOG, read_all=True)
     validate_results(
@@ -222,7 +224,7 @@ def test_standard_gps_bodyvel_ins_app() -> None:
 
 def test_standard_gps_ins_vel_app() -> None:
     run_pntos_with_log_transport(
-        Path('apps/standard/gps_vel_ins.py'), OUTPUT_LOG, validate=True
+        Path('apps/standard/gps_vel_ins.py'), [OUTPUT_LOG.as_posix()], validate=True
     )
     log_data = read_pva(OUTPUT_LOG, read_all=True)
     validate_results(
@@ -257,7 +259,7 @@ def test_standard_gps_ins_vel_app() -> None:
 
 def test_standard_posvel_ins_app() -> None:
     run_pntos_with_log_transport(
-        Path('apps/standard/posvel_ins.py'), OUTPUT_LOG, validate=True
+        Path('apps/standard/posvel_ins.py'), [OUTPUT_LOG.as_posix()], validate=True
     )
     log_data = read_pva(OUTPUT_LOG, read_all=True)
 
@@ -293,7 +295,7 @@ def test_standard_posvel_ins_app() -> None:
 
 def test_standard_gps_ins_baro_app() -> None:
     run_pntos_with_log_transport(
-        Path('apps/standard/gps_ins_baro.py'), OUTPUT_LOG, validate=True
+        Path('apps/standard/gps_ins_baro.py'), [OUTPUT_LOG.as_posix()], validate=True
     )
     log_data = read_pva(OUTPUT_LOG, read_all=True)
     validate_results(
@@ -313,7 +315,7 @@ def test_standard_gps_ins_baro_app() -> None:
 
 def test_standard_gps_ins_vsb_app() -> None:
     run_pntos_with_log_transport(
-        Path('apps/standard/gps_ins_vsb.py'), OUTPUT_LOG, validate=True
+        Path('apps/standard/gps_ins_vsb.py'), [OUTPUT_LOG.as_posix()], validate=True
     )
     log_data = read_pva(OUTPUT_LOG, read_all=True)
     validate_results(
@@ -329,7 +331,7 @@ def test_standard_gps_ins_vsb_app() -> None:
 
 def test_buscat_app() -> None:
     run_pntos_with_log_transport(
-        Path('apps/advanced/buscat.py'), OUTPUT_LOG, validate=True
+        Path('apps/advanced/buscat.py'), [OUTPUT_LOG.as_posix()], validate=True
     )
     result = subprocess.run(
         ['print_channels', ASPN2_EXAMPLE_LCM_LOG],
