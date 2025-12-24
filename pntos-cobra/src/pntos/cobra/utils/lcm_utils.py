@@ -483,7 +483,11 @@ def run_logger(output_file: Path) -> Popen[str]:  # pragma: no cover
         output_file.unlink()
     current_dir = Path(__file__).parent
     logger_path = current_dir / 'logger.py'
-    return run_app(logger_path, [output_file.as_posix()], monitor=True)
+    return run_app(
+        logger_path,
+        [output_file.as_posix(), '2584', '/solution/pntos/pva'],
+        monitor=True,
+    )
 
 
 def run_lcm_logplayer(logfile: Path) -> Popen[bytes]:  # pragma: no cover
