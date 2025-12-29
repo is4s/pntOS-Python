@@ -26,15 +26,15 @@ from .hdf5 import (
     load_from_hdf5_file as load_from_hdf5_file,
     save_to_hdf5_file as save_to_hdf5_file,
 )
-from .lcm import (
+from .lcm_utils import (
     create_lcm_message as create_lcm_message,
     decode_aspn_lcm_msg as decode_aspn_lcm_msg,
     marshal_from_lcm as marshal_from_lcm,
     marshal_to_aspn2_lcm as marshal_to_aspn2_lcm,
     marshal_to_aspn23_lcm as marshal_to_aspn23_lcm,
     process_lcm_message as process_lcm_message,
-    run_lcm_logger as run_lcm_logger,
     run_lcm_logplayer as run_lcm_logplayer,
+    run_logger as run_logger,
     run_pntos_with_log_transport as run_pntos_with_log_transport,
     run_pntos_with_network_transport as run_pntos_with_network_transport,
     run_tcp_relay as run_tcp_relay,

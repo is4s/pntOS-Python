@@ -75,5 +75,9 @@ def run_app(
 
 
 def kill(process: Popen[Any]) -> None:
-    os.killpg(os.getpgid(process.pid), SIGINT)
-    process.wait()
+    try:
+        os.killpg(os.getpgid(process.pid), SIGINT)
+    except OSError:
+        return
+    else:
+        process.wait()

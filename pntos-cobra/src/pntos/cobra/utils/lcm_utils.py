@@ -12,7 +12,7 @@ import datasources.lcm.messages.aspn as aspn2_lcm
 from pntos.api import LoggingLevel, Mediator, Message
 from pntos.cobra.config import AspnVersion
 
-from .apps import kill, monitor_app_output, run_app, wait_until_file_stable
+from .apps import kill, monitor_app_output, run_app
 
 Aspn23LcmMeasurement = (
     aspn23_lcm.measurement_angular_velocity_1d
@@ -477,13 +477,16 @@ def run_tcp_relay() -> Popen[str]:  # pragma: no cover
     return process
 
 
-def run_lcm_logger(output_file: Path) -> Popen[bytes]:  # pragma: no cover
+def run_logger(output_file: Path) -> Popen[str]:  # pragma: no cover
     # Remove any pre-existing output
     if output_file.exists():
         output_file.unlink()
-    return Popen(
-        ['lcm-logger', '--lcm-url=tcpq://', '-q', output_file.as_posix()],
-        start_new_session=True,
+    current_dir = Path(__file__).parent
+    logger_path = current_dir / 'logger.py'
+    return run_app(
+        logger_path,
+        [output_file.as_posix(), '2584', '/solution/pntos/pva'],
+        monitor=True,
     )
 
 
@@ -552,7 +555,7 @@ def run_pntos_with_network_transport(
 
     try:
         relay_process = run_tcp_relay()
-        logger_process = run_lcm_logger(output_log)
+        logger_process = run_logger(output_log)
         app_process = run_app(app, args, monitor=True, validate=validate)
 
         # wait for cobra to connect to TCP relay
@@ -564,14 +567,11 @@ def run_pntos_with_network_transport(
         # play log. note that logplayer process automatically terminates at end of log
         logplayer_process = run_lcm_logplayer(input_log)
 
-        # Wait until data is no longer being recorded to output log
-        wait_until_file_stable(output_log, stable_secs=5)
-
     finally:
+        if logger_process is not None:
+            logger_process.wait()
         if app_process is not None:
             kill(app_process)
-        if logger_process is not None:
-            kill(logger_process)
         if logplayer_process is not None:
             kill(logplayer_process)
         if relay_process is not None:

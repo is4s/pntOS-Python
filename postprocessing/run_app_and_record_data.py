@@ -4,7 +4,7 @@ from pathlib import Path
 from sys import argv
 
 from plot_results import plot_results
-from pntos.cobra.utils.lcm import run_pntos_with_log_transport
+from pntos.cobra.utils.lcm_utils import run_pntos_with_log_transport
 
 OUTPUT_LOG = Path('pntos_output.log')
 
