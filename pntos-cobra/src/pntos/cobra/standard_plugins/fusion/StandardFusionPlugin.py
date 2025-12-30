@@ -645,32 +645,24 @@ class StandardFusionEngine(api.StandardFusionEngine):
             else {}
         )
         for label in self._mp[processor_label].state_block_labels:
-            real_to_virt = None
-            if label in vsb_labels:
-                real_label = self._vsb_manager.get_start_block_label(label)
-                if real_label is None:
-                    self._mediator.log_message(
-                        LoggingLevel.ERROR,
-                        f'Unable to populate H with the jacobian from the VirtualStateBlock "{label}"',
-                    )
-                    return
-                real_est = self.get_state_block_estimate(real_label)
-                if real_est is None:
-                    return
-                real_to_virt = self._vsb_manager.jacobian(
-                    real_est, real_label, label, self.time
+            real_label = self.get_real_label(label)
+            if real_label is None:
+                self._mediator.log_message(
+                    LoggingLevel.ERROR,
+                    f'Unable to populate H with the jacobian from block "{label}"',
                 )
-                if real_to_virt is None:
-                    return
-            else:
-                real_label = label
+                return
             stop_index = mp_num_states + self._sb[real_label].num_states
-            real_to_meas = measurement_model.H[:, mp_num_states:stop_index]
-            if real_to_virt is not None:
-                real_to_meas = real_to_meas @ real_to_virt
+            curr_H: NDArray[float64] | None = measurement_model.H[
+                :, mp_num_states:stop_index
+            ]
+            if label in vsb_labels:
+                curr_H = self._vsb_manager.convert_H(self, real_label, label, curr_H)  # type: ignore[arg-type]
+                if curr_H is None:
+                    return
             big_H[
                 :, self._sb[real_label].start_index : self._sb[real_label].stop_index
-            ] = real_to_meas
+            ] = curr_H
             mp_num_states = stop_index
 
         # Make the h(x) function that operates on the full x rather than just the
@@ -719,6 +711,12 @@ class StandardFusionEngine(api.StandardFusionEngine):
 
         # Use the fusion strategy to update the states
         self._strategy.update(measurement_model=big_measurement_model)
+
+    def get_real_label(self, label: str) -> str | None:
+        real_label: str | None = label
+        if label not in self._sb:
+            real_label = self._vsb_manager.get_start_block_label(label)
+        return real_label
 
     def peek_ahead(
         self, time: TypeTimestamp, block_labels: list[str]

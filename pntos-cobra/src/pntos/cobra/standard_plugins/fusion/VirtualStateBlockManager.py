@@ -6,6 +6,7 @@ from pntos.api import (
     LoggingLevel,
     Mediator,
     Message,
+    StandardFusionEngine,
     VirtualStateBlock,
 )
 
@@ -179,6 +180,21 @@ class VirtualStateBlockManager:
                 continue
             est = node.block.convert_estimate(est, time)
         return est
+
+    def convert_H(
+        self,
+        engine: StandardFusionEngine,
+        real_label: str,
+        label: str,
+        curr_H: NDArray[float64],
+    ) -> NDArray[float64] | None:
+        real_est = engine.get_state_block_estimate(real_label)
+        if real_est is None:
+            return None
+        real_to_virt = self.jacobian(real_est, real_label, label, engine.time)
+        if real_to_virt is None:
+            return None
+        return curr_H @ real_to_virt
 
     def get_start_block_label(self, target: str) -> str | None:
         """
