@@ -672,32 +672,31 @@ class StandardFusionEngine(api.StandardFusionEngine):
             x_mp = np.zeros([mp_num_states, 1], dtype=float64)
             start_index = 0  # start index of the next stateblock
             for label in self._mp[processor_label].state_block_labels:
-                if label in vsb_labels:
-                    real_label = self._vsb_manager.get_start_block_label(label)
-                    if real_label is None:
-                        self._mediator.log_message(
-                            LoggingLevel.ERROR,
-                            f'Unable to obtain the set of states for the VirtualStateBlock "{label}".',
-                        )
-                        return x_mp
-                else:
-                    real_label = label
+                real_label = self.get_real_label(label)
+                if real_label is None:
+                    self._mediator.log_message(
+                        LoggingLevel.ERROR,
+                        f'Unable to find block "{label}".',
+                    )
+                    return x_mp
                 # Pull out the relevant portions of the full x matrix and insert
                 # them into the x_mp
-                est: NDArray[float64] = full_x[
+                est: NDArray[float64] | None = full_x[
                     self._sb[real_label].start_index : self._sb[real_label].stop_index
                 ]
-                if label != real_label:
-                    out = self._vsb_manager.convert_estimate(
-                        est, real_label, label, self.time
+                if label not in self._sb:
+                    est = self._vsb_manager.convert_estimate(
+                        est,  # type: ignore[arg-type]
+                        real_label,
+                        label,
+                        self.time,
                     )
-                    if out is None:
+                    if est is None:
                         self._mediator.log_message(
                             LoggingLevel.ERROR,
                             f'Unable to obtain the set of states for block "{real_label}".',
                         )
                         return x_mp
-                    est = out
                 x_mp[start_index : start_index + self._sb[real_label].num_states] = est
                 start_index += self._sb[real_label].num_states
 
