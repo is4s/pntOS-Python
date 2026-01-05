@@ -633,7 +633,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
             return
 
         # Make full size H matrix
-        big_H = np.zeros([measurement_model.H.shape[0], self._num_states])
+        full_H = np.zeros([measurement_model.H.shape[0], self._num_states])
 
         # Populate the full size H matrix from the values in the measurement processors's H
         # Also calculate the total number of states included in the measurement processor's
@@ -645,67 +645,58 @@ class StandardFusionEngine(api.StandardFusionEngine):
             else {}
         )
         for label in self._mp[processor_label].state_block_labels:
-            real_to_virt = None
-            if label in vsb_labels:
-                real_label = self._vsb_manager.get_start_block_label(label)
-                if real_label is None:
-                    self._mediator.log_message(
-                        LoggingLevel.ERROR,
-                        f'Unable to populate H with the jacobian from the VirtualStateBlock "{label}"',
-                    )
-                    return
-                real_est = self.get_state_block_estimate(real_label)
-                if real_est is None:
-                    return
-                real_to_virt = self._vsb_manager.jacobian(
-                    real_est, real_label, label, self.time
+            real_label = self.get_real_label(label)
+            if real_label is None:
+                self._mediator.log_message(
+                    LoggingLevel.ERROR,
+                    f'Unable to populate H with the jacobian from block "{label}"',
                 )
-                if real_to_virt is None:
-                    return
-            else:
-                real_label = label
+                return
             stop_index = mp_num_states + self._sb[real_label].num_states
-            real_to_meas = measurement_model.H[:, mp_num_states:stop_index]
-            if real_to_virt is not None:
-                real_to_meas = real_to_meas @ real_to_virt
-            big_H[
+            sub_H: NDArray[float64] | None = measurement_model.H[
+                :, mp_num_states:stop_index
+            ]
+            if label in vsb_labels:
+                sub_H = self._vsb_manager.convert_H(self, real_label, label, sub_H)  # type: ignore[arg-type]
+                if sub_H is None:
+                    return
+            full_H[
                 :, self._sb[real_label].start_index : self._sb[real_label].stop_index
-            ] = real_to_meas
+            ] = sub_H
             mp_num_states = stop_index
 
         # Make the h(x) function that operates on the full x rather than just the
         # x specified by the measurement processor's state_block_labels
-        def big_h(full_x: NDArray[float64]) -> NDArray[float64]:
+        def full_h(full_x: NDArray[float64]) -> NDArray[float64]:
             # Make the x matrix that the measurement processor h(x) is expecting
             x_mp = np.zeros([mp_num_states, 1], dtype=float64)
             start_index = 0  # start index of the next stateblock
             for label in self._mp[processor_label].state_block_labels:
-                if label in vsb_labels:
-                    real_label = self._vsb_manager.get_start_block_label(label)
-                    if real_label is None:
-                        self._mediator.log_message(
-                            LoggingLevel.ERROR,
-                            f'Unable to obtain the set of states for the VirtualStateBlock "{label}".',
-                        )
-                        return x_mp
-                else:
-                    real_label = label
+                real_label = self.get_real_label(label)
+                if real_label is None:
+                    self._mediator.log_message(
+                        LoggingLevel.ERROR,
+                        f'Unable to find block "{label}".',
+                    )
+                    return x_mp
                 # Pull out the relevant portions of the full x matrix and insert
                 # them into the x_mp
-                est: NDArray[float64] = full_x[
+                est: NDArray[float64] | None = full_x[
                     self._sb[real_label].start_index : self._sb[real_label].stop_index
                 ]
-                if label != real_label:
-                    out = self._vsb_manager.convert_estimate(
-                        est, real_label, label, self.time
+                if label not in self._sb:
+                    est = self._vsb_manager.convert_estimate(
+                        est,  # type: ignore[arg-type]
+                        real_label,
+                        label,
+                        self.time,
                     )
-                    if out is None:
+                    if est is None:
                         self._mediator.log_message(
                             LoggingLevel.ERROR,
                             f'Unable to obtain the set of states for block "{real_label}".',
                         )
                         return x_mp
-                    est = out
                 x_mp[start_index : start_index + self._sb[real_label].num_states] = est
                 start_index += self._sb[real_label].num_states
 
@@ -714,11 +705,24 @@ class StandardFusionEngine(api.StandardFusionEngine):
 
         # From the above, generate the measurement model that operates on all of the states
         big_measurement_model = StandardMeasurementModel(
-            z=measurement_model.z, h=big_h, H=big_H, R=measurement_model.R
+            z=measurement_model.z, h=full_h, H=full_H, R=measurement_model.R
         )
 
         # Use the fusion strategy to update the states
         self._strategy.update(measurement_model=big_measurement_model)
+
+    def get_real_label(self, label: str) -> str | None:
+        """
+        Takes a block label in and returns the real label associated with the block.
+        If `label` corresponds to a :class:`pntos.api.VirtualStateBlock` the label
+        of the starting block for the virtual transformation will be returned.
+        If `label` corresponds to a :class:`pntos.api.StandardStateBlock` then
+        `label` will be returned as is.
+        """
+        real_label: str | None = label
+        if label not in self._sb:
+            real_label = self._vsb_manager.get_start_block_label(label)
+        return real_label
 
     def peek_ahead(
         self, time: TypeTimestamp, block_labels: list[str]

@@ -6,6 +6,7 @@ from pntos.api import (
     LoggingLevel,
     Mediator,
     Message,
+    StandardFusionEngine,
     VirtualStateBlock,
 )
 
@@ -179,6 +180,38 @@ class VirtualStateBlockManager:
                 continue
             est = node.block.convert_estimate(est, time)
         return est
+
+    def convert_H(
+        self,
+        engine: StandardFusionEngine,
+        real_label: str,
+        label: str,
+        curr_H: NDArray[float64],
+    ) -> NDArray[float64] | None:
+        """
+        Given a measurement jacobian, H, calculate the full transformation from a set of real states
+        to a set of measurements.
+
+        Args:
+            engine (StandardFusionEngine): An instance of the :class:`pntos.api.StandardFusionEngine`
+                calling this method.
+            real_label (str): The label of the :class:`pntos.api.StandardStateBlock` the virtual
+                transformation starts with.
+            label (str): The label of the target state, corresponding to a
+                :class:`pntos.api.VirtualStateBlock`.
+            curr_H (NDArray[float64]): The measurement jacobian that maps a set of virtual states
+                to a set of measurements.
+
+        Returns:
+            `NDArray[float64]` if the labels provided exist in the engine, else `None`.
+        """
+        real_est = engine.get_state_block_estimate(real_label)
+        if real_est is None:
+            return None
+        real_to_virt = self.jacobian(real_est, real_label, label, engine.time)
+        if real_to_virt is None:
+            return None
+        return curr_H @ real_to_virt
 
     def get_start_block_label(self, target: str) -> str | None:
         """
