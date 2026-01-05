@@ -633,7 +633,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
             return
 
         # Make full size H matrix
-        big_H = np.zeros([measurement_model.H.shape[0], self._num_states])
+        full_H = np.zeros([measurement_model.H.shape[0], self._num_states])
 
         # Populate the full size H matrix from the values in the measurement processors's H
         # Also calculate the total number of states included in the measurement processor's
@@ -653,21 +653,21 @@ class StandardFusionEngine(api.StandardFusionEngine):
                 )
                 return
             stop_index = mp_num_states + self._sb[real_label].num_states
-            curr_H: NDArray[float64] | None = measurement_model.H[
+            sub_H: NDArray[float64] | None = measurement_model.H[
                 :, mp_num_states:stop_index
             ]
             if label in vsb_labels:
-                curr_H = self._vsb_manager.convert_H(self, real_label, label, curr_H)  # type: ignore[arg-type]
-                if curr_H is None:
+                sub_H = self._vsb_manager.convert_H(self, real_label, label, sub_H)  # type: ignore[arg-type]
+                if sub_H is None:
                     return
-            big_H[
+            full_H[
                 :, self._sb[real_label].start_index : self._sb[real_label].stop_index
-            ] = curr_H
+            ] = sub_H
             mp_num_states = stop_index
 
         # Make the h(x) function that operates on the full x rather than just the
         # x specified by the measurement processor's state_block_labels
-        def big_h(full_x: NDArray[float64]) -> NDArray[float64]:
+        def full_h(full_x: NDArray[float64]) -> NDArray[float64]:
             # Make the x matrix that the measurement processor h(x) is expecting
             x_mp = np.zeros([mp_num_states, 1], dtype=float64)
             start_index = 0  # start index of the next stateblock
@@ -705,7 +705,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
 
         # From the above, generate the measurement model that operates on all of the states
         big_measurement_model = StandardMeasurementModel(
-            z=measurement_model.z, h=big_h, H=big_H, R=measurement_model.R
+            z=measurement_model.z, h=full_h, H=full_H, R=measurement_model.R
         )
 
         # Use the fusion strategy to update the states
