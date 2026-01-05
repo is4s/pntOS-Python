@@ -713,6 +713,13 @@ class StandardFusionEngine(api.StandardFusionEngine):
         self._strategy.update(measurement_model=big_measurement_model)
 
     def get_real_label(self, label: str) -> str | None:
+        """
+        Takes a block label in and returns the real label associated with the block.
+        If `label` corresponds to a :class:`pntos.api.VirtualStateBlock` the label
+        of the starting block for the virtual transformation will be returned.
+        If `label` corresponds to a :class:`pntos.api.StandardStateBlock` then
+        `label` will be returned as is.
+        """
         real_label: str | None = label
         if label not in self._sb:
             real_label = self._vsb_manager.get_start_block_label(label)

@@ -188,6 +188,23 @@ class VirtualStateBlockManager:
         label: str,
         curr_H: NDArray[float64],
     ) -> NDArray[float64] | None:
+        """
+        Given a measurement jacobian, H, calculate the full transformation from a set of real states
+        to a set of measurements.
+
+        Args:
+            engine (StandardFusionEngine): An instance of the :class:`pntos.api.StandardFusionEngine`
+                calling this method.
+            real_label (str): The label of the :class:`pntos.api.StandardStateBlock` the virtual
+                transformation starts with.
+            label (str): The label of the target state, corresponding to a
+                :class:`pntos.api.VirtualStateBlock`.
+            curr_H (NDArray[float64]): The measurement jacobian that maps a set of virtual states
+                to a set of measurements.
+
+        Returns:
+            `NDArray[float64]` if the labels provided exist in the engine, else `None`.
+        """
         real_est = engine.get_state_block_estimate(real_label)
         if real_est is None:
             return None
