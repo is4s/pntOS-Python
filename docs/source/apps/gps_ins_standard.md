@@ -10,11 +10,11 @@ elaborate on.
 There are some plugins that were swapped out for more advanced implementations.
 
 - `TutorialGpsOrchestrationPlugin` was swapped for `StandardOrchestrationPlugin` so that the standard app could be more
-robust to different filter configurations. In the tutorial app, if you wanted to add a new (existing) preprocessor you
-would have to add the config to the app then update the Orchestration plugin to ingest that config and use the
-preprocessor when processing messages. In the standard version, this ingestion and use is handled automatically. Only
-the app config needs to be updated to use the preprocessor. This is only one of the many features the
-`StandardOrchestrationPlugin` provides.
+robust to different filter configurations. In the tutorial app, if you wanted to leverage an additional off-the-shelf
+preprocessor you would have to add the config to the app then update the Orchestration plugin to ingest that config and 
+use the preprocessor when processing messages. In the standard version, this ingestion and use is handled automatically.
+Only the app config needs to be updated to use the preprocessor as compared to the app and plugin.
+This is merely one of the many features the `StandardOrchestrationPlugin` provides.
 
 - `TutorialGpsInsStateModelingPlugin` and `StandardGpsInsStateModelingPlugin` are very similar in their structure.
 Although there are no major differences from the perspective of the app, the standard version plugin does provide
