@@ -34,15 +34,12 @@ first, it is a more realistic approach than expecting a full, pre-calculated ali
 
 ## Configuration Changes
 
-In the tutorial app, all of the config is independent of one another. The standard app introduces nested config which
-is when one config class is stored within another. This convention provides both modularity and a logical view on the
-interrelation of plugins. For example, most all of the config is actually within the `StandardOrchestrationConfig`.
-This includes orchestration-specific config such as `best_sol_channel` and more filter-specific config like the
-`FogmStateBlockConfig`. Logically this makes sense because the Orchestration Plugin is responsible for setting up the
-filter and channeling messages to it. 
+In the tutorial app, the config is flat a list of dataclasses where each element corresponds to one plugin. The
+standard app introduces nested config. Since the standard-level orchestration plugin needs to configure other plugins,
+their config is now a field on the orchestration plugin's config.
 
-There is a lot of config that is reused between the two apps as well. The standard app just logically restructures
-where the classes are located such as the `SensorConfig` which is now on the `SensorMeasurementProcessorConfig`.
+There are a lot of config values that are reused between the two apps; the standard app simply restructures where the
+classes are located. For example, the `SensorConfig` is now on the `SensorMeasurementProcessorConfig`.
 
 There are also quite a few new config classes introduced such as the measurement processor and state block
 configurations. The new config introduces customizable options such as the channel name of the measurements
