@@ -12,7 +12,7 @@ from sphinx.application import Sphinx
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = 'pntOS Python'
-copyright = '2025, IS4S'
+copyright = '2026, IS4S'
 author = 'IS4S'
 release = '0.1.0'
 
