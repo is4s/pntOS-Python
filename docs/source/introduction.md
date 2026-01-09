@@ -133,7 +133,7 @@ wired up to talk to each other, told to start listening and processing data, and
 Most apps will look very similar to each other, with the only changes being which plugins the {term}`App` has
 decided to use and what config stanzas it needs. You can find an example of a full-fledged {term}`App` that performs
 GPS/INS sensor fusion from sensor data it receives from an LCM network bus
-[here](https://git.aspn.us/pntos/pntos-python/-/blob/main/apps/tutorial/gps_ins/gps_ins.py?ref_type=heads).
+[here](https://git.aspn.us/pntos/pntos-python/-/blob/main/apps/tutorial/gps_ins.py).
 For instructions on how to run this example app, see [Running Your First App](first_app.md).
 
 ### Implementing Our Own Custom App
@@ -416,7 +416,7 @@ The {py:obj}`DummyTransportPlugin<pntos.cobra.DummyTransportPlugin>` is designed
 implementation of a {py:obj}`Transport Plugin<pntos.api.TransportPlugin>` possible to demonstrate the concepts
 above, which is why it was chosen as the transport for our [custom app](#implementing-our-own-custom-app).
 The source code of the {py:obj}`DummyTransportPlugin<pntos.cobra.DummyTransportPlugin>` can be
-[found here](https://git.aspn.us/pntos/pntos-python/-/blob/main/pntos-cobra/src/pntos/cobra/DummyTransportPlugin.py).
+[found here](https://git.aspn.us/pntos/pntos-python/-/blob/main/pntos-cobra/src/pntos/cobra/dummy_plugins/DummyTransportPlugin.py).
 We can see from the source that it is very similar to the simple approach we've described above, namely it:
 
 - Saves off its {py:obj}`Mediator<pntos.api.Mediator>` in its
@@ -789,7 +789,7 @@ The {py:obj}`TutorialGpsOrchestrationPlugin<pntos.cobra.TutorialGpsOrchestration
 of a {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` which demonstrates how one might write an
 {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` using a single EKF to do GPS/INS. The source code
 of the {py:obj}`TutorialGpsOrchestrationPlugin<pntos.cobra.TutorialGpsOrchestrationPlugin>` can be
-[found here](https://git.aspn.us/pntos/pntos-python/-/blob/main/pntos-cobra/src/pntos/cobra/TutorialGpsOrchestrationPlugin.py).
+[found here](https://git.aspn.us/pntos/pntos-python/-/blob/main/pntos-cobra/src/pntos/cobra/tutorial_plugins/TutorialGpsOrchestrationPlugin.py).
 We can see from the source code that complementary nav ASPN messages are
 [sent to the EKF](https://git.aspn.us/pntos/pntos-python/-/blob/main/pntos-cobra/src/pntos/cobra/TutorialGpsOrchestrationPlugin.py#L558)
 inside the {py:obj}`process_pntos_message<pntos.api.OrchestrationPlugin.process_pntos_message>`
