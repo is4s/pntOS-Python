@@ -133,7 +133,7 @@ wired up to talk to each other, told to start listening and processing data, and
 Most apps will look very similar to each other, with the only changes being which plugins the {term}`App` has
 decided to use and what config stanzas it needs. You can find an example of a full-fledged {term}`App` that performs
 GPS/INS sensor fusion from sensor data it receives from an LCM network bus
-[here](https://git.aspn.us/pntos/pntos-python/-/blob/main/apps/tutorial/gps_ins/gps_ins.py?ref_type=heads).
+[here](https://git.aspn.us/pntos/pntos-python/-/blob/main/apps/tutorial/gps_ins.py).
 For instructions on how to run this example app, see [Running Your First App](first_app.md).
 
 ### Implementing Our Own Custom App
@@ -416,7 +416,7 @@ The {py:obj}`DummyTransportPlugin<pntos.cobra.DummyTransportPlugin>` is designed
 implementation of a {py:obj}`Transport Plugin<pntos.api.TransportPlugin>` possible to demonstrate the concepts
 above, which is why it was chosen as the transport for our [custom app](#implementing-our-own-custom-app).
 The source code of the {py:obj}`DummyTransportPlugin<pntos.cobra.DummyTransportPlugin>` can be
-[found here](https://git.aspn.us/pntos/pntos-python/-/blob/main/pntos-cobra/src/pntos/cobra/DummyTransportPlugin.py).
+[found here](https://git.aspn.us/pntos/pntos-python/-/blob/main/pntos-cobra/src/pntos/cobra/dummy_plugins/DummyTransportPlugin.py).
 We can see from the source that it is very similar to the simple approach we've described above, namely it:
 
 - Saves off its {py:obj}`Mediator<pntos.api.Mediator>` in its
@@ -502,17 +502,36 @@ along with its {py:obj}`StandardMediator<pntos.cobra.internal.StandardMediator>`
 We can see from the source code that the {py:obj}`StandardMediator<pntos.cobra.internal.StandardMediator>`
 is similar to the approach we've described above, namely:
 
-- In the [take_control](https://git.aspn.us/pntos/pntos-python/-/blob/main/pntos-cobra/src/pntos/cobra/standard_plugins/controller/StandardControllerPlugin.py?ref_type=heads#L101)
-  implementation, the controller first
-  [calls init_plugin](https://git.aspn.us/pntos/pntos-python/-/blob/main/pntos-cobra/src/pntos/cobra/standard_plugins/controller/StandardControllerPlugin.py?ref_type=heads#L174)
-  on each plugin before using them, which is our Step 0 above.
-- In the [take_control](https://git.aspn.us/pntos/pntos-python/-/blob/main/pntos-cobra/src/pntos/cobra/standard_plugins/controller/StandardControllerPlugin.py?ref_type=heads#L101)
-  implementation, the controller tells [all the transport plugins to start listening](https://git.aspn.us/pntos/pntos-python/-/blob/main/pntos-cobra/src/pntos/cobra/standard_plugins/controller/StandardControllerPlugin.py?ref_type=heads#L284),
-  which is our Step 1 above.
-- The [implementation of StandardMediator.process_pntos_message](https://git.aspn.us/pntos/pntos-python/-/blob/main/pntos-cobra/src/pntos/cobra/standard_plugins/controller/StandardMediator.py#L74)
-  does some simple error checking and then
-  [passes messages received from the transport plugin into the orchestration plugin's process_pntos_message](https://git.aspn.us/pntos/pntos-python/-/blob/main/pntos-cobra/src/pntos/cobra/standard_plugins/controller/StandardMediator.py#L91),
-  which is our Step 2 above.
+- In the `take_control` implementation, the controller first calls `init_plugin` on each plugin
+  before using them, which is our Step 0 above:
+
+  ```{literalinclude} ../../pntos-cobra/src/pntos/cobra/standard_plugins/controller/StandardControllerPlugin.py
+  :language: python
+  :start-at: Initialize registry plugin first thing
+  :end-before: Give the mediators other needed plugins
+  :dedent: 8
+  ```
+
+- In the `take_control` implementation, the controller tells all the transport plugins to start
+  listening, which is our Step 1 above:
+
+  ```{literalinclude} ../../pntos-cobra/src/pntos/cobra/standard_plugins/controller/StandardControllerPlugin.py
+  :language: python
+  :start-at: for transport in self._transport_plugins:
+  :end-at: transport.start_listening()
+  :dedent: 8
+  ```
+
+- The implementation of `StandardMediator.process_pntos_message` does some simple error checking and
+  then passes messages received from the transport plugin into the orchestration plugin's
+  `process_pntos_message`, which is our Step 2 above:
+
+  ```{literalinclude} ../../pntos-cobra/src/pntos/cobra/standard_plugins/controller/StandardMediator.py
+  :language: python
+  :start-at: def process_pntos_message(self, message: Message) -> None:
+  :end-at: self._orchestration_plugin.process_pntos_message(m, True)
+  :dedent: 4
+  ```
 
 <!-- TODO: Break out TutorialXPlugin plugins, and dont use the Simple plugins here, which don't track what we're trying to do -->
 ```{note}
@@ -789,12 +808,27 @@ The {py:obj}`TutorialGpsOrchestrationPlugin<pntos.cobra.TutorialGpsOrchestration
 of a {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` which demonstrates how one might write an
 {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` using a single EKF to do GPS/INS. The source code
 of the {py:obj}`TutorialGpsOrchestrationPlugin<pntos.cobra.TutorialGpsOrchestrationPlugin>` can be
-[found here](https://git.aspn.us/pntos/pntos-python/-/blob/main/pntos-cobra/src/pntos/cobra/TutorialGpsOrchestrationPlugin.py).
-We can see from the source code that complementary nav ASPN messages are
-[sent to the EKF](https://git.aspn.us/pntos/pntos-python/-/blob/main/pntos-cobra/src/pntos/cobra/TutorialGpsOrchestrationPlugin.py#L558)
-inside the {py:obj}`process_pntos_message<pntos.api.OrchestrationPlugin.process_pntos_message>`
-method, and that [buffered solutions from the EKF are returned](https://git.aspn.us/pntos/pntos-python/-/blob/main/pntos-cobra/src/pntos/cobra/TutorialGpsOrchestrationPlugin.py#L666)
-by the {py:obj}`request_solutions<pntos.api.OrchestrationPlugin.request_solutions>`, as described above.
+[found here](https://git.aspn.us/pntos/pntos-python/-/blob/main/pntos-cobra/src/pntos/cobra/tutorial_plugins/TutorialGpsOrchestrationPlugin.py).
+We can see from the source code that complementary nav ASPN messages are sent to the EKF
+inside the {py:obj}`process_pntos_message<pntos.api.OrchestrationPlugin.process_pntos_message>` method:
+
+```{literalinclude} ../../pntos-cobra/src/pntos/cobra/tutorial_plugins/TutorialGpsOrchestrationPlugin.py
+:language: python
+:start-at: def process_pntos_message
+:end-at: self.fusion_engine.update(processor_label=label, message=message)
+:dedent: 4
+```
+
+and that buffered solutions from the EKF are returned
+by the {py:obj}`request_solutions<pntos.api.OrchestrationPlugin.request_solutions>` method:
+
+```{literalinclude} ../../pntos-cobra/src/pntos/cobra/tutorial_plugins/TutorialGpsOrchestrationPlugin.py
+:language: python
+:pyobject: TutorialGpsOrchestrationPlugin.request_solutions
+:dedent: 4
+```
+
+as described above.
 
 <!-- TODO: Level 1 vs Level 2, and a link to the Level 2 docs when they exist -->
 <!-- TODO: Tie this walkthrough to real code that exists somewhere in a repo, and show them how to actually run this example -->
