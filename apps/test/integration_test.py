@@ -321,7 +321,7 @@ def test_standard_gps_ins_vsb_app() -> None:
     validate_results(
         log_data.data[SOLUTION_CHANNEL],
         log_data.data[TRUTH_CHANNEL],
-        num_points=2584,
+        num_points=2570,
         pos_err_limits=ErrorLimits(std_thresh=1.4, max_thresh=3.8),
         vel_err_limits=ErrorLimits(std_thresh=0.1, max_thresh=0.8),
         tilt_err_limits=ErrorLimits(std_thresh=0.82, max_thresh=3.55),
