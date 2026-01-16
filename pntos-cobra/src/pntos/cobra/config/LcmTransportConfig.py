@@ -65,4 +65,10 @@ class LcmLogTransportConfig(BaseConfig):
     List of channels to process. If None, will process all channels.
     """
 
+    record_input_channels: bool = True
+    """
+    Flag to control whether input channels are written to the output log.
+
+    NOTE: The default is set to True. When enabled, the output log will contain any sensor or truth channels from the input log that may be required for postprocessing.
+    """
     group: str
