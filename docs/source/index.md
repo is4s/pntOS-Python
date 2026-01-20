@@ -39,6 +39,7 @@ apps/gps_vel_ins
 ```{toctree}
 :caption: Standard Apps
 :name: standard-apps
+apps/gps_ins_standard
 ```
 
 ```{toctree}
