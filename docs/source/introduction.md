@@ -771,11 +771,17 @@ def filter_description_list(self) -> list[str]:
 ```
 
 Here we define which types of solutions we offer. For this example, we'll only offer one type of solution: our best.
-The strings as a `filter_description` into {py:obj}`request_solutions<pntos.api.OrchestrationPlugin.request_solutions>`
+The string passed as a `filter_description` into {py:obj}`request_solutions<pntos.api.OrchestrationPlugin.request_solutions>`
 above must be in the list we return here. Therefore, the only valid string a user should pass into the
 {py:obj}`request_solutions<pntos.api.OrchestrationPlugin.request_solutions>` parameter `filter_description` is `"BEST"`.
 
-Which leave us with two last methods:
+```{note}
+`"BEST"` as a `filter_description` does not comply with the API-defined convention for the
+{py:obj}`filter_description_list<pntos.api.OrchestrationPlugin.filter_description_list>`. This example violates the convention
+for the sake of simplicity, but any real implementation should follow the convention.
+```
+
+Which leaves us with two last methods:
 ```Python
 def init_plugin(
     self,
