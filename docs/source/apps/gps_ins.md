@@ -132,14 +132,8 @@ While these helper functions can make it appear that we are storing unsupported 
 in the registry (see {py:obj}`RegistryValueTypeUnion<pntos.api.RegistryValueTypeUnion>`
 for the supported registry types), the reality is that these utility functions unpack the
 dataclass fields into types the registry does support. Thus, the config dataclasses only
-support the types specified in the documentation for {py:obj}`config_to_registry
-<pntos.cobra.config.config_to_registry>` and {py:obj}`config_from_registry
-<pntos.cobra.config.config_from_registry>`.
-
-
-For more information on making your own config objects, see the docstrings for {py:obj}`BaseConfig
-<pntos.cobra.config.BaseConfig>` and {py:obj}`config_to_registry
-<pntos.cobra.config.config_to_registry>`.
+support the types specified at the bottom of the [config conventions](../config.md).
+The conventions also provide information on creating your own config dataclasses.
 ```
 
 So, with that background, we can now understand what is happening next in the app:
