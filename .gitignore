@@ -23,4 +23,4 @@ metadata.yaml
 *.mcap
 
 # Artifacts from building the docs
-docs/source/images/
+docs/images/

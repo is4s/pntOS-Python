@@ -27,7 +27,7 @@ The Buscat app uses much fewer imports compared to a sensor fusion app. Let's lo
 
 Like the sensor fusion apps, this app only uses a single import from the API to initialize the global log level of the {py:obj}`StandardLoggingPlugin<pntos.cobra.StandardLoggingPlugin>`, the {py:obj}`LoggingLevel <pntos.api.LoggingLevel>` enum:
 
-```{literalinclude} ../../../../apps/advanced/buscat.py
+```{literalinclude} ../../../apps/advanced/buscat.py
 :start-at: "from pntos.api import"
 :end-at: "from pntos.api import"
 :lineno-match:
@@ -39,7 +39,7 @@ Let's move to the plugin imports.
 
 The Buscat app only imports the following {term}`Cobra` plugins:
 
-```{literalinclude} ../../../../apps/advanced/buscat.py
+```{literalinclude} ../../../apps/advanced/buscat.py
 :start-at: "from pntos.cobra import ("
 :end-at: ")"
 :lineno-match:
@@ -58,7 +58,7 @@ designate that as the desired output transport. The second config object is for 
 {py:obj}`LcmLogTransportPlugin <pntos.cobra.LcmLogTransportPlugin>`, specifying the input file to
 read from, the output file to write to, and the ASPN version to use for the output messages (ASPN23).
 
-```{literalinclude} ../../../../apps/advanced/buscat.py
+```{literalinclude} ../../../apps/advanced/buscat.py
 :start-at: "from pntos.cobra.config import ("
 :end-at: "# End Config"
 :lineno-match:
@@ -76,7 +76,7 @@ App](../gps_ins.md#instantiate-plugins); however, this time, we are instantiatin
 
 We can instantiate our buscat controller plugin much like the standard controller plugin in the tutorial apps:
 
-```{literalinclude} ../../../../apps/advanced/buscat.py
+```{literalinclude} ../../../apps/advanced/buscat.py
 :start-at: "controller = "
 :end-before: "plugins = "
 :lineno-match:
@@ -84,7 +84,7 @@ We can instantiate our buscat controller plugin much like the standard controlle
 
 #### 2. Generate List of Plugins
 
-```{literalinclude} ../../../../apps/advanced/buscat.py
+```{literalinclude} ../../../apps/advanced/buscat.py
 :start-at: "plugins = "
 :end-at: "]"
 :lineno-match:

@@ -80,7 +80,7 @@ branding_dir = f'{site_packages_dir}/branding/'
 rmtree('images', ignore_errors=True)
 copytree(src=branding_dir + '/figures/', dst='images')
 
-html_static_path = ['../_static', branding_dir]
+html_static_path = ['_static', branding_dir]
 
 html_logo = branding_dir + 'pntOs_Logo_Gradient_Light_Horizontal.png'
 html_theme_options = {

@@ -505,7 +505,7 @@ is similar to the approach we've described above, namely:
 - In the `take_control` implementation, the controller first calls `init_plugin` on each plugin
   before using them, which is our Step 0 above:
 
-  ```{literalinclude} ../../pntos-cobra/src/pntos/cobra/standard_plugins/controller/StandardControllerPlugin.py
+  ```{literalinclude} ../pntos-cobra/src/pntos/cobra/standard_plugins/controller/StandardControllerPlugin.py
   :language: python
   :start-at: Initialize registry plugin first thing
   :end-before: Give the mediators other needed plugins
@@ -515,7 +515,7 @@ is similar to the approach we've described above, namely:
 - In the `take_control` implementation, the controller tells all the transport plugins to start
   listening, which is our Step 1 above:
 
-  ```{literalinclude} ../../pntos-cobra/src/pntos/cobra/standard_plugins/controller/StandardControllerPlugin.py
+  ```{literalinclude} ../pntos-cobra/src/pntos/cobra/standard_plugins/controller/StandardControllerPlugin.py
   :language: python
   :start-at: for transport in self._transport_plugins:
   :end-at: transport.start_listening()
@@ -526,7 +526,7 @@ is similar to the approach we've described above, namely:
   then passes messages received from the transport plugin into the orchestration plugin's
   `process_pntos_message`, which is our Step 2 above:
 
-  ```{literalinclude} ../../pntos-cobra/src/pntos/cobra/standard_plugins/controller/StandardMediator.py
+  ```{literalinclude} ../pntos-cobra/src/pntos/cobra/standard_plugins/controller/StandardMediator.py
   :language: python
   :start-at: def process_pntos_message(self, message: Message) -> None:
   :end-at: self._orchestration_plugin.process_pntos_message(m, True)
@@ -818,7 +818,7 @@ of the {py:obj}`TutorialGpsOrchestrationPlugin<pntos.cobra.TutorialGpsOrchestrat
 We can see from the source code that complementary nav ASPN messages are sent to the EKF
 inside the {py:obj}`process_pntos_message<pntos.api.OrchestrationPlugin.process_pntos_message>` method:
 
-```{literalinclude} ../../pntos-cobra/src/pntos/cobra/tutorial_plugins/TutorialGpsOrchestrationPlugin.py
+```{literalinclude} ../pntos-cobra/src/pntos/cobra/tutorial_plugins/TutorialGpsOrchestrationPlugin.py
 :language: python
 :start-at: def process_pntos_message
 :end-at: self.fusion_engine.update(processor_label=label, message=message)
@@ -828,7 +828,7 @@ inside the {py:obj}`process_pntos_message<pntos.api.OrchestrationPlugin.process_
 and that buffered solutions from the EKF are returned
 by the {py:obj}`request_solutions<pntos.api.OrchestrationPlugin.request_solutions>` method:
 
-```{literalinclude} ../../pntos-cobra/src/pntos/cobra/tutorial_plugins/TutorialGpsOrchestrationPlugin.py
+```{literalinclude} ../pntos-cobra/src/pntos/cobra/tutorial_plugins/TutorialGpsOrchestrationPlugin.py
 :language: python
 :pyobject: TutorialGpsOrchestrationPlugin.request_solutions
 :dedent: 4
