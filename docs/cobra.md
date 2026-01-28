@@ -17,21 +17,21 @@ implementing the API and has nothing notable besides.
 
 ```{toctree} 
 :hidden:
-documentation/cobra_plugins
+autodocs/cobra_plugins
 ```
 
 ```{toctree} 
 :hidden:
-documentation/cobra_config
+autodocs/cobra_config
 ```
 
 ```{toctree} 
 :hidden:
-documentation/cobra_utils
+autodocs/cobra_utils
 ```
 
 ```{toctree} 
 :hidden:
-documentation/cobra_internal
+autodocs/cobra_internal
 ```
 

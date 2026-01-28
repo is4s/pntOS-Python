@@ -64,7 +64,7 @@ This is used for initializing the global log level of the {py:obj}`StandardLoggi
 
 #### Cobra Plugin Imports
 
-You should only see plugin imports from the top-level of [`pntos.cobra`](../documentation/cobra_plugins.rst). For instance,
+You should only see plugin imports from the top-level of [`pntos.cobra`](../autodocs/cobra_plugins.rst). For instance,
 check out where the app imports the following {term}`Cobra` plugins:
 ```{literalinclude} ../../apps/tutorial/gps_ins.py
 :start-at: "from pntos.cobra import ("
@@ -78,7 +78,7 @@ further along in [](#plugins-overview). For now, on to the config imports.
 #### Cobra Config Imports
 
 The
-[`pntos.cobra.config`](../documentation/cobra_config.rst)
+[`pntos.cobra.config`](../autodocs/cobra_config.rst)
 submodule contains {term}`Cobra` config objects and a few utility functions relevant
 specifically to these config objects. We'll explore these more in the next section, but
 for now we need the following config objects for this GPS INS fusion app:
