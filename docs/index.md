@@ -68,6 +68,6 @@ config
 :caption: Documentation
 :hidden:
 :maxdepth: 1
-documentation/api
+autodocs/api
 cobra
 ```

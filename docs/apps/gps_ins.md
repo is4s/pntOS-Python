@@ -46,7 +46,7 @@ a plugin in an app.
 
 In this case, we need to import the {py:obj}`LoggingLevel <pntos.api.LoggingLevel>` enum
 from the API:
-```{literalinclude} ../../../apps/tutorial/gps_ins.py
+```{literalinclude} ../../apps/tutorial/gps_ins.py
 :start-at: "from pntos.api import"
 :end-at: "from pntos.api import"
 :lineno-match:
@@ -54,7 +54,7 @@ from the API:
 
 This is used for initializing the global log level of the {py:obj}`StandardLoggingPlugin
 <pntos.cobra.StandardLoggingPlugin>` later in the app:
-```{literalinclude} ../../../apps/tutorial/gps_ins.py
+```{literalinclude} ../../apps/tutorial/gps_ins.py
 :start-at: "StandardLoggingPlugin("
 :end-at: ")"
 :lineno-match:
@@ -64,9 +64,9 @@ This is used for initializing the global log level of the {py:obj}`StandardLoggi
 
 #### Cobra Plugin Imports
 
-You should only see plugin imports from the top-level of [`pntos.cobra`](../documentation/cobra_plugins.rst). For instance,
+You should only see plugin imports from the top-level of [`pntos.cobra`](../autodocs/cobra_plugins.rst). For instance,
 check out where the app imports the following {term}`Cobra` plugins:
-```{literalinclude} ../../../apps/tutorial/gps_ins.py
+```{literalinclude} ../../apps/tutorial/gps_ins.py
 :start-at: "from pntos.cobra import ("
 :end-at: ")"
 :lineno-match:
@@ -78,11 +78,11 @@ further along in [](#plugins-overview). For now, on to the config imports.
 #### Cobra Config Imports
 
 The
-[`pntos.cobra.config`](../documentation/cobra_config.rst)
+[`pntos.cobra.config`](../autodocs/cobra_config.rst)
 submodule contains {term}`Cobra` config objects and a few utility functions relevant
 specifically to these config objects. We'll explore these more in the next section, but
 for now we need the following config objects for this GPS INS fusion app:
-```{literalinclude} ../../../apps/tutorial/gps_ins.py
+```{literalinclude} ../../apps/tutorial/gps_ins.py
 :start-at: "from pntos.cobra.config import ("
 :end-at: ")"
 :lineno-match:
@@ -99,7 +99,7 @@ recorded, along with all input measurements. This log can then be used to analyz
 the solution. If this filename is not provided as a command-line argument, it defaults to
 `pntos_output.log`.
 
-```{literalinclude} ../../../apps/tutorial/gps_ins.py
+```{literalinclude} ../../apps/tutorial/gps_ins.py
 :start-at: "from pntos_python_datasets"
 :end-at: "OUTPUT_LOG"
 :lineno-match:
@@ -137,7 +137,7 @@ The conventions also provide information on creating your own config dataclasses
 ```
 
 So, with that background, we can now understand what is happening next in the app:
-```{literalinclude} ../../../apps/tutorial/gps_ins.py
+```{literalinclude} ../../apps/tutorial/gps_ins.py
 :start-at: "my_config"
 :end-at: "# End Config"
 :lineno-match:
@@ -179,7 +179,7 @@ Now we have everything we need to get our plugins running. All that's left is:
 
 #### 1. Instantiate Controller Plugin
 We can instantiate our controller plugin like so:
-```{literalinclude} ../../../apps/tutorial/gps_ins.py
+```{literalinclude} ../../apps/tutorial/gps_ins.py
 :start-at: "controller = "
 :end-before: "plugins = "
 :lineno-match:
@@ -187,7 +187,7 @@ We can instantiate our controller plugin like so:
 
 #### 2. Generate List of Plugins
 Next we can instantiate all the other plugins we want in this app and put them in a list:
-```{literalinclude} ../../../apps/tutorial/gps_ins.py
+```{literalinclude} ../../apps/tutorial/gps_ins.py
 :start-at: "plugins = "
 :end-at: "]"
 :lineno-match:
@@ -210,7 +210,7 @@ since we've got a controller plugin and a list of instantiated plugins, let's se
 start up the controller:
 
 #### 3. Call `init_plugin` on Controller
-```{literalinclude} ../../../apps/tutorial/gps_ins.py
+```{literalinclude} ../../apps/tutorial/gps_ins.py
 :start-at: "controller.init_plugin()"
 :end-at: ")"
 :lineno-match:

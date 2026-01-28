@@ -37,7 +37,7 @@ see [Environment Setup](https://pntos.pages.aspn.us/pntos-python/installation.ht
 From the project directory, you can build the docs with:
 
 ```shell
-sphinx-build --exception-on-warning docs/source/ docs/build/
+sphinx-build --exception-on-warning docs/ docs/build/
 ```
 
 Then, in a web browser, open the outputted `docs/build/index.html` file to view the documentation

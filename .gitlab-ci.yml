@@ -176,7 +176,7 @@ documentation check:
         - docker run --rm -dit -v $(pwd):/work -v $HOME/.ccache:/root/.cache/uv --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
         - docker exec pntos-python uv sync
         # Build the documentation
-        - docker exec -e TZ=UTC pntos-python sphinx-build --exception-on-warning docs/source/ docs/build/
+        - docker exec -e TZ=UTC pntos-python sphinx-build --exception-on-warning docs/ docs/build/
     artifacts:
         expose_as: "documentation"
         paths:
@@ -191,7 +191,7 @@ link check:
         - docker run --rm -dit -v $(pwd):/work -v $HOME/.ccache:/root/.cache/uv --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
         - docker exec pntos-python uv sync
         # Check external links in the documentation
-        - docker exec -e TZ=UTC pntos-python sphinx-build -b linkcheck --exception-on-warning docs/source/ docs/build/
+        - docker exec -e TZ=UTC pntos-python sphinx-build -b linkcheck --exception-on-warning docs/ docs/build/
 
 Tutorial GPS INS App:
     stage: run

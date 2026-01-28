@@ -20,7 +20,7 @@ mypy apps/standard/ --no-implicit-reexport
 mypy apps/tutorial/ --no-implicit-reexport
 source util/check_sync.sh
 ret_val=$?  # this must be set after check_sync to observe if it passed or not
-sphinx-build --exception-on-warning docs/source/ docs/build/
+sphinx-build --exception-on-warning docs/ docs/build/
 pytest pntos-cobra --cov --cov-fail-under=75 --cov-report={term,html} --cov-config=.coveragerc
 pytest apps -s
 python3 util/api_synchronization/compare_apis.py
