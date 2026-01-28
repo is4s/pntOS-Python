@@ -162,7 +162,7 @@ class AltitudeMeasurementProcessor(StandardMeasurementProcessor):
         # z = measured inertial altitude error
         z = np.array([[alt - inertial_alt]])
         H = np.zeros((1, num_states))
-        H[0, 2] = 1
+        H[0, 2] = -1
         H[0, 15] = 1
 
         def h(x: NDArray[float64]) -> NDArray[float64]:

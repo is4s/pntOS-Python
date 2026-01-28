@@ -943,7 +943,7 @@ def test_generate_model_alt(
 
     assert mm is not None
     exp_H = np.zeros((1, 16))
-    exp_H[0, 2] = 1
+    exp_H[0, 2] = -1
     exp_H[0, 15] = 1
     exp_R = np.array([[alt.variance]])
     exp_z = alt.altitude - inertial_pva.p3
@@ -982,7 +982,7 @@ def test_generate_model_alt_msl(
 
     assert mm is not None
     exp_H = np.zeros((1, 16))
-    exp_H[0, 2] = 1
+    exp_H[0, 2] = -1
     exp_H[0, 15] = 1
     exp_R = np.array([[alt.variance]])
     exp_z = hae_alt - inertial_pva.p3
@@ -1014,7 +1014,7 @@ def test_generate_model_pos_alt(
 
     assert mm is not None
     exp_H = np.zeros((1, 16))
-    exp_H[0, 2] = 1
+    exp_H[0, 2] = -1
     exp_H[0, 15] = 1
     exp_R = np.array([[pos.covariance[2, 2]]])
     exp_z = pos.term3 - inertial_pva.p3

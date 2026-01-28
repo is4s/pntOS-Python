@@ -281,7 +281,7 @@ Standard GPS INS Baro App:
     script:
         - docker run --rm -dit -v $(pwd):/work -v $HOME/.ccache:/root/.cache/uv --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
         - docker exec pntos-python uv sync
-        - docker exec pntos-python pytest apps -k test_standard_gps_ins_baro_app -s
+        - docker exec pntos-python pytest apps -k test_standard_gps_ins_baro_with_outage_app -s
 
 Standard GPS INS VSB App:
     stage: run
