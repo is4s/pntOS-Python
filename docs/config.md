@@ -187,7 +187,7 @@ support the following types:
 |                            | `float`                                                            | Accepts `int`, automatically converted                                     | `frequency: float`                      |
 |                            | `str`                                                              | N/A                                                                        | `label: str`                            |
 |                            | `bool`                                                             | N/A                                                                        | `enabled: bool`                         |
-| **Enums**                  | `Enum`                                                             | Any subclass of `Enum`                                                     | `mode: SensorMode`                      |
+| **Enums**                  | `Enum` or `IntEnum`| Any subclass of `Enum` or `IntEnum` | `mode: SensorMode`                      |
 | **EstimateWithCovariance** | {py:obj}`EstimateWithCovariance<pntos.api.EstimateWithCovariance>` | N/A                                                                        | `state: EstimateWithCovariance`         |
 | **Nested Configs**         | `BaseConfig`                                                       | Any subclass of `BaseConfig`                                               | `sensor_config: SensorConfig`           |
 | **1-D List**               | `list[T]`                                                          | `T` must be `int`, `float`, `str`, or `BaseConfig`                         | `values: list[float]`                   |

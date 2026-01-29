@@ -2,7 +2,7 @@
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from enum import Enum
+from enum import IntEnum
 from typing import Any, TypeVar
 
 from aspn23 import TypeTimestamp
@@ -13,7 +13,7 @@ from .common import CommonPlugin, EstimateWithCovariance, Message
 from .inertial import StandardInertialErrors
 
 
-class InitializationStatus(Enum):
+class InitializationStatus(IntEnum):
     """
     An enumeration that allows the user to know the initialization status.
 
@@ -46,7 +46,7 @@ class InitializationStatus(Enum):
     """The initialization process failed in some way, and may attempt to restart."""
 
 
-class InitializationMotionNeeded(Enum):
+class InitializationMotionNeeded(IntEnum):
     """
     An enumeration that specifies what type of motion is required by the initialization strategy.
 

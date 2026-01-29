@@ -3,7 +3,7 @@
 from abc import ABC, abstractmethod
 from collections.abc import Callable, ItemsView, Iterator, ValuesView
 from dataclasses import dataclass
-from enum import Enum, IntEnum
+from enum import IntEnum
 from typing import (
     TypeVar,
 )
@@ -34,7 +34,7 @@ class Message:
     source_identifier: str
 
 
-class EstimateWithCovarianceType(Enum):
+class EstimateWithCovarianceType(IntEnum):
     """Describes how the fields in :class:`pntos.api.EstimateWithCovariance` are used."""
 
     EWC_GENERIC = 0
@@ -106,7 +106,7 @@ class LoggingLevel(IntEnum):
     """
 
 
-class KeyValueStoreDataFormat(Enum):
+class KeyValueStoreDataFormat(IntEnum):
     """
     The format of data returned or expected.
 
