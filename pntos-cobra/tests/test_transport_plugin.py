@@ -77,6 +77,8 @@ def _test_handler(
 
         received_response = pva.decode(data)
 
+    assert transport_plugin.lcm is not None
+
     # Subscribe to the response channel
     transport_plugin.lcm.subscribe('pva', on_response)
 

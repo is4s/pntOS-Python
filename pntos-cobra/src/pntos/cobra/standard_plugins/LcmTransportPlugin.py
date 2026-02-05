@@ -1,4 +1,5 @@
 import threading
+import time
 from queue import Queue
 from threading import Thread
 
@@ -14,7 +15,7 @@ class LcmTransportPlugin(TransportPlugin):
     Capable of marshalling both ASPN2-LCM and ASPN23-LCM to ASPN23-Python."""
 
     identifier: str
-    lcm: LCM
+    lcm: LCM | None
     mediator: Mediator
     subscription: LCMSubscription
     handler: Thread | None
@@ -34,6 +35,7 @@ class LcmTransportPlugin(TransportPlugin):
         """
         self.identifier = identifier
         self._shutdown_threads = threading.Event()
+        self.lcm = None
         self.handler = None
         self._channels = set()
         self._output_queue = Queue()
@@ -84,6 +86,13 @@ class LcmTransportPlugin(TransportPlugin):
             if message is None:
                 break
 
+            if self.lcm is None:
+                self.mediator.log_message(
+                    LoggingLevel.WARN,
+                    'Lcm is not connected; dropping message set for broadcast.',
+                )
+                continue
+
             lcm_msg = create_lcm_message(message, self._output_version)
             if lcm_msg is None:
                 self.mediator.log_message(
@@ -108,7 +117,10 @@ class LcmTransportPlugin(TransportPlugin):
         """Call LCM.handle in a loop."""
         while not self._shutdown_threads.is_set():
             # Handle any messages that have come - restart every hundredth of a second
-            self.lcm.handle_timeout(10)
+            if self.lcm is not None:
+                self.lcm.handle_timeout(10)
+            else:
+                time.sleep(0.01)
 
     def start_listening(self) -> None:
         try:
@@ -129,7 +141,8 @@ class LcmTransportPlugin(TransportPlugin):
         self.mediator.log_message(LoggingLevel.INFO, 'LCM message handler is running.')
 
     def stop_listening(self) -> None:
-        self.lcm.unsubscribe(self.subscription)
+        if self.lcm is not None:
+            self.lcm.unsubscribe(self.subscription)
 
         # This closes the handler thread
         self._shutdown_threads.set()

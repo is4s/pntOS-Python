@@ -1,4 +1,3 @@
-import sys
 from threading import Event
 from typing import ClassVar
 
@@ -108,7 +107,5 @@ class BuscatMediator(Mediator):
                 level,
                 message,
             )
-        # This implementation shuts down pntos if an error is detected.
         if level is LoggingLevel.ERROR and self._controller_plugin is not None:
             self._logging_error_event.set()
-            sys.exit(1)
