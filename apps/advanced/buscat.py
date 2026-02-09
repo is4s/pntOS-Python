@@ -23,7 +23,7 @@ OUTPUT_LOG = sys.argv[1] if len(sys.argv) > 1 else 'pntos_output.log'
 
 # Config setup
 my_config = [
-    BuscatConfig(group='buscat', output_transport='Cobra LCM Log Transport Plugin'),
+    BuscatConfig(group='buscat', output_transports=('Cobra LCM Log Transport Plugin',)),
     LcmLogTransportConfig(
         group='config/lcm_log_transport',
         output_version=AspnVersion.V23,

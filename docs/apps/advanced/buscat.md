@@ -91,7 +91,7 @@ We can instantiate our buscat controller plugin much like the standard controlle
 ```
 
 It is important to ensure the {py:obj}`identifier<pntos.api.CommonPlugin>` for the output transport
-plugin matches the `output_transport` input in the
+plugin exists in the `output_transports` tuple input in the
 {py:obj}`BuscatConfig<pntos.cobra.config.BuscatConfig>`.
 
 That's all the configuration for the Buscat app. Now, let's look at a top-level overview of what each of the plugins in this app are contributing to the app.

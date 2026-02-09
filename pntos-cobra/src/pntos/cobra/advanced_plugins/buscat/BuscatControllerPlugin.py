@@ -174,7 +174,7 @@ class BuscatControllerPlugin(ControllerPlugin):
                 'Could not extract BuscatConfig from group "buscat". Cannot initialize Buscat controller plugin.',
             )
             return
-        BuscatMediator._output_transport = config.output_transport
+        BuscatMediator._output_transports = config.output_transports
 
         # Pass off to main control loop
         self._main()

@@ -27,7 +27,7 @@ class BuscatMediator(Mediator):
     _controller_plugin: ControllerPlugin | None = None
     _logging_error_event: Event = Event()
     registry: Registry
-    _output_transport: str
+    _output_transports: tuple[str, ...]
 
     def __init__(
         self,
@@ -63,11 +63,13 @@ class BuscatMediator(Mediator):
             channel = message.source_identifier
         else:
             channel = '/buscat/pntos' + message.source_identifier
-        self.broadcast_aspn_message(
-            message,
-            transport=self._output_transport,
-            destination_identifier=channel,
-        )
+
+        for output_transport in self._output_transports:
+            self.broadcast_aspn_message(
+                message,
+                transport=output_transport,
+                destination_identifier=channel,
+            )
 
     def broadcast_aspn_message(
         self,

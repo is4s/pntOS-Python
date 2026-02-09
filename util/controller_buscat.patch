@@ -1,5 +1,5 @@
 diff --git a/pntos-cobra/src/pntos/cobra/standard_plugins//controller/StandardControllerPlugin.py b/pntos-cobra/src/pntos/cobra/advanced_plugins//buscat/BuscatControllerPlugin.py
-index 2fdc67aa..07c0d3d7 100644
+index 2fdc67aa..f1a13e5d 100644
 --- a/pntos-cobra/src/pntos/cobra/standard_plugins//controller/StandardControllerPlugin.py
 +++ b/pntos-cobra/src/pntos/cobra/advanced_plugins//buscat/BuscatControllerPlugin.py
 @@ -6,12 +6,11 @@ from pntos.api import (
@@ -139,7 +139,7 @@ index 2fdc67aa..07c0d3d7 100644
 -        StandardMediator._buffer_time_nsec = int(config.buffer_length_sec * 1e9)
 -        if config.publish_interval is not None:
 -            StandardMediator._publish_interval_ns = int(config.publish_interval * 1e9)
-+        BuscatMediator._output_transport = config.output_transport
++        BuscatMediator._output_transports = config.output_transports
  
          # Pass off to main control loop
          self._main()
