@@ -136,7 +136,7 @@ def controller_plugin(capsys: pytest.CaptureFixture[str]) -> BuscatControllerPlu
 @pytest.fixture
 def plugin_list() -> list[CommonPlugin]:
     my_config: list[BaseConfig] = [
-        BuscatConfig(group='buscat', output_transport='Transport 1')
+        BuscatConfig(group='buscat', output_transports=('Transport 1',))
     ]
 
     return [
@@ -189,11 +189,11 @@ def test_buscat(
     assert_no_warnings_or_errors(output)  # no warnings/errors after taking control
 
     expected_output = []
-    output_transport = BuscatMediator._output_transport
+    output_transports = BuscatMediator._output_transports
     expected_output.append('Processing message from Transport 1')
-    expected_output.append(f'Publishing message from {output_transport}')
+    expected_output.append(f'Publishing message from {output_transports[0]}')
     expected_output.append('Processing message from Transport 2')
-    expected_output.append(f'Publishing message from {output_transport}')
+    expected_output.append(f'Publishing message from {output_transports[0]}')
 
     for line in output.split('\n'):
         if expected_output and line == expected_output[0]:

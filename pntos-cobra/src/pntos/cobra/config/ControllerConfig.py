@@ -30,11 +30,11 @@ class BuscatConfig(BaseConfig):
 
     Attributes:
         group (str): Inherited from BaseConfig. Registry group in which to store this config.
-        output_transport (str): Identifier of transport plugin through when to route output messages.
+        output_transport (tuple[str, ...]): Identifiers of transport plugins through which to route output messages.
     """
 
     # INHERITED FIELDS
     group: str
 
     # UNIQUE FIELDS
-    output_transport: str
+    output_transports: tuple[str, ...]
