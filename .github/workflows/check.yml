@@ -1,0 +1,317 @@
+name: Check
+
+on: [push, pull_request]
+
+env:
+  FIREHOSE_OUTPUTS_VERSION: 56f06136cdc82002f444a6b895488dce50cb167a
+
+jobs:
+    ruff-check:
+        name: ruff check
+        runs-on: ubuntu-24.04
+        steps:
+        - uses: actions/checkout@v4
+
+        - name: Set up
+          uses: ./.github/actions/setup
+
+        - name: Run ruff check
+          run: docker exec pntos-python ruff check
+
+    ruff-format:
+        name: ruff format
+        runs-on: ubuntu-24.04
+        steps:
+        - uses: actions/checkout@v4
+
+        - name: Set up
+          uses: ./.github/actions/setup
+
+        - name: Run ruff format
+          run: docker exec pntos-python ruff format --diff
+
+    pyproject-format:
+        name: pyproject format
+        runs-on: ubuntu-24.04
+        steps:
+        - uses: actions/checkout@v4
+
+        - name: Set up
+          uses: ./.github/actions/setup
+
+        - name: Run pyproject-fmt
+          run: |
+            set -xe
+            # Run the formatter to see if it produces a diff.
+            docker exec pntos-python pyproject-fmt pyproject.toml --column-width 88 --indent 4 --keep-full-version
+            docker exec pntos-python pyproject-fmt pntos-api/pyproject.toml --column-width 88 --indent 4 --keep-full-version
+            docker exec pntos-python pyproject-fmt pntos-cobra/pyproject.toml --column-width 88 --indent 4 --keep-full-version
+            # If there's a diff, fail the stage.
+            git diff --exit-code
+
+    app-synchronization:
+        name: App and orchestration synchronization
+        runs-on: ubuntu-24.04
+        steps:
+        - uses: actions/checkout@v4
+
+        - name: Set up
+          uses: ./.github/actions/setup
+
+        - name: Run app sync check
+          run: |
+            set -xe
+            docker exec pntos-python git config --global --add safe.directory /work
+            docker exec pntos-python util/check_sync.sh
+
+    api-synchronization:
+        name: API Synchronization
+        runs-on: ubuntu-24.04
+        steps:
+        - uses: actions/checkout@v4
+
+        - name: Set up
+          uses: ./.github/actions/setup
+
+        - name: Run API sync check
+          run: docker exec pntos-python util/api_synchronization/compare_apis.py
+
+    Requirements-up-to-date:
+        name: Requirements up-to-date
+        runs-on: ubuntu-24.04
+        steps:
+        - uses: actions/checkout@v4
+
+        - name: Set up
+          uses: ./.github/actions/setup
+
+        - name: Check requirements files
+          run: |
+            set -xe
+            # Generate requirements*.txt files
+            docker exec pntos-python uv export --frozen --no-dev --no-hashes -o requirements-minimal.txt
+            docker exec pntos-python uv export --frozen --no-hashes -o requirements.txt
+            # If there's still a diff, then there's unsynced changes; fail the job.
+            git diff --exit-code
+
+    Python-3_10-Test:
+        name: Python 3.10 Test
+        runs-on: ubuntu-24.04
+        steps:
+        - uses: actions/checkout@v4
+
+        - name: Set up
+          uses: ./.github/actions/setup
+
+        - name: Run tests
+          run: docker exec pntos-python pytest pntos-cobra --cov --cov-fail-under=75 --cov-report={term,html}  --cov-config=.coveragerc
+
+        - name: Save coverage report
+          uses: actions/upload-artifact@v4
+          with:
+            name: coverage-report
+            path: htmlcov/*
+
+    Python-3_13-Test:
+        name: Python 3.13 Test
+        runs-on: ubuntu-24.04
+        steps:
+        - uses: actions/checkout@v4
+
+        - name: Set up
+          uses: ./.github/actions/setup
+          with:
+            python: 3.13
+
+        - name: Run tests
+          run: docker exec pntos-python pytest pntos-cobra --cov --cov-fail-under=75 --cov-report={term,html}  --cov-config=.coveragerc
+
+    ROS-Test:
+        name: ROS Transport Tests
+        runs-on: ubuntu-24.04
+        steps:
+        - uses: actions/checkout@v4
+
+        - name: Set up
+          uses: ./.github/actions/setup
+          with:
+            python: 3.12 # 3.12 for Jazzy compatibility
+
+        - name: Run tests
+          run: |
+            set -xe
+            docker exec pntos-python git clone --depth 1 https://github.com/Open-PNT/firehose-outputs.git
+            docker exec pntos-python bash -c "cd firehose-outputs &&
+                                            git fetch --depth 1 origin $FIREHOSE_OUTPUTS_VERSION &&
+                                            git checkout $FIREHOSE_OUTPUTS_VERSION"
+            docker exec pntos-python bash -c ". firehose-outputs/ros_devel/jazzy/setup.bash &&
+                                            pytest pntos-cobra/tests/test_aspn_ros.py"
+
+    mypy:
+        runs-on: ubuntu-24.04
+        steps:
+        - uses: actions/checkout@v4
+
+        - name: Set up
+          uses: ./.github/actions/setup
+
+        - name: Run tests
+          run: |
+            set -xe
+            docker exec pntos-python mypy pntos-api --no-implicit-reexport
+            docker exec pntos-python mypy pntos-cobra --no-implicit-reexport
+            docker exec pntos-python mypy apps/advanced/ --no-implicit-reexport
+            docker exec pntos-python mypy apps/standard/ --no-implicit-reexport
+            docker exec pntos-python mypy apps/tutorial/ --no-implicit-reexport
+
+    documentation-check:
+        name: Documentation check
+        runs-on: ubuntu-24.04
+        steps:
+        - uses: actions/checkout@v4
+
+        - name: Set up
+          uses: ./.github/actions/setup
+
+        - name: Build docs
+          run: docker exec -e TZ=UTC pntos-python sphinx-build --exception-on-warning docs/ docs/build/
+
+        # On non-main pushes, archive the docs.
+        - name: Archive Docs
+          if: github.ref != 'refs/heads/main'
+          uses: actions/upload-artifact@v4
+          with:
+            name: documentation
+            path: docs/build/*
+
+        # On main pushes, upload for deployment
+        - name: Upload Pages Artifact
+          if: github.ref == 'refs/heads/main'
+          uses: actions/upload-pages-artifact@v3
+          with:
+            path: docs/build/*
+
+    link-check:
+        name: Check external links
+        runs-on: ubuntu-24.04
+        steps:
+        - uses: actions/checkout@v4
+
+        - name: Set up
+          uses: ./.github/actions/setup
+
+        - name: Build docs with external link check
+          run: docker exec -e TZ=UTC pntos-python sphinx-build -b linkcheck --exception-on-warning docs/ docs/build/
+
+    standard-and-tutorial-apps:
+        name: Run ${{ matrix.app }}
+        runs-on: ubuntu-24.04
+        strategy:
+          fail-fast: false
+          matrix:
+            app:
+              - test_dummy_app
+              - test_tutorial_pos_ins_app
+              - test_tutorial_pos_ins_vel_app
+              - test_standard_pos_ins_app
+              - test_standard_pos_ins_network_app
+              - test_standard_pos_ins_leverarm_app
+              - test_standard_pos_bodyvel_ins_app
+              - test_standard_pos_ins_vel_app
+              - test_standard_posvel_ins_app
+              - test_standard_direction_to_points_app
+              - test_standard_outage_sim_app
+              - test_standard_pos_ins_vsb_app
+              - test_standard_pos_ins_record_states
+        steps:
+        - uses: actions/checkout@v4
+
+        - name: Set up
+          uses: ./.github/actions/setup
+
+        - name: Run app
+          run: docker exec pntos-python pytest apps -k ${{ matrix.app }} -s
+
+    ROS-App:
+        name: ROS Transport App
+        runs-on: ubuntu-24.04
+        steps:
+        - uses: actions/checkout@v4
+
+        - name: Set up
+          uses: ./.github/actions/setup
+          with:
+            python: 3.12 # 3.12 for Jazzy compatibility
+
+        - name: Run app
+          run: |
+            set -xe
+            docker exec pntos-python git clone --depth 1 https://github.com/Open-PNT/firehose-outputs.git
+            docker exec pntos-python bash -c "cd firehose-outputs &&
+                                            git fetch --depth 1 origin $FIREHOSE_OUTPUTS_VERSION &&
+                                            git checkout $FIREHOSE_OUTPUTS_VERSION"
+            docker exec pntos-python bash -c ". firehose-outputs/ros_devel/jazzy/setup.bash &&
+                                            pytest apps -k test_advanced_pos_ins_ros_app -s"
+
+    pip-workflow:
+        name: Test ${{ matrix.requirements }} pip workflow
+        runs-on: ubuntu-24.04
+        strategy:
+          fail-fast: false
+          matrix:
+            requirements:
+              - requirements.txt
+              - requirements-minimal.txt
+        steps:
+        - uses: actions/checkout@v4
+
+        - name: Set up
+          uses: ./.github/actions/setup
+          with:
+            sync: false
+
+        - name: Restore pip cache
+          uses: actions/cache/restore@v4
+          with:
+            path: ~/.cache
+            key: pip-cache-${{ matrix.requirements }}-${{ hashFiles(matrix.requirements) }}
+            restore-keys: pip-cache-${{ matrix.requirements }}
+
+        - name: Install Python packages
+          run: |
+            set -xe
+            docker exec pntos-python python3 -m venv /work/.venv
+            docker exec pntos-python .venv/bin/pip install -v -r ${{ matrix.requirements }}
+
+        - name: Save pip cache
+          uses: actions/cache/save@v4
+          with:
+            path: ~/.cache
+            key: pip-cache-${{ matrix.requirements }}-${{ hashFiles(matrix.requirements) }}
+
+        - name: Run an app
+          run: docker exec pntos-python postprocessing/run_app_and_record_data.py apps/standard/pos_ins.py
+
+    Copyright:
+        name: Copyright year
+        runs-on: ubuntu-24.04
+        steps:
+        - uses: actions/checkout@v4
+
+        - name: Check copyright year
+          run: (! grep --color -i "copyright.*$(( $(date +%Y) - 1 ))" $(git ls-files))
+
+    deploy-docs:
+        if: github.ref == 'refs/heads/main'
+        needs: documentation-check
+        runs-on: ubuntu-24.04
+        permissions:
+          pages: write
+          id-token: write
+        environment:
+          name: github-pages
+          url: ${{ steps.deployment.outputs.page_url }}
+        steps:
+        - name: Deploy Documentation
+          id: deployment
+          uses: actions/deploy-pages@v4
