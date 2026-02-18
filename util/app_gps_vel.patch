@@ -1,5 +1,5 @@
 diff --git a/apps/tutorial/gps_ins.py b/apps/tutorial/gps_vel_ins.py
-index b3034afe..ed922c0e 100755
+index 8355e122..9f214962 100755
 --- a/apps/tutorial/gps_ins.py
 +++ b/apps/tutorial/gps_vel_ins.py
 @@ -16,7 +16,7 @@ from pntos.cobra import (
@@ -19,10 +19,10 @@ index b3034afe..ed922c0e 100755
      ),
      TimeAdjusterConfig(
          group='config/time_adjuster',
-@@ -123,7 +124,10 @@ my_config = [
+@@ -120,7 +121,10 @@ my_config = [
+     ),
      TimeBiasConfig(
          group='config/time_bias',
-         identifier='time_bias',
 -        channels_to_correct=('/sensor/ublox-ZED-F9T/position',),
 +        channels_to_correct=(
 +            '/sensor/ublox-ZED-F9T/position',
@@ -31,7 +31,7 @@ index b3034afe..ed922c0e 100755
          time_bias=int(0.15 * 1e9),
      ),
  ]
-@@ -145,7 +149,7 @@ plugins = [
+@@ -142,7 +146,7 @@ plugins = [
      StandardRegistryPlugin('Cobra Standard Registry Plugin', config=my_config),
      StandardPreprocessorPlugin('Cobra Standard Preprocessor Plugin'),
      UiLogPlottingPlugin('Cobra UI Logfile Plotting Plugin'),

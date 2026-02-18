@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from .BaseConfig import BaseConfig
 
@@ -50,7 +50,7 @@ class StateExtractorConfig(VirtualStateBlockConfig):
     # INHERITED FIELDS
     group: str
 
-    identifier: str
+    identifier: str = field(default='state_extractor', init=False)
 
     source: str
 

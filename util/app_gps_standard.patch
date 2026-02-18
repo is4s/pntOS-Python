@@ -1,5 +1,5 @@
 diff --git a/apps/tutorial/gps_ins.py b/apps/standard/gps_ins.py
-index b3034afe..46f2a3b2 100755
+index 8355e122..11421dd9 100755
 --- a/apps/tutorial/gps_ins.py
 +++ b/apps/standard/gps_ins.py
 @@ -2,38 +2,41 @@
@@ -52,7 +52,7 @@ index b3034afe..46f2a3b2 100755
  )
  from pntos_python_datasets import EXAMPLE_LCM_LOG
  
-@@ -45,87 +48,108 @@ C_imu_to_platform = (
+@@ -45,84 +48,103 @@ C_imu_to_platform = (
      (-0.01742059, 0.99983262, -0.00559042),
      (-0.0603517, 0.00452957, 0.9981669),
  )
@@ -132,14 +132,12 @@ index b3034afe..46f2a3b2 100755
 +        alignment_channels=('/sensor/ublox-ZED-F9T/position', '/sensor/vn-100/imu'),
 +        pinson_sb_config=PinsonStateBlockConfig(
 +            group='config/pinson_block',
-+            identifier='pinson15',
 +            label='pinson15',
 +            imu_model=imu_model,
 +        ),
 +        additional_sb_configs=(
 +            FogmStateBlockConfig(
 +                group='config/pos_fogm_block',
-+                identifier='fogm',
 +                label='pos_sensor_error',
 +                estimate_with_covariance=EstimateWithCovariance(
 +                    type=EstimateWithCovarianceType.EWC_GENERIC,
@@ -186,19 +184,16 @@ index b3034afe..46f2a3b2 100755
 +        preprocessor_configs=(
 +            ImuRotatorConfig(
 +                group='config/imu_rotator',
-+                identifier='imu_rotator',
 +                channel='/sensor/vn-100/imu',
 +                C_imu_to_platform=C_imu_to_platform,
 +            ),
 +            TimeAdjusterConfig(
 +                group='config/time_adjuster',
-+                identifier='time_adjuster',
 +                channel_to_correct='/sensor/vn-100/imu',
 +                expected_dt_nsec=int(0.01 * 1e9),
 +            ),
 +            TimeBiasConfig(
 +                group='config/time_bias',
-+                identifier='time_bias',
 +                channels_to_correct=('/sensor/ublox-ZED-F9T/position',),
 +                time_bias=int(0.15 * 1e9),
 +            ),
@@ -207,7 +202,6 @@ index b3034afe..46f2a3b2 100755
      ),
 -    TimeAdjusterConfig(
 -        group='config/time_adjuster',
--        identifier='time_adjuster',
 -        channel_to_correct='/sensor/vn-100/imu',
 -        expected_dt_nsec=int(0.01 * 1e9),
 -    ),
@@ -219,20 +213,18 @@ index b3034afe..46f2a3b2 100755
 -    ),
 -    ImuRotatorConfig(
 -        group='config/imu_rotator',
--        identifier='imu_rotator',
 -        C_imu_to_platform=C_imu_to_platform,
 -        channel='/sensor/vn-100/imu',
 -    ),
 -    TimeBiasConfig(
 -        group='config/time_bias',
--        identifier='time_bias',
 -        channels_to_correct=('/sensor/ublox-ZED-F9T/position',),
 -        time_bias=int(0.15 * 1e9),
 -    ),
  ]
  # End Config
  
-@@ -135,17 +159,18 @@ plugins = [
+@@ -132,17 +154,18 @@ plugins = [
      LcmLogTransportPlugin('Cobra LCM Log Transport Plugin'),
      EkfFusionStrategyPlugin('Cobra EKF Fusion Strategy Plugin'),
      StandardFusionPlugin('Cobra Standard Fusion Plugin'),

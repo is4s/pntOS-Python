@@ -80,7 +80,6 @@ _lever_arm = (-2.0, 3.0, 5.0)
 my_config: list[BaseConfig] = [
     PinsonStateBlockConfig(
         group='config/pinson_block',
-        identifier='pinson15',
         label='pinson15',
         imu_model=ImuConfig(
             group='config/pinson_block',
@@ -116,7 +115,6 @@ my_config: list[BaseConfig] = [
     ),
     StateExtractorConfig(
         group='config/extractor',
-        identifier='state_extractor',
         source='some_real_block',
         target='extractor',
         incoming_state_size=3,

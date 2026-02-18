@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from .BaseConfig import BaseConfig
 
@@ -32,7 +32,7 @@ class BarometerToAltitudeConfig(PreprocessorConfig):
     # INHERITED FIELDS
     group: str
 
-    identifier: str
+    identifier: str = field(default='baro_converter', init=False)
 
     # UNIQUE FIELDS
     channel: str
@@ -49,7 +49,7 @@ class DownsamplerConfig(PreprocessorConfig):
     # INHERITED FIELDS
     group: str
 
-    identifier: str
+    identifier: str = field(default='downsampler', init=False)
 
     # UNIQUE FIELDS
     channels_to_downsample: tuple[str, ...]
@@ -72,7 +72,7 @@ class ImuRotatorConfig(PreprocessorConfig):
     # INHERITED FIELDS
     group: str
 
-    identifier: str
+    identifier: str = field(default='imu_rotator', init=False)
 
     # UNIQUE FIELDS
     channel: str
@@ -97,7 +97,7 @@ class TimeAdjusterConfig(PreprocessorConfig):
     # INHERITED FIELDS
     group: str
 
-    identifier: str
+    identifier: str = field(default='time_adjuster', init=False)
 
     # UNIQUE FIELDS
     channel_to_correct: str
@@ -123,7 +123,7 @@ class TimeBiasConfig(PreprocessorConfig):
     # INHERITED FIELDS
     group: str
 
-    identifier: str
+    identifier: str = field(default='time_bias', init=False)
 
     # UNIQUE FIELDS
     channels_to_correct: tuple[str, ...]
@@ -161,6 +161,7 @@ class OutageConfig(PreprocessorConfig):
     """
 
     group: str
+    identifier: str = field(default='outage', init=False)
     channel: str
     start_time: float
     end_time: float

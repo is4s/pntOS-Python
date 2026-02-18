@@ -105,7 +105,6 @@ my_config = [
     ),
     TimeAdjusterConfig(
         group='config/time_adjuster',
-        identifier='time_adjuster',
         channel_to_correct='/sensor/vn-100/imu',
         expected_dt_nsec=int(0.01 * 1e9),
     ),
@@ -117,13 +116,11 @@ my_config = [
     ),
     ImuRotatorConfig(
         group='config/imu_rotator',
-        identifier='imu_rotator',
         C_imu_to_platform=C_imu_to_platform,
         channel='/sensor/vn-100/imu',
     ),
     TimeBiasConfig(
         group='config/time_bias',
-        identifier='time_bias',
         channels_to_correct=(
             '/sensor/ublox-ZED-F9T/position',
             '/sensor/ublox-ZED-F9T/velocity',

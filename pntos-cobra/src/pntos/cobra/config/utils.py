@@ -113,6 +113,9 @@ def config_from_registry(
     val: SupportedRegistryTypeUnion
     fail = False
     for param in conf_params:
+        if not param.init:  # field has constant value, don't set
+            continue
+
         dtype = _get_dtype(param.type)  # type: ignore[arg-type]
         if _is_type_optional(param.type) and not _exists(kv, param.name, dtype):
             out[param.name] = None

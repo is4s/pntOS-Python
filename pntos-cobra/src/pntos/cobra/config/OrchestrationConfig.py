@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from pntos.api import EstimateWithCovariance
 
@@ -54,7 +54,7 @@ class PinsonStateBlockConfig(StateBlockConfig):
     # INHERITED FIELDS
     group: str
 
-    identifier: str
+    identifier: str = field(default='pinson15', init=False)
 
     label: str
 
@@ -80,7 +80,7 @@ class FogmStateBlockConfig(StateBlockConfig):
     # INHERITED FIELDS
     group: str
 
-    identifier: str
+    identifier: str = field(default='fogm', init=False)
 
     label: str
 

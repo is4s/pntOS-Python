@@ -1,5 +1,5 @@
 diff --git a/apps/standard/gps_ins.py b/apps/standard/gps_vel_ins.py
-index 46f2a3b2..65040937 100755
+index 11421dd9..b5cff6fe 100755
 --- a/apps/standard/gps_ins.py
 +++ b/apps/standard/gps_vel_ins.py
 @@ -1,5 +1,12 @@
@@ -31,7 +31,7 @@ index 46f2a3b2..65040937 100755
          ),
      ),
      ControllerConfig(group='controller'),
-@@ -101,10 +110,10 @@ my_config = [
+@@ -99,10 +108,10 @@ my_config = [
          mp_configs=(
              SensorMeasurementProcessorConfig(
                  group='config/gps_measurement_processor',
@@ -44,7 +44,7 @@ index 46f2a3b2..65040937 100755
                  aux_channels=('INERTIAL_PVA',),
                  sensor_config=SensorConfig(
                      group='config/gp3d_state_modeling',
-@@ -113,6 +122,14 @@ my_config = [
+@@ -111,6 +120,14 @@ my_config = [
                      sensor_name='position',
                  ),
              ),
@@ -59,10 +59,10 @@ index 46f2a3b2..65040937 100755
          ),
          inertial_config=InertialConfig(
              group='config/inertial',
-@@ -144,7 +161,10 @@ my_config = [
+@@ -139,7 +156,10 @@ my_config = [
+             ),
              TimeBiasConfig(
                  group='config/time_bias',
-                 identifier='time_bias',
 -                channels_to_correct=('/sensor/ublox-ZED-F9T/position',),
 +                channels_to_correct=(
 +                    '/sensor/ublox-ZED-F9T/position',
