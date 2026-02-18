@@ -12,6 +12,8 @@ from aspn23 import (
     TypeHeader,
     TypeTimestamp,
 )
+from numpy import float64, int64, ndarray
+from numpy.typing import NDArray
 from pntos.api import (
     EstimateWithCovariance,
     EstimateWithCovarianceType,
@@ -55,11 +57,24 @@ SUPPORTED_TYPES = [
     str,
     bool,
     BaseConfig,
+    list[int],
+    list[float],
+    list[str],
+    list[BaseConfig],
+    list[list[float]],
+    list[list[int]],
     tuple[int, ...],
     tuple[str, ...],
     tuple[float, ...],
     tuple[BaseConfig, ...],
     tuple[tuple[float, ...], ...],
+    tuple[tuple[int, ...], ...],
+    NDArray[float64],  # Any-dimension array of floats (will be 1d for test)
+    NDArray[int64],  # Any-dimension array of ints (will be 1d for test)
+    ndarray[(2, 2), np.dtype[float64]],  # type: ignore[misc] # 2d array of floats
+    ndarray[(2, 2), np.dtype[int64]],  # type: ignore[misc] # 2d array of ints
+    ndarray[(2, 2, 2), np.dtype[float64]],  # type: ignore[misc] # 3d array of floats
+    ndarray[(2, 2, 2), np.dtype[int64]],  # type: ignore[misc] # 3d array of ints
     DummyEnum,
     EstimateWithCovariance,
 ]
@@ -451,7 +466,7 @@ class TestConfigUtils(unittest.TestCase):
                 assert test_val.dtype == result_val.dtype
             elif isinstance(test_val, EstimateWithCovariance):
                 self._compare_ewc(test_val, result_val)
-            elif isinstance(test_val, tuple):
+            elif isinstance(test_val, (tuple, list)):
                 assert len(test_val) > 0
                 if isinstance(test_val[0], BaseConfig):
                     for i in range(len(test_val)):
@@ -491,7 +506,15 @@ class TestConfigUtils(unittest.TestCase):
         if origin is tuple:
             val = self._create_dummy_value(get_args(in_type)[0])
             return (val, val)
-
+        if origin is list:
+            val = self._create_dummy_value(get_args(in_type)[0])
+            return [val, val]
+        if origin is np.ndarray:
+            shape, dtype = get_args(in_type)
+            val = self._create_dummy_value(get_args(dtype)[0])
+            if shape is Any:
+                shape = (2,)
+            return np.full(shape, val)
         if in_type is bool:
             return True
         if issubclass(in_type, (int, np.int_)):
@@ -531,9 +554,9 @@ class TestConfigUtils(unittest.TestCase):
         for i in range(3):
             for j, t in enumerate(SUPPORTED_TYPES):
                 dynamic_group = f'dynamic_test_{i}{j}'
-                DynConf = self._make_config('dynamic_field', t, optional=bool(i))
+                DynConf = self._make_config('dynamic_field', t, optional=bool(i))  # type: ignore[arg-type]
                 # test with dummy value when type hint is and isn't optional; test with None
-                val = self._create_dummy_value(t) if i in {0, 3} else None
+                val = self._create_dummy_value(t) if i in {0, 2} else None  # type: ignore[arg-type]
                 conf = DynConf(  # type: ignore[call-arg]
                     dynamic_field=val,
                     group=dynamic_group,

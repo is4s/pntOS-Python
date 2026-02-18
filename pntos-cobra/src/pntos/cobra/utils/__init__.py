@@ -15,6 +15,7 @@ from .conversions import (
     convert_imu_type_from_cpp as convert_imu_type_from_cpp,
     convert_imu_type_to_cpp as convert_imu_type_to_cpp,
     convert_message as convert_message,
+    convert_ndarray_to_list as convert_ndarray_to_list,
     convert_ndarray_to_tuple as convert_ndarray_to_tuple,
     convert_pva_from_cpp as convert_pva_from_cpp,
     convert_pva_to_cpp as convert_pva_to_cpp,
