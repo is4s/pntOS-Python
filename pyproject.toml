@@ -101,6 +101,7 @@ lint.per-file-ignores."internal.py" = [ "PLC0414" ]
 lint.per-file-ignores."pntos-api/*" = [ "PIE" ]
 lint.per-file-ignores."pntos-cobra/*" = [ "D" ]
 lint.per-file-ignores."postprocessing/*" = [ "D" ]
+lint.per-file-ignores."util/*" = [ "D", "F" ]
 lint.isort.combine-as-imports = true
 lint.pydocstyle.convention = "google"
 
