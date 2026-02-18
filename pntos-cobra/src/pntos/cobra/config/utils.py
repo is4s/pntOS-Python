@@ -5,6 +5,7 @@ from typing import Any, TypeVar, get_args, get_origin
 
 import numpy as np
 from navtk.filtering import ImuModel
+from numpy.typing import NDArray
 
 from pntos.api import (
     EstimateWithCovariance,
@@ -14,7 +15,7 @@ from pntos.api import (
     Mediator,
     RegistryValueTypeUnion,
 )
-from pntos.cobra.utils import convert_ndarray_to_tuple
+from pntos.cobra.utils import convert_ndarray_to_list, convert_ndarray_to_tuple
 
 from .BaseConfig import BaseConfig
 from .ImuConfig import ImuConfig
@@ -27,10 +28,12 @@ SUPPORTED_TYPES = {
     bool,
     BaseConfig,
     tuple,
+    list,
     Enum,
     EstimateWithCovariance,
+    np.ndarray,
 }
-SupportedTupleTypes = {int, float, str, BaseConfig}
+SupportedSeriesTypes = (int, float, str, BaseConfig)
 SupportedRegistryTypeUnion = (
     RegistryValueTypeUnion | tuple[Any, ...] | Enum | EstimateWithCovariance | None
 )
@@ -110,7 +113,7 @@ def config_from_registry(
     val: SupportedRegistryTypeUnion
     fail = False
     for param in conf_params:
-        dtype = _get_dtype(param)
+        dtype = _get_dtype(param.type)  # type: ignore[arg-type]
         if _is_type_optional(param.type) and not _exists(kv, param.name, dtype):
             out[param.name] = None
             continue
@@ -135,19 +138,23 @@ def config_from_registry(
             continue
 
         if isinstance(val, np.ndarray):
-            val = convert_ndarray_to_tuple(val, dtype)
+            # Numerical data series are stored in registry as numpy arrays, but config
+            # dataclass supports list, tuple, or numpy array. Convert numpy array from
+            # registry into desired dataclass type.
+            val = _convert_numerical_series(val, param.type)  # type:ignore[arg-type]
         elif isinstance(val, list):
-            val = tuple(val)
+            # String data series are stored in registry as 1-D lists, but config
+            # dataclass supports lists or tuples. Convert list to desired dataclass
+            # type.
+            val = _convert_series(val, param.type)  # type:ignore[arg-type]
+
         # Special case: enum. Convert integer back to enum type.
-        elif isclass(param.type) and issubclass(param.type, Enum):
-            val = param.type(val)
+        elif isclass(dtype) and issubclass(dtype, Enum):
+            val = dtype(val)
 
         if not _confirm_types(val, param.type):  # type: ignore[arg-type]
-            mediator.log_message(
-                LoggingLevel.ERROR,
-                f'Expected field {param.name} in {config_type} to have type '
-                + f'{param.type} but received {type(val)} from registry.',
-            )
+            mismatch_type_msg = f'config_from_registry: Field {param.name} in {config_type.__name__} has the wrong type.\n\tExpected: {param.type}\n\tReceived: {_get_verbose_type(val)}'
+            mediator.log_message(LoggingLevel.ERROR, mismatch_type_msg)
             kv.batch_end()
             return None
 
@@ -179,7 +186,7 @@ def _exists(kv: KeyValueStore, pname: str, ptype: type[Any]) -> bool:
     return True
 
 
-def _get_dtype(param: Field[Any]) -> type[Any]:
+def _get_dtype(param_type: type[Any]) -> type[Any]:
     """
     Utility function that returns the most internal data type of a field.
 
@@ -189,10 +196,10 @@ def _get_dtype(param: Field[Any]) -> type[Any]:
     Returns:
         type[Any]
     """
-    dtype = param.type
-    args = get_args(param.type)
+    dtype = param_type
+    args = get_args(param_type)
     while len(args) != 0:
-        dtype = args[0]
+        dtype = args[1] if get_origin(dtype) is np.ndarray else args[0]
         args = get_args(dtype)
     assert isinstance(dtype, type)
     return dtype
@@ -276,11 +283,11 @@ def config_to_registry(config: BaseConfig, mediator: Mediator) -> None:
 
         if isinstance(val_to_store, (tuple, list, np.ndarray)):
             if len(val_to_store) > 0:
-                # convert numerical tuples to ndarray; we only support numerical multi dimensional tuples
                 if np.issubdtype(type(val_to_store[0]), np.number) or isinstance(
                     val_to_store[0], (tuple, list, np.ndarray)
                 ):
-                    val_to_store = np.array(val_to_store, dtype=float)
+                    # convert arrays of numbers to NDArray[float64]
+                    val_to_store = np.array(val_to_store, dtype=np.float64)
                 elif isinstance(val_to_store[0], str):
                     val_to_store = list(val_to_store)
                 elif isinstance(val_to_store[0], BaseConfig):
@@ -330,33 +337,30 @@ def _validate_config_value(
         A `tuple[bool, Any]` where the first value indicates if the validation was successful and the second value
         is ``val`` or what it gets converted to.
     """
+    if _confirm_types(val, param.type):  # type: ignore[arg-type]
+        return (True, val)  # Got expected type, everything is good
+
+    # If type mismatch, log a warning and convert to expected type for the following cases:
+    #   - got int, expected float
+    #   - got list/tuple/ndarray expected list/tuple/ndarray
+    # Otherwise error and return failure.
+    mismatch_type_msg = f'config_to_registry: Field {param.name} in {config_type.__name__} has the wrong type.\n\tExpected: {param.type}\n\tReceived: {_get_verbose_type(val)}'
+    converting_msg = f'{mismatch_type_msg}\nConverting to expected type.'
     # internally convert int to float if type is supposed to be float
     if isinstance(val, int) and param.type is float:
-        mediator.log_message(
-            LoggingLevel.WARN,
-            f'Expected field {param.name} in {config_type} to have type {param.type} '
-            + f'but received {type(val)} from registry. Converting to {param.type}.',
-        )
+        mediator.log_message(LoggingLevel.WARN, converting_msg)
         val = float(val)
-    # log warning if user provided a non-tuple series
-    if isinstance(val, (list, np.ndarray)):
-        mediator.log_message(
-            LoggingLevel.WARN,
-            f'Expected field {param.name} to be a tuple but received a {type(val)}. '
-            + 'Conversion to a supported registry type will be attempted.',
-        )
-    # compare user provided type with the validated config type hint
-    if not isinstance(val, (tuple, list, np.ndarray)) and not _confirm_types(
-        val,
-        param.type,  # type: ignore[arg-type]
-    ):
-        mediator.log_message(
-            LoggingLevel.ERROR,
-            f'Expected field {param.name} in {config_type} to have type {param.type} '
-            + f'but received {type(val)} from registry.',
-        )
-        return (False, val)
-    return (True, val)
+        return (True, val)
+    if isinstance(val, (tuple, list, np.ndarray)):
+        # don't need to actually convert to expected type now, as all
+        # tuples/lists/ndarrays will be converted to the same internal type when storing
+        # in the registry.
+        mediator.log_message(LoggingLevel.WARN, converting_msg)
+        return (True, val)
+
+    # Could not convert to expected type
+    mediator.log_message(LoggingLevel.ERROR, mismatch_type_msg)
+    return (False, val)
 
 
 def _confirm_types(
@@ -375,20 +379,36 @@ def _confirm_types(
         bool
     """
 
-    def compare_tuples(tuple1: type[Any], tuple2: type[Any]) -> bool:
-        args1, args2 = (get_args(tuple1), get_args(tuple2))
+    def check_ndarray_type(actual_type: type[Any], expected_type: type[Any]) -> bool:
+        actual_dtype = get_args(actual_type)[0]
+        expected_shape, expected_dtype = get_args(expected_type)  # noqa:RUF059
+        return actual_dtype == expected_dtype  # type:ignore[no-any-return]
+
+    def check_list_type(actual_type: type[Any], expected_type: type[Any]) -> bool:
+        actual_item_type = get_args(actual_type)[0]
+        expected_item_type = get_args(expected_type)[0]
+
+        if actual_item_type == expected_item_type:
+            return True
+
+        if get_origin(actual_item_type) is list:
+            # list of lists
+            return check_list_type(actual_item_type, expected_item_type)
+
+        return False
+
+    def check_tuple_type(actual_type: type[Any], expected_type: type[Any]) -> bool:
+        args1, args2 = (get_args(actual_type), get_args(expected_type))
         for i, arg1 in enumerate(args1):
-            # if at the end of tuple2, iterate over the rest of tuple1
+            # if at the end of expected_type, iterate over the rest of actual_type
             if i < len(args2):
                 arg2 = args2[i]
             org1, org2 = (get_origin(arg1), get_origin(arg2))
             if org1 is tuple and org2 is tuple:
-                if not compare_tuples(arg1, arg2):
+                if not check_tuple_type(arg1, arg2):
                     return False
             elif org1 is None and org2 is None:
-                if arg1 == arg2:
-                    continue
-                if arg2 is Ellipsis:
+                if arg2 is Ellipsis or issubclass(arg1, arg2):
                     continue
                 return False
             elif org1 is tuple and org2 is None:
@@ -407,9 +427,12 @@ def _confirm_types(
         ret_org = get_origin(type_to_compare)
         if exp_org != ret_org:
             return False
-        # Check if expected_type is series
+        if exp_org is np.ndarray:
+            return check_ndarray_type(type_to_compare, expected_type)
+        if exp_org is list:
+            return check_list_type(type_to_compare, expected_type)
         if exp_org is tuple:
-            return compare_tuples(type_to_compare, expected_type)
+            return check_tuple_type(type_to_compare, expected_type)
 
         # Otherwise, just see if it's the same type
         return issubclass(type_to_compare, expected_type)
@@ -427,6 +450,10 @@ def _get_verbose_type(obj: SupportedRegistryTypeUnion) -> type[Any]:
     if isinstance(obj, tuple):
         inner_types = tuple(_get_verbose_type(item) for item in obj)
         return tuple[inner_types]  # type: ignore[valid-type]
+    if isinstance(obj, list):
+        return list[_get_verbose_type(obj[0])]  # type: ignore[misc,return-value]
+    if isinstance(obj, np.ndarray):
+        return np.ndarray[np.dtype[obj.dtype]]  # type: ignore[misc,no-any-return,name-defined]
     return type(obj)
 
 
@@ -461,9 +488,15 @@ def _is_type_supported(field_type: type[Any]) -> bool:
     if _is_type_optional(type_to_compare):
         type_to_compare = get_args(type_to_compare)[0]
     origin = get_origin(type_to_compare)
-    # if type is a tuple, check each type it contains
+    # if type is a tuple or list, check the type of each value it contains
+    if origin is list:
+        return _validate_list_type(type_to_compare)
     if origin is tuple:
         return _validate_tuple_type(type_to_compare)
+    if origin is np.ndarray:
+        shape, dtype = get_args(type_to_compare)  # noqa: RUF059
+        dtype = get_args(dtype)[0]
+        return dtype in (np.float64, np.int64)
     # we support lists of one of the following types: int, str, float, BaseConfig
     if origin is not None:
         return False
@@ -472,10 +505,28 @@ def _is_type_supported(field_type: type[Any]) -> bool:
     )
 
 
+def _validate_list_type(list_type: type[Any]) -> bool:
+    """
+    A recursive function that checks if the type of the input ``list`` is supported by
+    ``config_from_registry`` and ``config_to_registry``.
+
+    Args:
+        list_type (type[Any]): The list type-hint to be checked.
+
+    Returns:
+        bool
+    """
+    item_type = get_args(list_type)[0]
+    if get_origin(item_type) is list:
+        return _validate_list_type(item_type)
+
+    return issubclass(item_type, SupportedSeriesTypes)
+
+
 def _validate_tuple_type(tuple_type: type[Any], rec_call: bool = False) -> bool:
     """
-    A recursive function that checks each type of the input ``tuple`` and determines
-    if they are supported by ``config_from_registry`` and ``config_to_registry``.
+    A recursive function that checks each type of the input ``tuple`` and determines if
+    they are supported by ``config_from_registry`` and ``config_to_registry``.
 
     Args:
         tuple_type (type[Any]): The tuple type-hint to be checked.
@@ -497,7 +548,7 @@ def _validate_tuple_type(tuple_type: type[Any], rec_call: bool = False) -> bool:
                 if arg not in {int, float, Ellipsis}:
                     return False
             elif (
-                arg not in SupportedTupleTypes
+                arg not in SupportedSeriesTypes
                 and arg is not Ellipsis
                 and not issubclass(arg, BaseConfig)
             ):
@@ -505,3 +556,49 @@ def _validate_tuple_type(tuple_type: type[Any], rec_call: bool = False) -> bool:
         else:
             return False
     return True
+
+
+def _convert_numerical_series(
+    val: NDArray,  # type: ignore[type-arg]
+    output_type: type[Any],
+) -> list | tuple | NDArray:  # type: ignore[type-arg]
+    """Convert numpy array of numbers to desired type when extracting from registry.
+
+    Possible output types are:
+    - list of ints
+    - tuple of ints
+    - numpy array of ints
+    - list of floats
+    - tuple of floats
+    - numpy array of floats (No conversion necessary)
+
+    Note that these could be multidimensional arrays.
+    """
+    dtype = _get_dtype(output_type)  # type of individual values (int or float)
+    if _is_type_optional(output_type):
+        output_type = get_args(output_type)[0]
+    series_type = get_origin(output_type)
+    if series_type is list:
+        return convert_ndarray_to_list(val, dtype)
+    if series_type is tuple:
+        return convert_ndarray_to_tuple(val, dtype)
+
+    return val.astype(dtype)  # return numpy array as-is
+
+
+def _convert_series(
+    val: list[Any], output_type: type[list[Any] | tuple[Any]]
+) -> list[Any] | tuple[Any]:
+    """Convert list of values to desired type when extracting from registry.
+
+    Possible output types are:
+    - list[Any] (No conversion necessary)
+    - tuple[Any]
+    """
+    if _is_type_optional(output_type):
+        output_type = get_args(output_type)[0]
+
+    if get_origin(output_type) is tuple:
+        return tuple(val)
+
+    return val  # return list as-is

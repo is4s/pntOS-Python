@@ -410,3 +410,23 @@ def convert_ndarray_to_tuple(arr: NDArray[np.number], target_type: type[Any]) ->
     if arr.ndim == 1:
         return tuple(target_type(x) for x in arr)
     return tuple(convert_ndarray_to_tuple(sub, target_type) for sub in arr)
+
+
+def convert_ndarray_to_list(
+    arr: NDArray[np.number],  # type: ignore[type-arg]
+    target_type: type[int] | type[float],
+) -> list[float] | list[int]:
+    """
+    Convert from an NDArray with a numerical ``dtype`` to a list of ``target_type``. Multi-dimensional arrays
+    will be converted and their structure will be preserved in the output list.
+
+    Args:
+        arr (NDArray[int | float]): The array to convert.
+        target_type (type[Any]): The data type to convert to.
+
+    Returns:
+        list[``target_type``]
+    """
+    if target_type is int:
+        return arr.astype(int).tolist()  # type:ignore[no-any-return]
+    return arr.tolist()  # type:ignore[no-any-return]
