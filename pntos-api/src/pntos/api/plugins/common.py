@@ -145,7 +145,7 @@ the type on an input is the same as the returned type.
 
 Example:
     For example, :meth:`pntos.api.KeyValueStore.get_value` needs to guarantee that
-    the input and the return types are the same. Thus, :meth:`pntos.api.get_value` would
+    the input and the return types are the same. Thus, :meth:`pntos.api.KeyValueStore.get_value` would
     be a good place to use ``RegistryValueType`` in the type description::
 
         def get_value(
