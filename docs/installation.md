@@ -82,6 +82,7 @@ source .venv/bin/activate.fish
 ```
 ````
 `````
+
 <br>
 Your shell should now be inside the venv. It is recommended that you upgrade your pip to the latest:
 
@@ -105,27 +106,22 @@ If not, please see [Errata](#errata--troubleshooting) for troubleshooting help.
 
 ## Testing Your Installation
 
-If everything installed correctly, you now should be able to import classes from the API and Cobra
-modules in the Python interpreter:
+Simply run the following command to verify that installation was successful:
 
 ```shell
-    $ python
-    >>> from pntos.api import ControllerPlugin
-    >>> from pntos.cobra import StandardControllerPlugin
-    >>> StandardControllerPlugin
-    <class 'pntos.cobra.standard_plugins.controller.StandardControllerPlugin.StandardControllerPlugin'>
-    >>> ControllerPlugin
-    <class 'pntos.api.plugins.controller.ControllerPlugin'>
+python util/test_installation.py
 ```
 
-If you are able to access these classes successfully, then congratulations, you are ready to
-start using Cobra! Your next steps are to try running a sample Cobra app, or start the tutorial
-on how Cobra works. If you'd like to try running a sample app, you should head over to
-[running your first app](first_app.md). If you'd like to learn more about how Cobra works first,
-head over to the [introduction to Cobra](introduction.md).
+If successful, you should see the following output:
 
+```text
+Installation successful!
+```
 
-
+Congratulations, you are ready to start using Cobra! Your next steps are to try running a sample
+Cobra app, or start the tutorial on how Cobra works. If you'd like to try running a sample app, you
+should head over to [running your first app](first_app.md). If you'd like to learn more about how
+Cobra works first, head over to the [introduction to Cobra](introduction.md).
 
 ## Errata & Troubleshooting
 
