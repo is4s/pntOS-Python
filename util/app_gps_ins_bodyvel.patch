@@ -1,5 +1,5 @@
 diff --git a/apps/standard/gps_ins.py b/apps/standard/gps_ins_bodyvel.py
-index 46f2a3b2..4a7f3178 100755
+index 11421dd9..576f0fa4 100755
 --- a/apps/standard/gps_ins.py
 +++ b/apps/standard/gps_ins_bodyvel.py
 @@ -68,6 +68,7 @@ my_config = [
@@ -10,7 +10,7 @@ index 46f2a3b2..4a7f3178 100755
          ),
      ),
      ControllerConfig(group='controller'),
-@@ -113,6 +114,20 @@ my_config = [
+@@ -111,6 +112,20 @@ my_config = [
                      sensor_name='position',
                  ),
              ),

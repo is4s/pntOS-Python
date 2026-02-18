@@ -139,19 +139,16 @@ tutorial_config = [
     ),
     TimeAdjusterConfig(
         group='config/time_adjuster',
-        identifier='time_adjuster',
         channel_to_correct=IMU_CHANNEL,
         expected_dt_nsec=int(0.01 * 1e9),
     ),
     ImuRotatorConfig(
         group='config/imu_rotator',
-        identifier='imu_rotator',
         channel=IMU_CHANNEL,
         C_imu_to_platform=C_imu_to_platform,
     ),
     TimeBiasConfig(
         group='config/time_bias',
-        identifier='time_bias',
         channels_to_correct=(
             '/sensor/ublox-ZED-F9T/position',
             '/sensor/ublox-ZED-F9T/velocity',
@@ -168,14 +165,12 @@ standard_config = [
         alignment_channels=(GPS_CHANNEL, IMU_CHANNEL),
         pinson_sb_config=PinsonStateBlockConfig(
             group='config/pinson_block',
-            identifier='pinson15',
             label='pinson15',
             imu_model=imu_config,
         ),
         additional_sb_configs=(
             FogmStateBlockConfig(
                 group='config/pos_fogm_block',
-                identifier='fogm',
                 label='pos_sensor_error',
                 estimate_with_covariance=EstimateWithCovariance(
                     type=EstimateWithCovarianceType.EWC_GENERIC,
@@ -220,7 +215,6 @@ standard_config = [
             ),
             StateExtractorConfig(
                 group='config/extractor',
-                identifier='state_extractor',
                 source='pinson15',
                 target='pos_out',
                 incoming_state_size=15,
@@ -232,7 +226,6 @@ standard_config = [
         preprocessor_configs=(
             ImuRotatorConfig(
                 group='config/rotator',
-                identifier='imu_rotator',
                 channel=IMU_CHANNEL,
                 C_imu_to_platform=C_imu_to_platform,
             ),

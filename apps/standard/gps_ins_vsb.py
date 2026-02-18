@@ -78,14 +78,12 @@ my_config = [
         alignment_channels=('/sensor/ublox-ZED-F9T/position', '/sensor/vn-100/imu'),
         pinson_sb_config=PinsonStateBlockConfig(
             group='config/pinson_block',
-            identifier='pinson15',
             label='pinson15',
             imu_model=imu_model,
         ),
         additional_sb_configs=(
             FogmStateBlockConfig(
                 group='config/pos_fogm_block',
-                identifier='fogm',
                 label='pos_sensor_error',
                 estimate_with_covariance=EstimateWithCovariance(
                     type=EstimateWithCovarianceType.EWC_GENERIC,
@@ -143,19 +141,16 @@ my_config = [
         preprocessor_configs=(
             ImuRotatorConfig(
                 group='config/imu_rotator',
-                identifier='imu_rotator',
                 channel='/sensor/vn-100/imu',
                 C_imu_to_platform=C_imu_to_platform,
             ),
             TimeAdjusterConfig(
                 group='config/time_adjuster',
-                identifier='time_adjuster',
                 channel_to_correct='/sensor/vn-100/imu',
                 expected_dt_nsec=int(0.01 * 1e9),
             ),
             TimeBiasConfig(
                 group='config/time_bias',
-                identifier='time_bias',
                 channels_to_correct=('/sensor/ublox-ZED-F9T/position',),
                 time_bias=int(0.15 * 1e9),
             ),

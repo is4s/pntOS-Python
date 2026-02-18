@@ -19,7 +19,6 @@ from pntos.cobra.internal import ConstantStateBlock, StandardMediator
 my_config: list[BaseConfig] = [
     ConstantStateBlockConfig(
         group='constant_block',
-        identifier='constant',
         label='constant_block',
         estimate_with_covariance=EstimateWithCovariance(
             EstimateWithCovarianceType.EWC_GENERIC,
@@ -29,7 +28,6 @@ my_config: list[BaseConfig] = [
     ),
     ConstantStateBlockConfig(
         group='constant_block_with_noise',
-        identifier='constant',
         label='constant_block_with_noise',
         estimate_with_covariance=EstimateWithCovariance(
             EstimateWithCovarianceType.EWC_GENERIC,

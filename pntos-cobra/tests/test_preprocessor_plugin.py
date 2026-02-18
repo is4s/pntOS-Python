@@ -36,28 +36,24 @@ from pntos.cobra.internal import (
 
 downsampler_config = DownsamplerConfig(
     channels_to_downsample=('test1', 'test2', 'test3'),
-    identifier='downsampler',
     downsampling_factors=(2, 3, -1),
     group='test',
 )
 inertial_config = ImuRotatorConfig(
     group='/config/imu_rotator',
-    identifier='imu_rotator',
     channel='/sensor/imu',
     C_imu_to_platform=((0, 1, 0), (1, 0, 0), (0, 0, -1)),
 )
 time_adjuster_config = TimeAdjusterConfig(
     group='test',
-    identifier='time_adjuster',
     channel_to_correct='/sensor/imu',
     expected_dt_nsec=int(0.01 * 1e9),
 )
 baro_to_alt_config = BarometerToAltitudeConfig(
-    group='baro_test', identifier='baro_converter', channel='/sensor/barometer'
+    group='baro_test', channel='/sensor/barometer'
 )
 outage_config = OutageConfig(
     group='outage',
-    identifier='outage',
     channel='/sensor/imu',
     start_time=2.0,
     end_time=3.0,

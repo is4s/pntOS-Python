@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from pntos.api import EstimateWithCovariance
 
@@ -27,7 +27,7 @@ class ConstantStateBlockConfig(StateBlockConfig):
 
     # INHERITED FIELDS
     group: str
-    identifier: str
+    identifier: str = field(default='constant', init=False)
     label: str
     estimate_with_covariance: EstimateWithCovariance | None
     aux_channels: tuple[str, ...] | None = None

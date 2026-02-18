@@ -33,7 +33,6 @@ Begin by updating the import to bring in the new Orchestration plugin:
 ```diff
      TimeBiasConfig(
          group='config/time_bias',
-         identifier='time_bias',
 -        channels_to_correct=('/sensor/ublox-ZED-F9T/position',),
 +        channels_to_correct=(
 +            '/sensor/ublox-ZED-F9T/position',

@@ -192,7 +192,9 @@ class TestConfigUtils(unittest.TestCase):
 
     def test_DownsamplerConfig_to_from_registry(self) -> None:
         test_conf = DownsamplerConfig(
-            CONFIG_TEST_GROUP, 'downsampler', ('chan1', 'chan2', 'chan3'), (1, 2, 3)
+            CONFIG_TEST_GROUP,
+            channels_to_downsample=('chan1', 'chan2', 'chan3'),
+            downsampling_factors=(1, 2, 3),
         )
         # Test config_to_registry
         config_to_registry(test_conf, self.mediator)
@@ -228,7 +230,6 @@ class TestConfigUtils(unittest.TestCase):
             alignment_channels=('/sensor/ublox-ZED-F9T/position', '/sensor/vn-100/imu'),
             pinson_sb_config=PinsonStateBlockConfig(
                 group='config/pinson_block',
-                identifier='pinson15',
                 label='pinson15',
                 imu_model=ImuConfig(
                     group='config/inertial_state',
@@ -301,13 +302,11 @@ class TestConfigUtils(unittest.TestCase):
             preprocessor_configs=(
                 ImuRotatorConfig(
                     group='config/imu_rotator',
-                    identifier='imu_rotator',
                     channel='/sensor/vn-100/imu',
                     C_imu_to_platform=C_imu_to_platform,
                 ),
                 TimeAdjusterConfig(
                     group='config/time_adjuster',
-                    identifier='time_adjuster',
                     channel_to_correct='/sensor/vn-100/imu',
                     expected_dt_nsec=int(0.01 * 1e9),
                 ),

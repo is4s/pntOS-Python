@@ -19,7 +19,6 @@ from pntos.cobra.internal import ClockBiasStateBlock, StandardMediator
 my_config: list[BaseConfig] = [
     ClockBiasStateBlockConfig(
         group='clock_bias_block',
-        identifier='clock_bias',
         label='clock_bias',
         estimate_with_covariance=EstimateWithCovariance(
             EstimateWithCovarianceType.EWC_GENERIC,
