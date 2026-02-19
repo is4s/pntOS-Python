@@ -212,6 +212,11 @@ InitializationType = TypeVar(
     EwcInitializationStrategy,
     Any,
 )
+"""
+An enumeration of the types of initializers an initializer plugin could provide.
+
+"Any" is included for future compatibility.
+"""
 
 
 class InitializationPlugin(CommonPlugin, ABC):

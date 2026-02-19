@@ -33,6 +33,11 @@ PluginType = (
     | type[UiPlugin]
     | type[UtilityPlugin]
 )
+"""
+An union of all the types of plugins.
+
+Can be used by the logging plugin to print which plugin the message originated from.
+"""
 
 
 class LoggingPlugin(CommonPlugin, ABC):
@@ -55,7 +60,7 @@ class LoggingPlugin(CommonPlugin, ABC):
         Log a string to the logging plugin's sink.
 
         Args:
-            source_plugin_type (type[CommonPlugin]): Information on the plugin that sent the logout.
+            source_plugin_type (PluginType): Information on the plugin that sent the logout.
             source_plugin_identifier (str): Information on the plugin that sent the logout.
             level (LoggingLevel): The event severity.
             message (str): The string contents to be logged.

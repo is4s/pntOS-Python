@@ -115,13 +115,6 @@ nitpick_ignore = [
     # A NavToolkit class which automodule automatically tries to link to.
     ('py:class', 'ImuModel'),
     ('py:class', 'AlignBase.AlignmentStatus'),
-    ('py:class', 'PluginType'),
-    ('py:class', 'ConfigType'),
-    ('py:class', 'InertialType'),
-    ('py:class', 'InitializationType'),
-    ('py:class', 'StateModelProviderType'),
-    ('py:class', 'FusionStrategyType'),
-    ('py:class', 'FusionEngineType'),
     ('py:class', 'pathlib.Path'),
 ]
 

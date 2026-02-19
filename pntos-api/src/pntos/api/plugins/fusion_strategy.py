@@ -229,6 +229,11 @@ class StandardFusionStrategy(ABC):
 
 
 FusionStrategyType = TypeVar('FusionStrategyType', StandardFusionStrategy, Any)
+"""Enumerates the types of fusion strategies.
+
+Currently only StandardFusionStrategy is defined, but this TypeVar also includes "Any" in the type
+list for future compatibility.
+"""
 
 
 class FusionStrategyPlugin(CommonPlugin, ABC):

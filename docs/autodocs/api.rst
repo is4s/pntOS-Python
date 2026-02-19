@@ -37,3 +37,41 @@ pntOS Python API
       in the type description::
 
          def set_value(self, key: str, value: RegistryValueTypeUnion) -> None
+
+.. class:: FusionEngineType
+
+   Enumerates the types of fusion engines.
+
+   Currently only StandardFusionEngine is defined, but this TypeVar also includes "Any" in the type
+   list for future compatibility.
+
+.. class:: FusionStrategyType
+
+   Enumerates the types of fusion strategies.
+
+   Currently only StandardFusionStrategy is defined, but this TypeVar also includes "Any" in the type
+   list for future compatibility.
+
+.. class:: PluginType
+
+   An union of all the types of plugins.
+
+   Can be used by the logging plugin to print which plugin the message originated from.
+
+.. class:: InertialType
+
+   An enumeration of the types of inertials an inertial plugin could provide.
+
+   "Any" is included for future compatibility.
+
+.. class:: InitializationType
+
+   An enumeration of the types of initializers an initializer plugin could provide.
+
+   "Any" is included for future compatibility.
+
+.. class:: StateModelProviderType
+
+   An enumeration of the types of state model providers a state modeling plugin could provide.
+
+   "Any" is included for future compatibility.

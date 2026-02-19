@@ -20,6 +20,12 @@ from .BaseConfig import BaseConfig
 from .ImuConfig import ImuConfig
 
 ConfigType = TypeVar('ConfigType', bound=BaseConfig)
+"""
+The type of any class which inherits from BaseConfig.
+
+Used to tell :meth:`config_from_registry` which type of config class to attempt to get from the
+registry.
+"""
 SUPPORTED_TYPES = {
     int,
     float,
