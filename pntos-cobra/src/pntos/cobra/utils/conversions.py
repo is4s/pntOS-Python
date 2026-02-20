@@ -44,10 +44,10 @@ def convert_header_to_cpp(
     """
     return aspn23_xtensor.TypeHeader(
         message_type,
-        header.vendor_id,
-        header.device_id,
-        header.context_id,
-        header.sequence_id,
+        header.vendor_id % (2**32),
+        header.device_id % (2**64),
+        header.context_id % (2**32),
+        header.sequence_id % (2**16),
     )
 
 
