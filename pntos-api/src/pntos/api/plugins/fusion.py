@@ -522,6 +522,11 @@ class StandardFusionEngine(ABC):
 
 
 FusionEngineType = TypeVar('FusionEngineType', StandardFusionEngine, Any)
+"""Enumerates the types of fusion engines.
+
+Currently only StandardFusionEngine is defined, but this TypeVar also includes "Any" in the type
+list for future compatibility.
+"""
 
 
 class FusionPlugin(CommonPlugin, ABC):

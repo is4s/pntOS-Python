@@ -145,8 +145,8 @@ the type on an input is the same as the returned type.
 
 Example:
     For example, :meth:`pntos.api.KeyValueStore.get_value` needs to guarantee that
-    the input and the return types are the same. Thus, :meth:`pntos.api.get_value` would
-    be a good place to use ``RegistryValueType`` in the type description::
+    the input and the return types are the same. Thus, :meth:`pntos.api.KeyValueStore.get_value` would
+    be a good place to use :class:`pntos.api.RegistryValueType` in the type description::
 
         def get_value(
             self, key: str, value_type: type[RegistryValueType]
@@ -165,7 +165,7 @@ the type on an input is the same as the returned type.
 Example:
     For example, :meth:`pntos.api.KeyValueStore.set_value` does not need to guarantee that
     the input and the return type are the same since it returns `None`. Thus,
-    :meth:`pntos.api.KeyValueStore.set_value` would be a good place to use ``RegistryValueTypeUnion``
+    :meth:`pntos.api.KeyValueStore.set_value` would be a good place to use :class:`RegistryValueTypeUnion`
     in the type description::
 
         def set_value(self, key: str, value: RegistryValueTypeUnion) -> None
@@ -180,7 +180,7 @@ class KeyValueStore(ABC):
     dictionary.
 
     Each value can be looked up by an associated key (string). Values can be of
-    any type specified by ``RegistryValueType``/``RegistryValueTypeUnion``.
+    any type specified by :class:`RegistryValueType`/:class:`RegistryValueTypeUnion`.
 
     Example:
         For example, to store a string value "foo" in the key-value store under the key "k1", one
@@ -264,7 +264,7 @@ class KeyValueStore(ABC):
             value_type (type[RegistryValueType])
 
         Returns:
-            RegistryValueType | None: Returns ``None`` if the key is not available. The return is
+            :class:`pntos.api.RegistryValueType` | None: Returns ``None`` if the key is not available. The return is
             guaranteed to not be ``None`` if called with a valid key (which can be checked with
             :meth:`pntos.api.KeyValueStore.__contains__`) and if the store can convert the value to the requested type.
         """
@@ -288,7 +288,7 @@ class KeyValueStore(ABC):
             key (str)
 
         Returns:
-            RegistryValueTypeUnion | None: This is guaranteed to return a value
+            :class:`RegistryValueTypeUnion` | None: This is guaranteed to return a value
             of the same type as :meth:`get_type` returns for the given key, if
             the key exists. If :meth:`get_type` returns ``None`` (indicating
             type information is not available), then this method will only

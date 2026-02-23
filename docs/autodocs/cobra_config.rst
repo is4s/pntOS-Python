@@ -3,9 +3,15 @@
 Cobra Config
 ============
 
-These are all the objects that can be directly imported from ``pntos.cobra.config``. 
+These are all the objects that can be directly imported from ``pntos.cobra.config``.
 
 .. automodule:: pntos.cobra.config
    :private-members:
    :exclude-members: _abc_impl, _is_protocol, _is_runtime_protocol
-   
+
+.. class:: ConfigType
+
+   The type of any class which inherits from BaseConfig.
+
+   Used to tell :meth:`config_from_registry` which type of config class to attempt to get from the
+   registry.

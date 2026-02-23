@@ -350,6 +350,11 @@ class StandardInertialMechanization(CommonInertial, ABC):
 InertialType = TypeVar(
     'InertialType', StandardInertialMechanization, ExternalInertial, Any
 )
+"""
+An enumeration of the types of inertials an inertial plugin could provide.
+
+"Any" is included for future compatibility.
+"""
 
 
 class InertialPlugin(CommonPlugin, ABC):

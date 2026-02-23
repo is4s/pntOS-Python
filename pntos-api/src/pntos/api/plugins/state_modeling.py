@@ -512,6 +512,11 @@ class StandardStateModelProvider(ABC):
 StateModelProviderType = TypeVar(
     'StateModelProviderType', StandardStateModelProvider, Any
 )
+"""
+An enumeration of the types of state model providers a state modeling plugin could provide.
+
+"Any" is included for future compatibility.
+"""
 
 
 class StateModelingPlugin(CommonPlugin, ABC):
