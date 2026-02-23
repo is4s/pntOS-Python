@@ -31,6 +31,7 @@ from pntos.cobra.internal import (
     StandardRegistry,
     StateExtractor,
 )
+from scipy.linalg import block_diag
 
 
 # Test Sensor plugin
@@ -132,6 +133,19 @@ def create_state_block(label: str) -> tuple[_TestStateBlock, EstimateWithCovaria
     return sb, x_and_p
 
 
+def create_random_state_block(
+    label: str, num_states: int
+) -> tuple[_TestStateBlock, EstimateWithCovariance]:
+    sb = _TestStateBlock(label=label)
+    X0 = np.random.random((num_states, 1))
+    P0 = np.random.random((num_states, num_states))
+    x_and_p = EstimateWithCovariance(
+        type=EstimateWithCovarianceType.EWC_GENERIC, estimate=X0, covariance=P0
+    )
+
+    return sb, x_and_p
+
+
 @pytest.fixture
 def mediator() -> StandardMediator:
     registry = StandardRegistry(dummy_log)
@@ -218,3 +232,34 @@ def test_remove_state_block(fusion_engine: CobraStandardFusionEngine) -> None:
     fusion_engine.remove_state_block('sb1')
     assert fusion_engine._sb['sb2'].start_index == 0
     assert fusion_engine._sb['sb2'].stop_index == 4
+
+
+def test_gen_x_and_p(fusion_engine: CobraStandardFusionEngine) -> None:
+    # Add 2 state blocks to fusion engine with random est and cov
+    random_block1, x_and_p1 = create_random_state_block('random1', 2)
+    random_block2, x_and_p2 = create_random_state_block('random2', 3)
+    cross_cov = np.random.random((2, 3))
+    fusion_engine.add_state_block(random_block1, x_and_p1)
+    fusion_engine.add_state_block(random_block2, x_and_p2)
+    fusion_engine.set_state_block_cross_covariance('random1', 'random2', cross_cov)
+
+    # generate x and p for individual SBs
+    x_and_p1_out = fusion_engine.generate_x_and_p(['random1'])
+    assert x_and_p1_out is not None
+    assert np.allclose(x_and_p1.estimate, x_and_p1_out.estimate)
+    assert np.allclose(x_and_p1.covariance, x_and_p1_out.covariance)
+    x_and_p2_out = fusion_engine.generate_x_and_p(['random2'])
+    assert x_and_p2_out is not None
+    assert np.allclose(x_and_p2.estimate, x_and_p2_out.estimate)
+    assert np.allclose(x_and_p2.covariance, x_and_p2_out.covariance)
+
+    # generate x and p for combined SBs
+    x_and_p_both = fusion_engine.generate_x_and_p(['random1', 'random2'])
+    expected_est = np.vstack((x_and_p1.estimate, x_and_p2.estimate))
+    expected_cov = block_diag(x_and_p1.covariance, x_and_p2.covariance)
+    expected_cov[:2, 2:] = cross_cov
+    expected_cov[2:, :2] = cross_cov.T
+
+    assert x_and_p_both is not None
+    assert np.allclose(x_and_p_both.estimate, expected_est)
+    assert np.allclose(x_and_p_both.covariance, expected_cov)
