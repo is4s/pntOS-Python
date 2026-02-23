@@ -815,8 +815,23 @@ class StandardFusionEngine(api.StandardFusionEngine):
     ) -> NDArray[float64] | None:
         cov_out = np.zeros((size, size))
         num_labels = len(block_labels)
-        start_index = np.array([0, 0])
+        row0 = 0
+        col0 = 0
+        sb0_num_states = 0
+        # Example cov for 3 state blocks, A,B, C:
+        #
+        # A  A  A  AB AB AB AC AC AC
+        # A  A  A  AB AB AB AC AC AC
+        # A  A  A  AB AB AB AC AC AC
+        # AB AB AB B  B  B  BC BC BC
+        # AB AB AB B  B  B  BC BC BC
+        # AB AB AB B  B  B  BC BC BC
+        # AC AC AC BC BC BC C  C  C
+        # AC AC AC BC BC BC C  C  C
+        # AC AC AC BC BC BC C  C  C
         for i in range(num_labels):
+            row0 += sb0_num_states
+            col0 = row0
             for j in range(i, num_labels):
                 if i == j:
                     block = self.get_state_block_covariance(block_labels[i])
@@ -826,17 +841,20 @@ class StandardFusionEngine(api.StandardFusionEngine):
                     )
                 if block is None:
                     return None
-                end_index = start_index + block.shape
-                cov_out[start_index[0] : end_index[0]][
-                    :, start_index[1] : end_index[1]
-                ] = block
-                if i == j:
-                    next_index = end_index
-                else:
-                    cov_out[start_index[1] : end_index[1]][
-                        :, start_index[0] : end_index[0]
-                    ] = block.T
-            start_index = next_index
+                # If i == j:
+                #   block = cov of current state block
+                #   sb0 and sb1 refer to the same state block
+                # else:
+                #   block = cross-cov b/w state block 0 and state block 1
+                sb0_num_states, sb1_num_states = block.shape
+                row1 = row0 + sb0_num_states
+                col1 = col0 + sb1_num_states
+                cov_out[row0:row1, col0:col1] = block
+
+                if i != j:
+                    cov_out[col0:col1, row0:row1] = block.T
+
+                col0 = col1
         return cov_out
 
     def give_state_block_aux_data(
