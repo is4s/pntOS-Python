@@ -1,5 +1,5 @@
 diff --git a/pntos-cobra/src/pntos/cobra/standard_plugins//controller/StandardControllerPlugin.py b/pntos-cobra/src/pntos/cobra/advanced_plugins//buscat/BuscatControllerPlugin.py
-index 2fdc67aa..e1a55e77 100644
+index 2fdc67aa..621de1f7 100644
 --- a/pntos-cobra/src/pntos/cobra/standard_plugins//controller/StandardControllerPlugin.py
 +++ b/pntos-cobra/src/pntos/cobra/advanced_plugins//buscat/BuscatControllerPlugin.py
 @@ -6,12 +6,11 @@ from pntos.api import (
@@ -139,7 +139,7 @@ index 2fdc67aa..e1a55e77 100644
 -        config = config_from_registry(ControllerConfig, temp_mediator, 'controller')
 +        # Set the mediators' output transport
 +        temp_mediator = BuscatMediator(self.identifier, ControllerPlugin)
-+        config = config_from_registry(BuscatConfig, temp_mediator, 'buscat')
++        config = config_from_registry(BuscatConfig, temp_mediator, BuscatConfig.group)
          if config is None:
              self._log(
                  LoggingLevel.ERROR,

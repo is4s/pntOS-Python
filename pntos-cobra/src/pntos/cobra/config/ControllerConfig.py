@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from .BaseConfig import BaseConfig
 
@@ -34,8 +34,7 @@ class BuscatConfig(BaseConfig):
     """
 
     # INHERITED FIELDS
-    group: str
-    """Inherited from BaseConfig. Registry group in which to store this config."""
+    group: str = field(default='config/buscat', init=False)
 
     # UNIQUE FIELDS
     output_transports: tuple[str, ...]

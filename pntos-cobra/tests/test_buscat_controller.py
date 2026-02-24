@@ -100,7 +100,9 @@ class DummyTransportPlugin(TransportPlugin):
 
 
 @pytest.fixture
-def controller_plugin(capsys: pytest.CaptureFixture[str]) -> BuscatControllerPlugin:
+def controller_plugin(
+    capsys: pytest.CaptureFixture[str],
+) -> BuscatControllerPlugin:
     plugin = BuscatControllerPlugin('Buscat Controller Plugin')
     plugin.init_plugin()
 
@@ -109,9 +111,7 @@ def controller_plugin(capsys: pytest.CaptureFixture[str]) -> BuscatControllerPlu
 
 @pytest.fixture
 def plugin_list() -> list[CommonPlugin]:
-    my_config: list[BaseConfig] = [
-        BuscatConfig(group='buscat', output_transports=('Transport 1',))
-    ]
+    my_config: list[BaseConfig] = [BuscatConfig(output_transports=('Transport 1',))]
 
     return [
         StandardRegistryPlugin('Standard Registry Plugin', my_config),
@@ -129,7 +129,8 @@ def assert_no_warnings_or_errors(output: str) -> None:
 
 
 def test_init_plugin(
-    controller_plugin: BuscatControllerPlugin, capsys: pytest.CaptureFixture[str]
+    controller_plugin: BuscatControllerPlugin,
+    capsys: pytest.CaptureFixture[str],
 ) -> None:
     """
     Validate that controller plugin was initialized without any warnings or errors
