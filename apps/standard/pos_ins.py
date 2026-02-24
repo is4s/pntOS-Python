@@ -144,7 +144,6 @@ my_config = [
                 time_bias=int(0.15 * 1e9),
             ),
         ),
-        group='config/orchestration',
     ),
 ]
 # End Config

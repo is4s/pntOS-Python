@@ -151,7 +151,6 @@ my_config = [
                 downsampling_factors=(1,),
             ),
         ),
-        group='config/orchestration',
     ),
 ]
 # End Config

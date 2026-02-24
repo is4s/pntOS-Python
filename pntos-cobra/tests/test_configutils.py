@@ -283,13 +283,14 @@ class TestConfigUtils(unittest.TestCase):
                     expected_dt_nsec=int(0.01 * 1e9),
                 ),
             ),
-            group=CONFIG_TEST_GROUP,
         )
 
         # Verify configs survive
         config_to_registry(test_conf, self.mediator)
         result_config = config_from_registry(
-            StandardOrchestrationConfig, self.mediator, CONFIG_TEST_GROUP
+            StandardOrchestrationConfig,
+            self.mediator,
+            StandardOrchestrationConfig.group,
         )
         assert result_config is not None
         self._validate_conf_from_registry(test_conf, result_config)

@@ -209,7 +209,7 @@ class TutorialOrchestrationConfig(BaseConfig):
     The name of the velocity channel whose messages will be used for measurement updates in the fusion engine.
     """
 
-    group: str
+    group: str = field(default='config/orchestration', init=False)
 
 
 @dataclass(kw_only=True)
@@ -220,6 +220,8 @@ class StandardOrchestrationConfig(BaseConfig):
     Includes additional config groups for data that assists with instantiating core orchestration
     components such as the measurement processor and state block.
     """
+
+    group: str = field(default='config/orchestration', init=False)
 
     best_sol_channel: str
     """
@@ -304,5 +306,3 @@ class StandardOrchestrationConfig(BaseConfig):
     `publish_interval` in ControllerConfig, otherwise filter solutions may be published
     out of order.
     """
-
-    group: str

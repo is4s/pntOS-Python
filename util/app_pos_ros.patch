@@ -1,5 +1,5 @@
 diff --git a/apps/standard/pos_ins.py b/apps/advanced/pos_ins_ros.py
-index b599ba5d..48f8977d 100755
+index 701f7e6b..fff121dc 100755
 --- a/apps/standard/pos_ins.py
 +++ b/apps/advanced/pos_ins_ros.py
 @@ -1,7 +1,5 @@
@@ -102,7 +102,7 @@ index b599ba5d..48f8977d 100755
                  expected_dt_nsec=int(0.01 * 1e9),
              ),
              TimeBiasConfig(
-@@ -152,7 +136,7 @@ my_config = [
+@@ -151,7 +135,7 @@ my_config = [
  # Instantiate all of our plugins
  controller = StandardControllerPlugin('Cobra Standard Controller Plugin')
  plugins = [

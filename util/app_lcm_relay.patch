@@ -1,5 +1,5 @@
 diff --git a/apps/standard/pos_ins.py b/apps/standard/lcm_relay.py
-index b599ba5d..8a033f0e 100755
+index 701f7e6b..618e8fb5 100755
 --- a/apps/standard/pos_ins.py
 +++ b/apps/standard/lcm_relay.py
 @@ -1,7 +1,5 @@
@@ -55,7 +55,7 @@ index b599ba5d..8a033f0e 100755
      ControllerConfig(),
      FusionEngineConfig(),
      StandardOrchestrationConfig(
-@@ -152,7 +139,7 @@ my_config = [
+@@ -151,7 +138,7 @@ my_config = [
  # Instantiate all of our plugins
  controller = StandardControllerPlugin('Cobra Standard Controller Plugin')
  plugins = [

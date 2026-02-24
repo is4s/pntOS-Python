@@ -200,7 +200,6 @@ my_config = [
             ),
         ),
         max_prop_interval=1.0,
-        group='config/orchestration',
     ),
 ]
 # End Config

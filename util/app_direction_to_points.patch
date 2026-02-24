@@ -1,5 +1,5 @@
 diff --git a/apps/standard/pos_ins.py b/apps/standard/direction_to_points.py
-index b599ba5d..a94eee86 100755
+index 701f7e6b..ad710f60 100755
 --- a/apps/standard/pos_ins.py
 +++ b/apps/standard/direction_to_points.py
 @@ -24,6 +24,7 @@ from pntos.cobra import (
@@ -55,5 +55,5 @@ index b599ba5d..a94eee86 100755
 +                downsampling_factors=(1,),
 +            ),
          ),
-         group='config/orchestration',
      ),
+ ]

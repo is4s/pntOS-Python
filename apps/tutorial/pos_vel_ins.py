@@ -101,7 +101,6 @@ my_config = [
     ),
     TutorialOrchestrationConfig(
         position_channel='/sensor/ublox-ZED-F9T/position',
-        group='config/orchestration',
         velocity_channel='/sensor/ublox-ZED-F9T/velocity',
     ),
     TimeAdjusterConfig(

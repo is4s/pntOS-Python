@@ -1,5 +1,5 @@
 diff --git a/apps/standard/pos_ins.py b/apps/standard/pos_ins_leverarm.py
-index b599ba5d..5806227e 100755
+index 701f7e6b..50249f76 100755
 --- a/apps/standard/pos_ins.py
 +++ b/apps/standard/pos_ins_leverarm.py
 @@ -96,18 +96,40 @@ my_config = [

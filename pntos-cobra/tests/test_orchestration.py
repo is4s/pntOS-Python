@@ -147,7 +147,6 @@ tutorial_config = [
     ),
     TutorialOrchestrationConfig(
         position_channel=POS_CHANNEL,
-        group='config/orchestration',
     ),
     TimeAdjusterConfig(
         group='config/time_adjuster',
@@ -238,7 +237,6 @@ standard_config = [
                 C_imu_to_platform=C_imu_to_platform,
             ),
         ),
-        group='config/orchestration',
     ),
 ]
 
