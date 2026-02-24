@@ -40,12 +40,13 @@ class UiLogPlottingPlugin(UiPlugin):
         if mediator is not None:
             self.mediator = mediator
 
-        config_group = 'config/ui_logfile_plotting'
-        config = config_from_registry(UiLogPlottingConfig, self.mediator, config_group)
+        config = config_from_registry(
+            UiLogPlottingConfig, self.mediator, UiLogPlottingConfig.group
+        )
         if config is None:
             self.mediator.log_message(
                 LoggingLevel.ERROR,
-                'Unable to retrieve config from registry. No config given or incorrect config group given. Expects config group "config/ui_logfile_plotting".',
+                f'Unable to retrieve config from registry. No config given or incorrect config group given. Expects config group {UiLogPlottingConfig.group}.',
             )
             return
         self.logfile = Path(config.logfile)

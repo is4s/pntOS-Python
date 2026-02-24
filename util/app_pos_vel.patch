@@ -1,5 +1,5 @@
 diff --git a/apps/tutorial/pos_ins.py b/apps/tutorial/pos_vel_ins.py
-index 043537a3..c780b2a2 100755
+index 49e9a082..db14d812 100755
 --- a/apps/tutorial/pos_ins.py
 +++ b/apps/tutorial/pos_vel_ins.py
 @@ -17,7 +17,7 @@ from pntos.cobra import (
@@ -19,7 +19,7 @@ index 043537a3..c780b2a2 100755
      ),
      TimeAdjusterConfig(
          group='config/time_adjuster',
-@@ -120,7 +121,10 @@ my_config = [
+@@ -119,7 +120,10 @@ my_config = [
      ),
      TimeBiasConfig(
          group='config/time_bias',
@@ -31,7 +31,7 @@ index 043537a3..c780b2a2 100755
          time_bias=int(0.15 * 1e9),
      ),
  ]
-@@ -142,7 +146,7 @@ plugins = [
+@@ -141,7 +145,7 @@ plugins = [
      StandardRegistryPlugin('Cobra Standard Registry Plugin', config=my_config),
      StandardPreprocessorPlugin('Cobra Standard Preprocessor Plugin'),
      UiLogPlottingPlugin('Cobra UI Logfile Plotting Plugin'),

@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from .BaseConfig import BaseConfig
 
@@ -9,7 +9,7 @@ class UiLogPlottingConfig(BaseConfig):
     Defines the LCM or ROS log file for plotting and the solution and truth PVA channels.
     """
 
-    group: str
+    group: str = field(default='config/ui_logfile_plotting', init=False)
 
     logfile: str
     """

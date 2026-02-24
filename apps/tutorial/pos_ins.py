@@ -108,7 +108,6 @@ my_config = [
         expected_dt_nsec=int(0.01 * 1e9),
     ),
     UiLogPlottingConfig(
-        group='config/ui_logfile_plotting',
         logfile=OUTPUT_LOG,
         solution_channel='/solution/pntos/pva',
         truth_channel='/sensor/ins-d/pva',
