@@ -55,8 +55,9 @@ class LcmTransportPlugin(TransportPlugin):
         if mediator is not None:
             self.mediator = mediator
 
-        config_group = 'config/lcm_transport'
-        config = config_from_registry(LcmTransportConfig, self.mediator, config_group)
+        config = config_from_registry(
+            LcmTransportConfig, self.mediator, LcmTransportConfig.group
+        )
         if config is None:
             self.mediator.log_message(
                 LoggingLevel.ERROR,

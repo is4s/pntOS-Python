@@ -31,7 +31,7 @@ class LcmTransportConfig(BaseConfig):
         subscribe_to (str): A regex string indicating which channels to which the transport should subscribe.
     """
 
-    group: str
+    group: str = field(default='config/lcm_transport', init=False)
     output_version: AspnVersion
     url: str = 'tcpq://'
     subscribe_to: str = '^((?!pntos).)*$'

@@ -56,7 +56,7 @@ imu_model = ImuConfig(
     gyro_bias_initial_sigma=(0.003, 0.003, 0.003),
 )
 my_config = [
-    LcmTransportConfig(output_version=AspnVersion.V23, group='config/lcm_transport'),
+    LcmTransportConfig(output_version=AspnVersion.V23),
     ControllerConfig(group='controller'),
     FusionEngineConfig(),
     StandardOrchestrationConfig(
