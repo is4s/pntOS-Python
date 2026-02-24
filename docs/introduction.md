@@ -352,13 +352,6 @@ this tour:
   by the controller when this {py:obj}`Transport Plugin<pntos.api.TransportPlugin>` should stop listening to its
   data source.
 
-```{note}
-Every plugin in Python pntOS is guaranteed to have its
-{py:obj}`init_plugin()<pntos.api.CommonPlugin.init_plugin>` method called by the controller
-before any other method. Thus a {py:obj}`Mediator<pntos.api.Mediator>` is passed as a parameter to
-{py:obj}`init_plugin()<pntos.api.CommonPlugin.init_plugin>` to each and every plugin used by Python pntOS.
-```
-
 Thus, a simple example implementation of a {py:obj}`Transport Plugin<pntos.api.TransportPlugin>`
 might do the following:
 
