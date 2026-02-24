@@ -161,7 +161,7 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
             )
             return
         controller_config = config_from_registry(
-            ControllerConfig, self.mediator, 'controller'
+            ControllerConfig, self.mediator, ControllerConfig.group
         )
         if controller_config is None:
             self._log(

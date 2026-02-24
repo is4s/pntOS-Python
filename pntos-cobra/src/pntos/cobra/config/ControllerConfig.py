@@ -17,7 +17,7 @@ class ControllerConfig(BaseConfig):
     """
 
     # INHERITED FIELDS
-    group: str
+    group: str = field(default='config/controller', init=False)
 
     # UNIQUE FIELDS
     buffer_length_sec: float = 2.0

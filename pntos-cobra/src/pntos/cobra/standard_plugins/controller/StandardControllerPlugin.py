@@ -189,7 +189,9 @@ class StandardControllerPlugin(ControllerPlugin):
 
         # Extract controller-specific config
         temp_mediator = StandardMediator(self.identifier, ControllerPlugin)
-        config = config_from_registry(ControllerConfig, temp_mediator, 'controller')
+        config = config_from_registry(
+            ControllerConfig, temp_mediator, ControllerConfig.group
+        )
         if config is None:
             self._log(
                 LoggingLevel.ERROR,

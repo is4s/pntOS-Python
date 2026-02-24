@@ -85,7 +85,7 @@ my_config = [
             '/sensor/ublox-ZED-F9T/position',
         ),
     ),
-    ControllerConfig(group='controller'),
+    ControllerConfig(),
     FusionEngineConfig(save_x_and_p_after_prop=True, save_x_and_p_after_update=True),
     StandardOrchestrationConfig(
         best_sol_channel='/solution/pntos/pva',

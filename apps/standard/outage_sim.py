@@ -75,7 +75,7 @@ my_config = [
             # '/sensor/ublox-ZED-F9T/velocity', # uncomment me to use a velocity update
         ),
     ),
-    ControllerConfig(group='controller'),
+    ControllerConfig(),
     FusionEngineConfig(),
     StandardOrchestrationConfig(
         best_sol_channel='/solution/pntos/pva',

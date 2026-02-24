@@ -52,7 +52,7 @@ my_config = [
         output_file=OUTPUT_LOG,
         output_version=AspnVersion.V23,
     ),
-    ControllerConfig(group='controller'),
+    ControllerConfig(),
     FusionEngineConfig(),
     ImuConfig(
         group='config/inertial_state',

@@ -57,7 +57,7 @@ imu_model = ImuConfig(
 )
 my_config = [
     LcmTransportConfig(output_version=AspnVersion.V23),
-    ControllerConfig(group='controller'),
+    ControllerConfig(),
     FusionEngineConfig(),
     StandardOrchestrationConfig(
         best_sol_channel='/solution/pntos/pva',

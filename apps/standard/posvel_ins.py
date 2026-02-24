@@ -80,7 +80,7 @@ my_config = [
             '/sensor/ublox-ZED-F9T/pva',
         ),
     ),
-    ControllerConfig(group='controller'),
+    ControllerConfig(),
     FusionEngineConfig(),
     StandardOrchestrationConfig(
         best_sol_channel='/solution/pntos/pva',

@@ -1,5 +1,5 @@
 diff --git a/apps/standard/pos_vel_ins.py b/apps/standard/posvel_ins.py
-index 53ccc216..213b0168 100755
+index 58d4e501..067491cb 100755
 --- a/apps/standard/pos_vel_ins.py
 +++ b/apps/standard/posvel_ins.py
 @@ -1,11 +1,13 @@
@@ -35,7 +35,7 @@ index 53ccc216..213b0168 100755
 +            '/sensor/ublox-ZED-F9T/pva',
          ),
      ),
-     ControllerConfig(group='controller'),
+     ControllerConfig(),
 @@ -108,27 +109,19 @@ my_config = [
          ),
          mp_configs=(

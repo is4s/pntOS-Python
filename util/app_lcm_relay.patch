@@ -1,5 +1,5 @@
 diff --git a/apps/standard/pos_ins.py b/apps/standard/lcm_relay.py
-index d40a1834..e41f58db 100755
+index b599ba5d..8a033f0e 100755
 --- a/apps/standard/pos_ins.py
 +++ b/apps/standard/lcm_relay.py
 @@ -1,7 +1,5 @@
@@ -52,7 +52,7 @@ index d40a1834..e41f58db 100755
 -        ),
 -    ),
 +    LcmTransportConfig(output_version=AspnVersion.V23),
-     ControllerConfig(group='controller'),
+     ControllerConfig(),
      FusionEngineConfig(),
      StandardOrchestrationConfig(
 @@ -152,7 +139,7 @@ my_config = [

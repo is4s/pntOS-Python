@@ -1,5 +1,5 @@
 diff --git a/apps/standard/pos_ins.py b/apps/standard/pos_ins_bodyvel.py
-index d40a1834..231999d8 100755
+index b599ba5d..744c2864 100755
 --- a/apps/standard/pos_ins.py
 +++ b/apps/standard/pos_ins_bodyvel.py
 @@ -68,6 +68,7 @@ my_config = [
@@ -9,7 +9,7 @@ index d40a1834..231999d8 100755
 +            '/sensor/simulated/velocity',
          ),
      ),
-     ControllerConfig(group='controller'),
+     ControllerConfig(),
 @@ -112,6 +113,20 @@ my_config = [
                      sensor_name='position',
                  ),

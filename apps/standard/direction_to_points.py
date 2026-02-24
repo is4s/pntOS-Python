@@ -72,7 +72,7 @@ my_config = [
             '/sensor/simulated/directiontoknownfeature',
         ),
     ),
-    ControllerConfig(group='controller'),
+    ControllerConfig(),
     FusionEngineConfig(),
     StandardOrchestrationConfig(
         best_sol_channel='/solution/pntos/pva',

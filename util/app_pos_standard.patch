@@ -1,5 +1,5 @@
 diff --git a/apps/tutorial/pos_ins.py b/apps/standard/pos_ins.py
-index 274ae9d4..d40a1834 100755
+index ba251865..b599ba5d 100755
 --- a/apps/tutorial/pos_ins.py
 +++ b/apps/standard/pos_ins.py
 @@ -2,39 +2,42 @@
@@ -78,7 +78,7 @@ index 274ae9d4..d40a1834 100755
 +            '/sensor/ublox-ZED-F9T/position',
 +        ),
      ),
-     ControllerConfig(group='controller'),
+     ControllerConfig(),
      FusionEngineConfig(),
 -    ImuConfig(
 -        group='config/inertial_state',

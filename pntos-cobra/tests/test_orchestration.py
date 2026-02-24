@@ -171,7 +171,7 @@ tutorial_config = [
 ]
 
 standard_config = [
-    ControllerConfig(group='controller'),
+    ControllerConfig(),
     FusionEngineConfig(),
     StandardOrchestrationConfig(
         best_sol_channel=BEST_SOL_CHANNEL,
