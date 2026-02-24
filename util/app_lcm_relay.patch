@@ -1,5 +1,5 @@
 diff --git a/apps/standard/pos_ins.py b/apps/standard/lcm_relay.py
-index 11f25a0b..4d42d555 100755
+index d40a1834..4d42d555 100755
 --- a/apps/standard/pos_ins.py
 +++ b/apps/standard/lcm_relay.py
 @@ -1,7 +1,5 @@
@@ -38,7 +38,7 @@ index 11f25a0b..4d42d555 100755
  
  # Config setup
  C_imu_to_platform = (
-@@ -61,16 +56,7 @@ imu_model = ImuConfig(
+@@ -61,15 +56,7 @@ imu_model = ImuConfig(
      gyro_bias_initial_sigma=(0.003, 0.003, 0.003),
  )
  my_config = [
@@ -46,7 +46,6 @@ index 11f25a0b..4d42d555 100755
 -        input_file=EXAMPLE_LCM_LOG,
 -        output_file=OUTPUT_LOG,
 -        output_version=AspnVersion.V23,
--        group='config/lcm_log_transport',
 -        channels_to_process=(
 -            '/sensor/vn-100/imu',
 -            '/sensor/ublox-ZED-F9T/position',
@@ -56,7 +55,7 @@ index 11f25a0b..4d42d555 100755
      ControllerConfig(group='controller'),
      FusionEngineConfig(),
      StandardOrchestrationConfig(
-@@ -153,7 +139,7 @@ my_config = [
+@@ -152,7 +139,7 @@ my_config = [
  # Instantiate all of our plugins
  controller = StandardControllerPlugin('Cobra Standard Controller Plugin')
  plugins = [

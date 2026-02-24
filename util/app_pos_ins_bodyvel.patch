@@ -1,8 +1,8 @@
 diff --git a/apps/standard/pos_ins.py b/apps/standard/pos_ins_bodyvel.py
-index 11f25a0b..a70bbcb6 100755
+index d40a1834..231999d8 100755
 --- a/apps/standard/pos_ins.py
 +++ b/apps/standard/pos_ins_bodyvel.py
-@@ -69,6 +69,7 @@ my_config = [
+@@ -68,6 +68,7 @@ my_config = [
          channels_to_process=(
              '/sensor/vn-100/imu',
              '/sensor/ublox-ZED-F9T/position',
@@ -10,7 +10,7 @@ index 11f25a0b..a70bbcb6 100755
          ),
      ),
      ControllerConfig(group='controller'),
-@@ -113,6 +114,20 @@ my_config = [
+@@ -112,6 +113,20 @@ my_config = [
                      sensor_name='position',
                  ),
              ),

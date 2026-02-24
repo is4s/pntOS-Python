@@ -1,5 +1,5 @@
 diff --git a/apps/standard/pos_vel_ins.py b/apps/standard/posvel_ins.py
-index 4920cc7a..0f7f8f30 100755
+index 53ccc216..213b0168 100755
 --- a/apps/standard/pos_vel_ins.py
 +++ b/apps/standard/posvel_ins.py
 @@ -1,11 +1,13 @@
@@ -27,7 +27,7 @@ index 4920cc7a..0f7f8f30 100755
      PinsonStateBlockConfig,
      SensorConfig,
      SensorMeasurementProcessorConfig,
-@@ -77,7 +78,7 @@ my_config = [
+@@ -76,7 +77,7 @@ my_config = [
          channels_to_process=(
              '/sensor/vn-100/imu',
              '/sensor/ublox-ZED-F9T/position',
@@ -36,7 +36,7 @@ index 4920cc7a..0f7f8f30 100755
          ),
      ),
      ControllerConfig(group='controller'),
-@@ -109,27 +110,19 @@ my_config = [
+@@ -108,27 +109,19 @@ my_config = [
          ),
          mp_configs=(
              SensorMeasurementProcessorConfig(
@@ -69,7 +69,7 @@ index 4920cc7a..0f7f8f30 100755
          ),
          inertial_config=InertialConfig(
              group='config/inertial',
-@@ -158,10 +151,7 @@ my_config = [
+@@ -157,10 +150,7 @@ my_config = [
              ),
              TimeBiasConfig(
                  group='config/time_bias',

@@ -51,7 +51,6 @@ my_config = [
         input_file=EXAMPLE_LCM_LOG,
         output_file=OUTPUT_LOG,
         output_version=AspnVersion.V23,
-        group='config/lcm_log_transport',
     ),
     ControllerConfig(group='controller'),
     FusionEngineConfig(),

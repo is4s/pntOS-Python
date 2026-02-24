@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import IntEnum
 
 from .BaseConfig import BaseConfig
@@ -43,6 +43,8 @@ class LcmLogTransportConfig(BaseConfig):
     Configuration for LcmLogTransportPlugin, which processes messages from an LCM log.
     """
 
+    group: str = field(default='config/lcm_log_transport', init=False)
+
     input_file: str
     """
     The path of the LCM log to be processed.
@@ -71,4 +73,3 @@ class LcmLogTransportConfig(BaseConfig):
 
     NOTE: The default is set to True. When enabled, the output log will contain any sensor or truth channels from the input log that may be required for postprocessing.
     """
-    group: str

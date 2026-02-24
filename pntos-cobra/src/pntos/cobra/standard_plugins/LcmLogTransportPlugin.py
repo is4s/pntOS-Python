@@ -5,10 +5,7 @@ from time import time
 from lcm import LCM, Event, EventLog
 from pntos.api import LoggingLevel, Mediator, Message, TransportPlugin
 from pntos.cobra.config import LcmLogTransportConfig, config_from_registry
-from pntos.cobra.utils import (
-    create_lcm_message,
-    process_lcm_message,
-)
+from pntos.cobra.utils import create_lcm_message, process_lcm_message
 from tqdm import tqdm
 
 
@@ -46,14 +43,12 @@ class LcmLogTransportPlugin(TransportPlugin):
         if mediator is not None:
             self.mediator = mediator
 
-        config_group = 'config/lcm_log_transport'
         config = config_from_registry(
-            LcmLogTransportConfig, self.mediator, config_group
+            LcmLogTransportConfig, self.mediator, LcmLogTransportConfig.group
         )
         if config is None:
             self.mediator.log_message(
-                LoggingLevel.ERROR,
-                'Unable to retrieve config from registry.',
+                LoggingLevel.ERROR, 'Unable to retrieve config from registry.'
             )
             return
 
