@@ -235,12 +235,11 @@ would need to perform the following steps in order:
   (more on why we need to do this in a minute).
 1. Tell {py:obj}`my_transport<pntos.api.TransportPlugin>` to start listening to its network bus,
   by calling {py:obj}`my_transport.start_listening()<pntos.api.TransportPlugin.start_listening>`.
-2. Take the sensor data received from {py:obj}`my_transport<pntos.api.TransportPlugin>` and send
-  it to
-  {py:obj}`my_orchestration<pntos.api.OrchestrationPlugin>`'s
-  {py:obj}`process_pntos_message()<pntos.api.OrchestrationPlugin.process_pntos_message>`, which accepts ASPN sensor data
-  and processes it into a solution.
-3. Call {py:obj}`my_orchestration<pntos.api.OrchestrationPlugin>`'s
+2. Take the ASPN sensor data received from {py:obj}`my_transport<pntos.api.TransportPlugin>` and
+  send it to {py:obj}`my_orchestration<pntos.api.OrchestrationPlugin>`'s
+  {py:obj}`process_pntos_message()<pntos.api.OrchestrationPlugin.process_pntos_message>` via the
+  mediator, processing it into a solution.
+1. Call {py:obj}`my_orchestration<pntos.api.OrchestrationPlugin>`'s
   {py:obj}`request_solutions()<pntos.api.OrchestrationPlugin.request_solutions()>`, which asks the
   {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` to return the PNT solution it has computed
   by utilizing all previously received data from step 2.
