@@ -13,7 +13,7 @@ class ManualAlignmentConfig(BaseConfig):
 
     initial_pos: tuple[float, float, float]
     """
-    Initial latitude, longitude, and altitude of the sensor. (rad, rad, m)
+    Initial latitude, longitude, and altitude of the sensor. (rad, rad, m HAE)
     """
 
     initial_vel: tuple[float, float, float]
@@ -23,7 +23,7 @@ class ManualAlignmentConfig(BaseConfig):
 
     initial_rpy: tuple[float, float, float]
     """
-    Initial attitude expressed as Euler angles (roll, pitch, yaw).
+    Initial attitude expressed as Euler angles (roll, pitch, yaw, in radians).
     The corresponding quaternion is in the same frame as an ASPN PVA's quaternion.
     The corresponding DCM would be `C_platform_to_navigation`.
     """
@@ -55,7 +55,7 @@ class ManualAlignmentConfig(BaseConfig):
 
     initial_pos_var: tuple[float, float, float]
     """
-    The variance of the error in the initial position (rad^2, rad^2, m^2).
+    The variance of the error in the initial position in the NED frame (m^2, m^2, m^2).
     """
 
     initial_vel_var: tuple[float, float, float]
