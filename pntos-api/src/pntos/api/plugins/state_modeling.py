@@ -310,7 +310,7 @@ class StandardStateModelProvider(ABC):
     A collection of tools for modeling states and measurements.
 
     These tools are used to model the propagation and innovation of state
-    spaces using pntOS' standard fusion model. Specifically, a
+    spaces using pntOS's standard fusion model. Specifically, a
     :class:`pntos.api.StandardStateModelProvider` provides three types of tools:
 
     1. State Blocks - Define a set of states and a model for propagating those states.

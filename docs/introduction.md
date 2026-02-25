@@ -235,12 +235,11 @@ would need to perform the following steps in order:
   (more on why we need to do this in a minute).
 1. Tell {py:obj}`my_transport<pntos.api.TransportPlugin>` to start listening to its network bus,
   by calling {py:obj}`my_transport.start_listening()<pntos.api.TransportPlugin.start_listening>`.
-2. Take the sensor data received from {py:obj}`my_transport<pntos.api.TransportPlugin>` and send
-  it to
-  {py:obj}`my_orchestration<pntos.api.OrchestrationPlugin>`'s
-  {py:obj}`process_pntos_message()<pntos.api.OrchestrationPlugin.process_pntos_message>`, which accepts ASPN sensor data
-  and processes it into a solution.
-3. Call {py:obj}`my_orchestration<pntos.api.OrchestrationPlugin>`'s
+2. Take the ASPN sensor data received from {py:obj}`my_transport<pntos.api.TransportPlugin>` and
+  send it to {py:obj}`my_orchestration<pntos.api.OrchestrationPlugin>`'s
+  {py:obj}`process_pntos_message()<pntos.api.OrchestrationPlugin.process_pntos_message>` via the
+  mediator, processing it into a solution.
+1. Call {py:obj}`my_orchestration<pntos.api.OrchestrationPlugin>`'s
   {py:obj}`request_solutions()<pntos.api.OrchestrationPlugin.request_solutions()>`, which asks the
   {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` to return the PNT solution it has computed
   by utilizing all previously received data from step 2.
@@ -351,13 +350,6 @@ this tour:
 - {py:obj}`TransportPlugin.stop_listening()<pntos.api.TransportPlugin.stop_listening>`, which is called
   by the controller when this {py:obj}`Transport Plugin<pntos.api.TransportPlugin>` should stop listening to its
   data source.
-
-```{note}
-Every plugin in Python pntOS is guaranteed to have its
-{py:obj}`init_plugin()<pntos.api.CommonPlugin.init_plugin>` method called by the controller
-before any other method. Thus a {py:obj}`Mediator<pntos.api.Mediator>` is passed as a parameter to
-{py:obj}`init_plugin()<pntos.api.CommonPlugin.init_plugin>` to each and every plugin used by Python pntOS.
-```
 
 Thus, a simple example implementation of a {py:obj}`Transport Plugin<pntos.api.TransportPlugin>`
 might do the following:
