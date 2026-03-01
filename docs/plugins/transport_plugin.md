@@ -56,8 +56,8 @@ The {py:obj}`LcmLogTransportPlugin<pntos.cobra.LcmLogTransportPlugin>` utilizes 
 Communications and Marshalling (LCM)](https://lcm-proj.github.io/lcm/) protocol, reading ASPN messages from one LCM log and writing messages to another.
 
 This plugin is primarily useful for obtaining fast, postprocessed solutions, as it will run through
-all the messages in the input log as quick as possible. It is capable of ingesting both ASPN2 and
-ASPN23 messages from an LCM log and outputting messages in either version.
+all the messages in the input log as quick as possible. It is capable of ingesting
+ASPN23 messages from an LCM log.
 
 To use this plugin in your app, you just have to ensure that this plugin is included in your list of
 plugins to run, and that it's been configured by setting the

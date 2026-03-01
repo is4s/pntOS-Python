@@ -6,13 +6,13 @@ from threading import Thread
 from lcm import LCM, LCMSubscription
 from pntos.api import LoggingLevel, Mediator, Message, TransportPlugin
 from pntos.cobra.config import LcmTransportConfig, config_from_registry
-from pntos.cobra.utils import create_lcm_message, process_lcm_message
+from pntos.cobra.utils import marshal_to_aspn23_lcm, process_lcm_message
 
 
 class LcmTransportPlugin(TransportPlugin):
     """A transport plugin which listens for LCM messages.
 
-    Capable of marshalling both ASPN2-LCM and ASPN23-LCM to ASPN23-Python."""
+    Capable of marshalling ASPN23-LCM to ASPN23-Python."""
 
     identifier: str
     lcm: LCM | None
@@ -65,7 +65,6 @@ class LcmTransportPlugin(TransportPlugin):
             )
             return
 
-        self._output_version = config.output_version
         self._url = config.url
         self._subscription_regex = config.subscribe_to
 
@@ -97,7 +96,7 @@ class LcmTransportPlugin(TransportPlugin):
                 )
                 continue
 
-            lcm_msg = create_lcm_message(message, self._output_version)
+            lcm_msg = marshal_to_aspn23_lcm(message.wrapped_message)
             if lcm_msg is None:
                 self.mediator.log_message(
                     LoggingLevel.WARN,

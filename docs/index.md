@@ -44,7 +44,6 @@ apps/outage_sim
 ```{toctree}
 :caption: Advanced Apps
 :name: advanced-apps
-apps/advanced/buscat
 apps/advanced/pos_ins_ros
 ```
 

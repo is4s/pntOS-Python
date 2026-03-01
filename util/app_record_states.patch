@@ -1,5 +1,5 @@
 diff --git a/apps/standard/pos_ins.py b/apps/standard/pos_ins_record_states.py
-index 48ea5e79..a3515070 100755
+index eb98e009..7be9208c 100755
 --- a/apps/standard/pos_ins.py
 +++ b/apps/standard/pos_ins_record_states.py
 @@ -1,5 +1,18 @@
@@ -29,15 +29,15 @@ index 48ea5e79..a3515070 100755
      EkfFusionStrategyPlugin,
      LcmLogTransportPlugin,
      ManualHeadingAlignInitializationPlugin,
-@@ -24,6 +38,7 @@ from pntos.cobra import (
+@@ -23,6 +37,7 @@ from pntos.cobra import (
+ )
  from pntos.cobra.config import (
-     AspnVersion,
      ControllerConfig,
 +    FeedbackConfig,
      FogmConfig,
      FogmStateBlockConfig,
      FusionEngineConfig,
-@@ -70,7 +85,7 @@ my_config = [
+@@ -68,7 +83,7 @@ my_config = [
          ),
      ),
      ControllerConfig(),
@@ -46,7 +46,7 @@ index 48ea5e79..a3515070 100755
      StandardOrchestrationConfig(
          best_sol_channel='/solution/pntos/pva',
          imu_sol_channel='/solution/pntos-imu/pva',
-@@ -112,6 +127,9 @@ my_config = [
+@@ -110,6 +125,9 @@ my_config = [
              C_imu_to_platform=C_imu_to_platform,
              inertial_buffer_length=10.0,
          ),
@@ -56,7 +56,7 @@ index 48ea5e79..a3515070 100755
          alignment_config=ManualHeadingAlignmentConfig(
              group='config/default/alignment',
              static_time=10.0,
-@@ -158,6 +176,7 @@ plugins = [
+@@ -156,6 +174,7 @@ plugins = [
      StandardRegistryPlugin('Cobra Standard Registry Plugin', config=my_config),
      StandardPreprocessorPlugin('Cobra Standard Preprocessor Plugin'),
      StandardOrchestrationPlugin('Cobra Standard Orchestration Plugin'),

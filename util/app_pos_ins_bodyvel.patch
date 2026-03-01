@@ -1,8 +1,8 @@
 diff --git a/apps/standard/pos_ins.py b/apps/standard/pos_ins_bodyvel.py
-index 48ea5e79..b219707e 100755
+index eb98e009..df77d4e1 100755
 --- a/apps/standard/pos_ins.py
 +++ b/apps/standard/pos_ins_bodyvel.py
-@@ -32,6 +32,7 @@ from pntos.cobra.config import (
+@@ -31,6 +31,7 @@ from pntos.cobra.config import (
      InertialConfig,
      LcmLogTransportConfig,
      ManualHeadingAlignmentConfig,
@@ -10,7 +10,7 @@ index 48ea5e79..b219707e 100755
      PinsonStateBlockConfig,
      PinsonWithNedFogmPositionMPConfig,
      StandardOrchestrationConfig,
-@@ -67,6 +68,7 @@ my_config = [
+@@ -65,6 +66,7 @@ my_config = [
          channels_to_process=(
              '/sensor/vn-100/imu',
              '/sensor/ublox-ZED-F9T/position',
@@ -18,7 +18,7 @@ index 48ea5e79..b219707e 100755
          ),
      ),
      ControllerConfig(),
-@@ -104,6 +106,14 @@ my_config = [
+@@ -102,6 +104,14 @@ my_config = [
                  state_block_labels=('pinson15', 'pos_sensor_error'),
                  lever_arm=(-0.50, 0.38, -0.05),
              ),
