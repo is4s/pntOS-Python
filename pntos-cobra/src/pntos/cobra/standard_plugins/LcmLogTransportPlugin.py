@@ -5,14 +5,17 @@ from time import time
 from lcm import LCM, Event, EventLog
 from pntos.api import LoggingLevel, Mediator, Message, TransportPlugin
 from pntos.cobra.config import LcmLogTransportConfig, config_from_registry
-from pntos.cobra.utils import create_lcm_message, process_lcm_message
+from pntos.cobra.utils import (
+    marshal_to_aspn23_lcm,
+    process_lcm_message,
+)
 from tqdm import tqdm
 
 
 class LcmLogTransportPlugin(TransportPlugin):
     """A transport plugin which process LCM messages from a log.
 
-    Capable of marshalling both ASPN2-LCM and ASPN23-LCM to ASPN23-Python."""
+    Capable of marshalling ASPN23-LCM to ASPN23-Python."""
 
     identifier: str
     mediator: Mediator
@@ -52,7 +55,6 @@ class LcmLogTransportPlugin(TransportPlugin):
             )
             return
 
-        self._output_version = config.output_version
         self._input_log = EventLog(config.input_file)
         if config.output_file == config.input_file:
             self.mediator.log_message(
@@ -145,7 +147,7 @@ class LcmLogTransportPlugin(TransportPlugin):
             )
             return
 
-        lcm_msg = create_lcm_message(message, self._output_version)
+        lcm_msg = marshal_to_aspn23_lcm(message.wrapped_message)
         if lcm_msg is None:
             self.mediator.log_message(
                 LoggingLevel.WARN,

@@ -14,7 +14,6 @@ from .FusionEngineConfig import FusionEngineConfig as FusionEngineConfig
 from .ImuConfig import ImuConfig as ImuConfig
 from .InertialConfig import InertialConfig as InertialConfig
 from .LcmTransportConfig import (
-    AspnVersion as AspnVersion,
     LcmLogTransportConfig as LcmLogTransportConfig,
     LcmTransportConfig as LcmTransportConfig,
 )

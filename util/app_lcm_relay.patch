@@ -1,5 +1,5 @@
 diff --git a/apps/standard/pos_ins.py b/apps/standard/lcm_relay.py
-index 48ea5e79..329380b3 100755
+index eb98e009..c4bbc3fb 100755
 --- a/apps/standard/pos_ins.py
 +++ b/apps/standard/lcm_relay.py
 @@ -1,7 +1,5 @@
@@ -19,7 +19,7 @@ index 48ea5e79..329380b3 100755
      ManualHeadingAlignInitializationPlugin,
      StandardControllerPlugin,
      StandardFusionPlugin,
-@@ -30,7 +28,7 @@ from pntos.cobra.config import (
+@@ -29,7 +27,7 @@ from pntos.cobra.config import (
      ImuConfig,
      ImuRotatorConfig,
      InertialConfig,
@@ -28,7 +28,7 @@ index 48ea5e79..329380b3 100755
      ManualHeadingAlignmentConfig,
      PinsonStateBlockConfig,
      PinsonWithNedFogmPositionMPConfig,
-@@ -38,9 +36,6 @@ from pntos.cobra.config import (
+@@ -37,9 +35,6 @@ from pntos.cobra.config import (
      TimeAdjusterConfig,
      TimeBiasConfig,
  )
@@ -38,24 +38,23 @@ index 48ea5e79..329380b3 100755
  
  # Config setup
  C_imu_to_platform = (
-@@ -60,15 +55,7 @@ imu_model = ImuConfig(
+@@ -59,14 +54,7 @@ imu_model = ImuConfig(
      gyro_bias_initial_sigma=(0.003, 0.003, 0.003),
  )
  my_config = [
 -    LcmLogTransportConfig(
 -        input_file=EXAMPLE_LCM_LOG,
 -        output_file=OUTPUT_LOG,
--        output_version=AspnVersion.V23,
 -        channels_to_process=(
 -            '/sensor/vn-100/imu',
 -            '/sensor/ublox-ZED-F9T/position',
 -        ),
 -    ),
-+    LcmTransportConfig(output_version=AspnVersion.V23),
++    LcmTransportConfig(),
      ControllerConfig(),
      FusionEngineConfig(),
      StandardOrchestrationConfig(
-@@ -143,7 +130,7 @@ my_config = [
+@@ -141,7 +129,7 @@ my_config = [
  # Instantiate all of our plugins
  controller = StandardControllerPlugin('Cobra Standard Controller Plugin')
  plugins = [

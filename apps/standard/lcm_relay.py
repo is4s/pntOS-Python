@@ -20,7 +20,6 @@ from pntos.cobra import (
     StandardStateModelingPlugin,
 )
 from pntos.cobra.config import (
-    AspnVersion,
     ControllerConfig,
     FogmConfig,
     FogmStateBlockConfig,
@@ -55,7 +54,7 @@ imu_model = ImuConfig(
     gyro_bias_initial_sigma=(0.003, 0.003, 0.003),
 )
 my_config = [
-    LcmTransportConfig(output_version=AspnVersion.V23),
+    LcmTransportConfig(),
     ControllerConfig(),
     FusionEngineConfig(),
     StandardOrchestrationConfig(

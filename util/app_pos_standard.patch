@@ -1,8 +1,8 @@
 diff --git a/apps/tutorial/pos_ins.py b/apps/standard/pos_ins.py
-index 2ef947dd..48ea5e79 100755
+index 95655e8c..eb98e009 100755
 --- a/apps/tutorial/pos_ins.py
 +++ b/apps/standard/pos_ins.py
-@@ -2,39 +2,41 @@
+@@ -2,38 +2,40 @@
  
  import sys
  
@@ -31,7 +31,6 @@ index 2ef947dd..48ea5e79 100755
 +    StandardStateModelingPlugin,
  )
  from pntos.cobra.config import (
-     AspnVersion,
      ControllerConfig,
      FogmConfig,
 +    FogmStateBlockConfig,
@@ -53,7 +52,7 @@ index 2ef947dd..48ea5e79 100755
  )
  from pntos_python_datasets_lcm import EXAMPLE_LCM_LOG
  
-@@ -46,80 +48,94 @@ C_imu_to_platform = (
+@@ -45,79 +47,93 @@ C_imu_to_platform = (
      (-0.01742059, 0.99983262, -0.00559042),
      (-0.0603517, 0.00452957, 0.9981669),
  )
@@ -72,7 +71,6 @@ index 2ef947dd..48ea5e79 100755
      LcmLogTransportConfig(
          input_file=EXAMPLE_LCM_LOG,
          output_file=OUTPUT_LOG,
-         output_version=AspnVersion.V23,
 +        channels_to_process=(
 +            '/sensor/vn-100/imu',
 +            '/sensor/ublox-ZED-F9T/position',
@@ -214,7 +212,7 @@ index 2ef947dd..48ea5e79 100755
      ),
  ]
  # End Config
-@@ -130,17 +146,18 @@ plugins = [
+@@ -128,17 +144,18 @@ plugins = [
      LcmLogTransportPlugin('Cobra LCM Log Transport Plugin'),
      EkfFusionStrategyPlugin('Cobra EKF Fusion Strategy Plugin'),
      StandardFusionPlugin('Cobra Standard Fusion Plugin'),

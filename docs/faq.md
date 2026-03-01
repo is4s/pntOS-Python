@@ -193,16 +193,6 @@ messages and relaying or receiving them through LCM.
 
 ```
 
-```{dropdown} ASPN2 vs ASPN23
-
-ASPN23 is an updated version of ASPN2 that both defines new and redefines existing
-message contents from various {term}`PNT` sensors. For example the `MeasurementIMU`
-message used to have a different field for each accelerometer and gyroscope axis. ASPN23
-compacted these fields into two vectors of length 3, one vector for acceleration and the
-other for gyro measurements with each index being for a different axis (xyz).
-
-```
-
 ```{dropdown} How does a pntOS Message relate to ASPN and AspnBase?
 
 In pntOS-python, the {py:obj}`Message<pntos.api.Message>` class functions as a container
