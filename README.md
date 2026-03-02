@@ -1,33 +1,30 @@
-
 # pntos-python
 
-This project contains the Python pntOS API and an example implementation called Cobra.
+This project contains pntOS-Python and an example implementation called Cobra.
 
 ## Documentation
 
 For a full set of documentation, visit the hosted,
-pre-generated documentation here: [pntOS Python
+pre-generated documentation here: [pntOS-Python
 Documentation](https://pntos.pages.aspn.us/pntos-python/).
 
 Some quick references:
 
 ### Getting Started
 
-* [Installation Guide](https://pntos.pages.aspn.us/pntos-python/installation.html)
-* [Introduction to pntOS
-  Python](https://pntos.pages.aspn.us/pntos-python/introduction.html)
-* [Running Your First App](https://pntos.pages.aspn.us/pntos-python/first_app.html)
+- [Installation Guide](https://pntos.pages.aspn.us/pntos-python/installation.html)
+- [Introduction to pntOS-Python](https://pntos.pages.aspn.us/pntos-python/introduction.html)
+- [Running Your First App](https://pntos.pages.aspn.us/pntos-python/first_app.html)
 
 ### Reference
 
-* [Python pntOS API
+- [pntOS-Python
   Documentation](https://pntos.pages.aspn.us/pntos-python/documentation/api.html)
-* [Cobra Documentation](https://pntos.pages.aspn.us/pntos-python/cobra.html)
+- [Cobra Documentation](https://pntos.pages.aspn.us/pntos-python/cobra.html)
 
 ## Contributing
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md).
-
 
 ## Generating Documentation
 
