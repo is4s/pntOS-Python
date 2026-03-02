@@ -2,7 +2,7 @@
 
 In the `{workspace-root}/apps` directory, there are several off-the-shelf {term}`apps
 <App>` of increasing complexity assembled from off-the-shelf {term}`Cobra` plugins that
-serve to demonstrate the {term}`Python pntOS API` and the development process for you to
+serve to demonstrate {term}`pntOS-Python` and the development process for you to
 build your own {term}`apps <App>`. This page serves as an introduction to running an
 arbitrary {term}`Cobra` {term}`app <App>`. For more details on any particular app, refer
 to the corresponding page in the {ref}`tutorial-apps` section of the docs.
@@ -50,9 +50,10 @@ source .venv/bin/activate.fish
 ### Select an App
 
 The available apps can be found in each subfolder of the `{workspace-root}/apps`
-directory. If this is your first time with the {term}`Python pntOS API`, it is recommended you
-start with the `gps_ins` app. If you are running your own custom app, just switch
-out the paths to the off-the-shelf apps with the path to your app in the following instructions.
+directory. If this is your first time with {term}`pntOS-Python`, it is recommended you
+start with the `gps_ins` app. If you are running your own custom app, just switch out
+the paths to the off-the-shelf apps with the path to your app in the following
+instructions.
 
 The available off-the-shelf apps are in the
 {ref}`tutorial-apps` section of these docs.
@@ -127,4 +128,3 @@ postprocessing/plot_results.py pntos_output.log
 These plots should look fairly similar to the first app's plots, since the position update will be
 the dominating update. To be able to see a bigger difference, try inducing a position measurement
 outage to see the velocity update constrain the solution's drift.
-

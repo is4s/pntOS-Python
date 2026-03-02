@@ -3,17 +3,16 @@ Cobra documentation master file.
 You can adapt this file completely to your liking, but it should at least
 contain the root `toctree` directive.
 -->
-Welcome to pntOS Python's documentation
-========================================
+
+# Welcome to pntOS Python's documentation
 
 Some good places to get started:
 
-* For more information or if you are new to pntOS, see [](./introduction.md).
-* For instructions on getting pntOS-Python installed see [](./installation.md).
-* For instructions on running Cobra, see [](./first_app.md).
+- For more information or if you are new to pntOS, see [](./introduction.md).
+- For instructions on getting pntOS-Python installed see [](./installation.md).
+- For instructions on running Cobra, see [](./first_app.md).
 
-Index
-=====
+# Index
 
 ```{toctree}
 :caption: Getting Started
@@ -23,6 +22,7 @@ first_app
 
 <!-- TODO: add `dataflow` back in to this index -->
 <!-- TODO #114: add `frequent_questions` back in to this index -->
+
 ```{toctree}
 :caption: What is pntOS?
 introduction
@@ -51,9 +51,11 @@ apps/advanced/gps_ins_ros
 
 <!-- TODO #114: add `navtk` back in to this index -->
 <!-- TODO: add `troubleshooting` back in to this index -->
+
 ```{toctree}
 :caption: Reference
-aspn
+faq
+coordinate_frames
 ```
 
 ```{toctree}

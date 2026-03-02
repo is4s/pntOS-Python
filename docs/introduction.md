@@ -33,9 +33,9 @@ This project consists of the following main parts:
 While pntOS is analogous to an operating system in terms of its comprehensive scope, it is not a true
 operating system in the sense of a kernel. For more information, see {ref}`is-pntos-an-operating-system`.
 
-## High Level Overview of Python pntOS
+## High Level Overview of pntOS-Python
 
-At the top-level, the Python pntOS API defines a set of plugins that collectively: accept sensor data from various sensors,
+At the top-level, {term}`pntOS-Python` is an API that defines a set of plugins that collectively: accept sensor data from various sensors,
 perform sensor fusion on the sensor data, and finally produce a resulting navigation solution.
 This concept is illustrated below, with an example experimental setup where pntOS is receiving and processing
 data from three sensors and producing a fused navigation solution:
@@ -79,7 +79,6 @@ isolated plugins.
 The Python pntOS black box in the figure from the previous section is really a collection
 of plugins that are utilized by an app, as shown here:
 
-
 ```{image} images/pntos_overview2.png
 :align: center
 ```
@@ -92,18 +91,18 @@ Python pntOS system) and work our way through the control flow. In particular, i
 section we will walk through how:
 
 1. The {term}`App` kickstarts the system, then transfers control to the
-  {py:obj}`Controller Plugin<pntos.api.ControllerPlugin>`, passing it a list of plugins to use.
+   {py:obj}`Controller Plugin<pntos.api.ControllerPlugin>`, passing it a list of plugins to use.
 2. The {py:obj}`Controller Plugin<pntos.api.ControllerPlugin>` takes in the list of plugins and
-  wires them up to be able to communicate with each other via the
-  {py:obj}`Mediator<pntos.api.Mediator>`.
+   wires them up to be able to communicate with each other via the
+   {py:obj}`Mediator<pntos.api.Mediator>`.
 3. The {py:obj}`Transport Plugin<pntos.api.TransportPlugin>` receives data off the wire from a
-  sensor, then delivers that data to the {py:obj}`Mediator<pntos.api.Mediator>`.
+   sensor, then delivers that data to the {py:obj}`Mediator<pntos.api.Mediator>`.
 4. The {py:obj}`Mediator<pntos.api.Mediator>` routes the sensor data it receives from the
-  {py:obj}`Transport Plugin<pntos.api.TransportPlugin>` to the
-  {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>`.
+   {py:obj}`Transport Plugin<pntos.api.TransportPlugin>` to the
+   {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>`.
 5. The {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` receives the sensor data
-  and processes it into a solution, then makes the PNT solution available to anyone who calls
-  {py:obj}`OrchestrationPlugin.request_solutions()<pntos.api.OrchestrationPlugin.request_solutions()>`.
+   and processes it into a solution, then makes the PNT solution available to anyone who calls
+   {py:obj}`OrchestrationPlugin.request_solutions()<pntos.api.OrchestrationPlugin.request_solutions()>`.
 
 ### The App
 
@@ -116,11 +115,11 @@ In general, the {term}`App` is responsible for:
 3. Creating an instance of a controller plugin
 4. Creating a list of instances of other plugins to pass to the controller, as desired
 5. Calling {py:obj}`ControllerPlugin.take_control()<pntos.api.ControllerPlugin.take_control>` on the
-  controller plugin we created in `3.` to start the system. The controller plugin is passed in the
-  list of the other plugins we created in `4.`, and it is now responsible for setting up the system using them.
-  Once {py:obj}`ControllerPlugin.take_control()<pntos.api.ControllerPlugin.take_control>` is called,
-  the {term}`App`'s job is done, and the {py:obj}`Controller Plugin<pntos.api.ControllerPlugin>` coordinates
-  the pntOS system going forward.
+   controller plugin we created in `3.` to start the system. The controller plugin is passed in the
+   list of the other plugins we created in `4.`, and it is now responsible for setting up the system using them.
+   Once {py:obj}`ControllerPlugin.take_control()<pntos.api.ControllerPlugin.take_control>` is called,
+   the {term}`App`'s job is done, and the {py:obj}`Controller Plugin<pntos.api.ControllerPlugin>` coordinates
+   the pntOS system going forward.
 
 ```{note}
 One way to think of an {term}`App` is that it is a simple Python script that kicks off the system, finds the plugins and
@@ -141,12 +140,12 @@ For instructions on how to run this example app, see [Running Your First App](fi
 For the purposes of this tour, suppose we defined a new app that used five plugins of the following types:
 
 | Plugin Type          | Description                                                                                     |
-|----------------------|-------------------------------------------------------------------------------------------------|
+| -------------------- | ----------------------------------------------------------------------------------------------- |
 | Orchestration Plugin | A plugin that is given sensor data and produces a solution (i.e. via sensor fusion internally)  |
 | Transport Plugin     | A plugin that listens for sensor data from a network and converts it to ASPN format (if needed) |
 | Registry Plugin      | A plugin that stores key/value pairs, and comes pre-populated with values from a config file    |
 | Logging Plugin       | A plugin that takes errors/warnings and prints them to a log (e.g. the console)                 |
-| Controller Plugin    | A plugin that receives all the other plugins and takes over control from the App               |
+| Controller Plugin    | A plugin that receives all the other plugins and takes over control from the App                |
 
 Furthermore, suppose we wanted to use off-the-shelf Cobra plugins for the transport, registry, logging, and controller
 plugins, but wanted to implement our own sensor fusion solution in a custom
@@ -186,7 +185,6 @@ the `other_plugin_list` as the `plugins` parameter, our app is done. The rest of
 inside the {py:obj}`StandardControllerPlugin<pntos.api.ControllerPlugin>` implementation, which is the
 next stop on our tour.
 
-
 ### Understanding the Controller Plugin
 
 Once the {term}`App` has called {py:obj}`ControllerPlugin.take_control()<pntos.api.ControllerPlugin.take_control>`,
@@ -196,7 +194,6 @@ has one method on it called {py:obj}`take_control()<pntos.api.ControllerPlugin.t
 that method is all that is needed to fully implement a {py:obj}`Controller Plugin<pntos.api.ControllerPlugin>`.
 Thus, we will turn our attention towards what is required to implement
 the {py:obj}`take_control()<pntos.api.ControllerPlugin.take_control>` method.
-
 
 As a parameter,
 {py:obj}`take_control<pntos.api.ControllerPlugin.take_control>` receives a list of plugins that it is
@@ -230,19 +227,19 @@ To set up that chain of data flow, the {py:obj}`take_control()<pntos.api.Control
 would need to perform the following steps in order:
 
 0. First call {py:obj}`init_plugin()<pntos.api.CommonPlugin.init_plugin>` on both
-  {py:obj}`my_transport<pntos.api.TransportPlugin>` and
-  {py:obj}`my_orchestration<pntos.api.OrchestrationPlugin>` plugins before using them
-  (more on why we need to do this in a minute).
+   {py:obj}`my_transport<pntos.api.TransportPlugin>` and
+   {py:obj}`my_orchestration<pntos.api.OrchestrationPlugin>` plugins before using them
+   (more on why we need to do this in a minute).
 1. Tell {py:obj}`my_transport<pntos.api.TransportPlugin>` to start listening to its network bus,
-  by calling {py:obj}`my_transport.start_listening()<pntos.api.TransportPlugin.start_listening>`.
+   by calling {py:obj}`my_transport.start_listening()<pntos.api.TransportPlugin.start_listening>`.
 2. Take the ASPN sensor data received from {py:obj}`my_transport<pntos.api.TransportPlugin>` and
-  send it to {py:obj}`my_orchestration<pntos.api.OrchestrationPlugin>`'s
-  {py:obj}`process_pntos_message()<pntos.api.OrchestrationPlugin.process_pntos_message>` via the
-  mediator, processing it into a solution.
-1. Call {py:obj}`my_orchestration<pntos.api.OrchestrationPlugin>`'s
-  {py:obj}`request_solutions()<pntos.api.OrchestrationPlugin.request_solutions()>`, which asks the
-  {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` to return the PNT solution it has computed
-  by utilizing all previously received data from step 2.
+   send it to {py:obj}`my_orchestration<pntos.api.OrchestrationPlugin>`'s
+   {py:obj}`process_pntos_message()<pntos.api.OrchestrationPlugin.process_pntos_message>` via the
+   mediator, processing it into a solution.
+3. Call {py:obj}`my_orchestration<pntos.api.OrchestrationPlugin>`'s
+   {py:obj}`request_solutions()<pntos.api.OrchestrationPlugin.request_solutions()>`, which asks the
+   {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` to return the PNT solution it has computed
+   by utilizing all previously received data from step 2.
 
 ```{note}
 A few other necessary chores are omitted here for brevity.
@@ -256,7 +253,7 @@ in our hand (it was passed in as a parameter) and we can directly call the
 {py:obj}`my_orchestration.request_solutions()<pntos.api.OrchestrationPlugin.request_solutions()>` method on it. However,
 Step 2 requires us to receive data from the {py:obj}`Transport Plugin<pntos.api.TransportPlugin>` so that
 we can pass it into the {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>`'s
-  {py:obj}`process_message()<pntos.api.OrchestrationPlugin.process_pntos_message()>`. How do we do that?
+{py:obj}`process_message()<pntos.api.OrchestrationPlugin.process_pntos_message()>`. How do we do that?
 
 The answer lies in the mediator, and the {py:obj}`init_plugin()<pntos.api.CommonPlugin.init_plugin>` call in Step 0
 that we overlooked.
@@ -279,6 +276,7 @@ One way to think of the Mediator is that it is a "communications object". Every 
 object when it first starts, and from then on that plugin should use the communications object for all interactions
 with any other Python pntOS plugin.
 ```
+
 ```{note}
 Mediators are so named because they implement the computer science [mediator design
 pattern](https://en.wikipedia.org/wiki/Mediator_pattern) concept. They represent an abstraction of the
@@ -290,7 +288,6 @@ using a Mediator pattern adds complexity, it is necessary to support swappable/p
 
 Because the design of pntOS is such that all plugins must communicate with other plugins via the
 {py:obj}`Mediator<pntos.api.Mediator>`, that means that our previous figure actually should look like:
-
 
 ```{image} images/Graph_14.png
 :width: 80%
@@ -403,7 +400,6 @@ go back to waiting for data from the wire, for networked {py:obj}`Transport Plug
 
 ### A Simple Transport Plugin Example
 
-
 The {py:obj}`DummyTransportPlugin<pntos.cobra.DummyTransportPlugin>` is designed to be the simplest possible
 implementation of a {py:obj}`Transport Plugin<pntos.api.TransportPlugin>` possible to demonstrate the concepts
 above, which is why it was chosen as the transport for our [custom app](#implementing-our-own-custom-app).
@@ -424,7 +420,7 @@ it serves as a concrete example of a transport plugin that delivers data into th
 
 ```{note}
 You'll see in the implementation of `start_listening` in `DummyTransport` that a new thread is created
-to send in the zeros. This is because the Python pntOS APIs require that plugins do not block on pntOS system threads.
+to send in the zeros. This is because {term}`pntOS-Python` requires that plugins do not block on pntOS system threads.
 Since `start_listening` was called by the Python pntOS system, it is not ours to block, and so the `DummyTransport`
 creates its own thread to spin in a busy loop and call the mediator.
 ```
@@ -445,19 +441,19 @@ of the {py:obj}`take_control()<pntos.api.ControllerPlugin.take_control>`
 method as the following four steps:
 
 0. First call {py:obj}`init_plugin()<pntos.api.CommonPlugin.init_plugin>` on both
-  {py:obj}`my_transport<pntos.api.TransportPlugin>` and
-  {py:obj}`my_orchestration<pntos.api.OrchestrationPlugin>` plugins before using them.
+   {py:obj}`my_transport<pntos.api.TransportPlugin>` and
+   {py:obj}`my_orchestration<pntos.api.OrchestrationPlugin>` plugins before using them.
 1. Tell {py:obj}`my_transport<pntos.api.TransportPlugin>` to start listening to its network bus,
-  by calling {py:obj}`my_transport.start_listening()<pntos.api.TransportPlugin.start_listening>`.
+   by calling {py:obj}`my_transport.start_listening()<pntos.api.TransportPlugin.start_listening>`.
 2. Take the sensor data received from {py:obj}`my_transport<pntos.api.TransportPlugin>` and send
-  it to
-  {py:obj}`my_orchestration<pntos.api.OrchestrationPlugin>`'s
-  {py:obj}`process_pntos_message()<pntos.api.OrchestrationPlugin.process_pntos_message>`, which accepts ASPN sensor data
-  and processes it into a solution.
+   it to
+   {py:obj}`my_orchestration<pntos.api.OrchestrationPlugin>`'s
+   {py:obj}`process_pntos_message()<pntos.api.OrchestrationPlugin.process_pntos_message>`, which accepts ASPN sensor data
+   and processes it into a solution.
 3. Call {py:obj}`my_orchestration<pntos.api.OrchestrationPlugin>`'s
-  {py:obj}`request_solutions()<pntos.api.OrchestrationPlugin.request_solutions()>`, which asks the
-  {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` to return the PNT solution it has computed
-  by utilizing all previously received data from Step 2.
+   {py:obj}`request_solutions()<pntos.api.OrchestrationPlugin.request_solutions()>`, which asks the
+   {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` to return the PNT solution it has computed
+   by utilizing all previously received data from Step 2.
 
 At the time, we knew how to implement Steps 1 and 3, but didn't understand how to implement Step 2.
 Now we come back armed with knowledge of how the Transport Plugin delivers its data into the
@@ -526,6 +522,7 @@ is similar to the approach we've described above, namely:
   ```
 
 <!-- TODO: Break out TutorialXPlugin plugins, and dont use the Simple plugins here, which don't track what we're trying to do -->
+
 ```{note}
 
 Because all data passing between plugins are sent through one or more
@@ -593,7 +590,7 @@ to us:
   parameters a _list_ of times and string descriptions, so that the controller may ask for a solution
   at multiple times and of multiple types all at once.
 
-```{note}
+````{note}
 The {py:obj}`OrchestrationPlugin.request_solutions<pntos.api.OrchestrationPlugin.request_solutions>` method has some
 complicated parameters in order to handle advanced real-world use cases (for example, needing to return a set of
 times that are reset-free, for delta poses). However, using it is pretty straightforward if you just want
@@ -607,7 +604,7 @@ and the time `t` as a length=1 `List` for the `solution_times` parameter. e.g.
   # Ask the orchestration plugin for the best solution it has at time=`nsecs`
   my_orchestration_plugin.request_solutions(solution_times=[aspn.TypeTimestamp(nsecs)],
                                             filter_description="BEST")
-```
+````
 
 In most Python pntOS systems, an {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` will receive a stream
 of data from repeated calls to its {py:obj}`process_pntos_message<pntos.api.OrchestrationPlugin.process_pntos_message>`
@@ -639,7 +636,6 @@ multi-model adaptive estimation (MMAE) multi-filter approaches that include inte
 
 In our {term}`App`, we were interested in our own custom `MyOrchestrationPlugin`. The outline of the
 simplest possible {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` would look like this:
-
 
 ```Python
 from aspn23 import TypeTimestamp
@@ -774,6 +770,7 @@ for the sake of simplicity, but any real implementation should follow the conven
 ```
 
 Which leaves us with two last methods:
+
 ```Python
 def init_plugin(
     self,
@@ -842,11 +839,11 @@ and how an orchestration plugin produces solutions from the sensor data it has r
 Here are some next steps we recommend people move to after finishing the tour, depending on what they would like
 to try next:
 
-| Link                    | Description                                                                                                     |
-| ----------------------- | --------------------------------------------------------------------------------------------------------------- |
-| [](./plugins.md)        | Explore the {term}`Python pntOS API` plugins in greater detail, as well as their {term}`Cobra` implementations. |
-| [](./installation.md)   | Installation instructions for getting started with {term}`Cobra`.                                               |
-| [](./first_app.md)      | Instructions for running your first {term}`Cobra` tutorial {term}`App`.                                         |
-| {ref}`tutorial-apps`    | Explore the {term}`Cobra` tutorial apps.                                                                        |
-| {ref}`pntos_python_api` | Explore the {term}`Python pntOS API` documentation.                                                             |
-| [](./cobra.md)          | Explore the {term}`Cobra` documentation.                                                                        |
+| Link                    | Description                                                                                             |
+| ----------------------- | ------------------------------------------------------------------------------------------------------- |
+| [](./plugins.md)        | Explore {term}`pntOS-Python` plugins in greater detail, as well as their {term}`Cobra` implementations. |
+| [](./installation.md)   | Installation instructions for getting started with {term}`Cobra`.                                       |
+| [](./first_app.md)      | Instructions for running your first {term}`Cobra` tutorial {term}`App`.                                 |
+| {ref}`tutorial-apps`    | Explore the {term}`Cobra` tutorial apps.                                                                |
+| {ref}`pntos_python_api` | Explore {term}`pntOS-Python` documentation.                                                             |
+| [](./cobra.md)          | Explore the {term}`Cobra` documentation.                                                                |
