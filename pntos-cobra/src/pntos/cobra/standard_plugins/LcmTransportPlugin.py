@@ -111,7 +111,12 @@ class LcmTransportPlugin(TransportPlugin):
                 )
 
     def _general_handler(self, channel: str, data: bytes) -> None:
-        process_lcm_message(self.mediator, channel, data, self._channels)
+        try:
+            process_lcm_message(self.mediator, channel, data, self._channels)
+        except ValueError as e:
+            self.mediator.log_message(
+                LoggingLevel.WARN, f'Failed to process lcm message: {e}'
+            )
 
     def _handler_thread(self) -> None:
         """Call LCM.handle in a loop."""
