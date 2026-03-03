@@ -253,14 +253,23 @@ def process_lcm_message(
         )
         return
 
-    lcm_aspn_msg = decode_aspn_lcm_msg(data)
+    try:
+        lcm_aspn_msg = decode_aspn_lcm_msg(data)
+    except ValueError as e:
+        mediator.log_message(LoggingLevel.WARN, f'Failed to decode lcm message: {e}')
+
     if lcm_aspn_msg is None:
         mediator.log_message(
             LoggingLevel.WARN,
             f'Cannot decode message on channel {channel}. Ignoring message.',
         )
         return
-    aspn_msg = marshal_from_lcm(lcm_aspn_msg)
+
+    try:
+        aspn_msg = marshal_from_lcm(lcm_aspn_msg)
+    except ValueError as e:
+        mediator.log_message(LoggingLevel.WARN, f'Failed to marshal lcm message: {e}')
+
     if aspn_msg is None:
         mediator.log_message(
             LoggingLevel.WARN,
