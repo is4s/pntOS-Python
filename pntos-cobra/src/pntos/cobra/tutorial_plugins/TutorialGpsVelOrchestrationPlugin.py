@@ -302,7 +302,7 @@ class TutorialGpsVelOrchestrationPlugin(OrchestrationPlugin):
 
         self.mediator.log_message(
             LoggingLevel.INFO,
-            f'Aligned filter at {self.fusion_engine.time}.',
+            f'Aligned filter at {self.fusion_engine.time.elapsed_nsec * 1e-9:.9f}s',
         )
 
     def _get_best_solution(self, time: TypeTimestamp) -> Message:
