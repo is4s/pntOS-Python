@@ -124,7 +124,7 @@ class EkfFusionStrategy(StandardFusionStrategy):
     def set_estimate_slice(
         self, new_estimate: NDArray[np.float64], first_index: int
     ) -> None:
-        validate_array(new_estimate, self._mediator, 'new_estiamte', dims=2, cols=1)
+        validate_array(new_estimate, self._mediator, 'new_estimate', dims=2, cols=1)
 
         n = new_estimate.shape[0]
         if first_index + n > self._num_states:
@@ -192,7 +192,7 @@ class EkfFusionStrategy(StandardFusionStrategy):
         # Propagate the state: x_new = g(x_old)
         self._x = dynamics_model.g(self._x)
 
-        # Propagate the covaraince (P_new = Phi * P * Phi^T + Qd)
+        # Propagate the covariance (P_new = Phi * P * Phi^T + Qd)
         self._P = (
             dynamics_model.Phi @ self._P @ dynamics_model.Phi.T + dynamics_model.Qd
         )
