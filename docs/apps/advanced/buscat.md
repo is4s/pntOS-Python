@@ -135,12 +135,12 @@ measurements.
 
 ```text
 Channels in pntos_output.log:
-        /buscat/pntos/sensor/ins-d/pva
-        /buscat/pntos/sensor/ublox-ZED-F9T/position
-        /buscat/pntos/sensor/vn-100/imu
-        /sensor/ins-d/pva
-        /sensor/ublox-ZED-F9T/position
-        /sensor/vn-100/imu
+	/buscat/pntos/sensor/ins-d/pva
+	/buscat/pntos/sensor/ublox-ZED-F9T/position
+	/buscat/pntos/sensor/vn-100/imu
+	/sensor/ins-d/pva
+	/sensor/ublox-ZED-F9T/position
+	/sensor/vn-100/imu
 ```
 
 You have now seen how we can use the
