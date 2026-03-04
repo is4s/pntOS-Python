@@ -1447,7 +1447,7 @@ dev = [
     { name = "mypy", specifier = "==1.18.2" },
     { name = "myst-parser", specifier = ">=4" },
     { name = "pip", specifier = ">=24" },
-    { name = "pntos-python-docs-data", specifier = "==0.1.5" },
+    { name = "pntos-python-docs-data", specifier = "==0.1.6" },
     { name = "pyproject-fmt", specifier = ">=2.7" },
     { name = "pytest", specifier = ">=8.2" },
     { name = "pytest-cov", specifier = ">=6" },
@@ -1468,10 +1468,10 @@ wheels = [
 
 [[package]]
 name = "pntos-python-docs-data"
-version = "0.1.5"
+version = "0.1.6"
 source = { registry = "https://git.aspn.us/api/v4/projects/94/packages/pypi/simple" }
 wheels = [
-    { url = "https://git.aspn.us/api/v4/projects/94/packages/pypi/files/6fcbd3a38c4a10880738c8ccc6ead4399c953975591d00247825c00b4b0ba70b/pntos_python_docs_data-0.1.5-py2.py3-none-any.whl", hash = "sha256:6fcbd3a38c4a10880738c8ccc6ead4399c953975591d00247825c00b4b0ba70b" },
+    { url = "https://git.aspn.us/api/v4/projects/94/packages/pypi/files/6d0bf5c25d9b6f046764965bc2f776bedee644f785d7923cede10d5b6a9b44d8/pntos_python_docs_data-0.1.6-py2.py3-none-any.whl", hash = "sha256:6d0bf5c25d9b6f046764965bc2f776bedee644f785d7923cede10d5b6a9b44d8" },
 ]
 
 [[package]]

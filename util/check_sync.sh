@@ -83,6 +83,8 @@ check_sync $orig_dir"/util/app_gps_ins_leverarm.patch"
 check_sync $orig_dir"/util/app_gps_ins_bodyvel.patch"
 # Apply app vsb patch
 check_sync $orig_dir"/util/app_gps_ins_vsb.patch"
+# Apply app outage patch
+check_sync $orig_dir"/util/app_outage_sim.patch"
 
 # Cleanup and return
 popd > /dev/null

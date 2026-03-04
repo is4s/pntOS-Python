@@ -32,6 +32,7 @@ from pntos.cobra.config import (
     InertialConfig,
     LcmLogTransportConfig,
     ManualHeadingAlignmentConfig,
+    MeasurementProcessorConfig,
     OutageConfig,
     PinsonStateBlockConfig,
     SensorConfig,
@@ -70,7 +71,8 @@ my_config = [
         channels_to_process=(
             '/sensor/vn-100/imu',
             '/sensor/ublox-ZED-F9T/position',
-            '/sensor/bmp388/baro_pressure',
+            # '/sensor/bmp388/baro_pressure',   # uncomment me to use a baro update
+            # '/sensor/ublox-ZED-F9T/velocity', # uncomment me to use a velocity update
         ),
     ),
     ControllerConfig(group='controller'),
@@ -104,11 +106,11 @@ my_config = [
                 estimate_with_covariance=EstimateWithCovariance(
                     type=EstimateWithCovarianceType.EWC_GENERIC,
                     estimate=np.zeros((1,)),
-                    covariance=(np.array([[25.0]])),
+                    covariance=(np.array([[100.0**2]])),
                 ),
                 fogm_model=FogmConfig(
                     group='config/alt_sensor_error',
-                    sigma=(10.0,),
+                    sigma=(100.0,),
                     tau=(3600.0,),
                 ),
             ),
@@ -142,6 +144,14 @@ my_config = [
                     sensor_name='altitude',
                 ),
             ),
+            MeasurementProcessorConfig(
+                group='config/vel_measurement_processor',
+                identifier='pinson_velocity',
+                label='vel',
+                channel='/sensor/ublox-ZED-F9T/velocity',
+                state_block_labels=('pinson15',),
+                aux_channels=('INERTIAL_PVA',),
+            ),
         ),
         inertial_config=InertialConfig(
             group='config/inertial',
@@ -170,13 +180,16 @@ my_config = [
             ),
             TimeBiasConfig(
                 group='config/time_bias',
-                channels_to_correct=('/sensor/ublox-ZED-F9T/position',),
+                channels_to_correct=(
+                    '/sensor/ublox-ZED-F9T/position',
+                    '/sensor/ublox-ZED-F9T/velocity',
+                ),
                 time_bias=int(0.15 * 1e9),
             ),
             BarometerToAltitudeConfig(
                 group='config/pressure_to_alt',
                 channel='/sensor/bmp388/baro_pressure',
-                alt_sigma=3.0,
+                alt_sigma=30.0,
             ),
             OutageConfig(
                 group='config/gps_outage',
@@ -185,6 +198,7 @@ my_config = [
                 end_time=1600.0,
             ),
         ),
+        max_prop_interval=1.0,
         group='config/orchestration',
     ),
 ]

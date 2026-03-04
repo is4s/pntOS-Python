@@ -1,7 +1,7 @@
-diff --git a/apps/standard/gps_ins.py b/apps/standard/gps_ins_baro_with_outage.py
-index 11421dd9..d0c68859 100755
+diff --git a/apps/standard/gps_ins.py b/apps/standard/outage_sim.py
+index 11421dd9..a231dbfb 100755
 --- a/apps/standard/gps_ins.py
-+++ b/apps/standard/gps_ins_baro_with_outage.py
++++ b/apps/standard/outage_sim.py
 @@ -23,6 +23,7 @@ from pntos.cobra import (
  )
  from pntos.cobra.config import (
@@ -10,23 +10,25 @@ index 11421dd9..d0c68859 100755
      ControllerConfig,
      FogmConfig,
      FogmStateBlockConfig,
-@@ -31,6 +32,7 @@ from pntos.cobra.config import (
+@@ -31,6 +32,8 @@ from pntos.cobra.config import (
      InertialConfig,
      LcmLogTransportConfig,
      ManualHeadingAlignmentConfig,
++    MeasurementProcessorConfig,
 +    OutageConfig,
      PinsonStateBlockConfig,
      SensorConfig,
      SensorMeasurementProcessorConfig,
-@@ -68,6 +70,7 @@ my_config = [
+@@ -68,6 +71,8 @@ my_config = [
          channels_to_process=(
              '/sensor/vn-100/imu',
              '/sensor/ublox-ZED-F9T/position',
-+            '/sensor/bmp388/baro_pressure',
++            # '/sensor/bmp388/baro_pressure',   # uncomment me to use a baro update
++            # '/sensor/ublox-ZED-F9T/velocity', # uncomment me to use a velocity update
          ),
      ),
      ControllerConfig(group='controller'),
-@@ -95,6 +98,20 @@ my_config = [
+@@ -95,6 +100,20 @@ my_config = [
                      tau=(300.0, 300.0, 200.0),
                  ),
              ),
@@ -36,18 +38,18 @@ index 11421dd9..d0c68859 100755
 +                estimate_with_covariance=EstimateWithCovariance(
 +                    type=EstimateWithCovarianceType.EWC_GENERIC,
 +                    estimate=np.zeros((1,)),
-+                    covariance=(np.array([[25.0]])),
++                    covariance=(np.array([[100.0**2]])),
 +                ),
 +                fogm_model=FogmConfig(
 +                    group='config/alt_sensor_error',
-+                    sigma=(10.0,),
++                    sigma=(100.0,),
 +                    tau=(3600.0,),
 +                ),
 +            ),
          ),
          mp_configs=(
              SensorMeasurementProcessorConfig(
-@@ -111,6 +128,20 @@ my_config = [
+@@ -111,6 +130,28 @@ my_config = [
                      sensor_name='position',
                  ),
              ),
@@ -65,17 +67,32 @@ index 11421dd9..d0c68859 100755
 +                    sensor_name='altitude',
 +                ),
 +            ),
++            MeasurementProcessorConfig(
++                group='config/vel_measurement_processor',
++                identifier='pinson_velocity',
++                label='vel',
++                channel='/sensor/ublox-ZED-F9T/velocity',
++                state_block_labels=('pinson15',),
++                aux_channels=('INERTIAL_PVA',),
++            ),
          ),
          inertial_config=InertialConfig(
              group='config/inertial',
-@@ -142,6 +173,17 @@ my_config = [
-                 channels_to_correct=('/sensor/ublox-ZED-F9T/position',),
+@@ -139,10 +180,25 @@ my_config = [
+             ),
+             TimeBiasConfig(
+                 group='config/time_bias',
+-                channels_to_correct=('/sensor/ublox-ZED-F9T/position',),
++                channels_to_correct=(
++                    '/sensor/ublox-ZED-F9T/position',
++                    '/sensor/ublox-ZED-F9T/velocity',
++                ),
                  time_bias=int(0.15 * 1e9),
              ),
 +            BarometerToAltitudeConfig(
 +                group='config/pressure_to_alt',
 +                channel='/sensor/bmp388/baro_pressure',
-+                alt_sigma=3.0,
++                alt_sigma=30.0,
 +            ),
 +            OutageConfig(
 +                group='config/gps_outage',
@@ -84,5 +101,7 @@ index 11421dd9..d0c68859 100755
 +                end_time=1600.0,
 +            ),
          ),
++        max_prop_interval=1.0,
          group='config/orchestration',
      ),
+ ]
