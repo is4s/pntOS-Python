@@ -15,6 +15,6 @@ git diff --no-index apps/standard/gps_ins.py apps/advanced/gps_ins_ros.py > util
 git diff --no-index $tutorial_plugins_folder"TutorialGpsOrchestrationPlugin.py" $tutorial_plugins_folder"TutorialGpsVelOrchestrationPlugin.py" > util/orch_gps_vel.patch
 git diff --no-index apps/standard/gps_ins.py apps/standard/gps_vel_ins.py > util/app_gps_vel_standard.patch
 git diff --no-index apps/standard/gps_vel_ins.py apps/standard/posvel_ins.py > util/app_posvel_standard.patch
-git diff --no-index apps/standard/gps_ins.py apps/standard/gps_ins_baro_with_outage.py > util/app_gps_ins_baro_with_outage.patch
+git diff --no-index apps/standard/gps_ins.py apps/standard/outage_sim.py > util/app_outage_sim.patch
 git diff --no-index apps/standard/gps_ins.py apps/standard/gps_ins_vsb.py > util/app_gps_ins_vsb.patch
 git diff --no-index $standard_plugins_folder/controller/StandardControllerPlugin.py $advanced_plugins_folder/buscat/BuscatControllerPlugin.py > util/controller_buscat.patch

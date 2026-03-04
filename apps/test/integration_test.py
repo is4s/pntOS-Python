@@ -293,9 +293,9 @@ def test_standard_posvel_ins_app() -> None:
     )
 
 
-def test_standard_gps_ins_baro_with_outage_app() -> None:
+def test_standard_outage_sim_app() -> None:
     run_pntos_with_log_transport(
-        Path('apps/standard/gps_ins_baro_with_outage.py'),
+        Path('apps/standard/outage_sim.py'),
         [OUTPUT_LOG.as_posix()],
         validate=True,
     )
@@ -305,13 +305,13 @@ def test_standard_gps_ins_baro_with_outage_app() -> None:
         log_data.data[TRUTH_CHANNEL],
         num_points=2570,
         pos_err_limits=ErrorLimits(
-            std_thresh=1240, max_thresh=5400, pct_below_1sigma=64
+            std_thresh=306, max_thresh=2441, pct_below_1sigma=64
         ),
         vel_err_limits=ErrorLimits(
             std_thresh=8, max_thresh=35, pct_below_2sigma=91, pct_below_3sigma=98
         ),
         tilt_err_limits=ErrorLimits(
-            std_thresh=1.15, max_thresh=4.1, pct_below_3sigma=98
+            std_thresh=1.32, max_thresh=5.3, pct_below_3sigma=98
         ),
         expected_start_time_offset=10.0,
     )

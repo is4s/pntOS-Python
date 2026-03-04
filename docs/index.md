@@ -40,6 +40,7 @@ apps/gps_vel_ins
 :caption: Standard Apps
 :name: standard-apps
 apps/gps_ins_standard
+apps/outage_sim
 ```
 
 ```{toctree}
