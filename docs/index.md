@@ -55,6 +55,7 @@ apps/advanced/gps_ins_ros
 
 ```{toctree}
 :caption: Reference
+auxiliary_data
 faq
 coordinate_frames
 ```
