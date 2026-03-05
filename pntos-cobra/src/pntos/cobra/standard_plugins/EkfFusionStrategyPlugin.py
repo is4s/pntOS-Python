@@ -100,12 +100,18 @@ class EkfFusionStrategy(StandardFusionStrategy):
 
     def remove_states(self, first_index: int, count: int) -> None:
         # Make sure states exist
+        if count <= 0:
+            self._mediator.log_message(
+                LoggingLevel.WARN, f'Attempted to remove {count} states, ignoring.'
+            )
+            return
         if first_index + count > self._num_states:
             self._mediator.log_message(
                 LoggingLevel.ERROR,
                 f'Tried to remove states [{first_index}:{first_index + count}] but '
                 + f'state vector is only length {self._num_states}.',
             )
+            return
 
         # Delete states
         i_delete = slice(first_index, first_index + count)
@@ -172,25 +178,23 @@ class EkfFusionStrategy(StandardFusionStrategy):
         self._symmetrize_covariance()
 
         # Check sizes of Phi and Qd matrices
+        ns = self._num_states
         validate_array(
             dynamics_model.Phi,
             self._mediator,
             'Phi',
             dims=2,
-            rows=self._P.shape[0],
-            cols=self._P.shape[1],
+            rows=ns,
+            cols=ns,
+            err=True,
         )
         validate_array(
-            dynamics_model.Qd,
-            self._mediator,
-            'Qd',
-            dims=2,
-            rows=self._P.shape[0],
-            cols=self._P.shape[1],
+            dynamics_model.Qd, self._mediator, 'Qd', dims=2, rows=ns, cols=ns, err=True
         )
 
         # Propagate the state: x_new = g(x_old)
         self._x = dynamics_model.g(self._x)
+        validate_array(self._x, self._mediator, 'x', dims=2, rows=ns, cols=1, err=True)
 
         # Propagate the covariance (P_new = Phi * P * Phi^T + Qd)
         self._P = (
@@ -220,7 +224,9 @@ class EkfFusionStrategy(StandardFusionStrategy):
 
         # Calculate residual(s)
         h_x = measurement_model.h(self._x)
-        validate_array(h_x, self._mediator, 'h(x)', dims=2, rows=num_meas, cols=1)
+        validate_array(
+            h_x, self._mediator, 'h(x)', dims=2, rows=num_meas, cols=1, err=True
+        )
         resid = measurement_model.z - h_x
 
         # Calculate residual covariance
