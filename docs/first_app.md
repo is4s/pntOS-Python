@@ -74,7 +74,7 @@ environment activated):
 apps/tutorial/gps_ins.py
 ```
 
-Once the app is started, it will immediately start processing messages from the input log, 
+Once the app is started, it will immediately start processing messages from the input log,
 with a progress bar tracking the percentage of messages that have been processed.
 Once the entire input log has been processed, you should see something like the following:
 
@@ -110,7 +110,7 @@ Reading measurements from log...
 The results from the tutorial app will be displayed in separate windows. To continue with the shutdown, simply close all the plotting windows.
 
 ```{note}
-The UI plotting plugin is only used in tutorial apps. 
+The UI plotting plugin is only used in tutorial apps.
 
 However, most apps record the pntOS solution to `pntos_output.log` by default for plotting or further processing.
 For information on how to plot the pntOS solution from a log file, see [](#view-results-from-a-log-file).
@@ -131,7 +131,7 @@ environment activated):
 apps/tutorial/gps_vel_ins.py
 ```
 
-Once the app is started, it will immediately start processing messages from the input log, 
+Once the app is started, it will immediately start processing messages from the input log,
 with a progress bar tracking the percentage of messages that have been processed.
 Once the entire input log has been processed, you should see something like the following:
 
@@ -166,7 +166,7 @@ Reading measurements from log...
 The results from the tutorial app will be displayed in separate windows. To continue with the shutdown, simply close all the plotting windows.
 
 ```{note}
-The UI plotting plugin is only used in tutorial apps. 
+The UI plotting plugin is only used in tutorial apps.
 
 However, most apps record the pntOS solution to `pntos_output.log` by default for plotting or further processing.
 For information on how to plot the pntOS solution from a log file, see [](#view-results-from-a-log-file).
@@ -187,7 +187,7 @@ environment activated):
 apps/standard/gps_ins.py
 ```
 
-Once the app is started, it will immediately start processing messages from the input log, 
+Once the app is started, it will immediately start processing messages from the input log,
 with a progress bar tracking the percentage of messages that have been processed.
 Once the entire input log has been processed, you should see something like the following:
 
@@ -289,13 +289,13 @@ push the `play` button in the LogPlayer to start the datastream. You should see 
 LCM tcpq: connecting...
 [20/02/2026 12:14:00] [TransportPlugin] [INFO] LCM message handler is running.
 [20/02/2026 12:14:00] [ControllerPlugin] [INFO] Press Ctrl + C at any time to shut down pntOS...
-[20/02/2026 12:14:03] [TransportPlugin] [INFO] Found new channel /sensor/ins-d/pva	 with a timestamp of 1747680882.938483715s
-[20/02/2026 12:14:03] [TransportPlugin] [INFO] Found new channel /sensor/vn-100/imu	 with a timestamp of 1747680882.940131664s
-[20/02/2026 12:14:03] [TransportPlugin] [INFO] Found new channel /sensor/ublox-ZED-F9T/position	 with a timestamp of 1747680883.294163942s
-[20/02/2026 12:14:03] [TransportPlugin] [INFO] Found new channel /sensor/ublox-ZED-F9T/velocity	 with a timestamp of 1747680883.294163942s
-[20/02/2026 12:14:03] [TransportPlugin] [INFO] Found new channel /sensor/ublox-ZED-F9T/pva	 with a timestamp of 1747680883.294163942s
-[20/02/2026 12:14:04] [TransportPlugin] [INFO] Found new channel /sensor/simulated/velocity	 with a timestamp of 1747680883.543442726s
-[20/02/2026 12:14:06] [TransportPlugin] [INFO] Found new channel /sensor/bmp388/baro_pressure	 with a timestamp of 1747680885.336656809s
+[20/02/2026 12:14:03] [TransportPlugin] [INFO] Found new channel /sensor/ins-d/pva  with a timestamp of 1747680882.938483715s
+[20/02/2026 12:14:03] [TransportPlugin] [INFO] Found new channel /sensor/vn-100/imu  with a timestamp of 1747680882.940131664s
+[20/02/2026 12:14:03] [TransportPlugin] [INFO] Found new channel /sensor/ublox-ZED-F9T/position  with a timestamp of 1747680883.294163942s
+[20/02/2026 12:14:03] [TransportPlugin] [INFO] Found new channel /sensor/ublox-ZED-F9T/velocity  with a timestamp of 1747680883.294163942s
+[20/02/2026 12:14:03] [TransportPlugin] [INFO] Found new channel /sensor/ublox-ZED-F9T/pva  with a timestamp of 1747680883.294163942s
+[20/02/2026 12:14:04] [TransportPlugin] [INFO] Found new channel /sensor/simulated/velocity  with a timestamp of 1747680883.543442726s
+[20/02/2026 12:14:06] [TransportPlugin] [INFO] Found new channel /sensor/bmp388/baro_pressure  with a timestamp of 1747680885.336656809s
 [20/02/2026 12:14:13] [OrchestrationPlugin] [INFO] Aligned filter at 1747680892.949498653s
 ```
 
@@ -341,3 +341,14 @@ postprocessing/plot_results.py pntos_output.log
 This should display the pntOS results in individual windows and save the plots
 to the `{workspace-root}/pntos_output` directory.
 
+```{tip}
+Included in the source code is a convenience script that will run an app, process an example log
+file, and plot the results all via a single command. It will work on any of the existing apps that
+produce a PVA solution from the example LCM or ROS logs.
+
+To use it, simply run:
+
+    python3 postprocessing/run_app_and_record_data.py <path/to/app.py>
+
+Where `<path/to/app.py>` is the app you want to run.
+```

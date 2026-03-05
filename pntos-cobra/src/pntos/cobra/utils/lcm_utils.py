@@ -353,7 +353,7 @@ def run_pntos_with_log_transport(
     app: Path,
     args: list[str] | None = None,
     validate: bool = False,
-) -> None:  # pragma: no cover
+) -> int:  # pragma: no cover
     """Spin up app, process log, then shut down.
 
     Args:
@@ -361,6 +361,9 @@ def run_pntos_with_log_transport(
         args (list[str] | None): Optional command-line arguments to pass to app (e.g. output log).
         validate (bool): Whether to validate the app's output, ensuring there are no
             warnings or errors. Defaults to False.
+
+    Returns:
+        Return code of app. Will be 0 if app ran and terminated successfully.
     """
     # initialize process variables to avoid possibly unbound errors
     app_process = None
@@ -380,6 +383,8 @@ def run_pntos_with_log_transport(
         if app_process is not None:
             kill(app_process)
 
+    return app_process.returncode if app_process else -1
+
 
 def run_pntos_with_network_transport(
     app: Path,
@@ -387,7 +392,7 @@ def run_pntos_with_network_transport(
     output_log: Path,
     args: list[str] | None = None,
     validate: bool = False,
-) -> None:  # pragma: no cover
+) -> int:  # pragma: no cover
     """Spin up app and network tools necessary to run it, process log, then shut down.
 
     Args:
@@ -397,6 +402,9 @@ def run_pntos_with_network_transport(
         args (list[str] | None): Optional command-line arguments to pass to app.
         validate (bool): Whether to validate the app's output, ensuring there are no
             warnings or errors. Defaults to False.
+
+    Returns:
+        Return code of app. Will be 0 if app ran and terminated successfully.
     """
 
     # initialize process variables to avoid possibly unbound errors
@@ -428,3 +436,5 @@ def run_pntos_with_network_transport(
             kill(logplayer_process)
         if relay_process is not None:
             kill(relay_process)
+
+    return app_process.returncode if app_process else -1

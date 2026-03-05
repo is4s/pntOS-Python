@@ -37,7 +37,7 @@ def run_pntos_with_ros_transport(
     input_log: Path,
     output_log: Path,
     validate: bool = False,
-) -> None:  # pragma: no cover
+) -> int:  # pragma: no cover
     """Spin up app and network tools necessary to run it, process log, then shut down.
 
     Args:
@@ -46,6 +46,9 @@ def run_pntos_with_ros_transport(
         output_log (pathlib.Path): ROS log to which output should be recorded.
         validate (bool): Whether to validate the app's output, ensuring there are no
             warnings or errors. Defaults to False.
+
+    Returns:
+        Return code of app. Will be 0 if app ran and terminated successfully.
     """
     # initialize process variables to avoid possibly unbound errors
     logplayer_process = None
@@ -77,3 +80,5 @@ def run_pntos_with_ros_transport(
             kill(logger_process)
         if logplayer_process is not None:
             kill(logplayer_process)
+
+    return app_process.returncode if app_process else -1

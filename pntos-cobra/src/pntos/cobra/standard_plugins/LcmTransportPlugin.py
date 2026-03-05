@@ -19,6 +19,7 @@ class LcmTransportPlugin(TransportPlugin):
     mediator: Mediator
     subscription: LCMSubscription
     handler: Thread | None
+    _sender: Thread | None
     _url: str
     _subscription_regex: str
     _shutdown_threads: threading.Event
@@ -37,6 +38,7 @@ class LcmTransportPlugin(TransportPlugin):
         self._shutdown_threads = threading.Event()
         self.lcm = None
         self.handler = None
+        self._sender = None
         self._channels = set()
         self._output_queue = Queue()
 
@@ -66,7 +68,8 @@ class LcmTransportPlugin(TransportPlugin):
         self._url = config.url
         self._subscription_regex = config.subscribe_to
 
-        threading.Thread(target=self._send_thread).start()
+        self._sender = threading.Thread(target=self._send_thread)
+        self._sender.start()
 
     def shutdown_plugin(self) -> None:
         """
@@ -141,12 +144,16 @@ class LcmTransportPlugin(TransportPlugin):
         self.mediator.log_message(LoggingLevel.INFO, 'LCM message handler is running.')
 
     def stop_listening(self) -> None:
-        if self.lcm is not None:
-            self.lcm.unsubscribe(self.subscription)
-
         # This closes the handler thread
         self._shutdown_threads.set()
         self._output_queue.put(None)
+        # Wait for other threads to terminate
+        if self.handler:
+            self.handler.join()
+        if self._sender:
+            self._sender.join()
+        if self.lcm is not None:
+            self.lcm.unsubscribe(self.subscription)
 
         self.mediator.log_message(LoggingLevel.INFO, 'LCM transport stopped.')
 
