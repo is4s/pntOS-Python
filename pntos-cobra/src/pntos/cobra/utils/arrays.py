@@ -11,6 +11,7 @@ def validate_array(
     dims: int | None = None,
     rows: int | None = None,
     cols: int | None = None,
+    err: bool = False,
 ) -> None:
     """
     Validate the dimensionality and/or length of a 1-D or 2-D numpy array.
@@ -24,12 +25,15 @@ def validate_array(
         dims (int | None, optional): Expected number of dimensions, or None to ignore dimensions. Defaults to None.
         rows (int | None, optional): Expected number of rows, or None to ignore rows. Defaults to None.
         cols (int | None, optional): Expected number of cols, or None to ignore cols. Defaults to None.
+        err (bool): When True, raise a ValueError on a failed check.
     """
+    should_raise = False
     if dims is not None and arr.ndim != dims:
         mediator.log_message(
             LoggingLevel.ERROR,
             f'Expected {dims} dimensions for {name}, but got {arr.ndim}',
         )
+        should_raise = err
 
     if rows is not None and cols is not None:
         expected_shape = (rows, cols)
@@ -38,16 +42,22 @@ def validate_array(
                 LoggingLevel.ERROR,
                 f'Expected shape {expected_shape} for {name}, but got {arr.shape}',
             )
+            should_raise = err
     elif rows is not None and arr.shape[0] != rows:
         mediator.log_message(
             LoggingLevel.ERROR,
             f'Expected {rows} rows for {name}, but got {arr.shape[0]}.',
         )
-    elif cols is not None and arr.shape[1] != cols:
+        should_raise = err
+    elif cols is not None and arr.ndim > 1 and arr.shape[1] != cols:
         mediator.log_message(
             LoggingLevel.ERROR,
             f'Expected {cols} cols for {name}, but got {arr.shape[1]}.',
         )
+        should_raise = err
+
+    if should_raise:
+        raise ValueError
 
 
 def is_symmetric(
