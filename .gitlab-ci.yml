@@ -317,7 +317,7 @@ pip workflow check:
         - docker run --rm -dit -v $(pwd):/work -v $HOME/.ccache:/root/.cache/pip --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
         - docker exec pntos-python python3 -m venv /work/.venv
         - docker exec pntos-python .venv/bin/pip install -v -r requirements.txt --extra-index-url=${UV_INDEX}
-        - docker exec pntos-python postprocessing/run_app_and_record_data.py
+        - docker exec pntos-python postprocessing/run_app_and_record_data.py apps/standard/gps_ins.py
 
 minimal pip workflow check:
     stage: check
