@@ -7,6 +7,12 @@ with contextlib.suppress(ImportError):
 from .advanced_plugins.buscat.BuscatControllerPlugin import (
     BuscatControllerPlugin as BuscatControllerPlugin,
 )
+from .dummy_plugins.DummyControllerPlugin import (
+    DummyControllerPlugin as DummyControllerPlugin,
+)
+from .dummy_plugins.DummyOrchestrationPlugin import (
+    DummyOrchestrationPlugin as DummyOrchestrationPlugin,
+)
 from .dummy_plugins.DummyTransportPlugin import (
     DummyTransportPlugin as DummyTransportPlugin,
 )

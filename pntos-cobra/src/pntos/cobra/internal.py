@@ -1,4 +1,10 @@
 from .advanced_plugins.buscat.BuscatMediator import BuscatMediator as BuscatMediator
+from .dummy_plugins.DummyMediator import (
+    DummyMediator as DummyMediator,
+)
+from .dummy_plugins.DummyMessageStreamConfig import (
+    DummyMessageStreamConfig as DummyMessageStreamConfig,
+)
 from .standard_plugins.controller.StandardMediator import (
     StandardMediator as StandardMediator,
 )

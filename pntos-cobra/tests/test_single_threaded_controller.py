@@ -7,7 +7,6 @@ from aspn23 import (
 from numpy import float64
 from numpy.typing import NDArray
 from pntos.api import (
-    CommonPlugin,
     ControllerPlugin,
     CrossCovariances,
     EstimateWithCovariance,
@@ -23,13 +22,10 @@ from pntos.api import (
     InitializationPlugin,
     InitializationStatus,
     InitializationType,
-    LoggingLevel,
     LoggingPlugin,
     Mediator,
     Message,
-    MessageStreamConfig,
     OrchestrationPlugin,
-    Registry,
     StandardDynamicsModel,
     StandardFusionEngine,
     StandardFusionStrategy,
@@ -44,11 +40,13 @@ from pntos.api import (
     VirtualStateBlock,
 )
 from pntos.cobra import (
+    DummyOrchestrationPlugin,
+    DummyTransportPlugin,
     StandardControllerPlugin,
     StandardLoggingPlugin,
     StandardRegistryPlugin,
 )
-from pntos.cobra.internal import StandardMediator
+from pntos.cobra.internal import DummyMediator, StandardMediator
 
 FOUND_ERROR = False
 ERROR_MESSAGE = ''
@@ -425,99 +423,6 @@ class DummyUiPlugin(UiPlugin):
         raise ExitThread
 
 
-class DummyMediator(Mediator):
-    registry: Registry
-
-    @property
-    def filter_description_list(self) -> list[str]:
-        return []
-
-    def request_solutions(
-        self,
-        solution_times: list[TypeTimestamp],
-        filter_description: str | None = None,
-    ) -> list[Message | None] | None:
-        return None
-
-    def process_pntos_message(self, message: Message) -> None:
-        return
-
-    def broadcast_aspn_message(
-        self,
-        message: Message,
-        transport: str | None = None,
-        destination_identifier: str | None = None,
-    ) -> None:
-        return
-
-    def log_message(self, level: LoggingLevel, message: str) -> None:
-        if level is LoggingLevel.ERROR:
-            global ERROR_MESSAGE
-            ERROR_MESSAGE = message
-            FOUND_ERROR = True
-            assert not FOUND_ERROR, ERROR_MESSAGE
-
-
-class DummyTransportPlugin(TransportPlugin):
-    def __init__(self, identifier: str) -> None:
-        self.identifier = identifier
-
-    def init_plugin(
-        self,
-        plugin_resources_location: str | None = None,
-        mediator: Mediator | None = None,
-    ) -> None:
-        self.mediator = mediator
-
-    def shutdown_plugin(self) -> None:
-        return
-
-    def start_listening(self) -> None:
-        pass
-
-    def stop_listening(self) -> None:
-        pass
-
-    def broadcast_message(
-        self, message: Message, channel_name: str | None = None
-    ) -> None:
-        pass
-
-
-class DummyOrchestrationPlugin(OrchestrationPlugin):
-    def __init__(self, identifier: str) -> None:
-        self.identifier = identifier
-
-    def init_plugin(
-        self,
-        plugin_resources_location: str | None = None,
-        mediator: Mediator | None = None,
-    ) -> None:
-        self.mediator = mediator
-
-    def shutdown_plugin(self) -> None:
-        return
-
-    def init_orchestration_plugin(
-        self, plugins: list[CommonPlugin] | None, stream_config: MessageStreamConfig
-    ) -> None:
-        pass
-
-    def process_pntos_message(self, message: Message, sequenced: bool) -> None:
-        pass
-
-    @property
-    def filter_description_list(self) -> list[str]:
-        return []
-
-    def request_solutions(
-        self,
-        solution_times: list[TypeTimestamp],
-        filter_description: str | None = None,
-    ) -> list[Message | None] | None:
-        return None
-
-
 class Test_StandardControllerPlugin(unittest.TestCase):
     def __init__(self, name: str) -> None:
         super().__init__(name)
@@ -603,7 +508,7 @@ class Test_StandardControllerPlugin(unittest.TestCase):
             self.controller.take_control(self.plugins_list)
 
     def test_mediator_filter_description_list(self) -> None:
-        expected_filter_description_list: list[str] = []
+        expected_filter_description_list: list[str] = ['LAST_MESSAGE']
         self.set_up_plugins()
         mediator = StandardMediator(self.controller.identifier, ControllerPlugin)
         orchestration_plugin = DummyOrchestrationPlugin('Dummy orchestration')

@@ -20,6 +20,7 @@ from aspn23 import (
     TypeHeader,
     TypeTimestamp,
 )
+from conftest import gxp
 from navtk.navutils import (
     d_rpy_to_dcm_wrt_p,
     d_rpy_to_dcm_wrt_r,
@@ -302,26 +303,8 @@ def pva_aux_data() -> Message:
 
 
 @pytest.fixture
-def zero_pva_aux_data() -> Message:
-    return Message(
-        MeasurementPositionVelocityAttitude(
-            TypeHeader(0, 0, 0, 0),
-            TypeTimestamp(0),
-            MeasurementPositionVelocityAttitudeReferenceFrame.GEODETIC,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            np.array([1, 0, 0, 0]),
-            np.zeros((9, 9)),
-            MeasurementPositionVelocityAttitudeErrorModel.NONE,
-            np.array([]),
-            [],
-        ),
-        'pva_aux',
-    )
+def zero_pva_aux_data(dummy_pva: MeasurementPositionVelocityAttitude) -> Message:
+    return Message(dummy_pva, 'pva_aux')
 
 
 @pytest.fixture
@@ -433,12 +416,6 @@ def force_and_rate_aux_data() -> Message:
             [],
         ),
         'force_and_rate_aux',
-    )
-
-
-def gxp(num: int) -> EstimateWithCovariance:
-    return EstimateWithCovariance(
-        EstimateWithCovarianceType.EWC_GENERIC, np.ones((num, 1)) * 0.01, np.eye(num)
     )
 
 

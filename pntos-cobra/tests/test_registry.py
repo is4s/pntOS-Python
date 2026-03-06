@@ -15,17 +15,13 @@ from numpy import float64
 from numpy.typing import NDArray
 from pntos.api import (
     CommonPlugin,
-    ControllerPlugin,
     KeyValueStore,
     LoggingLevel,
-    Mediator,
     Message,
     Registry,
     RegistryValueTypeUnion,
 )
-from pntos.cobra import (
-    StandardRegistryPlugin,
-)
+from pntos.cobra import DummyControllerPlugin, StandardRegistryPlugin
 from pntos.cobra.config import (
     BaseConfig,
     ImuConfig,
@@ -33,7 +29,7 @@ from pntos.cobra.config import (
     SensorConfig,
     config_from_registry,
 )
-from pntos.cobra.internal import StandardKeyValueStore
+from pntos.cobra.internal import DummyMediator, StandardKeyValueStore
 
 my_config: list[BaseConfig] = [
     ImuConfig(
@@ -83,51 +79,16 @@ def dummy_log(level: LoggingLevel, message: str) -> None:
         assert ERROR_DETECTED, DUMMY_LOG_OUT
 
 
-class DummyMediator(Mediator):
-    registry: Registry
-
-    @property
-    def filter_description_list(self) -> list[str]:
-        return []
-
-    def request_solutions(
-        self,
-        solution_times: list[TypeTimestamp],
-        filter_description: str | None = None,
-    ) -> list[Message | None] | None:
-        return None
-
-    def process_pntos_message(self, message: Message) -> None:
-        return
-
-    def broadcast_aspn_message(
-        self,
-        message: Message,
-        transport: str | None = None,
-        destination_identifier: str | None = None,
-    ) -> None:
-        return
-
+class LocalDummyMediator(DummyMediator):
     def log_message(self, level: LoggingLevel, message: str) -> None:
         dummy_log(level, message)
 
 
-class DummyControllerPlugin(ControllerPlugin):
+class LocalDummyControllerPlugin(DummyControllerPlugin):
     plugins: list[CommonPlugin]
 
     def __init__(self, identifier: str) -> None:
-        self.identifier = identifier
-
-    def init_plugin(
-        self,
-        plugin_resources_location: str | None = None,
-        mediator: Mediator | None = None,
-    ) -> None:
-        return
-
-    def shutdown_plugin(self) -> None:
-        for plugin in self.plugins:
-            plugin.shutdown_plugin()
+        super().__init__(identifier)
 
     def take_control(
         self,
@@ -137,7 +98,7 @@ class DummyControllerPlugin(ControllerPlugin):
     ) -> None:
         self.plugins = plugins
         for plugin in self.plugins:
-            plugin.init_plugin(mediator=DummyMediator())
+            plugin.init_plugin(mediator=LocalDummyMediator())
 
 
 class TestRegistry(unittest.TestCase):
@@ -147,9 +108,9 @@ class TestRegistry(unittest.TestCase):
 
     def __init__(self, name: str) -> None:
         self.registry = StandardRegistryPlugin('Standard registry 1')
-        self.registry.init_plugin(mediator=DummyMediator())
+        self.registry.init_plugin(mediator=LocalDummyMediator())
         self.reg = self.registry.new_registry(None)
-        DummyMediator.registry = self.reg
+        LocalDummyMediator.registry = self.reg
 
         self.test_message = Message(
             MeasurementPositionVelocityAttitude(
@@ -250,8 +211,8 @@ class TestRegistry(unittest.TestCase):
         global EXPECTED_LOG_OUTPUT
         EXPECTED_LOG_OUTPUT = ''
         registry_plugin = StandardRegistryPlugin('Standard registry', config=my_config)
-        registry_plugin.init_plugin(mediator=DummyMediator())
-        DummyMediator.registry = registry_plugin.new_registry(None)
+        registry_plugin.init_plugin(mediator=LocalDummyMediator())
+        LocalDummyMediator.registry = registry_plugin.new_registry(None)
         for expected in my_config:
             collected = config_from_registry(
                 type(expected), registry_plugin.mediator, expected.group
@@ -841,7 +802,7 @@ class TestRegistry(unittest.TestCase):
         ### First instance of plugins ###
 
         # Start up this instance
-        controller = DummyControllerPlugin('Dummy Controller 1')
+        controller = LocalDummyControllerPlugin('Dummy Controller 1')
         registry = StandardRegistryPlugin('Standard registry 1')
         controller.take_control(
             [registry],
@@ -877,7 +838,7 @@ class TestRegistry(unittest.TestCase):
         ### Second instance of plugins ### (Pretend it's a fresh start of pntOS)
 
         # Set up the instance
-        controller = DummyControllerPlugin('Dummy Controller 2')
+        controller = LocalDummyControllerPlugin('Dummy Controller 2')
         registry = StandardRegistryPlugin('Standard registry 2')
         controller.take_control(
             [registry],
@@ -939,7 +900,7 @@ class TestRegistry(unittest.TestCase):
         global EXPECTED_LOG_OUTPUT, ERROR_DETECTED, DUMMY_LOG_OUT
         EXPECTED_LOG_OUTPUT = ''
         registry = StandardRegistryPlugin('Standard registry 2')
-        mediator = DummyMediator()
+        mediator = LocalDummyMediator()
         registry.init_plugin(mediator=mediator)
         reg = registry.new_registry(None)
         mediator.registry = reg

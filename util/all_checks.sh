@@ -18,6 +18,7 @@ mypy pntos-cobra --no-implicit-reexport
 mypy apps/advanced/ --no-implicit-reexport
 mypy apps/standard/ --no-implicit-reexport
 mypy apps/tutorial/ --no-implicit-reexport
+mypy apps/dummy/ --no-implicit-reexport
 source util/check_sync.sh
 ret_val=$?  # this must be set after check_sync to observe if it passed or not
 sphinx-build --exception-on-warning docs/ docs/build/

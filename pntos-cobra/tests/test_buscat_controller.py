@@ -1,14 +1,10 @@
 import pytest
-from aspn23 import (
-    TypeTimestamp,
-)
 from pntos.api import (
     CommonPlugin,
     ControllerPlugin,
     LoggingLevel,
     Mediator,
     Message,
-    Registry,
     TransportPlugin,
     UiPlugin,
     UtilityPlugin,
@@ -19,7 +15,7 @@ from pntos.cobra import (
     StandardRegistryPlugin,
 )
 from pntos.cobra.config import BaseConfig, BuscatConfig
-from pntos.cobra.internal import BuscatMediator
+from pntos.cobra.internal import BuscatMediator, DummyMediator
 
 FOUND_ERROR = False
 ERROR_MESSAGE = ''
@@ -63,31 +59,7 @@ class DummyUiPlugin(UiPlugin):
         pass
 
 
-class DummyMediator(Mediator):
-    registry: Registry
-
-    @property
-    def filter_description_list(self) -> list[str]:
-        return []
-
-    def request_solutions(
-        self,
-        solution_times: list[TypeTimestamp],
-        filter_description: str | None = None,
-    ) -> list[Message | None] | None:
-        return None
-
-    def process_pntos_message(self, message: Message) -> None:
-        return
-
-    def broadcast_aspn_message(
-        self,
-        message: Message,
-        transport: str | None = None,
-        destination_identifier: str | None = None,
-    ) -> None:
-        return
-
+class DummyTestMediator(DummyMediator):
     def log_message(self, level: LoggingLevel, message: str) -> None:
         if level is LoggingLevel.ERROR:
             global ERROR_MESSAGE
@@ -96,6 +68,8 @@ class DummyMediator(Mediator):
             assert not FOUND_ERROR, ERROR_MESSAGE
 
 
+# TODO This does not swap cleanly with the DummyTransport that exists in Cobra,
+# even if the expected printouts are added to that class
 class DummyTransportPlugin(TransportPlugin):
     def __init__(self, identifier: str) -> None:
         self.identifier = identifier
@@ -168,7 +142,7 @@ def test_init_plugin_with_mediator(capsys: pytest.CaptureFixture[str]) -> None:
     Should log error as controller shouldn't be passed a mediator.
     """
     plugin = BuscatControllerPlugin('Buscat Controller Plugin')
-    mediator = DummyMediator()
+    mediator = DummyTestMediator()
     plugin.init_plugin(mediator=mediator)
 
     output = capsys.readouterr().out
