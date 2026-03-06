@@ -50,6 +50,12 @@ apps/advanced/buscat
 apps/advanced/gps_ins_ros
 ```
 
+```{toctree}
+:caption: Dummy Apps
+:name: dummy-apps
+apps/minimal
+```
+
 <!-- TODO #114: add `navtk` back in to this index -->
 <!-- TODO: add `troubleshooting` back in to this index -->
 

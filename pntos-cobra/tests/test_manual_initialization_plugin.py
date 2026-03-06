@@ -4,16 +4,14 @@ from aspn23 import (
 )
 from navtk.navutils import quat_to_rpy
 from pntos.api import (
-    CommonPlugin,
     EwcInitializationStrategy,
     InertialInitializationStrategy,
     InitializationMotionNeeded,
     InitializationStatus,
     LoggingLevel,
     LoggingPlugin,
-    Mediator,
 )
-from pntos.cobra import TutorialInitializationPlugin
+from pntos.cobra import DummyTransportPlugin, TutorialInitializationPlugin
 from pntos.cobra.config import ManualAlignmentConfig, config_to_registry
 from pntos.cobra.internal import StandardMediator, StandardRegistry
 
@@ -22,24 +20,9 @@ def dummy_log(level: LoggingLevel, message: str) -> None:
     pass
 
 
-class DummyPlugin(CommonPlugin):
-    def __init__(self, identifier: str) -> None:
-        self.identifier = identifier
-
-    def init_plugin(
-        self,
-        plugin_resources_location: str | None = None,
-        mediator: Mediator | None = None,
-    ) -> None:
-        pass
-
-    def shutdown_plugin(self) -> None:
-        pass
-
-
 def test() -> None:
     # Setup
-    dummy_plugin = DummyPlugin('dummy plugin')
+    dummy_plugin = DummyTransportPlugin('dummy plugin')
     registry = StandardRegistry(dummy_log)
     mediator = StandardMediator(dummy_plugin.identifier, LoggingPlugin)
     StandardMediator.registry = registry

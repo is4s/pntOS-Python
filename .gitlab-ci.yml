@@ -167,6 +167,7 @@ mypy:
         - docker exec pntos-python mypy apps/advanced/ --no-implicit-reexport
         - docker exec pntos-python mypy apps/standard/ --no-implicit-reexport
         - docker exec pntos-python mypy apps/tutorial/ --no-implicit-reexport
+        - docker exec pntos-python mypy apps/dummy/ --no-implicit-reexport
 
 documentation check:
     stage: check
@@ -192,6 +193,16 @@ link check:
         - docker exec pntos-python uv sync
         # Check external links in the documentation
         - docker exec -e TZ=UTC pntos-python sphinx-build -b linkcheck --exception-on-warning docs/ docs/build/
+
+Dummy App:
+    stage: run
+    needs: []
+    tags:
+        - linux-light-runner
+    script:
+        - docker run --rm -dit -v $(pwd):/work -v $HOME/.ccache:/root/.cache/uv --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
+        - docker exec pntos-python uv sync
+        - docker exec pntos-python pytest apps -k test_dummy_app -s
 
 Tutorial GPS INS App:
     stage: run

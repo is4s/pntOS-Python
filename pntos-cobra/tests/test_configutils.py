@@ -17,8 +17,6 @@ from numpy.typing import NDArray
 from pntos.api import (
     EstimateWithCovariance,
     EstimateWithCovarianceType,
-    LoggingLevel,
-    Mediator,
     Message,
     RegistryValueTypeUnion,
 )
@@ -42,6 +40,7 @@ from pntos.cobra.config import (
     config_from_registry,
     config_to_registry,
 )
+from pntos.cobra.internal import DummyMediator
 from pntos.cobra.utils import validate_manual_ewc
 
 
@@ -78,33 +77,6 @@ SUPPORTED_TYPES = [
     DummyEnum,
     EstimateWithCovariance,
 ]
-
-
-class DummyMediator(Mediator):
-    @property
-    def filter_description_list(self) -> list[str]:
-        return []
-
-    def request_solutions(
-        self,
-        solution_times: list[TypeTimestamp],
-        filter_description: str | None = None,
-    ) -> list[Message | None] | None:
-        return None
-
-    def process_pntos_message(self, message: Message) -> None:
-        pass
-
-    def broadcast_aspn_message(
-        self,
-        message: Message,
-        transport: str | None = None,
-        destination_identifier: str | None = None,
-    ) -> None:
-        pass
-
-    def log_message(self, level: LoggingLevel, message: str) -> None:
-        pass
 
 
 class TestConfigUtils(unittest.TestCase):

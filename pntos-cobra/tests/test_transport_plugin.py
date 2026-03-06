@@ -2,44 +2,14 @@ import time
 
 import numpy as np
 import pytest
-from aspn23 import TypeTimestamp
 from aspn23_lcm import measurement_position_velocity_attitude
-from pntos.api import LoggingLevel, Mediator, Message, Registry
+from pntos.api import LoggingLevel
 from pntos.cobra import LcmTransportPlugin
-from pntos.cobra.internal import StandardMediator, StandardRegistry
+from pntos.cobra.internal import DummyMediator, StandardMediator, StandardRegistry
 
 
 def dummy_log(level: LoggingLevel, message: str) -> None:
     pass
-
-
-class DummyMediator(Mediator):
-    registry: Registry
-
-    @property
-    def filter_description_list(self) -> list[str]:
-        return []
-
-    def request_solutions(
-        self,
-        solution_times: list[TypeTimestamp],
-        filter_description: str | None = None,
-    ) -> list[Message | None] | None:
-        return None
-
-    def process_pntos_message(self, message: Message) -> None:
-        return
-
-    def broadcast_aspn_message(
-        self,
-        message: Message,
-        transport: str | None = None,
-        destination_identifier: str | None = None,
-    ) -> None:
-        return
-
-    def log_message(self, level: LoggingLevel, message: str) -> None:
-        return
 
 
 @pytest.fixture

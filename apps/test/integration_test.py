@@ -16,6 +16,7 @@ from pntos.cobra.utils import (
     run_pntos_with_network_transport,
     run_pntos_with_ros_transport,
 )
+from pntos.cobra.utils.apps import kill, run_app
 from pntos_python_datasets import (
     ASPN2_EXAMPLE_LCM_LOG,
     EXAMPLE_LCM_LOG,
@@ -98,6 +99,16 @@ def validate_results(
     validate_error(ned_err, pva.ned_sig, limits=pos_err_limits)
     validate_error(vel_err, pva.vel_sig, limits=vel_err_limits)
     validate_error(tilt_err, pva.tilt_sig, limits=tilt_err_limits)
+
+
+def test_dummy_app() -> None:
+    app_process = None
+    try:
+        # Doesn't do anything fancy, just make sure it runs.
+        app_process = run_app(Path('apps/dummy/minimal.py'), args=None, validate=True)
+    finally:
+        if app_process is not None:
+            kill(app_process)
 
 
 def test_tutorial_gps_ins_app() -> None:
