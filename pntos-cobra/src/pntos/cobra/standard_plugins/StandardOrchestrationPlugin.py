@@ -270,7 +270,7 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
         # Alignment
         self.alignment_channels = orch_config.alignment_channels
         # Inertial
-        self.inertial_channel = orch_config.inertial_config.channel
+        self.inertial_channels = orch_config.inertial_config.channels
         self.inertial_group = orch_config.inertial_config.group
         self.max_prop_dt_ns = int(orch_config.max_prop_interval * 1e9)
         self.buffer_time_ns = int(controller_config.buffer_length_sec * 1e9)
@@ -789,7 +789,7 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
                 continue
 
             # If aligned, send messages to IMU or filter
-            if channel == self.inertial_channel:
+            if channel in self.inertial_channels:
                 self.inertial.process_pntos_message(message)
             elif channel in self.measurement_channels:
                 time = msg.wrapped_message.time_of_validity  # type: ignore[attr-defined]

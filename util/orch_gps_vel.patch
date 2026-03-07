@@ -1,5 +1,5 @@
 diff --git a/pntos-cobra/src/pntos/cobra/tutorial_plugins/TutorialGpsOrchestrationPlugin.py b/pntos-cobra/src/pntos/cobra/tutorial_plugins/TutorialGpsVelOrchestrationPlugin.py
-index 34ecfa61..f3b409e8 100644
+index daacfda5..fe94533c 100644
 --- a/pntos-cobra/src/pntos/cobra/tutorial_plugins/TutorialGpsOrchestrationPlugin.py
 +++ b/pntos-cobra/src/pntos/cobra/tutorial_plugins/TutorialGpsVelOrchestrationPlugin.py
 @@ -31,7 +31,7 @@ from pntos.cobra.config import (

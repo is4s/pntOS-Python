@@ -156,7 +156,7 @@ my_config = [
         inertial_config=InertialConfig(
             group='config/inertial',
             expected_dt=0.01,
-            channel='/sensor/vn-100/imu',
+            channels=('/sensor/vn-100/imu',),
             C_imu_to_platform=C_imu_to_platform,
             inertial_buffer_length=10.0,
         ),
