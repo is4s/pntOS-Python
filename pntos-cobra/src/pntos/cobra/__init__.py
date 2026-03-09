@@ -73,6 +73,6 @@ from .tutorial_plugins.TutorialInitializationPlugin import (
 from .tutorial_plugins.TutorialLcmTransportPlugin import (
     TutorialLcmTransportPlugin as TutorialLcmTransportPlugin,
 )
-from .tutorial_plugins.UiLogPlotterPlugin import (
+from .tutorial_plugins.UiLogPlottingPlugin import (
     UiLogPlottingPlugin as UiLogPlottingPlugin,
 )
