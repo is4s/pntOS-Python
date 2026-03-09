@@ -64,6 +64,7 @@ apps/minimal
 auxiliary_data
 faq
 coordinate_frames
+concurrency
 ```
 
 ```{toctree}

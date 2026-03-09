@@ -419,6 +419,7 @@ class TestConfigUtils(unittest.TestCase):
                 val = tuple(val)
             else:
                 assert val == conf_val
+        kv.batch_end()
 
     def _validate_conf_from_registry(
         self, test_conf: BaseConfig, result_conf: BaseConfig
