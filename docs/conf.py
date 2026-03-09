@@ -26,6 +26,7 @@ extensions = [
     'sphinx.ext.mathjax',
     'sphinx_design',
     'sphinx_copybutton',
+    'sphinxcontrib.mermaid',
 ]
 
 # Myst settings
@@ -36,6 +37,7 @@ myst_enable_extensions = [
     'colon_fence',  # Allow :::{note} syntax, making it easier to have code in notes
 ]
 myst_heading_anchors = 3
+myst_footnote_sort = False
 
 # Napoleon settings
 napoleon_google_docstring = True
@@ -116,6 +118,7 @@ nitpick_ignore = [
     ('py:class', 'ImuModel'),
     ('py:class', 'AlignBase.AlignmentStatus'),
     ('py:class', 'pathlib.Path'),
+    ('py:class', 'Event'),
 ]
 
 # Linkcheck builder options.

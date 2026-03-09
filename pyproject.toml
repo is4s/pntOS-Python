@@ -41,6 +41,7 @@ dev = [
     "sphinx-copybutton",
     "sphinx-design",
     "sphinx-rtd-theme>=3.0.2",
+    "sphinxcontrib-mermaid",
 ]
 
 [tool.ruff]
@@ -79,7 +80,15 @@ lint.select = [
     "UP",
     "W",
 ]
-lint.ignore = [ "COM812", "D212", "D417", "E501", "PLR0911", "PLR0912", "PLR0913" ]
+lint.ignore = [
+    "COM812",
+    "D212",
+    "D417",
+    "E501",
+    "PLR0911",
+    "PLR0912",
+    "PLR0913",
+]
 lint.per-file-ignores."*/tests/*" = [
     "ANN001",
     "B008",
