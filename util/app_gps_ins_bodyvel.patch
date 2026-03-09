@@ -1,5 +1,5 @@
 diff --git a/apps/standard/gps_ins.py b/apps/standard/gps_ins_bodyvel.py
-index 11421dd9..576f0fa4 100755
+index 269e9cb8..bba3082e 100755
 --- a/apps/standard/gps_ins.py
 +++ b/apps/standard/gps_ins_bodyvel.py
 @@ -68,6 +68,7 @@ my_config = [

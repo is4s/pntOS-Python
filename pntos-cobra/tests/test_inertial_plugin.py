@@ -154,7 +154,7 @@ def test() -> None:
     config = InertialConfig(
         expected_dt=0.01,
         inertial_buffer_length=5.0,
-        channel='/sensor/imu',
+        channels=('/sensor/imu',),
         C_imu_to_platform=((1, 0, 0), (0, 1, 0), (0, 0, 1)),
         group='test',
     )

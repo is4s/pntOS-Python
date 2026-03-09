@@ -98,7 +98,7 @@ class TutorialGpsOrchestrationPlugin(OrchestrationPlugin):
             InertialConfig, self.mediator, 'config/inertial'
         )
 
-        self.inertial_channel = inertial_config.channel
+        self.inertial_channel = inertial_config.channels[0]
 
         preprocessor_plugin = plugins[5]
         idx = preprocessor_plugin.preprocessor_identifiers.index('time_adjuster')

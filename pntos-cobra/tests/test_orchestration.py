@@ -105,7 +105,7 @@ C_imu_to_platform = ((1, 0, 0), (0, 1, 0), (0, 0, 1))
 inertial_config = InertialConfig(
     group='config/inertial',
     expected_dt=0.01,
-    channel=IMU_CHANNEL,
+    channels=(IMU_CHANNEL,),
     C_imu_to_platform=C_imu_to_platform,
     inertial_buffer_length=10.0,
 )

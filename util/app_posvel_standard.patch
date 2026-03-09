@@ -1,5 +1,5 @@
 diff --git a/apps/standard/gps_vel_ins.py b/apps/standard/posvel_ins.py
-index b5cff6fe..c2438d8c 100755
+index fa9ddd88..60e8f7cc 100755
 --- a/apps/standard/gps_vel_ins.py
 +++ b/apps/standard/posvel_ins.py
 @@ -1,11 +1,13 @@

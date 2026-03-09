@@ -116,7 +116,7 @@ class StandardPreprocessorPlugin(PreprocessorPlugin):
                 if inert_config is None:
                     self.mediator.log_message(
                         LoggingLevel.ERROR,
-                        f'Failed to populate InertialConfig for preprocessor {self.preprocessor_identifiers[preprocessor_index]}.',
+                        f'Failed to populate ImuRotatorConfig for preprocessor {self.preprocessor_identifiers[preprocessor_index]}.',
                     )
                     return None
 

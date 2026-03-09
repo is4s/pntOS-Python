@@ -19,8 +19,8 @@ class InertialConfig(BaseConfig):
     The length of the inertial buffer in seconds.
     """
 
-    channel: str
-    """Channel containing IMU measurements."""
+    channels: tuple[str, ...]
+    """Channel(s) containing inertial measurements to process."""
 
     C_imu_to_platform: tuple[
         tuple[float, float, float],
