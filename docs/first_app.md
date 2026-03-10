@@ -10,7 +10,7 @@ to the corresponding page in the {ref}`tutorial-apps` section of the docs.
 ## Running an App
 
 A Python app consists of a Python script containing all plugin imports, config, and code
-needed to start a particular instance of Python pntOS. The {term}`Cobra` plugin set
+needed to start a particular instance of a {term}`pntOS-Python` implementation. The {term}`Cobra` plugin set
 contains a [Transport plugin](./plugins/transport_plugin.md) that retrieves
 {term}`ASPN` messages from an
 [LCM](https://github.com/lcm-proj/lcm)

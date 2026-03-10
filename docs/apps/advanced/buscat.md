@@ -1,6 +1,6 @@
 # Buscat App
 
-This app is very different from other apps. While pntOS is designed for sensor fusion, Buscat takes advantage of its modularity to convert and retransmit sensor data.
+This app is very different from other apps. While {term}`pntOS-Python` is designed for sensor fusion, Buscat takes advantage of its modularity to convert and retransmit sensor data.
 
 ## Overview
 
