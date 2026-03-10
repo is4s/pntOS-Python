@@ -1,5 +1,5 @@
 diff --git a/pntos-cobra/src/pntos/cobra/standard_plugins//controller/StandardControllerPlugin.py b/pntos-cobra/src/pntos/cobra/advanced_plugins//buscat/BuscatControllerPlugin.py
-index 2fdc67aa..f1a13e5d 100644
+index 2fdc67aa..e1a55e77 100644
 --- a/pntos-cobra/src/pntos/cobra/standard_plugins//controller/StandardControllerPlugin.py
 +++ b/pntos-cobra/src/pntos/cobra/advanced_plugins//buscat/BuscatControllerPlugin.py
 @@ -6,12 +6,11 @@ from pntos.api import (
@@ -16,7 +16,7 @@ index 2fdc67aa..f1a13e5d 100644
  from pntos.cobra.utils import (
      SortedPlugins,
      find_base_plugin_type,
-@@ -20,44 +19,35 @@ from pntos.cobra.utils import (
+@@ -20,44 +19,46 @@ from pntos.cobra.utils import (
      validate_plugins,
  )
  
@@ -30,6 +30,17 @@ index 2fdc67aa..f1a13e5d 100644
      """
 -    This is a simple single-threaded controller plugin.
 +    This is a simple single-threaded Buscat controller plugin.
++
++    The purpose of this plugin is to route one or more data streams from
++    :class:`TransportPlugins <pntos.api.TransportPlugin>` back out through one or more
++    :class:`TransportPlugins <pntos.api.TransportPlugin>`, as specified in the supplied
++    :attr:`BuscatConfig.output_transports <pntos.cobra.config.BuscatConfig.output_transports>`.
++    This has the effect of combining multiple data streams and converting all input to the formats
++    supported by the output :class:`TransportPlugins <pntos.api.TransportPlugin>`. Note that this
++    controller does not do any buffering or sorting of the input data before publishing. It (or more
++    specifically, the :class:`BuscatMediator <pntos.cobra.internal.BuscatMediator>`) also does not
++    explicitly pass input data to plugins other than :class:`TransportPlugins <pntos.api.TransportPlugin>`,
++    and thus will not support sensor fusion without some modification.
  
      Here are the plugins and corresponding expected number of instances this controller
      looks for:
@@ -67,7 +78,7 @@ index 2fdc67aa..f1a13e5d 100644
  
          Args:
              identifier (str): The plugin identifier passed to the
-@@ -110,22 +100,16 @@ class StandardControllerPlugin(ControllerPlugin):
+@@ -110,22 +111,16 @@ class StandardControllerPlugin(ControllerPlugin):
              self._registry_plugin,
              self._logging_plugin,
              self._transport_plugins,
@@ -92,7 +103,7 @@ index 2fdc67aa..f1a13e5d 100644
              for p in self._plugins
          ]
  
-@@ -152,7 +136,7 @@ class StandardControllerPlugin(ControllerPlugin):
+@@ -152,7 +147,7 @@ class StandardControllerPlugin(ControllerPlugin):
          )
  
          # Give mediators a registry
@@ -101,7 +112,7 @@ index 2fdc67aa..f1a13e5d 100644
  
          # Initialize logger second
          assert self._logging_plugin is not None
-@@ -165,7 +149,7 @@ class StandardControllerPlugin(ControllerPlugin):
+@@ -165,7 +160,7 @@ class StandardControllerPlugin(ControllerPlugin):
          )
  
          # Give mediators a logging plugin
@@ -110,7 +121,7 @@ index 2fdc67aa..f1a13e5d 100644
  
          # call init_plugin() on all the other plugins
          for i, plugin in enumerate(self._plugins):
-@@ -179,40 +163,25 @@ class StandardControllerPlugin(ControllerPlugin):
+@@ -179,40 +174,25 @@ class StandardControllerPlugin(ControllerPlugin):
              )
  
          # Give the mediators other needed plugins
@@ -158,7 +169,7 @@ index 2fdc67aa..f1a13e5d 100644
          """
          Utility function to ensure ``plugins`` contains enough plugins to run pntOS
          Cobra. Then assigns and dispatches them to the relevant fields on the
-@@ -220,34 +189,21 @@ class StandardControllerPlugin(ControllerPlugin):
+@@ -220,34 +200,21 @@ class StandardControllerPlugin(ControllerPlugin):
          not as expected.
          """
          sorted_plugins: SortedPlugins = sort_plugins_dataclass(plugins)
@@ -193,7 +204,7 @@ index 2fdc67aa..f1a13e5d 100644
          )
  
      def _log(self, level: LoggingLevel, message: str) -> None:
-@@ -285,10 +241,10 @@ class StandardControllerPlugin(ControllerPlugin):
+@@ -285,10 +252,10 @@ class StandardControllerPlugin(ControllerPlugin):
                  'Press Ctrl + C at any time to shut down pntOS...',
              )
              try:

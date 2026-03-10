@@ -26,6 +26,17 @@ class BuscatControllerPlugin(ControllerPlugin):
     """
     This is a simple single-threaded Buscat controller plugin.
 
+    The purpose of this plugin is to route one or more data streams from
+    :class:`TransportPlugins <pntos.api.TransportPlugin>` back out through one or more
+    :class:`TransportPlugins <pntos.api.TransportPlugin>`, as specified in the supplied
+    :attr:`BuscatConfig.output_transports <pntos.cobra.config.BuscatConfig.output_transports>`.
+    This has the effect of combining multiple data streams and converting all input to the formats
+    supported by the output :class:`TransportPlugins <pntos.api.TransportPlugin>`. Note that this
+    controller does not do any buffering or sorting of the input data before publishing. It (or more
+    specifically, the :class:`BuscatMediator <pntos.cobra.internal.BuscatMediator>`) also does not
+    explicitly pass input data to plugins other than :class:`TransportPlugins <pntos.api.TransportPlugin>`,
+    and thus will not support sensor fusion without some modification.
+
     Here are the plugins and corresponding expected number of instances this controller
     looks for:
 

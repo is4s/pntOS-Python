@@ -35,6 +35,8 @@ class BuscatConfig(BaseConfig):
 
     # INHERITED FIELDS
     group: str
+    """Inherited from BaseConfig. Registry group in which to store this config."""
 
     # UNIQUE FIELDS
     output_transports: tuple[str, ...]
+    """Identifiers of transport plugins through which to route output messages."""
