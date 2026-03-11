@@ -15,7 +15,7 @@ class DummyOrchestrationPlugin(OrchestrationPlugin):
     """
     A very simple :class:`~pntos.api.OrchestrationPlugin` implementation that mimics a fully
     functional system by accepting inputs and echoing these inputs as outputs through a
-    :class:`~pntos.api.Mediator`. Though additonal plugins may be supplied to this instance
+    :class:`~pntos.api.Mediator`. Though additional plugins may be supplied to this instance
     they are not used in any way.
     """
 
