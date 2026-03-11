@@ -62,6 +62,7 @@ apps/minimal
 ```{toctree}
 :caption: Reference
 auxiliary_data
+factory_pattern
 faq
 coordinate_frames
 concurrency
