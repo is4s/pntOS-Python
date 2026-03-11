@@ -19,7 +19,7 @@ Some quick references:
 ### Reference
 
 - [pntOS-Python
-  Documentation](https://pntos.pages.aspn.us/pntos-python/documentation/api.html)
+  Documentation](https://pntos.pages.aspn.us/pntos-python/autodocs/api.html)
 - [Cobra Documentation](https://pntos.pages.aspn.us/pntos-python/cobra.html)
 
 ## Contributing
