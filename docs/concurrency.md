@@ -217,16 +217,13 @@ This leads us to the following rule all plugins must follow:
    modify a list after returning it as a resource, it must either modify a copy of the
    returned list or return a copied list.
 
-## PIP and Controller
+## The PIP and Controller Plugin
 
-The [PIP](./plugins/platform_integration_plugin.md) and [Controller
-Plugin](./plugins/controller_plugin.md) work closely to handle system resources
-concurrently in pntOS. Because of this close relationship, there is no way to
-prescriptively lay out a set of rules the
-[PIP](./plugins/platform_integration_plugin.md) and [Controller
-Plugin](./plugins/controller_plugin.md) must adhere to in order to avoid races,
-deadlocks, and other undesirable effects. Instead, for concurrent implementations, the
-[PIP](./plugins/platform_integration_plugin.md) must be designed to work specifically
-with a chosen [Controller Plugin](./plugins/controller_plugin.md), and document the way
-that it coordinates concurrency with the [Controller
-Plugin](./plugins/controller_plugin.md).
+The {py:obj}`Platform Integration plugin<pntos.api.PlatformIntegrationPlugin>` (PIP) and [Controller
+Plugin](./plugins/controller_plugin.md) work closely to handle system resources concurrently in
+pntOS. Because of this close relationship, there is no way to prescriptively lay out a set of rules
+the PIP and [Controller Plugin](./plugins/controller_plugin.md) must adhere to in order to avoid
+races, deadlocks, and other undesirable effects. Instead, for concurrent implementations, the PIP
+must be designed to work specifically with a chosen [Controller
+Plugin](./plugins/controller_plugin.md), and document the way that it coordinates concurrency with
+the [Controller Plugin](./plugins/controller_plugin.md).
