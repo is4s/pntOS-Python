@@ -5,14 +5,12 @@ of reference, let's walk through this graphic:
 
 ![Overview Image](./images/pntos_yet_another_view.png)
 
-Notice that the {term}`App` starts the [Controller
-Plugin](./plugins/controller_plugin.md), which then hands a
-[Mediator](./plugins/controller_plugin.md#mediator) to all the other plugins which
-controls the flow of data through the system. Data comes into the system from the
-platform through [Transport Plugins](./plugins/transport_plugin.md) (or for more
-specialized cases, the [Platform Interface
-Plugin](./plugins/platform_integration_plugin.md)) which then pass data on to the [Orchestration
-Plugin](./plugins/orchestration_plugin.md). 
+Notice that the {term}`App` starts the [Controller Plugin](./plugins/controller_plugin.md), which
+then hands a [Mediator](./plugins/controller_plugin.md#mediator) to all the other plugins which
+controls the flow of data through the system. Data comes into the system from the platform through
+[Transport Plugins](./plugins/transport_plugin.md) (or for more specialized cases, the
+{py:obj}`Platform Integration plugin<pntos.api.PlatformIntegrationPlugin>`) which then pass data on
+to the [Orchestration Plugin](./plugins/orchestration_plugin.md).
 
 The [Orchestration
 Plugin](./plugins/orchestration_plugin.md) can optionally incorporate other plugins to implement
@@ -33,10 +31,10 @@ plugins to assemble the fusion engine.
 
 Additionally, all plugins have access to the [Registry
 Plugin](./plugins/registry_plugin.md) and [Logging Plugin](./plugins/logging_plugin.md)
-via the mediator. 
+via the mediator.
 
 Other plugins such as the [UI Plugin](./plugins/ui_plugin.md),
-[Platform Integration Plugin](./plugins/platform_integration_plugin.md), or the [Utility
+{py:obj}`Platform Integration plugin<pntos.api.PlatformIntegrationPlugin>`, or the [Utility
 Plugin](./plugins/utility_plugin.md) optionally provide the system with expanded
 capabilities.
 
@@ -53,7 +51,6 @@ plugins/inertial_plugin
 plugins/initialization_plugin
 plugins/logging_plugin
 plugins/orchestration_plugin
-plugins/platform_integration_plugin
 plugins/preprocessor_plugin
 plugins/registry_plugin
 plugins/state_modeling_plugin
