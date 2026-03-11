@@ -11,6 +11,9 @@ variables:
   GIT_CLEAN_FLAGS: -xdff
   UV_INDEX: https://gitlab-ci-token:${CI_JOB_TOKEN}@git.aspn.us/api/v4/projects/94/packages/pypi/simple
   FIREHOSE_OUTPUTS_VERSION: d051b108d4c68e648ed551356ad7ddc1b76b99e1  # main, July 28, 2025
+  # Specify a GIT_EDITOR so that the git merge doesn't result in the error:
+  # Terminal is dumb, but EDITOR unset
+  GIT_EDITOR: cat
 
 default:
     retry:
@@ -28,6 +31,12 @@ default:
         - git --no-optional-locks fetch --prune
         - git reset --hard "$CI_COMMIT_SHA"
         - git clean "$GIT_CLEAN_FLAGS" || true
+
+        # Set git metadata so we can create a merge commit when we merge with main.
+        - export GIT_COMMITTER_NAME="$(git log -1 --pretty=%cn)"
+        - export GIT_COMMITTER_EMAIL="$(git log -1 --pretty=%ce)"
+        - export GIT_AUTHOR_NAME="$(git log -1 --pretty=%an)"
+        - export GIT_AUTHOR_EMAIL="$(git log -1 --pretty=%ae)"
 
         # If this is a branch pipeline, attempt to merge with master/target branch, but keep going
         # if it fails.
