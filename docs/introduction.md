@@ -135,54 +135,31 @@ GPS/INS sensor fusion from sensor data it receives from an LCM network bus
 [here](https://git.aspn.us/pntos/pntos-python/-/blob/main/apps/tutorial/gps_ins.py).
 For instructions on how to run this example app, see [Running Your First App](first_app.md).
 
-### Implementing Our Own Custom App
+### A Very Simple App
 
-For the purposes of this tour, suppose we defined a new app that used five plugins of the following types:
+For the purposes of this tour, suppose we defined an app that used three plugins of the following
+types:
 
 | Plugin Type          | Description                                                                                     |
 | -------------------- | ----------------------------------------------------------------------------------------------- |
 | Orchestration Plugin | A plugin that is given sensor data and produces a solution (i.e. via sensor fusion internally)  |
 | Transport Plugin     | A plugin that listens for sensor data from a network and converts it to ASPN format (if needed) |
-| Registry Plugin      | A plugin that stores key/value pairs, and comes pre-populated with values from a config file    |
-| Logging Plugin       | A plugin that takes errors/warnings and prints them to a log (e.g. the console)                 |
 | Controller Plugin    | A plugin that receives all the other plugins and takes over control from the App                |
 
-Furthermore, suppose we wanted to use off-the-shelf Cobra plugins for the transport, registry, logging, and controller
-plugins, but wanted to implement our own sensor fusion solution in a custom
-{py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>`. Then we might write our app like this:
+```{note}
+Most pntOS-Python implementations will also require a registry and logging plugin, but those are
+excluded here for brevity.
+```
 
-```python
-# Use the off-the-shelf Cobra implementations of these plugins
-from pntos.cobra import (
-    DummyTransportPlugin,
-    StandardRegistryPlugin,
-    StandardLoggingPlugin,
-    StandardControllerPlugin,
-)
+We might write our app like this:
 
-# Define our own OrchestrationPlugin (sensor data in, solution out)
-from my.example.project import (
-    MyOrchestrationPlugin,
-)
-
-# Create the orchestration plugin
-my_orchestration = MyOrchestrationPlugin("My Orchestration Name")
-
-# Create the other plugins and put them into a list
-my_transport = DummyTransportPlugin("My Transport Name")
-my_registry = StandardRegistryPlugin("My Registry Name")
-my_logging = StandardLoggingPlugin("My Logger Name")
-my_controller = StandardControllerPlugin("My Controller Name")
-other_plugin_list = [my_orchestration, my_transport, my_registry, my_logging]
-
-# Give the controller control, and pass it the list of other plugins
-my_controller.take_control(plugins=other_plugin_list)
+```{literalinclude} ../apps/dummy/minimal.py
 ```
 
 ...and thats it! Once our {term}`App` calls
 {py:obj}`my_controller.take_control()<pntos.api.ControllerPlugin.take_control>`, passing in
 the `other_plugin_list` as the `plugins` parameter, our app is done. The rest of the work is done
-inside the {py:obj}`StandardControllerPlugin<pntos.api.ControllerPlugin>` implementation, which is the
+inside the {py:obj}`ControllerPlugin<pntos.api.ControllerPlugin>` implementation, which is the
 next stop on our tour.
 
 ### Understanding the Controller Plugin
@@ -195,13 +172,13 @@ that method is all that is needed to fully implement a {py:obj}`Controller Plugi
 Thus, we will turn our attention towards what is required to implement
 the {py:obj}`take_control()<pntos.api.ControllerPlugin.take_control>` method.
 
-As a parameter,
-{py:obj}`take_control<pntos.api.ControllerPlugin.take_control>` receives a list of plugins that it is
-supposed to use to set up the {term}`pntOS-Python` system. For example, our {py:obj}`Controller<pntos.api.ControllerPlugin>`
-might receive this list of plugins:
+As a parameter, {py:obj}`take_control<pntos.api.ControllerPlugin.take_control>` receives a list of
+plugins that it is supposed to use to set up the {term}`pntOS-Python` system. For example, our
+{py:obj}`Controller plugin<pntos.api.ControllerPlugin>` might receive this list of plugins:
 
-```python
-[my_orchestration, my_transport, my_registry, my_logging]
+```{literalinclude} ../apps/dummy/minimal.py
+:start-at: plugins =
+:end-at: ]
 ```
 
 as described in the last section.
@@ -211,10 +188,9 @@ to write some code that takes those four plugins that were passed in as paramete
 system out of them.
 
 Let's suppose we wanted to start with the simplest possible implementation of
-{py:obj}`take_control()<pntos.api.ControllerPlugin.take_control>`, and so we decided to throw out
-`my_registry` (configuration) and `my_logging` (error logging) plugins for the moment. Then we would be left with two: A
-{py:obj}`Transport Plugin<pntos.api.TransportPlugin>` called `my_transport`, which _produces_ sensor data from the
-network, and an {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` called `my_orchestration`, which
+{py:obj}`take_control()<pntos.api.ControllerPlugin.take_control>`. In this case, we have two plugins to work with: A
+{py:obj}`Transport Plugin<pntos.api.TransportPlugin>`, which _produces_ sensor data from the
+network, and an {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>`, which
 _consumes_ sensor data and produces PNT solutions. Then the implementation of
 {py:obj}`take_control()<pntos.api.ControllerPlugin.take_control>` would ideally set up a pipeline that looked like this:
 
@@ -227,16 +203,15 @@ To set up that chain of data flow, the {py:obj}`take_control()<pntos.api.Control
 would need to perform the following steps in order:
 
 0. First call {py:obj}`init_plugin()<pntos.api.CommonPlugin.init_plugin>` on both
-   {py:obj}`my_transport<pntos.api.TransportPlugin>` and
-   {py:obj}`my_orchestration<pntos.api.OrchestrationPlugin>` plugins before using them
+   the Transport and Orchestration plugins before using them
    (more on why we need to do this in a minute).
-1. Tell {py:obj}`my_transport<pntos.api.TransportPlugin>` to start listening to its network bus,
-   by calling {py:obj}`my_transport.start_listening()<pntos.api.TransportPlugin.start_listening>`.
-2. Take the ASPN sensor data received from {py:obj}`my_transport<pntos.api.TransportPlugin>` and
-   send it to {py:obj}`my_orchestration<pntos.api.OrchestrationPlugin>`'s
+1. Tell the Transport plugin to start listening to its network bus,
+   by calling {py:obj}`start_listening()<pntos.api.TransportPlugin.start_listening>`.
+2. Take the ASPN sensor data received from the Transport plugin and
+   send it to the Orchestration plugin's
    {py:obj}`process_pntos_message()<pntos.api.OrchestrationPlugin.process_pntos_message>` via the
    mediator, processing it into a solution.
-3. Call {py:obj}`my_orchestration<pntos.api.OrchestrationPlugin>`'s
+3. Call the Orchestration plugin's
    {py:obj}`request_solutions()<pntos.api.OrchestrationPlugin.request_solutions()>`, which asks the
    {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` to return the PNT solution it has computed
    by utilizing all previously received data from step 2.
@@ -245,12 +220,12 @@ would need to perform the following steps in order:
 A few other necessary chores are omitted here for brevity.
 ```
 
-Step 1 is relatively straightforward, since we have the {py:obj}`my_transport<pntos.api.TransportPlugin>`
+Step 1 is relatively straightforward, since we have the Transport plugin
 in our hand (it was passed in as a parameter) and we can directly call the
-{py:obj}`my_transport.start_listening()<pntos.api.TransportPlugin.start_listening>` method on it. Similarly,
+{py:obj}`start_listening()<pntos.api.TransportPlugin.start_listening>` method on it. Similarly,
 Step 3 is relatively straightforward, as we have the {py:obj}`my_orchestration<pntos.api.OrchestrationPlugin>`
 in our hand (it was passed in as a parameter) and we can directly call the
-{py:obj}`my_orchestration.request_solutions()<pntos.api.OrchestrationPlugin.request_solutions()>` method on it. However,
+{py:obj}`request_solutions()<pntos.api.OrchestrationPlugin.request_solutions()>` method on it. However,
 Step 2 requires us to receive data from the {py:obj}`Transport Plugin<pntos.api.TransportPlugin>` so that
 we can pass it into the {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>`'s
 {py:obj}`process_message()<pntos.api.OrchestrationPlugin.process_pntos_message()>`. How do we do that?
@@ -312,10 +287,10 @@ is implemented, and then, armed with that knowledge, we'll return to Step 2 of t
 ### Understanding the Transport Plugin
 
 A {py:obj}`Transport Plugin<pntos.api.TransportPlugin>` has one primary purpose: receive sensor data from
-a sensor and deliver it into its {py:obj}`Mediator<pntos.api.Mediator>`, for consumption/routing to other
+a sensor and deliver it into its {py:obj}`Mediator<pntos.api.Mediator>`, for consumption or routing to other
 plugins.
 
-How a {py:obj}`Transport Plugin<pntos.api.TransportPlugin>` collects data from the sensor/network is totally arbitrary
+How a {py:obj}`Transport Plugin<pntos.api.TransportPlugin>` collects data from the sensor or network is totally arbitrary
 and depends on the nature of the sensor data.
 For example, one transport plugin might listen to an ethernet connection for data streaming over DDS or LCM.
 Another transport plugin might listen to a local serial device or UART.
@@ -332,13 +307,13 @@ Whatever the source of the sensor data is, a {py:obj}`Transport Plugin<pntos.api
 sending it on to its {py:obj}`Mediator<pntos.api.Mediator>`. If the source data is already in ASPN format,
 great! In this case, the {py:obj}`Transport Plugin<pntos.api.TransportPlugin>` simply acts as a transparent
 network bridge, marshaling data from the source of choice into the mediator without needing to convert
-from a non-ASPN to ASPN format.
+from a non-ASPN to an ASPN format.
 
 The {py:obj}`Transport Plugin<pntos.api.TransportPlugin>` has three methods of interest for the purposes of
 this tour:
 
 - {py:obj}`init_plugin()<pntos.api.CommonPlugin.init_plugin>` method, which it inherits from
-  {py:obj}`CommonPlugin<pntos.api.CommonPlugin>` method. This is used to receive the
+  {py:obj}`CommonPlugin<pntos.api.CommonPlugin>`. This is used to receive the
   {py:obj}`Mediator<pntos.api.Mediator>` from the controller, and is guaranteed to be called before any of
   its other methods.
 - {py:obj}`TransportPlugin.start_listening()<pntos.api.TransportPlugin.start_listening>`, which is called
@@ -369,15 +344,21 @@ has a lot of fields on it for things like logging, config, and so forth. But the
 here is {py:obj}`Mediator.process_pntos_message(message)<pntos.api.Mediator.process_pntos_message>`.
 The docstring reads:
 
-> Send a new message to the system for arbitrary processing.
-> For example, this function is useful for plugins who have just received new sensor
-> data that they wish to relay to the system to be used in a sensor fusion solution.
+```{literalinclude} ../pntos-api/src/pntos/api/plugins/common.py
+:language: none
+:start-at: Send a new message to the system for arbitrary processing.
+:end-at: solution.
+```
 
 If we look at the type of the parameter that
 {py:obj}`Mediator.process_pntos_message(message)<pntos.api.Mediator.process_pntos_message>`
 accepts, we see that it is a {py:obj}`pntos.api.Message<pntos.api.Message>`, which is defined as:
 
-> A container for an ASPN message.
+```{literalinclude} ../pntos-api/src/pntos/api/plugins/common.py
+:language: none
+:start-at: A container for an ASPN message.
+:end-at: A container for an ASPN message.
+```
 
 Which looks like exactly what we need. In short:
 
@@ -398,11 +379,11 @@ will now be delivered to the {py:obj}`Mediator<pntos.api.Mediator>` and the
 {py:obj}`Transport Plugin<pntos.api.TransportPlugin>` can move on to the next sensor data in its loop (or
 go back to waiting for data from the wire, for networked {py:obj}`Transport Plugins<pntos.api.TransportPlugin>`).
 
-### A Simple Transport Plugin Example
+### A Dummy Transport Plugin Example
 
 The {py:obj}`DummyTransportPlugin<pntos.cobra.DummyTransportPlugin>` is designed to be the simplest possible
 implementation of a {py:obj}`Transport Plugin<pntos.api.TransportPlugin>` possible to demonstrate the concepts
-above, which is why it was chosen as the transport for our [custom app](#implementing-our-own-custom-app).
+above, which is why it was chosen as the transport for our [simple app example](#a-very-simple-app).
 The source code of the {py:obj}`DummyTransportPlugin<pntos.cobra.DummyTransportPlugin>` can be
 [found here](https://git.aspn.us/pntos/pntos-python/-/blob/main/pntos-cobra/src/pntos/cobra/dummy_plugins/DummyTransportPlugin.py).
 We can see from the source that it is very similar to the simple approach we've described above, namely it:
@@ -422,7 +403,8 @@ it serves as a concrete example of a transport plugin that delivers data into th
 You'll see in the implementation of `start_listening` in `DummyTransport` that a new thread is created
 to send in the zeros. This is because {term}`pntOS-Python` requires that plugins do not block on {term}`pntOS-Python` system threads.
 Since `start_listening` was called by the {term}`pntOS-Python` system, it is not ours to block, and so the `DummyTransport`
-creates its own thread to spin in a busy loop and call the mediator.
+creates its own thread to spin in a busy loop and call the mediator. For more information, see the
+page on [Concurrency](concurrency.md) in pntOS-Python.
 ```
 
 ### Back to the Controller
@@ -477,51 +459,60 @@ And thats it! we've now set up a pipeline that forwards all data received by a
 {py:obj}`Transport Plugin<pntos.api.TransportPlugin>` into the
 {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>`.
 
-### A Simple Controller Plugin Example
+### A Dummy Controller Plugin Example
 
-The {py:obj}`StandardControllerPlugin<pntos.cobra.StandardControllerPlugin>` is designed to be a simple implementation
+The {py:obj}`DummyControllerPlugin<pntos.cobra.DummyControllerPlugin>` is designed to be a simple implementation
 of a {py:obj}`Controller Plugin<pntos.api.ControllerPlugin>` to demonstrate the concepts
-above, which is why it was chosen as the controller for our [custom app](#implementing-our-own-custom-app).
-The source code of the {py:obj}`StandardControllerPlugin<pntos.cobra.StandardControllerPlugin>` can be
-[found here](https://git.aspn.us/pntos/pntos-python/-/blob/main/pntos-cobra/src/pntos/cobra/standard_plugins/controller/StandardControllerPlugin.py),
-along with its {py:obj}`StandardMediator<pntos.cobra.internal.StandardMediator>`
-[here](https://git.aspn.us/pntos/pntos-python/-/blob/main/pntos-cobra/src/pntos/cobra/standard_plugins/controller/StandardMediator.py).
+above, which is why it was chosen as the controller for our [simple app example](#a-very-simple-app).
+The source code of the {py:obj}`DummyControllerPlugin<pntos.cobra.DummyControllerPlugin>` can be
+[found here](https://git.aspn.us/pntos/pntos-python/-/blob/main/pntos-cobra/src/pntos/cobra/dummy_plugins/DummyControllerPlugin.py),
+along with its {py:obj}`DummyMediator<pntos.cobra.internal.DummyMediator>`
+[here](https://git.aspn.us/pntos/pntos-python/-/blob/main/pntos-cobra/src/pntos/cobra/dummy_plugins/DummyMediator.py).
 
-We can see from the source code that the {py:obj}`StandardMediator<pntos.cobra.internal.StandardMediator>`
+We can see from the source code that the {py:obj}`DummyMediator<pntos.cobra.internal.DummyMediator>`
 is similar to the approach we've described above, namely:
 
 - In the `take_control` implementation, the controller first calls `init_plugin` on each plugin
   before using them, which is our Step 0 above:
 
-  ```{literalinclude} ../pntos-cobra/src/pntos/cobra/standard_plugins/controller/StandardControllerPlugin.py
+  ```{literalinclude} ../pntos-cobra/src/pntos/cobra/dummy_plugins/DummyControllerPlugin.py
   :language: python
-  :start-at: Initialize registry plugin first thing
-  :end-before: Give the mediators other needed plugins
+  :start-at: Initialize each plugin.
+  :end-at: plugin.init_plugin
   :dedent: 8
   ```
 
 - In the `take_control` implementation, the controller tells all the transport plugins to start
   listening, which is our Step 1 above:
 
-  ```{literalinclude} ../pntos-cobra/src/pntos/cobra/standard_plugins/controller/StandardControllerPlugin.py
+  ```{literalinclude} ../pntos-cobra/src/pntos/cobra/dummy_plugins/DummyControllerPlugin.py
   :language: python
-  :start-at: for transport in self._transport_plugins:
-  :end-at: transport.start_listening()
+  :start-at: Tell the Transport plugin to start listening.
+  :end-at: plugin.start_listening()
   :dedent: 8
   ```
 
-- The implementation of `StandardMediator.process_pntos_message` does some simple error checking and
-  then passes messages received from the transport plugin into the orchestration plugin's
-  `process_pntos_message`, which is our Step 2 above:
+- The implementation of `DummyMediator.process_pntos_message` searches through its list of plugins
+  for the Orchestration plugin and then passes messages received from the transport plugin into the
+  orchestration plugin's `process_pntos_message`, which is our Step 2 above:
 
-  ```{literalinclude} ../pntos-cobra/src/pntos/cobra/standard_plugins/controller/StandardMediator.py
+  ```{literalinclude} ../pntos-cobra/src/pntos/cobra/dummy_plugins/DummyMediator.py
   :language: python
-  :start-at: def process_pntos_message(self, message: Message) -> None:
-  :end-at: self._orchestration_plugin.process_pntos_message(m, True)
+  :start-at: Find the Orchestration plugin and pass it the message.
+  :end-at: orchestration_plugin.process_pntos_message(message, sequenced=False)
   :dedent: 4
   ```
 
-<!-- TODO: Break out TutorialXPlugin plugins, and dont use the Simple plugins here, which don't track what we're trying to do -->
+- Last, the implementation of `DummyMediator.process_pntos_message` then requests a solution from
+  the Orchestration plugin and sends that solution out, which is our Step 3 above:
+
+  ```{literalinclude} ../pntos-cobra/src/pntos/cobra/dummy_plugins/DummyMediator.py
+  :language: python
+  :start-at: orchestration_plugin.request_solutions
+  :end-before: def broadcast_aspn_message
+  :dedent: 4
+  ```
+
 
 ```{note}
 
@@ -595,15 +586,15 @@ The {py:obj}`OrchestrationPlugin.request_solutions<pntos.api.OrchestrationPlugin
 complicated parameters in order to handle advanced real-world use cases (for example, needing to return a set of
 times that are reset-free, for delta poses). However, using it is pretty straightforward if you just want
 the best solution that an {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` has
-at a given time `t`. All you need to do is pass in the string "BEST" for the `filter_description` parameter,
-and the time `t` as a length=1 `List` for the `solution_times` parameter. e.g.
+at a given time `t`. You leave off the `filter_description` parameter and just pass the time `t` as
+a length=1 `List` for the `solution_times` parameter. For example:
 
   ```Python
   # The time I want a solution at (in nanoseconds since ASPN epoch)
   nsecs=50000
   # Ask the orchestration plugin for the best solution it has at time=`nsecs`
-  my_orchestration_plugin.request_solutions(solution_times=[aspn.TypeTimestamp(nsecs)],
-                                            filter_description="BEST")
+  my_orchestration_plugin.request_solutions(solution_times=[aspn.TypeTimestamp(nsecs)])
+  ```
 ````
 
 In most {term}`pntOS-Python` systems, an {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` will receive a stream
@@ -620,10 +611,10 @@ Because the {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` is the
 algorithm in a {term}`pntOS-Python` system, it is a very open-ended plugin. The design of {term}`pntOS-Python` is to
 allow for a flexible architecture that enables any kind of navigation solution to be developed. For example,
 one classical way to implement the {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` would be via an
-extended Kalman filter (EKF), which propagates and updates to each measurement as it is received (optionally
+{term}`EKF`, which propagates and updates to each measurement as it is received (optionally
 with some amount of buffering or re-ordering messages internally). In this case, the
 {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` would likely want to buffer solutions that the EKF
-produced, and when a {py:obj}`OrchestrationPlugin.request_solutions<pntos.api.OrchestrationPlugin.request_solutions>`
+produced. Then, when a {py:obj}`OrchestrationPlugin.request_solutions<pntos.api.OrchestrationPlugin.request_solutions>`
 came in, the plugin would look for the nearest solution and return it (potentially after interpolation to the
 requested time). Alternatively, someone could write an advanced algorithm that produces
 solutions completely differently; for example, a neural network that takes in measurements as context and produces
@@ -632,170 +623,132 @@ solutions from a set of trained weights. Because of the vast number of ways that
 way to write one. Everything from trivial single-filter EKF approaches to
 multi-model adaptive estimation (MMAE) multi-filter approaches that include integrity are supported, and beyond.
 
-### Implementing a Custom Orchestration Plugin
+### A Dummy Orchestration Plugin Example
 
-In our {term}`App`, we were interested in our own custom `MyOrchestrationPlugin`. The outline of the
-simplest possible {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` would look like this:
-
-```Python
-from aspn23 import TypeTimestamp
-from pntos.api import (
-    OrchestrationPlugin,
-    Mediator,
-    Message,
-    CommonPlugin,
-    MessageStreamConfig,
-)
-
-class MyOrchestrationPlugin(OrchestrationPlugin):
-    def __init__(self, identifier: str):
-        self.identifier = identifier
-
-    def init_orchestration_plugin(
-        self, plugins: list[CommonPlugin], stream_config: MessageStreamConfig
-    ) -> None:
-        stream_config.immediate_stream_all(True)
-
-    def process_pntos_message(self, message: Message, sequenced: bool) -> None:
-        print(f'Got Message: {message}')
-        # TODO: Process the ASPN message, and save the result off to `self`,
-        # so `request_solutions` can access it later
-
-    def request_solutions(
-        self, solution_times: list[TypeTimestamp], filter_description: str | None = None
-    ) -> list[Message | None] | None:
-        # This method should use the solution computed in `process_pntos_message`
-        # and stored away in `self` in order to return a solution at the requested time.
-        return None
-
-    def filter_description_list(self) -> list[str]:
-        # We only have one solution, our 'best' solution
-        return ["BEST"]
-
-    def init_plugin(
-        self,
-        plugin_resources_location: str | None = None,
-        mediator: Mediator | None = None,
-    ) -> None:
-        self.mediator = mediator
-
-    def shutdown_plugin(self) -> None:
-        pass
-
-```
+In our {term}`App`, we used
+{py:obj}`DummyOrchestrationPlugin<pntos.cobra.DummyOrchestrationPlugin>`, which is designed to be a
+simple implementation of a {py:obj}`Orchestration plugin<pntos.api.OrchestrationPlugin>`. The source
+code of `DummyOrchestrationPlugin` can be [found
+here](https://git.aspn.us/pntos/pntos-python/-/blob/main/pntos-cobra/src/pntos/cobra/dummy_plugins/DummyOrchestrationPlugin.py)
 
 Let's walk through this example step-by-step. We'll skip the imports, which are just bringing in symbols from the
 pntOS-Python APIs. The constructor:
 
-```Python
-def __init__(self, identifier: str):
-    self.identifier = identifier
+```{literalinclude} ../pntos-cobra/src/pntos/cobra/dummy_plugins/DummyOrchestrationPlugin.py
+:start-at: def __init__
+:end-at: self.mediator = None
+:dedent: 4
 ```
 
-simply takes in a name for this plugin that is human-readable and stores it off. The next method:
+simply takes in a name for this plugin that is human-readable and stores it off. It also initializes
+a few other internal fields to the default, null values.
 
-```Python
-def init_orchestration_plugin(
-    self, plugins: list[CommonPlugin], stream_config: MessageStreamConfig
-) -> None:
-    stream_config.immediate_stream_all(True)
+The `init_plugin` method implementation is similar to the examples we've seen for other plugin
+types:
+
+```{literalinclude} ../pntos-cobra/src/pntos/cobra/dummy_plugins/DummyOrchestrationPlugin.py
+:start-at: def init_plugin
+:end-at: self.mediator = mediator
+:dedent: 4
 ```
 
-is where the plugin tells the controller how it wants measurements delivered to it. The
-{py:obj}`Controller Plugin<pntos.api.ControllerPlugin>` will call this method, pass in the
-{py:obj}`stream_config<pntos.api.MessageStreamConfig>`, and see what methods the
-{py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` calls on the
+It saves off an instance of the mediator to be used in later methods.
+
+The next method:
+
+```{literalinclude} ../pntos-cobra/src/pntos/cobra/dummy_plugins/DummyOrchestrationPlugin.py
+:start-at: def init_orchestration_plugin
+:end-at: self._plugins = plugins
+:dedent: 4
+```
+
+is where the plugin gets its list of the other plugins and tells the controller how it wants
+measurements delivered to it. The {py:obj}`Controller Plugin<pntos.api.ControllerPlugin>` will call
+this method, pass in the {py:obj}`stream_config<pntos.api.MessageStreamConfig>`, and see what
+methods the {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` calls on the
 {py:obj}`stream_config<pntos.api.MessageStreamConfig>` in order to determine how the
-{py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` wants data delivered. In this case,
-we will call {py:obj}`MessageStreamConfig.immediate_stream_all<pntos.api.MessageStreamConfig.immediate_stream_all>`,
+{py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` wants data delivered. In this case, we
+will call
+{py:obj}`MessageStreamConfig.immediate_stream_all<pntos.api.MessageStreamConfig.immediate_stream_all>`,
 which is how the {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` indicates to the
-{py:obj}`Controller Plugin<pntos.api.ControllerPlugin>` that no buffering should be done, and that the
-{py:obj}`Controller Plugin<pntos.api.ControllerPlugin>` should deliver all data to the orchestration plugin
-immediately as data is received, even if data is coming in out of order according to their timestamps.
+{py:obj}`Controller Plugin<pntos.api.ControllerPlugin>` that no buffering should be done, and that
+the {py:obj}`Controller Plugin<pntos.api.ControllerPlugin>` should deliver all data to the
+orchestration plugin immediately as data is received, even if data is coming in out of order
+according to their timestamps.
 
 The next method is where we receive ASPN data:
 
-```Python
-def process_pntos_message(self, message: Message, sequenced: bool) -> None:
-    print(f'Got Message: {message}')
-    # TODO: Process the ASPN message, and save the result off to `self`,
-    # so `request_solutions` can access it later
+```{literalinclude} ../pntos-cobra/src/pntos/cobra/dummy_plugins/DummyOrchestrationPlugin.py
+:start-at: def process_pntos_message
+:end-at: self._last_message = message
+:dedent: 4
 ```
 
-In this trivial example, we take the data in and print its contents to the screen. However,
+In this trivial example, we take the data in, print its contents to the screen, then save it off. However,
 in a real {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` this is where we would perform
 sensor fusion, taking the {py:obj}`pntOS message<pntos.api.Message>` we just received and sending it into our
-algorithm, e.g. performing an update in an EKF. The results of this processing should be saved off on `self`
-and not immediately used (we will use it in the next method).
+algorithm, e.g. performing an update in an EKF. The results of this processing would be saved off on `self`
+rather than just saving off the input.
+
+Next, let's take a look at the filter descriptions:
+
+```{literalinclude} ../pntos-cobra/src/pntos/cobra/dummy_plugins/DummyOrchestrationPlugin.py
+:start-at: @property
+:end-at: return ['LAST_MESSAGE']
+:dedent: 4
+```
+
+This implementation will only provide one type of filter solution. Rather than calculating an actual
+filtering solution, it just returns the last message received.
+
+```{warning}
+For simplicity, this filter description does not follow the conventions defined by the API.
+```
 
 The next method is:
 
-```Python
-def request_solutions(
-    self, solution_times: list[TypeTimestamp], filter_description: str | None = None
-) -> list[Message | None] | None:
-    # This method should use the solution computed in `process_pntos_message`
-    # and stored away in `self` in order to return a solution at the requested time.
-    return None
+```{literalinclude} ../pntos-cobra/src/pntos/cobra/dummy_plugins/DummyOrchestrationPlugin.py
+:start-at: def request_solutions
+:end-at: return [self._last_message] * len(solution_times)
+:dedent: 4
 ```
 
-This is where we return a solution to the caller. A caller may request a solution at a set of different times,
-and so our `solution_times` parameter is a list of timestamps that the caller wants our solution at.
-The `filter_description` parameter is where callers can request different types of solutions. For example,
-we might offer our "best" solution as one that uses all the available information, but also offer a solution
-that only uses inertial data. No matter the `filter_description` parameter however, all
-{py:obj}`Orchestration Plugins<pntos.api.OrchestrationPlugin>`
-reserve the right to return `None` here, which indicates that they do not have a good solution for the requested
-times. This can happen if the `solution_times` fall outside the range where we have computed a solution, for
-example. We'll return `None` for our trivial example here, but to fill out our [custom app](#implementing-our-own-custom-app),
-we should use the solution we previously computed and return it in this function, if we have a solution at or near the requested time.
+This is where we return a solution to the caller. A caller may request a solution at a set of
+different times, and so our `solution_times` parameter is a list of timestamps that the caller wants
+our solution at. In this simple, implementation, though, we return the same solution multiple times
+for each requested time.
 
-That brings us to our next method:
+The `filter_description` parameter is where callers can request different types of solutions. If you
+remember back to the filter descriptions list, the only valid description for this implementation is
+`'LAST_MESSAGE'`, for simplicity. If the caller requests any other description, this method will
+return `None` rather than a solution. A more realistic implementation might offer our "best"
+solution as one that uses all the available information, but also offer a solution that only uses
+inertial data.
 
-```Python
-def filter_description_list(self) -> list[str]:
-    # We only have one solution, our 'best' solution
-    return ["BEST"]
+No matter the `filter_description` parameter however, all {py:obj}`Orchestration
+Plugins<pntos.api.OrchestrationPlugin>` reserve the right to return `None` here, which indicates
+that they do not have a good solution for the requested times. This can happen if the
+`solution_times` fall outside the range where we have computed a solution, for example.
+
+The last method gives the plugin a place where it can clean up after itself
+during shutdown, if needed:
+
+```{literalinclude} ../pntos-cobra/src/pntos/cobra/dummy_plugins/DummyOrchestrationPlugin.py
+:start-at: def shutdown_plugin
+:end-at: pass
+:dedent: 4
 ```
 
-Here we define which types of solutions we offer. For this example, we'll only offer one type of solution: our best.
-The string passed as a `filter_description` into {py:obj}`request_solutions<pntos.api.OrchestrationPlugin.request_solutions>`
-above must be in the list we return here. Therefore, the only valid string a user should pass into the
-{py:obj}`request_solutions<pntos.api.OrchestrationPlugin.request_solutions>` parameter `filter_description` is `"BEST"`.
+In this case, however, no extra cleanup is necessary.
 
-```{note}
-`"BEST"` as a `filter_description` does not comply with the API-defined convention for the
-{py:obj}`filter_description_list<pntos.api.OrchestrationPlugin.filter_description_list>`. This example violates the convention
-for the sake of simplicity, but any real implementation should follow the convention.
-```
-
-Which leaves us with two last methods:
-
-```Python
-def init_plugin(
-    self,
-    plugin_resources_location: str | None = None,
-    mediator: Mediator | None = None,
-) -> None:
-    self.mediator = mediator
-
-def shutdown_plugin(self) -> None:
-    pass
-```
-
-The former is where this plugin receives its {py:obj}`Mediator<pntos.api.Mediator>` as all plugins do, as we've
-discussed at length previously in the tour. The latter gives the plugin a place where it can clean up after itself
-during shutdown, if needed, which we can safely leave blank here.
-
-...and thats it! While the above plugin is not yet usable (it always returns `None` when asked for a solution),
-the next step is to fill in the {py:obj}`process_pntos_message<pntos.api.OrchestrationPlugin.process_pntos_message>`
-method with your desired sensor fusion algorithm, and then return
-the solution generated in `request_solutions`.
+...and thats it! While the above plugin is not a realistic implementation (it doesn't process any of
+the received messages into a solution), this demonstrates the general structure and dataflow of the
+Orchestration plugin.
 
 ### A Simple Orchestration Plugin Example
 
-In the previous section we developed the scaffolding for an
-{py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>`, which did not yet return a result. To do so,
+In the previous section we showed the scaffolding for an
+{py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>`, which did not calculate a result. To do so,
 we would need to pick a sensor fusion approach and implement it within
 {py:obj}`process_pntos_message<pntos.api.OrchestrationPlugin.process_pntos_message>`.
 
@@ -825,9 +778,39 @@ by the {py:obj}`request_solutions<pntos.api.OrchestrationPlugin.request_solution
 
 as described above.
 
+To run an app with the `TutorialGpsOrchestrationPlugin`, see [Running Your First App](first_app.md).
+
 <!-- TODO: Level 1 vs Level 2, and a link to the Level 2 docs when they exist -->
-<!-- TODO: Tie this walkthrough to real code that exists somewhere in a repo, and show them how to actually run this example -->
 <!-- TODO: Part 2 of the tour could be the Level 2 integration tour -->
+
+### Running The Very Simple App
+
+In the previous sections we walked through a very simple app the the dummy-level plugins it uses.
+
+```{note}
+If you do not have Cobra installed into an active virtual environment, first see the
+[Installation Guide](installation.md).
+```
+
+Now, let's run the app:
+
+```shell
+apps/dummy/minimal.py
+```
+
+You should see something like:
+
+```
+[11/03/2026 12:08:14] [unknown_dummy] [INFO] Initialized DummyTransport
+[11/03/2026 12:08:14] [unknown_dummy] [INFO] DummyTransport listening
+[11/03/2026 12:08:14] [unknown_dummy] [INFO] DummyTransport publishing to channel_foo
+[11/03/2026 12:08:14] [unknown_dummy] [INFO] Orchestration processing message from channel_foo
+...
+[11/03/2026 12:08:15] [unknown_dummy] [INFO] DummyTransport publishing to channel_foo
+[11/03/2026 12:08:15] [unknown_dummy] [INFO] Orchestration processing message from channel_foo
+[11/03/2026 12:08:15] [unknown_dummy] [INFO] Shutting down DummyTransport
+[11/03/2026 12:08:15] [unknown_dummy] [INFO] DummyTransport stopping
+```
 
 ### End of the Tour
 
