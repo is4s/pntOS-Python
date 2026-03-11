@@ -41,14 +41,17 @@ def test_dummy_orchestration_plugin(
     assert orch_plugin.mediator is not None
     orch_plugin.init_orchestration_plugin(plugins=[], stream_config=stream_config)
     sol = orch_plugin.request_solutions(solution_times=[], filter_description=None)
-    assert sol is None
+    assert sol is not None
+    assert len(sol) == 0
     sol = orch_plugin.request_solutions(
         solution_times=[TypeTimestamp(1)], filter_description=None
     )
-    assert sol is None
+    assert sol is not None
+    assert len(sol) == 1
+    assert sol[0] is None
     orch_plugin.process_pntos_message(message=dummy_msg, sequenced=False)
     sol = orch_plugin.request_solutions(
-        solution_times=[TypeTimestamp(1)], filter_description=None
+        solution_times=[TypeTimestamp(1)], filter_description='LAST_MESSAGE'
     )
     assert sol is not None
     assert len(sol) == 1
@@ -57,7 +60,8 @@ def test_dummy_orchestration_plugin(
         assert isinstance(x.wrapped_message, Trashspn)
 
     sol = orch_plugin.request_solutions(
-        solution_times=[TypeTimestamp(1), TypeTimestamp(2)], filter_description=None
+        solution_times=[TypeTimestamp(1), TypeTimestamp(2)],
+        filter_description='LAST_MESSAGE',
     )
     assert sol is not None
     assert len(sol) == 2
@@ -65,4 +69,3 @@ def test_dummy_orchestration_plugin(
         assert x is not None
         assert isinstance(x.wrapped_message, Trashspn)
     orch_plugin.shutdown_plugin()
-    assert orch_plugin.mediator is None

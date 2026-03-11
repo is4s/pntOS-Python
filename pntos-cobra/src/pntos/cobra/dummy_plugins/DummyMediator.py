@@ -54,7 +54,7 @@ class DummyMediator(Mediator):
         """
         for x in self.plugins:
             if isinstance(x, OrchestrationPlugin):
-                return x.request_solutions(solution_times=solution_times)
+                return x.request_solutions(solution_times, filter_description)
         return None
 
     def process_pntos_message(self, message: Message) -> None:
@@ -64,18 +64,17 @@ class DummyMediator(Mediator):
         Args:
             message (Message): Message to process.
         """
+        # Find the Orchestration plugin and pass it the message.
         for x in self.plugins:
             if isinstance(x, OrchestrationPlugin):
-                x.process_pntos_message(message, sequenced=False)
-                solutions = x.request_solutions([TypeTimestamp(0)])
-                # solutions may be None, or may contain None
-                if solutions:
-                    for sol in solutions:
-                        if sol:
-                            self.broadcast_aspn_message(
-                                message=sol,
-                                destination_identifier=f'{message.source_identifier}_echo',
-                            )
+                orchestration_plugin = x
+                orchestration_plugin.process_pntos_message(message, sequenced=False)
+                solutions = orchestration_plugin.request_solutions([TypeTimestamp(0)])
+                if solutions is not None:
+                    self.broadcast_aspn_message(
+                        message=solutions[0],
+                        destination_identifier=f'{message.source_identifier}_echo',
+                    )
 
     def broadcast_aspn_message(
         self,

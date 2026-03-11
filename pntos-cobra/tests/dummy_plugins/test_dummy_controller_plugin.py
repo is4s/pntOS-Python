@@ -38,7 +38,7 @@ class DoStuffPlugin(CommonPlugin):
         self.th.start()
 
     def interact_with_mediator(self) -> None:
-        exp_tag = 'last_message'
+        exp_tag = 'LAST_MESSAGE'
         loops = 100
         message = Message(wrapped_message=Trashspn(), source_identifier=self.identifier)
         # This is False initially, but should get flipped if controller calls init_plugin like it should
@@ -48,14 +48,9 @@ class DoStuffPlugin(CommonPlugin):
             sleep(0.1)
             self.mediator.process_pntos_message(message=message)
             self.mediator.broadcast_aspn_message(message=message)
-            if exp_tag in self.mediator.filter_description_list:
-                old_sol = self.mediator.request_solutions(
-                    filter_description=exp_tag, solution_times=[TypeTimestamp(0)]
-                )
-            else:
-                old_sol = self.mediator.request_solutions(
-                    solution_times=[TypeTimestamp(0)]
-                )
+            old_sol = self.mediator.request_solutions(
+                filter_description=exp_tag, solution_times=[TypeTimestamp(0)]
+            )
             if old_sol is not None:
                 self.mediator.log_message(
                     message=f'Got sol {old_sol[0].source_identifier if old_sol[0] is not None else "None"}',
@@ -110,8 +105,6 @@ def test_dummy_controller(
     # on first iteration.
     plugs = [orch_plugin, trans_plugin, stuff_plugin]
     controller_plugin.take_control(plugs)
-    sleep(0.5)  # Let transport/do_stuff spin for a bit
-    controller_plugin.shutdown_plugin()
     assert stuff_plugin.did_log
 
 
@@ -125,6 +118,4 @@ def test_dummy_slim(
     # loop will spin until control returns here after sleep or it hits max number of loops.
     plugs = [trans_plugin, stuff_plugin]
     controller_plugin.take_control(plugs)
-    sleep(0.5)  # Let transport/do_stuff spin for a bit
-    controller_plugin.shutdown_plugin()
     assert not stuff_plugin.did_log

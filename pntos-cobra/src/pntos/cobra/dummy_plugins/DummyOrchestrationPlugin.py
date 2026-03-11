@@ -40,20 +40,19 @@ class DummyOrchestrationPlugin(OrchestrationPlugin):
         self.mediator = mediator
 
     def shutdown_plugin(self) -> None:
-        self.mediator = None
+        pass
 
     def init_orchestration_plugin(
         self, plugins: list[CommonPlugin] | None, stream_config: MessageStreamConfig
     ) -> None:
-        if plugins is not None:
-            self._plugins = plugins
+        self._plugins = plugins
+        stream_config.immediate_stream_all(True)
 
     def process_pntos_message(self, message: Message, sequenced: bool) -> None:
-        if self.mediator:
-            self.mediator.log_message(
-                level=LoggingLevel.INFO,
-                message=f'Orchestration processing message from {message.source_identifier}',
-            )
+        self.mediator.log_message(
+            level=LoggingLevel.INFO,
+            message=f'Orchestration processing message from {message.source_identifier}',
+        )
         self._last_message = message
 
     @property
@@ -65,10 +64,8 @@ class DummyOrchestrationPlugin(OrchestrationPlugin):
         solution_times: list[TypeTimestamp],
         filter_description: str | None = None,
     ) -> list[Message | None] | None:
-        if not self._last_message:
-            return None
         if (
-            filter_description
+            filter_description is not None
             and filter_description not in self.filter_description_list
         ):
             return None

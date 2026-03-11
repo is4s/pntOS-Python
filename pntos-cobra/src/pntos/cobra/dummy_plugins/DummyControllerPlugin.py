@@ -1,3 +1,5 @@
+from time import sleep
+
 from pntos.api import (
     CommonPlugin,
     ControllerPlugin,
@@ -63,10 +65,14 @@ class DummyControllerPlugin(ControllerPlugin):
             plugin_resources_locations (list[str | None] | None): Unused.
             initial_config (str | None): Unused.
         """
+        # Save off the plugins.
         self._mediator.plugins = plugins
+
+        # Initialize each plugin.
         for plugin in self._mediator.plugins:
             plugin.init_plugin(mediator=DummyMediator(plugins))
 
+        # Initialize the Orchestration plugin.
         for plugin in self._mediator.plugins:
             if isinstance(plugin, OrchestrationPlugin):
                 plugin.init_orchestration_plugin(
@@ -74,6 +80,13 @@ class DummyControllerPlugin(ControllerPlugin):
                     stream_config=DummyMessageStreamConfig(),
                 )
 
+        # Tell the Transport plugin to start listening.
         for plugin in self._mediator.plugins:
             if isinstance(plugin, TransportPlugin):
                 plugin.start_listening()
+
+        # Run for 0.5 seconds
+        sleep(0.5)
+
+        # Shut down.
+        self.shutdown_plugin()
