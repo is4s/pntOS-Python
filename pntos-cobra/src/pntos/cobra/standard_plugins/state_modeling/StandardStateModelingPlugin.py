@@ -150,7 +150,7 @@ class StandardStateModelProvider(api.StandardStateModelProvider):
                 if config_group is None:
                     self._mediator.log_message(
                         LoggingLevel.ERROR,
-                        f'A config group is required for processor {self.processor_identifiers[processor_index]}',
+                        f'A config group is required for processor {self.processor_identifiers[processor_index]}',  # ty:ignore[not-subscriptable]
                     )
                     return None
                 pos_mp_config = config_from_registry(
@@ -178,7 +178,7 @@ class StandardStateModelProvider(api.StandardStateModelProvider):
                 if config_group is None:
                     self._mediator.log_message(
                         LoggingLevel.ERROR,
-                        f'A config group is required for processor {self.processor_identifiers[processor_index]}',
+                        f'A config group is required for processor {self.processor_identifiers[processor_index]}',  # ty:ignore[not-subscriptable]
                     )
                     return None
                 pos_fogm_mp_config = config_from_registry(
@@ -200,7 +200,7 @@ class StandardStateModelProvider(api.StandardStateModelProvider):
                 if config_group is None:
                     self._mediator.log_message(
                         LoggingLevel.ERROR,
-                        f'A config group is required for processor {self.processor_identifiers[processor_index]}',
+                        f'A config group is required for processor {self.processor_identifiers[processor_index]}',  # ty:ignore[not-subscriptable]
                     )
                     return None
                 alt_mp_config = config_from_registry(
@@ -223,7 +223,7 @@ class StandardStateModelProvider(api.StandardStateModelProvider):
                 if config_group is None:
                     self._mediator.log_message(
                         LoggingLevel.ERROR,
-                        f'A config group is required for processor type {self.processor_identifiers[processor_index]}',
+                        f'A config group is required for processor type {self.processor_identifiers[processor_index]}',  # ty:ignore[not-subscriptable]
                     )
                     return None
                 pos_lever_arm_mp_config = config_from_registry(
@@ -245,7 +245,7 @@ class StandardStateModelProvider(api.StandardStateModelProvider):
                 if config_group is None:
                     self._mediator.log_message(
                         LoggingLevel.ERROR,
-                        f'A config group is required for processor {self.processor_identifiers[processor_index]}',
+                        f'A config group is required for processor {self.processor_identifiers[processor_index]}',  # ty:ignore[not-subscriptable]
                     )
                     return None
                 vel_body_mp_config = config_from_registry(
@@ -268,7 +268,7 @@ class StandardStateModelProvider(api.StandardStateModelProvider):
                 if config_group is None:
                     self._mediator.log_message(
                         LoggingLevel.ERROR,
-                        f'A config group is required for processor {self.processor_identifiers[processor_index]}',
+                        f'A config group is required for processor {self.processor_identifiers[processor_index]}',  # ty:ignore[not-subscriptable]
                     )
                     return None
                 posvel_mp_config = config_from_registry(
@@ -290,7 +290,7 @@ class StandardStateModelProvider(api.StandardStateModelProvider):
                 if config_group is None:
                     self._mediator.log_message(
                         LoggingLevel.ERROR,
-                        f'A config group is required for processor {self.processor_identifiers[processor_index]}',
+                        f'A config group is required for processor {self.processor_identifiers[processor_index]}',  # ty:ignore[not-subscriptable]
                     )
                     return None
                 direct_pos_mp_config = config_from_registry(
@@ -313,7 +313,7 @@ class StandardStateModelProvider(api.StandardStateModelProvider):
                 if config_group is None:
                     self._mediator.log_message(
                         LoggingLevel.ERROR,
-                        f'A config group is required for processor {self.processor_identifiers[processor_index]}',
+                        f'A config group is required for processor {self.processor_identifiers[processor_index]}',  # ty:ignore[not-subscriptable]
                     )
                     return None
                 dir3d_mp_config = config_from_registry(
@@ -380,7 +380,7 @@ class StandardStateModelProvider(api.StandardStateModelProvider):
                 if config_group is None:
                     self._mediator.log_message(
                         LoggingLevel.ERROR,
-                        f'A config group is required for state block {self.block_identifiers[block_index]}',
+                        f'A config group is required for state block {self.block_identifiers[block_index]}',  # ty:ignore[not-subscriptable]
                     )
                     return None
                 pinson_sb_config = config_from_registry(
@@ -401,7 +401,7 @@ class StandardStateModelProvider(api.StandardStateModelProvider):
                 if config_group is None:
                     self._mediator.log_message(
                         LoggingLevel.ERROR,
-                        f'A config group is required for state block {self.block_identifiers[block_index]}',
+                        f'A config group is required for state block {self.block_identifiers[block_index]}',  # ty:ignore[not-subscriptable]
                     )
                     return None
                 fogm_sb_config = config_from_registry(
@@ -425,7 +425,7 @@ class StandardStateModelProvider(api.StandardStateModelProvider):
                 if config_group is None:
                     self._mediator.log_message(
                         LoggingLevel.ERROR,
-                        f'A config group is required for state block {self.block_identifiers[block_index]}',
+                        f'A config group is required for state block {self.block_identifiers[block_index]}',  # ty:ignore[not-subscriptable]
                     )
                     return None
                 sb_config = config_from_registry(
@@ -445,7 +445,7 @@ class StandardStateModelProvider(api.StandardStateModelProvider):
                 if config_group is None:
                     self._mediator.log_message(
                         LoggingLevel.ERROR,
-                        f'A config group is required for state block {self.block_identifiers[block_index]}',
+                        f'A config group is required for state block {self.block_identifiers[block_index]}',  # ty:ignore[not-subscriptable]
                     )
                     return None
                 constant_sb_config = config_from_registry(
@@ -517,7 +517,7 @@ class StandardStateModelProvider(api.StandardStateModelProvider):
                 if config_group is None:
                     self._mediator.log_message(
                         LoggingLevel.ERROR,
-                        f'A config group is required for virtual state block {self.virtual_block_identifiers[virtual_block_index]}',
+                        f'A config group is required for virtual state block {self.virtual_block_identifiers[virtual_block_index]}',  # ty:ignore[not-subscriptable]
                     )
                     return None
                 se_config = config_from_registry(
