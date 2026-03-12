@@ -240,7 +240,7 @@ standard_config = [
 ]
 
 manual_fogm_config = deepcopy(standard_config)
-orch_config: StandardOrchestrationConfig = manual_fogm_config[2]
+orch_config: StandardOrchestrationConfig = manual_fogm_config[2]  # ty:ignore[invalid-assignment]
 orch_config.additional_sb_configs[0].estimate_with_covariance = EstimateWithCovariance(  # ty:ignore[not-subscriptable]
     type=EstimateWithCovarianceType.EWC_GENERIC,
     estimate=np.zeros((3,)),
@@ -869,7 +869,7 @@ class Test_Orchestration(unittest.TestCase):
             imu_model=imu_config,
         )
         temp_config = deepcopy(standard_config)
-        orch_config: StandardOrchestrationConfig = temp_config[2]
+        orch_config: StandardOrchestrationConfig = temp_config[2]  # ty:ignore[invalid-assignment]
         orch_config.alignment_config = align_config
         static_alignment_plugin = StaticAlignInitializationPlugin(
             'Static Alignment Initialization Plugin'

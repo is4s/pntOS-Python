@@ -769,7 +769,7 @@ class TestRegistry(unittest.TestCase):
         )
         EXPECTED_LOG_OUTPUT = f'Received invalid type {ImuConfig} from key "invalid_type_key". Expected {RegistryValueTypeUnion}.'
         # Have to type ignore this one because it's exactly what we're testing:
-        kv[key] = value
+        kv[key] = value  # ty:ignore[invalid-assignment]
         assert key not in kv, 'Expected failure to insert value - but key exists.'
 
     def test___delitem__(self) -> None:

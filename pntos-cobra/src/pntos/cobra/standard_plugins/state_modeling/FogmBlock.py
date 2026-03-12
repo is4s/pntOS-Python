@@ -63,7 +63,7 @@ class FogmBlock(StandardStateBlock):
         self.num_states = taus.size
         self._mediator = mediator
         self._F = diagflat(-1.0 / taus)
-        self._Q = diagflat(2.0 * pow(sigmas, 2.0) / taus)
+        self._Q = diagflat(2.0 * pow(sigmas, 2.0) / taus)  # ty:ignore[invalid-assignment]
         self._I = eye(self.num_states)
 
     def receive_aux_data(self, aux: list[Message | None]) -> None:

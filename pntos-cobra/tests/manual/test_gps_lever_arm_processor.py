@@ -150,7 +150,7 @@ def fusion(la_guess: NDArray[float64]) -> StandardFusionEngine:
     fusion_strategy_plugin = EkfFusionStrategyPlugin(identifier='test_strategy_plugin')
     fusion_strategy_plugin.init_plugin('test_strategy', mediator=mediator)
     fusion_strategy = fusion_strategy_plugin.new_fusion_strategy(StandardFusionStrategy)
-    fusion_engine.strategy = fusion_strategy
+    fusion_engine.strategy = fusion_strategy  # ty:ignore[invalid-assignment]
 
     pos_model_plug = StandardStateModelingPlugin('pos_ins_state_modeling')
     pos_model_plug.init_plugin(mediator=mediator)

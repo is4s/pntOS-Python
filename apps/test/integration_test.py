@@ -65,8 +65,8 @@ def validate_results(
     tilt_err_limits: ErrorLimits,
     expected_start_time_offset: float = 0.0,
 ) -> None:
-    filter_time: NDArray[np.float64] = pva.time
-    truth_time: NDArray[np.float64] = truth.time
+    filter_time = pva.time
+    truth_time = truth.time
 
     # ensure solution has enough points
     assert filter_time.size == num_points

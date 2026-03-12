@@ -142,7 +142,7 @@ class ValueView(Generic[ValueType]):
         kv.request_notify(self._key, self._callback)
         if self._key in kv:
             if self._type is None:
-                self._value = kv[self._key]
+                self._value = kv[self._key]  # ty:ignore[invalid-assignment]
             else:
                 self._value = kv.get_value(self._key, self._type)
         kv.batch_end()
@@ -153,7 +153,7 @@ class ValueView(Generic[ValueType]):
             if self._type is not None:
                 self._value = kv.get_value(self._key, self._type)
             else:
-                self._value = kv[self._key]
+                self._value = kv[self._key]  # ty:ignore[invalid-assignment]
 
         if self._post_callback is not None:
             self._post_callback(group, keys, kv)

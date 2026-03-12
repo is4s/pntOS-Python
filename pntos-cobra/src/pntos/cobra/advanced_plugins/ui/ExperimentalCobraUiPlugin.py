@@ -84,7 +84,7 @@ class ExperimentalCobraUiPlugin(UiPlugin):
         if config.static_folder:
             self.static_folder = Path(config.static_folder)
         else:
-            self.static_folder = files('pntos.cobra').joinpath(
+            self.static_folder = files('pntos.cobra').joinpath(  # ty:ignore[invalid-assignment]
                 'advanced_plugins',
                 'ui',  # ty:ignore[too-many-positional-arguments]
                 '_static',
