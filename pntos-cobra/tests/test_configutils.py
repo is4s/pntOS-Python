@@ -71,10 +71,10 @@ SUPPORTED_TYPES = [
     tuple[tuple[int, ...], ...],
     NDArray[float64],  # Any-dimension array of floats (will be 1d for test)
     NDArray[int64],  # Any-dimension array of ints (will be 1d for test)
-    ndarray[(2, 2), np.dtype[float64]],
-    ndarray[(2, 2), np.dtype[int64]],
-    ndarray[(2, 2, 2), np.dtype[float64]],
-    ndarray[(2, 2, 2), np.dtype[int64]],
+    ndarray[(2, 2), np.dtype[float64]],  # ty:ignore[invalid-type-form]
+    ndarray[(2, 2), np.dtype[int64]],  # ty:ignore[invalid-type-form]
+    ndarray[(2, 2, 2), np.dtype[float64]],  # ty:ignore[invalid-type-form]
+    ndarray[(2, 2, 2), np.dtype[int64]],  # ty:ignore[invalid-type-form]
     DummyEnum,
     EstimateWithCovariance,
 ]

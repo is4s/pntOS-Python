@@ -475,11 +475,11 @@ def _confirm_types(
 def _get_verbose_type(obj: SupportedRegistryTypeUnion) -> type[Any]:
     if isinstance(obj, tuple):
         inner_types = tuple(_get_verbose_type(item) for item in obj)
-        return tuple[inner_types]
+        return tuple[inner_types]  # ty:ignore[invalid-type-form]
     if isinstance(obj, list):
-        return list[_get_verbose_type(obj[0])]
+        return list[_get_verbose_type(obj[0])]  # ty:ignore[invalid-type-form]
     if isinstance(obj, np.ndarray):
-        return np.ndarray[np.dtype[obj.dtype]]  # ty:ignore[invalid-type-arguments]
+        return np.ndarray[np.dtype[obj.dtype]]  # ty:ignore[invalid-type-arguments, invalid-type-form]
     return type(obj)
 
 

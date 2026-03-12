@@ -148,7 +148,6 @@ not-iterable = "ignore"
 invalid-assignment = "ignore"
 no-matching-overload = "ignore"
 not-subscriptable = "ignore"
-invalid-type-form = "ignore"
 
 [tool.ty.src]
 exclude = [

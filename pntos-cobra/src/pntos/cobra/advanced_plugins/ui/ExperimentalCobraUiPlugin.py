@@ -217,7 +217,7 @@ class ExperimentalCobraUiPlugin(UiPlugin):
             emit('snapshot', self.registry_manager.snapshot().model_dump())
 
         @self.socket.event
-        def subscribe(subscription_json: Unpack[Subscription]) -> None:
+        def subscribe(subscription_json: Unpack[Subscription]) -> None:  # ty:ignore[invalid-type-form]
             subscription = Subscription.model_validate(subscription_json)
             self.registry_manager.subscribe(subscription)
             initial_value = self.registry_manager.get_current_value(
@@ -232,12 +232,12 @@ class ExperimentalCobraUiPlugin(UiPlugin):
                 )
 
         @self.socket.event
-        def unsubscribe(subscription_json: Unpack[Subscription]) -> None:
+        def unsubscribe(subscription_json: Unpack[Subscription]) -> None:  # ty:ignore[invalid-type-form]
             subscription = Subscription.model_validate(subscription_json)
             self.registry_manager.unsubscribe(subscription)
 
         @self.socket.event
-        def write(write_request_dict: Unpack[Write]) -> None:
+        def write(write_request_dict: Unpack[Write]) -> None:  # ty:ignore[invalid-type-form]
             write_request = Write.model_validate(write_request_dict)
             for write in self.write_buffer.add(write_request):
                 self.registry_manager.write(write)
