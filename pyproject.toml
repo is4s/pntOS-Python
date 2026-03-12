@@ -149,7 +149,6 @@ invalid-assignment = "ignore"
 no-matching-overload = "ignore"
 not-subscriptable = "ignore"
 invalid-type-form = "ignore"
-invalid-type-arguments = "ignore"
 
 [tool.ty.src]
 exclude = [

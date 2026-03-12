@@ -479,7 +479,7 @@ def _get_verbose_type(obj: SupportedRegistryTypeUnion) -> type[Any]:
     if isinstance(obj, list):
         return list[_get_verbose_type(obj[0])]
     if isinstance(obj, np.ndarray):
-        return np.ndarray[np.dtype[obj.dtype]]
+        return np.ndarray[np.dtype[obj.dtype]]  # ty:ignore[invalid-type-arguments]
     return type(obj)
 
 
