@@ -9,7 +9,7 @@ each other.
 ## Definitions
 
 Fundamentally, pntOS plugins interact with resources handed to them by the [Controller
-Plugin](./plugins/controller_plugin.md) (see the [Introduction](./introduction.md) for
+plugin](./plugins/controller_plugin.md) (see the [Introduction](./introduction.md) for
 more information on the overall pntOS architecture). For example, when a non-[Controller
 Plugin](./plugins/controller_plugin.md) is first loaded into pntOS, the
 {py:obj}`CommonPlugin.init_plugin<pntos.api.CommonPlugin.init_plugin>` call provides a
@@ -17,36 +17,36 @@ Plugin](./plugins/controller_plugin.md) is first loaded into pntOS, the
 plugin to request information from the system. Similarly, the [Orchestration
 Plugin](./plugins/orchestration_plugin.md) is handed a set of plugins in the
 {py:obj}`OrchestrationPlugin.init_orchestration_plugin<pntos.api.OrchestrationPlugin.init_orchestration_plugin>`
-call, which the [Orchestration Plugin](./plugins/orchestration_plugin.md) is free to use
+call, which the [Orchestration plugin](./plugins/orchestration_plugin.md) is free to use
 in the future to access system resources. A plugin using a function on the
 [Mediator](./plugins/controller_plugin.md#mediator) it was given and the [Orchestration
 Plugin](./plugins/orchestration_plugin.md) using a plugin from the list of plugins it
 was given are both examples of plugins using system resources given to them by the
 system.
 
-Conversely, when the [Controller Plugin](./plugins/controller_plugin.md) starts up it
+Conversely, when the [Controller plugin](./plugins/controller_plugin.md) starts up it
 is handed a list of raw plugins from an {term}`App`. The
-[Controller Plugin](./plugins/controller_plugin.md) wants to use these plugins, but
+[Controller plugin](./plugins/controller_plugin.md) wants to use these plugins, but
 it first must ensure that it adheres to the rules and expectations of these plugins. For
-example, before the [Controller Plugin](./plugins/controller_plugin.md) may start
-using functionality on a [Transport Plugin](./plugins/transport_plugin.md), it is
+example, before the [Controller plugin](./plugins/controller_plugin.md) may start
+using functionality on a [Transport plugin](./plugins/transport_plugin.md), it is
 required to call {py:obj}`CommonPlugin.init_plugin<pntos.api.CommonPlugin.init_plugin>`
-on that [Transport Plugin](./plugins/transport_plugin.md). When the
-[Controller Plugin](./plugins/controller_plugin.md) accesses a raw plugin or a
+on that [Transport plugin](./plugins/transport_plugin.md). When the
+[Controller plugin](./plugins/controller_plugin.md) accesses a raw plugin or a
 resource returned by a raw plugin, that constitutes the pntOS system accessing a plugin
 resource. The above example of the
-[Controller Plugin](./plugins/controller_plugin.md) calling
+[Controller plugin](./plugins/controller_plugin.md) calling
 {py:obj}`CommonPlugin.init_plugin<pntos.api.CommonPlugin.init_plugin>` on a
-[Transport Plugin](./plugins/transport_plugin.md) is an example of the system
+[Transport plugin](./plugins/transport_plugin.md) is an example of the system
 accessing a plugin resource.
 
-Thus, we can say that the [Controller Plugin](./plugins/controller_plugin.md) is
+Thus, we can say that the [Controller plugin](./plugins/controller_plugin.md) is
 acting as the "pntOS System" and managing the concurrency and data access between
 plugins. We will now consider both of these use cases individually:
 
-1. What responsibilities do non-[Controller Plugin](./plugins/controller_plugin.md)s
+1. What responsibilities do non-[Controller plugin](./plugins/controller_plugin.md)s
    have in accessing system resources
-2. What responsibilities does the [Controller Plugin](./plugins/controller_plugin.md)
+2. What responsibilities does the [Controller plugin](./plugins/controller_plugin.md)
    plugin have in accessing plugin resources
 
 ## Plugin Accessing System Resources
@@ -94,7 +94,7 @@ _concurrently_, they are subject to the following rules:
 
 The system may access resources on a plugin or returned by a plugin (or recursively
 returned by a resource previously returned by a plugin) at any time. Such accesses are
-usually made by the [Controller Plugin](./plugins/controller_plugin.md) accessing plugin
+usually made by the [Controller plugin](./plugins/controller_plugin.md) accessing plugin
 memory or functions, and are subject to the following rules:
 
 1. Access to a plugin resource must be on a _single_ thread, and concurrent accesses to
@@ -124,7 +124,7 @@ be used under certain conditions.
 In the last two sections, we discussed the rules for the [Controller
 Plugin](./plugins/controller_plugin.md) accessing plugin resources and the plugin
 accessing system resources. However, what if these two things happen simultaneously?
-That is, a [Controller Plugin](./plugins/controller_plugin.md) accesses a plugin
+That is, a [Controller plugin](./plugins/controller_plugin.md) accesses a plugin
 resource while at the same time the plugin accesses a system resource?
 
 In general, such behavior is _allowed_, meaning that:
@@ -133,15 +133,15 @@ In general, such behavior is _allowed_, meaning that:
    currently requesting something from the system. The plugin must **not** block on the
    system accessing one of its functions until its current request to the system is
    complete.
-2. The [Controller Plugin](./plugins/controller_plugin.md) must expect the plugin to
+2. The [Controller plugin](./plugins/controller_plugin.md) must expect the plugin to
    request something from the system even if the controller is currently waiting for a
    call it has made to the plugin to complete. The [Controller
-   Plugin](./plugins/controller_plugin.md) must **not** block on the plugin request
-   until after the [Controller Plugin](./plugins/controller_plugin.md)'s request to the
+   plugin](./plugins/controller_plugin.md) must **not** block on the plugin request
+   until after the [Controller plugin](./plugins/controller_plugin.md)'s request to the
    plugin is complete.
 
 Taken in whole, this allows for calls one direction to initialize a call the other
-direction. For example, if the [Controller Plugin](./plugins/controller_plugin.md) asks
+direction. For example, if the [Controller plugin](./plugins/controller_plugin.md) asks
 plugin A to perform a task, plugin A may call back into the mediator while it is trying
 to perform that task. An example use case is that plugin A may need to get a config
 value from the registry to complete its task. The mediator must dispatch the request for
@@ -186,12 +186,12 @@ The solution to this issue is isolation of responsibilities. In general, the fol
 rules must be followed:
 
 1. Plugins must not call back into functions which they are responsible for
-   implementing. For example, a [Registry Plugin](./plugins/registry_plugin.md) may not
+   implementing. For example, a [Registry plugin](./plugins/registry_plugin.md) may not
    access the [Mediator](./plugins/controller_plugin.md#mediator)'s
    `mediator.registry`. Similarly, the [Orchestration
    Plugin](./plugins/orchestration_plugin.md) must not call into
    {py:obj}`Mediator.request_solutions<pntos.api.Mediator.request_solutions>`, and the
-   [Transport Plugin](./plugins/transport_plugin.md) must not call into
+   [Transport plugin](./plugins/transport_plugin.md) must not call into
    {py:obj}`Mediator.broadcast_aspn_message<pntos.api.Mediator.broadcast_aspn_message>`.
 2. Callbacks must not use [Mediator](./plugins/controller_plugin.md#mediator) resources.
    For example, when the callback function to
@@ -217,16 +217,13 @@ This leads us to the following rule all plugins must follow:
    modify a list after returning it as a resource, it must either modify a copy of the
    returned list or return a copied list.
 
-## PIP and Controller
+## The PIP and Controller Plugin
 
-The [PIP](./plugins/platform_integration_plugin.md) and [Controller
-Plugin](./plugins/controller_plugin.md) work closely to handle system resources
-concurrently in pntOS. Because of this close relationship, there is no way to
-prescriptively lay out a set of rules the
-[PIP](./plugins/platform_integration_plugin.md) and [Controller
-Plugin](./plugins/controller_plugin.md) must adhere to in order to avoid races,
-deadlocks, and other undesirable effects. Instead, for concurrent implementations, the
-[PIP](./plugins/platform_integration_plugin.md) must be designed to work specifically
-with a chosen [Controller Plugin](./plugins/controller_plugin.md), and document the way
-that it coordinates concurrency with the [Controller
-Plugin](./plugins/controller_plugin.md).
+The {py:obj}`Platform Integration plugin<pntos.api.PlatformIntegrationPlugin>` (PIP) and [Controller
+Plugin](./plugins/controller_plugin.md) work closely to handle system resources concurrently in
+pntOS. Because of this close relationship, there is no way to prescriptively lay out a set of rules
+the PIP and [Controller plugin](./plugins/controller_plugin.md) must adhere to in order to avoid
+races, deadlocks, and other undesirable effects. Instead, for concurrent implementations, the PIP
+must be designed to work specifically with a chosen [Controller
+Plugin](./plugins/controller_plugin.md), and document the way that it coordinates concurrency with
+the [Controller plugin](./plugins/controller_plugin.md).
