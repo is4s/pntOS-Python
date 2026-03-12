@@ -262,7 +262,7 @@ def run_pntos_with_network_transport(
                     flush=True,
                 )
                 raise TimeoutError
-            if re.search(r'[2-9] clients', line):
+            if re.search(r'[2-9] clients', line):  # ty:ignore[no-matching-overload]
                 break
 
         # play log. note that logplayer process automatically terminates at end of log

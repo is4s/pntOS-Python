@@ -97,7 +97,7 @@ class KeyInfo(MutableValueView[ValueType], Generic[ValueType]):
         self._subscriptions = {}
         self._callback_registrar: CallbackRegistrar = callback_registrar
         self._do_not_update_front_end = Event()
-        super().__init__(registry, group, key, None)
+        super().__init__(registry, group, key, None)  # ty:ignore[no-matching-overload]
 
     def _callback(self, group: str, keys: list[str], kv: KeyValueStore) -> None:
         super()._callback(group, keys, kv)

@@ -146,7 +146,6 @@ unresolved-attribute = "ignore"
 invalid-return-type = "ignore"
 not-iterable = "ignore"
 invalid-assignment = "ignore"
-no-matching-overload = "ignore"
 
 [tool.ty.src]
 exclude = [

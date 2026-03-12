@@ -215,7 +215,7 @@ class BufferedValueView(ValueView[ValueType], Generic[ValueType]):
     ) -> None:
         self._buffer: list[ValueType | None] = []
         self._buffer_lock: RLock = RLock()
-        super().__init__(registry, group, key, type)
+        super().__init__(registry, group, key, type)  # ty:ignore[no-matching-overload]
 
     def _callback(self, group: str, keys: list[str], kv: KeyValueStore) -> None:
         with self._value_lock:
@@ -273,7 +273,7 @@ class MutableValueView(ValueView[ValueType], Generic[ValueType]):
         key: str,
         type: type[ValueType] | None = None,
     ) -> None:
-        super().__init__(registry, group, key, type)
+        super().__init__(registry, group, key, type)  # ty:ignore[no-matching-overload]
         self._started_batch = False
 
     def _batch_start(self, kv: KeyValueStore | None = None) -> KeyValueStore:
