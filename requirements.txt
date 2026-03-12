@@ -130,9 +130,6 @@ mdit-py-plugins==0.4.2
     # via myst-parser
 mdurl==0.1.2
     # via markdown-it-py
-mypy==1.18.2
-mypy-extensions==1.1.0
-    # via mypy
 myst-parser==4.0.1
 navanalysis-lcm==0.1.5
     # via
@@ -166,8 +163,6 @@ packaging==25.0
     #   sphinx
 parso==0.8.4
     # via jedi
-pathspec==0.12.1
-    # via mypy
 pexpect==4.9.0 ; sys_platform != 'emscripten' and sys_platform != 'win32'
     # via ipython
 pillow==11.3.0
@@ -278,7 +273,6 @@ toml-fmt-common==1.0.1
 tomli==2.2.1 ; python_full_version <= '3.11'
     # via
     #   coverage
-    #   mypy
     #   pytest
     #   sphinx
     #   toml-fmt-common
@@ -292,11 +286,11 @@ traitlets==5.14.3
     # via
     #   ipython
     #   matplotlib-inline
+ty==0.0.54
 typing-extensions==4.14.1
     # via
     #   exceptiongroup
     #   ipython
-    #   mypy
     #   pydantic
     #   pydantic-core
     #   typing-inspection

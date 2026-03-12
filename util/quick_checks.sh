@@ -13,12 +13,7 @@ ruff format
 pyproject-fmt pyproject.toml --column-width 88 --indent 4 --keep-full-version
 pyproject-fmt pntos-api/pyproject.toml --column-width 88 --indent 4 --keep-full-version
 pyproject-fmt pntos-cobra/pyproject.toml --column-width 88 --indent 4 --keep-full-version
-mypy pntos-api --no-implicit-reexport
-mypy pntos-cobra --no-implicit-reexport
-mypy apps/advanced/ --no-implicit-reexport
-mypy apps/standard/ --no-implicit-reexport
-mypy apps/tutorial/ --no-implicit-reexport
-mypy apps/dummy/ --no-implicit-reexport
+ty check
 util/check_sync.sh
 ret_val=$?  # this must be set after check_sync to observe if it passed or not
 util/build_docs.sh

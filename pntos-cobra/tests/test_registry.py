@@ -457,7 +457,7 @@ class TestRegistry(unittest.TestCase):
         EXPECTED_LOG_OUTPUT = ''
         ERROR_DETECTED = False
         if self.registry.mediator is None:  # Controller not implemented
-            return  # type: ignore[unreachable]
+            return
 
         kv = self.reg.batch_start(self.test_group)
         kv.batch_end()
@@ -471,7 +471,7 @@ class TestRegistry(unittest.TestCase):
         EXPECTED_LOG_OUTPUT = ''
         ERROR_DETECTED = False
         if self.registry.mediator is None:  # Controller not implemented
-            return  # type: ignore[unreachable]
+            return
 
         with self.reg.batch_start(self.test_group) as kv:
             pass
@@ -769,7 +769,7 @@ class TestRegistry(unittest.TestCase):
         )
         EXPECTED_LOG_OUTPUT = f'Received invalid type {ImuConfig} from key "invalid_type_key". Expected {RegistryValueTypeUnion}.'
         # Have to type ignore this one because it's exactly what we're testing:
-        kv[key] = value  # type: ignore[assignment]
+        kv[key] = value
         assert key not in kv, 'Expected failure to insert value - but key exists.'
 
     def test___delitem__(self) -> None:

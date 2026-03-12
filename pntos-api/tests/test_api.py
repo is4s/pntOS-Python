@@ -85,13 +85,13 @@ def test_type_parameters() -> None:
 class MockControllerPlugin(api.ControllerPlugin):
     identifier = ''
 
-    def init_plugin(self, plugin_resources_location=None, mediator=None) -> None:  # type: ignore
+    def init_plugin(self, plugin_resources_location=None, mediator=None) -> None:
         return
 
     def shutdown_plugin(self) -> None:
         return
 
-    def take_control(  # type: ignore
+    def take_control(
         self,
         plugins,
         plugin_resources_locations=None,
@@ -103,7 +103,7 @@ class MockControllerPlugin(api.ControllerPlugin):
 class MockFusionPlugin(api.FusionPlugin):
     identifier = ''
 
-    def init_plugin(self, plugin_resources_location=None, mediator=None) -> None:  # type: ignore
+    def init_plugin(self, plugin_resources_location=None, mediator=None) -> None:
         return
 
     def shutdown_plugin(self) -> None:
@@ -121,7 +121,7 @@ class MockFusionPlugin(api.FusionPlugin):
 class MockFusionStrategyPlugin(api.FusionStrategyPlugin):
     identifier = ''
 
-    def init_plugin(self, plugin_resources_location=None, mediator=None) -> None:  # type: ignore
+    def init_plugin(self, plugin_resources_location=None, mediator=None) -> None:
         return
 
     def shutdown_plugin(self) -> None:
@@ -141,7 +141,7 @@ class MockFusionStrategyPlugin(api.FusionStrategyPlugin):
 class MockInertialPlugin(api.InertialPlugin):
     identifier = ''
 
-    def init_plugin(self, plugin_resources_location=None, mediator=None) -> None:  # type: ignore
+    def init_plugin(self, plugin_resources_location=None, mediator=None) -> None:
         return
 
     def shutdown_plugin(self) -> None:
@@ -162,7 +162,7 @@ class MockInertialPlugin(api.InertialPlugin):
 class MockInitializationPlugin(api.InitializationPlugin):
     identifier = ''
 
-    def init_plugin(self, plugin_resources_location=None, mediator=None) -> None:  # type: ignore
+    def init_plugin(self, plugin_resources_location=None, mediator=None) -> None:
         return
 
     def shutdown_plugin(self) -> None:
@@ -182,7 +182,7 @@ class MockInitializationPlugin(api.InitializationPlugin):
 class MockLoggingPlugin(api.LoggingPlugin):
     identifier = ''
 
-    def init_plugin(self, plugin_resources_location=None, mediator=None) -> None:  # type: ignore
+    def init_plugin(self, plugin_resources_location=None, mediator=None) -> None:
         return
 
     def shutdown_plugin(self) -> None:
@@ -201,35 +201,35 @@ class MockLoggingPlugin(api.LoggingPlugin):
 class MockOrchestrationPlugin(api.OrchestrationPlugin):
     identifier = ''
 
-    def init_plugin(self, plugin_resources_location=None, mediator=None) -> None:  # type: ignore
+    def init_plugin(self, plugin_resources_location=None, mediator=None) -> None:
         return
 
     def shutdown_plugin(self) -> None:
         return
 
-    def init_orchestration_plugin(self, plugins, stream_config) -> None:  # type: ignore
+    def init_orchestration_plugin(self, plugins, stream_config) -> None:
         return
 
-    def filter_description_list(self) -> None:  # type: ignore
+    def filter_description_list(self) -> None:
         return None
 
-    def process_pntos_message(self, message, sequenced) -> None:  # type: ignore
+    def process_pntos_message(self, message, sequenced) -> None:
         return
 
-    def request_solutions(self, solution_times, filter_description=None) -> None:  # type: ignore
+    def request_solutions(self, solution_times, filter_description=None) -> None:
         return None
 
 
 class MockPlatformIntegrationPlugin(api.PlatformIntegrationPlugin):
     identifier = ''
 
-    def init_plugin(self, plugin_resources_location=None, mediator=None) -> None:  # type: ignore
+    def init_plugin(self, plugin_resources_location=None, mediator=None) -> None:
         return
 
     def shutdown_plugin(self) -> None:
         return
 
-    def take_control(  # type: ignore
+    def take_control(
         self, plugins, plugin_resources_locations=None, initial_config=None
     ) -> None:
         return
@@ -241,55 +241,55 @@ class MockPreprocessorPlugin(api.PreprocessorPlugin):
     def __init__(self) -> None:
         self.preprocessor_identifiers = ['']
 
-    def init_plugin(self, plugin_resources_location=None, mediator=None) -> None:  # type: ignore
+    def init_plugin(self, plugin_resources_location=None, mediator=None) -> None:
         return
 
     def shutdown_plugin(self) -> None:
         return
 
-    def new_preprocessor(self, preprocessor_index, config_group=None) -> None:  # type: ignore
+    def new_preprocessor(self, preprocessor_index, config_group=None) -> None:
         return None
 
 
 class MockRegistryPlugin(api.RegistryPlugin):
     identifier = ''
 
-    def init_plugin(self, plugin_resources_location=None, mediator=None) -> None:  # type: ignore
+    def init_plugin(self, plugin_resources_location=None, mediator=None) -> None:
         return
 
     def shutdown_plugin(self) -> None:
         return
 
-    def new_registry(self, initial_config=None) -> None:  # type: ignore
+    def new_registry(self, initial_config=None) -> None:
         return None
 
 
 class MockStateModelingPlugin(api.StateModelingPlugin):
     identifier = ''
 
-    def init_plugin(self, plugin_resources_location=None, mediator=None) -> None:  # type: ignore
+    def init_plugin(self, plugin_resources_location=None, mediator=None) -> None:
         return
 
     def shutdown_plugin(self) -> None:
         return
 
-    def is_fusion_type_supported(self, type) -> bool:  # type: ignore
+    def is_fusion_type_supported(self, type) -> bool:
         return False
 
-    def new_state_model_provider(self, type) -> None:  # type: ignore
+    def new_state_model_provider(self, type) -> None:
         return None
 
 
 class MockTransportPlugin(api.TransportPlugin):
     identifier = ''
 
-    def init_plugin(self, plugin_resources_location=None, mediator=None) -> None:  # type: ignore
+    def init_plugin(self, plugin_resources_location=None, mediator=None) -> None:
         return
 
     def shutdown_plugin(self) -> None:
         return
 
-    def broadcast_message(self, message, channel_name=None) -> None:  # type: ignore
+    def broadcast_message(self, message, channel_name=None) -> None:
         return
 
     def start_listening(self) -> None:
@@ -302,7 +302,7 @@ class MockTransportPlugin(api.TransportPlugin):
 class MockUiPlugin(api.UiPlugin):
     identifier = ''
 
-    def init_plugin(self, plugin_resources_location=None, mediator=None) -> None:  # type: ignore
+    def init_plugin(self, plugin_resources_location=None, mediator=None) -> None:
         return
 
     def shutdown_plugin(self) -> None:

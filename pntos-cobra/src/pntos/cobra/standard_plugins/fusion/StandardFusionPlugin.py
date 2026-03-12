@@ -108,8 +108,8 @@ class StandardFusionEngine(api.StandardFusionEngine):
             i_next = i_next + self._sb[this_key].num_states
 
     def _save_x_and_p_to_registry(self) -> None:
-        estimate = self._strategy.estimate  # type: ignore[union-attr]
-        covariance = self._strategy.covariance  # type: ignore[union-attr]
+        estimate = self._strategy.estimate
+        covariance = self._strategy.covariance
 
         if estimate is None or covariance is None:
             return
@@ -673,7 +673,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
                 :, mp_num_states:stop_index
             ]
             if label in vsb_labels:
-                sub_H = self._vsb_manager.convert_H(self, real_label, label, sub_H)  # type: ignore[arg-type]
+                sub_H = self._vsb_manager.convert_H(self, real_label, label, sub_H)
                 if sub_H is None:
                     return
             full_H[
@@ -702,7 +702,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
                 ]
                 if label not in self._sb:
                     est = self._vsb_manager.convert_estimate(
-                        est,  # type: ignore[arg-type]
+                        est,
                         real_label,
                         label,
                         self.time,

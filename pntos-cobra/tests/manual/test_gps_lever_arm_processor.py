@@ -150,7 +150,7 @@ def fusion(la_guess: NDArray[float64]) -> StandardFusionEngine:
     fusion_strategy_plugin = EkfFusionStrategyPlugin(identifier='test_strategy_plugin')
     fusion_strategy_plugin.init_plugin('test_strategy', mediator=mediator)
     fusion_strategy = fusion_strategy_plugin.new_fusion_strategy(StandardFusionStrategy)
-    fusion_engine.strategy = fusion_strategy  # type: ignore[assignment]
+    fusion_engine.strategy = fusion_strategy
 
     pos_model_plug = StandardStateModelingPlugin('pos_ins_state_modeling')
     pos_model_plug.init_plugin(mediator=mediator)
@@ -221,7 +221,7 @@ def estimate_arm(
     num = 0
     last_pva: MeasurementPositionVelocityAttitude | None = None
     # mypy complains about no __iter__
-    for e in log:  # type: ignore[attr-defined]
+    for e in log:
         if chan == e.channel:
             num += 1
             if num >= proc_every:

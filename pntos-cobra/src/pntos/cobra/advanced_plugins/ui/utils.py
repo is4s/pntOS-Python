@@ -97,7 +97,7 @@ class KeyInfo(MutableValueView[ValueType], Generic[ValueType]):
         self._subscriptions = {}
         self._callback_registrar: CallbackRegistrar = callback_registrar
         self._do_not_update_front_end = Event()
-        super().__init__(registry, group, key, None)  # type: ignore[arg-type]
+        super().__init__(registry, group, key, None)
 
     def _callback(self, group: str, keys: list[str], kv: KeyValueStore) -> None:
         super()._callback(group, keys, kv)
@@ -105,7 +105,7 @@ class KeyInfo(MutableValueView[ValueType], Generic[ValueType]):
             # Front-end write or set_value(): we don't need to track this one
             self._do_not_update_front_end.clear()
             return
-        self._callback_registrar.register_change(self)  # type: ignore[arg-type]
+        self._callback_registrar.register_change(self)
 
     def add(self, subscription: Subscription) -> None:
         """Adds subscription to this key."""

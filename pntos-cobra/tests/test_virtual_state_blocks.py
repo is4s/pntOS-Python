@@ -58,9 +58,9 @@ class PinsonErrorToStandardWrapped(VirtualStateBlock):
             source,
             target,
             lambda time: NavSolution(
-                array([self._pva.p1, self._pva.p2, self._pva.p3]),  # type: ignore[union-attr]
-                array([self._pva.v1, self._pva.v2, self._pva.v3]),  # type: ignore[union-attr]
-                quat_to_dcm(self._pva.quaternion).T,  # type: ignore
+                array([self._pva.p1, self._pva.p2, self._pva.p3]),
+                array([self._pva.v1, self._pva.v2, self._pva.v3]),
+                quat_to_dcm(self._pva.quaternion).T,
                 time,
             ),
         )
@@ -391,7 +391,7 @@ def test_give_aux_data(mediator: StandardMediator, pva: Message) -> None:
     aux: list[Message | None] = [pva]
     vsbm.give_virtual_state_block_aux_data('give_data', aux)
     node = vsbm._node_map['give_data']
-    assert node.block._pva.p1 == pva.wrapped_message.p1  # type: ignore
+    assert node.block._pva.p1 == pva.wrapped_message.p1
 
 
 def test_invalid_vsb_manager_ops(

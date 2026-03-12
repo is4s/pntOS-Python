@@ -94,8 +94,8 @@ def test_diagnostic_log_plugin() -> None:
     test_dict: dict[str, RegistryValueTypeUnion] = {
         'str': 'Hello',
         'list-str': ['I', 'am', 'a', 'list', 'of', 'strings'],
-        'int': np.random.randint(-1e9, 1e9),  # type: ignore[call-overload]
-        'float': np.random.randn() * np.random.randint(-1e9, 1e9),  # type: ignore[call-overload]
+        'int': np.random.randint(-1e9, 1e9),
+        'float': np.random.randn() * np.random.randint(-1e9, 1e9),
         'bool': np.random.rand() > 0.5,
         'numpy array': np.random.randn(30),
         'message': generate_random_pva_message(),
@@ -131,7 +131,7 @@ def test_diagnostic_log_plugin() -> None:
 
         # Make sure values are the same
         if isinstance(received_val, np.ndarray):
-            np.allclose(test_val, received_val)  # type: ignore[arg-type]
+            np.allclose(test_val, received_val)
         elif isinstance(received_val, Message):
             compare_messages(test_val, received_val)
         else:

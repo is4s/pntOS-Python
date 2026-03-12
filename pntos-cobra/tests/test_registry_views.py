@@ -568,7 +568,7 @@ class TestMutableValueView:
         # Clear terminal
         capsys.readouterr()
 
-        view.set_value('I am a str!')  # type: ignore[arg-type]
+        view.set_value('I am a str!')
 
         # Callback should trigger, we should get a normal error message (not a terminal
         # error message)

@@ -86,7 +86,7 @@ class TutorialPinsonWithNedFogmPositionMeasurementProcessor(
             ]
         )
 
-        C_platform_to_nav = quat_to_dcm(self._inertial_pva.quaternion)  # type: ignore[arg-type]
+        C_platform_to_nav = quat_to_dcm(self._inertial_pva.quaternion)
 
         z = llh - inertial_llh
         z[0] = delta_lat_to_north(z[0], llh[0], llh[2])
@@ -96,7 +96,7 @@ class TutorialPinsonWithNedFogmPositionMeasurementProcessor(
 
         ewc = gen_x_and_p_func(self.state_block_labels)
 
-        H = np.zeros((3, ewc.estimate.shape[0]))  # type: ignore[union-attr]
+        H = np.zeros((3, ewc.estimate.shape[0]))
         H[:, 0:3] = np.eye(3)
         H[:, 6:9] = C_platform_to_nav @ self._l_ps_p
         H[:, -3:] = -np.eye(3)

@@ -66,10 +66,6 @@ SerializableRegistryValue = Annotated[
 
 # This is very much TODO
 DeSerializableRegistryValue = Annotated[
-    str
-    | list  # type: ignore[type-arg]
-    | int
-    | bool
-    | float,  # Accept any list type (strings or numbers)
+    str | list | int | bool | float,  # Accept any list type (strings or numbers)
     PlainValidator(_validate_registry_value),
 ]

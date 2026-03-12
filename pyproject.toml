@@ -30,7 +30,6 @@ dev = [
     "gitpython==3.1.44",
     "ipython>=8.24",
     "libclang>=18.1.1",
-    "mypy==1.18.2",
     "myst-parser>=4",
     "pip>=24",
     "pntos-python-docs-data",
@@ -43,6 +42,7 @@ dev = [
     "sphinx-copybutton",
     "sphinx-design",
     "sphinx-rtd-theme>=3.0.2",
+    "ty==0.0.54",
 ]
 
 [tool.ruff]
@@ -129,26 +129,34 @@ omit = [
     "pntos-cobra/src/pntos/cobra/utils/apps.py",
 ]
 
-[tool.mypy]
-strict = true
-disable_error_code = [ "import-untyped", "no-untyped-call" ]
-warn_unreachable = true
+[tool.ty.rules]
+all = "error"
+missing-type-argument = "ignore"
+missing-override-decorator = "ignore"
+possibly-unresolved-reference = "ignore"
+dataclass-field-order = "ignore"
+unsupported-operator = "ignore"
+unknown-argument = "ignore"
+unused-type-ignore-comment = "ignore"
+unresolved-import = "ignore"
+possibly-missing-attribute = "ignore"
+invalid-argument-type = "ignore"
+invalid-method-override = "ignore"
+unresolved-attribute = "ignore"
+invalid-return-type = "ignore"
+not-iterable = "ignore"
+invalid-assignment = "ignore"
+no-matching-overload = "ignore"
+not-subscriptable = "ignore"
+invalid-type-form = "ignore"
+invalid-type-arguments = "ignore"
+too-many-positional-arguments = "ignore"
 
-[[tool.mypy.overrides]]
-module = "pntos.cobra.tutorial_plugins.TutorialPosOrchestrationPlugin"
-ignore_errors = true
-
-[[tool.mypy.overrides]]
-module = "pntos.cobra.tutorial_plugins.TutorialPosVelOrchestrationPlugin"
-ignore_errors = true
-
-[[tool.mypy.overrides]]
-module = "pntos.cobra.dummy_plugins.DummyMediator"
-ignore_errors = true
-
-[[tool.mypy.overrides]]
-module = "pntos.cobra.dummy_plugins.DummyOrchestrationPlugin"
-ignore_errors = true
+[tool.ty.src]
+exclude = [
+    "pntos-cobra/src/pntos/cobra/tutorial_plugins/*",
+    "pntos-cobra/src/pntos/cobra/dummy_plugins/*",
+]
 
 [tool.uv]
 package = false

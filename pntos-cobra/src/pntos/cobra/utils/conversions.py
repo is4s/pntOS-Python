@@ -395,7 +395,7 @@ def convert_alignment(
     )
 
 
-def convert_ndarray_to_tuple(arr: NDArray[np.number], target_type: type[Any]) -> tuple:  # type: ignore[type-arg]
+def convert_ndarray_to_tuple(arr: NDArray[np.number], target_type: type[Any]) -> tuple:
     """
     Convert from an NDArray with a numerical ``dtype`` to a tuple of ``target_type``. Multi-dimensional arrays
     will be converted and their structure will be preserved in the output tuple.
@@ -413,7 +413,7 @@ def convert_ndarray_to_tuple(arr: NDArray[np.number], target_type: type[Any]) ->
 
 
 def convert_ndarray_to_list(
-    arr: NDArray[np.number],  # type: ignore[type-arg]
+    arr: NDArray[np.number],
     target_type: type[int] | type[float],
 ) -> list[float] | list[int]:
     """
@@ -428,5 +428,5 @@ def convert_ndarray_to_list(
         list[``target_type``]
     """
     if target_type is int:
-        return arr.astype(int).tolist()  # type:ignore[no-any-return]
-    return arr.tolist()  # type:ignore[no-any-return]
+        return arr.astype(int).tolist()
+    return arr.tolist()

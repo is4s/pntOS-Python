@@ -64,7 +64,7 @@ def build_frontend_assets() -> None:
         print('WARNING: npm not found. Installing backend-only build.')
 
 
-class BuildPyCommand(build_py):  # type: ignore[misc]
+class BuildPyCommand(build_py):
     def run(self) -> None:
         move_branding_assets()
         build_frontend_assets()

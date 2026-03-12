@@ -10,7 +10,7 @@ import pytest
 )
 def test_aspn_ros() -> None:
     # ROS and ASPN-ROS imports should work here
-    import rclpy  # type: ignore[import-not-found]
+    import rclpy
     from aspn23 import (
         MeasurementPositionVelocityAttitude,
         MeasurementPositionVelocityAttitudeErrorModel,
@@ -18,7 +18,7 @@ def test_aspn_ros() -> None:
         TypeHeader,
         TypeTimestamp,
     )
-    from aspn23_ros_utils import AspnMsg, AspnRosNode  # type: ignore[import-not-found]
+    from aspn23_ros_utils import AspnMsg, AspnRosNode
 
     rclpy.init()
     node = AspnRosNode('test_aspn_ros')

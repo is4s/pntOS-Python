@@ -136,7 +136,7 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
         if self.mediator is not None:
             self.mediator.log_message(level, message)
         else:
-            print_message(level, OrchestrationPlugin.__name__, message)  # type: ignore[unreachable]
+            print_message(level, OrchestrationPlugin.__name__, message)
 
     def _set_stream_config(
         self,
@@ -300,8 +300,8 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
         Then adds the block and time to the fusion engine effectively beginning the filter.
         """
         # get pinson covariance
-        pva_cov = self.init_solution.solution.wrapped_message.covariance  # type: ignore[union-attr] # 9x9
-        bias_cov = self.init_solution.inertial_error_covariance  # type: ignore[union-attr] # 6x6
+        pva_cov = self.init_solution.solution.wrapped_message.covariance
+        bias_cov = self.init_solution.inertial_error_covariance
         self.init_pinson_cov = block_diag(pva_cov, bias_cov)
 
         # add pinson state block
@@ -316,7 +316,7 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
         self._add_state_block(providers, self.pinson_sb_config)
 
         # sync fusion engine and initial solution time
-        init_time = self.init_solution.solution.wrapped_message.time_of_validity  # type: ignore[union-attr]
+        init_time = self.init_solution.solution.wrapped_message.time_of_validity
         self.fusion_engine.time = init_time
         self.last_feedback_time_ns = init_time.elapsed_nsec
 
@@ -522,7 +522,7 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
             return
 
         # Give the fusion engine a strategy
-        fusion_engine.strategy = self.fusion_strategy_plugin.new_fusion_strategy(  # type: ignore[assignment]
+        fusion_engine.strategy = self.fusion_strategy_plugin.new_fusion_strategy(
             StandardFusionStrategy
         )
 
@@ -729,7 +729,7 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
 
         if self.feedback_config.pos_error_threshold:
             pinson_x_and_p: EstimateWithCovariance = self.cache.get('pinson')
-            surpassed_error_threshold = np.any(  # type: ignore[assignment]
+            surpassed_error_threshold = np.any(
                 np.abs(pinson_x_and_p.estimate[:3])
                 >= self.feedback_config.pos_error_threshold
             )
@@ -876,7 +876,7 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
             if channel in self.inertial_channels:
                 self.inertial.process_pntos_message(message)
             elif target_mps := self.measurement_channels.get(channel):
-                time = msg.wrapped_message.time_of_validity  # type: ignore[attr-defined]
+                time = msg.wrapped_message.time_of_validity
                 self._propagate_to_time(time)
                 for mp in target_mps:
                     self._perform_measurement_update(msg, mp)

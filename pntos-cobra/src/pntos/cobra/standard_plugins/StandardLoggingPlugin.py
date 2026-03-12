@@ -37,7 +37,7 @@ class StandardLoggingPlugin(LoggingPlugin):
         mediator: Mediator | None = None,
     ) -> None:
         self.log(
-            LoggingPlugin,  # type: ignore[type-abstract]
+            LoggingPlugin,
             self.identifier,
             LoggingLevel.INFO,
             'using hard-coded global logging level ' + self.global_log_level.name,
@@ -45,7 +45,7 @@ class StandardLoggingPlugin(LoggingPlugin):
 
     def shutdown_plugin(self) -> None:
         self.log(
-            LoggingPlugin,  # type: ignore[type-abstract]
+            LoggingPlugin,
             self.identifier,
             LoggingLevel.INFO,
             ' Logging plugin shut down correctly.',

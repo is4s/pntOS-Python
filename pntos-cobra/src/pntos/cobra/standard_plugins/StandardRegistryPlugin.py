@@ -616,4 +616,4 @@ class StandardRegistryPlugin(RegistryPlugin):
         if self.mediator is not None:
             self.mediator.log_message(level, message)
         else:
-            print_message(level, RegistryPlugin.__name__, message)  # type: ignore[unreachable]
+            print_message(level, RegistryPlugin.__name__, message)

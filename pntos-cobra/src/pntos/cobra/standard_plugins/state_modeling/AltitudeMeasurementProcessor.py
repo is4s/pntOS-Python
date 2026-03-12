@@ -198,7 +198,7 @@ class AltitudeMeasurementProcessor(StandardMeasurementProcessor):
             lever_arm_diff = (
                 (np.eye(3) - skew(x[6:9, 0])) @ self._C_platform_to_nav @ self._l_ps_p
             )
-            return -x[2:3] + x[-1:] + lever_arm_diff[2]  # type: ignore[no-any-return]
+            return -x[2:3] + x[-1:] + lever_arm_diff[2]
 
         R = np.array([[variance]])
 

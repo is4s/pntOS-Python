@@ -104,6 +104,3 @@ class TutorialLcmTransportPlugin(TransportPlugin):
 
         time_microsec = int(time() * 1e6)
         self._output_log.write_event(time_microsec, channel_name, lcm_msg.encode())
-
-
-# mypy: disable-error-code="union-attr,attr-defined,arg-type"

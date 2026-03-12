@@ -71,7 +71,7 @@ def marshal_from_lcm(
         return None
 
     marshal_func = marshaler_from_aspn23_lcm[msg_type]
-    return marshal_func(msg)  # type: ignore[no-any-return]
+    return marshal_func(msg)
 
 
 def marshal_to_aspn23_lcm(msg: aspn23.AspnBase) -> Aspn23LcmMsg | None:
@@ -90,8 +90,8 @@ def marshal_to_aspn23_lcm(msg: aspn23.AspnBase) -> Aspn23LcmMsg | None:
     if msg_type not in marshaler_to_aspn23_lcm:
         return None
 
-    marshal_func = marshaler_to_aspn23_lcm[msg_type]  # type: ignore[index]
-    return marshal_func(msg)  # type: ignore[no-any-return]
+    marshal_func = marshaler_to_aspn23_lcm[msg_type]
+    return marshal_func(msg)
 
 
 def process_lcm_message(
@@ -166,7 +166,7 @@ def run_tcp_relay() -> Popen[str]:  # pragma: no cover
         start_new_session=True,
     )
     # wait until we start seeing output from relay
-    process.stdout.readline()  # type: ignore[union-attr]
+    process.stdout.readline()
     return process
 
 
@@ -254,7 +254,7 @@ def run_pntos_with_network_transport(
         app_process = run_app(app, args, monitor=True, validate=validate)
 
         # wait for cobra to connect to TCP relay
-        for i, line in enumerate(relay_process.stdout):  # type: ignore[arg-type]
+        for i, line in enumerate(relay_process.stdout):
             # wait for at least 2 clients to be connected (cobra and LCM logger)
             if i > max_relay_wait_iterations:
                 print(

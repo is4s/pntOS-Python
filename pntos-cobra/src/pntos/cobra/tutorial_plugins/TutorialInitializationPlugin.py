@@ -49,7 +49,7 @@ class ManualInitialization(InertialInitializationStrategy):
         """
         self.config_group = config_group
         self.mediator = mediator
-        config: ManualAlignmentConfig = config_from_registry(  # type: ignore[assignment]
+        config: ManualAlignmentConfig = config_from_registry(
             ManualAlignmentConfig, mediator, config_group
         )
         self.solution = Message(self._create_pva(config), 'Cobra simple initialization')
@@ -155,7 +155,7 @@ class TutorialInitializationPlugin(InitializationPlugin):
         plugin_resources_location: str | None = None,
         mediator: Mediator | None = None,
     ) -> None:
-        self.mediator = mediator  # type: ignore[assignment]
+        self.mediator = mediator
 
     def shutdown_plugin(self) -> None:
         return
@@ -163,7 +163,7 @@ class TutorialInitializationPlugin(InitializationPlugin):
     def is_initialization_type_supported(
         self, initialization_type: InitializationType
     ) -> bool:
-        return initialization_type == InertialInitializationStrategy  # type: ignore[no-any-return]
+        return initialization_type == InertialInitializationStrategy
 
     def new_initialization_strategy(
         self,
@@ -171,6 +171,6 @@ class TutorialInitializationPlugin(InitializationPlugin):
         config_group: str | None = None,
     ) -> InitializationType | None:
         if issubclass(initialization_type, InertialInitializationStrategy):
-            return ManualInitialization(config_group, self.mediator)  # type: ignore[arg-type]
+            return ManualInitialization(config_group, self.mediator)
         self.mediator.log_message(LoggingLevel.ERROR, 'Unsupported type requested.')
         return None

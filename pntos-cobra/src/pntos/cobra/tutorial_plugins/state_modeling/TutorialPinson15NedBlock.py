@@ -187,10 +187,10 @@ class TutorialPinson15NedBlock(StandardStateBlock):
         Returns:
             NDArray[float64]: The F Matrix.
         """
-        pos = extract_pos(self._new_pva_aux)  # type: ignore[arg-type]
-        vel = extract_vel(self._new_pva_aux)  # type: ignore[arg-type]
-        force = self._force_and_rate_aux.meas_accel  # type: ignore[union-attr]
-        C_sensor_to_ned = quat_to_dcm(self._new_pva_aux.quaternion)  # type: ignore[union-attr,arg-type]
+        pos = extract_pos(self._new_pva_aux)
+        vel = extract_vel(self._new_pva_aux)
+        force = self._force_and_rate_aux.meas_accel
+        C_sensor_to_ned = quat_to_dcm(self._new_pva_aux.quaternion)
 
         earth = EarthModel(pos, vel)
         omega = OMEGA_E
@@ -321,7 +321,7 @@ class TutorialPinson15NedBlock(StandardStateBlock):
             NDArray[float64]: The Q Matrix.
         """
         Q = self._pre_Q
-        C_sensor_to_ned = quat_to_dcm(self._new_pva_aux.quaternion)  # type: ignore[union-attr,arg-type]
+        C_sensor_to_ned = quat_to_dcm(self._new_pva_aux.quaternion)
 
         Q[3:6, 3:6] = C_sensor_to_ned @ Q[3:6, 3:6] @ C_sensor_to_ned.T
         Q[6:9, 6:9] = C_sensor_to_ned @ Q[6:9, 6:9] @ C_sensor_to_ned.T

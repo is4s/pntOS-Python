@@ -1,7 +1,7 @@
 from threading import Thread
 
 try:
-    import rclpy  # type: ignore[import-not-found]
+    import rclpy
 except ImportError as e:
     raise ImportError(
         'Is ROS installed and is its environment sourced? See the ROS usage '
@@ -9,7 +9,7 @@ except ImportError as e:
     ) from e
 
 try:
-    from aspn23_ros_utils import AspnMsg, AspnRosNode  # type: ignore[import-not-found]
+    from aspn23_ros_utils import AspnMsg, AspnRosNode
 except ImportError as e:
     raise ImportError(
         'Is the ASPN-ROS environment sourced? See the ROS usage tutorial in '
@@ -19,12 +19,12 @@ except ImportError as e:
 import contextlib
 
 from pntos.api import LoggingLevel, Mediator, Message, TransportPlugin
-from rclpy.executors import (  # type: ignore[import-not-found]
+from rclpy.executors import (
     ExternalShutdownException,
     SingleThreadedExecutor,
 )
-from rclpy.node import Subscription  # type: ignore[import-not-found]
-from rclpy.timer import Timer  # type: ignore[import-not-found]
+from rclpy.node import Subscription
+from rclpy.timer import Timer
 
 
 class Aspn23RosTransportPlugin(TransportPlugin):

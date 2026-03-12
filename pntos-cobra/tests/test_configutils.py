@@ -71,10 +71,10 @@ SUPPORTED_TYPES = [
     tuple[tuple[int, ...], ...],
     NDArray[float64],  # Any-dimension array of floats (will be 1d for test)
     NDArray[int64],  # Any-dimension array of ints (will be 1d for test)
-    ndarray[(2, 2), np.dtype[float64]],  # type: ignore[misc] # 2d array of floats
-    ndarray[(2, 2), np.dtype[int64]],  # type: ignore[misc] # 2d array of ints
-    ndarray[(2, 2, 2), np.dtype[float64]],  # type: ignore[misc] # 3d array of floats
-    ndarray[(2, 2, 2), np.dtype[int64]],  # type: ignore[misc] # 3d array of ints
+    ndarray[(2, 2), np.dtype[float64]],
+    ndarray[(2, 2), np.dtype[int64]],
+    ndarray[(2, 2, 2), np.dtype[float64]],
+    ndarray[(2, 2, 2), np.dtype[int64]],
     DummyEnum,
     EstimateWithCovariance,
 ]
@@ -519,10 +519,10 @@ class TestConfigUtils(unittest.TestCase):
         for i in range(3):
             for j, t in enumerate(SUPPORTED_TYPES):
                 dynamic_group = f'dynamic_test_{i}{j}'
-                DynConf = self._make_config('dynamic_field', t, optional=bool(i))  # type: ignore[arg-type]
+                DynConf = self._make_config('dynamic_field', t, optional=bool(i))
                 # test with dummy value when type hint is and isn't optional; test with None
-                val = self._create_dummy_value(t) if i in {0, 2} else None  # type: ignore[arg-type]
-                conf = DynConf(  # type: ignore[call-arg]
+                val = self._create_dummy_value(t) if i in {0, 2} else None
+                conf = DynConf(
                     dynamic_field=val,
                     group=dynamic_group,
                 )
@@ -535,13 +535,11 @@ class TestConfigUtils(unittest.TestCase):
         group = 'itfconv'
         DynConf = self._make_config('dynamic_field', float)
         val = 1
-        conf = DynConf(  # type: ignore[call-arg]
-            dynamic_field=val, group=group
-        )
+        conf = DynConf(dynamic_field=val, group=group)
         config_to_registry(conf, self.mediator)
         out_conf = config_from_registry(DynConf, self.mediator, group)
         assert out_conf is not None
-        assert conf.dynamic_field == out_conf.dynamic_field  # type: ignore[attr-defined]
+        assert conf.dynamic_field == out_conf.dynamic_field
 
     def test_list_to_tuple_conversion(self) -> None:
         group = 'md_list_to_tuple'
@@ -549,24 +547,20 @@ class TestConfigUtils(unittest.TestCase):
             'dynamic_field', tuple[tuple[float, float], tuple[float, float]]
         )
         val = [[1, 2], [3, 4]]
-        conf = DynConf(  # type: ignore[call-arg]
-            dynamic_field=val, group=group
-        )
+        conf = DynConf(dynamic_field=val, group=group)
         config_to_registry(conf, self.mediator)
         out_conf = config_from_registry(DynConf, self.mediator, group)
         assert out_conf is not None
-        assert np.allclose(conf.dynamic_field, out_conf.dynamic_field)  # type: ignore[attr-defined]
+        assert np.allclose(conf.dynamic_field, out_conf.dynamic_field)
 
         group = 'str_list_to_tuple'
         DynConf = self._make_config('dynamic_field', tuple[str, ...])
         new_val = ['hello', 'world']
-        conf = DynConf(  # type: ignore[call-arg]
-            dynamic_field=new_val, group=group
-        )
+        conf = DynConf(dynamic_field=new_val, group=group)
         config_to_registry(conf, self.mediator)
         out_conf = config_from_registry(DynConf, self.mediator, group)
         assert out_conf is not None
-        for e1, e2 in zip(conf.dynamic_field, out_conf.dynamic_field, strict=False):  # type: ignore[attr-defined]
+        for e1, e2 in zip(conf.dynamic_field, out_conf.dynamic_field, strict=False):
             assert e1 == e2
 
     def test_ndarray_to_tuple_conversion(self) -> None:
@@ -575,13 +569,11 @@ class TestConfigUtils(unittest.TestCase):
             'dynamic_field', tuple[tuple[float, float], tuple[float, float]]
         )
         val = np.array(((1, 2), (3, 4)))
-        conf = DynConf(  # type: ignore[call-arg]
-            dynamic_field=val, group=group
-        )
+        conf = DynConf(dynamic_field=val, group=group)
         config_to_registry(conf, self.mediator)
         out_conf = config_from_registry(DynConf, self.mediator, group)
         assert out_conf is not None
-        assert np.allclose(conf.dynamic_field, out_conf.dynamic_field)  # type: ignore[attr-defined]
+        assert np.allclose(conf.dynamic_field, out_conf.dynamic_field)
 
     def test_non_uniform_tuple(self) -> None:
         group = 'non_uniform'
@@ -589,7 +581,7 @@ class TestConfigUtils(unittest.TestCase):
             'dynamic_field', tuple[tuple[float, ...], tuple[float, float]]
         )
         val = ((1, 2, 3, 4, 5), (6, 7))
-        conf = DynConf(dynamic_field=val, group=group)  # type: ignore[call-arg]
+        conf = DynConf(dynamic_field=val, group=group)
         config_to_registry(conf, self.mediator)
         out_conf = config_from_registry(DynConf, self.mediator, group)
         assert out_conf is None
@@ -600,7 +592,7 @@ class TestConfigUtils(unittest.TestCase):
             'dynamic_field', tuple[tuple[str, ...], tuple[str, ...]]
         )
         val = (('hello', 'world'), ('2001', 'a space odyssey'))
-        conf = DynConf(dynamic_field=val, group=group)  # type: ignore[call-arg]
+        conf = DynConf(dynamic_field=val, group=group)
         config_to_registry(conf, self.mediator)
         out_conf = config_from_registry(DynConf, self.mediator, group)
         assert out_conf is None

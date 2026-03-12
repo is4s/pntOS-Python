@@ -139,15 +139,15 @@ def config_from_registry(
             out[param.name] = config_group
             continue
 
-        dtype = _get_dtype(param.type)  # type: ignore[arg-type]
+        dtype = _get_dtype(param.type)
         if _is_type_optional(param.type) and not _exists(kv, param.name, dtype):
             out[param.name] = None
             continue
         if issubclass(dtype, EstimateWithCovariance):
             val = EstimateWithCovariance(
-                type=EstimateWithCovarianceType(kv['_ewc_type']),  # type: ignore[arg-type]
-                estimate=kv['_estimate'],  # type: ignore[arg-type]
-                covariance=kv['_covariance'],  # type: ignore[arg-type]
+                type=EstimateWithCovarianceType(kv['_ewc_type']),
+                estimate=kv['_estimate'],
+                covariance=kv['_covariance'],
             )
         # Special case: nested config or a series of nested configs
         elif issubclass(dtype, BaseConfig):
@@ -167,18 +167,18 @@ def config_from_registry(
             # Numerical data series are stored in registry as numpy arrays, but config
             # dataclass supports list, tuple, or numpy array. Convert numpy array from
             # registry into desired dataclass type.
-            val = _convert_numerical_series(val, param.type)  # type:ignore[arg-type]
+            val = _convert_numerical_series(val, param.type)
         elif isinstance(val, list):
             # String data series are stored in registry as 1-D lists, but config
             # dataclass supports lists or tuples. Convert list to desired dataclass
             # type.
-            val = _convert_series(val, param.type)  # type:ignore[arg-type]
+            val = _convert_series(val, param.type)
 
         # Special case: enum. Convert integer back to enum type.
         elif isclass(dtype) and issubclass(dtype, Enum):
             val = dtype(val)
 
-        if not _confirm_types(val, param.type):  # type: ignore[arg-type]
+        if not _confirm_types(val, param.type):
             mismatch_type_msg = f'config_from_registry: Field {param.name} in {config_type.__name__} has the wrong type.\n\tExpected: {param.type}\n\tReceived: {_get_verbose_type(val)}'
             mediator.log_message(LoggingLevel.ERROR, mismatch_type_msg)
             kv.batch_end()
@@ -188,7 +188,7 @@ def config_from_registry(
     kv.batch_end()
     if fail:
         return None
-    return config_type(**out)  # type:ignore[arg-type]
+    return config_type(**out)
 
 
 def _exists(kv: KeyValueStore, pname: str, ptype: type[Any]) -> bool:
@@ -291,7 +291,7 @@ def config_to_registry(config: BaseConfig, mediator: Mediator) -> None:
     kv = mediator.registry.batch_start(config.group)
 
     for param in conf_params:
-        if not _is_type_supported(param.type):  # type: ignore[arg-type]
+        if not _is_type_supported(param.type):
             mediator.log_message(
                 LoggingLevel.ERROR,
                 f'Support for converting {param.type} to a registry type does not exist. Support must be added or a different type must be used on the config class {type(config)}.',
@@ -363,7 +363,7 @@ def _validate_config_value(
         A `tuple[bool, Any]` where the first value indicates if the validation was successful and the second value
         is ``val`` or what it gets converted to.
     """
-    if _confirm_types(val, param.type):  # type: ignore[arg-type]
+    if _confirm_types(val, param.type):
         return (True, val)  # Got expected type, everything is good
 
     # If type mismatch, log a warning and convert to expected type for the following cases:
@@ -408,7 +408,7 @@ def _confirm_types(
     def check_ndarray_type(actual_type: type[Any], expected_type: type[Any]) -> bool:
         actual_dtype = get_args(actual_type)[0]
         expected_shape, expected_dtype = get_args(expected_type)  # noqa:RUF059
-        return actual_dtype == expected_dtype  # type:ignore[no-any-return]
+        return actual_dtype == expected_dtype
 
     def check_list_type(actual_type: type[Any], expected_type: type[Any]) -> bool:
         actual_item_type = get_args(actual_type)[0]
@@ -475,11 +475,11 @@ def _confirm_types(
 def _get_verbose_type(obj: SupportedRegistryTypeUnion) -> type[Any]:
     if isinstance(obj, tuple):
         inner_types = tuple(_get_verbose_type(item) for item in obj)
-        return tuple[inner_types]  # type: ignore[valid-type]
+        return tuple[inner_types]
     if isinstance(obj, list):
-        return list[_get_verbose_type(obj[0])]  # type: ignore[misc,return-value]
+        return list[_get_verbose_type(obj[0])]
     if isinstance(obj, np.ndarray):
-        return np.ndarray[np.dtype[obj.dtype]]  # type: ignore[misc,no-any-return,name-defined]
+        return np.ndarray[np.dtype[obj.dtype]]
     return type(obj)
 
 
@@ -585,9 +585,9 @@ def _validate_tuple_type(tuple_type: type[Any], rec_call: bool = False) -> bool:
 
 
 def _convert_numerical_series(
-    val: NDArray,  # type: ignore[type-arg]
+    val: NDArray,
     output_type: type[Any],
-) -> list | tuple | NDArray:  # type: ignore[type-arg]
+) -> list | tuple | NDArray:
     """Convert numpy array of numbers to desired type when extracting from registry.
 
     Possible output types are:

@@ -54,7 +54,7 @@ def save_to_hdf5_file(
                 if isinstance(val_list[0], str):
                     hdf5_file.create_dataset(
                         key,
-                        data=np.array([i.encode('ascii') for i in val_list]),  # type: ignore[union-attr]
+                        data=np.array([i.encode('ascii') for i in val_list]),
                     )
                 elif (  # Check for list[list[str]]
                     isinstance(val_list[0], list)
@@ -64,7 +64,7 @@ def save_to_hdf5_file(
                     hdf5_file.create_dataset(
                         key,
                         data=np.array(
-                            [[i.encode('ascii') for i in j] for j in val_list]  # type: ignore[union-attr]
+                            [[i.encode('ascii') for i in j] for j in val_list]
                         ),
                     )
                 elif isinstance(val_list[0], bool):
@@ -110,9 +110,9 @@ def load_from_hdf5_file(
                     output[key] = [i.decode('ascii') for i in val]
                 elif isinstance(val[0], np.bool_):
                     output[key] = [bool(i) for i in val]
-                elif isinstance(val[0], int64):  # type: ignore[misc]
+                elif isinstance(val[0], int64):
                     output[key] = [int(i) for i in val]
-                elif isinstance(val[0], float64):  # type: ignore[misc]
+                elif isinstance(val[0], float64):
                     output[key] = [float(i) for i in val]
                 elif isinstance(val[0], np.ndarray) and isinstance(
                     val[0][0], np.bytes_

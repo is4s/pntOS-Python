@@ -84,7 +84,7 @@ class ExperimentalCobraUiPlugin(UiPlugin):
         if config.static_folder:
             self.static_folder = Path(config.static_folder)
         else:
-            self.static_folder = files('pntos.cobra').joinpath(  # type: ignore[call-arg, assignment]
+            self.static_folder = files('pntos.cobra').joinpath(
                 'advanced_plugins', 'ui', '_static', 'dist'
             )
 
@@ -209,12 +209,12 @@ class ExperimentalCobraUiPlugin(UiPlugin):
     def _route_socket(self) -> None:
         """Set up WebSocket event handlers."""
 
-        @self.socket.on('connect')  # type: ignore[misc]
+        @self.socket.on('connect')
         def handle_connect(connection: None) -> None:
             emit('snapshot', self.registry_manager.snapshot().model_dump())
 
-        @self.socket.event  # type: ignore[misc]
-        def subscribe(subscription_json: Unpack[Subscription]) -> None:  # type: ignore[valid-type]
+        @self.socket.event
+        def subscribe(subscription_json: Unpack[Subscription]) -> None:
             subscription = Subscription.model_validate(subscription_json)
             self.registry_manager.subscribe(subscription)
             initial_value = self.registry_manager.get_current_value(
@@ -228,18 +228,18 @@ class ExperimentalCobraUiPlugin(UiPlugin):
                     ).model_dump(),
                 )
 
-        @self.socket.event  # type: ignore[misc]
-        def unsubscribe(subscription_json: Unpack[Subscription]) -> None:  # type: ignore[valid-type]
+        @self.socket.event
+        def unsubscribe(subscription_json: Unpack[Subscription]) -> None:
             subscription = Subscription.model_validate(subscription_json)
             self.registry_manager.unsubscribe(subscription)
 
-        @self.socket.event  # type: ignore[misc]
-        def write(write_request_dict: Unpack[Write]) -> None:  # type: ignore[valid-type]
+        @self.socket.event
+        def write(write_request_dict: Unpack[Write]) -> None:
             write_request = Write.model_validate(write_request_dict)
             for write in self.write_buffer.add(write_request):
                 self.registry_manager.write(write)
 
-        @self.socket.event  # type: ignore[misc]
+        @self.socket.event
         def snapshot() -> Snapshot:
             return self.registry_manager.snapshot()
 

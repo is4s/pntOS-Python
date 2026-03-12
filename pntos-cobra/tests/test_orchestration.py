@@ -240,8 +240,8 @@ standard_config = [
 ]
 
 manual_fogm_config = deepcopy(standard_config)
-orch_config: StandardOrchestrationConfig = manual_fogm_config[2]  # type: ignore[assignment]
-orch_config.additional_sb_configs[0].estimate_with_covariance = EstimateWithCovariance(  # type: ignore[index]
+orch_config: StandardOrchestrationConfig = manual_fogm_config[2]
+orch_config.additional_sb_configs[0].estimate_with_covariance = EstimateWithCovariance(
     type=EstimateWithCovarianceType.EWC_GENERIC,
     estimate=np.zeros((3,)),
     covariance=np.eye(3),
@@ -356,7 +356,7 @@ class Test_Orchestration(unittest.TestCase):
             MeasurementSatnav,
         ]
 
-    def instantiate_default_plugins(self, config) -> list:  # type: ignore[type-arg, no-untyped-def]
+    def instantiate_default_plugins(self, config) -> list:
         self.initialization_plugin: InitializationPlugin = TutorialInitializationPlugin(
             'Cobra Tutorial Initialization Plugin'
         )
@@ -693,7 +693,7 @@ class Test_Orchestration(unittest.TestCase):
             )
         assert (
             self.orchestration_plugin.fusion_engine.time.elapsed_nsec
-            == self.orchestration_plugin.inertial_drift_prop_dt  # type: ignore[union-attr]
+            == self.orchestration_plugin.inertial_drift_prop_dt
         )
 
     def test_process_pntos_message_alignment_tutorial(self) -> None:
@@ -869,7 +869,7 @@ class Test_Orchestration(unittest.TestCase):
             imu_model=imu_config,
         )
         temp_config = deepcopy(standard_config)
-        orch_config: StandardOrchestrationConfig = temp_config[2]  # type: ignore[assignment]
+        orch_config: StandardOrchestrationConfig = temp_config[2]
         orch_config.alignment_config = align_config
         static_alignment_plugin = StaticAlignInitializationPlugin(
             'Static Alignment Initialization Plugin'

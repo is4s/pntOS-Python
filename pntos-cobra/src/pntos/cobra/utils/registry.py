@@ -142,18 +142,18 @@ class ValueView(Generic[ValueType]):
         kv.request_notify(self._key, self._callback)
         if self._key in kv:
             if self._type is None:
-                self._value = kv[self._key]  # type: ignore[assignment]
+                self._value = kv[self._key]
             else:
-                self._value = kv.get_value(self._key, self._type)  # type: ignore[type-var]
+                self._value = kv.get_value(self._key, self._type)
         kv.batch_end()
         self._post_callback = post_callback
 
     def _callback(self, group: str, keys: list[str], kv: KeyValueStore) -> None:
         with self._value_lock:
             if self._type is not None:
-                self._value = kv.get_value(self._key, self._type)  # type: ignore[type-var]
+                self._value = kv.get_value(self._key, self._type)
             else:
-                self._value = kv[self._key]  # type: ignore[assignment]
+                self._value = kv[self._key]
 
         if self._post_callback is not None:
             self._post_callback(group, keys, kv)
@@ -215,7 +215,7 @@ class BufferedValueView(ValueView[ValueType], Generic[ValueType]):
     ) -> None:
         self._buffer: list[ValueType | None] = []
         self._buffer_lock: RLock = RLock()
-        super().__init__(registry, group, key, type)  # type: ignore[arg-type]
+        super().__init__(registry, group, key, type)
 
     def _callback(self, group: str, keys: list[str], kv: KeyValueStore) -> None:
         with self._value_lock:
@@ -273,7 +273,7 @@ class MutableValueView(ValueView[ValueType], Generic[ValueType]):
         key: str,
         type: type[ValueType] | None = None,
     ) -> None:
-        super().__init__(registry, group, key, type)  # type: ignore[arg-type]
+        super().__init__(registry, group, key, type)
         self._started_batch = False
 
     def _batch_start(self, kv: KeyValueStore | None = None) -> KeyValueStore:

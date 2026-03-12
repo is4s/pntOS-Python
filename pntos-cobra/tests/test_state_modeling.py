@@ -1293,7 +1293,7 @@ def test_copy_proc(
         assert m[0]._inertial_pva is not None
 
         # copy MP and compare with new MP
-        new_position_mp = deepcopy(m[0])  # type: ignore[unreachable]
+        new_position_mp = deepcopy(m[0])
         assert new_position_mp._inertial_pva is not None
         assert new_position_mp._inertial_pva.p1 == m[0]._inertial_pva.p1
         # modify new MP and re-compare with original MP
