@@ -65,6 +65,8 @@ auxiliary_data
 faq
 coordinate_frames
 concurrency
+pyproject
+uv
 ```
 
 ```{toctree}

@@ -34,18 +34,9 @@ to [](#select-and-run-an-app).
 If you have created the virtual environment but it is not currently activated, run the below command
 from the root directory to enter the virtual environment. The command varies depending on your shell:
 
-`````{tab-set}
-````{tab-item} **bash/zsh**
+```{include} snippets/activate_venv.md
+
 ```
-source .venv/bin/activate
-```
-````
-````{tab-item} **fish**
-```
-source .venv/bin/activate.fish
-```
-````
-`````
 
 ### Select and Run an App
 
