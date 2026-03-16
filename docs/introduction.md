@@ -658,7 +658,7 @@ The next method:
 
 ```{literalinclude} ../pntos-cobra/src/pntos/cobra/dummy_plugins/DummyOrchestrationPlugin.py
 :start-at: def init_orchestration_plugin
-:end-at: self._plugins = plugins
+:end-at: stream_config.immediate_stream_all(True)
 :dedent: 4
 ```
 
@@ -745,43 +745,11 @@ In this case, however, no extra cleanup is necessary.
 the received messages into a solution), this demonstrates the general structure and dataflow of the
 Orchestration plugin.
 
-### A Simple Orchestration Plugin Example
-
-In the previous section we showed the scaffolding for an
-{py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>`, which did not calculate a result. To do so,
-we would need to pick a sensor fusion approach and implement it within
-{py:obj}`process_pntos_message<pntos.api.OrchestrationPlugin.process_pntos_message>`.
-
-The {py:obj}`TutorialGpsOrchestrationPlugin<pntos.cobra.TutorialGpsOrchestrationPlugin>` is designed to be a simple implementation
-of a {py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` which demonstrates how one might write an
-{py:obj}`Orchestration Plugin<pntos.api.OrchestrationPlugin>` using a single EKF to do GPS/INS. The source code
-of the {py:obj}`TutorialGpsOrchestrationPlugin<pntos.cobra.TutorialGpsOrchestrationPlugin>` can be
-[found here](https://git.aspn.us/pntos/pntos-python/-/blob/main/pntos-cobra/src/pntos/cobra/tutorial_plugins/TutorialGpsOrchestrationPlugin.py).
-We can see from the source code that complementary nav ASPN messages are sent to the EKF
-inside the {py:obj}`process_pntos_message<pntos.api.OrchestrationPlugin.process_pntos_message>` method:
-
-```{literalinclude} ../pntos-cobra/src/pntos/cobra/tutorial_plugins/TutorialGpsOrchestrationPlugin.py
-:language: python
-:start-at: def process_pntos_message
-:end-at: self.fusion_engine.update(processor_label=label, message=message)
-:dedent: 4
+```{note}
+If you're interested in seeing a simple implementation of an Orchestration plugin that actually
+performs sensor fusion to produce a navigation solution, check out the
+[`DummyOrchestrationPlugin`](https://git.aspn.us/pntos/pntos-python/-/blob/main/pntos-cobra/src/pntos/cobra/dummy_plugins/DummyOrchestrationPlugin.py).
 ```
-
-and that buffered solutions from the EKF are returned
-by the {py:obj}`request_solutions<pntos.api.OrchestrationPlugin.request_solutions>` method:
-
-```{literalinclude} ../pntos-cobra/src/pntos/cobra/tutorial_plugins/TutorialGpsOrchestrationPlugin.py
-:language: python
-:pyobject: TutorialGpsOrchestrationPlugin.request_solutions
-:dedent: 4
-```
-
-as described above.
-
-To run an app with the `TutorialGpsOrchestrationPlugin`, see [Running Your First App](first_app.md).
-
-<!-- TODO: Level 1 vs Level 2, and a link to the Level 2 docs when they exist -->
-<!-- TODO: Part 2 of the tour could be the Level 2 integration tour -->
 
 ### Running The Very Simple App
 
