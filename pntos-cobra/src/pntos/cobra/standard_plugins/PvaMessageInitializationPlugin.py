@@ -145,13 +145,17 @@ class PvaMessageInitializationPlugin(InitializationPlugin):
     def shutdown_plugin(self) -> None:
         return
 
-    def is_initialization_type_supported(self, itype: InitializationType) -> bool:
-        return itype is InertialInitializationStrategy
+    def is_initialization_type_supported(
+        self, initialization_type: InitializationType
+    ) -> bool:
+        return initialization_type is InertialInitializationStrategy
 
     def new_initialization_strategy(
-        self, type: type[InitializationType], config_group: str | None = None
+        self,
+        initialization_type: type[InitializationType],
+        config_group: str | None = None,
     ) -> InitializationType | None:
-        if issubclass(type, InertialInitializationStrategy):
+        if issubclass(initialization_type, InertialInitializationStrategy):
             if config_group is None:
                 self.mediator.log_message(
                     LoggingLevel.ERROR,

@@ -66,13 +66,17 @@ class DummyInitializationPlugin(InitializationPlugin):
     def shutdown_plugin(self) -> None:
         return
 
-    def is_initialization_type_supported(self, type: type[InitializationType]) -> bool:
+    def is_initialization_type_supported(
+        self, initialization_type: type[InitializationType]
+    ) -> bool:
         return True
 
     def new_initialization_strategy(
-        self, type: type[InitializationType], config_group: str | None = None
+        self,
+        initialization_type: type[InitializationType],
+        config_group: str | None = None,
     ) -> InitializationType | None:
-        if issubclass(type, InertialInitializationStrategy):
+        if issubclass(initialization_type, InertialInitializationStrategy):
             return DummyInertialInitializationStrategy()  # ty:ignore[invalid-return-type]
         return None
 
@@ -91,16 +95,16 @@ class DummyInertialPlugin(InertialPlugin):
     def shutdown_plugin(self) -> None:
         return
 
-    def is_inertial_type_supported(self, type: type[InertialType]) -> bool:
+    def is_inertial_type_supported(self, inertial_type: type[InertialType]) -> bool:
         return True
 
     def new_inertial(
         self,
-        type: type[InertialType],
+        inertial_type: type[InertialType],
         solution: Message,
         config_group: str | None = None,
     ) -> InertialType | None:
-        return type()
+        return inertial_type()
 
 
 class DummyFusionPlugin(FusionPlugin):
@@ -117,13 +121,13 @@ class DummyFusionPlugin(FusionPlugin):
     def shutdown_plugin(self) -> None:
         return
 
-    def is_fusion_type_supported(self, type: type[FusionEngineType]) -> bool:
+    def is_fusion_type_supported(self, fusion_type: type[FusionEngineType]) -> bool:
         return True
 
     def new_fusion_engine(
-        self, type: type[FusionEngineType]
+        self, fusion_type: type[FusionEngineType]
     ) -> FusionEngineType | None:
-        if issubclass(type, StandardFusionStrategy):
+        if issubclass(fusion_type, StandardFusionStrategy):
             return DummyStandardFusionEngine()
         return None
 
@@ -290,11 +294,13 @@ class DummyStateModelingPlugin(StateModelingPlugin):
     def shutdown_plugin(self) -> None:
         return
 
-    def is_fusion_type_supported(self, type: type[StateModelProviderType]) -> bool:
+    def is_fusion_type_supported(
+        self, fusion_type: type[StateModelProviderType]
+    ) -> bool:
         return True
 
     def new_state_model_provider(
-        self, type: type[StateModelProviderType]
+        self, fusion_type: type[StateModelProviderType]
     ) -> StateModelProviderType | None:
         return DummyStandardStateModelProvider()
 

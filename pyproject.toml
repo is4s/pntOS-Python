@@ -141,7 +141,6 @@ unused-type-ignore-comment = "ignore"
 unresolved-import = "ignore"
 possibly-missing-attribute = "ignore"
 invalid-argument-type = "ignore"
-invalid-method-override = "ignore"
 
 [tool.ty.src]
 exclude = [

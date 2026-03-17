@@ -334,11 +334,13 @@ class MockStateModelingPlugin(StateModelingPlugin):
     def shutdown_plugin(self) -> None:
         return
 
-    def is_fusion_type_supported(self, type: type[StateModelProviderType]) -> bool:
+    def is_fusion_type_supported(
+        self, fusion_type: type[StateModelProviderType]
+    ) -> bool:
         return False
 
     def new_state_model_provider(
-        self, type: type[StateModelProviderType]
+        self, fusion_type: type[StateModelProviderType]
     ) -> StateModelProviderType | None:
         return MockStateModelProvider()
 

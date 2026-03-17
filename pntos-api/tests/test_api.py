@@ -1,6 +1,7 @@
 from abc import ABC
 
 from pntos import api
+from pntos.api import Registry
 
 
 def assert_is_only_instance(plugin: api.CommonPlugin, expected_type: type[ABC]) -> None:
@@ -109,11 +110,11 @@ class MockFusionPlugin(api.FusionPlugin):
     def shutdown_plugin(self) -> None:
         return
 
-    def is_fusion_type_supported(self, type: type[api.FusionEngineType]) -> bool:
+    def is_fusion_type_supported(self, fusion_type: type[api.FusionEngineType]) -> bool:
         return False
 
     def new_fusion_engine(
-        self, type: type[api.FusionEngineType]
+        self, fusion_type: type[api.FusionEngineType]
     ) -> api.FusionEngineType | None:
         return None
 
@@ -147,12 +148,12 @@ class MockInertialPlugin(api.InertialPlugin):
     def shutdown_plugin(self) -> None:
         return
 
-    def is_inertial_type_supported(self, type: type[api.InertialType]) -> bool:
+    def is_inertial_type_supported(self, inertial_type: type[api.InertialType]) -> bool:
         return False
 
     def new_inertial(
         self,
-        type: type[api.InertialType],
+        inertial_type: type[api.InertialType],
         solution: api.Message,
         config_group: str | None = None,
     ) -> api.InertialType | None:
@@ -169,12 +170,14 @@ class MockInitializationPlugin(api.InitializationPlugin):
         return
 
     def is_initialization_type_supported(
-        self, type: type[api.InitializationType]
+        self, initialization_type: type[api.InitializationType]
     ) -> bool:
         return False
 
     def new_initialization_strategy(
-        self, type: type[api.InitializationType], config_group: str | None = None
+        self,
+        initialization_type: type[api.InitializationType],
+        config_group: str | None = None,
     ) -> api.InitializationType | None:
         return None
 
@@ -260,8 +263,8 @@ class MockRegistryPlugin(api.RegistryPlugin):
     def shutdown_plugin(self) -> None:
         return
 
-    def new_registry(self, initial_config=None) -> None:
-        return None
+    def new_registry(self, initial_config: str | None = None) -> Registry:
+        return None  # ty:ignore[invalid-return-type]
 
 
 class MockStateModelingPlugin(api.StateModelingPlugin):
@@ -273,10 +276,10 @@ class MockStateModelingPlugin(api.StateModelingPlugin):
     def shutdown_plugin(self) -> None:
         return
 
-    def is_fusion_type_supported(self, type) -> bool:
+    def is_fusion_type_supported(self, fusion_type) -> bool:
         return False
 
-    def new_state_model_provider(self, type) -> None:
+    def new_state_model_provider(self, fusion_type) -> None:
         return None
 
 

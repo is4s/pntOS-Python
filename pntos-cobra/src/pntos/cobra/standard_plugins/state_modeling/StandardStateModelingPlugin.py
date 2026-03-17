@@ -564,12 +564,12 @@ class StandardStateModelingPlugin(StateModelingPlugin):
         pass
 
     def new_state_model_provider(
-        self, type: type[StateModelProviderType]
+        self, fusion_type: type[StateModelProviderType]
     ) -> StateModelProviderType | None:
-        if not self.is_fusion_type_supported(type):
+        if not self.is_fusion_type_supported(fusion_type):
             return None
 
         return StandardStateModelProvider(self._mediator)
 
-    def is_fusion_type_supported(self, type: StateModelProviderType) -> bool:
-        return type is api.StandardStateModelProvider
+    def is_fusion_type_supported(self, fusion_type: StateModelProviderType) -> bool:
+        return fusion_type is api.StandardStateModelProvider
