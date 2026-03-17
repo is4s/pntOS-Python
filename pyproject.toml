@@ -134,7 +134,6 @@ all = "error"
 missing-type-argument = "ignore"
 missing-override-decorator = "ignore"
 possibly-unresolved-reference = "ignore"
-dataclass-field-order = "ignore"
 
 [tool.ty.src]
 exclude = [
