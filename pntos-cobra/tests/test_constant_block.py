@@ -85,7 +85,7 @@ def test_constant_generate_dynamics(block: ConstantStateBlock) -> None:
     expected_Phi = np.eye(3)
     expected_Qd = np.zeros((3, 3))
 
-    dyn = block.generate_dynamics(None, t1, t2)
+    dyn = block.generate_dynamics(None, t1, t2)  # ty:ignore[invalid-argument-type]
 
     # propagating x shouldn't change x
     init_x = np.random.rand(3, 1)
@@ -95,7 +95,7 @@ def test_constant_generate_dynamics(block: ConstantStateBlock) -> None:
     assert np.all(expected_Qd == dyn.Qd)
 
     # propagating over longer interval should be the exact same as a shorter interval
-    dyn2 = block.generate_dynamics(None, t2, t3)
+    dyn2 = block.generate_dynamics(None, t2, t3)  # ty:ignore[invalid-argument-type]
     assert np.all(dyn2.Phi == dyn.Phi)
     assert np.all(dyn2.Qd == dyn.Qd)
     prop_x2 = dyn2.g(prop_x)
@@ -110,7 +110,7 @@ def test_generate_dynamics_with_noise(block_with_noise: ConstantStateBlock) -> N
     expected_Phi = np.eye(3)
     expected_Qd = np.eye(3)
 
-    dyn = block_with_noise.generate_dynamics(None, t1, t2)
+    dyn = block_with_noise.generate_dynamics(None, t1, t2)  # ty:ignore[invalid-argument-type]
 
     # propagating x shouldn't change x
     init_x = np.random.rand(3, 1)
@@ -121,7 +121,7 @@ def test_generate_dynamics_with_noise(block_with_noise: ConstantStateBlock) -> N
 
     # propagating over longer interval should be the exact same as a shorter interval
     expected_Qd *= 100
-    dyn2 = block_with_noise.generate_dynamics(None, t2, t3)
+    dyn2 = block_with_noise.generate_dynamics(None, t2, t3)  # ty:ignore[invalid-argument-type]
     assert np.all(dyn2.Phi == dyn.Phi)
     assert np.all(dyn2.Qd == expected_Qd)
     prop_x2 = dyn2.g(prop_x)
@@ -135,7 +135,7 @@ def test_various_sizes(mediator: StandardMediator) -> None:
         block = ConstantStateBlock('block', mediator, num_states)
 
         init_x = np.random.rand(num_states, 1)
-        dyn = block.generate_dynamics(None, t1, t2)
+        dyn = block.generate_dynamics(None, t1, t2)  # ty:ignore[invalid-argument-type]
         assert np.all(dyn.Phi == dyn.Phi)
         assert np.all(dyn.Qd == dyn.Qd)
         prop_x = dyn.g(init_x)

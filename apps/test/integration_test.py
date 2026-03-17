@@ -84,7 +84,7 @@ def validate_results(
     assert abs(filter_time[-1] - truth_time[-1]) < 3  # noqa: PLR2004
 
     # Interpolate truth onto solution times so that we can calculate the solution error
-    interp_truth_pva = interpolate_pva(pva.time, truth)
+    interp_truth_pva = interpolate_pva(pva.time, truth)  # ty:ignore[invalid-argument-type]
     ned_err = pva.ned - interp_truth_pva.ned
     vel_err = pva.vel - interp_truth_pva.vel
     rpy_rad = np.deg2rad(pva.rpy)
@@ -92,9 +92,9 @@ def validate_results(
     tilt_err = np.rad2deg(calc_tilts(truth_rpy_rad, rpy_rad))
 
     # ensure PVA errors are within expected limits
-    validate_error(ned_err, pva.ned_sig, limits=pos_err_limits)
-    validate_error(vel_err, pva.vel_sig, limits=vel_err_limits)
-    validate_error(tilt_err, pva.tilt_sig, limits=tilt_err_limits)
+    validate_error(ned_err, pva.ned_sig, limits=pos_err_limits)  # ty:ignore[invalid-argument-type]
+    validate_error(vel_err, pva.vel_sig, limits=vel_err_limits)  # ty:ignore[invalid-argument-type]
+    validate_error(tilt_err, pva.tilt_sig, limits=tilt_err_limits)  # ty:ignore[invalid-argument-type]
 
 
 def test_dummy_app() -> None:
@@ -128,7 +128,7 @@ def test_standard_pos_ins_app() -> None:
     run_pntos_with_log_transport(
         Path('apps/standard/pos_ins.py'), [OUTPUT_LOG.as_posix()], validate=True
     )
-    log_data = read_pva(OUTPUT_LOG, read_all=True)
+    log_data = read_pva(OUTPUT_LOG.as_posix(), read_all=True)
     validate_results(
         log_data.data[SOLUTION_CHANNEL],
         log_data.data[TRUTH_CHANNEL],
@@ -146,7 +146,7 @@ def test_standard_pos_ins_record_states_app() -> None:
         [OUTPUT_LOG.as_posix()],
         validate=True,
     )
-    log_data = read_pva(OUTPUT_LOG, read_all=True)
+    log_data = read_pva(OUTPUT_LOG.as_posix(), read_all=True)
     validate_results(
         log_data.data[SOLUTION_CHANNEL],
         log_data.data[TRUTH_CHANNEL],
@@ -183,7 +183,7 @@ def test_tutorial_pos_ins_vel_app() -> None:
     run_pntos_with_log_transport(
         Path('apps/tutorial/pos_vel_ins.py'), [OUTPUT_LOG.as_posix()], validate=True
     )
-    log_data = read_pva(OUTPUT_LOG, read_all=True)
+    log_data = read_pva(OUTPUT_LOG.as_posix(), read_all=True)
     validate_results(
         log_data.data[SOLUTION_CHANNEL],
         log_data.data[TRUTH_CHANNEL],
@@ -219,7 +219,7 @@ def test_standard_pos_ins_leverarm_app() -> None:
         [OUTPUT_LOG.as_posix()],
         validate=True,
     )
-    log_data = read_pva(OUTPUT_LOG, read_all=True)
+    log_data = read_pva(OUTPUT_LOG.as_posix(), read_all=True)
     validate_results(
         log_data.data[SOLUTION_CHANNEL],
         log_data.data[TRUTH_CHANNEL],
@@ -237,7 +237,7 @@ def test_standard_pos_bodyvel_ins_app() -> None:
     run_pntos_with_log_transport(
         Path('apps/standard/pos_ins_bodyvel.py'), [OUTPUT_LOG.as_posix()], validate=True
     )
-    log_data = read_pva(OUTPUT_LOG, read_all=True)
+    log_data = read_pva(OUTPUT_LOG.as_posix(), read_all=True)
     validate_results(
         log_data.data[SOLUTION_CHANNEL],
         log_data.data[TRUTH_CHANNEL],
@@ -253,7 +253,7 @@ def test_standard_pos_ins_vel_app() -> None:
     run_pntos_with_log_transport(
         Path('apps/standard/pos_vel_ins.py'), [OUTPUT_LOG.as_posix()], validate=True
     )
-    log_data = read_pva(OUTPUT_LOG, read_all=True)
+    log_data = read_pva(OUTPUT_LOG.as_posix(), read_all=True)
     validate_results(
         log_data.data[SOLUTION_CHANNEL],
         log_data.data[TRUTH_CHANNEL],
@@ -288,7 +288,7 @@ def test_standard_posvel_ins_app() -> None:
     run_pntos_with_log_transport(
         Path('apps/standard/posvel_ins.py'), [OUTPUT_LOG.as_posix()], validate=True
     )
-    log_data = read_pva(OUTPUT_LOG, read_all=True)
+    log_data = read_pva(OUTPUT_LOG.as_posix(), read_all=True)
 
     validate_results(
         log_data.data[SOLUTION_CHANNEL],
@@ -326,7 +326,7 @@ def test_standard_outage_sim_app() -> None:
         [OUTPUT_LOG.as_posix()],
         validate=True,
     )
-    log_data = read_pva(OUTPUT_LOG, read_all=True)
+    log_data = read_pva(OUTPUT_LOG.as_posix(), read_all=True)
     validate_results(
         log_data.data[SOLUTION_CHANNEL],
         log_data.data[TRUTH_CHANNEL],
@@ -348,7 +348,7 @@ def test_standard_pos_ins_vsb_app() -> None:
     run_pntos_with_log_transport(
         Path('apps/standard/pos_ins_vsb.py'), [OUTPUT_LOG.as_posix()], validate=True
     )
-    log_data = read_pva(OUTPUT_LOG, read_all=True)
+    log_data = read_pva(OUTPUT_LOG.as_posix(), read_all=True)
     validate_results(
         log_data.data[SOLUTION_CHANNEL],
         log_data.data[TRUTH_CHANNEL],
@@ -403,7 +403,7 @@ def test_standard_direction_to_points_app() -> None:
         [OUTPUT_LOG.as_posix()],
         validate=True,
     )
-    log_data = read_pva(OUTPUT_LOG, read_all=True)
+    log_data = read_pva(OUTPUT_LOG.as_posix(), read_all=True)
     validate_results(
         log_data.data[SOLUTION_CHANNEL],
         log_data.data[TRUTH_CHANNEL],

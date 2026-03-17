@@ -131,7 +131,7 @@ def test_diagnostic_log_plugin() -> None:
 
         # Make sure values are the same
         if isinstance(received_val, np.ndarray):
-            np.allclose(test_val, received_val)
+            np.allclose(test_val, received_val)  # ty:ignore[invalid-argument-type]
         elif isinstance(received_val, Message):
             compare_messages(test_val, received_val)
         else:

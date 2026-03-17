@@ -1,8 +1,8 @@
 diff --git a/apps/standard/pos_ins.py b/apps/standard/pos_ins_vsb.py
-index eb98e009..80372ac8 100755
+index 391390a3..bab3005a 100755
 --- a/apps/standard/pos_ins.py
 +++ b/apps/standard/pos_ins_vsb.py
-@@ -31,8 +31,9 @@ from pntos.cobra.config import (
+@@ -37,8 +37,9 @@ from pntos.cobra.config import (
      InertialConfig,
      LcmLogTransportConfig,
      ManualHeadingAlignmentConfig,
@@ -13,7 +13,7 @@ index eb98e009..80372ac8 100755
      StandardOrchestrationConfig,
      TimeAdjusterConfig,
      TimeBiasConfig,
-@@ -85,24 +86,33 @@ my_config = [
+@@ -91,24 +92,33 @@ my_config: list[BaseConfig] = [
                  estimate_with_covariance=EstimateWithCovariance(
                      type=EstimateWithCovarianceType.EWC_GENERIC,
                      estimate=np.zeros((3,)),

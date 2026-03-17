@@ -547,7 +547,7 @@ class Test_Orchestration(unittest.TestCase):
 
     def init_orchestration_plugin(self) -> None:
         stream_config = StandardMessageStreamConfig()
-        plugins = [
+        plugins: list[CommonPlugin] = [
             self.fusion_plugin,
             self.fusion_strategy_plugin,
             self.inertial_plugin,

@@ -1,5 +1,5 @@
 diff --git a/apps/standard/pos_ins.py b/apps/standard/lcm_relay.py
-index eb98e009..c4bbc3fb 100755
+index 391390a3..fdf95961 100755
 --- a/apps/standard/pos_ins.py
 +++ b/apps/standard/lcm_relay.py
 @@ -1,7 +1,5 @@
@@ -10,7 +10,7 @@ index eb98e009..c4bbc3fb 100755
  import numpy as np
  
  # API imports
-@@ -10,7 +8,7 @@ from pntos.api import EstimateWithCovariance, EstimateWithCovarianceType, Loggin
+@@ -15,7 +13,7 @@ from pntos.api import (
  # Import Cobra plugins and config structs
  from pntos.cobra import (
      EkfFusionStrategyPlugin,
@@ -19,7 +19,7 @@ index eb98e009..c4bbc3fb 100755
      ManualHeadingAlignInitializationPlugin,
      StandardControllerPlugin,
      StandardFusionPlugin,
-@@ -29,7 +27,7 @@ from pntos.cobra.config import (
+@@ -35,7 +33,7 @@ from pntos.cobra.config import (
      ImuConfig,
      ImuRotatorConfig,
      InertialConfig,
@@ -28,7 +28,7 @@ index eb98e009..c4bbc3fb 100755
      ManualHeadingAlignmentConfig,
      PinsonStateBlockConfig,
      PinsonWithNedFogmPositionMPConfig,
-@@ -37,9 +35,6 @@ from pntos.cobra.config import (
+@@ -43,9 +41,6 @@ from pntos.cobra.config import (
      TimeAdjusterConfig,
      TimeBiasConfig,
  )
@@ -38,10 +38,10 @@ index eb98e009..c4bbc3fb 100755
  
  # Config setup
  C_imu_to_platform = (
-@@ -59,14 +54,7 @@ imu_model = ImuConfig(
+@@ -65,14 +60,7 @@ imu_model = ImuConfig(
      gyro_bias_initial_sigma=(0.003, 0.003, 0.003),
  )
- my_config = [
+ my_config: list[BaseConfig] = [
 -    LcmLogTransportConfig(
 -        input_file=EXAMPLE_LCM_LOG,
 -        output_file=OUTPUT_LOG,
@@ -54,10 +54,10 @@ index eb98e009..c4bbc3fb 100755
      ControllerConfig(),
      FusionEngineConfig(),
      StandardOrchestrationConfig(
-@@ -141,7 +129,7 @@ my_config = [
+@@ -147,7 +135,7 @@ my_config: list[BaseConfig] = [
  # Instantiate all of our plugins
  controller = StandardControllerPlugin('Cobra Standard Controller Plugin')
- plugins = [
+ plugins: list[CommonPlugin] = [
 -    LcmLogTransportPlugin('Cobra LCM Log Transport Plugin'),
 +    LcmTransportPlugin('Cobra LCM Transport Plugin'),
      EkfFusionStrategyPlugin('Cobra EKF Fusion Strategy Plugin'),

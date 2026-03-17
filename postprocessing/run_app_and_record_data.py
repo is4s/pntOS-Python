@@ -34,7 +34,7 @@ if __name__ == '__main__':
         returncode = run_pntos_with_ros_transport(
             app_to_run, Path(EXAMPLE_ROS_LOG), Path(OUTPUT_LOG_PREFIX)
         )
-        OUTPUT_LOG = get_ros_bag_file(OUTPUT_LOG_PREFIX)
+        OUTPUT_LOG = get_ros_bag_file(Path(OUTPUT_LOG_PREFIX))
     else:
         returncode = run_pntos_with_log_transport(app_to_run, [OUTPUT_LOG.as_posix()])
 

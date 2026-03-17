@@ -7,6 +7,7 @@ from aspn23 import (
 from numpy import float64
 from numpy.typing import NDArray
 from pntos.api import (
+    CommonPlugin,
     ControllerPlugin,
     CrossCovariances,
     EstimateWithCovariance,
@@ -463,7 +464,7 @@ class Test_StandardControllerPlugin(unittest.TestCase):
         self.ui: UiPlugin = DummyUiPlugin('DummyUiPlugin')
         self.transport: TransportPlugin = DummyTransportPlugin('DummyTransportPlugin')
 
-        self.plugins_list = [
+        self.plugins_list: list[CommonPlugin] = [
             self.orchestration_plugin,
             self.initialization_plugin,
             self.inertial_plugin,

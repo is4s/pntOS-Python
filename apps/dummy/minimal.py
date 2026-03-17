@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+from pntos.api import CommonPlugin
+
 # Import Cobra plugins and config structs
 from pntos.cobra import (
     DummyControllerPlugin,
@@ -9,7 +11,7 @@ from pntos.cobra import (
 
 # Instantiate all of our plugins
 controller = DummyControllerPlugin('Cobra Dummy Controller Plugin')
-plugins = [
+plugins: list[CommonPlugin] = [
     DummyTransportPlugin('Cobra Dummy Transport Plugin'),
     DummyOrchestrationPlugin('Cobra Dummy Orchestration Plugin'),
 ]

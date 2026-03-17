@@ -105,7 +105,7 @@ class KeyInfo(MutableValueView[ValueType], Generic[ValueType]):
             # Front-end write or set_value(): we don't need to track this one
             self._do_not_update_front_end.clear()
             return
-        self._callback_registrar.register_change(self)
+        self._callback_registrar.register_change(self)  # ty:ignore[invalid-argument-type]
 
     def add(self, subscription: Subscription) -> None:
         """Adds subscription to this key."""

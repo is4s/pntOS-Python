@@ -177,7 +177,7 @@ plugins that it is supposed to use to set up the {term}`pntOS-Python` system. Fo
 {py:obj}`Controller plugin<pntos.api.ControllerPlugin>` might receive this list of plugins:
 
 ```{literalinclude} ../apps/dummy/minimal.py
-:start-at: plugins =
+:start-at: plugins: list[CommonPlugin] =
 :end-at: ]
 ```
 

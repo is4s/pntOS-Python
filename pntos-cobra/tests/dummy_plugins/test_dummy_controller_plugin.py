@@ -103,7 +103,7 @@ def test_dummy_controller(
     # a solution to the DoStuffPlugin, at which point it should
     # flip the 'did_log' flag. interact_with_mediator loop usually exits
     # on first iteration.
-    plugs = [orch_plugin, trans_plugin, stuff_plugin]
+    plugs: list[CommonPlugin] = [orch_plugin, trans_plugin, stuff_plugin]
     controller_plugin.take_control(plugs)
     assert stuff_plugin.did_log
 
@@ -116,6 +116,6 @@ def test_dummy_slim(
     # Transport is dumping data out, but there is no orchestration for the mediator
     # to hand it to, so DoStuffPlugin cannot get a solution.  interact_with_mediator
     # loop will spin until control returns here after sleep or it hits max number of loops.
-    plugs = [trans_plugin, stuff_plugin]
+    plugs: list[CommonPlugin] = [trans_plugin, stuff_plugin]
     controller_plugin.take_control(plugs)
     assert not stuff_plugin.did_log

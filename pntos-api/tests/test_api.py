@@ -1,13 +1,13 @@
 from abc import ABC
 
 from pntos import api
-from pntos.api import Registry
+from pntos.api import CommonPlugin, Registry
 
 
 def assert_is_only_instance(plugin: api.CommonPlugin, expected_type: type[ABC]) -> None:
     """Asserts that the given plugin is of the expected type and no other."""
     assert issubclass(expected_type, api.CommonPlugin)
-    all_plugin_types = [
+    all_plugin_types: list[type[CommonPlugin]] = [
         api.ControllerPlugin,
         api.FusionPlugin,
         api.FusionStrategyPlugin,

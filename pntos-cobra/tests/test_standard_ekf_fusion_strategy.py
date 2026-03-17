@@ -55,7 +55,7 @@ def strat(plugin: EkfFusionStrategyPlugin) -> EkfFusionStrategy:
 def pop_strat(st: EkfFusionStrategy, ns: int, v1: float64 | int) -> None:
     x = arange(v1, v1 + ns, 1.0).reshape((ns, 1))
     p = diagflat(pow(x, 2))
-    st.add_states(x, p)
+    st.add_states(x, p)  # ty:ignore[invalid-argument-type]
 
 
 def test_get_strategy_fail(plugin: EkfFusionStrategyPlugin) -> None:

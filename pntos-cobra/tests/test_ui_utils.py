@@ -58,14 +58,14 @@ def test_subscription() -> Subscription:
 class TestSequenceBuffer:
     def test_initialization(self) -> None:
         buffer: SequenceBuffer[dict[str, int | str]] = SequenceBuffer(
-            lambda x: x['seq']
+            lambda x: x['seq']  # ty:ignore[invalid-argument-type]
         )  # ty:ignore[invalid-assignment]
         assert buffer._next_id == 0
         assert len(buffer._pending) == 0
 
     def test_add_items_in_order_returns_immediately(self) -> None:
         buffer: SequenceBuffer[dict[str, int | str]] = SequenceBuffer(
-            lambda x: x['seq']
+            lambda x: x['seq']  # ty:ignore[invalid-argument-type]
         )  # ty:ignore[invalid-assignment]
 
         result1 = buffer.add({'seq': 0, 'data': 'first'})
@@ -82,7 +82,7 @@ class TestSequenceBuffer:
 
     def test_add_items_out_of_order_buffers_them(self) -> None:
         buffer: SequenceBuffer[dict[str, int | str]] = SequenceBuffer(
-            lambda x: x['seq']
+            lambda x: x['seq']  # ty:ignore[invalid-argument-type]
         )  # ty:ignore[invalid-assignment]
 
         result1 = buffer.add({'seq': 2, 'data': 'third'})
@@ -95,7 +95,7 @@ class TestSequenceBuffer:
 
     def test_adding_missing_sequence_releases_buffered_items(self) -> None:
         buffer: SequenceBuffer[dict[str, int | str]] = SequenceBuffer(
-            lambda x: x['seq']
+            lambda x: x['seq']  # ty:ignore[invalid-argument-type]
         )  # ty:ignore[invalid-assignment]
 
         buffer.add({'seq': 2, 'data': 'third'})
@@ -111,7 +111,7 @@ class TestSequenceBuffer:
 
     def test_multiple_gaps_in_sequence(self) -> None:
         buffer: SequenceBuffer[dict[str, int | str]] = SequenceBuffer(
-            lambda x: x['seq']
+            lambda x: x['seq']  # ty:ignore[invalid-argument-type]
         )  # ty:ignore[invalid-assignment]
 
         buffer.add({'seq': 0, 'data': 'first'})
@@ -134,7 +134,7 @@ class TestSequenceBuffer:
 
     def test_duplicate_sequence_ids(self) -> None:
         buffer: SequenceBuffer[dict[str, int | str]] = SequenceBuffer(
-            lambda x: x['seq']
+            lambda x: x['seq']  # ty:ignore[invalid-argument-type]
         )  # ty:ignore[invalid-assignment]
 
         buffer.add({'seq': 1, 'data': 'first_version'})
@@ -148,7 +148,7 @@ class TestSequenceBuffer:
 
     def test_large_sequence_gap(self) -> None:
         buffer: SequenceBuffer[dict[str, int | str]] = SequenceBuffer(
-            lambda x: x['seq']
+            lambda x: x['seq']  # ty:ignore[invalid-argument-type]
         )  # ty:ignore[invalid-assignment]
 
         buffer.add({'seq': 1000, 'data': 'far_future'})
@@ -168,7 +168,7 @@ class TestSequenceBuffer:
 
     def test_thread_safety_with_concurrent_adds(self) -> None:
         buffer: SequenceBuffer[dict[str, int | str]] = SequenceBuffer(
-            lambda x: x['seq']
+            lambda x: x['seq']  # ty:ignore[invalid-argument-type]
         )  # ty:ignore[invalid-assignment]
         results = []
         errors = []

@@ -60,7 +60,7 @@ class PinsonErrorToStandardWrapped(VirtualStateBlock):
             lambda time: NavSolution(
                 array([self._pva.p1, self._pva.p2, self._pva.p3]),  # ty:ignore[unresolved-attribute]
                 array([self._pva.v1, self._pva.v2, self._pva.v3]),  # ty:ignore[unresolved-attribute]
-                quat_to_dcm(self._pva.quaternion).T,  # ty:ignore[unresolved-attribute]
+                quat_to_dcm(self._pva.quaternion).T,  # ty:ignore[unresolved-attribute, invalid-argument-type]
                 time,
             ),
         )

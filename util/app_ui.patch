@@ -1,8 +1,8 @@
 diff --git a/apps/standard/lcm_relay.py b/apps/advanced/ui.py
-index c4bbc3fb..9732d59c 100755
+index fdf95961..798034b5 100755
 --- a/apps/standard/lcm_relay.py
 +++ b/apps/advanced/ui.py
-@@ -7,7 +7,9 @@ from pntos.api import EstimateWithCovariance, EstimateWithCovarianceType, Loggin
+@@ -12,7 +12,9 @@ from pntos.api import (
  
  # Import Cobra plugins and config structs
  from pntos.cobra import (
@@ -12,15 +12,15 @@ index c4bbc3fb..9732d59c 100755
      LcmTransportPlugin,
      ManualHeadingAlignInitializationPlugin,
      StandardControllerPlugin,
-@@ -21,6 +23,7 @@ from pntos.cobra import (
- )
+@@ -27,6 +29,7 @@ from pntos.cobra import (
  from pntos.cobra.config import (
+     BaseConfig,
      ControllerConfig,
 +    ExperimentalCobraUiConfig,
      FogmConfig,
      FogmStateBlockConfig,
      FusionEngineConfig,
-@@ -123,6 +126,9 @@ my_config = [
+@@ -129,6 +132,9 @@ my_config: list[BaseConfig] = [
              ),
          ),
      ),
@@ -30,7 +30,7 @@ index c4bbc3fb..9732d59c 100755
  ]
  # End Config
  
-@@ -144,6 +150,8 @@ plugins = [
+@@ -150,6 +156,8 @@ plugins: list[CommonPlugin] = [
      StandardRegistryPlugin('Cobra Standard Registry Plugin', config=my_config),
      StandardPreprocessorPlugin('Cobra Standard Preprocessor Plugin'),
      StandardOrchestrationPlugin('Cobra Standard Orchestration Plugin'),

@@ -93,7 +93,9 @@ def main(revision: str) -> None:
         c_path = c_api_path / 'pntos/'
         py_path = Path('pntos-api/src/pntos/api/')
 
-        exit_val = compare_dir(c_path, py_path, c_api_path, aspn_path, bad_mods)
+        exit_val = compare_dir(
+            c_path, py_path, c_api_path.as_posix(), aspn_path.as_posix(), bad_mods
+        )
 
     print(f'\n{colored("Overall Result:", BLUE)}')
     if exit_val:

@@ -90,7 +90,7 @@ def marshal_to_aspn23_lcm(msg: aspn23.AspnBase) -> Aspn23LcmMsg | None:
     if msg_type not in marshaler_to_aspn23_lcm:
         return None
 
-    marshal_func = marshaler_to_aspn23_lcm[msg_type]
+    marshal_func = marshaler_to_aspn23_lcm[msg_type]  # ty:ignore[invalid-argument-type]
     return marshal_func(msg)
 
 

@@ -144,14 +144,14 @@ class ValueView(Generic[ValueType]):
             if self._type is None:
                 self._value = kv[self._key]  # ty:ignore[invalid-assignment]
             else:
-                self._value = kv.get_value(self._key, self._type)
+                self._value = kv.get_value(self._key, self._type)  # ty:ignore[invalid-argument-type]
         kv.batch_end()
         self._post_callback = post_callback
 
     def _callback(self, group: str, keys: list[str], kv: KeyValueStore) -> None:
         with self._value_lock:
             if self._type is not None:
-                self._value = kv.get_value(self._key, self._type)
+                self._value = kv.get_value(self._key, self._type)  # ty:ignore[invalid-argument-type]
             else:
                 self._value = kv[self._key]  # ty:ignore[invalid-assignment]
 

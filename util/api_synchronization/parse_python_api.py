@@ -65,7 +65,7 @@ class ApiVisitor(ast.NodeVisitor):
         """Customized method for visiting methods and their arguments."""
         assert self.curr_class is not None
         name = node.name
-        return_type = ast.unparse(node.returns)
+        return_type = ast.unparse(node.returns)  # ty:ignore[invalid-argument-type]
         return_type = [self._convert_type(return_type)]
         params = {}
         for arg in node.args.args:
@@ -77,7 +77,7 @@ class ApiVisitor(ast.NodeVisitor):
                 self._parse_callback_param(arg, name)
                 continue
             else:
-                param_type = ast.unparse(arg.annotation)
+                param_type = ast.unparse(arg.annotation)  # ty:ignore[invalid-argument-type]
                 param_type = [self._convert_type(param_type)]
             params[param_name] = param_type
         func = ApiFunction(name=name, return_type=return_type, parameters=params)
@@ -103,7 +103,7 @@ class ApiVisitor(ast.NodeVisitor):
     def _parse_callback_param(self, arg: ast.arg, func_name: str) -> None:
         """Parses ``callback`` parameter and stores it as its own function."""
         assert self.curr_class is not None
-        callback_spelling = ast.unparse(arg.annotation)
+        callback_spelling = ast.unparse(arg.annotation)  # ty:ignore[invalid-argument-type]
         sep = callback_spelling.rfind(',')
         callback_type = callback_spelling[sep + 2 : -1]  # slice out return type
         callback_param_type_spelling = callback_spelling[

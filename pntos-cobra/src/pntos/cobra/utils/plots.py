@@ -29,7 +29,7 @@ def plot_pva(
     leg_w_sigma = [pva.label, truth_pva.label, '+/- 1 sigma']
 
     # Interpolate truth onto solution times so that we can calculate the solution error
-    interp_truth_pva = interpolate_pva(pva.time, truth_pva)
+    interp_truth_pva = interpolate_pva(pva.time, truth_pva)  # ty:ignore[invalid-argument-type]
     ned_err = pva.ned - interp_truth_pva.ned
     vel_err = pva.vel - interp_truth_pva.vel
     rpy_rad = np.deg2rad(pva.rpy)
@@ -40,15 +40,21 @@ def plot_pva(
     drms_str = f'DRMS: {drms:.2f} m'
 
     plot_trajectory(
-        pva.ned, truth_pva.ned, pva.time, truth_pva.time, leg, drms_str, save_dir
+        pva.ned,
+        truth_pva.ned,
+        pva.time,  # ty:ignore[invalid-argument-type]
+        truth_pva.time,  # ty:ignore[invalid-argument-type]
+        leg,
+        drms_str,
+        save_dir,
     )
 
     plot_llh(
-        pva.llh,
-        truth_pva.llh,
-        pva.llh_sig,
-        pva.time,
-        truth_pva.time,
+        pva.llh,  # ty:ignore[invalid-argument-type]
+        truth_pva.llh,  # ty:ignore[invalid-argument-type]
+        pva.llh_sig,  # ty:ignore[invalid-argument-type]
+        pva.time,  # ty:ignore[invalid-argument-type]
+        truth_pva.time,  # ty:ignore[invalid-argument-type]
         t0,
         leg_w_sigma,
         save_dir,
@@ -56,38 +62,38 @@ def plot_pva(
     plot_ned(
         pva.ned,
         truth_pva.ned,
-        pva.ned_sig,
-        pva.time,
-        truth_pva.time,
+        pva.ned_sig,  # ty:ignore[invalid-argument-type]
+        pva.time,  # ty:ignore[invalid-argument-type]
+        truth_pva.time,  # ty:ignore[invalid-argument-type]
         t0,
         leg_w_sigma,
         save_dir,
     )
-    plot_ned_err(ned_err, pva.ned_sig, pva.time, t0, pva.label, save_dir)
+    plot_ned_err(ned_err, pva.ned_sig, pva.time, t0, pva.label, save_dir)  # ty:ignore[invalid-argument-type]
 
     plot_vel(
-        pva.vel,
-        truth_pva.vel,
-        pva.vel_sig,
-        pva.time,
-        truth_pva.time,
+        pva.vel,  # ty:ignore[invalid-argument-type]
+        truth_pva.vel,  # ty:ignore[invalid-argument-type]
+        pva.vel_sig,  # ty:ignore[invalid-argument-type]
+        pva.time,  # ty:ignore[invalid-argument-type]
+        truth_pva.time,  # ty:ignore[invalid-argument-type]
         t0,
         leg_w_sigma,
         save_dir,
     )
-    plot_vel_err(vel_err, pva.vel_sig, pva.time, t0, pva.label, save_dir)
+    plot_vel_err(vel_err, pva.vel_sig, pva.time, t0, pva.label, save_dir)  # ty:ignore[invalid-argument-type]
 
     plot_rpy(
-        pva.rpy,
-        truth_pva.rpy,
-        pva.tilt_sig,
-        pva.time,
-        truth_pva.time,
+        pva.rpy,  # ty:ignore[invalid-argument-type]
+        truth_pva.rpy,  # ty:ignore[invalid-argument-type]
+        pva.tilt_sig,  # ty:ignore[invalid-argument-type]
+        pva.time,  # ty:ignore[invalid-argument-type]
+        truth_pva.time,  # ty:ignore[invalid-argument-type]
         t0,
         leg_w_sigma,
         save_dir,
     )
-    plot_tilt_err(tilt_err, pva.tilt_sig, pva.time, t0, pva.label, save_dir)
+    plot_tilt_err(tilt_err, pva.tilt_sig, pva.time, t0, pva.label, save_dir)  # ty:ignore[invalid-argument-type]
 
 
 def plot_x_and_p(

@@ -12,7 +12,12 @@ import sys
 import numpy as np
 
 # API imports
-from pntos.api import EstimateWithCovariance, EstimateWithCovarianceType, LoggingLevel
+from pntos.api import (
+    CommonPlugin,
+    EstimateWithCovariance,
+    EstimateWithCovarianceType,
+    LoggingLevel,
+)
 
 # Import Cobra plugins and config structs
 from pntos.cobra import (
@@ -29,6 +34,7 @@ from pntos.cobra import (
     StandardStateModelingPlugin,
 )
 from pntos.cobra.config import (
+    BaseConfig,
     ControllerConfig,
     FogmConfig,
     FogmStateBlockConfig,
@@ -66,7 +72,7 @@ imu_model = ImuConfig(
     accel_bias_initial_sigma=(0.072, 0.072, 0.072),
     gyro_bias_initial_sigma=(0.003, 0.003, 0.003),
 )
-my_config = [
+my_config: list[BaseConfig] = [
     LcmLogTransportConfig(
         input_file=EXAMPLE_LCM_LOG,
         output_file=OUTPUT_LOG,
@@ -158,7 +164,7 @@ my_config = [
 
 # Instantiate all of our plugins
 controller = StandardControllerPlugin('Cobra Standard Controller Plugin')
-plugins = [
+plugins: list[CommonPlugin] = [
     LcmLogTransportPlugin('Cobra LCM Log Transport Plugin'),
     EkfFusionStrategyPlugin('Cobra EKF Fusion Strategy Plugin'),
     StandardFusionPlugin('Cobra Standard Fusion Plugin'),

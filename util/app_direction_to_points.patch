@@ -1,17 +1,17 @@
 diff --git a/apps/standard/pos_ins.py b/apps/standard/direction_to_points.py
-index eb98e009..74ffc4b4 100755
+index 391390a3..b37e6575 100755
 --- a/apps/standard/pos_ins.py
 +++ b/apps/standard/direction_to_points.py
-@@ -23,6 +23,8 @@ from pntos.cobra import (
- )
+@@ -29,6 +29,8 @@ from pntos.cobra import (
  from pntos.cobra.config import (
+     BaseConfig,
      ControllerConfig,
 +    Direction3dToPointsMPConfig,
 +    DownsamplerConfig,
      FogmConfig,
      FogmStateBlockConfig,
      FusionEngineConfig,
-@@ -32,7 +34,6 @@ from pntos.cobra.config import (
+@@ -38,7 +40,6 @@ from pntos.cobra.config import (
      LcmLogTransportConfig,
      ManualHeadingAlignmentConfig,
      PinsonStateBlockConfig,
@@ -19,7 +19,7 @@ index eb98e009..74ffc4b4 100755
      StandardOrchestrationConfig,
      TimeAdjusterConfig,
      TimeBiasConfig,
-@@ -65,6 +66,7 @@ my_config = [
+@@ -71,6 +72,7 @@ my_config: list[BaseConfig] = [
          channels_to_process=(
              '/sensor/vn-100/imu',
              '/sensor/ublox-ZED-F9T/position',
@@ -27,7 +27,7 @@ index eb98e009..74ffc4b4 100755
          ),
      ),
      ControllerConfig(),
-@@ -95,12 +97,13 @@ my_config = [
+@@ -101,12 +103,13 @@ my_config: list[BaseConfig] = [
              ),
          ),
          mp_configs=(
@@ -47,7 +47,7 @@ index eb98e009..74ffc4b4 100755
              ),
          ),
          inertial_config=InertialConfig(
-@@ -133,6 +136,11 @@ my_config = [
+@@ -139,6 +142,11 @@ my_config: list[BaseConfig] = [
                  channels_to_correct=('/sensor/ublox-ZED-F9T/position',),
                  time_bias=int(0.15 * 1e9),
              ),

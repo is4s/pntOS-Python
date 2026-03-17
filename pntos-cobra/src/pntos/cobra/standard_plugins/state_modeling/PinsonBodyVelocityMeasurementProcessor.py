@@ -209,7 +209,7 @@ class PinsonBodyVelocityMeasurementProcessor(StandardMeasurementProcessor):
 
             if np.any(z):
                 tan_vel_sensor = self._calc_tan_vel(
-                    lat,
+                    lat,  # ty:ignore[invalid-argument-type]
                     alt,
                     corr_inertial_vel_ned,
                     rotation_rate,

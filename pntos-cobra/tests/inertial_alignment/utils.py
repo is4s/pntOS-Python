@@ -134,8 +134,8 @@ def check_inertial_align_initialization_plugin(
 
     # Check IMU error covariance
     covariance = solution.inertial_error_covariance
-    np.fill_diagonal(covariance, 0)
-    assert np.allclose(covariance, np.zeros((6, 6)))
+    np.fill_diagonal(covariance, 0)  # ty:ignore[invalid-argument-type]
+    assert np.allclose(covariance, np.zeros((6, 6)))  # ty:ignore[invalid-argument-type]
 
     if expect_inertial_errors:
         assert solution.inertial_errors is not None

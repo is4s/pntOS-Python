@@ -3,7 +3,7 @@
 import sys
 
 # API imports
-from pntos.api import LoggingLevel
+from pntos.api import CommonPlugin, LoggingLevel
 
 # Import Cobra plugins and config structs
 from pntos.cobra import (
@@ -21,6 +21,7 @@ from pntos.cobra import (
     UiLogPlottingPlugin,
 )
 from pntos.cobra.config import (
+    BaseConfig,
     ControllerConfig,
     FogmConfig,
     FusionEngineConfig,
@@ -45,11 +46,8 @@ C_imu_to_platform = (
     (-0.01742059, 0.99983262, -0.00559042),
     (-0.0603517, 0.00452957, 0.9981669),
 )
-my_config = [
-    LcmLogTransportConfig(
-        input_file=EXAMPLE_LCM_LOG,
-        output_file=OUTPUT_LOG,
-    ),
+my_config: list[BaseConfig] = [
+    LcmLogTransportConfig(input_file=EXAMPLE_LCM_LOG, output_file=OUTPUT_LOG),
     ControllerConfig(),
     FusionEngineConfig(),
     ImuConfig(
@@ -124,7 +122,7 @@ my_config = [
 
 # Instantiate all of our plugins
 controller = StandardControllerPlugin('Cobra Standard Controller Plugin')
-plugins = [
+plugins: list[CommonPlugin] = [
     LcmLogTransportPlugin('Cobra LCM Log Transport Plugin'),
     EkfFusionStrategyPlugin('Cobra EKF Fusion Strategy Plugin'),
     StandardFusionPlugin('Cobra Standard Fusion Plugin'),

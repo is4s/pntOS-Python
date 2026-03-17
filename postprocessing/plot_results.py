@@ -18,10 +18,12 @@ def harvest_data(
     if logfile.suffix in {'.db3', '.mcap'}:
         from navanalysis.ros import RosBagReader  # noqa: PLC0415
 
-        return RosBagReader(logfile).harvest_topics(channels)
+        return RosBagReader(logfile.as_posix()).harvest_topics(channels)
 
     # LCM logfile
-    return read_pva(logfile=logfile, read_all=True, truth_channel=truth_channel)
+    return read_pva(
+        logfile=logfile.as_posix(), read_all=True, truth_channel=truth_channel
+    )
 
 
 def plot_results(
@@ -45,7 +47,7 @@ def plot_results(
 
     logfile = Path(logfile)
     save_dir = logfile.parent / logfile.stem
-    plot_pva(solution, truth, log_data.t0, save_dir=save_dir)
+    plot_pva(solution, truth, log_data.t0.get_elapsed_nsec(), save_dir=save_dir)
     print(f'Plots saved to {save_dir}.')
 
     if hdf5_file:
@@ -71,7 +73,7 @@ def plot_results(
         plot_x_and_p(
             time_s,
             t0_s,
-            state_labels,
+            state_labels,  # ty:ignore[invalid-argument-type]
             np.array(h5_data['estimate']),
             np.array(h5_data['sigma']),
             save_dir,

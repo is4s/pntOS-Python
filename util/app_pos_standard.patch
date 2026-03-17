@@ -1,16 +1,21 @@
 diff --git a/apps/tutorial/pos_ins.py b/apps/standard/pos_ins.py
-index 95655e8c..eb98e009 100755
+index 508c1218..391390a3 100755
 --- a/apps/tutorial/pos_ins.py
 +++ b/apps/standard/pos_ins.py
-@@ -2,38 +2,40 @@
+@@ -2,39 +2,46 @@
  
  import sys
  
 +import numpy as np
 +
  # API imports
--from pntos.api import LoggingLevel
-+from pntos.api import EstimateWithCovariance, EstimateWithCovarianceType, LoggingLevel
+-from pntos.api import CommonPlugin, LoggingLevel
++from pntos.api import (
++    CommonPlugin,
++    EstimateWithCovariance,
++    EstimateWithCovarianceType,
++    LoggingLevel,
++)
  
  # Import Cobra plugins and config structs
  from pntos.cobra import (
@@ -31,6 +36,7 @@ index 95655e8c..eb98e009 100755
 +    StandardStateModelingPlugin,
  )
  from pntos.cobra.config import (
+     BaseConfig,
      ControllerConfig,
      FogmConfig,
 +    FogmStateBlockConfig,
@@ -52,7 +58,7 @@ index 95655e8c..eb98e009 100755
  )
  from pntos_python_datasets_lcm import EXAMPLE_LCM_LOG
  
-@@ -45,79 +47,93 @@ C_imu_to_platform = (
+@@ -46,76 +53,93 @@ C_imu_to_platform = (
      (-0.01742059, 0.99983262, -0.00559042),
      (-0.0603517, 0.00452957, 0.9981669),
  )
@@ -67,15 +73,16 @@ index 95655e8c..eb98e009 100755
 +    accel_bias_initial_sigma=(0.072, 0.072, 0.072),
 +    gyro_bias_initial_sigma=(0.003, 0.003, 0.003),
 +)
- my_config = [
-     LcmLogTransportConfig(
-         input_file=EXAMPLE_LCM_LOG,
-         output_file=OUTPUT_LOG,
+ my_config: list[BaseConfig] = [
+-    LcmLogTransportConfig(input_file=EXAMPLE_LCM_LOG, output_file=OUTPUT_LOG),
++    LcmLogTransportConfig(
++        input_file=EXAMPLE_LCM_LOG,
++        output_file=OUTPUT_LOG,
 +        channels_to_process=(
 +            '/sensor/vn-100/imu',
 +            '/sensor/ublox-ZED-F9T/position',
 +        ),
-     ),
++    ),
      ControllerConfig(),
      FusionEngineConfig(),
 -    ImuConfig(
@@ -212,7 +219,7 @@ index 95655e8c..eb98e009 100755
      ),
  ]
  # End Config
-@@ -128,17 +144,18 @@ plugins = [
+@@ -126,17 +150,18 @@ plugins: list[CommonPlugin] = [
      LcmLogTransportPlugin('Cobra LCM Log Transport Plugin'),
      EkfFusionStrategyPlugin('Cobra EKF Fusion Strategy Plugin'),
      StandardFusionPlugin('Cobra Standard Fusion Plugin'),

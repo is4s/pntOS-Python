@@ -334,7 +334,7 @@ class StandardStateModelProvider(api.StandardStateModelProvider):
                 )
         self._mediator.log_message(
             LoggingLevel.ERROR,
-            f'Invalid processor index of {processor_index}. StandardStateModelProvider provides {len(self.processor_identifiers)} processors.',
+            f'Invalid processor index of {processor_index}. StandardStateModelProvider provides {len(self.processor_identifiers)} processors.',  # ty:ignore[invalid-argument-type]
         )
         return None
 
@@ -475,7 +475,7 @@ class StandardStateModelProvider(api.StandardStateModelProvider):
             case _:
                 self._mediator.log_message(
                     LoggingLevel.ERROR,
-                    f'Invalid block index of {block_index}. StandardStateModelProvider provides {len(self.block_identifiers)} state blocks.',
+                    f'Invalid block index of {block_index}. StandardStateModelProvider provides {len(self.block_identifiers)} state blocks.',  # ty:ignore[invalid-argument-type]
                 )
                 return None
 
@@ -539,7 +539,7 @@ class StandardStateModelProvider(api.StandardStateModelProvider):
 
         self._mediator.log_message(
             LoggingLevel.ERROR,
-            f'Invalid virtual block index of {virtual_block_index}. StandardStateModelProvider provides {len(self.virtual_block_identifiers)} virtual state blocks.',
+            f'Invalid virtual block index of {virtual_block_index}. StandardStateModelProvider provides {len(self.virtual_block_identifiers)} virtual state blocks.',  # ty:ignore[invalid-argument-type]
         )
         return None
 

@@ -139,15 +139,15 @@ def config_from_registry(
             out[param.name] = config_group
             continue
 
-        dtype = _get_dtype(param.type)
+        dtype = _get_dtype(param.type)  # ty:ignore[invalid-argument-type]
         if _is_type_optional(param.type) and not _exists(kv, param.name, dtype):
             out[param.name] = None
             continue
         if issubclass(dtype, EstimateWithCovariance):
             val = EstimateWithCovariance(
                 type=EstimateWithCovarianceType(kv['_ewc_type']),
-                estimate=kv['_estimate'],
-                covariance=kv['_covariance'],
+                estimate=kv['_estimate'],  # ty:ignore[invalid-argument-type]
+                covariance=kv['_covariance'],  # ty:ignore[invalid-argument-type]
             )
         # Special case: nested config or a series of nested configs
         elif issubclass(dtype, BaseConfig):
@@ -167,18 +167,18 @@ def config_from_registry(
             # Numerical data series are stored in registry as numpy arrays, but config
             # dataclass supports list, tuple, or numpy array. Convert numpy array from
             # registry into desired dataclass type.
-            val = _convert_numerical_series(val, param.type)
+            val = _convert_numerical_series(val, param.type)  # ty:ignore[invalid-argument-type]
         elif isinstance(val, list):
             # String data series are stored in registry as 1-D lists, but config
             # dataclass supports lists or tuples. Convert list to desired dataclass
             # type.
-            val = _convert_series(val, param.type)
+            val = _convert_series(val, param.type)  # ty:ignore[invalid-argument-type]
 
         # Special case: enum. Convert integer back to enum type.
         elif isclass(dtype) and issubclass(dtype, Enum):
             val = dtype(val)
 
-        if not _confirm_types(val, param.type):
+        if not _confirm_types(val, param.type):  # ty:ignore[invalid-argument-type]
             mismatch_type_msg = f'config_from_registry: Field {param.name} in {config_type.__name__} has the wrong type.\n\tExpected: {param.type}\n\tReceived: {_get_verbose_type(val)}'
             mediator.log_message(LoggingLevel.ERROR, mismatch_type_msg)
             kv.batch_end()
@@ -188,7 +188,7 @@ def config_from_registry(
     kv.batch_end()
     if fail:
         return None
-    return config_type(**out)
+    return config_type(**out)  # ty:ignore[invalid-argument-type]
 
 
 def _exists(kv: KeyValueStore, pname: str, ptype: type[Any]) -> bool:
@@ -259,14 +259,14 @@ def _nested_config_from_registry(
             conf_type = get_args(param.type)[0]
         else:
             conf_type = param.type
-        val = config_from_registry(conf_type, mediator, groups)
+        val = config_from_registry(conf_type, mediator, groups)  # ty:ignore[invalid-argument-type]
     elif isinstance(groups, list):
         conf_type = get_args(param.type)[0]
         if _is_type_optional(param.type):
             conf_type = get_args(conf_type)[0]
         val = []
         for group in groups:
-            conf = config_from_registry(conf_type, mediator, group)
+            conf = config_from_registry(conf_type, mediator, group)  # ty:ignore[invalid-argument-type]
             if conf is None:
                 val = None
                 break
@@ -291,7 +291,7 @@ def config_to_registry(config: BaseConfig, mediator: Mediator) -> None:
     kv = mediator.registry.batch_start(config.group)
 
     for param in conf_params:
-        if not _is_type_supported(param.type):
+        if not _is_type_supported(param.type):  # ty:ignore[invalid-argument-type]
             mediator.log_message(
                 LoggingLevel.ERROR,
                 f'Support for converting {param.type} to a registry type does not exist. Support must be added or a different type must be used on the config class {type(config)}.',
@@ -363,7 +363,7 @@ def _validate_config_value(
         A `tuple[bool, Any]` where the first value indicates if the validation was successful and the second value
         is ``val`` or what it gets converted to.
     """
-    if _confirm_types(val, param.type):
+    if _confirm_types(val, param.type):  # ty:ignore[invalid-argument-type]
         return (True, val)  # Got expected type, everything is good
 
     # If type mismatch, log a warning and convert to expected type for the following cases:
@@ -474,10 +474,10 @@ def _confirm_types(
 
 def _get_verbose_type(obj: SupportedRegistryTypeUnion) -> type[Any]:
     if isinstance(obj, tuple):
-        inner_types = tuple(_get_verbose_type(item) for item in obj)
+        inner_types = tuple(_get_verbose_type(item) for item in obj)  # ty:ignore[invalid-argument-type]
         return tuple[inner_types]  # ty:ignore[invalid-type-form]
     if isinstance(obj, list):
-        return list[_get_verbose_type(obj[0])]  # ty:ignore[invalid-type-form]
+        return list[_get_verbose_type(obj[0])]  # ty:ignore[invalid-type-form, invalid-argument-type]
     if isinstance(obj, np.ndarray):
         return np.ndarray[np.dtype[obj.dtype]]  # ty:ignore[invalid-type-arguments, invalid-type-form]
     return type(obj)

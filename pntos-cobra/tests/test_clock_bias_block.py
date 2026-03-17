@@ -67,7 +67,7 @@ def test_generate_dynamics_2state(block: ClockBiasStateBlock) -> None:
     expected_Phi = np.array([[1, dt], [0, 1]])
     expected_Qd = np.array([[index_one, diagonal], [diagonal, index_four]])
 
-    dyn = block.generate_dynamics(None, t_start, t_stop)
+    dyn = block.generate_dynamics(None, t_start, t_stop)  # ty:ignore[invalid-argument-type]
 
     init_x = np.array([0.0, 1.0])
     prop_x = dyn.g(init_x)
@@ -130,7 +130,7 @@ def test_generate_dynamics_3state(block: ClockBiasStateBlock) -> None:
         + third_state
     )
 
-    dyn = block.generate_dynamics(None, t_start, t_stop)
+    dyn = block.generate_dynamics(None, t_start, t_stop)  # ty:ignore[invalid-argument-type]
 
     init_x = np.array([0.0, 1.0, 0.1])
     prop_x = dyn.g(init_x)
