@@ -163,7 +163,7 @@ class TestRegistry(unittest.TestCase):
 
     @property
     def test_types(self) -> list[type[RegistryValueTypeUnion]]:
-        return self._test_types
+        return self._test_types  # ty:ignore[invalid-return-type]
 
     @property
     def test_keys(self) -> list[str]:

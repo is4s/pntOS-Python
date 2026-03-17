@@ -73,7 +73,7 @@ class DummyInitializationPlugin(InitializationPlugin):
         self, type: type[InitializationType], config_group: str | None = None
     ) -> InitializationType | None:
         if issubclass(type, InertialInitializationStrategy):
-            return DummyInertialInitializationStrategy()
+            return DummyInertialInitializationStrategy()  # ty:ignore[invalid-return-type]
         return None
 
 

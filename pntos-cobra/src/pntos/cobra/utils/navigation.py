@@ -51,7 +51,7 @@ def delta_lat_to_north(delta_lat: T, approx_lat: float, altitude: float) -> T:
     Returns:
         N-length array of distances in the north direction.
     """
-    return (meridian_radius(approx_lat) + altitude) * delta_lat
+    return (meridian_radius(approx_lat) + altitude) * delta_lat  # ty:ignore[invalid-return-type]
 
 
 def delta_lon_to_east(delta_lon: T, approx_lat: float, altitude: float) -> T:
@@ -65,7 +65,7 @@ def delta_lon_to_east(delta_lon: T, approx_lat: float, altitude: float) -> T:
     Returns:
         A single east distance or an N-length array of distances in the east direction.
     """
-    return (transverse_radius(approx_lat) + altitude) * delta_lon * cos(approx_lat)
+    return (transverse_radius(approx_lat) + altitude) * delta_lon * cos(approx_lat)  # ty:ignore[invalid-return-type]
 
 
 def east_to_delta_lon(east_distance: T, approx_lat: float, altitude: float) -> T:
@@ -81,7 +81,7 @@ def east_to_delta_lon(east_distance: T, approx_lat: float, altitude: float) -> T
     """
     return east_distance / (
         (transverse_radius(approx_lat) + altitude) * cos(approx_lat)
-    )
+    )  # ty:ignore[invalid-return-type]
 
 
 def north_to_delta_lat(north_distance: T, approx_lat: float, altitude: float) -> T:
@@ -95,7 +95,7 @@ def north_to_delta_lat(north_distance: T, approx_lat: float, altitude: float) ->
     Returns:
         A single delta-latitude or an N-length array of delta-latitudes.
     """
-    return north_distance / (meridian_radius(approx_lat) + altitude)
+    return north_distance / (meridian_radius(approx_lat) + altitude)  # ty:ignore[invalid-return-type]
 
 
 def quat_to_dcm(quat: NDArray[float64]) -> NDArray[float64]:

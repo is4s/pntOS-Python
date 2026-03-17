@@ -143,7 +143,6 @@ possibly-missing-attribute = "ignore"
 invalid-argument-type = "ignore"
 invalid-method-override = "ignore"
 unresolved-attribute = "ignore"
-invalid-return-type = "ignore"
 
 [tool.ty.src]
 exclude = [

@@ -176,7 +176,7 @@ class PvaMessageInitializationPlugin(InitializationPlugin):
                 config.initial_pva_sigma,
                 config.initial_accel_bias_sigma,
                 config.initial_gyro_bias_sigma,
-            )
+            )  # ty:ignore[invalid-return-type]
 
         self.mediator.log_message(LoggingLevel.ERROR, 'Unsupported type requested.')
         return None

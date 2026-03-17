@@ -123,6 +123,6 @@ class ManualHeadingAlignInitializationPlugin(InitializationPlugin):
             )
             return None
         if issubclass(initialization_type, InertialInitializationStrategy):
-            return ManualHeadingAlign(config_group, self.mediator)
+            return ManualHeadingAlign(config_group, self.mediator)  # ty:ignore[invalid-return-type]
         self.mediator.log_message(LoggingLevel.ERROR, 'Unsupported type requested')
         return None
