@@ -31,7 +31,7 @@ def plot_pva(
     # Interpolate truth onto solution times so that we can calculate the solution error
     interp_truth_pva = interpolate_pva(pva.time, truth_pva)  # ty:ignore[invalid-argument-type]
     ned_err = pva.ned - interp_truth_pva.ned
-    vel_err = pva.vel - interp_truth_pva.vel
+    vel_err = pva.vel - interp_truth_pva.vel  # ty:ignore[unsupported-operator]
     rpy_rad = np.deg2rad(pva.rpy)
     truth_rpy_rad = np.deg2rad(interp_truth_pva.rpy)
     tilt_err = np.rad2deg(calc_tilts(truth_rpy_rad, rpy_rad))
