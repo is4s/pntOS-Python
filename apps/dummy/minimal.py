@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-import asyncio
 
 # Import Cobra plugins and config structs
 from pntos.cobra import (
@@ -18,18 +17,5 @@ plugins = [
 # Start the controller
 controller.init_plugin()
 
-
-# Set up a function to run the plugins with a non-blocking timer
-async def run_cobra() -> None:
-    # pass the controller all of the other plugins to use
-    controller.take_control(plugins)
-    await asyncio.sleep(5)
-
-
-# Let the plugins run and clean up when done/interrupted
-try:
-    asyncio.run(run_cobra())
-except KeyboardInterrupt:
-    pass
-finally:
-    controller.shutdown_plugin()
+# Give the controller control, and pass it the list of other plugins
+controller.take_control(plugins)

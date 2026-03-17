@@ -56,6 +56,9 @@ Viper
 API
     Application Programming Interface
 
+EKF
+    Extended Kalman Filter
+
 PVA
     Position, Velocity, and Attitude. This is usually in reference to a wrapped
     `MeasurementPositionVelocityAttitude` {py:obj}`Message<pntos.api.Message>`.

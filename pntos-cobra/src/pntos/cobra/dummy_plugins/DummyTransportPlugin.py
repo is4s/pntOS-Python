@@ -109,10 +109,10 @@ def listen_for_messages(my_plugin: DummyTransportPlugin) -> None:
     )
 
     while my_plugin._listening:
-        sleep(0.1)
         # Send a new ASPN message we've received to the system
         if my_plugin.mediator:
             my_plugin._log(f'DummyTransport publishing to {chan}')
             my_plugin.mediator.process_pntos_message(
                 Message(aspn_msg, source_identifier=chan)
             )
+        sleep(0.1)
