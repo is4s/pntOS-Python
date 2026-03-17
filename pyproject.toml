@@ -139,7 +139,6 @@ unsupported-operator = "ignore"
 unknown-argument = "ignore"
 unused-type-ignore-comment = "ignore"
 unresolved-import = "ignore"
-possibly-missing-attribute = "ignore"
 
 [tool.ty.src]
 exclude = [
