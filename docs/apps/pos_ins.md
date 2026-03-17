@@ -200,7 +200,7 @@ We can instantiate our controller plugin like so:
 
 ```{literalinclude} ../../apps/tutorial/pos_ins.py
 :start-at: "controller = "
-:end-before: "plugins = "
+:end-before: "plugins: list[CommonPlugin] = "
 :lineno-match:
 ```
 
@@ -209,7 +209,7 @@ We can instantiate our controller plugin like so:
 Next we can instantiate all the other plugins we want in this app and put them in a list:
 
 ```{literalinclude} ../../apps/tutorial/pos_ins.py
-:start-at: "plugins = "
+:start-at: "plugins: list[CommonPlugin] = "
 :end-at: "]"
 :lineno-match:
 ```

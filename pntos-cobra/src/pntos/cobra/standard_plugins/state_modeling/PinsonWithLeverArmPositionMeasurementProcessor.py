@@ -247,7 +247,7 @@ class PinsonWithLeverArmPositionMeasurementProcessor(StandardMeasurementProcesso
         )
 
         # Already validated presence of quaternion when aux data was received. This
-        # assertion is just to satisfy mypy.
+        # assertion is just to satisfy the typechecker.
         assert self._inertial_pva.quaternion is not None
         C_platform_to_nav = quat_to_dcm(self._inertial_pva.quaternion)
 
