@@ -133,7 +133,6 @@ omit = [
 all = "error"
 missing-type-argument = "ignore"
 missing-override-decorator = "ignore"
-possibly-unresolved-reference = "ignore"
 
 [tool.ty.src]
 exclude = [

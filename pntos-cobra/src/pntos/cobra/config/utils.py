@@ -429,6 +429,8 @@ def _confirm_types(
             # if at the end of expected_type, iterate over the rest of actual_type
             if i < len(args2):
                 arg2 = args2[i]
+            else:
+                continue
             org1, org2 = (get_origin(arg1), get_origin(arg2))
             if org1 is tuple and org2 is tuple:
                 if not check_tuple_type(arg1, arg2):
