@@ -985,11 +985,9 @@ class CommonPlugin(ABC):
         """
         A function that will be called by pntOS when it is done using the plugin.
 
-        Here the plugin should release any resources it has acquired (including the
-        :class:`pntos.api.Mediator` if it kept a reference to that when
-        :meth:`pntos.api.CommonPlugin.init_plugin` was called). When this function call returns
-        pntOS may only call the destructor function (it will not call any other functions of this
-        plugin). The plugin may not call any function on any other plugin, mediator, or use any
+        Here the plugin should release any resources it has acquired. When this function call
+        returns pntOS may only call the destructor function (it will not call any other functions of
+        this plugin). The plugin may not call any function on any other plugin, mediator, or use any
         resource that was given to it by pntOS after it returns from this function.
         """
         pass
