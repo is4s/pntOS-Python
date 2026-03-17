@@ -1,6 +1,6 @@
 import builtins
 import pickle
-from collections.abc import Callable, ItemsView, Iterator, ValuesView
+from collections.abc import Callable, Iterator
 from copy import copy
 from pathlib import Path
 from typing import (
@@ -444,13 +444,13 @@ class StandardKeyValueStore(KeyValueStore):
         self._modified_keys = set()
         self._permanent_keys = set()
 
-    def values(self) -> ValuesView[RegistryValueTypeUnion]:
+    def values(self) -> list[RegistryValueTypeUnion]:
         self._check_batch_operation()
-        return self._store.values()
+        return list(self._store.values())
 
-    def items(self) -> ItemsView[str, RegistryValueTypeUnion]:
+    def items(self) -> list[tuple[str, RegistryValueTypeUnion]]:
         self._check_batch_operation()
-        return self._store.items()
+        return [(k, v) for k, v in self._store.items()]
 
     def set_permanent(self, permanent: bool) -> bool:
         self._check_batch_operation()

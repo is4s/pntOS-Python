@@ -1,7 +1,7 @@
 """Python API of pntOS."""
 
 from abc import ABC, abstractmethod
-from collections.abc import Callable, ItemsView, Iterator, ValuesView
+from collections.abc import Callable, Iterator
 from dataclasses import dataclass
 from enum import Enum, IntEnum
 from typing import (
@@ -597,9 +597,9 @@ class KeyValueStore(ABC):
         pass
 
     @abstractmethod
-    def values(self) -> ValuesView[RegistryValueTypeUnion]:
+    def values(self) -> list[RegistryValueTypeUnion]:
         """
-        Returns a new view of the key-value store's values.
+        Returns a list of the key-value store's values.
 
         This method is useful for unloading all values from a key-value store.
 
@@ -614,15 +614,15 @@ class KeyValueStore(ABC):
                     return None
 
         Returns:
-            ValuesView: A ``ValuesView`` of the values in the store.
+            list[RegistryValueTypeUnion]: A list of all values in the store.
 
         """
         pass
 
     @abstractmethod
-    def items(self) -> ItemsView[str, RegistryValueTypeUnion]:
+    def items(self) -> list[tuple[str, RegistryValueTypeUnion]]:
         """
-        Returns an ``ItemsView`` of the items (key-value pairs) in the store.
+        Returns a list of the items (key-value pairs) in the store.
 
         This method is useful for when you need to iterate over both keys and
         values in a dictionary.
@@ -634,7 +634,8 @@ class KeyValueStore(ABC):
                     printf('Key: {key}, Value: {value}')
 
         Returns:
-            ItemsView: An ``ItemsView`` of the key-value pairs in the store.
+            list[tuple[str, RegistryValueTypeUnion]]: A list of the key-value pairs (as
+            tuples) in the store.
         """
         pass
 
