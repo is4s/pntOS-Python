@@ -529,7 +529,7 @@ class Test_Orchestration(unittest.TestCase):
         with "==" after coming out of permanency. This is a hacky workaround to
         run np.all() on any np elements, and run normal comparison otherwise."""
         if hasattr(m1, '__dict__') and depth < 3:
-            for attr in m1.__dict__:
+            for attr in m1.__dict__:  # ty:ignore[not-iterable]
                 value1 = getattr(m1, attr)
                 value2 = getattr(m2, attr)
 

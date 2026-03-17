@@ -253,6 +253,8 @@ def run_pntos_with_network_transport(
         print('Starting app...', flush=True)
         app_process = run_app(app, args, monitor=True, validate=validate)
 
+        assert relay_process.stdout is not None
+
         # wait for cobra to connect to TCP relay
         for i, line in enumerate(relay_process.stdout):
             # wait for at least 2 clients to be connected (cobra and LCM logger)
@@ -262,7 +264,7 @@ def run_pntos_with_network_transport(
                     flush=True,
                 )
                 raise TimeoutError
-            if re.search(r'[2-9] clients', line):  # ty:ignore[no-matching-overload]
+            if re.search(r'[2-9] clients', line):
                 break
 
         # play log. note that logplayer process automatically terminates at end of log

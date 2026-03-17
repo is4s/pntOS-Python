@@ -220,8 +220,7 @@ def estimate_arm(
     proc_every = 100
     num = 0
     last_pva: MeasurementPositionVelocityAttitude | None = None
-    # mypy complains about no __iter__
-    for e in log:
+    for e in log:  # ty:ignore[not-iterable]
         if chan == e.channel:
             num += 1
             if num >= proc_every:

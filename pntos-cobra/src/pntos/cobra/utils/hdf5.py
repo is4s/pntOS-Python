@@ -64,7 +64,7 @@ def save_to_hdf5_file(
                     hdf5_file.create_dataset(
                         key,
                         data=np.array(
-                            [[i.encode('ascii') for i in j] for j in val_list]
+                            [[i.encode('ascii') for i in j] for j in val_list]  # ty:ignore[not-iterable]
                         ),
                     )
                 elif isinstance(val_list[0], bool):

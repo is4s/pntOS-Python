@@ -75,7 +75,7 @@ class UiMetadataInterface:
         self._groups_view.set_value(list(groups))
 
     def _new_group_requested(self, _: str, __: list[str], ___: KeyValueStore) -> None:
-        for group in self._requested_groups_view.value:
+        for group in self._requested_groups_view.value:  # ty:ignore[not-iterable]
             if group in self._keys_writers:
                 continue
             # Create KeysView to spy on keys in group, and MutableValueView to update list of keys in group
