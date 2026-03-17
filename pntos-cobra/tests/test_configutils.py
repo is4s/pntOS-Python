@@ -523,7 +523,7 @@ class TestConfigUtils(unittest.TestCase):
                 # test with dummy value when type hint is and isn't optional; test with None
                 val = self._create_dummy_value(t) if i in {0, 2} else None
                 conf = DynConf(
-                    dynamic_field=val,
+                    dynamic_field=val,  # ty:ignore[unknown-argument]
                     group=dynamic_group,
                 )
                 config_to_registry(conf, self.mediator)
@@ -535,7 +535,7 @@ class TestConfigUtils(unittest.TestCase):
         group = 'itfconv'
         DynConf = self._make_config('dynamic_field', float)
         val = 1
-        conf = DynConf(dynamic_field=val, group=group)
+        conf = DynConf(dynamic_field=val, group=group)  # ty:ignore[unknown-argument]
         config_to_registry(conf, self.mediator)
         out_conf = config_from_registry(DynConf, self.mediator, group)
         assert out_conf is not None
@@ -547,7 +547,7 @@ class TestConfigUtils(unittest.TestCase):
             'dynamic_field', tuple[tuple[float, float], tuple[float, float]]
         )
         val = [[1, 2], [3, 4]]
-        conf = DynConf(dynamic_field=val, group=group)
+        conf = DynConf(dynamic_field=val, group=group)  # ty:ignore[unknown-argument]
         config_to_registry(conf, self.mediator)
         out_conf = config_from_registry(DynConf, self.mediator, group)
         assert out_conf is not None
@@ -556,7 +556,7 @@ class TestConfigUtils(unittest.TestCase):
         group = 'str_list_to_tuple'
         DynConf = self._make_config('dynamic_field', tuple[str, ...])
         new_val = ['hello', 'world']
-        conf = DynConf(dynamic_field=new_val, group=group)
+        conf = DynConf(dynamic_field=new_val, group=group)  # ty:ignore[unknown-argument]
         config_to_registry(conf, self.mediator)
         out_conf = config_from_registry(DynConf, self.mediator, group)
         assert out_conf is not None
@@ -569,7 +569,7 @@ class TestConfigUtils(unittest.TestCase):
             'dynamic_field', tuple[tuple[float, float], tuple[float, float]]
         )
         val = np.array(((1, 2), (3, 4)))
-        conf = DynConf(dynamic_field=val, group=group)
+        conf = DynConf(dynamic_field=val, group=group)  # ty:ignore[unknown-argument]
         config_to_registry(conf, self.mediator)
         out_conf = config_from_registry(DynConf, self.mediator, group)
         assert out_conf is not None
@@ -581,7 +581,7 @@ class TestConfigUtils(unittest.TestCase):
             'dynamic_field', tuple[tuple[float, ...], tuple[float, float]]
         )
         val = ((1, 2, 3, 4, 5), (6, 7))
-        conf = DynConf(dynamic_field=val, group=group)
+        conf = DynConf(dynamic_field=val, group=group)  # ty:ignore[unknown-argument]
         config_to_registry(conf, self.mediator)
         out_conf = config_from_registry(DynConf, self.mediator, group)
         assert out_conf is None
@@ -592,7 +592,7 @@ class TestConfigUtils(unittest.TestCase):
             'dynamic_field', tuple[tuple[str, ...], tuple[str, ...]]
         )
         val = (('hello', 'world'), ('2001', 'a space odyssey'))
-        conf = DynConf(dynamic_field=val, group=group)
+        conf = DynConf(dynamic_field=val, group=group)  # ty:ignore[unknown-argument]
         config_to_registry(conf, self.mediator)
         out_conf = config_from_registry(DynConf, self.mediator, group)
         assert out_conf is None
