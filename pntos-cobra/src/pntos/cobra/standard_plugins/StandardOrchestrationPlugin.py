@@ -300,8 +300,8 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
         Then adds the block and time to the fusion engine effectively beginning the filter.
         """
         # get pinson covariance
-        pva_cov = self.init_solution.solution.wrapped_message.covariance
-        bias_cov = self.init_solution.inertial_error_covariance
+        pva_cov = self.init_solution.solution.wrapped_message.covariance  # ty:ignore[unresolved-attribute]
+        bias_cov = self.init_solution.inertial_error_covariance  # ty:ignore[unresolved-attribute]
         self.init_pinson_cov = block_diag(pva_cov, bias_cov)
 
         # add pinson state block
@@ -316,7 +316,7 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
         self._add_state_block(providers, self.pinson_sb_config)
 
         # sync fusion engine and initial solution time
-        init_time = self.init_solution.solution.wrapped_message.time_of_validity
+        init_time = self.init_solution.solution.wrapped_message.time_of_validity  # ty:ignore[unresolved-attribute]
         self.fusion_engine.time = init_time
         self.last_feedback_time_ns = init_time.elapsed_nsec
 
@@ -734,7 +734,7 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
                 >= self.feedback_config.pos_error_threshold
             )
 
-        return surpassed_time_threshold and surpassed_error_threshold
+        return surpassed_time_threshold and surpassed_error_threshold  # ty:ignore[invalid-return-type]
 
     def _apply_inertial_feedback(self) -> None:
         """Correct inertial solution with pinson error states and reset states."""
@@ -876,7 +876,7 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
             if channel in self.inertial_channels:
                 self.inertial.process_pntos_message(message)
             elif target_mps := self.measurement_channels.get(channel):
-                time = msg.wrapped_message.time_of_validity
+                time = msg.wrapped_message.time_of_validity  # ty:ignore[unresolved-attribute]
                 self._propagate_to_time(time)
                 for mp in target_mps:
                     self._perform_measurement_update(msg, mp)

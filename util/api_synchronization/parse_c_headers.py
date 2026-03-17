@@ -123,7 +123,7 @@ def clang_parse_file(
     )
     for cursor in tu.cursor.get_children():
         if (
-            cursor.kind != CursorKind.STRUCT_DECL
+            cursor.kind != CursorKind.STRUCT_DECL  # ty:ignore[unresolved-attribute]
             or cursor.displayname[0] == '_'
             or not cursor.is_definition()
         ):
@@ -135,7 +135,7 @@ def clang_parse_file(
 
             parameters = {}
             for param in field.get_children():
-                if param.kind == CursorKind.PARM_DECL:
+                if param.kind == CursorKind.PARM_DECL:  # ty:ignore[unresolved-attribute]
                     param_name = param.displayname
                     param_type = generate_type_list(param.type.spelling)
                     # treat callback parameter as its own function

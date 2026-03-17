@@ -351,8 +351,8 @@ class TestRegistry(unittest.TestCase):
         assert type(out_2) is np.ndarray, 'Did not receive a np array back.'
         assert type(out_3) is np.ndarray, 'Did not receive a np array back.'
         assert (out_1 == test_array_1).all(), 'One-dimensional numpy array failed.'
-        assert (out_2 == test_array_2).all(), 'Two-dimensional numpy array failed.'
-        assert (out_3 == test_array_3).all(), 'Three-dimensional numpy array failed.'
+        assert (out_2 == test_array_2).all(), 'Two-dimensional numpy array failed.'  # ty:ignore[unresolved-attribute]
+        assert (out_3 == test_array_3).all(), 'Three-dimensional numpy array failed.'  # ty:ignore[unresolved-attribute]
         kv.batch_end()
 
     def test_str_to_list(self) -> None:

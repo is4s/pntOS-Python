@@ -133,7 +133,7 @@ def process_lcm_message(
         # It is possible for conversions to return a list of Measurements to cover the case
         # where ASPN23 dropped support for multiple obs in 1 message
         ts = (
-            aspn_msg[0].time_of_validity.elapsed_nsec / 1e9
+            aspn_msg[0].time_of_validity.elapsed_nsec / 1e9  # ty:ignore[unresolved-attribute]
             if isinstance(aspn_msg, list)
             else aspn_msg.time_of_validity.elapsed_nsec / 1e9
         )
@@ -165,6 +165,7 @@ def run_tcp_relay() -> Popen[str]:  # pragma: no cover
         stdout=PIPE,
         start_new_session=True,
     )
+    assert process.stdout is not None
     # wait until we start seeing output from relay
     process.stdout.readline()
     return process

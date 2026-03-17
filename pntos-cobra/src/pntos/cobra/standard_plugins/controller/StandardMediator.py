@@ -41,7 +41,7 @@ class ExitEvent(Event):
 
 def _get_time(msg: Message) -> int:
     """Returns the time of the message in nanoseconds."""
-    return int(msg.wrapped_message.time_of_validity.elapsed_nsec)
+    return int(msg.wrapped_message.time_of_validity.elapsed_nsec)  # ty:ignore[unresolved-attribute]
 
 
 class StandardMediator(Mediator):
@@ -114,7 +114,7 @@ class StandardMediator(Mediator):
         else:
             self._orchestration_plugin.process_pntos_message(message, False)
 
-        cur_time = message.wrapped_message.time_of_validity
+        cur_time = message.wrapped_message.time_of_validity  # ty:ignore[unresolved-attribute]
 
         process_until_time = cur_time.elapsed_nsec - self._buffer_time_nsec
         process_until_index = bisect.bisect_left(

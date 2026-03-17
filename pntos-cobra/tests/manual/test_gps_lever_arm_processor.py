@@ -162,7 +162,7 @@ def fusion(la_guess: NDArray[float64]) -> StandardFusionEngine:
     assert pins is not None
     assert sb1 is not None
     assert sb2 is not None
-    proc_index = mod_prov.processor_identifiers.index('pinson_with_lever_arm_position')
+    proc_index = mod_prov.processor_identifiers.index('pinson_with_lever_arm_position')  # ty:ignore[unresolved-attribute]
     mp = mod_prov.new_processor(
         proc_index, None, 'proc', ['pinson', 'fogm1', 'fogm2'], '/config/cobra/sensor'
     )

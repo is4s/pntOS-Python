@@ -7,6 +7,7 @@ from aspn23 import (
     MeasurementPosition,
     MeasurementPositionErrorModel,
     MeasurementPositionReferenceFrame,
+    MeasurementPositionVelocityAttitude,
     TypeHeader,
     TypeTimestamp,
 )
@@ -110,6 +111,7 @@ def check_inertial_align_initialization_plugin(
     assert solution.solution.source_identifier == 'Cobra initializer'
 
     pva = solution.solution.wrapped_message
+    assert isinstance(pva, MeasurementPositionVelocityAttitude)
     assert pva.time_of_validity.elapsed_nsec == align_time_centiseconds * 10000000
     assert pva.p1 is not None
     assert pva.p2 is not None

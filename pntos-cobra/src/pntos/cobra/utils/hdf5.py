@@ -54,7 +54,7 @@ def save_to_hdf5_file(
                 if isinstance(val_list[0], str):
                     hdf5_file.create_dataset(
                         key,
-                        data=np.array([i.encode('ascii') for i in val_list]),
+                        data=np.array([i.encode('ascii') for i in val_list]),  # ty:ignore[unresolved-attribute]
                     )
                 elif (  # Check for list[list[str]]
                     isinstance(val_list[0], list)

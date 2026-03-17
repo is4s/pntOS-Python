@@ -69,7 +69,7 @@ def validate_results(
     truth_time = truth.time
 
     # ensure solution has enough points
-    assert filter_time.size == num_points
+    assert filter_time.size == num_points  # ty:ignore[unresolved-attribute]
 
     # ensure solution has no NANs
     assert not np.isnan(pva.ned).any()

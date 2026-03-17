@@ -691,9 +691,10 @@ class Test_Orchestration(unittest.TestCase):
                 ),
                 False,
             )
+
         assert (
             self.orchestration_plugin.fusion_engine.time.elapsed_nsec
-            == self.orchestration_plugin.inertial_drift_prop_dt
+            == self.orchestration_plugin.inertial_drift_prop_dt  # ty:ignore[unresolved-attribute]
         )
 
     def test_process_pntos_message_alignment_tutorial(self) -> None:

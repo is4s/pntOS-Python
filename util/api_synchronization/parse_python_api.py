@@ -63,6 +63,7 @@ class ApiVisitor(ast.NodeVisitor):
 
     def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
         """Customized method for visiting methods and their arguments."""
+        assert self.curr_class is not None
         name = node.name
         return_type = ast.unparse(node.returns)
         return_type = [self._convert_type(return_type)]
@@ -84,6 +85,7 @@ class ApiVisitor(ast.NodeVisitor):
 
     def visit_AnnAssign(self, node: ast.AnnAssign) -> None:
         """Customized method for visiting class attributes."""
+        assert self.curr_class is not None
         if isinstance(node.target, ast.Name):
             attr_name = node.target.id
             attr_type = ast.unparse(node.annotation)
@@ -100,6 +102,7 @@ class ApiVisitor(ast.NodeVisitor):
 
     def _parse_callback_param(self, arg: ast.arg, func_name: str) -> None:
         """Parses ``callback`` parameter and stores it as its own function."""
+        assert self.curr_class is not None
         callback_spelling = ast.unparse(arg.annotation)
         sep = callback_spelling.rfind(',')
         callback_type = callback_spelling[sep + 2 : -1]  # slice out return type

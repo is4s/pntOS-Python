@@ -539,7 +539,7 @@ class TestConfigUtils(unittest.TestCase):
         config_to_registry(conf, self.mediator)
         out_conf = config_from_registry(DynConf, self.mediator, group)
         assert out_conf is not None
-        assert conf.dynamic_field == out_conf.dynamic_field
+        assert conf.dynamic_field == out_conf.dynamic_field  # ty:ignore[unresolved-attribute]
 
     def test_list_to_tuple_conversion(self) -> None:
         group = 'md_list_to_tuple'
@@ -551,7 +551,7 @@ class TestConfigUtils(unittest.TestCase):
         config_to_registry(conf, self.mediator)
         out_conf = config_from_registry(DynConf, self.mediator, group)
         assert out_conf is not None
-        assert np.allclose(conf.dynamic_field, out_conf.dynamic_field)
+        assert np.allclose(conf.dynamic_field, out_conf.dynamic_field)  # ty:ignore[unresolved-attribute]
 
         group = 'str_list_to_tuple'
         DynConf = self._make_config('dynamic_field', tuple[str, ...])
@@ -560,7 +560,7 @@ class TestConfigUtils(unittest.TestCase):
         config_to_registry(conf, self.mediator)
         out_conf = config_from_registry(DynConf, self.mediator, group)
         assert out_conf is not None
-        for e1, e2 in zip(conf.dynamic_field, out_conf.dynamic_field, strict=False):
+        for e1, e2 in zip(conf.dynamic_field, out_conf.dynamic_field, strict=False):  # ty:ignore[unresolved-attribute]
             assert e1 == e2
 
     def test_ndarray_to_tuple_conversion(self) -> None:
@@ -573,7 +573,7 @@ class TestConfigUtils(unittest.TestCase):
         config_to_registry(conf, self.mediator)
         out_conf = config_from_registry(DynConf, self.mediator, group)
         assert out_conf is not None
-        assert np.allclose(conf.dynamic_field, out_conf.dynamic_field)
+        assert np.allclose(conf.dynamic_field, out_conf.dynamic_field)  # ty:ignore[unresolved-attribute]
 
     def test_non_uniform_tuple(self) -> None:
         group = 'non_uniform'
