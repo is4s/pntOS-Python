@@ -1,5 +1,5 @@
 from dataclasses import Field, fields
-from enum import Enum
+from enum import Enum, IntEnum
 from inspect import isclass
 from typing import Any, TypeVar, get_args, get_origin
 
@@ -36,12 +36,18 @@ SUPPORTED_TYPES = {
     tuple,
     list,
     Enum,
+    IntEnum,
     EstimateWithCovariance,
     np.ndarray,
 }
 SupportedSeriesTypes = (int, float, str, BaseConfig)
 SupportedRegistryTypeUnion = (
-    RegistryValueTypeUnion | tuple[Any, ...] | Enum | EstimateWithCovariance | None
+    RegistryValueTypeUnion
+    | tuple[Any, ...]
+    | Enum
+    | IntEnum
+    | EstimateWithCovariance
+    | None
 )
 
 
@@ -128,7 +134,7 @@ def config_from_registry(
             continue
         if issubclass(dtype, EstimateWithCovariance):
             val = EstimateWithCovariance(
-                type=EstimateWithCovarianceType(kv['_ewc_type']),
+                type=EstimateWithCovarianceType(kv['_ewc_type']),  # type: ignore[arg-type]
                 estimate=kv['_estimate'],  # type: ignore[arg-type]
                 covariance=kv['_covariance'],  # type: ignore[arg-type]
             )
@@ -510,7 +516,7 @@ def _is_type_supported(field_type: type[Any]) -> bool:
     if origin is not None:
         return False
     return type_to_compare in SUPPORTED_TYPES or issubclass(
-        type_to_compare, (Enum, BaseConfig)
+        type_to_compare, (Enum, IntEnum, BaseConfig)
     )
 
 

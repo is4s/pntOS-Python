@@ -1,10 +1,10 @@
 from dataclasses import dataclass
-from enum import Enum
+from enum import IntEnum
 
 from .BaseConfig import BaseConfig
 
 
-class AspnVersion(Enum):
+class AspnVersion(IntEnum):
     """
     Available versions for ASPN messages.
     """

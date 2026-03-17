@@ -1,6 +1,6 @@
 import unittest
 from dataclasses import dataclass, field, fields
-from enum import Enum
+from enum import IntEnum
 from pathlib import Path
 from typing import Any, get_args, get_origin
 
@@ -44,7 +44,7 @@ from pntos.cobra.internal import DummyMediator
 from pntos.cobra.utils import validate_manual_ewc
 
 
-class DummyEnum(Enum):
+class DummyEnum(IntEnum):
     RED = 0
 
 
@@ -407,13 +407,14 @@ class TestConfigUtils(unittest.TestCase):
         kv = self.mediator.registry.batch_start(CONFIG_TEST_GROUP)
         conf_fields = [f for f in fields(test_conf) if f.name != 'group']
         for conf_field in conf_fields:
-            val: RegistryValueTypeUnion | tuple[Any, ...] | Enum | None = kv[
+            val: RegistryValueTypeUnion | tuple[Any, ...] | IntEnum | None = kv[
                 conf_field.name
             ]
             conf_val = getattr(test_conf, conf_field.name)
             if isinstance(val, np.ndarray):
                 assert np.all(val == conf_val)
-            elif isinstance(conf_val, Enum):
+            elif isinstance(conf_val, IntEnum):
+                assert isinstance(val, int)
                 val = type(conf_val)(val)
             elif isinstance(val, list):
                 val = tuple(val)
@@ -489,6 +490,9 @@ class TestConfigUtils(unittest.TestCase):
             return np.full(shape, val)
         if in_type is bool:
             return True
+        # Need this to come before the int check, since IntEnum objects are also an int
+        if issubclass(in_type, IntEnum):
+            return next(iter(in_type))
         if issubclass(in_type, (int, np.int_)):
             return 1
         if issubclass(in_type, (float, np.floating)):
@@ -511,8 +515,6 @@ class TestConfigUtils(unittest.TestCase):
                 ),
                 source_identifier='dummy',
             )
-        if issubclass(in_type, Enum):
-            return next(iter(in_type))
         if issubclass(in_type, EstimateWithCovariance):
             return in_type(
                 type=EstimateWithCovarianceType.EWC_GENERIC,

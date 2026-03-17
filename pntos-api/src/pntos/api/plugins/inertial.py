@@ -2,7 +2,7 @@
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from enum import Enum
+from enum import IntEnum
 from typing import Any, TypeVar
 
 from aspn23 import AspnBase, MeasurementImu, TypeTimestamp
@@ -12,7 +12,7 @@ from numpy.typing import NDArray
 from .common import CommonPlugin, Message
 
 
-class InertialFrame(Enum):
+class InertialFrame(IntEnum):
     """
     An enumeration that specifies frame.
 
@@ -83,7 +83,7 @@ class StandardInertialErrors:
     gyro_scale_factors: NDArray[float64]
 
 
-class InertialSolutionRangeType(Enum):
+class InertialSolutionRangeType(IntEnum):
     """
     Solution type to request from an inertial.
 
