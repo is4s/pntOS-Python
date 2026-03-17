@@ -6,7 +6,7 @@ from pathlib import Path
 
 import clang.cindex
 from clang.cindex import CursorKind
-from common_api_representation import (
+from common_api_representation import (  # ty:ignore[unresolved-import]
     ApiAttribute,
     ApiClass,
     ApiFunction,

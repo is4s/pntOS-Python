@@ -3,7 +3,7 @@
 import ast
 from pathlib import Path
 
-from common_api_representation import (
+from common_api_representation import (  # ty:ignore[unresolved-import]
     ApiAttribute,
     ApiClass,
     ApiFunction,

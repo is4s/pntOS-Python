@@ -1,7 +1,7 @@
 from threading import Thread
 
 try:
-    import rclpy
+    import rclpy  # ty:ignore[unresolved-import]
 except ImportError as e:
     raise ImportError(
         'Is ROS installed and is its environment sourced? See the ROS usage '
@@ -9,7 +9,7 @@ except ImportError as e:
     ) from e
 
 try:
-    from aspn23_ros_utils import AspnMsg, AspnRosNode
+    from aspn23_ros_utils import AspnMsg, AspnRosNode  # ty:ignore[unresolved-import]
 except ImportError as e:
     raise ImportError(
         'Is the ASPN-ROS environment sourced? See the ROS usage tutorial in '
@@ -19,12 +19,12 @@ except ImportError as e:
 import contextlib
 
 from pntos.api import LoggingLevel, Mediator, Message, TransportPlugin
-from rclpy.executors import (
+from rclpy.executors import (  # ty:ignore[unresolved-import]
     ExternalShutdownException,
     SingleThreadedExecutor,
 )
-from rclpy.node import Subscription
-from rclpy.timer import Timer
+from rclpy.node import Subscription  # ty:ignore[unresolved-import]
+from rclpy.timer import Timer  # ty:ignore[unresolved-import]
 
 
 class Aspn23RosTransportPlugin(TransportPlugin):

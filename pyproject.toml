@@ -138,7 +138,6 @@ dataclass-field-order = "ignore"
 unsupported-operator = "ignore"
 unknown-argument = "ignore"
 unused-type-ignore-comment = "ignore"
-unresolved-import = "ignore"
 
 [tool.ty.src]
 exclude = [

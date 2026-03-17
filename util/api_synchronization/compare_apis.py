@@ -6,10 +6,16 @@ import sys
 import tempfile
 from pathlib import Path
 
-from common_api_representation import BLUE, GREEN, RED, CtoPyApiComparator, colored
+from common_api_representation import (  # ty:ignore[unresolved-import]
+    BLUE,
+    GREEN,
+    RED,
+    CtoPyApiComparator,
+    colored,
+)
 from git import Repo
-from parse_c_headers import clang_parse_file
-from parse_python_api import parse_python_file
+from parse_c_headers import clang_parse_file  # ty:ignore[unresolved-import]
+from parse_python_api import parse_python_file  # ty:ignore[unresolved-import]
 
 PNTOS_URL = 'https://github.com/Open-PNT/pntOS-C.git'
 ASPN_GENERATED_URL = 'https://github.com/is4s/aspn-generated.git'
