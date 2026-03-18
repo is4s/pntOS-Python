@@ -87,9 +87,9 @@ pyproject format:
         - docker run --rm -dit -v $(pwd):/work -v $HOME/.ccache:/root/.cache/uv --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
         # Run the formatter to see if it produces a diff.
         - docker exec pntos-python uv sync
-        - docker exec pntos-python pyproject-fmt pyproject.toml --column-width 88 --indent 4
-        - docker exec pntos-python pyproject-fmt pntos-api/pyproject.toml --column-width 88 --indent 4
-        - docker exec pntos-python pyproject-fmt pntos-cobra/pyproject.toml --column-width 88 --indent 4
+        - docker exec pntos-python pyproject-fmt pyproject.toml --column-width 88 --indent 4 --keep-full-version
+        - docker exec pntos-python pyproject-fmt pntos-api/pyproject.toml --column-width 88 --indent 4 --keep-full-version
+        - docker exec pntos-python pyproject-fmt pntos-cobra/pyproject.toml --column-width 88 --indent 4 --keep-full-version
         # If there's a diff, fail the stage.
         - git diff --exit-code
 
