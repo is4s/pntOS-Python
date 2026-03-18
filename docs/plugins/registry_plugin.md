@@ -63,29 +63,8 @@ object, and the {py:obj}`Registry<pntos.api.Registry>` object provides a
 {py:obj}`KeyValueStore<pntos.api.KeyValueStore>` for each group which then provides the
 value for each key:
 
-```{mermaid}
-:config: {"theme": "neutral","themeVariables": {"fontSize": "10px"}}
-:align: left
-flowchart TB
-    RP[RegistryPlugin]
-    R[Registry]
-    KVS1[KeyValueStore]
-    KVS2[KeyValueStore]
-    V11[value]
-    V12[value]
-    V21[value]
-    V22[value]
-    V23[value]
-
-    RP --> R
-    R -->|group| KVS1
-    KVS1 -->|key| V11
-    KVS1 -->|key| V12
-    R -->|group| KVS2
-    KVS2 -->|key| V21
-    KVS2 -->|key| V22
-    KVS2 -->|key| V23
-
+```{image} ../images/registry_plugin.png
+:align: center
 ```
 
 Why use a group-key-value store instead of a simple key-value store? There are two main

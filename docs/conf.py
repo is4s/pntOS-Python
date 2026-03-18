@@ -26,7 +26,6 @@ extensions = [
     'sphinx.ext.mathjax',
     'sphinx_design',
     'sphinx_copybutton',
-    'sphinxcontrib.mermaid',
 ]
 
 # Myst settings

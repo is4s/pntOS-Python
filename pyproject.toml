@@ -31,8 +31,8 @@ dev = [
     "mypy==1.18.2",
     "myst-parser>=4",
     "pip>=24",
-    # Generated from commit 79975a039c4381b6b4cf1725398db8dbd71f0fef on 2 Mar 2026
-    "pntos-python-docs-data==0.1.6",
+    # Generated from commit ce6c78bd72ca4d3f890987f0c13e1d0c12acced3 on 17 March 2026
+    "pntos-python-docs-data==0.3.0",
     "pyproject-fmt>=2.7",
     "pytest>=8.2",
     "pytest-cov>=6",
@@ -41,7 +41,6 @@ dev = [
     "sphinx-copybutton",
     "sphinx-design",
     "sphinx-rtd-theme>=3.0.2",
-    "sphinxcontrib-mermaid",
 ]
 
 [tool.ruff]
