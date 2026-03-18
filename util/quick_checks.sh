@@ -10,9 +10,9 @@ set -xe
 
 ruff check --fix
 ruff format
-pyproject-fmt pyproject.toml --column-width 88 --indent 4
-pyproject-fmt pntos-api/pyproject.toml --column-width 88 --indent 4
-pyproject-fmt pntos-cobra/pyproject.toml --column-width 88 --indent 4
+pyproject-fmt pyproject.toml --column-width 88 --indent 4 --keep-full-version
+pyproject-fmt pntos-api/pyproject.toml --column-width 88 --indent 4 --keep-full-version
+pyproject-fmt pntos-cobra/pyproject.toml --column-width 88 --indent 4 --keep-full-version
 mypy pntos-api --no-implicit-reexport
 mypy pntos-cobra --no-implicit-reexport
 mypy apps/advanced/ --no-implicit-reexport
