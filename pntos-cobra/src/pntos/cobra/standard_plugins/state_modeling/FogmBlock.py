@@ -3,13 +3,14 @@ from aspn23 import (
 )
 from numpy import diagflat, eye, float64
 from numpy.typing import NDArray
-from pntos.api.plugins.common import (
-    EstimateWithCovariance,
+from pntos.api import (
+    GenXandP,
     LoggingLevel,
     Mediator,
     Message,
+    StandardDynamicsModel,
+    StandardStateBlock,
 )
-from pntos.api.plugins.state_modeling import StandardDynamicsModel, StandardStateBlock
 from scipy.linalg import expm
 
 
@@ -78,7 +79,7 @@ class FogmBlock(StandardStateBlock):
 
     def generate_dynamics(
         self,
-        x_and_p: EstimateWithCovariance,
+        gen_x_and_p_func: GenXandP,
         time_from: TypeTimestamp,
         time_to: TypeTimestamp,
     ) -> StandardDynamicsModel | None:

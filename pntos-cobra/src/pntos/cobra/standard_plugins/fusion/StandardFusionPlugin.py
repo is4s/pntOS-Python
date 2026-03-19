@@ -545,15 +545,10 @@ class StandardFusionEngine(api.StandardFusionEngine):
         # loop through the stateblocks and generate the dynamics model and save off
         dynamics_model: dict[str, StandardDynamicsModel] = {}
         for label, sb_data in self._sb.items():
-            ewc = self.generate_x_and_p([label])
-            if ewc is None:
-                self._mediator.log_message(
-                    LoggingLevel.ERROR,
-                    'Unable to generate estimate with covariance during propagate.',
-                )
-                return
             dynamics = self._sb[label].block.generate_dynamics(
-                x_and_p=ewc, time_from=self.time, time_to=time
+                gen_x_and_p_func=self.generate_x_and_p,
+                time_from=self.time,
+                time_to=time,
             )
             if dynamics is None:
                 self._mediator.log_message(
@@ -610,20 +605,8 @@ class StandardFusionEngine(api.StandardFusionEngine):
         assert hasattr(message.wrapped_message, 'time_of_validity')
         self.propagate(message.wrapped_message.time_of_validity)
 
-        # Get the measurement model that only applies to just the states identified by the
-        # measurement processor's state_block_labels
-        x_and_p = self.generate_x_and_p(
-            block_labels=self._mp[processor_label].state_block_labels
-        )
-        if x_and_p is None:
-            self._mediator.log_message(
-                LoggingLevel.ERROR,
-                'Unable to generate estimate with covariance during update.',
-            )
-            return
-
         measurement_model = self._mp[processor_label].generate_model(
-            message=message, x_and_p=x_and_p
+            message=message, gen_x_and_p_func=self.generate_x_and_p
         )
         if measurement_model is None:
             self._mediator.log_message(

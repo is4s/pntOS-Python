@@ -13,13 +13,11 @@ from navtk.navutils import (
 )
 from numpy import float64
 from numpy.typing import NDArray
-from pntos.api.plugins.common import (
-    EstimateWithCovariance,
+from pntos.api import (
+    GenXandP,
     LoggingLevel,
     Mediator,
     Message,
-)
-from pntos.api.plugins.state_modeling import (
     StandardMeasurementModel,
     StandardMeasurementProcessor,
 )
@@ -67,7 +65,9 @@ class PositionMeasurementProcessor(StandardMeasurementProcessor):
         )
 
     def generate_model(
-        self, message: Message, x_and_p: EstimateWithCovariance
+        self,
+        message: Message,
+        gen_x_and_p_func: GenXandP,
     ) -> StandardMeasurementModel | None:
         """
         Generates the model mapping state estimates to the provided measurement.
@@ -75,13 +75,13 @@ class PositionMeasurementProcessor(StandardMeasurementProcessor):
         Args:
             message (Message): Measurement to process. `message.wrapped_message` must be a
                 MeasurementPosition using the GEODETIC reference frame.
-            x_and_p: Current joint state estimate and covariance for both the PinsonErrorToStandard
-                block and sensor measurement error blocks this processor is updating. LLA position in
+            gen_x_and_p_func: Callback to get the current joint state estimate and covariance for both the PinsonErrorToStandard
+                virtual state block and sensor measurement error blocks this processor is updating. LLA position in
                 rad, rad, meters respectively are expected at indices [0:3] and RPY tilt in radians are
                 expected at indices [6:9]. Sensor measurement error states in the NED frame are expected to
                 be the last 3 states.
         Returns:
-            StandardMeasurementModel if all restrictions on `message` and `x_and_p` are met and
+            StandardMeasurementModel if all restrictions on `message` and `gen_x_and_p_func` are met and
             proper aux data is available, None otherwise.
         """
         if not isinstance(message.wrapped_message, MeasurementPosition):
@@ -131,8 +131,11 @@ class PositionMeasurementProcessor(StandardMeasurementProcessor):
         conversion = np.diag([north_fac, east_fac, -1.0])
         R = conversion @ pos.covariance @ conversion
 
-        H = np.eye(3, x_and_p.estimate.shape[0])
-        rpy = x_and_p.estimate[6:9, 0]
+        ewc = gen_x_and_p_func(self.state_block_labels)
+        if ewc is None:
+            return None
+        H = np.eye(3, ewc.estimate.shape[0])
+        rpy = ewc.estimate[6:9, 0]
         H[:, 6] = conversion @ d_rpy_to_dcm_wrt_r(rpy) @ self._l_ps_p
         H[:, 7] = conversion @ d_rpy_to_dcm_wrt_p(rpy) @ self._l_ps_p
         H[:, 8] = conversion @ d_rpy_to_dcm_wrt_y(rpy) @ self._l_ps_p

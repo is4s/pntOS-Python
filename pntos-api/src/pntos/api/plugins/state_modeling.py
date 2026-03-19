@@ -70,6 +70,22 @@ class StandardMeasurementModel:
     R: NDArray[float64]
 
 
+GenXandP = Callable[[list[str]], EstimateWithCovariance | None]
+"""
+Returns the estimate and covariance associated with the states of ``block_labels`` within a
+particular measurement processor or state block. This is used to lazily evaluate estimate and
+covariance.
+
+Args:
+    block_labels (list[str]): Labels for state blocks to generate estimate and
+        covariance for.
+
+Returns:
+    Estimate and covariance of the provided block_labels. Returns ``None`` if any label in
+    ``block_labels`` does not correspond to a valid block.
+"""
+
+
 class StandardStateBlock(ABC):
     """
     A description of a set of states and their dynamics.
@@ -106,7 +122,7 @@ class StandardStateBlock(ABC):
     @abstractmethod
     def generate_dynamics(
         self,
-        x_and_p: EstimateWithCovariance,
+        gen_x_and_p_func: GenXandP,
         time_from: TypeTimestamp,
         time_to: TypeTimestamp,
     ) -> StandardDynamicsModel | None:
@@ -118,9 +134,8 @@ class StandardStateBlock(ABC):
         return a set of static matrices that are pre-defined.
 
         Args:
-            x_and_p (EstimateWithCovariance): The current estimate and covariance for this
-                state block. Note that this is only valid for the duration of this function, and
-                users are strongly discouraged from saving it off for later use.
+            gen_x_and_p_func (GenXandP): A callback function that the state block can
+                use to get the current estimate and covariance.
             time_from (TypeTimestamp): The time to propagate from.
             time_to (TypeTimestamp): The time to propagate to.
 
@@ -281,18 +296,16 @@ class StandardMeasurementProcessor(ABC):
 
     @abstractmethod
     def generate_model(
-        self, message: Message, x_and_p: EstimateWithCovariance
+        self, message: Message, gen_x_and_p_func: GenXandP
     ) -> StandardMeasurementModel | None:
         """
         Generate a :class:`pntos.api.StandardMeasurementModel`.
 
         Args:
             message (Message): The measurement/observation to process.
-            x_and_p (EstimateWithCovariance): The current estimate and covariance for the state
-                blocks this measurement processor targets. Note that this is only valid for the
-                duration of this function, and users are strongly discouraged from saving it off for
-                later use. Similarly, the estimate and covariance are invalidated if this function
-                adds or removes any state blocks from the fusion engine.
+            gen_x_and_p_func (GenXandP): A callback function that can be used to
+                retrieve the current estimate and covariance for the state blocks this
+                measurement processor targets.
 
         Returns:
             StandardMeasurementModel | None: A generated model containing the

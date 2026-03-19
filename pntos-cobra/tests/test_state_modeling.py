@@ -31,6 +31,7 @@ from navtk.navutils import (
 from pntos.api import (
     EstimateWithCovariance,
     EstimateWithCovarianceType,
+    GenXandP,
     Message,
     RegistryPlugin,
     StandardMeasurementProcessor,
@@ -226,6 +227,18 @@ def all_pos_processors(
 ) -> all_pos_proc_type:
     # Second arg is num expected states, third is expected number of state block labels, 4th is index to create
     return [(position_mp, 15, 1, 0), (position_mp2, 18, 2, 2), (position_mp3, 21, 3, 4)]
+
+
+@pytest.fixture
+def gen_x_and_p_all_pos(all_pos_processors: all_pos_proc_type) -> GenXandP:
+    def _test_gen_x_and_p(sb_labels: list[str]) -> EstimateWithCovariance | None:
+        out: EstimateWithCovariance | None = None
+        for m in all_pos_processors:
+            if not set(m[0].state_block_labels).difference(sb_labels):
+                out = gxp(m[1])
+        return out
+
+    return _test_gen_x_and_p
 
 
 @pytest.fixture
@@ -482,6 +495,7 @@ def test_wrong_number_blocks(
     pva_aux_data: Message,
     pos_meas: Message,
     all_pos_processors: all_pos_proc_type,
+    gen_x_and_p_all_pos: GenXandP,
 ) -> None:
     inertial_pva = pva_aux_data.wrapped_message
     assert isinstance(inertial_pva, MeasurementPositionVelocityAttitude)
@@ -490,15 +504,13 @@ def test_wrong_number_blocks(
     labs = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
 
     for m in all_pos_processors:
-        x_and_p = gxp(m[1])
-
         invalid_mp = state_model_provider.new_processor(
             m[3], None, 'label', [], 'config/test'
         )
         assert invalid_mp is not None
         assert isinstance(invalid_mp, type(m[0]))
         invalid_mp.receive_aux_data([pva_aux_data])
-        mod = invalid_mp.generate_model(pos_meas, x_and_p)
+        mod = invalid_mp.generate_model(pos_meas, gen_x_and_p_all_pos)
         assert mod is None
 
         invalid_mp = state_model_provider.new_processor(
@@ -507,7 +519,7 @@ def test_wrong_number_blocks(
         assert invalid_mp is not None
         assert isinstance(invalid_mp, type(m[0]))
         invalid_mp.receive_aux_data([pva_aux_data])
-        mod = invalid_mp.generate_model(pos_meas, x_and_p)
+        mod = invalid_mp.generate_model(pos_meas, gen_x_and_p_all_pos)
         assert mod is None
 
 
@@ -540,6 +552,7 @@ def test_bad_meas_inputs(
     state_model_provider: StateModelProviderType,
     pva_aux_data: Message,
     pos_meas: Message,
+    gen_x_and_p_all_pos: GenXandP,
 ) -> None:
     inertial_pva = pva_aux_data.wrapped_message
     assert isinstance(inertial_pva, MeasurementPositionVelocityAttitude)
@@ -554,18 +567,17 @@ def test_bad_meas_inputs(
     assert isinstance(pv2.wrapped_message, MeasurementPositionVelocityAttitude)
     pv2.wrapped_message.quaternion = None
     for m in all_pos_processors:
-        x_and_p = gxp(m[1])
         m[0].receive_aux_data([pva_aux_data])
-        mod = m[0].generate_model(pos_meas, x_and_p)
+        mod = m[0].generate_model(pos_meas, gen_x_and_p_all_pos)
         assert mod is not None
         pos.reference_frame = MeasurementPositionReferenceFrame.ECI
-        mod = m[0].generate_model(pos_meas, x_and_p)
+        mod = m[0].generate_model(pos_meas, gen_x_and_p_all_pos)
         assert mod is None
         pos.reference_frame = MeasurementPositionReferenceFrame.GEODETIC
-        mod = m[0].generate_model(pos_meas, x_and_p)
+        mod = m[0].generate_model(pos_meas, gen_x_and_p_all_pos)
         assert mod is not None
         m[0].receive_aux_data([pv2])
-        mod = m[0].generate_model(pos_meas, x_and_p)
+        mod = m[0].generate_model(pos_meas, gen_x_and_p_all_pos)
         assert mod is not None
 
 
@@ -587,19 +599,22 @@ def test_invalid_aux_proc(
         assert proc[0]._inertial_pva is None
 
 
-def test_no_aux_block(pinson_block: Pinson15NedBlock) -> None:
-    x_and_p = gxp(15)
-    dm = pinson_block.generate_dynamics(x_and_p, TypeTimestamp(0), TypeTimestamp(1))
+def test_no_aux_block(
+    pinson_block: Pinson15NedBlock, gen_x_and_p_all_pos: GenXandP
+) -> None:
+    dm = pinson_block.generate_dynamics(
+        gen_x_and_p_all_pos, TypeTimestamp(0), TypeTimestamp(1)
+    )
     assert dm is None
 
 
 def test_no_aux_data_proc(
     all_pos_processors: all_pos_proc_type,
     pos_meas: Message,
+    gen_x_and_p_all_pos: GenXandP,
 ) -> None:
     for m in all_pos_processors:
-        x_and_p = gxp(m[1])
-        mm = m[0].generate_model(pos_meas, x_and_p)
+        mm = m[0].generate_model(pos_meas, gen_x_and_p_all_pos)
         assert mm is None
 
 
@@ -607,6 +622,7 @@ def test_stale_aux_data(
     all_pos_processors: all_pos_proc_type,
     pva_aux_data: Message,
     pos_meas: Message,
+    gen_x_and_p_all_pos: GenXandP,
 ) -> None:
     inertial_pva = pva_aux_data.wrapped_message
     assert isinstance(inertial_pva, MeasurementPositionVelocityAttitude)
@@ -617,8 +633,7 @@ def test_stale_aux_data(
     for m in all_pos_processors:
         m[0].receive_aux_data([pva_aux_data])
         assert m[0]._inertial_pva is not None
-        x_and_p = gxp(m[1])
-        mm = m[0].generate_model(pos_meas, x_and_p)
+        mm = m[0].generate_model(pos_meas, gen_x_and_p_all_pos)
         assert mm is None
 
 
@@ -626,22 +641,23 @@ def test_stale_aux_data2(
     all_pos_processors: all_pos_proc_type,
     pva_aux_data: Message,
     pos_meas: Message,
+    gen_x_and_p_all_pos: GenXandP,
 ) -> None:
     assert isinstance(pos_meas.wrapped_message, MeasurementPosition)
     for m in all_pos_processors:
         m[0].receive_aux_data([pva_aux_data])
         assert m[0]._inertial_pva is not None
-        x_and_p = gxp(m[1])
         pos_meas.wrapped_message.time_of_validity.elapsed_nsec += 1_000_000_000
-        mm = m[0].generate_model(pos_meas, x_and_p)
+        mm = m[0].generate_model(pos_meas, gen_x_and_p_all_pos)
         assert mm is None
 
 
-def test_invalid_measurement(all_pos_processors: all_pos_proc_type) -> None:
+def test_invalid_measurement(
+    all_pos_processors: all_pos_proc_type, gen_x_and_p_all_pos: GenXandP
+) -> None:
     msg = Message(TypeHeader(0, 0, 0, 0), 'bad_meas')
     for m in all_pos_processors:
-        x_and_p = gxp(m[1])
-        mm = m[0].generate_model(msg, x_and_p)
+        mm = m[0].generate_model(msg, gen_x_and_p_all_pos)
         assert mm is None
 
 
@@ -651,12 +667,16 @@ def test_generate_model_direct_pos(
     x_and_p = EstimateWithCovariance(
         EstimateWithCovarianceType.EWC_GENERIC, np.zeros((18, 1)), np.eye(18)
     )
+
+    def _test_gen_x_and_p(sb_labels: list[str]) -> EstimateWithCovariance | None:
+        return x_and_p
+
     pos = pos_meas.wrapped_message
     assert isinstance(pos, MeasurementPosition)
     assert pos.term1 is not None
     assert pos.term2 is not None
     assert pos.term3 is not None
-    mm = direct_pos.generate_model(pos_meas, x_and_p)
+    mm = direct_pos.generate_model(pos_meas, _test_gen_x_and_p)
     assert mm is not None
 
     conv = np.diag(
@@ -693,6 +713,7 @@ def test_generate_model_gps_all(
     all_pos_processors: all_pos_proc_type,
     pva_aux_data: Message,
     pos_meas: Message,
+    gen_x_and_p_all_pos: GenXandP,
 ) -> None:
     inertial_pva = pva_aux_data.wrapped_message
     assert isinstance(inertial_pva, MeasurementPositionVelocityAttitude)
@@ -702,7 +723,7 @@ def test_generate_model_gps_all(
         m[0].receive_aux_data([pva_aux_data])
         assert m[0]._inertial_pva is not None
         x_and_p = gxp(m[1])
-        mm = m[0].generate_model(pos_meas, x_and_p)
+        mm = m[0].generate_model(pos_meas, gen_x_and_p_all_pos)
         assert mm is not None
         exp_H = np.zeros((3, m[1]))
         exp_H[:, :3] = np.eye(3)
@@ -752,7 +773,11 @@ def test_generate_model_vel(
     x_and_p = EstimateWithCovariance(
         EstimateWithCovarianceType.EWC_GENERIC, np.zeros(15), np.eye(15)
     )
-    mm = velocity_mp.generate_model(vel_meas, x_and_p)
+
+    def _test_gen_x_and_p(sb_labels: list[str]) -> EstimateWithCovariance | None:
+        return x_and_p
+
+    mm = velocity_mp.generate_model(vel_meas, _test_gen_x_and_p)
     assert mm is not None
     exp_H = np.zeros((3, 15))
     exp_H[:, 3:6] = np.eye(3)
@@ -786,7 +811,11 @@ def test_generate_model_posvel(
         ),
         np.eye(15),
     )
-    mm = posvel_mp.generate_model(posvel_meas, x_and_p)
+
+    def _test_gen_x_and_p(sb_labels: list[str]) -> EstimateWithCovariance | None:
+        return x_and_p
+
+    mm = posvel_mp.generate_model(posvel_meas, _test_gen_x_and_p)
     assert mm is not None
 
     exp_H = np.zeros((6, 15))
@@ -841,7 +870,11 @@ def test_generate_model_bodyvel(
     x_and_p = EstimateWithCovariance(
         EstimateWithCovarianceType.EWC_GENERIC, np.zeros((15, 1)), np.eye(15)
     )
-    mm = body_velocity_mp.generate_model(bodyvel_meas, x_and_p)
+
+    def _test_gen_x_and_p(sb_labels: list[str]) -> EstimateWithCovariance | None:
+        return x_and_p
+
+    mm = body_velocity_mp.generate_model(bodyvel_meas, _test_gen_x_and_p)
     assert mm is not None
     x = x_and_p.estimate
     inertial_vel = np.array([inertial_pva.v1, inertial_pva.v2, inertial_pva.v3])
@@ -914,7 +947,11 @@ def test_generate_model_alt(
     x_and_p = EstimateWithCovariance(
         EstimateWithCovarianceType.EWC_GENERIC, np.zeros((16, 1)), np.eye(16)
     )
-    mm = altitude_mp.generate_model(alt_meas, x_and_p)
+
+    def _test_gen_x_and_p(sb_labels: list[str]) -> EstimateWithCovariance | None:
+        return x_and_p
+
+    mm = altitude_mp.generate_model(alt_meas, _test_gen_x_and_p)
 
     assert mm is not None
     exp_H = np.zeros((1, 16))
@@ -952,8 +989,12 @@ def test_generate_model_alt_msl(
     x_and_p = EstimateWithCovariance(
         EstimateWithCovarianceType.EWC_GENERIC, np.zeros((16, 1)), np.eye(16)
     )
+
+    def _test_gen_x_and_p(sb_labels: list[str]) -> EstimateWithCovariance | None:
+        return x_and_p
+
     alt.reference = MeasurementAltitudeReference.MSL
-    mm = altitude_mp.generate_model(alt_meas, x_and_p)
+    mm = altitude_mp.generate_model(alt_meas, _test_gen_x_and_p)
 
     assert mm is not None
     exp_H = np.zeros((1, 16))
@@ -985,7 +1026,11 @@ def test_generate_model_pos_alt(
     x_and_p = EstimateWithCovariance(
         EstimateWithCovarianceType.EWC_GENERIC, np.zeros((16, 1)), np.eye(16)
     )
-    mm = altitude_mp.generate_model(pos_meas, x_and_p)
+
+    def _test_gen_x_and_p(sb_labels: list[str]) -> EstimateWithCovariance | None:
+        return x_and_p
+
+    mm = altitude_mp.generate_model(pos_meas, _test_gen_x_and_p)
 
     assert mm is not None
     exp_H = np.zeros((1, 16))
@@ -1055,7 +1100,11 @@ def test_generate_dynamics(
     x_and_p = EstimateWithCovariance(
         EstimateWithCovarianceType.EWC_GENERIC, np.zeros(15), np.eye(15)
     )
-    dyn = pinson_block.generate_dynamics(x_and_p, time_from, time_to)
+
+    def _test_gen_x_and_p(sb_labels: list[str]) -> EstimateWithCovariance | None:
+        return x_and_p
+
+    dyn = pinson_block.generate_dynamics(_test_gen_x_and_p, time_from, time_to)
     assert dyn is not None
 
     absolute_tolerance = 1e-20

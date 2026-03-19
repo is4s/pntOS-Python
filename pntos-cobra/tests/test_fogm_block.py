@@ -61,8 +61,12 @@ def test_single_init(mediator: StandardMediator) -> None:
     x_and_p = EstimateWithCovariance(
         EstimateWithCovarianceType.EWC_GENERIC, ones(1), eye(1)
     )
+
+    def _test_gen_x_and_p(sb_labels: list[str]) -> EstimateWithCovariance | None:
+        return x_and_p
+
     dyn = blk.generate_dynamics(
-        x_and_p, time_from=TypeTimestamp(0), time_to=TypeTimestamp(int(1e9))
+        _test_gen_x_and_p, time_from=TypeTimestamp(0), time_to=TypeTimestamp(int(1e9))
     )
     assert dyn is not None
     assert dyn.Phi.shape == (1, 1)
@@ -74,8 +78,12 @@ def test_double_flat_init(mediator: StandardMediator) -> None:
     x_and_p = EstimateWithCovariance(
         EstimateWithCovarianceType.EWC_GENERIC, ones(2), eye(2)
     )
+
+    def _test_gen_x_and_p(sb_labels: list[str]) -> EstimateWithCovariance | None:
+        return x_and_p
+
     dyn = blk.generate_dynamics(
-        x_and_p, time_from=TypeTimestamp(0), time_to=TypeTimestamp(int(1e9))
+        _test_gen_x_and_p, time_from=TypeTimestamp(0), time_to=TypeTimestamp(int(1e9))
     )
     assert dyn is not None
     assert dyn.Phi.shape == (2, 2)
@@ -87,8 +95,12 @@ def test_double_trans_init(mediator: StandardMediator) -> None:
     x_and_p = EstimateWithCovariance(
         EstimateWithCovarianceType.EWC_GENERIC, ones(2), eye(2)
     )
+
+    def _test_gen_x_and_p(sb_labels: list[str]) -> EstimateWithCovariance | None:
+        return x_and_p
+
     dyn = blk.generate_dynamics(
-        x_and_p, time_from=TypeTimestamp(0), time_to=TypeTimestamp(int(1e9))
+        _test_gen_x_and_p, time_from=TypeTimestamp(0), time_to=TypeTimestamp(int(1e9))
     )
     assert dyn is not None
     assert dyn.Phi.shape == (2, 2)
@@ -171,8 +183,12 @@ def test_gen_dyn(mediator: StandardMediator) -> None:
     x_and_p = EstimateWithCovariance(
         EstimateWithCovarianceType.EWC_GENERIC, zeros(1), eye(1)
     )
+
+    def _test_gen_x_and_p(sb_labels: list[str]) -> EstimateWithCovariance | None:
+        return x_and_p
+
     dyn = blk.generate_dynamics(
-        x_and_p, time_from=TypeTimestamp(0), time_to=TypeTimestamp(int(1e9))
+        _test_gen_x_and_p, time_from=TypeTimestamp(0), time_to=TypeTimestamp(int(1e9))
     )
     assert dyn is not None
     res = dyn.g(array([1.0]))
@@ -186,8 +202,14 @@ def test_gen_dyn_eq(mediator: StandardMediator) -> None:
     x_and_p = EstimateWithCovariance(
         EstimateWithCovarianceType.EWC_GENERIC, array([3.0]), eye(1) * 9.0
     )
+
+    def _test_gen_x_and_p(sb_labels: list[str]) -> EstimateWithCovariance | None:
+        return x_and_p
+
     dyn = blk.generate_dynamics(
-        x_and_p, time_from=TypeTimestamp(int(1e9)), time_to=TypeTimestamp(int(1e9))
+        _test_gen_x_and_p,
+        time_from=TypeTimestamp(int(1e9)),
+        time_to=TypeTimestamp(int(1e9)),
     )
     assert dyn is not None
     res = dyn.g(x_and_p.estimate)
@@ -203,8 +225,12 @@ def test_gen_dyn_neg(mediator: StandardMediator) -> None:
     x_and_p = EstimateWithCovariance(
         EstimateWithCovarianceType.EWC_GENERIC, zeros(1), eye(1)
     )
+
+    def _test_gen_x_and_p(sb_labels: list[str]) -> EstimateWithCovariance | None:
+        return x_and_p
+
     dyn = blk.generate_dynamics(
-        x_and_p, time_from=TypeTimestamp(int(1e9)), time_to=TypeTimestamp(0)
+        _test_gen_x_and_p, time_from=TypeTimestamp(int(1e9)), time_to=TypeTimestamp(0)
     )
     assert dyn is not None
     dyn.g(x_and_p.estimate)
@@ -217,8 +243,12 @@ def test_gen_dyn_multi(mediator: StandardMediator) -> None:
     x_and_p = EstimateWithCovariance(
         EstimateWithCovarianceType.EWC_GENERIC, array([0.5, 1.5, -2.5]), eye(3) * 3.0
     )
+
+    def _test_gen_x_and_p(sb_labels: list[str]) -> EstimateWithCovariance | None:
+        return x_and_p
+
     dyn = blk.generate_dynamics(
-        x_and_p, time_from=TypeTimestamp(0), time_to=TypeTimestamp(int(1e9))
+        _test_gen_x_and_p, time_from=TypeTimestamp(0), time_to=TypeTimestamp(int(1e9))
     )
     assert dyn is not None
     res = dyn.g(x_and_p.estimate)
