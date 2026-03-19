@@ -178,7 +178,6 @@ class CtoPyApiComparator:
             'num_block_labels': '',
             'num_times': '',
             'num_state_block_labels': '',
-            'gen_x_and_p_func': 'x_and_p',  # TODO: Remove exception once the semantic inequivalence is resolved. Related issue: https://git.aspn.us/pntos/pntos-python/-/issues/262
             'type': '',  # TODO: Remove exception once https://git.aspn.us/pntos/pntos/-/merge_requests/1091 has been merged.
         }
         self.class_exceptions = {

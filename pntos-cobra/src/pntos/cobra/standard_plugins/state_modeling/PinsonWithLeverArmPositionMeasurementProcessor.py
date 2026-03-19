@@ -6,13 +6,11 @@ from aspn23 import (
 )
 from numpy import float64
 from numpy.typing import NDArray
-from pntos.api.plugins.common import (
-    EstimateWithCovariance,
+from pntos.api import (
+    GenXandP,
     LoggingLevel,
     Mediator,
     Message,
-)
-from pntos.api.plugins.state_modeling import (
     StandardMeasurementModel,
     StandardMeasurementProcessor,
 )
@@ -127,7 +125,7 @@ class PinsonWithLeverArmPositionMeasurementProcessor(StandardMeasurementProcesso
         self._inertial_pva = pva
 
     def generate_model(
-        self, message: Message, x_and_p: EstimateWithCovariance
+        self, message: Message, gen_x_and_p_func: GenXandP
     ) -> StandardMeasurementModel | None:
         """
         Generates a StandardMeasurementModel relating a position measurement to the states
@@ -136,8 +134,9 @@ class PinsonWithLeverArmPositionMeasurementProcessor(StandardMeasurementProcesso
         Args:
             message (Message): Measurement used to update. The ``wrapped_message`` member must
                 be of type ``aspn23.MeasurementPosition``.
-            x_and_p (EstimateWithCovariance): The estimate and covariance of the states referenced
-                by this model. The layout of the states should follow the description in :meth:`__init__`.
+            gen_x_and_p_func (GenXandP): Callback to get the estimate and covariance of the
+                states referenced by this model. The layout of the states should follow
+                the description in :meth:`__init__`.
 
         Returns:
             Model relating measurement to states. Will return ``None`` if
@@ -258,10 +257,14 @@ class PinsonWithLeverArmPositionMeasurementProcessor(StandardMeasurementProcesso
         z[2] = -z[2]
         z = z.reshape(3, 1)
 
-        H = np.zeros((3, x_and_p.estimate.shape[0]))
+        ewc = gen_x_and_p_func(self.state_block_labels)
+        if ewc is None:
+            return None
+
+        H = np.zeros((3, ewc.estimate.shape[0]))
         H[:, 0:3] = np.eye(3)
-        H[:, 6:9] = skew(C_platform_to_nav @ (self._l_ps_p + x_and_p.estimate[-3:, 0]))
-        H[:, -3:] = (np.eye(3) - skew(x_and_p.estimate[6:9, 0])) @ C_platform_to_nav
+        H[:, 6:9] = skew(C_platform_to_nav @ (self._l_ps_p + ewc.estimate[-3:, 0]))
+        H[:, -3:] = (np.eye(3) - skew(ewc.estimate[6:9, 0])) @ C_platform_to_nav
         H[:, -6:-3] = -np.eye(3)
 
         def h(x: NDArray[float64]) -> NDArray[float64]:

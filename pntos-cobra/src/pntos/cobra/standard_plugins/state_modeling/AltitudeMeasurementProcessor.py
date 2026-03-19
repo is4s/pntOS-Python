@@ -10,7 +10,7 @@ from navtk.navutils import msl_to_hae
 from numpy import float64
 from numpy.typing import NDArray
 from pntos.api import (
-    EstimateWithCovariance,
+    GenXandP,
     LoggingLevel,
     Mediator,
     Message,
@@ -105,7 +105,7 @@ class AltitudeMeasurementProcessor(StandardMeasurementProcessor):
         self._inertial_pos[2] = pva.p3
 
     def generate_model(
-        self, message: Message, x_and_p: EstimateWithCovariance
+        self, message: Message, gen_x_and_p_func: GenXandP
     ) -> StandardMeasurementModel | None:
         meas = message.wrapped_message
         alt = None
@@ -158,7 +158,10 @@ class AltitudeMeasurementProcessor(StandardMeasurementProcessor):
 
         inertial_alt = self._inertial_pos[2]
 
-        num_states = x_and_p.estimate.size
+        ewc = gen_x_and_p_func(self.state_block_labels)
+        if ewc is None:
+            return None
+        num_states = ewc.estimate.size
         # z = measured inertial altitude error
         z = np.array([[alt - inertial_alt]])
         H = np.zeros((1, num_states))

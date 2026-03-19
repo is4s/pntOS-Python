@@ -12,6 +12,7 @@ from pntos.api import (
     EstimateWithCovariance,
     EstimateWithCovarianceType,
     FusionPlugin,
+    GenXandP,
     LoggingLevel,
     Message,
     StandardDynamicsModel,
@@ -45,7 +46,7 @@ class _TestStateBlock(StandardStateBlock):
 
     def generate_dynamics(
         self,
-        x_and_p: EstimateWithCovariance,
+        gen_x_and_p_func: GenXandP,
         time_from: TypeTimestamp,
         time_to: TypeTimestamp,
     ) -> StandardDynamicsModel | None:
@@ -70,7 +71,7 @@ class _TestMeasurementProcessor(StandardMeasurementProcessor):
         pass
 
     def generate_model(
-        self, message: Message, x_and_p: EstimateWithCovariance
+        self, message: Message, gen_x_and_p_func: GenXandP
     ) -> StandardMeasurementModel | None:
         assert isinstance(message.wrapped_message, MeasurementDeltaPosition)
         delta_pos = message.wrapped_message

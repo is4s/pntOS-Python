@@ -6,13 +6,11 @@ from aspn23 import (
 )
 from numpy import float64
 from numpy.typing import NDArray
-from pntos.api.plugins.common import (
-    EstimateWithCovariance,
+from pntos.api import (
+    GenXandP,
     LoggingLevel,
     Mediator,
     Message,
-)
-from pntos.api.plugins.state_modeling import (
     StandardMeasurementModel,
     StandardMeasurementProcessor,
 )
@@ -81,7 +79,7 @@ class PinsonVelocityMeasurementProcessor(StandardMeasurementProcessor):
         self._inertial_pva = pva
 
     def generate_model(
-        self, message: Message, x_and_p: EstimateWithCovariance
+        self, message: Message, gen_x_and_p_func: GenXandP
     ) -> StandardMeasurementModel | None:
         if not isinstance(message.wrapped_message, MeasurementVelocity):
             self._mediator.log_message(

@@ -7,13 +7,11 @@ from aspn23 import (
 )
 from numpy import float64
 from numpy.typing import NDArray
-from pntos.api.plugins.common import (
-    EstimateWithCovariance,
+from pntos.api import (
+    GenXandP,
     LoggingLevel,
     Mediator,
     Message,
-)
-from pntos.api.plugins.state_modeling import (
     StandardMeasurementModel,
     StandardMeasurementProcessor,
 )
@@ -126,7 +124,7 @@ class PinsonBodyVelocityMeasurementProcessor(StandardMeasurementProcessor):
         self._force_and_rate_aux = aux[1].wrapped_message
 
     def generate_model(
-        self, message: Message, x_and_p: EstimateWithCovariance
+        self, message: Message, gen_x_and_p_func: GenXandP
     ) -> StandardMeasurementModel | None:
         if not isinstance(message.wrapped_message, MeasurementVelocity):
             self._mediator.log_message(
@@ -159,7 +157,11 @@ class PinsonBodyVelocityMeasurementProcessor(StandardMeasurementProcessor):
             )
             return None
 
-        x = x_and_p.estimate
+        ewc = gen_x_and_p_func(self.state_block_labels)
+        if ewc is None:
+            return None
+
+        x = ewc.estimate
         num_states = x.shape[0]
         inertial_vel = np.array(
             [

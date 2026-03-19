@@ -6,7 +6,7 @@ from aspn23 import (
 from numpy import float64
 from numpy.typing import NDArray
 from pntos.api import (
-    EstimateWithCovariance,
+    GenXandP,
     Mediator,
     Message,
     StandardMeasurementModel,
@@ -68,7 +68,7 @@ class TutorialPinsonWithNedFogmPositionMeasurementProcessor(
         self._inertial_pva = pva
 
     def generate_model(
-        self, message: Message, x_and_p: EstimateWithCovariance
+        self, message: Message, gen_x_and_p_func: GenXandP
     ) -> StandardMeasurementModel | None:
         if (
             not isinstance(message.wrapped_message, MeasurementPosition)
@@ -94,7 +94,9 @@ class TutorialPinsonWithNedFogmPositionMeasurementProcessor(
         z[2] = -z[2]
         z = z.reshape(3, 1)
 
-        H = np.zeros((3, x_and_p.estimate.shape[0]))
+        ewc = gen_x_and_p_func(self.state_block_labels)
+
+        H = np.zeros((3, ewc.estimate.shape[0]))  # type: ignore[union-attr]
         H[:, 0:3] = np.eye(3)
         H[:, 6:9] = C_platform_to_nav @ self._l_ps_p
         H[:, -3:] = -np.eye(3)

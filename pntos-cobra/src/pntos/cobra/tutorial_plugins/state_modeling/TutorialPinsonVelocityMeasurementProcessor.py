@@ -1,12 +1,9 @@
 import numpy as np
-from aspn23 import (
-    MeasurementPositionVelocityAttitude,
-    MeasurementVelocity,
-)
+from aspn23 import MeasurementPositionVelocityAttitude, MeasurementVelocity
 from numpy import float64
 from numpy.typing import NDArray
 from pntos.api import (
-    EstimateWithCovariance,
+    GenXandP,
     Mediator,
     Message,
     StandardMeasurementModel,
@@ -23,10 +20,7 @@ class TutorialPinsonVelocityMeasurementProcessor(StandardMeasurementProcessor):
     _inertial_pva: MeasurementPositionVelocityAttitude | None
 
     def __init__(
-        self,
-        label: str,
-        state_block_labels: list[str],
-        mediator: Mediator,
+        self, label: str, state_block_labels: list[str], mediator: Mediator
     ) -> None:
         """
         A Pinson Velocity Measurement Processor
@@ -53,7 +47,7 @@ class TutorialPinsonVelocityMeasurementProcessor(StandardMeasurementProcessor):
         self._inertial_pva = pva
 
     def generate_model(
-        self, message: Message, x_and_p: EstimateWithCovariance
+        self, message: Message, gen_x_and_p_func: GenXandP
     ) -> StandardMeasurementModel | None:
         if (
             not isinstance(message.wrapped_message, MeasurementVelocity)
@@ -65,11 +59,7 @@ class TutorialPinsonVelocityMeasurementProcessor(StandardMeasurementProcessor):
 
         meas_vel = np.array([vel.x, vel.y, vel.z])
         inertial_vel = np.array(
-            [
-                self._inertial_pva.v1,
-                self._inertial_pva.v2,
-                self._inertial_pva.v3,
-            ]
+            [self._inertial_pva.v1, self._inertial_pva.v2, self._inertial_pva.v3]
         )
 
         # z = measured NED inertial velocity error

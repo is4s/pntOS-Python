@@ -5,13 +5,11 @@ from aspn23 import (
 )
 from numpy import float64
 from numpy.typing import NDArray
-from pntos.api.plugins.common import (
-    EstimateWithCovariance,
+from pntos.api import (
+    GenXandP,
     LoggingLevel,
     Mediator,
     Message,
-)
-from pntos.api.plugins.state_modeling import (
     StandardMeasurementModel,
     StandardMeasurementProcessor,
 )
@@ -106,7 +104,7 @@ class PinsonPosVelMeasurementProcessor(StandardMeasurementProcessor):
         self._inertial_pva = pva
 
     def generate_model(
-        self, message: Message, x_and_p: EstimateWithCovariance
+        self, message: Message, gen_x_and_p_func: GenXandP
     ) -> StandardMeasurementModel | None:
         """
         Generates the model mapping state estimates to the provided measurement.
@@ -114,11 +112,13 @@ class PinsonPosVelMeasurementProcessor(StandardMeasurementProcessor):
         Args:
             message (Message): Measurement to process. `message.wrapped_message` must be a
                 MeasurementPositionVelocityAttitude using the GEODETIC reference frame.
-            x_and_p: Current state estimate and covariance for the pinson-style block this processor
-                is updating. NED position errors in meters are expected in at indices [0:3], NED
-                velocity errors at indices [3:6], and NED tilt errors in radians at indices [6:9].
+            gen_x_and_p_func (GenXandP): Callback to get the current state estimate and
+                covariance for the pinson-style block this processor is updating. NED
+                position errors in meters are expected in at indices [0:3], NED velocity
+                errors at indices [3:6], and NED tilt errors in radians at indices
+                [6:9].
         Returns:
-            StandardMeasurementModel if all restrictions on `message` and `x_and_p` are met and
+            StandardMeasurementModel if all restrictions on `message` and `gen_x_and_p_func` are met and
             proper aux data is available, None otherwise.
 
         **Model Description and Derivation**
@@ -207,7 +207,11 @@ class PinsonPosVelMeasurementProcessor(StandardMeasurementProcessor):
         z[2] = -z[2]
         z = z.reshape(6, 1)
 
-        H = np.zeros((6, x_and_p.estimate.shape[0]))
+        ewc = gen_x_and_p_func(self.state_block_labels)
+        if ewc is None:
+            return None
+
+        H = np.zeros((6, ewc.estimate.shape[0]))
         H[:3, :3] = np.eye(3)
         H[:3, 6:9] = skew(C_platform_to_nav @ self._l_ps_p)
         H[3:, 3:6] = np.eye(3)

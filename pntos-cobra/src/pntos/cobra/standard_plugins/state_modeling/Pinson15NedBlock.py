@@ -8,13 +8,14 @@ from aspn23 import (
 )
 from numpy import float64
 from numpy.typing import NDArray
-from pntos.api.plugins.common import (
-    EstimateWithCovariance,
+from pntos.api import (
+    GenXandP,
     LoggingLevel,
     Mediator,
     Message,
+    StandardDynamicsModel,
+    StandardStateBlock,
 )
-from pntos.api.plugins.state_modeling import StandardDynamicsModel, StandardStateBlock
 from pntos.cobra.config import ImuConfig
 from pntos.cobra.utils import (
     OMEGA_E,
@@ -173,7 +174,7 @@ class Pinson15NedBlock(StandardStateBlock):
 
     def generate_dynamics(
         self,
-        x_and_p: EstimateWithCovariance,
+        gen_x_and_p_func: GenXandP,
         time_from: TypeTimestamp,
         time_to: TypeTimestamp,
     ) -> StandardDynamicsModel | None:

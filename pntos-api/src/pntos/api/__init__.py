@@ -64,6 +64,7 @@ from .plugins.preprocessor import (
 )
 from .plugins.registry import RegistryPlugin as RegistryPlugin
 from .plugins.state_modeling import (
+    GenXandP as GenXandP,
     StandardDynamicsModel as StandardDynamicsModel,
     StandardMeasurementModel as StandardMeasurementModel,
     StandardMeasurementProcessor as StandardMeasurementProcessor,

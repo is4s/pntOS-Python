@@ -75,3 +75,19 @@ pntOS Python API
    An enumeration of the types of state model providers a state modeling plugin could provide.
 
    "Any" is included for future compatibility.
+
+
+.. class:: GenXandP
+   A function of type: ``Callable[[list[str]], EstimateWithCovariance | None]``
+
+   Returns the estimate and covariance associated with the states of ``block_labels`` within a
+   particular measurement processor or state block. This is used to lazily evaluate estimate and
+   covariance.
+
+   Args:
+      block_labels (list[str]): Labels for state blocks to generate estimate and
+         covariance for.
+
+   Returns:
+      Estimate and covariance of the provided block_labels. Returns ``None`` if any label in
+      ``block_labels`` does not correspond to a valid block.

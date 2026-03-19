@@ -9,7 +9,7 @@ from aspn23 import TypeTimestamp
 from numpy import float64
 from numpy.typing import NDArray
 from pntos.api import (
-    EstimateWithCovariance,
+    GenXandP,
     Mediator,
     Message,
     StandardDynamicsModel,
@@ -39,7 +39,7 @@ class ConstantStateBlock(StandardStateBlock):
 
     def generate_dynamics(
         self,
-        x_and_p: EstimateWithCovariance,
+        gen_x_and_p_func: GenXandP,
         time_from: TypeTimestamp,
         time_to: TypeTimestamp,
     ) -> StandardDynamicsModel:
