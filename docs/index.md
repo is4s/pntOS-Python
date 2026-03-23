@@ -57,6 +57,7 @@ apps/advanced/gps_ins_ros
 :caption: Reference
 auxiliary_data
 factory_pattern
+example_data
 faq
 coordinate_frames
 concurrency
