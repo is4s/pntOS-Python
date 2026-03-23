@@ -50,9 +50,6 @@ apps/advanced/buscat
 apps/advanced/gps_ins_ros
 ```
 
-<!-- TODO #114: add `navtk` back in to this index -->
-<!-- TODO: add `troubleshooting` back in to this index -->
-
 ```{toctree}
 :caption: Reference
 auxiliary_data
