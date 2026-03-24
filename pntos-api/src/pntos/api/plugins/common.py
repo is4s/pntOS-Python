@@ -2,11 +2,11 @@
 
 from abc import ABC, abstractmethod
 from collections.abc import Callable, Iterator
+from contextlib import AbstractContextManager
 from dataclasses import dataclass
 from enum import IntEnum
-from typing import (
-    TypeVar,
-)
+from types import TracebackType
+from typing import TypeVar, final
 
 from aspn23 import AspnBase, TypeTimestamp
 from numpy import float64
@@ -172,7 +172,7 @@ Example:
 """
 
 
-class KeyValueStore(ABC):
+class KeyValueStore(AbstractContextManager['KeyValueStore']):
     """
     A key-value store implemented with a string-pair key.
 
@@ -674,6 +674,52 @@ class KeyValueStore(ABC):
     data_format: KeyValueStoreDataFormat
     """Defines the underlying format which the data in the key-value store will be stored as.
     """
+
+    ############# BEGIN FINAL METHODS - THESE SHOULD NOT BE OVERRIDDEN #################
+
+    @final
+    def __enter__(self) -> 'KeyValueStore':
+        """
+        Allows for use of the ``Registry`` through Python ``with`` statements.
+
+        Example:
+            Here is an example of how the registry can work using a ``with`` statement:
+
+                with registry.batch_start('my_group') as store:
+                    store['my_val'] = 42
+                    # store.batch_end() called automatically when leaving 'with' block
+                store['my_val'] = 73 # Invalid: store use outside of batch
+
+        This is hard-coded context behavior - do not implement this method in child
+        classes.
+        """
+        return super().__enter__()
+
+    @final
+    def __exit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc: BaseException | None,
+        tb: TracebackType | None,
+    ) -> bool | None:
+        """
+        Allows for use of the ``Registry`` through Python ``with`` statements.
+
+        Example:
+            Here is an example of how the registry can work using a ``with`` statement:
+
+                with registry.batch_start('my_group') as store:
+                    store['my_val'] = 42
+                    # store.batch_end() called automatically when leaving 'with' block
+                store['my_val'] = 73 # Invalid: store use outside of batch
+
+        This is hard-coded context behavior - do not implement this method in child
+        classes.
+        """
+        self.batch_end()
+        return None
+
+    ################################ END FINAL METHODS #################################
 
 
 class Registry(ABC):

@@ -32,7 +32,7 @@ dev = [
     "myst-parser>=4",
     "pip>=24",
     # Generated from commit ce6c78bd72ca4d3f890987f0c13e1d0c12acced3 on 17 March 2026
-    "pntos-python-docs-data==0.3.0",
+    "pntos-python-docs-data==0.3",
     "pyproject-fmt>=2.7",
     "pytest>=8.2",
     "pytest-cov>=6",
