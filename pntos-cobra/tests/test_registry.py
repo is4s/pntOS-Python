@@ -466,6 +466,20 @@ class TestRegistry(unittest.TestCase):
         kv.set_value('Enterprise', 1701)
         assert not ERROR_DETECTED, 'Did not catch misuse of Registry.'
 
+    @patch('sys.stdout', new_callable=io.StringIO)
+    def test_batch_rules_context(self, mock_stdout: io.StringIO) -> None:
+        global EXPECTED_LOG_OUTPUT, DUMMY_LOG_OUT, ERROR_DETECTED
+        EXPECTED_LOG_OUTPUT = ''
+        ERROR_DETECTED = False
+        if self.registry.mediator is None:  # Controller not implemented
+            return  # type: ignore[unreachable]
+
+        with self.reg.batch_start(self.test_group) as kv:
+            pass
+        EXPECTED_LOG_OUTPUT = 'Tried to use KeyValueStore outside of batch operation. (Make sure to use `batch_start`/`batch_restart` and `batch_end`)'
+        kv.set_value('Enterprise', 1701)
+        assert not ERROR_DETECTED, 'Did not catch misuse of Registry.'
+
     def test_request_notify_no_key(self) -> None:
         test_keys = ['Resistance', 'is', 'futile.']
         test_kv = self.reg.batch_start(self.test_group)
@@ -906,6 +920,16 @@ class TestRegistry(unittest.TestCase):
         mediator.registry = reg
         reg.batch_start('new_group')
         assert not ERROR_DETECTED, DUMMY_LOG_OUT
+
+    def test_context_manager(self) -> None:
+        with self.reg.batch_start('test_context') as kv:
+            kv['write'] = 42
+            read = kv.get_value('write', int)
+            assert read is not None
+            assert read == 42
+        # Make sure the batch closed by restarting - should throw error if not closed
+        kv = self.reg.batch_start('test_context')
+        kv.batch_end()
 
     def compare_messages(self, m1: object, m2: object, depth: int = 0) -> bool:
         """The numpy arrays in Message objects do not seem to compare nicely

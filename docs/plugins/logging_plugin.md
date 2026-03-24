@@ -35,7 +35,7 @@ The {py:obj}`LoggingPlugin.log()<pntos.api.LoggingPlugin.log>` method accepts a 
 Plugins log messages through {py:obj}`Mediator.log_message()<pntos.api.Mediator.log_message>`:
 
 ```{literalinclude} ../../pntos-api/src/pntos/api/plugins/common.py
-:lines: 896-907
+:pyobject: Mediator.log_message
 :language: python
 ```
 
