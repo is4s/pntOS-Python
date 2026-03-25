@@ -21,11 +21,6 @@ the data, and a variable in the Python module which provides the path on the dis
   - `cobra_gps_ins_example_data_0.db3`
   - `play-ros-dataset`
   - `EXAMPLE_ROS_LOG`
-
-* - `pntos-python-datasets-aspn2-lcm`
-  - `cobra_aspn2_example_data.log`
-  - `play-aspn2-lcm-dataset`
-  - `ASPN2_EXAMPLE_LCM_LOG`
 ```
 
 :::{tip}

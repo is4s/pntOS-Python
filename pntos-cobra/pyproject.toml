@@ -21,10 +21,6 @@ dependencies = [
     # analysis-scripts main branch - committed 1 May 2026
     "analysis-lcm @ git+https://git@github.com/Open-PNT/analysis-scripts.git@92ee7b01d89a4b06abb07a37c3a990e3933d9ef6#subdirectory=analysis-lcm",
     "analysis-ros @ git+https://git@github.com/Open-PNT/analysis-scripts.git@92ee7b01d89a4b06abb07a37c3a990e3933d9ef6#subdirectory=analysis-ros",
-    # lcm-generated aspn-2.2 branch - committed 10 November 2025
-    "aspn2-lcm @ git+ssh://git@git.aspn.us/pntos/lcm-generated.git@831a7727bffab217b3de60491dc12b96b50887a1#subdirectory=python",
-    # firehose-outputs main branch - committed 4 May 2026
-    "aspn2-translations @ git+ssh://git@git.aspn.us/pntos/firehose-outputs.git@5581f825c6936be56b1822bf0d948ede6a9736cb#subdirectory=aspn2_to_aspn_py_translations",
     # aspn-generated main branch - committed 21 April 2026
     "aspn23 @ git+https://github.com/is4s/aspn-generated.git@7e1f35bc84b90c6d361e690601448f8087e1a626#subdirectory=aspn-py",
     # aspn-generated main branch - committed 21 April 2026
