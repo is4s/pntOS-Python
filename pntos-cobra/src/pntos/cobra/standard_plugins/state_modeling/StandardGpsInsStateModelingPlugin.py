@@ -20,6 +20,9 @@ from pntos.cobra.config import (
 from .AltitudeMeasurementProcessor import AltitudeMeasurementProcessor
 from .ClockBiasStateBlock import ClockBiasStateBlock
 from .ConstantStateBlock import ConstantStateBlock
+from .Direction3DToPointsMeasurementProcessor import (
+    Direction3DToPointsMeasurementProcessor,
+)
 from .FogmBlock import FogmBlock
 from .Pinson15NedBlock import Pinson15NedBlock
 from .PinsonBodyVelocityMeasurementProcessor import (
@@ -63,6 +66,7 @@ class StandardGpsInsStateModelProvider(StandardStateModelProvider):
             'pinson_body_velocity',
             'pinson_posvel',
             'position',
+            'direction3D_to_points',
         ]
         self.block_identifiers: list[str] = [
             'pinson15',
@@ -91,6 +95,7 @@ class StandardGpsInsStateModelProvider(StandardStateModelProvider):
         | PinsonBodyVelocityMeasurementProcessor
         | PinsonPosVelMeasurementProcessor
         | PositionMeasurementProcessor
+        | Direction3DToPointsMeasurementProcessor
         | None
     ):
         """
@@ -106,6 +111,8 @@ class StandardGpsInsStateModelProvider(StandardStateModelProvider):
                 - Index 4 corresponds to a :class:`PinsonWithLeverArmPositionMeasurementProcessor`.
                 - Index 5 corresponds to a :class:`PinsonBodyVelocityMeasurementProcessor`.
                 - Index 6 corresponds to a :class:`PinsonPosVelMeasurementProcessor`.
+                - Index 7 corresponds to a :class:`PositionMeasurementProcessor`.
+                - Index 8 corresponds to a :class:`Direction3DToPointsMeasurementProcessor`.
                 - All other indices will result in a return value of None.
             engine (StandardFusionEngine | None): An optional parameter that may be provided to the
                 new processor, such that the processor may interact with the fusion engine it
@@ -274,6 +281,30 @@ class StandardGpsInsStateModelProvider(StandardStateModelProvider):
                     state_block_labels,
                     self._mediator,
                     np.array(sensor_mp_config.sensor_config.lever_arm),
+                )
+
+            case 8:
+                if config_group is None:
+                    self._mediator.log_message(
+                        LoggingLevel.ERROR,
+                        f'A config group is required for processor {self.processor_identifiers[processor_index]}',
+                    )
+                    return None
+                sensor_mp_config = config_from_registry(
+                    SensorMeasurementProcessorConfig, self._mediator, config_group
+                )
+                if sensor_mp_config is None:
+                    self._mediator.log_message(
+                        LoggingLevel.ERROR,
+                        'Could not get direction3D to points sensor config from registry.',
+                    )
+                    return None
+                return Direction3DToPointsMeasurementProcessor(
+                    label,
+                    state_block_labels,
+                    self._mediator,
+                    np.array(sensor_mp_config.sensor_config.lever_arm),
+                    np.array(sensor_mp_config.sensor_config.orientation),
                 )
         self._mediator.log_message(
             LoggingLevel.ERROR,

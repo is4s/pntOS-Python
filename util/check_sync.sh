@@ -85,6 +85,8 @@ check_sync $orig_dir"/util/app_gps_ins_bodyvel.patch"
 check_sync $orig_dir"/util/app_gps_ins_vsb.patch"
 # Apply app outage patch
 check_sync $orig_dir"/util/app_outage_sim.patch"
+# Apply app direction-to-points patch
+check_sync $orig_dir"/util/app_direction_to_points.patch"
 
 # Cleanup and return
 popd > /dev/null

@@ -6,6 +6,7 @@ from aspn23 import (
     MeasurementAltitude,
     MeasurementAltitudeErrorModel,
     MeasurementAltitudeReference,
+    MeasurementDirection3DToPoints,
     MeasurementImu,
     MeasurementImuImuType,
     MeasurementPosition,
@@ -17,7 +18,13 @@ from aspn23 import (
     MeasurementVelocity,
     MeasurementVelocityErrorModel,
     MeasurementVelocityReferenceFrame,
+    TypeDirection3DToPoint,
+    TypeDirection3DToPointErrorModel,
+    TypeDirection3DToPointReferenceFrame,
     TypeHeader,
+    TypeImageFeature,
+    TypeRemotePoint,
+    TypeRemotePointPositionReferenceFrame,
     TypeTimestamp,
 )
 from conftest import gxp
@@ -53,6 +60,7 @@ from pntos.cobra.config import (
 )
 from pntos.cobra.internal import (
     AltitudeMeasurementProcessor,
+    Direction3DToPointsMeasurementProcessor,
     Pinson15NedBlock,
     PinsonBodyVelocityMeasurementProcessor,
     PinsonErrorToStandard,
@@ -78,6 +86,8 @@ from pntos.cobra.utils.navigation import (
 )
 
 _lever_arm = (-2.0, 3.0, 5.0)
+# _orientation = (0.707106781, 0.0, 0.707106781, 0.0)
+_orientation = (1.0, 0.0, 0.0, 0.0)
 
 my_config: list[BaseConfig] = [
     PinsonStateBlockConfig(
@@ -293,6 +303,19 @@ def posvel_mp(
 
 
 @pytest.fixture
+def direction3D_to_points_mp(
+    state_model_provider: StateModelProviderType,
+) -> StandardMeasurementProcessor:
+    out = state_model_provider.new_processor(
+        8, None, 'direction3D_to_points', ['pinson'], 'config/test'
+    )
+    assert isinstance(out, StandardMeasurementProcessor)
+    assert isinstance(out, Direction3DToPointsMeasurementProcessor)
+
+    return out
+
+
+@pytest.fixture
 def pva_aux_data() -> Message:
     return Message(
         MeasurementPositionVelocityAttitude(
@@ -414,6 +437,44 @@ def alt_meas() -> Message:
             [],
         ),
         'alt',
+    )
+
+
+@pytest.fixture
+def direction3D_to_points_meas() -> Message:
+    return Message(
+        MeasurementDirection3DToPoints(
+            TypeHeader(0, 0, 0, 0),
+            TypeTimestamp(1_000_000_000),
+            [
+                TypeDirection3DToPoint(
+                    TypeRemotePoint(
+                        3,
+                        0,
+                        TypeRemotePointPositionReferenceFrame.GEODETIC,
+                        0.693950,
+                        -1.468400,
+                        0.0,
+                        np.array(
+                            [
+                                [1.0, 0.0, 0.0],
+                                [0.0, 1.0, 0.0],
+                                [0.0, 0.0, 1.0],
+                            ]
+                        ),
+                    ),
+                    TypeDirection3DToPointReferenceFrame.SINE_SPACE,
+                    np.array([0.5, 0.4]),
+                    np.diag([0.0001, 0.0001]),
+                    False,
+                    TypeImageFeature(1.0, 1.0, 1.0, 1, 1, np.array([1])),
+                    TypeDirection3DToPointErrorModel.NONE,
+                    np.array([]),
+                    [],
+                )
+            ],
+        ),
+        'direction3D_to_points',
     )
 
 
@@ -1041,6 +1102,98 @@ def test_generate_model_pos_alt(
     assert np.array_equal(mm.H, exp_H)
     assert np.array_equal(mm.R, exp_R)
     assert np.array_equal(mm.h(x_and_p.estimate).flatten(), np.zeros(1))
+    assert np.allclose(mm.z, exp_z)
+
+
+def test_generate_model_direction3D_to_points(
+    direction3D_to_points_mp: Direction3DToPointsMeasurementProcessor,
+    pva_aux_data: Message,
+    direction3D_to_points_meas: Message,
+) -> None:
+    inertial_pva = pva_aux_data.wrapped_message
+    assert isinstance(inertial_pva, MeasurementPositionVelocityAttitude)
+    assert inertial_pva.p1 is not None
+    assert inertial_pva.p2 is not None
+    assert inertial_pva.p3 is not None
+    direction3D_to_points = direction3D_to_points_meas.wrapped_message
+    assert isinstance(direction3D_to_points, MeasurementDirection3DToPoints)
+    assert direction3D_to_points.obs[0].obs[0] is not None
+    assert direction3D_to_points.obs[0].obs[1] is not None
+
+    direction3D_to_points_mp.receive_aux_data([pva_aux_data])
+    x_and_p = EstimateWithCovariance(
+        EstimateWithCovarianceType.EWC_GENERIC, np.zeros((16, 1)), np.eye(16)
+    )
+
+    def _test_gen_x_and_p(sb_labels: list[str]) -> EstimateWithCovariance | None:
+        return x_and_p
+
+    mm = direction3D_to_points_mp.generate_model(
+        direction3D_to_points_meas, _test_gen_x_and_p
+    )
+
+    assert mm is not None
+    inertial_llh = np.array([inertial_pva.p1, inertial_pva.p2, inertial_pva.p3])
+    assert inertial_pva.quaternion is not None
+    C_nav_to_platform = quat_to_dcm(inertial_pva.quaternion).T
+    C_platform_to_sensor = quat_to_dcm(np.array(_orientation))
+    C_nav_to_sensor = C_platform_to_sensor @ C_nav_to_platform
+    la_as_array = np.array([_lever_arm[0], _lever_arm[1], _lever_arm[2]]).reshape(3, 1)
+    feature_llh = np.array(
+        [
+            direction3D_to_points.obs[0].remote_point.position1,
+            direction3D_to_points.obs[0].remote_point.position2,
+            direction3D_to_points.obs[0].remote_point.position3,
+        ]
+    )
+    delta_pos_ned = np.array(
+        [
+            delta_lat_to_north(
+                feature_llh[0] - inertial_llh[0], inertial_llh[0], inertial_llh[2]
+            ),
+            delta_lon_to_east(
+                feature_llh[1] - inertial_llh[1], inertial_llh[0], inertial_llh[2]
+            ),
+            inertial_llh[2] - feature_llh[2],
+        ]
+    ).reshape(3, 1)
+    delta_pos_sensor = (
+        C_nav_to_sensor @ delta_pos_ned - C_platform_to_sensor @ la_as_array
+    )
+    u_nom = delta_pos_sensor / np.linalg.norm(delta_pos_sensor)
+    sy_m, sz_m = direction3D_to_points.obs[0].obs
+    exp_z = np.array([[sy_m - u_nom[1, 0]], [sz_m - u_nom[2, 0]]])
+    exp_H = np.zeros((2, 16))
+    exp_H[:, 0:3] = (
+        ((np.eye(3) - np.outer(u_nom, u_nom)) / np.linalg.norm(delta_pos_sensor))[
+            1:3, :
+        ]
+    ) @ (-C_nav_to_sensor)  # Position error
+    exp_H[:, 6:9] = (
+        ((np.eye(3) - np.outer(u_nom, u_nom)) / np.linalg.norm(delta_pos_sensor))[
+            1:3, :
+        ]
+    ) @ (C_nav_to_sensor @ -skew(delta_pos_ned.flatten()))  # Tilt error
+    x = x_and_p.estimate
+    dpos_ned = x[0:3, 0].reshape(3, 1)
+    dtheta_ned = x[6:9, 0].reshape(3, 1)
+    # Predict perturbed unit vector
+    delta_pos_sensor_p = (
+        C_nav_to_sensor
+        @ ((np.eye(3) + skew(dtheta_ned.flatten())) @ (delta_pos_ned - dpos_ned))
+        - C_platform_to_sensor @ la_as_array
+    )
+    u_p = delta_pos_sensor_p / np.linalg.norm(delta_pos_sensor_p)
+    # Predict nominal unit vector (no error)
+    delta_pos_sensor_n = (
+        C_nav_to_sensor @ delta_pos_ned - C_platform_to_sensor @ la_as_array
+    )
+    u_n = delta_pos_sensor_n / np.linalg.norm(delta_pos_sensor_n)
+    exp_pred = u_p[1:3] - u_n[1:3]
+    exp_R = direction3D_to_points.obs[0].covariance
+    assert np.array_equal(mm.H, exp_H)
+    assert np.array_equal(mm.R, exp_R)
+    assert np.array_equal(mm.h(x_and_p.estimate).flatten(), exp_pred.flatten())
     assert np.allclose(mm.z, exp_z)
 
 

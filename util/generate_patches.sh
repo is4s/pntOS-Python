@@ -18,3 +18,4 @@ git diff --no-index apps/standard/gps_vel_ins.py apps/standard/posvel_ins.py > u
 git diff --no-index apps/standard/gps_ins.py apps/standard/outage_sim.py > util/app_outage_sim.patch
 git diff --no-index apps/standard/gps_ins.py apps/standard/gps_ins_vsb.py > util/app_gps_ins_vsb.patch
 git diff --no-index $standard_plugins_folder/controller/StandardControllerPlugin.py $advanced_plugins_folder/buscat/BuscatControllerPlugin.py > util/controller_buscat.patch
+git diff --no-index apps/standard/gps_ins.py apps/standard/direction_to_points.py > util/app_direction_to_points.patch
