@@ -27,6 +27,7 @@ first_app
 :caption: What is pntOS?
 introduction
 plugins
+add_processor
 ```
 
 ```{toctree}

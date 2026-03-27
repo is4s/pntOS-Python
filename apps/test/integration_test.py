@@ -382,3 +382,39 @@ def test_advanced_gps_ins_ros_app() -> None:
         OUTPUT_BAG,
         validate=True,
     )
+
+
+def test_standard_direction_to_points_app() -> None:
+    run_pntos_with_log_transport(
+        Path('apps/standard/direction_to_points.py'),
+        [OUTPUT_LOG.as_posix()],
+        validate=True,
+    )
+    log_data = read_pva(OUTPUT_LOG, read_all=True)
+    validate_results(
+        log_data.data[SOLUTION_CHANNEL],
+        log_data.data[TRUTH_CHANNEL],
+        num_points=2570,
+        pos_err_limits=ErrorLimits(
+            std_thresh=20.0,
+            max_thresh=200.0,
+            pct_below_1sigma=55,
+            pct_below_2sigma=85,
+            pct_below_3sigma=95,
+        ),
+        vel_err_limits=ErrorLimits(
+            std_thresh=1.0,
+            max_thresh=8.0,
+            pct_below_1sigma=55,
+            pct_below_2sigma=85,
+            pct_below_3sigma=95,
+        ),
+        tilt_err_limits=ErrorLimits(
+            std_thresh=0.6,
+            max_thresh=3.5,
+            pct_below_1sigma=55,
+            pct_below_2sigma=85,
+            pct_below_3sigma=95,
+        ),
+        expected_start_time_offset=10.0,
+    )

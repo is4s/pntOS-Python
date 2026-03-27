@@ -57,6 +57,9 @@ from .standard_plugins.state_modeling.ClockBiasStateBlock import (
 from .standard_plugins.state_modeling.ConstantStateBlock import (
     ConstantStateBlock as ConstantStateBlock,
 )
+from .standard_plugins.state_modeling.Direction3DToPointsMeasurementProcessor import (
+    Direction3DToPointsMeasurementProcessor as Direction3DToPointsMeasurementProcessor,
+)
 from .standard_plugins.state_modeling.FogmBlock import (
     FogmBlock as FogmBlock,
 )
