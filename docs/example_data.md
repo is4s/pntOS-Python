@@ -42,6 +42,12 @@ model:
   - Reference system (truth)
   - N/A
 
+* - `/sensor/simulated/directiontoknownfeature`
+  - 1
+  - `measurement_direction_3d_to_points`
+  - Simulated 3D direction to points
+  - N/A
+
 * - `/sensor/simulated/velocity`
   - 1
   - `measurement_velocity`
