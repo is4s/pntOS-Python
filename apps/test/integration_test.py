@@ -88,7 +88,7 @@ def validate_results(
     assert abs(filter_time[-1] - truth_time[-1]) < 3  # noqa: PLR2004
 
     # Interpolate truth onto solution times so that we can calculate the solution error
-    interp_truth_pva = interpolate_pva(pva, truth)
+    interp_truth_pva = interpolate_pva(pva.time, truth)
     ned_err = pva.ned - interp_truth_pva.ned
     vel_err = pva.vel - interp_truth_pva.vel
     rpy_rad = np.deg2rad(pva.rpy)
