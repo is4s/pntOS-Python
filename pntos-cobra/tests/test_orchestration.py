@@ -1,10 +1,14 @@
 import unittest
+from contextlib import redirect_stdout
 from copy import deepcopy
+from io import StringIO
 
 import numpy as np
 from aspn23 import (
     AspnBase,
     MeasurementAltitude,
+    MeasurementAltitudeErrorModel,
+    MeasurementAltitudeReference,
     MeasurementAngularVelocity,
     MeasurementHeading,
     MeasurementImu,
@@ -22,16 +26,24 @@ from aspn23 import (
 from navtk.navutils import rpy_to_quat
 from numpy import float64
 from pntos.api import (
+    CommonPlugin,
     EstimateWithCovariance,
     EstimateWithCovarianceType,
     FusionPlugin,
     FusionStrategyPlugin,
+    GenXandP,
     InertialPlugin,
     InitializationPlugin,
     InitializationStatus,
+    Mediator,
     Message,
-    OrchestrationPlugin,
+    StandardFusionEngine,
+    StandardMeasurementProcessor,
+    StandardStateBlock,
+    StandardStateModelProvider,
     StateModelingPlugin,
+    StateModelProviderType,
+    VirtualStateBlock,
 )
 from pntos.api.plugins.registry import RegistryPlugin
 from pntos.cobra import (
@@ -101,7 +113,7 @@ align_config = ManualAlignmentConfig(
     initial_time=0.0,
     initial_vel=(0.0, 0.0, 0.0),
 )
-C_imu_to_platform = ((1, 0, 0), (0, 1, 0), (0, 0, 1))
+C_imu_to_platform = ((1.0, 0.0, 0.0), (0.0, 1.0, 0.0), (0.0, 0.0, 1.0))
 inertial_config = InertialConfig(
     group='config/inertial',
     expected_dt=0.01,
@@ -205,6 +217,20 @@ standard_config = [
                 channel='/sensor/ublox-ZED-F9T/velocity',
                 state_block_labels=('pinson15',),
             ),
+            MeasurementProcessorConfig(
+                group='config/mock_mp1',
+                identifier='mock_mp',
+                label='mock_mp1',
+                state_block_labels=('mock_sb',),
+                channel='mock_channel',
+            ),
+            MeasurementProcessorConfig(
+                group='config/mock_mp2',
+                identifier='mock_mp',
+                label='mock_mp2',
+                state_block_labels=('mock_sb',),
+                channel='mock_channel',
+            ),
         ),
         vsb_configs=(
             VirtualStateBlockConfig(
@@ -243,7 +269,78 @@ orch_config.additional_sb_configs[0].estimate_with_covariance = EstimateWithCova
 )
 
 
+class MockMP(StandardMeasurementProcessor):
+    def __init__(self, label: str) -> None:
+        self.label = label
+        self.state_block_labels = []
+
+    def generate_model(self, message: Message, gen_x_and_p_func: GenXandP) -> None:
+        print(f'{self.label} received message')
+
+    def receive_aux_data(self, aux: list[Message | None]) -> None:
+        pass
+
+
+class MockStateModelProvider(StandardStateModelProvider):
+    def __init__(self) -> None:
+        self.block_identifiers = []
+        self.virtual_block_identifiers = []
+        self.processor_identifiers = ['mock_mp']
+
+    def new_processor(
+        self,
+        processor_index: int,
+        engine: StandardFusionEngine | None,
+        label: str,
+        state_block_labels: list[str],
+        config_group: str | None,
+    ) -> StandardMeasurementProcessor | None:
+        return MockMP(label)
+
+    def new_block(
+        self,
+        block_index: int,
+        engine: StandardFusionEngine | None,
+        label: str,
+        config_group: str | None,
+    ) -> StandardStateBlock | None:
+        return None
+
+    def new_virtual_block(
+        self,
+        virtual_block_index: int,
+        source_label: str,
+        target_label: str,
+        config_group: str | None,
+    ) -> VirtualStateBlock | None:
+        return None
+
+
+class MockStateModelingPlugin(StateModelingPlugin):
+    identifier = 'Mock State Modeling Plugin'
+
+    def init_plugin(
+        self,
+        plugin_resources_location: str | None = None,
+        mediator: Mediator | None = None,
+    ) -> None:
+        return
+
+    def shutdown_plugin(self) -> None:
+        return
+
+    def is_fusion_type_supported(self, type: type[StateModelProviderType]) -> bool:
+        return False
+
+    def new_state_model_provider(
+        self, type: type[StateModelProviderType]
+    ) -> StateModelProviderType | None:
+        return MockStateModelProvider()
+
+
 class Test_Orchestration(unittest.TestCase):
+    orchestration_plugin: TutorialGpsOrchestrationPlugin | StandardOrchestrationPlugin
+
     def __init__(self, name: str) -> None:
         super().__init__(name)
         self.message_types: list[type[AspnBase]] = [
@@ -282,7 +379,7 @@ class Test_Orchestration(unittest.TestCase):
             self.preprocessor_plugin,
         ]
 
-    def init_all_plugins(self, plugins) -> None:  # type: ignore[no-untyped-def]
+    def init_all_plugins(self, plugins: list[CommonPlugin]) -> None:
         mediator = StandardMediator(self.registry_plugin.identifier, RegistryPlugin)
         self.registry_plugin.init_plugin(mediator=mediator)
         registry = self.registry_plugin.new_registry()
@@ -294,14 +391,16 @@ class Test_Orchestration(unittest.TestCase):
 
     def set_up_tutorial_orchestration(self) -> None:
         plugins = self.instantiate_default_plugins(tutorial_config)
-        self.orchestration_plugin: OrchestrationPlugin = TutorialGpsOrchestrationPlugin(
+        self.orchestration_plugin = TutorialGpsOrchestrationPlugin(
             'TutorialGpsOrchestrationPlugin'
         )
         self.state_modeling_plugin: StateModelingPlugin = (
             TutorialGpsInsStateModelingPlugin('Cobra Tutorial State Modeling Plugin')
         )
+        self.mock_state_modeling_plugin = MockStateModelingPlugin()
         plugins.append(self.orchestration_plugin)
         plugins.append(self.state_modeling_plugin)
+        plugins.append(self.mock_state_modeling_plugin)
         self.init_all_plugins(plugins)
 
     def set_up_standard_orchestration(self) -> None:
@@ -312,8 +411,10 @@ class Test_Orchestration(unittest.TestCase):
         self.state_modeling_plugin = StandardGpsInsStateModelingPlugin(
             'Cobra Standard State Modeling Plugin'
         )
+        self.mock_state_modeling_plugin = MockStateModelingPlugin()
         plugins.append(self.orchestration_plugin)
         plugins.append(self.state_modeling_plugin)
+        plugins.append(self.mock_state_modeling_plugin)
         self.init_all_plugins(plugins)
 
     def set_up_manual_fogm_orchestration(self) -> None:
@@ -324,8 +425,10 @@ class Test_Orchestration(unittest.TestCase):
         self.state_modeling_plugin = StandardGpsInsStateModelingPlugin(
             'Cobra Standard State Modeling Plugin'
         )
+        self.mock_state_modeling_plugin = MockStateModelingPlugin()
         plugins.append(self.orchestration_plugin)
         plugins.append(self.state_modeling_plugin)
+        plugins.append(self.mock_state_modeling_plugin)
         self.init_all_plugins(plugins)
 
     @property
@@ -444,6 +547,7 @@ class Test_Orchestration(unittest.TestCase):
             self.initialization_plugin,
             self.state_modeling_plugin,
             self.preprocessor_plugin,
+            self.mock_state_modeling_plugin,
         ]
         self.orchestration_plugin.init_orchestration_plugin(plugins, stream_config)
         global EXPECTED_ERROR_MESSAGE, ALIGNMENT_STATE
@@ -510,6 +614,31 @@ class Test_Orchestration(unittest.TestCase):
 
         self.orchestration_plugin.process_pntos_message(message, False)
 
+    def test_one_channel_multiple_mps(self) -> None:
+        self.test_init_orchestration_plugin_standard()
+        message = Message(
+            MeasurementAltitude(
+                TypeHeader(0, 0, 0, 0),
+                TypeTimestamp(0),
+                MeasurementAltitudeReference.MSL,
+                100.0,
+                10.0,
+                MeasurementAltitudeErrorModel.NONE,
+                np.array([]),
+                [],
+            ),
+            'mock_channel',
+        )
+        f = StringIO()
+        with redirect_stdout(f):
+            self.orchestration_plugin.process_pntos_message(message, False)
+
+        output = f.getvalue().strip()
+        assert (
+            'mock_mp1 received message' in output
+            and 'mock_mp2 received message' in output
+        )
+
     def test_outage_filter_propagation(self) -> None:
         self.test_init_orchestration_plugin_standard()
         for i in range(
@@ -532,8 +661,8 @@ class Test_Orchestration(unittest.TestCase):
                 False,
             )
         assert (
-            self.orchestration_plugin.fusion_engine.time.elapsed_nsec  # type: ignore[attr-defined]
-            == self.orchestration_plugin.inertial_drift_prop_dt  # type: ignore[attr-defined]
+            self.orchestration_plugin.fusion_engine.time.elapsed_nsec
+            == self.orchestration_plugin.inertial_drift_prop_dt  # type: ignore[union-attr]
         )
 
     def test_process_pntos_message_alignment_tutorial(self) -> None:
