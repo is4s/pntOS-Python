@@ -76,7 +76,7 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
     initializer: InertialInitializationStrategy
     inertial: StandardInertialMechanization
     fusion_engine: StandardFusionEngine
-    measurement_channels: dict[str, str]
+    measurement_channels: dict[str, list[str]]
     pinson_sb_config: PinsonStateBlockConfig
     alignment_channels: tuple[str, ...]
     inertial_drift_prop_dt: int
@@ -513,7 +513,9 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
             for mp_config in mp_configs:
                 self._add_measurement_processor(providers, mp_config)
                 # Measurement Channels used in fusion engine
-                self.measurement_channels[mp_config.channel] = mp_config.label
+                if mp_config.channel not in self.measurement_channels:
+                    self.measurement_channels[mp_config.channel] = []
+                self.measurement_channels[mp_config.channel].append(mp_config.label)
 
         if vsb_configs is not None:
             for vsb_config in vsb_configs:
@@ -686,7 +688,7 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
         # cached solution
         self.cache.clear('inertial solution')
 
-    def _perform_measurement_update(self, message: Message) -> None:
+    def _perform_measurement_update(self, message: Message, target_mp: str) -> None:
         """
         Send message to the fusion engine to update the filter.
 
@@ -694,9 +696,8 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
         resets pinson error states.
         """
         # Make sure measurement processor has most current aux data before update
-        mp_label = self.measurement_channels[message.source_identifier]
-        self._send_inertial_aux_to_measurement_processor(mp_label)
-        self._send_inertial_aux_to_vsbs(mp_label)
+        self._send_inertial_aux_to_measurement_processor(target_mp)
+        self._send_inertial_aux_to_vsbs(target_mp)
 
         if self.publish_before_update:
             self._publish_solution(
@@ -711,7 +712,7 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
             )
 
         # Update filter.
-        self.fusion_engine.update(mp_label, message)
+        self.fusion_engine.update(target_mp, message)
 
         # Filter update modified the pinson states and filter solution at the current
         # time, invalidating the cached solution.
@@ -791,10 +792,11 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
             # If aligned, send messages to IMU or filter
             if channel in self.inertial_channels:
                 self.inertial.process_pntos_message(message)
-            elif channel in self.measurement_channels:
+            elif target_mps := self.measurement_channels.get(channel):
                 time = msg.wrapped_message.time_of_validity  # type: ignore[attr-defined]
                 self._propagate_to_time(time)
-                self._perform_measurement_update(msg)
+                for mp in target_mps:
+                    self._perform_measurement_update(msg, mp)
             # Send message to any MPs or SBs that require it as aux data
             if (
                 channel in self.sb_aux_channels
