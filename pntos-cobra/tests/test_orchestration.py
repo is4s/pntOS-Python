@@ -70,14 +70,11 @@ from pntos.cobra.config import (
     MeasurementProcessorConfig,
     PinsonStateBlockConfig,
     SensorConfig,
-    SensorMeasurementProcessorConfig,
     StandardOrchestrationConfig,
-    StateExtractorConfig,
     StaticAlignmentConfig,
     TimeAdjusterConfig,
     TimeBiasConfig,
     TutorialOrchestrationConfig,
-    VirtualStateBlockConfig,
 )
 from pntos.cobra.internal import StandardMediator, StandardMessageStreamConfig
 
@@ -197,26 +194,6 @@ standard_config = [
             ),
         ),
         mp_configs=(
-            SensorMeasurementProcessorConfig(
-                group='config/gps_measurement_processor',
-                identifier='pinson_with_ned_fogm_position',
-                label='gps',
-                channel=GPS_CHANNEL,
-                state_block_labels=('pinson15', 'pos_sensor_error'),
-                sensor_config=SensorConfig(
-                    group='config/gp3d_state_modeling',
-                    lever_arm=(-0.50, 0.38, -0.05),
-                    orientation=(0.0, 0.0, 0.0, 0.0),
-                    sensor_name='position',
-                ),
-            ),
-            MeasurementProcessorConfig(
-                group='config/vel_measurement_processor',
-                identifier='pinson_velocity',
-                label='vel',
-                channel='/sensor/ublox-ZED-F9T/velocity',
-                state_block_labels=('pinson15',),
-            ),
             MeasurementProcessorConfig(
                 group='config/mock_mp1',
                 identifier='mock_mp',
@@ -230,21 +207,6 @@ standard_config = [
                 label='mock_mp2',
                 state_block_labels=('mock_sb',),
                 channel='mock_channel',
-            ),
-        ),
-        vsb_configs=(
-            VirtualStateBlockConfig(
-                group='config/pes',
-                identifier='pinson_error_to_standard',
-                source='pinson15',
-                target='direct_pinson',
-            ),
-            StateExtractorConfig(
-                group='config/extractor',
-                source='pinson15',
-                target='pos_out',
-                incoming_state_size=15,
-                indices_to_extract=(0, 1, 2),
             ),
         ),
         inertial_config=inertial_config,
