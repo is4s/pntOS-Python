@@ -103,6 +103,7 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
         self.needs_inertial_f_and_r: dict[str, bool] = {}
         self.vsbs_needing_pva: dict[str, list[str]] = {}
         self.vsbs_needing_f_and_r: dict[str, list[str]] = {}
+        self.vsb_target_to_source: dict[str, str] = {}
 
     def init_plugin(
         self,
@@ -439,6 +440,7 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
 
                 self.needs_inertial_pva[vsb_config.target] = False
                 self.needs_inertial_f_and_r[vsb_config.target] = False
+                self.vsb_target_to_source[vsb_config.target] = vsb_config.source
                 if vsb_config.aux_channels is not None:
                     for channel in vsb_config.aux_channels:
                         vsb_map = self.vsb_aux_channels.setdefault(channel, [])
@@ -459,12 +461,24 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
         """
         for mp_config in mp_configs:
             sb_labels = mp_config.state_block_labels
-            needs_pva = [
-                label for label in sb_labels if self.needs_inertial_pva.get(label)
-            ]
-            needs_fnr = [
-                label for label in sb_labels if self.needs_inertial_f_and_r.get(label)
-            ]
+
+            needs_pva = []
+            needs_fnr = []
+            for label in sb_labels:
+                # Get VSBs that need inertial aux before performing an update with this
+                # MP. Note that this may not just include VSBs that the MP directly
+                # targets, but any VSB in a chain of source->target labels, where the MP
+                # updates the last VSB in this chain.
+                cur_vsb_label: str | None = label
+                while cur_vsb_label is not None:
+                    if self.needs_inertial_pva.get(cur_vsb_label):
+                        needs_pva.append(cur_vsb_label)
+                    if self.needs_inertial_f_and_r.get(cur_vsb_label):
+                        needs_fnr.append(cur_vsb_label)
+
+                    # Get source label
+                    cur_vsb_label = self.vsb_target_to_source.get(cur_vsb_label)
+
             self.vsbs_needing_pva[mp_config.label] = needs_pva
             self.vsbs_needing_f_and_r[mp_config.label] = needs_fnr
 
