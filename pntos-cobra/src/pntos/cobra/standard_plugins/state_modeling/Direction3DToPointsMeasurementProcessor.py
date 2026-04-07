@@ -103,7 +103,7 @@ class Direction3DToPointsMeasurementProcessor(StandardMeasurementProcessor):
 
         self._inertial_pva = pva
 
-    def generate_model(
+    def generate_model(  # noqa: PLR0915
         self, message: Message, gen_x_and_p_func: GenXandP
     ) -> StandardMeasurementModel | None:
         """
@@ -185,118 +185,94 @@ class Direction3DToPointsMeasurementProcessor(StandardMeasurementProcessor):
 
         l_s = self._l_ps_p.reshape(3, 1)  # Lever arm in body frame
 
-        z_list, H_list, R_list, nominal_delta_pos_ned_list = [], [], [], []
+        ewc = gen_x_and_p_func(self.state_block_labels)
+        if ewc is None:
+            return None
 
-        # Process all observations at current time
-        for obs in dir2known.obs:
-            feature_llh = np.array(
+        N = len(dir2known.obs)  # number of observations
+        num_states = ewc.estimate.shape[0]
+        H = np.zeros((N, 2, num_states))
+
+        # Nx3 array of locations of each feature
+        feature_llh = np.array(
+            [
                 [
                     obs.remote_point.position1,
                     obs.remote_point.position2,
                     obs.remote_point.position3,
                 ]
-            )
+                for obs in dir2known.obs
+            ]
+        )
+        # Nx2 array of direction observations to each feature
+        direction_obs = np.array([obs.obs for obs in dir2known.obs])
 
-            # Convert LLA difference to NED meters
-            delta_pos_ned = np.array(
-                [
-                    delta_lat_to_north(
-                        feature_llh[0] - inertial_llh[0],
-                        inertial_llh[0],
-                        inertial_llh[2],
-                    ),
-                    delta_lon_to_east(
-                        feature_llh[1] - inertial_llh[1],
-                        inertial_llh[0],
-                        inertial_llh[2],
-                    ),
-                    inertial_llh[2] - feature_llh[2],
-                ]
-            ).reshape(3, 1)
-            nominal_delta_pos_ned_list.append(delta_pos_ned)
+        # Convert LLA difference to NED meters
+        delta_pos = feature_llh - inertial_llh
+        delta_pos[:, 0] = delta_lat_to_north(
+            delta_pos[:, 0], inertial_llh[0], inertial_llh[2]
+        )
+        delta_pos[:, 1] = delta_lon_to_east(
+            delta_pos[:, 1], inertial_llh[0], inertial_llh[2]
+        )
+        delta_pos[:, 2] = -delta_pos[:, 2]
 
-            # Map to sensor frame
-            delta_pos_sensor = (
-                C_nav_to_sensor @ delta_pos_ned - C_platform_to_sensor @ l_s
-            )
-            u_nom = delta_pos_sensor / np.linalg.norm(delta_pos_sensor)
+        # Map to sensor frame
+        delta_pos_sensor = (delta_pos @ C_nav_to_sensor.T)[:, :, None] - (
+            C_platform_to_sensor @ l_s
+        )[None, :]
+        delta_pos_norm = np.linalg.norm(delta_pos_sensor, axis=1)[:, None, :]
+        u_nom: NDArray[float64] = delta_pos_sensor / delta_pos_norm
 
-            # Residual (Sine-Space Y, Z only)
-            z_list.append(
-                np.array([[obs.obs[0] - u_nom[1, 0]], [obs.obs[1] - u_nom[2, 0]]])
-            )
+        # Measured least squares residual (Sine-Space Y, Z only)
+        z = (direction_obs[:, :, None] - u_nom[:, 1:3]).reshape((N * 2, 1))
 
-            ewc = gen_x_and_p_func(self.state_block_labels)
-            if ewc is None:
-                return None
+        # N x 3 x 3 array of unit vector outer products
+        uuT = u_nom @ u_nom.transpose((0, 2, 1))
+        I3x3 = np.eye(3)
+        temp = ((I3x3 - uuT) / delta_pos_norm)[:, 1:3]
+        H[:, :, :3] = temp @ -C_nav_to_sensor  # Position error
+        H[:, :, 6:9] = temp @ (C_nav_to_sensor @ -skew(delta_pos))  # Tilt error
 
-            Hi = np.zeros((2, ewc.estimate.shape[0]))
-            Hi[:, 0:3] = (
-                (
-                    (np.eye(3) - np.outer(u_nom, u_nom))
-                    / np.linalg.norm(delta_pos_sensor)
-                )[1:3, :]
-            ) @ (-C_nav_to_sensor)  # Position error
-            Hi[:, 6:9] = (
-                (
-                    (np.eye(3) - np.outer(u_nom, u_nom))
-                    / np.linalg.norm(delta_pos_sensor)
-                )[1:3, :]
-            ) @ (C_nav_to_sensor @ -skew(delta_pos_ned.flatten()))  # Tilt error
-            H_list.append(Hi)
-
-            # Covariance
-            Ri = obs.covariance
-
-            # Add feature uncertainty if available
-            if obs.remote_point.position_covariance.size > 0:
-                R_feat_ned = np.array(obs.remote_point.position_covariance)
-                H_feat = (
-                    (
-                        (
-                            (np.eye(3) - np.outer(u_nom, u_nom))
-                            / np.linalg.norm(delta_pos_sensor)
-                        )[1:3, :]
-                    )
-                    @ C_nav_to_sensor
-                )
-
-                Ri += H_feat @ R_feat_ned @ H_feat.T
-
-            R_list.append(Ri)
-
-        z = np.vstack(z_list)
-        H = np.vstack(H_list)
+        # Covariance
+        R = np.array([obs.covariance for obs in dir2known.obs])  # Nx2x2
+        # Add feature uncertainty if available
+        feat_cov = np.array(
+            [
+                obs.remote_point.position_covariance
+                if obs.remote_point.position_covariance.size
+                else np.zeros((2, 2))
+                for obs in dir2known.obs
+            ]
+        )
+        H_slice = H[:, :, :3]
+        R += H_slice @ feat_cov @ H_slice.transpose((0, 2, 1))
 
         # Measurement Function
         def h(x: NDArray[np.float64]) -> NDArray[np.float64]:
             dpos_ned = x[0:3, 0].reshape(3, 1)
             dtheta_ned = x[6:9, 0]
 
-            h_evals = []
-            for delta_pos_ned_nom in nominal_delta_pos_ned_list:
-                # Predict perturbed unit vector
-                delta_pos_sensor_p = (
-                    C_nav_to_sensor
-                    @ ((np.eye(3) + skew(dtheta_ned)) @ (delta_pos_ned_nom - dpos_ned))
-                    - C_platform_to_sensor @ l_s
-                )
-                u_p = delta_pos_sensor_p / np.linalg.norm(delta_pos_sensor_p)
+            # Predict perturbed unit vector
+            delta_pos_sensor_p = (
+                C_nav_to_sensor
+                @ ((I3x3 + skew(dtheta_ned)) @ (delta_pos[:, :, None] - dpos_ned))
+                - C_platform_to_sensor @ l_s
+            )
+            norm_p = np.linalg.norm(delta_pos_sensor_p, axis=1)[:, None, :]
+            u_p = delta_pos_sensor_p / norm_p
 
-                # Predict nominal unit vector (no error)
-                delta_pos_sensor_n = (
-                    C_nav_to_sensor @ delta_pos_ned_nom - C_platform_to_sensor @ l_s
-                )
+            # Predict nominal unit vector (no error)
+            delta_pos_sensor_n = (
+                C_nav_to_sensor @ delta_pos[:, :, None] - C_platform_to_sensor @ l_s
+            )
+            norm_n = np.linalg.norm(delta_pos_sensor_n, axis=1)[:, None, :]
 
-                h_evals.append(
-                    u_p[1:3]
-                    - (delta_pos_sensor_n / np.linalg.norm(delta_pos_sensor_n))[1:3]
-                )
+            out: NDArray[float64] = u_p[:, 1:3] - (delta_pos_sensor_n / norm_n)[:, 1:3]
 
-            return np.vstack(h_evals)
+            return out.reshape(-1, 1)
 
-        R = scipy.linalg.block_diag(
-            *R_list
-        )  # stacked R matrices along the block diagonal to keep them independent (e.g. noise for feature A is independent of noise for feature B)
-
-        return StandardMeasurementModel(z, h, H, R)
+        # stacked R matrices along the block diagonal to keep them independent (e.g. noise for feature A is independent of noise for feature B)
+        return StandardMeasurementModel(
+            z, h, H.reshape(-1, num_states), scipy.linalg.block_diag(*R)
+        )

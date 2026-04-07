@@ -32,8 +32,16 @@ from navtk.navutils import (
     d_rpy_to_dcm_wrt_p,
     d_rpy_to_dcm_wrt_r,
     d_rpy_to_dcm_wrt_y,
+    delta_lat_to_north,
+    delta_lon_to_east,
+    east_to_delta_lon,
     hae_to_msl,
+    meridian_radius,
+    north_to_delta_lat,
+    quat_to_dcm,
     rpy_to_dcm,
+    skew,
+    transverse_radius,
 )
 from pntos.api import (
     EstimateWithCovariance,
@@ -73,17 +81,7 @@ from pntos.cobra.internal import (
     StandardMediator,
     StateExtractor,
 )
-from pntos.cobra.utils.navigation import (
-    OMEGA_E,
-    delta_lat_to_north,
-    delta_lon_to_east,
-    east_to_delta_lon,
-    meridian_radius,
-    north_to_delta_lat,
-    quat_to_dcm,
-    skew,
-    transverse_radius,
-)
+from pntos.cobra.utils import OMEGA_E
 
 _lever_arm = (-2.0, 3.0, 5.0)
 # _orientation = (0.707106781, 0.0, 0.707106781, 0.0)
@@ -1191,8 +1189,8 @@ def test_generate_model_direction3D_to_points(
     u_n = delta_pos_sensor_n / np.linalg.norm(delta_pos_sensor_n)
     exp_pred = u_p[1:3] - u_n[1:3]
     exp_R = direction3D_to_points.obs[0].covariance
-    assert np.array_equal(mm.H, exp_H)
-    assert np.array_equal(mm.R, exp_R)
+    assert np.allclose(mm.H, exp_H)
+    assert np.allclose(mm.R, exp_R)
     assert np.array_equal(mm.h(x_and_p.estimate).flatten(), exp_pred.flatten())
     assert np.allclose(mm.z, exp_z)
 
