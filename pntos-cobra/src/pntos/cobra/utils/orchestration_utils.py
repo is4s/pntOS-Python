@@ -9,6 +9,13 @@ from aspn23 import (
     TypeHeader,
     TypeTimestamp,
 )
+from navtk.navutils import (
+    correct_dcm_with_tilt,
+    dcm_to_quat,
+    east_to_delta_lon,
+    north_to_delta_lat,
+    quat_to_dcm,
+)
 from numpy import array, float64
 from numpy.typing import NDArray
 
@@ -23,14 +30,6 @@ from pntos.api import (
     Message,
     StandardFusionEngine,
     StandardInertialMechanization,
-)
-
-from .navigation import (
-    correct_dcm_with_tilt,
-    dcm_to_quat,
-    east_to_delta_lon,
-    north_to_delta_lat,
-    quat_to_dcm,
 )
 
 

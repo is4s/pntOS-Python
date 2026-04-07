@@ -11,6 +11,13 @@ from aspn23 import (
 )
 from aspn23_lcm import measurement_position_velocity_attitude
 from lcm import EventLog
+from navtk.navutils import (
+    calculate_gravity_schwartz,
+    dcm_to_rpy,
+    east_to_delta_lon,
+    north_to_delta_lat,
+    quat_to_dcm,
+)
 from numpy import array, eye, float64, pi, sin, zeros
 from numpy.typing import NDArray
 from pntos.api import (
@@ -31,13 +38,6 @@ from pntos.cobra import (
 from pntos.cobra.config import BaseConfig, FogmConfig, ImuConfig, SensorConfig
 from pntos.cobra.internal import StandardGpsInsStateModelProvider, StandardMediator
 from pntos.cobra.utils import decode_aspn_lcm_msg, marshal_from_lcm
-from pntos.cobra.utils.navigation import (
-    calculate_gravity_schwartz,
-    dcm_to_rpy,
-    east_to_delta_lon,
-    north_to_delta_lat,
-    quat_to_dcm,
-)
 
 
 def gen_msg(

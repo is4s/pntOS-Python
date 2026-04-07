@@ -1,4 +1,5 @@
 from math import atan2, cos, sin, sqrt
+from typing import TypeVar
 
 import numpy as np
 from aspn23 import MeasurementPositionVelocityAttitude as MeasurementPVA
@@ -7,13 +8,21 @@ from numpy.typing import NDArray
 
 
 def skew(angles: NDArray[float64]) -> NDArray[float64]:
-    return np.array(
-        [
-            [0, -angles[2], angles[1]],
-            [angles[2], 0, -angles[0]],
-            [-angles[1], angles[0], 0],
-        ]
-    )
+    single_input = angles.ndim == 1
+    if single_input:
+        angles = angles[None, :]  # convert 3-length vector to 1x3 matrix
+
+    N = angles.shape[0]
+    S = np.zeros((N, 3, 3))
+
+    S[:, 0, 1] = -angles[:, 2]
+    S[:, 0, 2] = angles[:, 1]
+    S[:, 1, 0] = angles[:, 2]
+    S[:, 1, 2] = -angles[:, 0]
+    S[:, 2, 0] = -angles[:, 1]
+    S[:, 2, 1] = angles[:, 0]
+
+    return S[0] if single_input else S
 
 
 def meridian_radius(lat: float) -> float:
@@ -28,25 +37,64 @@ def transverse_radius(lat: float) -> float:
     return float(RAD_E / pow(1 - ECC_SQUARE * sin_lat * sin_lat, 0.5))
 
 
-def delta_lat_to_north(delta_lat: float, approx_lat: float, altitude: float) -> float:
+T = TypeVar('T', NDArray[float64], float)
+
+
+def delta_lat_to_north(delta_lat: T, approx_lat: float, altitude: float) -> T:
+    """Convert delta-latitude in radians to north distance in meters.
+
+    Args:
+        delta_lat: A single delta-latitude or an N-length array of delta-latitudes
+        approx_lat: Approximate latitude at which to calculate conversion (radians)
+        altitude: Approximate altitude at which to calculate conversion (meters)
+
+    Returns:
+        N-length array of distances in the north direction.
+    """
     return (meridian_radius(approx_lat) + altitude) * delta_lat
 
 
-def delta_lon_to_east(delta_lon: float, approx_lat: float, altitude: float) -> float:
+def delta_lon_to_east(delta_lon: T, approx_lat: float, altitude: float) -> T:
+    """Convert delta-longitude in radians to east distance in meters.
+
+    Args:
+        delta_lon: A single delta-longitude or an N-length array of delta-longitudes
+        approx_lat: Approximate latitude at which to calculate conversion (radians)
+        altitude: Approximate altitude at which to calculate conversion (meters)
+
+    Returns:
+        A single east distance or an N-length array of distances in the east direction.
+    """
     return (transverse_radius(approx_lat) + altitude) * delta_lon * cos(approx_lat)
 
 
-def east_to_delta_lon(
-    east_distance: float, approx_lat: float, altitude: float
-) -> float:
+def east_to_delta_lon(east_distance: T, approx_lat: float, altitude: float) -> T:
+    """Convert east distance in meters to delta-longitude in radians.
+
+    Args:
+        east_distance: A single east distance or N-length array of east distances
+        approx_lat: Approximate latitude at which to calculate conversion (radians)
+        altitude: Approximate altitude at which to calculate conversion (meters)
+
+    Returns:
+        A single delta-longitude or an N-length array of delta-longitudes.
+    """
     return east_distance / (
         (transverse_radius(approx_lat) + altitude) * cos(approx_lat)
     )
 
 
-def north_to_delta_lat(
-    north_distance: float, approx_lat: float, altitude: float
-) -> float:
+def north_to_delta_lat(north_distance: T, approx_lat: float, altitude: float) -> T:
+    """Convert north distance in meters to delta-latitude in radians.
+
+    Args:
+        north_distance: A single north distance or an N-length array of north distances
+        approx_lat: Approximate latitude at which to calculate conversion (radians)
+        altitude: Approximate altitude at which to calculate conversion (meters)
+
+    Returns:
+        A single delta-latitude or an N-length array of delta-latitudes.
+    """
     return north_distance / (meridian_radius(approx_lat) + altitude)
 
 
