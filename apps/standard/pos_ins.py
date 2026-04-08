@@ -14,12 +14,12 @@ from pntos.cobra import (
     ManualHeadingAlignInitializationPlugin,
     StandardControllerPlugin,
     StandardFusionPlugin,
-    StandardGpsInsStateModelingPlugin,
     StandardInertialPlugin,
     StandardLoggingPlugin,
     StandardOrchestrationPlugin,
     StandardPreprocessorPlugin,
     StandardRegistryPlugin,
+    StandardStateModelingPlugin,
 )
 from pntos.cobra.config import (
     AspnVersion,
@@ -95,40 +95,18 @@ my_config = [
                     tau=(300.0, 300.0, 200.0),
                 ),
             ),
-            FogmStateBlockConfig(
-                group='config/lever_arm_fogm_block',
-                label='pos_sensor_lever_arm',
-                estimate_with_covariance=EstimateWithCovariance(
-                    type=EstimateWithCovarianceType.EWC_GENERIC,
-                    estimate=np.zeros((3,)),
-                    covariance=(np.eye(3) * 100.0),
-                ),
-                fogm_model=FogmConfig(
-                    group='config/pos_sensor_lever_arm',
-                    sigma=(2.0, 2.0, 2.0),
-                    tau=(1e5, 1e5, 1e5),
-                ),
-            ),
         ),
         mp_configs=(
             SensorMeasurementProcessorConfig(
-                group='config/gps_measurement_processor',
-                identifier='pinson_with_lever_arm_position',
-                label='gps',
+                group='config/pos_measurement_processor',
+                identifier='pinson_with_ned_fogm_position',
+                label='pos',
                 channel='/sensor/ublox-ZED-F9T/position',
-                state_block_labels=(
-                    'pinson15',
-                    'pos_sensor_error',
-                    'pos_sensor_lever_arm',
-                ),
+                state_block_labels=('pinson15', 'pos_sensor_error'),
                 aux_channels=('INERTIAL_PVA',),
                 sensor_config=SensorConfig(
                     group='config/gp3d_state_modeling',
-                    lever_arm=(
-                        -8.50,
-                        8.38,
-                        -8.05,
-                    ),  # Initial lever arm incorrect to demonstrate estimation
+                    lever_arm=(-0.50, 0.38, -0.05),
                     orientation=(0.0, 0.0, 0.0, 0.0),
                     sensor_name='position',
                 ),
@@ -176,7 +154,7 @@ plugins = [
     LcmLogTransportPlugin('Cobra LCM Log Transport Plugin'),
     EkfFusionStrategyPlugin('Cobra EKF Fusion Strategy Plugin'),
     StandardFusionPlugin('Cobra Standard Fusion Plugin'),
-    StandardGpsInsStateModelingPlugin('Cobra Standard State Modeling Plugin'),
+    StandardStateModelingPlugin('Cobra Standard State Modeling Plugin'),
     StandardInertialPlugin('Cobra Standard Inertial Plugin'),
     ManualHeadingAlignInitializationPlugin(
         'Cobra Manual Heading Static Align Initialization Plugin'

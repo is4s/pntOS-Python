@@ -33,14 +33,14 @@ add_processor
 ```{toctree}
 :caption: Tutorial Apps
 :name: tutorial-apps
-apps/gps_ins
-apps/gps_vel_ins
+apps/pos_ins
+apps/pos_vel_ins
 ```
 
 ```{toctree}
 :caption: Standard Apps
 :name: standard-apps
-apps/gps_ins_standard
+apps/pos_ins_standard
 apps/outage_sim
 ```
 
@@ -48,7 +48,7 @@ apps/outage_sim
 :caption: Advanced Apps
 :name: advanced-apps
 apps/advanced/buscat
-apps/advanced/gps_ins_ros
+apps/advanced/pos_ins_ros
 ```
 
 ```{toctree}

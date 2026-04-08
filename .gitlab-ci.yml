@@ -213,7 +213,7 @@ Dummy App:
         - docker exec pntos-python uv sync
         - docker exec pntos-python pytest apps -k test_dummy_app -s
 
-Tutorial GPS INS App:
+Tutorial POS INS App:
     stage: run
     needs: []
     tags:
@@ -221,9 +221,9 @@ Tutorial GPS INS App:
     script:
         - docker run --rm -dit -v $(pwd):/work -v $HOME/.ccache:/root/.cache/uv --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
         - docker exec pntos-python uv sync
-        - docker exec pntos-python pytest apps -k test_tutorial_gps_ins_app -s
+        - docker exec pntos-python pytest apps -k test_tutorial_pos_ins_app -s
 
-Tutorial GPS INS Velocity App:
+Tutorial POS INS Velocity App:
     stage: run
     needs: []
     tags:
@@ -231,9 +231,9 @@ Tutorial GPS INS Velocity App:
     script:
         - docker run --rm -dit -v $(pwd):/work --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
         - docker exec pntos-python uv sync -v
-        - docker exec pntos-python pytest apps -k test_tutorial_gps_ins_vel_app -s
+        - docker exec pntos-python pytest apps -k test_tutorial_pos_ins_vel_app -s
 
-Standard GPS INS App w/ Log-based Transport:
+Standard POS INS App w/ Log-based Transport:
     stage: run
     needs: []
     tags:
@@ -241,9 +241,9 @@ Standard GPS INS App w/ Log-based Transport:
     script:
         - docker run --rm -dit -v $(pwd):/work -v $HOME/.ccache:/root/.cache/uv --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
         - docker exec pntos-python uv sync
-        - docker exec pntos-python pytest apps -k test_standard_gps_ins_app -s
+        - docker exec pntos-python pytest apps -k test_standard_pos_ins_app -s
 
-Standard GPS INS App w/ Network-based Transport:
+Standard POS INS App w/ Network-based Transport:
     stage: run
     needs: []
     tags:
@@ -251,9 +251,9 @@ Standard GPS INS App w/ Network-based Transport:
     script:
         - docker run --rm -dit -v $(pwd):/work -v $HOME/.ccache:/root/.cache/uv --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
         - docker exec pntos-python uv sync
-        - docker exec pntos-python pytest apps -k test_standard_gps_ins_network_app -s
+        - docker exec pntos-python pytest apps -k test_standard_pos_ins_network_app -s
 
-Standard GPS INS Lever Arm App:
+Standard POS INS Lever Arm App:
     stage: run
     needs: []
     tags:
@@ -261,9 +261,9 @@ Standard GPS INS Lever Arm App:
     script:
         - docker run --rm -dit -v $(pwd):/work -v $HOME/.ccache:/root/.cache/uv --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
         - docker exec pntos-python uv sync
-        - docker exec pntos-python pytest apps -k test_standard_gps_ins_leverarm_app -s
+        - docker exec pntos-python pytest apps -k test_standard_pos_ins_leverarm_app -s
 
-Standard GPS INS Body Velocity App:
+Standard POS INS Body Velocity App:
     stage: run
     needs: []
     tags:
@@ -271,9 +271,9 @@ Standard GPS INS Body Velocity App:
     script:
         - docker run --rm -dit -v $(pwd):/work -v $HOME/.ccache:/root/.cache/uv --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
         - docker exec pntos-python uv sync
-        - docker exec pntos-python pytest apps -k test_standard_gps_bodyvel_ins_app -s
+        - docker exec pntos-python pytest apps -k test_standard_pos_bodyvel_ins_app -s
 
-Standard GPS INS NED Velocity App:
+Standard POS INS NED Velocity App:
     stage: run
     needs: []
     tags:
@@ -281,7 +281,7 @@ Standard GPS INS NED Velocity App:
     script:
         - docker run --rm -dit -v $(pwd):/work -v $HOME/.ccache:/root/.cache/uv --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
         - docker exec pntos-python uv sync
-        - docker exec pntos-python pytest apps -k test_standard_gps_ins_vel_app -s
+        - docker exec pntos-python pytest apps -k test_standard_pos_ins_vel_app -s
 
 Standard PosVel INS App:
     stage: run
@@ -303,7 +303,7 @@ Standard Direction3D To Points App:
         - docker exec pntos-python uv sync
         - docker exec pntos-python pytest apps -k test_standard_direction_to_points_app -s
 
-Standard GPS INS Outage App:
+Standard POS INS Outage App:
     stage: run
     needs: []
     tags:
@@ -313,7 +313,7 @@ Standard GPS INS Outage App:
         - docker exec pntos-python uv sync
         - docker exec pntos-python pytest apps -k test_standard_outage_sim_app -s
 
-Standard GPS INS VSB App:
+Standard POS INS VSB App:
     stage: run
     needs: []
     tags:
@@ -321,9 +321,9 @@ Standard GPS INS VSB App:
     script:
         - docker run --rm -dit -v $(pwd):/work -v $HOME/.ccache:/root/.cache/uv --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
         - docker exec pntos-python uv sync
-        - docker exec pntos-python pytest apps -k test_standard_gps_ins_vsb_app -s
+        - docker exec pntos-python pytest apps -k test_standard_pos_ins_vsb_app -s
 
-Advanced GPS INS ROS App:
+Advanced POS INS ROS App:
     stage: run
     needs: []
     tags:
@@ -336,7 +336,7 @@ Advanced GPS INS ROS App:
                                             git fetch --depth 1 origin $FIREHOSE_OUTPUTS_VERSION &&
                                             git checkout $FIREHOSE_OUTPUTS_VERSION"
         - docker exec pntos-python bash -c ". firehose-outputs/ros_devel/jazzy/setup.bash &&
-                                            pytest apps -k test_advanced_gps_ins_ros_app -s"
+                                            pytest apps -k test_advanced_pos_ins_ros_app -s"
 
 pip workflow check:
     stage: run
@@ -347,7 +347,7 @@ pip workflow check:
         - docker run --rm -dit -v $(pwd):/work -v $HOME/.ccache:/root/.cache/pip --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
         - docker exec pntos-python python3 -m venv /work/.venv
         - docker exec pntos-python .venv/bin/pip install -v -r requirements.txt --extra-index-url=${UV_INDEX}
-        - docker exec pntos-python postprocessing/run_app_and_record_data.py apps/standard/gps_ins.py
+        - docker exec pntos-python postprocessing/run_app_and_record_data.py apps/standard/pos_ins.py
 
 minimal pip workflow check:
     stage: check

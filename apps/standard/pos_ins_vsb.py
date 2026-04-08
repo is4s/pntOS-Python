@@ -14,12 +14,12 @@ from pntos.cobra import (
     ManualHeadingAlignInitializationPlugin,
     StandardControllerPlugin,
     StandardFusionPlugin,
-    StandardGpsInsStateModelingPlugin,
     StandardInertialPlugin,
     StandardLoggingPlugin,
     StandardOrchestrationPlugin,
     StandardPreprocessorPlugin,
     StandardRegistryPlugin,
+    StandardStateModelingPlugin,
 )
 from pntos.cobra.config import (
     AspnVersion,
@@ -37,6 +37,7 @@ from pntos.cobra.config import (
     StandardOrchestrationConfig,
     TimeAdjusterConfig,
     TimeBiasConfig,
+    VirtualStateBlockConfig,
 )
 from pntos_python_datasets import EXAMPLE_LCM_LOG
 
@@ -87,22 +88,24 @@ my_config = [
                 estimate_with_covariance=EstimateWithCovariance(
                     type=EstimateWithCovarianceType.EWC_GENERIC,
                     estimate=np.zeros((3,)),
-                    covariance=(np.eye(3) * 9.0),
+                    covariance=np.diag(
+                        [2.22e-13, 3.73e-13, 9.0]
+                    ),  # converted to radians-squared
                 ),
                 fogm_model=FogmConfig(
                     group='config/pos_sensor_error',
-                    sigma=(1.5, 1.5, 2.0),
+                    sigma=(2.515e-7, 3.259e-7, 2.0),  # converted to radians
                     tau=(300.0, 300.0, 200.0),
                 ),
             ),
         ),
         mp_configs=(
             SensorMeasurementProcessorConfig(
-                group='config/gps_measurement_processor',
-                identifier='pinson_with_ned_fogm_position',
-                label='gps',
+                group='config/position',
+                identifier='position',
+                label='pos',
                 channel='/sensor/ublox-ZED-F9T/position',
-                state_block_labels=('pinson15', 'pos_sensor_error'),
+                state_block_labels=('platform_pva', 'pos_sensor_error'),
                 aux_channels=('INERTIAL_PVA',),
                 sensor_config=SensorConfig(
                     group='config/gp3d_state_modeling',
@@ -110,6 +113,15 @@ my_config = [
                     orientation=(0.0, 0.0, 0.0, 0.0),
                     sensor_name='position',
                 ),
+            ),
+        ),
+        vsb_configs=(
+            VirtualStateBlockConfig(
+                group='config/pes',
+                identifier='pinson_error_to_standard',
+                source='pinson15',
+                target='platform_pva',
+                aux_channels=('INERTIAL_PVA',),
             ),
         ),
         inertial_config=InertialConfig(
@@ -154,7 +166,7 @@ plugins = [
     LcmLogTransportPlugin('Cobra LCM Log Transport Plugin'),
     EkfFusionStrategyPlugin('Cobra EKF Fusion Strategy Plugin'),
     StandardFusionPlugin('Cobra Standard Fusion Plugin'),
-    StandardGpsInsStateModelingPlugin('Cobra Standard State Modeling Plugin'),
+    StandardStateModelingPlugin('Cobra Standard State Modeling Plugin'),
     StandardInertialPlugin('Cobra Standard Inertial Plugin'),
     ManualHeadingAlignInitializationPlugin(
         'Cobra Manual Heading Static Align Initialization Plugin'

@@ -1,4 +1,4 @@
-# GPS INS App
+# POS INS App
 
 Welcome to the first of the {term}`Cobra` tutorial {term}`apps <App>`!
 
@@ -19,7 +19,7 @@ navigation systems with {term}`pntOS-Python` and {term}`Cobra`.
 ## App Walkthrough
 
 Let's walk through this first app piece by piece. You can find the first app file at
-[`pntos-python/apps/tutorial/gps_ins.py`](https://git.aspn.us/pntos/pntos-python/-/blob/main/apps/tutorial/gps_ins.py?ref_type=heads)
+[`pntos-python/apps/tutorial/pos_ins.py`](https://git.aspn.us/pntos/pntos-python/-/blob/main/apps/tutorial/pos_ins.py?ref_type=heads)
 to follow along. Let's get started by examining how you import elements from the `pntos` module.
 
 ### Imports
@@ -47,7 +47,7 @@ a plugin in an app.
 In this case, we need to import the {py:obj}`LoggingLevel <pntos.api.LoggingLevel>` enum
 from the API:
 
-```{literalinclude} ../../apps/tutorial/gps_ins.py
+```{literalinclude} ../../apps/tutorial/pos_ins.py
 :start-at: "from pntos.api import"
 :end-at: "from pntos.api import"
 :lineno-match:
@@ -56,7 +56,7 @@ from the API:
 This is used for initializing the global log level of the {py:obj}`StandardLoggingPlugin
 <pntos.cobra.StandardLoggingPlugin>` later in the app:
 
-```{literalinclude} ../../apps/tutorial/gps_ins.py
+```{literalinclude} ../../apps/tutorial/pos_ins.py
 :start-at: "StandardLoggingPlugin("
 :end-at: ")"
 :lineno-match:
@@ -69,7 +69,7 @@ This is used for initializing the global log level of the {py:obj}`StandardLoggi
 You should only see plugin imports from the top-level of [`pntos.cobra`](../autodocs/cobra_plugins.rst). For instance,
 check out where the app imports the following {term}`Cobra` plugins:
 
-```{literalinclude} ../../apps/tutorial/gps_ins.py
+```{literalinclude} ../../apps/tutorial/pos_ins.py
 :start-at: "from pntos.cobra import ("
 :end-at: ")"
 :lineno-match:
@@ -85,9 +85,9 @@ The
 [`pntos.cobra.config`](../autodocs/cobra_config.rst)
 submodule contains {term}`Cobra` config objects and a few utility functions relevant
 specifically to these config objects. We'll explore these more in the next section, but
-for now we need the following config objects for this GPS INS fusion app:
+for now we need the following config objects for this POS INS fusion app:
 
-```{literalinclude} ../../apps/tutorial/gps_ins.py
+```{literalinclude} ../../apps/tutorial/pos_ins.py
 :start-at: "from pntos.cobra.config import ("
 :end-at: ")"
 :lineno-match:
@@ -104,7 +104,7 @@ recorded, along with all input measurements. This log can then be used to analyz
 the solution. If this filename is not provided as a command-line argument, it defaults to
 `pntos_output.log`.
 
-```{literalinclude} ../../apps/tutorial/gps_ins.py
+```{literalinclude} ../../apps/tutorial/pos_ins.py
 :start-at: "from pntos_python_datasets"
 :end-at: "OUTPUT_LOG"
 :lineno-match:
@@ -143,7 +143,7 @@ The conventions also provide information on creating your own config dataclasses
 
 So, with that background, we can now understand what is happening next in the app:
 
-```{literalinclude} ../../apps/tutorial/gps_ins.py
+```{literalinclude} ../../apps/tutorial/pos_ins.py
 :start-at: "my_config"
 :end-at: "# End Config"
 :lineno-match:
@@ -192,7 +192,7 @@ Now we have everything we need to get our plugins running. All that's left is:
 
 We can instantiate our controller plugin like so:
 
-```{literalinclude} ../../apps/tutorial/gps_ins.py
+```{literalinclude} ../../apps/tutorial/pos_ins.py
 :start-at: "controller = "
 :end-before: "plugins = "
 :lineno-match:
@@ -202,7 +202,7 @@ We can instantiate our controller plugin like so:
 
 Next we can instantiate all the other plugins we want in this app and put them in a list:
 
-```{literalinclude} ../../apps/tutorial/gps_ins.py
+```{literalinclude} ../../apps/tutorial/pos_ins.py
 :start-at: "plugins = "
 :end-at: "]"
 :lineno-match:
@@ -227,7 +227,7 @@ start up the controller:
 
 #### 3. Call `init_plugin` on Controller
 
-```{literalinclude} ../../apps/tutorial/gps_ins.py
+```{literalinclude} ../../apps/tutorial/pos_ins.py
 :start-at: "controller.init_plugin()"
 :end-at: ")"
 :lineno-match:
@@ -252,7 +252,7 @@ After {py:obj}`controller.init_plugin() <pntos.api.CommonPlugin.init_plugin>`, w
 {py:obj}`controller.take_control(plugins) <pntos.api.ControllerPlugin.take_control>` to
 pass our list of plugins over to the controller. From there, the
 {py:obj}`StandardControllerPlugin <pntos.cobra.StandardControllerPlugin>` has control and
-our GPS INS fusion app is up and running!
+our POS INS fusion app is up and running!
 
 Congratulations, you've just walked through your first {term}`Cobra` app! In the next section
 we'll look at a top-level overview of what each of the plugins in this app are
@@ -268,12 +268,12 @@ this app:
 | {py:obj}`StandardControllerPlugin <pntos.cobra.StandardControllerPlugin>`                   | Sets up communication between plugins by calling {py:obj}`init_plugin() <pntos.api.CommonPlugin.init_plugin>` with a {py:obj}`Mediator <pntos.api.Mediator>` for each plugin, then calls {py:obj}`start_listening()<pntos.api.TransportPlugin.start_listening>` on the [transport plugin](../plugins/transport_plugin.md) to start feeding {py:obj}`Messages <pntos.api.Message>` into the system.                                                           | [](../plugins/controller_plugin.md)      |
 | {py:obj}`StandardLoggingPlugin <pntos.cobra.StandardLoggingPlugin>`                         | Prints {py:obj}`mediator.log_message() <pntos.api.Mediator.log_message>` calls from any other plugin to the terminal via the mediator.                                                                                                                                                                                                                                                                                                                       | [](../plugins/logging_plugin.md)         |
 | {py:obj}`StandardRegistryPlugin <pntos.cobra.StandardRegistryPlugin>`                       | A group-key-value store for data storage and communication between plugins within the app.                                                                                                                                                                                                                                                                                                                                                                   | [](../plugins/registry_plugin.md)        |
-| {py:obj}`TutorialGpsOrchestrationPlugin <pntos.cobra.TutorialGpsOrchestrationPlugin>`       | Assembles the {py:obj}`TutorialInitializationPlugin <pntos.cobra.TutorialInitializationPlugin>`, {py:obj}`StandardInertialPlugin <pntos.cobra.StandardInertialPlugin>`, {py:obj}`StandardFusionPlugin <pntos.cobra.StandardFusionPlugin>`, {py:obj}`EkfFusionStrategyPlugin <pntos.cobra.EkfFusionStrategyPlugin>`, and {py:obj}`TutorialGpsInsStateModelingPlugin <pntos.cobra.TutorialGpsInsStateModelingPlugin>` into a working GPS INS fusion algorithm. | [](../plugins/orchestration_plugin.md)   |
+| {py:obj}`TutorialPosOrchestrationPlugin <pntos.cobra.TutorialPosOrchestrationPlugin>`       | Assembles the {py:obj}`TutorialInitializationPlugin <pntos.cobra.TutorialInitializationPlugin>`, {py:obj}`StandardInertialPlugin <pntos.cobra.StandardInertialPlugin>`, {py:obj}`StandardFusionPlugin <pntos.cobra.StandardFusionPlugin>`, {py:obj}`EkfFusionStrategyPlugin <pntos.cobra.EkfFusionStrategyPlugin>`, and {py:obj}`TutorialPosInsStateModelingPlugin <pntos.cobra.TutorialPosInsStateModelingPlugin>` into a working POS INS fusion algorithm. | [](../plugins/orchestration_plugin.md)   |
 | {py:obj}`TutorialInitializationPlugin <pntos.cobra.TutorialInitializationPlugin>`       | Provides the {py:obj}`StandardInertialPlugin <pntos.cobra.StandardInertialPlugin>` with an initial {term}`PVA` solution according to the {py:obj}`ManualAlignmentConfig <pntos.cobra.config.ManualAlignmentConfig>` in the registry (see [](#config-setup) for more info on config in the registry).                                                                                                                                                         | [](../plugins/initialization_plugin.md)  |
 | {py:obj}`StandardInertialPlugin <pntos.cobra.StandardInertialPlugin>`                   | Performs the inertial mechanization on IMU measurements to provide the fusion engine with {term}`PVA` solutions from the IMU.                                                                                                                                                                                                                                                                                                                            | [](../plugins/inertial_plugin.md)        |
-| {py:obj}`StandardFusionPlugin <pntos.cobra.StandardFusionPlugin>`                           | Provides the fusion engine to the {py:obj}`TutorialGpsOrchestrationPlugin <pntos.cobra.TutorialGpsOrchestrationPlugin>`.                                                                                                                                                                                                                                                                                                                                           | [](../plugins/fusion_plugin.md)          |
+| {py:obj}`StandardFusionPlugin <pntos.cobra.StandardFusionPlugin>`                           | Provides the fusion engine to the {py:obj}`TutorialPosOrchestrationPlugin <pntos.cobra.TutorialPosOrchestrationPlugin>`.                                                                                                                                                                                                                                                                                                                                           | [](../plugins/fusion_plugin.md)          |
 | {py:obj}`EkfFusionStrategyPlugin <pntos.cobra.EkfFusionStrategyPlugin>`                 | Provides the fusion engine (from the {py:obj}`StandardFusionPlugin <pntos.cobra.StandardFusionPlugin>`) with a fusion strategy - in this case an [Extended Kalman Filter](https://en.wikipedia.org/wiki/Extended_Kalman_filter) (EKF).                                                                                                                                                                                                                       | [](../plugins/fusion_strategy_plugin.md) |
-| {py:obj}`TutorialGpsInsStateModelingPlugin <pntos.cobra.TutorialGpsInsStateModelingPlugin>` | Models the state of the filter with Pinson15 states by providing a {py:obj}`TutorialPinsonWithNedFogmPositionMeasurementProcessor <pntos.cobra.internal.TutorialPinsonWithNedFogmPositionMeasurementProcessor>`, a {py:obj}`TutorialPinson15NedBlock <pntos.cobra.internal.TutorialPinson15NedBlock>`, and a {py:obj}`TutorialFogmBlock<pntos.cobra.internal.TutorialFogmBlock>` to the fusion engine.                                                                                                                                                                                 | [](../plugins/state_modeling_plugin.md)  |
+| {py:obj}`TutorialPosInsStateModelingPlugin <pntos.cobra.TutorialPosInsStateModelingPlugin>` | Models the state of the filter with Pinson15 states by providing a {py:obj}`TutorialPinsonWithNedFogmPositionMeasurementProcessor <pntos.cobra.internal.TutorialPinsonWithNedFogmPositionMeasurementProcessor>`, a {py:obj}`TutorialPinson15NedBlock <pntos.cobra.internal.TutorialPinson15NedBlock>`, and a {py:obj}`TutorialFogmBlock<pntos.cobra.internal.TutorialFogmBlock>` to the fusion engine.                                                                                                                                                                                 | [](../plugins/state_modeling_plugin.md)  |
 | {py:obj}`LcmLogTransportPlugin <pntos.cobra.LcmLogTransportPlugin>`                           | Reads {term}`ASPN` messages from an {term}`LCM` log file and feeds these {term}`ASPN` messages into the app as pntOS {py:obj}`Message <pntos.api.Message>`s.                                                                                                                                                                                                                                                                                                              | [](../plugins/transport_plugin.md)       |
 | {py:obj}`UiLogPlottingPlugin <pntos.cobra.UiLogPlottingPlugin>`                           | Plots the results of the {term}`Cobra` {term}`PVA` solution against a truth PVA from an {term}`LCM` log file upon shutdown.                                                                                                                                                                                    | [](../plugins/ui_plugin.md) |
 

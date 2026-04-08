@@ -1,6 +1,6 @@
-diff --git a/apps/standard/gps_ins.py b/apps/standard/lcm_relay.py
-index 269e9cb8..18bdd771 100755
---- a/apps/standard/gps_ins.py
+diff --git a/apps/standard/pos_ins.py b/apps/standard/lcm_relay.py
+index 832536b2..9c77f43a 100755
+--- a/apps/standard/pos_ins.py
 +++ b/apps/standard/lcm_relay.py
 @@ -1,7 +1,5 @@
  #!/usr/bin/env python3
@@ -64,4 +64,4 @@ index 269e9cb8..18bdd771 100755
 +    LcmTransportPlugin('Cobra LCM Transport Plugin'),
      EkfFusionStrategyPlugin('Cobra EKF Fusion Strategy Plugin'),
      StandardFusionPlugin('Cobra Standard Fusion Plugin'),
-     StandardGpsInsStateModelingPlugin('Cobra Standard State Modeling Plugin'),
+     StandardStateModelingPlugin('Cobra Standard State Modeling Plugin'),

@@ -222,9 +222,9 @@ class TestConfigUtils(unittest.TestCase):
             ),
             mp_configs=(
                 SensorMeasurementProcessorConfig(
-                    group='config/gps_measurement_processor',
+                    group='config/pos_measurement_processor',
                     identifier='pinson_with_ned_fogm_position',
-                    label='gps',
+                    label='pos',
                     channel='/sensor/ublox-ZED-F9T/position',
                     state_block_labels=('pinson15', 'pos_sensor_error'),
                     sensor_config=SensorConfig(

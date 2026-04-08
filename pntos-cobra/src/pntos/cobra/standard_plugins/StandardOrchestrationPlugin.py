@@ -826,7 +826,7 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
     def filter_description_list(self) -> list[str]:
         descriptions = []
         aspn_pva = 'ASPN_MEASUREMENT_POSITION_VELOCITY_ATTITUDE_ESTIMATE'
-        for label in ['GPS_INS']:
+        for label in ['POS_INS']:
             for solution_type in ['BEST', 'DEAD_RECKONING']:
                 descriptions += [f'{label}_{solution_type}_{aspn_pva}']
 

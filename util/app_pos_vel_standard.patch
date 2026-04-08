@@ -1,7 +1,7 @@
-diff --git a/apps/standard/gps_ins.py b/apps/standard/gps_vel_ins.py
-index 269e9cb8..fa9ddd88 100755
---- a/apps/standard/gps_ins.py
-+++ b/apps/standard/gps_vel_ins.py
+diff --git a/apps/standard/pos_ins.py b/apps/standard/pos_vel_ins.py
+index 832536b2..f7e44402 100755
+--- a/apps/standard/pos_ins.py
++++ b/apps/standard/pos_vel_ins.py
 @@ -1,5 +1,12 @@
  #!/usr/bin/env python3
  
@@ -34,10 +34,10 @@ index 269e9cb8..fa9ddd88 100755
 @@ -99,10 +108,10 @@ my_config = [
          mp_configs=(
              SensorMeasurementProcessorConfig(
-                 group='config/gps_measurement_processor',
+                 group='config/pos_measurement_processor',
 -                identifier='pinson_with_ned_fogm_position',
 +                identifier='pinson_position',
-                 label='gps',
+                 label='pos',
                  channel='/sensor/ublox-ZED-F9T/position',
 -                state_block_labels=('pinson15', 'pos_sensor_error'),
 +                state_block_labels=('pinson15',),

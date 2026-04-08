@@ -133,11 +133,11 @@ disable_error_code = [ "import-untyped", "no-untyped-call" ]
 warn_unreachable = true
 
 [[tool.mypy.overrides]]
-module = "pntos.cobra.tutorial_plugins.TutorialGpsOrchestrationPlugin"
+module = "pntos.cobra.tutorial_plugins.TutorialPosOrchestrationPlugin"
 ignore_errors = true
 
 [[tool.mypy.overrides]]
-module = "pntos.cobra.tutorial_plugins.TutorialGpsVelOrchestrationPlugin"
+module = "pntos.cobra.tutorial_plugins.TutorialPosVelOrchestrationPlugin"
 ignore_errors = true
 
 [[tool.mypy.overrides]]

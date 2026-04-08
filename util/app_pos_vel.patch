@@ -1,19 +1,19 @@
-diff --git a/apps/tutorial/gps_ins.py b/apps/tutorial/gps_vel_ins.py
-index 933b9c86..c90f958e 100755
---- a/apps/tutorial/gps_ins.py
-+++ b/apps/tutorial/gps_vel_ins.py
-@@ -16,7 +16,7 @@ from pntos.cobra import (
-     StandardPreprocessorPlugin,
+diff --git a/apps/tutorial/pos_ins.py b/apps/tutorial/pos_vel_ins.py
+index f1ef424a..50fd9f1e 100755
+--- a/apps/tutorial/pos_ins.py
++++ b/apps/tutorial/pos_vel_ins.py
+@@ -17,7 +17,7 @@ from pntos.cobra import (
      StandardRegistryPlugin,
-     TutorialGpsInsStateModelingPlugin,
--    TutorialGpsOrchestrationPlugin,
-+    TutorialGpsVelOrchestrationPlugin,
      TutorialInitializationPlugin,
+     TutorialPosInsStateModelingPlugin,
+-    TutorialPosOrchestrationPlugin,
++    TutorialPosVelOrchestrationPlugin,
      UiLogPlottingPlugin,
  )
+ from pntos.cobra.config import (
 @@ -101,6 +101,7 @@ my_config = [
      TutorialOrchestrationConfig(
-         gps_channel='/sensor/ublox-ZED-F9T/position',
+         position_channel='/sensor/ublox-ZED-F9T/position',
          group='config/orchestration',
 +        velocity_channel='/sensor/ublox-ZED-F9T/velocity',
      ),
@@ -35,8 +35,8 @@ index 933b9c86..c90f958e 100755
      StandardRegistryPlugin('Cobra Standard Registry Plugin', config=my_config),
      StandardPreprocessorPlugin('Cobra Standard Preprocessor Plugin'),
      UiLogPlottingPlugin('Cobra UI Logfile Plotting Plugin'),
--    TutorialGpsOrchestrationPlugin('Cobra Tutorial Orchestration Plugin'),
-+    TutorialGpsVelOrchestrationPlugin('Cobra Tutorial Orchestration Plugin'),
+-    TutorialPosOrchestrationPlugin('Cobra Tutorial Orchestration Plugin'),
++    TutorialPosVelOrchestrationPlugin('Cobra Tutorial Orchestration Plugin'),
  ]
  
  # Start the controller, and pass it all of the other plugins to use

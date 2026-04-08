@@ -1,25 +1,25 @@
-diff --git a/pntos-cobra/src/pntos/cobra/tutorial_plugins/TutorialGpsOrchestrationPlugin.py b/pntos-cobra/src/pntos/cobra/tutorial_plugins/TutorialGpsVelOrchestrationPlugin.py
-index daacfda5..fe94533c 100644
---- a/pntos-cobra/src/pntos/cobra/tutorial_plugins/TutorialGpsOrchestrationPlugin.py
-+++ b/pntos-cobra/src/pntos/cobra/tutorial_plugins/TutorialGpsVelOrchestrationPlugin.py
+diff --git a/pntos-cobra/src/pntos/cobra/tutorial_plugins/TutorialPosOrchestrationPlugin.py b/pntos-cobra/src/pntos/cobra/tutorial_plugins/TutorialPosVelOrchestrationPlugin.py
+index 99711bd3..3f818ed1 100644
+--- a/pntos-cobra/src/pntos/cobra/tutorial_plugins/TutorialPosOrchestrationPlugin.py
++++ b/pntos-cobra/src/pntos/cobra/tutorial_plugins/TutorialPosVelOrchestrationPlugin.py
 @@ -31,7 +31,7 @@ from pntos.cobra.config import (
  from pntos.cobra.utils import apply_error_states
  
  
--class TutorialGpsOrchestrationPlugin(OrchestrationPlugin):
-+class TutorialGpsVelOrchestrationPlugin(OrchestrationPlugin):
+-class TutorialPosOrchestrationPlugin(OrchestrationPlugin):
++class TutorialPosVelOrchestrationPlugin(OrchestrationPlugin):
      fusion_plugin: FusionPlugin
      fusion_strategy_plugin: FusionStrategyPlugin
      inertial_plugin: InertialPlugin
-@@ -92,6 +92,7 @@ class TutorialGpsOrchestrationPlugin(OrchestrationPlugin):
+@@ -92,6 +92,7 @@ class TutorialPosOrchestrationPlugin(OrchestrationPlugin):
          # Associate incoming channels with measurement processor labels
          self.measurement_channels = {
-             orch_config.gps_channel: 'gps',
+             orch_config.position_channel: 'pos',
 +            orch_config.velocity_channel: 'vel',
          }
  
          inertial_config = config_from_registry(
-@@ -248,6 +249,17 @@ class TutorialGpsOrchestrationPlugin(OrchestrationPlugin):
+@@ -248,6 +249,17 @@ class TutorialPosOrchestrationPlugin(OrchestrationPlugin):
  
          fusion_engine.add_measurement_processor(processor=processor)
  

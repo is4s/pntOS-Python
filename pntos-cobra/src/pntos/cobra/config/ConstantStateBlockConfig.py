@@ -8,7 +8,7 @@ from .OrchestrationConfig import StateBlockConfig
 @dataclass(kw_only=True)
 class ConstantStateBlockConfig(StateBlockConfig):
     """
-    Configuration for the ConstantStateBlock, provided by GpsInsStateModelingPlugin.
+    Configuration for the ConstantStateBlock, provided by StandardStateModelingPlugin.
 
     Attributes:
         group (str):

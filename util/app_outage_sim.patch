@@ -1,6 +1,6 @@
-diff --git a/apps/standard/gps_ins.py b/apps/standard/outage_sim.py
-index 269e9cb8..b32cb13f 100755
---- a/apps/standard/gps_ins.py
+diff --git a/apps/standard/pos_ins.py b/apps/standard/outage_sim.py
+index 832536b2..160c87ad 100755
+--- a/apps/standard/pos_ins.py
 +++ b/apps/standard/outage_sim.py
 @@ -23,6 +23,7 @@ from pntos.cobra import (
  )
@@ -95,7 +95,7 @@ index 269e9cb8..b32cb13f 100755
 +                alt_sigma=30.0,
 +            ),
 +            OutageConfig(
-+                group='config/gps_outage',
++                group='config/pos_outage',
 +                channel='/sensor/ublox-ZED-F9T/position',
 +                start_time=1000.0,
 +                end_time=1600.0,

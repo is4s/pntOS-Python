@@ -50,15 +50,15 @@ from pntos.api.plugins.registry import RegistryPlugin
 from pntos.cobra import (
     EkfFusionStrategyPlugin,
     StandardFusionPlugin,
-    StandardGpsInsStateModelingPlugin,
     StandardInertialPlugin,
     StandardOrchestrationPlugin,
     StandardPreprocessorPlugin,
     StandardRegistryPlugin,
+    StandardStateModelingPlugin,
     StaticAlignInitializationPlugin,
-    TutorialGpsInsStateModelingPlugin,
-    TutorialGpsOrchestrationPlugin,
     TutorialInitializationPlugin,
+    TutorialPosInsStateModelingPlugin,
+    TutorialPosOrchestrationPlugin,
 )
 from pntos.cobra.config import (
     ControllerConfig,
@@ -92,7 +92,7 @@ IMU_SOL_CHANNEL = '/solution/pntos-imu/pva'
 
 # Sensor input channels
 IMU_CHANNEL = '/sensor/vn-100/imu'
-GPS_CHANNEL = '/sensor/ublox-ZED-F9T/position'
+POS_CHANNEL = '/sensor/ublox-ZED-F9T/position'
 
 align_config = ManualAlignmentConfig(
     group='config/default/alignment',
@@ -145,7 +145,7 @@ tutorial_config = [
         tau=(300.0, 300.0, 200.0),
     ),
     TutorialOrchestrationConfig(
-        gps_channel=GPS_CHANNEL,
+        position_channel=POS_CHANNEL,
         group='config/orchestration',
     ),
     TimeAdjusterConfig(
@@ -173,7 +173,7 @@ standard_config = [
     StandardOrchestrationConfig(
         best_sol_channel=BEST_SOL_CHANNEL,
         imu_sol_channel=IMU_SOL_CHANNEL,
-        alignment_channels=(GPS_CHANNEL, IMU_CHANNEL),
+        alignment_channels=(POS_CHANNEL, IMU_CHANNEL),
         pinson_sb_config=PinsonStateBlockConfig(
             group='config/pinson_block',
             label='pinson15',
@@ -344,7 +344,7 @@ class MockStateModelingPlugin(StateModelingPlugin):
 
 
 class Test_Orchestration(unittest.TestCase):
-    orchestration_plugin: TutorialGpsOrchestrationPlugin | StandardOrchestrationPlugin
+    orchestration_plugin: TutorialPosOrchestrationPlugin | StandardOrchestrationPlugin
 
     def __init__(self, name: str) -> None:
         super().__init__(name)
@@ -396,11 +396,11 @@ class Test_Orchestration(unittest.TestCase):
 
     def set_up_tutorial_orchestration(self) -> None:
         plugins = self.instantiate_default_plugins(tutorial_config)
-        self.orchestration_plugin = TutorialGpsOrchestrationPlugin(
-            'TutorialGpsOrchestrationPlugin'
+        self.orchestration_plugin = TutorialPosOrchestrationPlugin(
+            'TutorialPosOrchestrationPlugin'
         )
         self.state_modeling_plugin: StateModelingPlugin = (
-            TutorialGpsInsStateModelingPlugin('Cobra Tutorial State Modeling Plugin')
+            TutorialPosInsStateModelingPlugin('Cobra Tutorial State Modeling Plugin')
         )
         self.mock_state_modeling_plugin = MockStateModelingPlugin()
         plugins.append(self.orchestration_plugin)
@@ -413,7 +413,7 @@ class Test_Orchestration(unittest.TestCase):
         self.orchestration_plugin = StandardOrchestrationPlugin(
             'StandardOrchestrationPlugin'
         )
-        self.state_modeling_plugin = StandardGpsInsStateModelingPlugin(
+        self.state_modeling_plugin = StandardStateModelingPlugin(
             'Cobra Standard State Modeling Plugin'
         )
         self.mock_state_modeling_plugin = MockStateModelingPlugin()
@@ -427,7 +427,7 @@ class Test_Orchestration(unittest.TestCase):
         self.orchestration_plugin = StandardOrchestrationPlugin(
             'StandardOrchestrationPlugin'
         )
-        self.state_modeling_plugin = StandardGpsInsStateModelingPlugin(
+        self.state_modeling_plugin = StandardStateModelingPlugin(
             'Cobra Standard State Modeling Plugin'
         )
         self.mock_state_modeling_plugin = MockStateModelingPlugin()
@@ -727,7 +727,7 @@ class Test_Orchestration(unittest.TestCase):
 
         self.orchestration_plugin.process_pntos_message(imu_message, False)
 
-        pva_message = self.generate_pva_message(source_identifier=GPS_CHANNEL)
+        pva_message = self.generate_pva_message(source_identifier=POS_CHANNEL)
 
         self.orchestration_plugin.process_pntos_message(pva_message, False)
 
@@ -738,7 +738,7 @@ class Test_Orchestration(unittest.TestCase):
 
         self.orchestration_plugin.process_pntos_message(imu_message, False)
 
-        pva_message = self.generate_pva_message(source_identifier=GPS_CHANNEL)
+        pva_message = self.generate_pva_message(source_identifier=POS_CHANNEL)
 
         self.orchestration_plugin.process_pntos_message(pva_message, False)
 
@@ -746,7 +746,7 @@ class Test_Orchestration(unittest.TestCase):
         self.test_init_orchestration_plugin_tutorial()  # To get past init_orchestration_plugin()
         filter_description_list = self.orchestration_plugin.filter_description_list
         expected_filter_description_list = [
-            'GPS_INS_BEST_ASPN_MEASUREMENT_POSITION_VELOCITY_ATTITUDE_ESTIMATE',
+            'POS_INS_BEST_ASPN_MEASUREMENT_POSITION_VELOCITY_ATTITUDE_ESTIMATE',
         ]
         assert filter_description_list == expected_filter_description_list
 
@@ -754,8 +754,8 @@ class Test_Orchestration(unittest.TestCase):
         self.test_init_orchestration_plugin_standard()  # To get past init_orchestration_plugin()
         filter_description_list = self.orchestration_plugin.filter_description_list
         expected_filter_description_list = [
-            'GPS_INS_BEST_ASPN_MEASUREMENT_POSITION_VELOCITY_ATTITUDE_ESTIMATE',
-            'GPS_INS_DEAD_RECKONING_ASPN_MEASUREMENT_POSITION_VELOCITY_ATTITUDE_ESTIMATE',
+            'POS_INS_BEST_ASPN_MEASUREMENT_POSITION_VELOCITY_ATTITUDE_ESTIMATE',
+            'POS_INS_DEAD_RECKONING_ASPN_MEASUREMENT_POSITION_VELOCITY_ATTITUDE_ESTIMATE',
         ]
         assert filter_description_list == expected_filter_description_list
 
@@ -804,7 +804,7 @@ class Test_Orchestration(unittest.TestCase):
         solution_times = [TypeTimestamp(100)]
         descriptions = self.orchestration_plugin.filter_description_list
         expected_descriptions = [
-            'GPS_INS_BEST_ASPN_MEASUREMENT_POSITION_VELOCITY_ATTITUDE_ESTIMATE',
+            'POS_INS_BEST_ASPN_MEASUREMENT_POSITION_VELOCITY_ATTITUDE_ESTIMATE',
         ]
         expected_solutions = [self.expected_pva_best]
         assert descriptions == expected_descriptions
@@ -821,8 +821,8 @@ class Test_Orchestration(unittest.TestCase):
         solution_times = [TypeTimestamp(0)]
         descriptions = self.orchestration_plugin.filter_description_list
         expected_descriptions = [
-            'GPS_INS_BEST_ASPN_MEASUREMENT_POSITION_VELOCITY_ATTITUDE_ESTIMATE',
-            'GPS_INS_DEAD_RECKONING_ASPN_MEASUREMENT_POSITION_VELOCITY_ATTITUDE_ESTIMATE',
+            'POS_INS_BEST_ASPN_MEASUREMENT_POSITION_VELOCITY_ATTITUDE_ESTIMATE',
+            'POS_INS_DEAD_RECKONING_ASPN_MEASUREMENT_POSITION_VELOCITY_ATTITUDE_ESTIMATE',
         ]
         expected_solutions = [self.expected_pva_best, self.expected_pva_dead_reckoning]
         assert descriptions == expected_descriptions
@@ -847,7 +847,7 @@ class Test_Orchestration(unittest.TestCase):
             np.array([]),
             [],
         )
-        return Message(position, GPS_CHANNEL)
+        return Message(position, POS_CHANNEL)
 
     def generate_imu(self, time: TypeTimestamp) -> Message:
         dt = 1e-2  # 100Hz
@@ -879,7 +879,7 @@ class Test_Orchestration(unittest.TestCase):
         self.orchestration_plugin = StandardOrchestrationPlugin(
             'StandardOrchestrationPlugin'
         )
-        self.state_modeling_plugin = StandardGpsInsStateModelingPlugin(
+        self.state_modeling_plugin = StandardStateModelingPlugin(
             'Cobra Standard State Modeling Plugin'
         )
         plugins.append(self.orchestration_plugin)
