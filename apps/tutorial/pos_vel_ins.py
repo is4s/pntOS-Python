@@ -15,9 +15,9 @@ from pntos.cobra import (
     StandardLoggingPlugin,
     StandardPreprocessorPlugin,
     StandardRegistryPlugin,
-    TutorialGpsInsStateModelingPlugin,
-    TutorialGpsOrchestrationPlugin,
     TutorialInitializationPlugin,
+    TutorialPosInsStateModelingPlugin,
+    TutorialPosVelOrchestrationPlugin,
     UiLogPlottingPlugin,
 )
 from pntos.cobra.config import (
@@ -99,8 +99,9 @@ my_config = [
         tau=(300.0, 300.0, 200.0),
     ),
     TutorialOrchestrationConfig(
-        gps_channel='/sensor/ublox-ZED-F9T/position',
+        position_channel='/sensor/ublox-ZED-F9T/position',
         group='config/orchestration',
+        velocity_channel='/sensor/ublox-ZED-F9T/velocity',
     ),
     TimeAdjusterConfig(
         group='config/time_adjuster',
@@ -120,7 +121,10 @@ my_config = [
     ),
     TimeBiasConfig(
         group='config/time_bias',
-        channels_to_correct=('/sensor/ublox-ZED-F9T/position',),
+        channels_to_correct=(
+            '/sensor/ublox-ZED-F9T/position',
+            '/sensor/ublox-ZED-F9T/velocity',
+        ),
         time_bias=int(0.15 * 1e9),
     ),
 ]
@@ -132,7 +136,7 @@ plugins = [
     LcmLogTransportPlugin('Cobra LCM Log Transport Plugin'),
     EkfFusionStrategyPlugin('Cobra EKF Fusion Strategy Plugin'),
     StandardFusionPlugin('Cobra Standard Fusion Plugin'),
-    TutorialGpsInsStateModelingPlugin('Cobra Tutorial State Modeling Plugin'),
+    TutorialPosInsStateModelingPlugin('Cobra Tutorial State Modeling Plugin'),
     StandardInertialPlugin('Cobra Standard Inertial Plugin'),
     TutorialInitializationPlugin('Cobra Manual Initialization Plugin'),
     StandardLoggingPlugin(
@@ -142,7 +146,7 @@ plugins = [
     StandardRegistryPlugin('Cobra Standard Registry Plugin', config=my_config),
     StandardPreprocessorPlugin('Cobra Standard Preprocessor Plugin'),
     UiLogPlottingPlugin('Cobra UI Logfile Plotting Plugin'),
-    TutorialGpsOrchestrationPlugin('Cobra Tutorial Orchestration Plugin'),
+    TutorialPosVelOrchestrationPlugin('Cobra Tutorial Orchestration Plugin'),
 ]
 
 # Start the controller, and pass it all of the other plugins to use

@@ -17,15 +17,15 @@ Measurement processors are structured to be Python classes that bring in several
 
 A few changes need to be made to the `generate_model` function in your file. Along with various print statements that you can update, this function contains the measurement model for your specific measurement processor. Once you complete a measurement processor that returns the z, h, H, and R model variables, you can move on to the next step.
 
-## StandardGpsInsStateModelingPlugin
+## StandardStateModelingPlugin
 
-Another change in the `pntos-cobra/src/pntos/cobra/standard_plugins/state_modeling` directory that needs to occur is the addition of your new processor to the `StandardGpsInsStateModelingPlugin.py` file. The specific changes are pretty simple because adding your processor can be done by following the format for the processors that are already present. But, the specific additions are below if needed.
+Another change in the `pntos-cobra/src/pntos/cobra/standard_plugins/state_modeling` directory that needs to occur is the addition of your new processor to the `StandardStateModelingPlugin.py` file. The specific changes are pretty simple because adding your processor can be done by following the format for the processors that are already present. But, the specific additions are below if needed.
 
-### Additions to StandardGpsInsStateModelingPlugin
+### Additions to StandardStateModelingPlugin
 
 First, you will need to import the measurement processor file that you just made. 
 
-Then, you can add an identifier of your choosing to the list of identifiers in the `StandardGpsInsStateModelProvider` class constructor in the `processor_identifiers` list. The identifier you choose will be used in your {term}`app
+Then, you can add an identifier of your choosing to the list of identifiers in the `StandardStateModelProvider` class constructor in the `processor_identifiers` list. The identifier you choose will be used in your {term}`app
 <App>` for the sensor measurement processor config. 
 
 Then, you can add your processor to the type hint return list in the `new_processor` function. 

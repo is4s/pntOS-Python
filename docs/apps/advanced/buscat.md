@@ -68,8 +68,8 @@ Now that we have our config set up in `my_config`, let's look at instantiating o
 
 ### Instantiate Plugins
 
-The steps for instantiating plugins is the same as described in the [GPS INS
-App](../gps_ins.md#instantiate-plugins); however, this time, we are instantiating the
+The steps for instantiating plugins is the same as described in the [POS INS
+App](../pos_ins.md#instantiate-plugins); however, this time, we are instantiating the
 {py:obj}`BuscatControllerPlugin<pntos.cobra.BuscatControllerPlugin>` and a shorter list of plugins.
 
 #### 1. Instantiate Controller Plugin

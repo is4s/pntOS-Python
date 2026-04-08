@@ -5,7 +5,7 @@
 Note: This app uses a simpler position measurement model than some of the other apps.
 Thus, the filter solution is less accurate than those apps.
 
-Note: This is the same data as the gps_vel_ins tutorial app, but with the GPS position
+Note: This is the same data as the pos_vel_ins tutorial app, but with the  position
 and NED velocity measurements combined into a PVA measurement to be processed as a
 single measurement."""
 
@@ -23,12 +23,12 @@ from pntos.cobra import (
     ManualHeadingAlignInitializationPlugin,
     StandardControllerPlugin,
     StandardFusionPlugin,
-    StandardGpsInsStateModelingPlugin,
     StandardInertialPlugin,
     StandardLoggingPlugin,
     StandardOrchestrationPlugin,
     StandardPreprocessorPlugin,
     StandardRegistryPlugin,
+    StandardStateModelingPlugin,
 )
 from pntos.cobra.config import (
     AspnVersion,
@@ -164,7 +164,7 @@ plugins = [
     LcmLogTransportPlugin('Cobra LCM Log Transport Plugin'),
     EkfFusionStrategyPlugin('Cobra EKF Fusion Strategy Plugin'),
     StandardFusionPlugin('Cobra Standard Fusion Plugin'),
-    StandardGpsInsStateModelingPlugin('Cobra Standard State Modeling Plugin'),
+    StandardStateModelingPlugin('Cobra Standard State Modeling Plugin'),
     StandardInertialPlugin('Cobra Standard Inertial Plugin'),
     ManualHeadingAlignInitializationPlugin(
         'Cobra Manual Heading Static Align Initialization Plugin'

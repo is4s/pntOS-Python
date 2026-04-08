@@ -65,24 +65,24 @@ check_sync() {
     check_diff $patch_file
 }
 
-# Apply orchestration gps-velocity patch
-check_sync $orig_dir"/util/orch_gps_vel.patch"
+# Apply orchestration pos-velocity patch
+check_sync $orig_dir"/util/orch_pos_vel.patch"
 # Check sync between buscat controller plugin and standard controller plugin
 check_sync $orig_dir"/util/controller_buscat.patch"
-# Apply app gps-velocity patch
-check_sync $orig_dir"/util/app_gps_vel.patch"
+# Apply app pos-velocity patch
+check_sync $orig_dir"/util/app_pos_vel.patch"
 # Apply app add ROS patch
-check_sync $orig_dir"/util/app_gps_ros.patch"
-# Apply app gps-standard patch
-check_sync $orig_dir"/util/app_gps_standard.patch"
+check_sync $orig_dir"/util/app_pos_ros.patch"
+# Apply app pos-standard patch
+check_sync $orig_dir"/util/app_pos_standard.patch"
 # Apply app lcm-relay patch
 check_sync $orig_dir"/util/app_lcm_relay.patch"
 # Apply app lever_arm patch
-check_sync $orig_dir"/util/app_gps_ins_leverarm.patch"
+check_sync $orig_dir"/util/app_pos_ins_leverarm.patch"
 # Apply app bodyvel patch
-check_sync $orig_dir"/util/app_gps_ins_bodyvel.patch"
+check_sync $orig_dir"/util/app_pos_ins_bodyvel.patch"
 # Apply app vsb patch
-check_sync $orig_dir"/util/app_gps_ins_vsb.patch"
+check_sync $orig_dir"/util/app_pos_ins_vsb.patch"
 # Apply app outage patch
 check_sync $orig_dir"/util/app_outage_sim.patch"
 # Apply app direction-to-points patch

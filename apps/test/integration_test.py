@@ -111,9 +111,9 @@ def test_dummy_app() -> None:
             kill(app_process)
 
 
-def test_tutorial_gps_ins_app() -> None:
+def test_tutorial_pos_ins_app() -> None:
     run_pntos_with_log_transport(
-        Path('apps/tutorial/gps_ins.py'), [OUTPUT_LOG.as_posix()], validate=True
+        Path('apps/tutorial/pos_ins.py'), [OUTPUT_LOG.as_posix()], validate=True
     )
     log_data = read_pva(OUTPUT_LOG.as_posix(), read_all=True)
     validate_results(
@@ -128,9 +128,9 @@ def test_tutorial_gps_ins_app() -> None:
     )
 
 
-def test_standard_gps_ins_app() -> None:
+def test_standard_pos_ins_app() -> None:
     run_pntos_with_log_transport(
-        Path('apps/standard/gps_ins.py'), [OUTPUT_LOG.as_posix()], validate=True
+        Path('apps/standard/pos_ins.py'), [OUTPUT_LOG.as_posix()], validate=True
     )
     log_data = read_pva(OUTPUT_LOG, read_all=True)
     validate_results(
@@ -144,7 +144,7 @@ def test_standard_gps_ins_app() -> None:
     )
 
 
-def test_standard_gps_ins_network_app() -> None:
+def test_standard_pos_ins_network_app() -> None:
     run_pntos_with_network_transport(
         Path('apps/standard/lcm_relay.py'),
         Path(EXAMPLE_LCM_LOG),
@@ -163,9 +163,9 @@ def test_standard_gps_ins_network_app() -> None:
     )
 
 
-def test_tutorial_gps_ins_vel_app() -> None:
+def test_tutorial_pos_ins_vel_app() -> None:
     run_pntos_with_log_transport(
-        Path('apps/tutorial/gps_vel_ins.py'), [OUTPUT_LOG.as_posix()], validate=True
+        Path('apps/tutorial/pos_vel_ins.py'), [OUTPUT_LOG.as_posix()], validate=True
     )
     log_data = read_pva(OUTPUT_LOG, read_all=True)
     validate_results(
@@ -197,9 +197,9 @@ def test_tutorial_gps_ins_vel_app() -> None:
     )
 
 
-def test_standard_gps_ins_leverarm_app() -> None:
+def test_standard_pos_ins_leverarm_app() -> None:
     run_pntos_with_log_transport(
-        Path('apps/standard/gps_ins_leverarm.py'),
+        Path('apps/standard/pos_ins_leverarm.py'),
         [OUTPUT_LOG.as_posix()],
         validate=True,
     )
@@ -217,9 +217,9 @@ def test_standard_gps_ins_leverarm_app() -> None:
     )
 
 
-def test_standard_gps_bodyvel_ins_app() -> None:
+def test_standard_pos_bodyvel_ins_app() -> None:
     run_pntos_with_log_transport(
-        Path('apps/standard/gps_ins_bodyvel.py'), [OUTPUT_LOG.as_posix()], validate=True
+        Path('apps/standard/pos_ins_bodyvel.py'), [OUTPUT_LOG.as_posix()], validate=True
     )
     log_data = read_pva(OUTPUT_LOG, read_all=True)
     validate_results(
@@ -233,9 +233,9 @@ def test_standard_gps_bodyvel_ins_app() -> None:
     )
 
 
-def test_standard_gps_ins_vel_app() -> None:
+def test_standard_pos_ins_vel_app() -> None:
     run_pntos_with_log_transport(
-        Path('apps/standard/gps_vel_ins.py'), [OUTPUT_LOG.as_posix()], validate=True
+        Path('apps/standard/pos_vel_ins.py'), [OUTPUT_LOG.as_posix()], validate=True
     )
     log_data = read_pva(OUTPUT_LOG, read_all=True)
     validate_results(
@@ -328,9 +328,9 @@ def test_standard_outage_sim_app() -> None:
     )
 
 
-def test_standard_gps_ins_vsb_app() -> None:
+def test_standard_pos_ins_vsb_app() -> None:
     run_pntos_with_log_transport(
-        Path('apps/standard/gps_ins_vsb.py'), [OUTPUT_LOG.as_posix()], validate=True
+        Path('apps/standard/pos_ins_vsb.py'), [OUTPUT_LOG.as_posix()], validate=True
     )
     log_data = read_pva(OUTPUT_LOG, read_all=True)
     validate_results(
@@ -368,7 +368,7 @@ def test_buscat_app() -> None:
         assert f'/buscat/pntos{input_channel}' in output_channels
 
 
-def test_advanced_gps_ins_ros_app() -> None:
+def test_advanced_pos_ins_ros_app() -> None:
     import pytest  # noqa: PLC0415
 
     # Only run this test if ros is installed
@@ -377,7 +377,7 @@ def test_advanced_gps_ins_ros_app() -> None:
     # Just run the app and ensure it doesn't crash. Don't validate the results, as the
     # ROS transport is not consistent enough.
     run_pntos_with_ros_transport(
-        Path('apps/advanced/gps_ins_ros.py'),
+        Path('apps/advanced/pos_ins_ros.py'),
         Path(EXAMPLE_ROS_LOG),
         OUTPUT_BAG,
         validate=True,

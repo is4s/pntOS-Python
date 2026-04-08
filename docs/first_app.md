@@ -42,7 +42,7 @@ from the root directory to enter the virtual environment. The command varies dep
 
 The available apps can be found in each subfolder of the `{workspace-root}/apps`
 directory. If this is your first time with {term}`pntOS-Python`, it is recommended you
-start with the `gps_ins` app. If you are running your own custom app, just switch out
+start with the `pos_ins` app. If you are running your own custom app, just switch out
 the paths to the off-the-shelf apps with the path to your app in the following
 instructions.
 
@@ -51,18 +51,18 @@ The available off-the-shelf apps are in the
 
 `````{tab-set}
 
-````{tab-item} GPS INS Tutorial App
-:sync: gps-ins-tutorial
+````{tab-item} POS INS Tutorial App
+:sync: pos-ins-tutorial
 For documentation specifically explaining this app, see
-[](./apps/gps_ins.md).
+[](./apps/pos_ins.md).
 
-### Run the GPS INS Tutorial App
+### Run the POS INS Tutorial App
 
 To run this app, run this command from the root workspace directory (with the Python virtual
 environment activated):
 
 ```shell
-apps/tutorial/gps_ins.py
+apps/tutorial/pos_ins.py
 ```
 
 Once the app is started, it will immediately start processing messages from the input log,
@@ -108,10 +108,10 @@ For information on how to plot the pntOS solution from a log file, see [](#view-
 ```
 ````
 
-````{tab-item} GPS INS Velocity Tutorial App
+````{tab-item} POS INS Velocity Tutorial App
 :sync: vel-app
 For documentation specifically explaining this app, see
-[](./apps/gps_vel_ins.md).
+[](./apps/pos_vel_ins.md).
 
 ### Run the Position and Velocity Update App
 
@@ -119,7 +119,7 @@ To run this app, run this command from the root workspace directory (with the Py
 environment activated):
 
 ```shell
-apps/tutorial/gps_vel_ins.py
+apps/tutorial/pos_vel_ins.py
 ```
 
 Once the app is started, it will immediately start processing messages from the input log,
@@ -164,18 +164,18 @@ For information on how to plot the pntOS solution from a log file, see [](#view-
 ```
 ````
 
-````{tab-item} GPS INS Standard App
-:sync: gps-ins-standard
+````{tab-item} POS INS Standard App
+:sync: pos-ins-standard
 For documentation specifically explaining this app, see
-[](./apps/gps_ins_standard.md).
+[](./apps/pos_ins_standard.md).
 
-### Run the GPS INS Standard App
+### Run the POS INS Standard App
 
 To run this app, run this command from the root workspace directory (with the Python virtual
 environment activated):
 
 ```shell
-apps/standard/gps_ins.py
+apps/standard/pos_ins.py
 ```
 
 Once the app is started, it will immediately start processing messages from the input log,
@@ -200,7 +200,7 @@ For information on how to plot the pntOS solution from a log file, see [](#view-
 ````{tab-item} LCM Relay App
 :sync: lcm-relay
 
-The LCM Relay App is similar to the GPS INS Standard App, but uses a different transport plugin that requires
+The LCM Relay App is similar to the POS INS Standard App, but uses a different transport plugin that requires
 the user to separately spin up an LCM relay, and manually record the output log file. The purpose of this
 app is to support real-time use cases where pntOS may ingest sensor data over the network, and broadcast a live solution.
 

@@ -359,7 +359,7 @@ object definitions in addition to all config utility functions such as
 
 To access config from within a plugin, first ensure that the config object is imported,
 instantiated, and passed to the registry in the current {term}`App` (For more
-information on {term}`Apps<App>`, see [the first App walkthrough](./apps/gps_ins.md)).
+information on {term}`Apps<App>`, see [the first App walkthrough](./apps/pos_ins.md)).
 Then, once your plugin has access to a
 [Mediator](./plugins/controller_plugin.md#mediator) (after
 {py:obj}`init_plugin()<pntos.api.CommonPlugin.init_plugin>`), you can retrieve config

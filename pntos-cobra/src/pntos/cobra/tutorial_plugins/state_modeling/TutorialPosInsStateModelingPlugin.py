@@ -19,7 +19,7 @@ from .TutorialPinsonWithNedFogmPositionMeasurementProcessor import (
 )
 
 
-class TutorialGpsInsStateModelProvider(StandardStateModelProvider):
+class TutorialPosInsStateModelProvider(StandardStateModelProvider):
     """A tutorial implementation of StandardStateModelProvider that offers a 15-state pinson state block,
     variable-size FOGM block, a position measurement processor and a velocity measurement processor.
     """
@@ -28,7 +28,7 @@ class TutorialGpsInsStateModelProvider(StandardStateModelProvider):
 
     def __init__(self, mediator: Mediator) -> None:
         """
-        Tutorial GPS and INS State Model Provider
+        Tutorial Position and INS State Model Provider
 
         Args:
             mediator (Mediator): A :class:(Mediator) instance.
@@ -172,8 +172,8 @@ class TutorialGpsInsStateModelProvider(StandardStateModelProvider):
         return None
 
 
-class TutorialGpsInsStateModelingPlugin(StateModelingPlugin):
-    """StateModelingPlugin that generates a :class:`pntos.cobra.internal.TutorialGpsInsStateModelProvider`."""
+class TutorialPosInsStateModelingPlugin(StateModelingPlugin):
+    """StateModelingPlugin that generates a :class:`pntos.cobra.internal.TutorialPosInsStateModelProvider`."""
 
     _mediator: Mediator
 
@@ -196,7 +196,7 @@ class TutorialGpsInsStateModelingPlugin(StateModelingPlugin):
         if not self.is_fusion_type_supported(fusion_type):
             return None
 
-        return TutorialGpsInsStateModelProvider(self._mediator)
+        return TutorialPosInsStateModelProvider(self._mediator)
 
     def is_fusion_type_supported(self, fusion_type: StateModelProviderType) -> bool:
         return fusion_type is StandardStateModelProvider

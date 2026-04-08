@@ -12,12 +12,12 @@ from pntos.cobra import (
     ManualHeadingAlignInitializationPlugin,
     StandardControllerPlugin,
     StandardFusionPlugin,
-    StandardGpsInsStateModelingPlugin,
     StandardInertialPlugin,
     StandardLoggingPlugin,
     StandardOrchestrationPlugin,
     StandardPreprocessorPlugin,
     StandardRegistryPlugin,
+    StandardStateModelingPlugin,
 )
 from pntos.cobra.config import (
     AspnVersion,
@@ -84,9 +84,9 @@ my_config = [
         ),
         mp_configs=(
             SensorMeasurementProcessorConfig(
-                group='config/gps_measurement_processor',
+                group='config/pos_measurement_processor',
                 identifier='pinson_with_ned_fogm_position',
-                label='gps',
+                label='pos',
                 channel='/sensor/ublox-ZED-F9T/position',
                 state_block_labels=('pinson15', 'pos_sensor_error'),
                 aux_channels=('INERTIAL_PVA',),
@@ -140,7 +140,7 @@ plugins = [
     LcmTransportPlugin('Cobra LCM Transport Plugin'),
     EkfFusionStrategyPlugin('Cobra EKF Fusion Strategy Plugin'),
     StandardFusionPlugin('Cobra Standard Fusion Plugin'),
-    StandardGpsInsStateModelingPlugin('Cobra Standard State Modeling Plugin'),
+    StandardStateModelingPlugin('Cobra Standard State Modeling Plugin'),
     StandardInertialPlugin('Cobra Standard Inertial Plugin'),
     ManualHeadingAlignInitializationPlugin(
         'Cobra Manual Heading Static Align Initialization Plugin'

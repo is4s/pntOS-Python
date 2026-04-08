@@ -1,7 +1,7 @@
-diff --git a/apps/standard/gps_ins.py b/apps/standard/gps_ins_leverarm.py
-index 269e9cb8..17495536 100755
---- a/apps/standard/gps_ins.py
-+++ b/apps/standard/gps_ins_leverarm.py
+diff --git a/apps/standard/pos_ins.py b/apps/standard/pos_ins_leverarm.py
+index 832536b2..ee9a9701 100755
+--- a/apps/standard/pos_ins.py
++++ b/apps/standard/pos_ins_leverarm.py
 @@ -95,18 +95,40 @@ my_config = [
                      tau=(300.0, 300.0, 200.0),
                  ),
@@ -23,10 +23,10 @@ index 269e9cb8..17495536 100755
          ),
          mp_configs=(
              SensorMeasurementProcessorConfig(
-                 group='config/gps_measurement_processor',
+                 group='config/pos_measurement_processor',
 -                identifier='pinson_with_ned_fogm_position',
 +                identifier='pinson_with_lever_arm_position',
-                 label='gps',
+                 label='pos',
                  channel='/sensor/ublox-ZED-F9T/position',
 -                state_block_labels=('pinson15', 'pos_sensor_error'),
 +                state_block_labels=(

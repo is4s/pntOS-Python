@@ -1,6 +1,6 @@
-# Standard GPS INS App
+# Standard POS INS App
 
-The `standard/gps_ins.py` app has a lot in common with its tutorial counterpart. Many plugins and config classes are
+The `standard/pos_ins.py` app has a lot in common with its tutorial counterpart. Many plugins and config classes are
 reused between the two apps such as the `LcmLogTransportPlugin`, `StandardPreprocessorPlugin`, `FogmConfig`,
 `SensorConfig`, and many more. There are, however, some key differences that this tutorial will walk through and
 elaborate on.
@@ -9,14 +9,14 @@ elaborate on.
 
 There are some plugins that were swapped out for more advanced implementations.
 
-- `TutorialGpsOrchestrationPlugin` was swapped for `StandardOrchestrationPlugin` so that the standard app could be more
+- `TutorialPosOrchestrationPlugin` was swapped for `StandardOrchestrationPlugin` so that the standard app could be more
 robust to different filter configurations. In the tutorial app, if you wanted to leverage an additional off-the-shelf
 preprocessor you would have to add the config to the app then update the Orchestration plugin to ingest that config and 
 use the preprocessor when processing messages. In the standard version, this ingestion and use is handled automatically.
 Only the app config needs to be updated to use the preprocessor as compared to the app and plugin.
 This is merely one of the many features the `StandardOrchestrationPlugin` provides.
 
-- `TutorialGpsInsStateModelingPlugin` and `StandardGpsInsStateModelingPlugin` are very similar in their structure.
+- `TutorialPosInsStateModelingPlugin` and `StandardStateModelingPlugin` are very similar in their structure.
 Although there are no major differences from the perspective of the app, the standard version plugin does provide
 two major improvements.
     - Config group validation which ensures Cobra appropriately logs any issue in obtaining necessary config.

@@ -131,8 +131,8 @@ wired up to talk to each other, told to start listening and processing data, and
 
 Most apps will look very similar to each other, with the only changes being which plugins the {term}`App` has
 decided to use and what config stanzas it needs. You can find an example of a full-fledged {term}`App` that performs
-GPS/INS sensor fusion from sensor data it receives from an LCM network bus
-[here](https://git.aspn.us/pntos/pntos-python/-/blob/main/apps/tutorial/gps_ins.py).
+POS/INS sensor fusion from sensor data it receives from an LCM network bus
+[here](https://git.aspn.us/pntos/pntos-python/-/blob/main/apps/tutorial/pos_ins.py).
 For instructions on how to run this example app, see [Running Your First App](first_app.md).
 
 ### A Very Simple App

@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 
-import sys
-
 import numpy as np
 
 # API imports
@@ -9,27 +7,25 @@ from pntos.api import EstimateWithCovariance, EstimateWithCovarianceType, Loggin
 
 # Import Cobra plugins and config structs
 from pntos.cobra import (
+    Aspn23RosTransportPlugin,
     EkfFusionStrategyPlugin,
-    LcmLogTransportPlugin,
     ManualHeadingAlignInitializationPlugin,
     StandardControllerPlugin,
     StandardFusionPlugin,
-    StandardGpsInsStateModelingPlugin,
     StandardInertialPlugin,
     StandardLoggingPlugin,
     StandardOrchestrationPlugin,
     StandardPreprocessorPlugin,
     StandardRegistryPlugin,
+    StandardStateModelingPlugin,
 )
 from pntos.cobra.config import (
-    AspnVersion,
     ControllerConfig,
     FogmConfig,
     FogmStateBlockConfig,
     ImuConfig,
     ImuRotatorConfig,
     InertialConfig,
-    LcmLogTransportConfig,
     ManualHeadingAlignmentConfig,
     PinsonStateBlockConfig,
     SensorConfig,
@@ -37,11 +33,7 @@ from pntos.cobra.config import (
     StandardOrchestrationConfig,
     TimeAdjusterConfig,
     TimeBiasConfig,
-    VirtualStateBlockConfig,
 )
-from pntos_python_datasets import EXAMPLE_LCM_LOG
-
-OUTPUT_LOG = sys.argv[1] if len(sys.argv) > 1 else 'pntos_output.log'
 
 # Config setup
 C_imu_to_platform = (
@@ -61,21 +53,11 @@ imu_model = ImuConfig(
     gyro_bias_initial_sigma=(0.003, 0.003, 0.003),
 )
 my_config = [
-    LcmLogTransportConfig(
-        input_file=EXAMPLE_LCM_LOG,
-        output_file=OUTPUT_LOG,
-        output_version=AspnVersion.V23,
-        group='config/lcm_log_transport',
-        channels_to_process=(
-            '/sensor/vn-100/imu',
-            '/sensor/ublox-ZED-F9T/position',
-        ),
-    ),
     ControllerConfig(group='controller'),
     StandardOrchestrationConfig(
         best_sol_channel='/solution/pntos/pva',
         imu_sol_channel='/solution/pntos-imu/pva',
-        alignment_channels=('/sensor/ublox-ZED-F9T/position', '/sensor/vn-100/imu'),
+        alignment_channels=('/sensor/ublox_ZED_F9T/position', '/sensor/vn_100/imu'),
         pinson_sb_config=PinsonStateBlockConfig(
             group='config/pinson_block',
             label='pinson15',
@@ -88,24 +70,22 @@ my_config = [
                 estimate_with_covariance=EstimateWithCovariance(
                     type=EstimateWithCovarianceType.EWC_GENERIC,
                     estimate=np.zeros((3,)),
-                    covariance=np.diag(
-                        [2.22e-13, 3.73e-13, 9.0]
-                    ),  # converted to radians-squared
+                    covariance=(np.eye(3) * 9.0),
                 ),
                 fogm_model=FogmConfig(
                     group='config/pos_sensor_error',
-                    sigma=(2.515e-7, 3.259e-7, 2.0),  # converted to radians
+                    sigma=(1.5, 1.5, 2.0),
                     tau=(300.0, 300.0, 200.0),
                 ),
             ),
         ),
         mp_configs=(
             SensorMeasurementProcessorConfig(
-                group='config/position',
-                identifier='position',
-                label='gps',
-                channel='/sensor/ublox-ZED-F9T/position',
-                state_block_labels=('platform_pva', 'pos_sensor_error'),
+                group='config/pos_measurement_processor',
+                identifier='pinson_with_ned_fogm_position',
+                label='pos',
+                channel='/sensor/ublox_ZED_F9T/position',
+                state_block_labels=('pinson15', 'pos_sensor_error'),
                 aux_channels=('INERTIAL_PVA',),
                 sensor_config=SensorConfig(
                     group='config/gp3d_state_modeling',
@@ -115,19 +95,10 @@ my_config = [
                 ),
             ),
         ),
-        vsb_configs=(
-            VirtualStateBlockConfig(
-                group='config/pes',
-                identifier='pinson_error_to_standard',
-                source='pinson15',
-                target='platform_pva',
-                aux_channels=('INERTIAL_PVA',),
-            ),
-        ),
         inertial_config=InertialConfig(
             group='config/inertial',
             expected_dt=0.01,
-            channels=('/sensor/vn-100/imu',),
+            channels=('/sensor/vn_100/imu',),
             C_imu_to_platform=C_imu_to_platform,
             inertial_buffer_length=10.0,
         ),
@@ -141,12 +112,12 @@ my_config = [
         preprocessor_configs=(
             ImuRotatorConfig(
                 group='config/imu_rotator',
-                channel='/sensor/vn-100/imu',
+                channel='/sensor/vn_100/imu',
                 C_imu_to_platform=C_imu_to_platform,
             ),
             TimeAdjusterConfig(
                 group='config/time_adjuster',
-                channel_to_correct='/sensor/vn-100/imu',
+                channel_to_correct='/sensor/vn_100/imu',
                 expected_dt_nsec=int(0.01 * 1e9),
             ),
             TimeBiasConfig(
@@ -163,10 +134,10 @@ my_config = [
 # Instantiate all of our plugins
 controller = StandardControllerPlugin('Cobra Standard Controller Plugin')
 plugins = [
-    LcmLogTransportPlugin('Cobra LCM Log Transport Plugin'),
+    Aspn23RosTransportPlugin('Cobra ASPN23-ROS Transport Plugin'),
     EkfFusionStrategyPlugin('Cobra EKF Fusion Strategy Plugin'),
     StandardFusionPlugin('Cobra Standard Fusion Plugin'),
-    StandardGpsInsStateModelingPlugin('Cobra Standard State Modeling Plugin'),
+    StandardStateModelingPlugin('Cobra Standard State Modeling Plugin'),
     StandardInertialPlugin('Cobra Standard Inertial Plugin'),
     ManualHeadingAlignInitializationPlugin(
         'Cobra Manual Heading Static Align Initialization Plugin'

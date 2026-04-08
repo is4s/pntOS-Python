@@ -117,8 +117,8 @@ outage.
 filter solutions the plugin implementation can provide. Currently, the plugin only provides two
 solutions:
 
-- `GPS_INS_BEST_ASPN_MEASUREMENT_POSITION_VELOCITY_ATTITUDE_ESTIMATE` - the best solution
-- `GPS_INS_DEAD_RECKONING_ASPN_MEASUREMENT_POSITION_VELOCITY_ATTITUDE_ESTIMATE` - the inertial
+- `POS_INS_BEST_ASPN_MEASUREMENT_POSITION_VELOCITY_ATTITUDE_ESTIMATE` - the best solution
+- `POS_INS_DEAD_RECKONING_ASPN_MEASUREMENT_POSITION_VELOCITY_ATTITUDE_ESTIMATE` - the inertial
 only solution
 
 Finally, `StandardOrchestrationPlugin.request_solutions()`. For simplicity, the current implementation

@@ -1,7 +1,7 @@
 # Outage Simulation App
 
 The `standard/outage_sim.py` app demonstrates the capabilities of both Cobra and sensor fusion as a whole. It is a
-derivation of `standard/gps_ins.py` that adds three key features:
+derivation of `standard/pos_ins.py` that adds three key features:
 - a simulated GPS position outage
 - a barometer update
 - a velocity update
@@ -12,7 +12,7 @@ This tutorial will iteratively walk through these features and the effects they 
 
 Thanks to the handy {py:obj}`OutagePreprocessor<pntos.cobra.internal.OutagePreprocessor>` we are able to simulate an outage of 
 any channel we choose. In this app we have chosen to deprive the filter of GPS position measurements for 600 seconds 
-(seconds 1000 to 1600). Inducing this outage on the Standard GPS INS App creates an IMU-only environment where the 
+(seconds 1000 to 1600). Inducing this outage on the Standard POS INS App creates an IMU-only environment where the 
 filter's error grows without any constraints. 
 
 ![](../images/outage_ne_traj.png)

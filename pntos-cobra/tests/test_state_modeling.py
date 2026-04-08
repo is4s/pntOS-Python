@@ -55,8 +55,8 @@ from pntos.api import (
     StateModelProviderType,
 )
 from pntos.cobra import (
-    StandardGpsInsStateModelingPlugin,
     StandardRegistryPlugin,
+    StandardStateModelingPlugin,
 )
 from pntos.cobra.config import (
     BaseConfig,
@@ -147,15 +147,15 @@ def mediator() -> StandardMediator:
 @pytest.fixture
 def state_modeling_plugin(
     mediator: StandardMediator,
-) -> StandardGpsInsStateModelingPlugin:
-    sm_plugin = StandardGpsInsStateModelingPlugin('gps_ins_state_modeling')
+) -> StandardStateModelingPlugin:
+    sm_plugin = StandardStateModelingPlugin('pos_ins_state_modeling')
     sm_plugin.init_plugin(mediator=mediator)
     return sm_plugin
 
 
 @pytest.fixture
 def state_model_provider(
-    state_modeling_plugin: StandardGpsInsStateModelingPlugin,
+    state_modeling_plugin: StandardStateModelingPlugin,
 ) -> StateModelProviderType | None:
     return state_modeling_plugin.new_state_model_provider(StandardStateModelProvider)
 
@@ -492,7 +492,7 @@ def force_and_rate_aux_data() -> Message:
 
 
 def test_invalid_fusion_type(
-    state_modeling_plugin: StandardGpsInsStateModelingPlugin,
+    state_modeling_plugin: StandardStateModelingPlugin,
 ) -> None:
     invalid_sm_provider = state_modeling_plugin.new_state_model_provider(
         EstimateWithCovarianceType
@@ -501,7 +501,7 @@ def test_invalid_fusion_type(
 
 
 def test_enough_labels(
-    state_modeling_plugin: StandardGpsInsStateModelingPlugin,
+    state_modeling_plugin: StandardStateModelingPlugin,
 ) -> None:
     model_provider = state_modeling_plugin.new_state_model_provider(
         StandardStateModelProvider
@@ -768,7 +768,7 @@ def test_generate_model_direct_pos(
     assert np.allclose(mm.z, exp_z)
 
 
-def test_generate_model_gps_all(
+def test_generate_model_pos_all(
     all_pos_processors: all_pos_proc_type,
     pva_aux_data: Message,
     pos_meas: Message,

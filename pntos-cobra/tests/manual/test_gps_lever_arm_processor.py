@@ -20,6 +20,7 @@ from navtk.navutils import (
 )
 from numpy import array, eye, float64, pi, sin, zeros
 from numpy.typing import NDArray
+from pntos import api
 from pntos.api import (
     EstimateWithCovariance,
     EstimateWithCovarianceType,
@@ -27,16 +28,15 @@ from pntos.api import (
     Message,
     StandardFusionEngine,
     StandardFusionStrategy,
-    StandardStateModelProvider,
 )
 from pntos.cobra import (
     EkfFusionStrategyPlugin,
     StandardFusionPlugin,
-    StandardGpsInsStateModelingPlugin,
     StandardRegistryPlugin,
+    StandardStateModelingPlugin,
 )
 from pntos.cobra.config import BaseConfig, FogmConfig, ImuConfig, SensorConfig
-from pntos.cobra.internal import StandardGpsInsStateModelProvider, StandardMediator
+from pntos.cobra.internal import StandardMediator, StandardStateModelProvider
 from pntos.cobra.utils import decode_aspn_lcm_msg, marshal_from_lcm
 
 
@@ -155,10 +155,10 @@ def fusion(la_guess: NDArray[float64]) -> StandardFusionEngine:
     fusion_strategy = fusion_strategy_plugin.new_fusion_strategy(StandardFusionStrategy)
     fusion_engine.strategy = fusion_strategy  # type: ignore[assignment]
 
-    gps_model_plug = StandardGpsInsStateModelingPlugin('gps_ins_state_modeling')
-    gps_model_plug.init_plugin(mediator=mediator)
-    mod_prov = gps_model_plug.new_state_model_provider(StandardStateModelProvider)
-    assert isinstance(mod_prov, StandardGpsInsStateModelProvider)
+    pos_model_plug = StandardStateModelingPlugin('pos_ins_state_modeling')
+    pos_model_plug.init_plugin(mediator=mediator)
+    mod_prov = pos_model_plug.new_state_model_provider(api.StandardStateModelProvider)
+    assert isinstance(mod_prov, StandardStateModelProvider)
     pins = mod_prov.new_block(0, None, 'pinson', '/config/cobra/imu')
     sb1 = mod_prov.new_block(1, None, 'fogm1', '/config/fogm1')
     sb2 = mod_prov.new_block(1, None, 'fogm2', '/config/fogm2')

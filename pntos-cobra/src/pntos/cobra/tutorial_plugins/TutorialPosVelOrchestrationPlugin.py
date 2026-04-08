@@ -31,7 +31,7 @@ from pntos.cobra.config import (
 from pntos.cobra.utils import apply_error_states
 
 
-class TutorialGpsOrchestrationPlugin(OrchestrationPlugin):
+class TutorialPosVelOrchestrationPlugin(OrchestrationPlugin):
     fusion_plugin: FusionPlugin
     fusion_strategy_plugin: FusionStrategyPlugin
     inertial_plugin: InertialPlugin
@@ -91,7 +91,8 @@ class TutorialGpsOrchestrationPlugin(OrchestrationPlugin):
 
         # Associate incoming channels with measurement processor labels
         self.measurement_channels = {
-            orch_config.gps_channel: 'gps',
+            orch_config.position_channel: 'pos',
+            orch_config.velocity_channel: 'vel',
         }
 
         inertial_config = config_from_registry(
@@ -152,7 +153,7 @@ class TutorialGpsOrchestrationPlugin(OrchestrationPlugin):
 
     @property
     def filter_description_list(self) -> list[str]:
-        return ['GPS_INS_BEST_ASPN_MEASUREMENT_POSITION_VELOCITY_ATTITUDE_ESTIMATE']
+        return ['POS_INS_BEST_ASPN_MEASUREMENT_POSITION_VELOCITY_ATTITUDE_ESTIMATE']
 
     def request_solutions(
         self,
@@ -241,12 +242,23 @@ class TutorialGpsOrchestrationPlugin(OrchestrationPlugin):
         processor = provider.new_processor(
             processor_index=processor_index,
             engine=fusion_engine,
-            label='gps',
+            label='pos',
             state_block_labels=['pinson15', 'pos_fogm'],
             config_group='config/gp3d_state_modeling',
         )
 
         fusion_engine.add_measurement_processor(processor=processor)
+
+        # Create velocity measurement processor and add to fusion engine
+        vel_processor_index = provider.processor_identifiers.index('pinson_velocity')
+        vel_processor = provider.new_processor(
+            processor_index=vel_processor_index,
+            engine=fusion_engine,
+            label='vel',
+            state_block_labels=['pinson15'],
+            config_group='config/gp3d_state_modeling',
+        )
+        fusion_engine.add_measurement_processor(processor=vel_processor)
 
         self.fusion_engine = fusion_engine
 

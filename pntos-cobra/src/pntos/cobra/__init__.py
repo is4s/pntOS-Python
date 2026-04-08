@@ -52,26 +52,26 @@ from .standard_plugins.StandardOrchestrationPlugin import (
 from .standard_plugins.StandardRegistryPlugin import (
     StandardRegistryPlugin as StandardRegistryPlugin,
 )
-from .standard_plugins.state_modeling.StandardGpsInsStateModelingPlugin import (
-    StandardGpsInsStateModelingPlugin as StandardGpsInsStateModelingPlugin,
+from .standard_plugins.state_modeling.StandardStateModelingPlugin import (
+    StandardStateModelingPlugin as StandardStateModelingPlugin,
 )
 from .standard_plugins.StaticAlignInitializationPlugin import (
     StaticAlignInitializationPlugin as StaticAlignInitializationPlugin,
 )
-from .tutorial_plugins.state_modeling.TutorialGpsInsStateModelingPlugin import (
-    TutorialGpsInsStateModelingPlugin as TutorialGpsInsStateModelingPlugin,
-)
-from .tutorial_plugins.TutorialGpsOrchestrationPlugin import (
-    TutorialGpsOrchestrationPlugin as TutorialGpsOrchestrationPlugin,
-)
-from .tutorial_plugins.TutorialGpsVelOrchestrationPlugin import (
-    TutorialGpsVelOrchestrationPlugin as TutorialGpsVelOrchestrationPlugin,
+from .tutorial_plugins.state_modeling.TutorialPosInsStateModelingPlugin import (
+    TutorialPosInsStateModelingPlugin as TutorialPosInsStateModelingPlugin,
 )
 from .tutorial_plugins.TutorialInitializationPlugin import (
     TutorialInitializationPlugin as TutorialInitializationPlugin,
 )
 from .tutorial_plugins.TutorialLcmTransportPlugin import (
     TutorialLcmTransportPlugin as TutorialLcmTransportPlugin,
+)
+from .tutorial_plugins.TutorialPosOrchestrationPlugin import (
+    TutorialPosOrchestrationPlugin as TutorialPosOrchestrationPlugin,
+)
+from .tutorial_plugins.TutorialPosVelOrchestrationPlugin import (
+    TutorialPosVelOrchestrationPlugin as TutorialPosVelOrchestrationPlugin,
 )
 from .tutorial_plugins.UiLogPlottingPlugin import (
     UiLogPlottingPlugin as UiLogPlottingPlugin,

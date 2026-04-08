@@ -1,8 +1,8 @@
 import numpy as np
+from pntos import api
 from pntos.api.plugins.common import LoggingLevel, Mediator
 from pntos.api.plugins.fusion import StandardFusionEngine
 from pntos.api.plugins.state_modeling import (
-    StandardStateModelProvider,
     StateModelingPlugin,
     StateModelProviderType,
     VirtualStateBlock,
@@ -42,7 +42,7 @@ from .virtual_state_blocks.PinsonErrorToStandard import PinsonErrorToStandard
 from .virtual_state_blocks.StateExtractor import StateExtractor
 
 
-class StandardGpsInsStateModelProvider(StandardStateModelProvider):
+class StandardStateModelProvider(api.StandardStateModelProvider):
     """StandardStateModelProvider that offers a 15-state pinson state block, variable-size
     Fogm Block and various position measurement processors.
     """
@@ -51,7 +51,7 @@ class StandardGpsInsStateModelProvider(StandardStateModelProvider):
 
     def __init__(self, mediator: Mediator) -> None:
         """
-        Standard GPS and INS State Model Provider
+        Standard Position and INS State Model Provider
 
         Args:
             mediator (Mediator): A :class:(Mediator) instance.
@@ -308,7 +308,7 @@ class StandardGpsInsStateModelProvider(StandardStateModelProvider):
                 )
         self._mediator.log_message(
             LoggingLevel.ERROR,
-            f'Invalid processor index of {processor_index}. StandardGpsInsStateModelProvider provides {len(self.processor_identifiers)} processors.',
+            f'Invalid processor index of {processor_index}. StandardStateModelProvider provides {len(self.processor_identifiers)} processors.',
         )
         return None
 
@@ -449,7 +449,7 @@ class StandardGpsInsStateModelProvider(StandardStateModelProvider):
             case _:
                 self._mediator.log_message(
                     LoggingLevel.ERROR,
-                    f'Invalid block index of {block_index}. StandardGpsInsStateModelProvider provides {len(self.block_identifiers)} state blocks.',
+                    f'Invalid block index of {block_index}. StandardStateModelProvider provides {len(self.block_identifiers)} state blocks.',
                 )
                 return None
 
@@ -513,13 +513,13 @@ class StandardGpsInsStateModelProvider(StandardStateModelProvider):
 
         self._mediator.log_message(
             LoggingLevel.ERROR,
-            f'Invalid virtual block index of {virtual_block_index}. StandardGpsInsStateModelProvider provides {len(self.virtual_block_identifiers)} virtual state blocks.',
+            f'Invalid virtual block index of {virtual_block_index}. StandardStateModelProvider provides {len(self.virtual_block_identifiers)} virtual state blocks.',
         )
         return None
 
 
-class StandardGpsInsStateModelingPlugin(StateModelingPlugin):
-    """StateModelingPlugin that generates a :class:`pntos.cobra.internal.StandardGpsInsStateModelProvider`."""
+class StandardStateModelingPlugin(StateModelingPlugin):
+    """StateModelingPlugin that generates a :class:`pntos.cobra.internal.StandardStateModelProvider`."""
 
     _mediator: Mediator
 
@@ -543,7 +543,7 @@ class StandardGpsInsStateModelingPlugin(StateModelingPlugin):
         if not self.is_fusion_type_supported(type):
             return None
 
-        return StandardGpsInsStateModelProvider(self._mediator)
+        return StandardStateModelProvider(self._mediator)
 
     def is_fusion_type_supported(self, type: StateModelProviderType) -> bool:
-        return type is StandardStateModelProvider
+        return type is api.StandardStateModelProvider

@@ -1,7 +1,7 @@
-diff --git a/apps/tutorial/gps_ins.py b/apps/standard/gps_ins.py
-index 933b9c86..269e9cb8 100755
---- a/apps/tutorial/gps_ins.py
-+++ b/apps/standard/gps_ins.py
+diff --git a/apps/tutorial/pos_ins.py b/apps/standard/pos_ins.py
+index f1ef424a..832536b2 100755
+--- a/apps/tutorial/pos_ins.py
++++ b/apps/standard/pos_ins.py
 @@ -2,38 +2,41 @@
  
  import sys
@@ -19,16 +19,16 @@ index 933b9c86..269e9cb8 100755
 +    ManualHeadingAlignInitializationPlugin,
      StandardControllerPlugin,
      StandardFusionPlugin,
-+    StandardGpsInsStateModelingPlugin,
      StandardInertialPlugin,
      StandardLoggingPlugin,
 +    StandardOrchestrationPlugin,
      StandardPreprocessorPlugin,
      StandardRegistryPlugin,
--    TutorialGpsInsStateModelingPlugin,
--    TutorialGpsOrchestrationPlugin,
 -    TutorialInitializationPlugin,
+-    TutorialPosInsStateModelingPlugin,
+-    TutorialPosOrchestrationPlugin,
 -    UiLogPlottingPlugin,
++    StandardStateModelingPlugin,
  )
  from pntos.cobra.config import (
      AspnVersion,
@@ -125,7 +125,7 @@ index 933b9c86..269e9cb8 100755
 -        tau=(300.0, 300.0, 200.0),
 -    ),
 -    TutorialOrchestrationConfig(
--        gps_channel='/sensor/ublox-ZED-F9T/position',
+-        position_channel='/sensor/ublox-ZED-F9T/position',
 +    StandardOrchestrationConfig(
 +        best_sol_channel='/solution/pntos/pva',
 +        imu_sol_channel='/solution/pntos-imu/pva',
@@ -153,9 +153,9 @@ index 933b9c86..269e9cb8 100755
 +        ),
 +        mp_configs=(
 +            SensorMeasurementProcessorConfig(
-+                group='config/gps_measurement_processor',
++                group='config/pos_measurement_processor',
 +                identifier='pinson_with_ned_fogm_position',
-+                label='gps',
++                label='pos',
 +                channel='/sensor/ublox-ZED-F9T/position',
 +                state_block_labels=('pinson15', 'pos_sensor_error'),
 +                aux_channels=('INERTIAL_PVA',),
@@ -228,8 +228,8 @@ index 933b9c86..269e9cb8 100755
      LcmLogTransportPlugin('Cobra LCM Log Transport Plugin'),
      EkfFusionStrategyPlugin('Cobra EKF Fusion Strategy Plugin'),
      StandardFusionPlugin('Cobra Standard Fusion Plugin'),
--    TutorialGpsInsStateModelingPlugin('Cobra Tutorial State Modeling Plugin'),
-+    StandardGpsInsStateModelingPlugin('Cobra Standard State Modeling Plugin'),
+-    TutorialPosInsStateModelingPlugin('Cobra Tutorial State Modeling Plugin'),
++    StandardStateModelingPlugin('Cobra Standard State Modeling Plugin'),
      StandardInertialPlugin('Cobra Standard Inertial Plugin'),
 -    TutorialInitializationPlugin('Cobra Manual Initialization Plugin'),
 +    ManualHeadingAlignInitializationPlugin(
@@ -242,7 +242,7 @@ index 933b9c86..269e9cb8 100755
      StandardRegistryPlugin('Cobra Standard Registry Plugin', config=my_config),
      StandardPreprocessorPlugin('Cobra Standard Preprocessor Plugin'),
 -    UiLogPlottingPlugin('Cobra UI Logfile Plotting Plugin'),
--    TutorialGpsOrchestrationPlugin('Cobra Tutorial Orchestration Plugin'),
+-    TutorialPosOrchestrationPlugin('Cobra Tutorial Orchestration Plugin'),
 +    StandardOrchestrationPlugin('Cobra Standard Orchestration Plugin'),
  ]
  

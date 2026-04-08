@@ -1,7 +1,7 @@
-diff --git a/apps/standard/gps_ins.py b/apps/standard/gps_ins_bodyvel.py
-index 269e9cb8..bba3082e 100755
---- a/apps/standard/gps_ins.py
-+++ b/apps/standard/gps_ins_bodyvel.py
+diff --git a/apps/standard/pos_ins.py b/apps/standard/pos_ins_bodyvel.py
+index 832536b2..ea24f16d 100755
+--- a/apps/standard/pos_ins.py
++++ b/apps/standard/pos_ins_bodyvel.py
 @@ -68,6 +68,7 @@ my_config = [
          channels_to_process=(
              '/sensor/vn-100/imu',

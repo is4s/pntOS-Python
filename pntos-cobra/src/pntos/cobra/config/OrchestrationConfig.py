@@ -173,9 +173,9 @@ class TutorialOrchestrationConfig(BaseConfig):
     Configuration that dictates what channels will be used by the orchestration plugin.
     """
 
-    gps_channel: str
+    position_channel: str
     """
-    The name of the gps channel whose messages will be used for alignment and the fusion engine.
+    The name of the position channel whose messages will be used for alignment and the fusion engine.
     """
 
     velocity_channel: str = 'unused'

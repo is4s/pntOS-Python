@@ -1,7 +1,7 @@
-diff --git a/apps/standard/gps_ins.py b/apps/standard/gps_ins_vsb.py
-index 269e9cb8..8b45fd6a 100755
---- a/apps/standard/gps_ins.py
-+++ b/apps/standard/gps_ins_vsb.py
+diff --git a/apps/standard/pos_ins.py b/apps/standard/pos_ins_vsb.py
+index 832536b2..b94dc268 100755
+--- a/apps/standard/pos_ins.py
++++ b/apps/standard/pos_ins_vsb.py
 @@ -37,6 +37,7 @@ from pntos.cobra.config import (
      StandardOrchestrationConfig,
      TimeAdjusterConfig,
@@ -29,11 +29,11 @@ index 269e9cb8..8b45fd6a 100755
          ),
          mp_configs=(
              SensorMeasurementProcessorConfig(
--                group='config/gps_measurement_processor',
+-                group='config/pos_measurement_processor',
 -                identifier='pinson_with_ned_fogm_position',
 +                group='config/position',
 +                identifier='position',
-                 label='gps',
+                 label='pos',
                  channel='/sensor/ublox-ZED-F9T/position',
 -                state_block_labels=('pinson15', 'pos_sensor_error'),
 +                state_block_labels=('platform_pva', 'pos_sensor_error'),

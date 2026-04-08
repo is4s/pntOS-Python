@@ -8,7 +8,7 @@ from .OrchestrationConfig import StateBlockConfig
 @dataclass(kw_only=True)
 class ClockBiasStateBlockConfig(StateBlockConfig):
     """
-    Configuration for the ClockBiasStateBlock, provided by GpsInsStateModelingPlugin.
+    Configuration for the ClockBiasStateBlock, provided by StandardStateModelingPlugin.
 
     Attributes:
         group (str):

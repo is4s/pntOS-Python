@@ -63,7 +63,7 @@ To use this plugin in your app, you just have to ensure that this plugin is incl
 plugins to run, and that it's been configured by setting the
 {py:obj}`LcmLogTransportConfig<pntos.cobra.config.LcmLogTransportConfig>`.
 
-See [](../apps/gps_ins.md) for a walkthrough of an app that uses this plugin.
+See [](../apps/pos_ins.md) for a walkthrough of an app that uses this plugin.
 ````
 
 
@@ -103,7 +103,7 @@ Currently, this transport only works with ROS2 Humble or Jazzy.
 The `Aspn23RosTransportPlugin` sends and receives ASPN23 messages over the network using the Robot
 Operating System (ROS) protocol.
 
-See [](../apps/advanced/gps_ins_ros.md) for a walkthrough of an app that uses this plugin.
+See [](../apps/advanced/pos_ins_ros.md) for a walkthrough of an app that uses this plugin.
 ````
 
 `````
