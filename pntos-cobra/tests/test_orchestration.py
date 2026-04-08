@@ -25,6 +25,7 @@ from aspn23 import (
 )
 from navtk.navutils import rpy_to_quat
 from numpy import float64
+from numpy.typing import NDArray
 from pntos.api import (
     CommonPlugin,
     EstimateWithCovariance,
@@ -70,9 +71,7 @@ from pntos.cobra.config import (
     MeasurementProcessorConfig,
     PinsonStateBlockConfig,
     SensorConfig,
-    SensorMeasurementProcessorConfig,
     StandardOrchestrationConfig,
-    StateExtractorConfig,
     StaticAlignmentConfig,
     TimeAdjusterConfig,
     TimeBiasConfig,
@@ -197,31 +196,11 @@ standard_config = [
             ),
         ),
         mp_configs=(
-            SensorMeasurementProcessorConfig(
-                group='config/gps_measurement_processor',
-                identifier='pinson_with_ned_fogm_position',
-                label='gps',
-                channel=GPS_CHANNEL,
-                state_block_labels=('pinson15', 'pos_sensor_error'),
-                sensor_config=SensorConfig(
-                    group='config/gp3d_state_modeling',
-                    lever_arm=(-0.50, 0.38, -0.05),
-                    orientation=(0.0, 0.0, 0.0, 0.0),
-                    sensor_name='position',
-                ),
-            ),
-            MeasurementProcessorConfig(
-                group='config/vel_measurement_processor',
-                identifier='pinson_velocity',
-                label='vel',
-                channel='/sensor/ublox-ZED-F9T/velocity',
-                state_block_labels=('pinson15',),
-            ),
             MeasurementProcessorConfig(
                 group='config/mock_mp1',
                 identifier='mock_mp',
                 label='mock_mp1',
-                state_block_labels=('mock_sb',),
+                state_block_labels=('mock_vsb2',),
                 channel='mock_channel',
             ),
             MeasurementProcessorConfig(
@@ -234,17 +213,17 @@ standard_config = [
         ),
         vsb_configs=(
             VirtualStateBlockConfig(
-                group='config/pes',
-                identifier='pinson_error_to_standard',
+                group='config/mock_vsb1',
+                identifier='mock_vsb',
                 source='pinson15',
-                target='direct_pinson',
+                target='mock_vsb1',
+                aux_channels=('INERTIAL_PVA',),
             ),
-            StateExtractorConfig(
-                group='config/extractor',
-                source='pinson15',
-                target='pos_out',
-                incoming_state_size=15,
-                indices_to_extract=(0, 1, 2),
+            VirtualStateBlockConfig(
+                group='config/mock_vsb2',
+                identifier='mock_vsb',
+                source='mock_vsb1',
+                target='mock_vsb2',
             ),
         ),
         inertial_config=inertial_config,
@@ -281,10 +260,36 @@ class MockMP(StandardMeasurementProcessor):
         pass
 
 
+class MockVSB(VirtualStateBlock):
+    def __init__(self, source: str, target: str) -> None:
+        self.source = source
+        self.target = target
+
+    def convert(
+        self,
+        estimate_with_covariance: EstimateWithCovariance,
+        time: TypeTimestamp,
+    ) -> EstimateWithCovariance:
+        return estimate_with_covariance
+
+    def convert_estimate(
+        self, estimate: NDArray[float64], time: TypeTimestamp
+    ) -> NDArray[float64]:
+        return estimate
+
+    def jacobian(
+        self, estimate: NDArray[float64], time: TypeTimestamp
+    ) -> NDArray[float64]:
+        return np.eye(estimate.size)
+
+    def receive_aux_data(self, aux: list[Message | None]) -> None:
+        print(f'{self.target} got aux')
+
+
 class MockStateModelProvider(StandardStateModelProvider):
     def __init__(self) -> None:
         self.block_identifiers = []
-        self.virtual_block_identifiers = []
+        self.virtual_block_identifiers = ['mock_vsb']
         self.processor_identifiers = ['mock_mp']
 
     def new_processor(
@@ -313,7 +318,7 @@ class MockStateModelProvider(StandardStateModelProvider):
         target_label: str,
         config_group: str | None,
     ) -> VirtualStateBlock | None:
-        return None
+        return MockVSB(source_label, target_label)
 
 
 class MockStateModelingPlugin(StateModelingPlugin):
@@ -638,6 +643,32 @@ class Test_Orchestration(unittest.TestCase):
             'mock_mp1 received message' in output
             and 'mock_mp2 received message' in output
         )
+
+    def test_aux_for_vsb_chain(self) -> None:
+        self.test_init_orchestration_plugin_standard()
+        message = Message(
+            MeasurementAltitude(
+                TypeHeader(0, 0, 0, 0),
+                TypeTimestamp(0),
+                MeasurementAltitudeReference.MSL,
+                100.0,
+                10.0,
+                MeasurementAltitudeErrorModel.NONE,
+                np.array([]),
+                [],
+            ),
+            'mock_channel',
+        )
+        f = StringIO()
+        with redirect_stdout(f):
+            # chain of VSBs is pinson15 -> mock_vsb1 -> mock_vsb2. mock_vsb1 requires
+            # inertial PVA as aux. Measurement is passed to mock_mp, which targets
+            # mock_vsb2. Since this chains off of mock_vsb1, then mock_vsb1 needs aux
+            # data before MP can perform update.
+            self.orchestration_plugin.process_pntos_message(message, False)
+
+        output = f.getvalue().strip()
+        assert 'mock_vsb1 got aux' in output
 
     def test_outage_filter_propagation(self) -> None:
         self.test_init_orchestration_plugin_standard()
