@@ -15,8 +15,8 @@ engine. For example, the {py:obj}`StandardFusionEngine<pntos.api.StandardFusionE
 - {py:obj}`give_state_block_aux_data<pntos.api.StandardFusionEngine.give_state_block_aux_data>`
 - {py:obj}`give_virtual_state_block_aux_data<pntos.api.StandardFusionEngine.give_virtual_state_block_aux_data>`
 
-One of the most common use-cases is a measurement processor which provides an measurement model for
+One of the most common use-cases is a measurement processor which provides a measurement model for
 an error-state filter. In the case, it will need a reference solution (usually from an INS) in order to calculate its model.
 
 One other key use-case is the {py:obj}`Pinson15NedBlock<pntos.cobra.internal.Pinson15NedBlock>`
-which, in additional an inertial solution, also requires specific forces and rotation rates.
+which, in addition to an inertial solution, also requires specific forces and rotation rates.

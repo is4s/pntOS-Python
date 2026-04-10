@@ -14,7 +14,7 @@ The pntOS application programming interface (API) is designed to address this
 situation. It has broken up the concept of a {term}`PNT` sensor fusion system into its
 component pieces (called plugins) and defined an API to standardize their interactions,
 allowing for plugins to be individually swappable. In order to aid development of new
-plugins, [`pntos-python`](https://git.aspn.us/pntos/pntos-python) provides not only a
+plugins, the [`pntos-python`](https://git.aspn.us/pntos/pntos-python) repository provides not only a
 [full Python API](./autodocs/api.rst), but also a set of plugins and
 {term}`Apps<App>` to serve as a reference implementation (called {term}`Cobra`).
 
@@ -25,7 +25,7 @@ This project consists of the following main parts:
 ```{table} pntOS-Python Project Breakdown
 | Component name                                                                               | Location within the project       | Description                                                                               |
 |:-------------------------------------------------------------------------------------------- |:--------------------------------- |:----------------------------------------------------------------------------------------- |
-| pntOS-Python Architecture Application Programming Interface (API)](./autodocs/api.rst) | `pntos-api/src/pntos/api/plugins` | Defines a set of plugins and how they are to interact.                                    |
+| pntOS-Python Architecture Application Programming Interface [(API)](./autodocs/api.rst) | `pntos-api/src/pntos/api/plugins` | Defines a set of plugins and how they are to interact.                                    |
 | [Cobra Plugins](./plugins.md)                                                                | `pntos-cobra/src/pntos/cobra`     | Implementation of API - functional Python plugins and helper objects.                     |
 | [Cobra Apps](./first_app.md)                                                                 | `apps/`                           | Each app loads a set of Cobra plugins, defines any config values, and starts the plugins. |
 ```
@@ -753,7 +753,7 @@ performs sensor fusion to produce a navigation solution, check out the
 
 ### Running The Very Simple App
 
-In the previous sections we walked through a very simple app the the dummy-level plugins it uses.
+In the previous sections we walked through a very simple app the dummy-level plugins it uses.
 
 ```{note}
 If you do not have Cobra installed into an active virtual environment, first see the

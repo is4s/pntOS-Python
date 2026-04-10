@@ -9,7 +9,7 @@ by another plugin to accomplish a task. Some examples include:
 - the {py:obj}`FusionStrategyPlugin<pntos.api.FusionStrategyPlugin>`, which provides fusion
   strategies
 - the {py:obj}`RegistryPlugin<pntos.api.RegistryPlugin>`, which provides
-  {py:obj}`Registry<pntos.api.Registry>`s
+  {py:obj}`Registry<pntos.api.Registry>` instances
 - the {py:obj}`StateModelingPlugin<pntos.api.StateModelingPlugin>`, which provides state model
   providers
 
