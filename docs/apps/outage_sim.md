@@ -40,7 +40,7 @@ The first sensor update we are bringing in is a barometer update via the BMP388.
 pressure measurement, so we make use of the {py:obj}`BarometerToAltitudePreprocessor<pntos.cobra.internal.BarometerToAltitudePreprocessor>`
 and convert these measurements to altitude before the {py:obj}`AltitudeMeasurementProcessor<pntos.cobra.internal.AltitudeMeasurementProcessor>`
 receives them. If you would like to run the filter with the baro measurement yourself, enable the measurement in
-config by uncommenting the barometer channel.
+the config by uncommenting the barometer channel.
 
 ```Diff
 LcmLogTransportConfig(
@@ -112,7 +112,7 @@ And voila! As we hoped, the velocity error has now been bound for the other two 
 ![](../images/outage_NED_Pos_Error_baro_vel.png)
 
 Not only that, but the massive drift in horizontal position is now gone. Thanks to our barometer and velocity updates,
-we have successfully constructed a filter can handle a 600 second GPS outage!
+we have successfully constructed a filter that can handle a 600 second GPS outage!
 
 ```{note}
 In this example and app, we incorporate a velocity measurement that originates from the Ublox GPS receiver. In a more
