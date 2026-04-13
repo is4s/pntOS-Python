@@ -41,6 +41,8 @@ def plot_results(
 
     print('Plotting results...')
     plt.rcParams['figure.figsize'] = (10, 6)
+    plt.rcParams['figure.max_open_warning'] = 0
+
     logfile = Path(logfile)
     save_dir = logfile.parent / logfile.stem
     plot_pva(solution, truth, log_data.t0, save_dir=save_dir)
