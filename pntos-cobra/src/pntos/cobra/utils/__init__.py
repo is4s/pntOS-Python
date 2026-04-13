@@ -66,6 +66,7 @@ from .plots import (
     plot_trajectory as plot_trajectory,
     plot_vel as plot_vel,
     plot_vel_err as plot_vel_err,
+    plot_x_and_p as plot_x_and_p,
 )
 from .plugins import (
     SortedPlugins as SortedPlugins,
