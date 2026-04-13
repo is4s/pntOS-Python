@@ -87,6 +87,8 @@ check_sync $orig_dir"/util/app_pos_ins_vsb.patch"
 check_sync $orig_dir"/util/app_outage_sim.patch"
 # Apply app direction-to-points patch
 check_sync $orig_dir"/util/app_direction_to_points.patch"
+# Apply app record_states patch
+check_sync $orig_dir"/util/app_record_states.patch"
 
 # Cleanup and return
 popd > /dev/null
