@@ -1,4 +1,5 @@
 import pickle
+from collections.abc import Callable
 from pathlib import Path
 
 import h5py
@@ -82,7 +83,8 @@ def save_to_hdf5_file(
 
 
 def load_from_hdf5_file(
-    file: Path, mediator: Mediator
+    file: Path,
+    log_func: Callable[[LoggingLevel, str], None],
 ) -> dict[str, list[RegistryValueTypeUnion]]:
     """
     Utility function for loading data from an HDF5 file into python.
@@ -119,7 +121,7 @@ def load_from_hdf5_file(
                 elif isinstance(val[0], np.ndarray):
                     output[key] = list(val)
                 else:
-                    mediator.log_message(
+                    log_func(
                         LoggingLevel.WARN,
                         f'Conversion not support for type in hdf5 file: {type(val[0])}',
                     )
