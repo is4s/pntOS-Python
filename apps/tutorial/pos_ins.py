@@ -24,6 +24,7 @@ from pntos.cobra.config import (
     AspnVersion,
     ControllerConfig,
     FogmConfig,
+    FusionEngineConfig,
     ImuConfig,
     ImuRotatorConfig,
     InertialConfig,
@@ -53,6 +54,7 @@ my_config = [
         group='config/lcm_log_transport',
     ),
     ControllerConfig(group='controller'),
+    FusionEngineConfig(),
     ImuConfig(
         group='config/inertial_state',
         accel_bias_sigma=(2.4e-3, 2.4e-3, 2.4e-3),

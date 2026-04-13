@@ -11,10 +11,10 @@ from numpy.typing import NDArray
 from pntos.api import (
     EstimateWithCovariance,
     EstimateWithCovarianceType,
-    FusionPlugin,
     GenXandP,
     LoggingLevel,
     Message,
+    RegistryPlugin,
     StandardDynamicsModel,
     StandardFusionEngine,
     StandardFusionStrategy,
@@ -25,14 +25,17 @@ from pntos.api import (
 from pntos.cobra import (
     EkfFusionStrategyPlugin,
     StandardFusionPlugin,
+    StandardRegistryPlugin,
 )
+from pntos.cobra.config import BaseConfig, FusionEngineConfig
 from pntos.cobra.internal import (
     StandardFusionEngine as CobraStandardFusionEngine,
     StandardMediator,
-    StandardRegistry,
     StateExtractor,
 )
 from scipy.linalg import block_diag
+
+config: list[BaseConfig] = [FusionEngineConfig()]
 
 
 # Test Sensor plugin
@@ -149,9 +152,12 @@ def create_random_state_block(
 
 @pytest.fixture
 def mediator() -> StandardMediator:
-    registry = StandardRegistry(dummy_log)
-    mediator = StandardMediator('Fusion Plugin', FusionPlugin)
+    registry_plugin = StandardRegistryPlugin('Standard registry', config=config)
+    mediator = StandardMediator(registry_plugin.identifier, RegistryPlugin)
+    registry_plugin.init_plugin(mediator=mediator)
+    registry = registry_plugin.new_registry()
     StandardMediator.registry = registry
+    StandardMediator._controller_plugin = None
     return mediator
 
 
