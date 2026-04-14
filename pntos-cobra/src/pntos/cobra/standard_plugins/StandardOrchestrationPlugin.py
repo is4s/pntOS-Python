@@ -603,15 +603,34 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
 
         self.mediator.broadcast_aspn_message(solution, None, solution.source_identifier)
 
-    def _get_inertial_forces(self) -> Message | None:
+    def _get_inertial_forces(
+        self, t1: TypeTimestamp | None = None, t2: TypeTimestamp | None = None
+    ) -> Message | None:
         """Get inertial foces at the current filter time."""
-        time = self.fusion_engine.time
-
-        self._inertial_forces = self.inertial.request_forces_and_rates(time)
+        t1 = (
+            self.fusion_engine.time
+            if t1 is None
+            else max(
+                t1, self.inertial.request_earliest_time(), key=lambda t: t.elapsed_nsec
+            )
+        )
+        t2 = (
+            self.fusion_engine.time
+            if t2 is None
+            else min(
+                t2, self.inertial.request_latest_time(), key=lambda t: t.elapsed_nsec
+            )
+        )
+        if t1 == t2:
+            self._inertial_forces = self.inertial.request_forces_and_rates(t1)
+        else:
+            self._inertial_forces = self.inertial.request_average_forces_and_rates(
+                t1, t2
+            )
         if self._inertial_forces is None:
             self.mediator.log_message(
                 LoggingLevel.ERROR,
-                f'Cannot get inertial aux. Forces not available at time {time.elapsed_nsec / 1e9:.9f}s',
+                f'Cannot get inertial aux. Forces not available spanning time [{t1.elapsed_nsec / 1e9:.9f}, {t2.elapsed_nsec / 1e9:.9f}]',
             )
             return None
         return Message(
@@ -631,7 +650,10 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
             pva = self.cache.get('inertial solution')
             aux.append(pva)
         if needs_forces:
-            forces = self._get_inertial_forces()
+            filter_time = self.fusion_engine.time
+            t1 = TypeTimestamp(filter_time.elapsed_nsec - 500_000_000)
+            t2 = TypeTimestamp(filter_time.elapsed_nsec + 500_000_000)
+            forces = self._get_inertial_forces(t1, t2)
             aux.append(forces)
 
         self.fusion_engine.give_measurement_processor_aux_data(mp_label, aux)
