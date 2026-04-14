@@ -152,6 +152,12 @@ class StandardInertial(StandardInertialMechanization):
         time1_cpp = convert_timestamp_to_cpp(time1)
         time2_cpp = convert_timestamp_to_cpp(time2)
         forces_and_rates_cpp = self.inertial.calc_force_and_rate(time1_cpp, time2_cpp)
+        if forces_and_rates_cpp is None:
+            self.mediator.log_message(  # type: ignore[unreachable] # navtk stubs are incorrect as calc_force_and_rate may return None
+                LoggingLevel.WARN,
+                f'Requested average force and rate spanning time [{time1.elapsed_nsec / 1e9}, {time2.elapsed_nsec / 1e9}], but inertial only spans [{self.request_earliest_time().elapsed_nsec / 1e9}, {self.request_latest_time().elapsed_nsec / 1e9}]',
+            )
+            return None
         forces_and_rates = convert_imu_from_cpp(forces_and_rates_cpp)
         return InertialForcesRates(forces_and_rates, InertialFrame.INERTIAL_FRAME_NED)
 
