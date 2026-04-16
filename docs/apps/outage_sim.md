@@ -121,3 +121,31 @@ utility of adding a velocity update still apply. The update could easily come fr
 similar results, assuming the sensor is reliable and well-modeled. With that being said, these results are for example
 purposes only and could vary if different sensors or data were used.
 ```
+
+## Results Summary
+
+```{list-table}
+:header-rows: 1
+:class: centered-table
+
+*   - Metric      
+    - IMU Only  
+    - +Barometer
+    - +Barometer and Velocity
+    - Percent Improvement
+*   - North Error (m)
+    - 2441
+    - 1055
+    - 7
+    - 99.7 %
+*   - East Error (m)
+    - 412
+    - 1436
+    - 8
+    - 98.1 %
+*   - Down Error (m)
+    - 152
+    - 10
+    - 3
+    - 98.0 %
+```
