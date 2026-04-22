@@ -2,7 +2,7 @@
 
 ```{dropdown} Who can benefit from pntOS?
 
-{term}`pntOS` was designed for the DoD community and it is an ideal architecture for
+{term}`pntOS` was designed for the navigation community and it is an ideal architecture for
 anyone building a {term}`PNT` solution for any operational environment, regardless of
 privacy needs or programming language. Custom plugins can be developed using any
 programming language and can either be made available to the pntOS community or used for
@@ -18,7 +18,7 @@ pntOS is a great solution for both operational and {term}`S&T` applications.
 rather a plugin architecture. This means pntOS defines the components and message
 formats that all pntOS implementations must follow via {term}`APIs<API>`. When someone
 uses pntOS to create a {term}`PNT` sensor fusion application, they have created a pntOS
-implementation. An example of an implementation is {term}`Cobra`.
+implementation. An example of an implementation is a Cobra {term}`app`.
 
 ```
 
@@ -70,7 +70,7 @@ or read the [introduction](./introduction.md).
 
 ```{dropdown} How is Cobra different from Viper?
 
-{term}`Cobra` and {term}`Viper` are both implementations of the {term}`pntOS` approach,
+{term}`Cobra` and {term}`Viper` are both sets of plugins,
 but Cobra is written in Python using {term}`pntOS-Python`, whereas Viper is written in
 C/C++ using the {term}`C pntOS API`.
 
@@ -78,9 +78,7 @@ C/C++ using the {term}`C pntOS API`.
 
 ```{dropdown} Can I use a combination of Viper and Cobra plugins together?
 
-While this is not yet supported, we hope to support interoperability within the next six
-months. Check the current status by visiting the full Cobra repository
-[here](https://git.aspn.us/pntos/pntos-python/-/tree/main?ref_type=heads).
+While this is not yet supported, we hope to support interoperability soon.
 
 ```
 
@@ -103,7 +101,7 @@ docs](https://pntos.pages.aspn.us/navtk/tutorial/introduction.html).
 {term}`PNT` sensor fusion solution that is able to ingest {term}`GPS` and other
 complementary navigation signals.
 
-{term}`Cobra` is the name of a reference implementation of the {term}`pntOS-Python`
+{term}`Cobra` is the name of a set of reference plugins which implement the {term}`pntOS-Python`
 specification.
 
 {term}`NavToolkit` (navtk) is a software library that contains navigation algorithms
@@ -155,7 +153,7 @@ to modify the `Pinson15NedBlock` to add an additional state. Then you could:
 
 ```{dropdown} What is ASPN?
 
-ASPN stands for All Source Position and Navigation and it is a community-developed data
+ASPN is a community-developed data
 standard that allows for consistent interoperability between various systems. Thanks to
 ASPN, {term}`PNT` systems can be modularized allowing developers and engineers to mix
 and match components. This results in more cost-effective and diverse development in
