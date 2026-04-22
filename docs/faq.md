@@ -232,7 +232,4 @@ important for components expecting a specific ASPN type to check for that type u
 arrival of a `Message` (e.g. a plugin expecting IMU measurements should make sure
 incoming `Message` objects are wrapping a `MeasurementIMU` ASPN object).
 
-<!-- TODO: Uncomment the below line once the section is written -->
-<!-- For more information on how data flows within pntOS-Python see [](./dataflow.md). -->
-
 ```
