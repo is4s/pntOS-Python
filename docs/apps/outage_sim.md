@@ -121,3 +121,30 @@ utility of adding a velocity update still apply. The update could easily come fr
 similar results, assuming the sensor is reliable and well-modeled. With that being said, these results are for example
 purposes only and could vary if different sensors or data were used.
 ```
+
+## Results Summary
+
+Below is a summary of how adding each sensor measurement effected the position error. Note that each new update also
+has an associated percent change statistic with it (compared with the previous column).
+
+```{list-table}
+:header-rows: 1
+:class: centered-table
+
+*   - Metric      
+    - IMU Only  
+    - +Barometer
+    - +Barometer and Velocity
+*   - North RMSE (m)
+    - 308
+    - 291<br>(-5.5%)
+    - 2<br>(-99.3%)
+*   - East RMSE (m)
+    - 128
+    - 380<br>(+196.8%)
+    - 3<br>(-99.2%)
+*   - Down RMSE (m)
+    - 33
+    - 4<br>(-87.9%)
+    - 1<br>(-75.0%)
+```

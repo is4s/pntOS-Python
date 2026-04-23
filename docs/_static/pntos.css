@@ -45,3 +45,8 @@ blockquote {
 blockquote p:last-child {
   margin-bottom: 0;
 }
+
+.centered-table th,
+.centered-table td {
+    text-align: center;
+}
