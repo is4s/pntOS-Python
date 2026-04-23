@@ -38,9 +38,6 @@ Other plugins such as the [UI Plugin](./plugins/ui_plugin.md),
 Plugin](./plugins/utility_plugin.md) optionally provide the system with expanded
 capabilities.
 
-
-<!-- TODO (#116) https://git.aspn.us/pntos/pntos-python/-/issues/116 -->
-
 See the below pages for descriptions of various plugins, as well as any related components:
 
 ```{toctree}

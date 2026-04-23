@@ -20,9 +20,6 @@ installation
 first_app
 ```
 
-<!-- TODO: add `dataflow` back in to this index -->
-<!-- TODO #114: add `frequent_questions` back in to this index -->
-
 ```{toctree}
 :caption: What is pntOS?
 introduction
