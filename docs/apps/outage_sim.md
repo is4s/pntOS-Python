@@ -124,6 +124,9 @@ purposes only and could vary if different sensors or data were used.
 
 ## Results Summary
 
+Below is a summary of how adding each sensor measurement effected the position error. Note that each new update also
+has an associated percent change statistic with it (compared with the previous column).
+
 ```{list-table}
 :header-rows: 1
 :class: centered-table
@@ -132,20 +135,16 @@ purposes only and could vary if different sensors or data were used.
     - IMU Only  
     - +Barometer
     - +Barometer and Velocity
-    - Percent Improvement
-*   - North Error (m)
-    - 2441
-    - 1055
-    - 7
-    - 99.7 %
-*   - East Error (m)
-    - 412
-    - 1436
-    - 8
-    - 98.1 %
-*   - Down Error (m)
-    - 152
-    - 10
-    - 3
-    - 98.0 %
+*   - North RMSE (m)
+    - 308
+    - 291<br>(-5.5%)
+    - 2<br>(-99.3%)
+*   - East RMSE (m)
+    - 128
+    - 380<br>(+196.8%)
+    - 3<br>(-99.2%)
+*   - Down RMSE (m)
+    - 33
+    - 4<br>(-87.9%)
+    - 1<br>(-75.0%)
 ```
