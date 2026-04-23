@@ -1098,25 +1098,26 @@ wheels = [
 
 [[package]]
 name = "navtk"
-version = "2.1.0.post3.dev0"
+version = "2.1.0.post6.dev0"
 source = { registry = "https://git.aspn.us/api/v4/projects/94/packages/pypi/simple" }
 dependencies = [
     { name = "numpy" },
 ]
-sdist = { url = "https://git.aspn.us/api/v4/projects/94/packages/pypi/files/aaf7fa6d87cdae6964e00238df3d0ee7f1bf1e2854cef187a41a72af515a37e2/navtk-2.1.0.post3.dev0.tar.gz", hash = "sha256:aaf7fa6d87cdae6964e00238df3d0ee7f1bf1e2854cef187a41a72af515a37e2" }
+sdist = { url = "https://git.aspn.us/api/v4/projects/94/packages/pypi/files/ca5daaf8f09bdce5d49d9116d4ad812a174f45f505873d613c1baed091f6e6fa/navtk-2.1.0.post6.dev0.tar.gz", hash = "sha256:ca5daaf8f09bdce5d49d9116d4ad812a174f45f505873d613c1baed091f6e6fa" }
 wheels = [
-    { url = "https://git.aspn.us/api/v4/projects/94/packages/pypi/files/ed42a2eca5e2160fa4932c9fa89114f6c4ca6df2860921d7952f7d8b7f41876d/navtk-2.1.0.post3.dev0-cp310-cp310-macosx_15_0_arm64.whl", hash = "sha256:ed42a2eca5e2160fa4932c9fa89114f6c4ca6df2860921d7952f7d8b7f41876d" },
-    { url = "https://git.aspn.us/api/v4/projects/94/packages/pypi/files/901c0a0895d4e41750d1120c6877ef18acec0744448794c52606c2a6f7a1595d/navtk-2.1.0.post3.dev0-cp310-cp310-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:901c0a0895d4e41750d1120c6877ef18acec0744448794c52606c2a6f7a1595d" },
-    { url = "https://git.aspn.us/api/v4/projects/94/packages/pypi/files/572ce5d986eced08b1ec883ddcd554a325a3f31636d1865b147adac7b594afc1/navtk-2.1.0.post3.dev0-cp310-cp310-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:572ce5d986eced08b1ec883ddcd554a325a3f31636d1865b147adac7b594afc1" },
-    { url = "https://git.aspn.us/api/v4/projects/94/packages/pypi/files/5374fc34dd9d044aeb39f611e613b20406ced8004e7dc63d04134dc6eed9fb1a/navtk-2.1.0.post3.dev0-cp311-cp311-macosx_15_0_arm64.whl", hash = "sha256:5374fc34dd9d044aeb39f611e613b20406ced8004e7dc63d04134dc6eed9fb1a" },
-    { url = "https://git.aspn.us/api/v4/projects/94/packages/pypi/files/ad9a412c73fc7f2ed2cbf27ee283497664ebe150f8cda521f9fe3d29d9726c33/navtk-2.1.0.post3.dev0-cp311-cp311-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:ad9a412c73fc7f2ed2cbf27ee283497664ebe150f8cda521f9fe3d29d9726c33" },
-    { url = "https://git.aspn.us/api/v4/projects/94/packages/pypi/files/6752dd5c95bfcc7a584033ce9673e023d955b9d599ea1c5072b9da922b04dd2b/navtk-2.1.0.post3.dev0-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:6752dd5c95bfcc7a584033ce9673e023d955b9d599ea1c5072b9da922b04dd2b" },
-    { url = "https://git.aspn.us/api/v4/projects/94/packages/pypi/files/38725f425de1f420929206e981aa79d0b84af7e74d7530fc0c634698d652dc2c/navtk-2.1.0.post3.dev0-cp312-cp312-macosx_15_0_arm64.whl", hash = "sha256:38725f425de1f420929206e981aa79d0b84af7e74d7530fc0c634698d652dc2c" },
-    { url = "https://git.aspn.us/api/v4/projects/94/packages/pypi/files/d8145646f7b1cad3f3a2164d6fd3b79d91388850993a73262e8a0fce87cf42d5/navtk-2.1.0.post3.dev0-cp312-cp312-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:d8145646f7b1cad3f3a2164d6fd3b79d91388850993a73262e8a0fce87cf42d5" },
-    { url = "https://git.aspn.us/api/v4/projects/94/packages/pypi/files/e201087549b9f66c69bb83b56b76f4ff438ced48c58d36483f12f72b79823acc/navtk-2.1.0.post3.dev0-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:e201087549b9f66c69bb83b56b76f4ff438ced48c58d36483f12f72b79823acc" },
-    { url = "https://git.aspn.us/api/v4/projects/94/packages/pypi/files/0e4181a01ef993fd5cb0f3d1b5a1dbec1d16297fb6e54391fb89a9a8e63127a9/navtk-2.1.0.post3.dev0-cp313-cp313-macosx_15_0_arm64.whl", hash = "sha256:0e4181a01ef993fd5cb0f3d1b5a1dbec1d16297fb6e54391fb89a9a8e63127a9" },
-    { url = "https://git.aspn.us/api/v4/projects/94/packages/pypi/files/8a2786f2a544abe42b16ebef7398a3f683d18643c07acb366025acc752f4d644/navtk-2.1.0.post3.dev0-cp313-cp313-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:8a2786f2a544abe42b16ebef7398a3f683d18643c07acb366025acc752f4d644" },
-    { url = "https://git.aspn.us/api/v4/projects/94/packages/pypi/files/fc34a9330766fa2ee6c36cf07754ed5811cd107e07ce454ef7a973990ad01623/navtk-2.1.0.post3.dev0-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:fc34a9330766fa2ee6c36cf07754ed5811cd107e07ce454ef7a973990ad01623" },
+    { url = "https://git.aspn.us/api/v4/projects/94/packages/pypi/files/70d43546c90ed8e568942e63fdd3c2fe59b389e89dbd85715b46ac9a50c77603/navtk-2.1.0.post6.dev0-cp310-cp310-macosx_26_0_arm64.whl", hash = "sha256:70d43546c90ed8e568942e63fdd3c2fe59b389e89dbd85715b46ac9a50c77603" },
+    { url = "https://git.aspn.us/api/v4/projects/94/packages/pypi/files/a54952d2c01d4a6c4cd28457ab237e317b4f00529cff95be34b3207a4adb57d3/navtk-2.1.0.post6.dev0-cp310-cp310-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:a54952d2c01d4a6c4cd28457ab237e317b4f00529cff95be34b3207a4adb57d3" },
+    { url = "https://git.aspn.us/api/v4/projects/94/packages/pypi/files/769de56ae991ebf7daccf45c739947ce009696b286302b121a0588f55f4284ff/navtk-2.1.0.post6.dev0-cp310-cp310-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:769de56ae991ebf7daccf45c739947ce009696b286302b121a0588f55f4284ff" },
+    { url = "https://git.aspn.us/api/v4/projects/94/packages/pypi/files/cbbde169247c5aab30812c89e34a6f7a271eef6f85f86b7c9f0df211f7f307d2/navtk-2.1.0.post6.dev0-cp311-cp311-macosx_26_0_arm64.whl", hash = "sha256:cbbde169247c5aab30812c89e34a6f7a271eef6f85f86b7c9f0df211f7f307d2" },
+    { url = "https://git.aspn.us/api/v4/projects/94/packages/pypi/files/b096698b7e5e5d8d55975326a494cea193f8e6ba08164f4555a999d85feb0694/navtk-2.1.0.post6.dev0-cp311-cp311-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:b096698b7e5e5d8d55975326a494cea193f8e6ba08164f4555a999d85feb0694" },
+    { url = "https://git.aspn.us/api/v4/projects/94/packages/pypi/files/a73bea92dc5ced56272c728b122b92549b21c4b42cbbf69ffcaeb796b520debe/navtk-2.1.0.post6.dev0-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:a73bea92dc5ced56272c728b122b92549b21c4b42cbbf69ffcaeb796b520debe" },
+    { url = "https://git.aspn.us/api/v4/projects/94/packages/pypi/files/3616334f1dc2276634957c1c55ceb6425039c91693ce70a32f73a4a7ba383267/navtk-2.1.0.post6.dev0-cp312-cp312-macosx_26_0_arm64.whl", hash = "sha256:3616334f1dc2276634957c1c55ceb6425039c91693ce70a32f73a4a7ba383267" },
+    { url = "https://git.aspn.us/api/v4/projects/94/packages/pypi/files/8d5725dff946e19eb5c752e62f1d6db4e128138b711a72ca663ec6b501c94b3f/navtk-2.1.0.post6.dev0-cp312-cp312-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:8d5725dff946e19eb5c752e62f1d6db4e128138b711a72ca663ec6b501c94b3f" },
+    { url = "https://git.aspn.us/api/v4/projects/94/packages/pypi/files/b438e4c19deb73c18e89015a34b8765a3eb6b8f2e9e1ca0f2a871a12d6414c2d/navtk-2.1.0.post6.dev0-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:b438e4c19deb73c18e89015a34b8765a3eb6b8f2e9e1ca0f2a871a12d6414c2d" },
+    { url = "https://git.aspn.us/api/v4/projects/94/packages/pypi/files/ed8bcd69aaa2f91a77730cd327621614b8e026ea5c49850e669ebd1605a9d22a/navtk-2.1.0.post6.dev0-cp313-cp313-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:ed8bcd69aaa2f91a77730cd327621614b8e026ea5c49850e669ebd1605a9d22a" },
+    { url = "https://git.aspn.us/api/v4/projects/94/packages/pypi/files/0c31b3f91e6c38bcc43f6961e3fa009ad0116aa356f4557836be025c63cb49b8/navtk-2.1.0.post6.dev0-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:0c31b3f91e6c38bcc43f6961e3fa009ad0116aa356f4557836be025c63cb49b8" },
+    { url = "https://git.aspn.us/api/v4/projects/94/packages/pypi/files/a8675c85b3b04c17c01884ee3630981bcc4543be6849af8db90b4e6a311f0490/navtk-2.1.0.post6.dev0-cp314-cp314-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:a8675c85b3b04c17c01884ee3630981bcc4543be6849af8db90b4e6a311f0490" },
+    { url = "https://git.aspn.us/api/v4/projects/94/packages/pypi/files/36032d16f194aba85deb72a9cd947df77eaf7bbde0305c4a72fe99a195dbc5db/navtk-2.1.0.post6.dev0-cp314-cp314-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:36032d16f194aba85deb72a9cd947df77eaf7bbde0305c4a72fe99a195dbc5db" },
 ]
 
 [[package]]
@@ -1388,7 +1389,7 @@ requires-dist = [
     { name = "h5py", specifier = ">1" },
     { name = "lcm", specifier = ">=1.5.1,<2" },
     { name = "matplotlib" },
-    { name = "navtk", specifier = "==2.1.post3.dev0" },
+    { name = "navtk", specifier = "==2.1.post6.dev0" },
     { name = "numpy", specifier = "!=2.2" },
     { name = "pntos-api", editable = "pntos-api" },
     { name = "scipy", specifier = ">=1.15.2" },
