@@ -323,6 +323,16 @@ Standard POS INS VSB App:
         - docker exec pntos-python uv sync
         - docker exec pntos-python pytest apps -k test_standard_pos_ins_vsb_app -s
 
+Standard POS INS Record States App:
+    stage: run
+    needs: []
+    tags:
+        - linux-light-runner
+    script:
+        - docker run --rm -dit -v $(pwd):/work -v $HOME/.ccache:/root/.cache/uv --name pntos-python -e UV_INDEX=${UV_INDEX} $DOCKER_IMAGE bash
+        - docker exec pntos-python uv sync
+        - docker exec pntos-python pytest apps -k test_standard_pos_ins_record_states -s
+
 Advanced POS INS ROS App:
     stage: run
     needs: []
