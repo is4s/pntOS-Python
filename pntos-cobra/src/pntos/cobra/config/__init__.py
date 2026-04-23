@@ -22,6 +22,7 @@ from .ManualHeadingAlignmentConfig import (
     ManualHeadingAlignmentConfig as ManualHeadingAlignmentConfig,
 )
 from .OrchestrationConfig import (
+    FeedbackConfig as FeedbackConfig,
     FogmStateBlockConfig as FogmStateBlockConfig,
     MeasurementProcessorConfig as MeasurementProcessorConfig,
     PinsonStateBlockConfig as PinsonStateBlockConfig,

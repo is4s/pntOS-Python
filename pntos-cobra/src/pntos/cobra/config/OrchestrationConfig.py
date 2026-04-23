@@ -167,6 +167,31 @@ class SensorMeasurementProcessorConfig(MeasurementProcessorConfig):
     """
 
 
+class FeedbackConfig(BaseConfig):
+    """Configuration specifying when to perform inertial resets.
+
+    Attributes:
+        group (str): Inherited from BaseConfig. Registry group in which to store this
+            config.
+
+        time_trigger (float): Minimum time b/w inertial resets, in seconds. If set to 0,
+            will perform a reset after every measurement update, provided
+            pos_error_threshold has also been surpassed.
+
+        pos_error_threshold (float): Minimum estimate, in meters, of any of the inertial
+            position error states required to trigger a reset. If set to 0, will perform
+            a reset after every measurement update, provided time_threshold has also
+            been surpassed.
+    """
+
+    # INHERITED FIELDS
+    group: str
+
+    # UNIQUE FIELDS
+    time_threshold: float = 0.0
+    pos_error_threshold: float = 0.0
+
+
 @dataclass
 class TutorialOrchestrationConfig(BaseConfig):
     """
@@ -235,6 +260,12 @@ class StandardOrchestrationConfig(BaseConfig):
     """
     An inertial config that contains inertial buffering and mechanization information.
     """
+
+    feedback_config: FeedbackConfig | None = None
+    """
+    Optional config specifying when to perform inertial resets. If None, will apply feedback after every measurement update.
+    """
+
     alignment_config: BaseConfig
     """
     A config that contains information used to set up the initialization strategy.

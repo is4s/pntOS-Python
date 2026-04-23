@@ -30,6 +30,7 @@ from pntos.api import (
 )
 from pntos.cobra.config import (
     ControllerConfig,
+    FeedbackConfig,
     MeasurementProcessorConfig,
     PinsonStateBlockConfig,
     PreprocessorConfig,
@@ -75,6 +76,8 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
     initialization_state: InitializationStatus
     initializer: InertialInitializationStrategy
     inertial: StandardInertialMechanization
+    feedback_config: FeedbackConfig | None
+    last_feedback_time_ns: int
     fusion_engine: StandardFusionEngine
     measurement_channels: dict[str, list[str]]
     pinson_sb_config: PinsonStateBlockConfig
@@ -275,6 +278,7 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
         self.inertial_group = orch_config.inertial_config.group
         self.max_prop_dt_ns = int(orch_config.max_prop_interval * 1e9)
         self.buffer_time_ns = int(controller_config.buffer_length_sec * 1e9)
+        self.feedback_config = orch_config.feedback_config
 
     def _initialize_filter(self) -> None:
         """
@@ -300,6 +304,7 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
         # sync fusion engine and initial solution time
         init_time = self.init_solution.solution.wrapped_message.time_of_validity  # type: ignore[union-attr]
         self.fusion_engine.time = init_time
+        self.last_feedback_time_ns = init_time.elapsed_nsec
 
         self.cache.set(
             'inertial solution',
@@ -671,8 +676,34 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
                     vsb_label, [forces]
                 )
 
+    def _ready_to_apply_feedback(self) -> bool:
+        if self.feedback_config is None:
+            return True
+
+        surpassed_time_threshold = True
+        surpassed_error_threshold = True
+
+        if self.feedback_config.time_threshold:
+            time_since_last_feedback = (
+                self.fusion_engine.time.elapsed_nsec - self.last_feedback_time_ns
+            ) * 1e-9
+            surpassed_time_threshold = (
+                time_since_last_feedback >= self.feedback_config.time_threshold
+            )
+
+        if self.feedback_config.pos_error_threshold:
+            pinson_x_and_p: EstimateWithCovariance = self.cache.get('pinson')
+            surpassed_error_threshold = np.any(  # type: ignore[assignment]
+                pinson_x_and_p.estimate[:3] >= self.feedback_config.pos_error_threshold
+            )
+
+        return surpassed_time_threshold and surpassed_error_threshold
+
     def _apply_inertial_feedback(self) -> None:
         """Correct inertial solution with pinson error states and reset states."""
+        if not self._ready_to_apply_feedback():
+            return
+
         solution = self.cache.get('filter solution')
         if solution is None:
             return
@@ -701,6 +732,7 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
         # Inertial reset modified the solution at the current time, invalidating the
         # cached solution
         self.cache.clear('inertial solution')
+        self.last_feedback_time_ns = cur_time.elapsed_nsec
 
     def _perform_measurement_update(self, message: Message, target_mp: str) -> None:
         """
