@@ -31,8 +31,8 @@ dev = [
     "mypy==1.18.2",
     "myst-parser>=4",
     "pip>=24",
-    # Generated from commit ce6c78bd72ca4d3f890987f0c13e1d0c12acced3 on 17 March 2026
-    "pntos-python-docs-data==0.3",
+    # Generated from commit 3a7ff00284c489029e7bceef6ff5b7e17dda42c2 on 13 April 2026
+    "pntos-python-docs-data==0.4",
     "pyproject-fmt>=2.7",
     "pytest>=8.2",
     "pytest-cov>=6",

@@ -153,7 +153,7 @@ pluggy==1.6.0
     #   pytest-cov
 pntos-python-datasets==0.5.0
     # via pntos-python
-pntos-python-docs-data==0.3.0
+pntos-python-docs-data==0.4.0
 prompt-toolkit==3.0.51
     # via ipython
 ptyprocess==0.7.0 ; sys_platform != 'emscripten' and sys_platform != 'win32'

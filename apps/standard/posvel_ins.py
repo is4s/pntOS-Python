@@ -5,7 +5,7 @@
 Note: This app uses a simpler position measurement model than some of the other apps.
 Thus, the filter solution is less accurate than those apps.
 
-Note: This is the same data as the pos_vel_ins tutorial app, but with the  position
+Note: This is the same data as the pos_vel_ins tutorial app, but with the position
 and NED velocity measurements combined into a PVA measurement to be processed as a
 single measurement."""
 
