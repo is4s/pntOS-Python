@@ -1,5 +1,5 @@
 diff --git a/apps/standard/pos_ins.py b/apps/standard/direction_to_points.py
-index 832536b2..1bd74a8c 100755
+index 11f25a0b..66a69f72 100755
 --- a/apps/standard/pos_ins.py
 +++ b/apps/standard/direction_to_points.py
 @@ -24,6 +24,7 @@ from pntos.cobra import (
@@ -9,8 +9,8 @@ index 832536b2..1bd74a8c 100755
 +    DownsamplerConfig,
      FogmConfig,
      FogmStateBlockConfig,
-     ImuConfig,
-@@ -68,6 +69,7 @@ my_config = [
+     FusionEngineConfig,
+@@ -69,6 +70,7 @@ my_config = [
          channels_to_process=(
              '/sensor/vn-100/imu',
              '/sensor/ublox-ZED-F9T/position',
@@ -18,7 +18,7 @@ index 832536b2..1bd74a8c 100755
          ),
      ),
      ControllerConfig(group='controller'),
-@@ -98,17 +100,17 @@ my_config = [
+@@ -100,17 +102,17 @@ my_config = [
          ),
          mp_configs=(
              SensorMeasurementProcessorConfig(
@@ -45,7 +45,7 @@ index 832536b2..1bd74a8c 100755
                  ),
              ),
          ),
-@@ -142,6 +144,11 @@ my_config = [
+@@ -144,6 +146,11 @@ my_config = [
                  channels_to_correct=('/sensor/ublox-ZED-F9T/position',),
                  time_bias=int(0.15 * 1e9),
              ),

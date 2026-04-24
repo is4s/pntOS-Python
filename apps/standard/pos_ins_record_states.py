@@ -1,13 +1,17 @@
 #!/usr/bin/env python3
 
-"""App to process IMU, position and velocity measurements.
+"""This app is nearly identical to the apps/standard/pos_ins.py, with 2 key differences:
 
-Note: This app uses a simpler position measurement model than some of the other apps.
-Thus, the filter solution is less accurate than those apps.
+1. The filter states are recorded after each propagation and update step and saved to an
+   HDF5 file. After running this app, these states can be plotted along with the filter
+   solution via:
 
-Note: This is the same data as the pos_vel_ins tutorial app, but with the position
-and NED velocity measurements combined into a PVA measurement to be processed as a
-single measurement."""
+    ./postprocessing/plot_results.py pntos_output.log --hdf5-file=OUTPUT.hdf5
+
+2. The inertial error states modeled by the Pinson15NedBlock are reset only after one or
+   more of the position error states reaches 100 m. This differs from the base app,
+   which resets these states after every measurement update.
+"""
 
 import sys
 
@@ -18,6 +22,7 @@ from pntos.api import EstimateWithCovariance, EstimateWithCovarianceType, Loggin
 
 # Import Cobra plugins and config structs
 from pntos.cobra import (
+    DiagnosticLogPlugin,
     EkfFusionStrategyPlugin,
     LcmLogTransportPlugin,
     ManualHeadingAlignInitializationPlugin,
@@ -33,6 +38,7 @@ from pntos.cobra import (
 from pntos.cobra.config import (
     AspnVersion,
     ControllerConfig,
+    FeedbackConfig,
     FogmConfig,
     FogmStateBlockConfig,
     FusionEngineConfig,
@@ -78,11 +84,10 @@ my_config = [
         channels_to_process=(
             '/sensor/vn-100/imu',
             '/sensor/ublox-ZED-F9T/position',
-            '/sensor/ublox-ZED-F9T/pva',
         ),
     ),
     ControllerConfig(group='controller'),
-    FusionEngineConfig(),
+    FusionEngineConfig(save_x_and_p_after_prop=True, save_x_and_p_after_update=True),
     StandardOrchestrationConfig(
         best_sol_channel='/solution/pntos/pva',
         imu_sol_channel='/solution/pntos-imu/pva',
@@ -110,17 +115,17 @@ my_config = [
         ),
         mp_configs=(
             SensorMeasurementProcessorConfig(
-                group='config/posvel_measurement_processor',
-                identifier='pinson_posvel',
-                label='posvel',
-                channel='/sensor/ublox-ZED-F9T/pva',
-                state_block_labels=('pinson15',),
+                group='config/pos_measurement_processor',
+                identifier='pinson_with_ned_fogm_position',
+                label='pos',
+                channel='/sensor/ublox-ZED-F9T/position',
+                state_block_labels=('pinson15', 'pos_sensor_error'),
                 aux_channels=('INERTIAL_PVA',),
                 sensor_config=SensorConfig(
                     group='config/gp3d_state_modeling',
                     lever_arm=(-0.50, 0.38, -0.05),
                     orientation=(0.0, 0.0, 0.0, 0.0),
-                    sensor_name='posvel',
+                    sensor_name='position',
                 ),
             ),
         ),
@@ -130,6 +135,9 @@ my_config = [
             channels=('/sensor/vn-100/imu',),
             C_imu_to_platform=C_imu_to_platform,
             inertial_buffer_length=10.0,
+        ),
+        feedback_config=FeedbackConfig(
+            'config/inertial_feedback', pos_error_threshold=100.0
         ),
         alignment_config=ManualHeadingAlignmentConfig(
             group='config/default/alignment',
@@ -151,7 +159,7 @@ my_config = [
             ),
             TimeBiasConfig(
                 group='config/time_bias',
-                channels_to_correct=('/sensor/ublox-ZED-F9T/pva',),
+                channels_to_correct=('/sensor/ublox-ZED-F9T/position',),
                 time_bias=int(0.15 * 1e9),
             ),
         ),
@@ -178,6 +186,7 @@ plugins = [
     StandardRegistryPlugin('Cobra Standard Registry Plugin', config=my_config),
     StandardPreprocessorPlugin('Cobra Standard Preprocessor Plugin'),
     StandardOrchestrationPlugin('Cobra Standard Orchestration Plugin'),
+    DiagnosticLogPlugin('Cobra HDF5 Diagnostic Log Plugin'),
 ]
 
 # Start the controller, and pass it all of the other plugins to use

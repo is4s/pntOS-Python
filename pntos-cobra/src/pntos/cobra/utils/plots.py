@@ -90,6 +90,41 @@ def plot_pva(
     plot_tilt_err(tilt_err, pva.tilt_sig, pva.time, t0, pva.label, save_dir)
 
 
+def plot_x_and_p(
+    time: NDArray[float64],
+    t0: float,
+    state_labels: list[str],
+    estimate: NDArray[float64],
+    sigma: NDArray[float64],
+    plot_dir: Path | None = None,
+) -> None:
+    """Plot state estimate and covariance over time.
+
+    Args:
+        time: K-length array of timestamps (seconds)
+        t0: Initial time (in seconds). Timestamps of ``pva`` and ``truth_pva`` are relative to this.
+        estimate: KxN array of estimates at each time step, where N is the number of states.
+        sigma: KxN array of state 1-sigmas at each time step, where N is the number of states.
+        plot_dir: Directory to save plots to, if desired. If None, will not save plots.
+    """
+    _, N = estimate.shape
+    for state_idx in range(N):
+        est = estimate[:, state_idx]
+        sig = sigma[:, state_idx]
+        state_label = state_labels[state_idx]
+        plt.figure(state_label)
+        plt.suptitle(f'{state_label} vs. Time')
+        plt.plot(time, est)
+        plt.plot(time, est + sig, 'black', linestyle='--')
+        plt.plot(time, est - sig, 'black', linestyle='--')
+        plt.ylabel('State')
+        plt.xlabel(f'Relative time (sec), t0 = {t0}')
+        plt.legend(['Error', '+/- 1-sigma'])
+        if plot_dir:
+            filename = plot_dir / state_label
+            plt.savefig(f'{filename}.png', dpi=300)
+
+
 def plot_trajectory(
     ned: NDArray[float64],
     truth_ned: NDArray[float64],

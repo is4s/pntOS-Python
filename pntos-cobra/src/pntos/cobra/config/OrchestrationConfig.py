@@ -167,6 +167,7 @@ class SensorMeasurementProcessorConfig(MeasurementProcessorConfig):
     """
 
 
+@dataclass
 class FeedbackConfig(BaseConfig):
     """Configuration specifying when to perform inertial resets.
 

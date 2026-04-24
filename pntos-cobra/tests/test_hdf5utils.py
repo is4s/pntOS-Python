@@ -74,7 +74,7 @@ def test_hdf5_to_and_from() -> None:
     }
     mediator = StandardMediator('testing', UtilityPlugin)
     save_to_hdf5_file(TEST_FILE, test_dict, mediator)
-    res_dict = load_from_hdf5_file(TEST_FILE, mediator)
+    res_dict = load_from_hdf5_file(TEST_FILE, mediator.log_message)
     for test_key, test_val in test_dict.items():
         assert test_key in res_dict
         res_val = res_dict[test_key]

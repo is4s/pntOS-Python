@@ -24,11 +24,14 @@ from pntos.api import (
     StandardStateBlock,
     VirtualStateBlock,
 )
+from pntos.cobra.config import FusionEngineConfig, config_from_registry
 from pntos.cobra.utils import validate_array
 
 from .VirtualStateBlockManager import (
     VirtualStateBlockManager,
 )
+
+CONFIG_GROUP = 'config/fusion_engine'
 
 
 @dataclass
@@ -44,10 +47,17 @@ class StandardFusionEngine(api.StandardFusionEngine):
     A fusion engine designed to use data from multiple sensors and output a unified state estimate.
     """
 
-    def __init__(self, mediator: Mediator) -> None:
+    def __init__(
+        self,
+        mediator: Mediator,
+        save_x_and_p_after_prop: bool,
+        save_x_and_p_after_update: bool,
+    ) -> None:
         """
         Args:
             mediator (Mediator): A :class:`pntos.api.Mediator` instance.
+            save_x_and_p_after_prop: Whether to save state estimate and sigma to registry right after each propagate.
+            save_x_and_p_after_update: Whether to save state estimate and sigma to registry right after each update.
         """
         self._time: TypeTimestamp = TypeTimestamp(0)  # property
         self._sb: dict[
@@ -60,6 +70,9 @@ class StandardFusionEngine(api.StandardFusionEngine):
         self._num_states = 0
         self._mediator = mediator
         self._strategy: StandardFusionStrategy | None = None
+        self._save_x_and_p_after_prop = save_x_and_p_after_prop
+        self._save_x_and_p_after_update = save_x_and_p_after_update
+        self._saved_state_labels: list[str] = []
 
     @property
     def time(self) -> TypeTimestamp:
@@ -95,6 +108,29 @@ class StandardFusionEngine(api.StandardFusionEngine):
             self._sb[this_key].start_index = i_next
             self._sb[this_key].stop_index = i_next + self._sb[this_key].num_states
             i_next = i_next + self._sb[this_key].num_states
+
+    def _save_x_and_p_to_registry(self) -> None:
+        estimate = self._strategy.estimate  # type: ignore[union-attr]
+        covariance = self._strategy.covariance  # type: ignore[union-attr]
+
+        if estimate is None or covariance is None:
+            return
+
+        with self._mediator.registry.batch_start('diagnostics') as kv:
+            if not self._saved_state_labels:
+                self._saved_state_labels = [''] * self.num_states
+                for sb_label, info in self._sb.items():
+                    for index in range(info.start_index, info.stop_index):
+                        state_label = f'{sb_label}_state{index - info.start_index}'
+                        self._saved_state_labels[index] = state_label
+                kv['state_labels'] = self._saved_state_labels
+
+            # clear time key so that registry callback will be triggered even if time doesn't change
+            if 'time' in kv and kv['time'] == self.time.elapsed_nsec:
+                del kv['time']
+            kv['time'] = self.time.elapsed_nsec
+            kv['estimate'] = estimate.flatten()
+            kv['sigma'] = np.sqrt(np.diagonal(covariance))
 
     @property
     def num_states(self) -> int:
@@ -589,6 +625,9 @@ class StandardFusionEngine(api.StandardFusionEngine):
         self._strategy.propagate(big_dynamics_model)
         self.time = time
 
+        if self._save_x_and_p_after_prop:
+            self._save_x_and_p_to_registry()
+
     def update(self, processor_label: str, message: Message) -> None:
         assert self._strategy is not None, 'FusionStrategy has not been set'
         # Verify processor exists
@@ -693,6 +732,9 @@ class StandardFusionEngine(api.StandardFusionEngine):
 
         # Use the fusion strategy to update the states
         self._strategy.update(measurement_model=big_measurement_model)
+
+        if self._save_x_and_p_after_update:
+            self._save_x_and_p_to_registry()
 
     def get_real_label(self, label: str) -> str | None:
         """
@@ -907,7 +949,17 @@ class StandardFusionPlugin(FusionPlugin):
         self, fusion_type: type[FusionEngineType]
     ) -> FusionEngineType | None:
         if self.is_fusion_type_supported(fusion_type):
-            return StandardFusionEngine(mediator=self._mediator)
+            config = config_from_registry(
+                FusionEngineConfig, self._mediator, CONFIG_GROUP
+            )
+            assert config is not None
+
+            return StandardFusionEngine(
+                self._mediator,
+                config.save_x_and_p_after_prop,
+                config.save_x_and_p_after_update,
+            )
+
         self._mediator.log_message(
             LoggingLevel.ERROR,
             f'Fusion strategy type {fusion_type.__name__} not currently supported. '

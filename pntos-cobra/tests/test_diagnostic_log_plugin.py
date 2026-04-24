@@ -117,7 +117,7 @@ def test_diagnostic_log_plugin() -> None:
     assert TEST_FILE.exists()
 
     # Load in the file and make sure it's all correct
-    result_dict = load_from_hdf5_file(TEST_FILE, mediator)
+    result_dict = load_from_hdf5_file(TEST_FILE, mediator.log_message)
 
     for key, received_list in result_dict.items():
         # Make sure we only received one value in the received list

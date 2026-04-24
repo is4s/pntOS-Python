@@ -10,6 +10,7 @@ from .ControllerConfig import (
     ControllerConfig as ControllerConfig,
 )
 from .FogmConfig import FogmConfig as FogmConfig
+from .FusionEngineConfig import FusionEngineConfig as FusionEngineConfig
 from .ImuConfig import ImuConfig as ImuConfig
 from .InertialConfig import InertialConfig as InertialConfig
 from .LcmTransportConfig import (

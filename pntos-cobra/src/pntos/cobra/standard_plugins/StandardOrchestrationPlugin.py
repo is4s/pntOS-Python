@@ -694,7 +694,8 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
         if self.feedback_config.pos_error_threshold:
             pinson_x_and_p: EstimateWithCovariance = self.cache.get('pinson')
             surpassed_error_threshold = np.any(  # type: ignore[assignment]
-                pinson_x_and_p.estimate[:3] >= self.feedback_config.pos_error_threshold
+                np.abs(pinson_x_and_p.estimate[:3])
+                >= self.feedback_config.pos_error_threshold
             )
 
         return surpassed_time_threshold and surpassed_error_threshold

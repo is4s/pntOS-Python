@@ -119,13 +119,17 @@ def config_from_registry(
     Returns:
         ConfigType | None
     """
-    conf_params = [f for f in fields(config_type) if f.name != 'group']
+    conf_params = fields(config_type)
     kv = mediator.registry.batch_start(config_group)
     out: dict[str, SupportedRegistryTypeUnion] = {}
     val: SupportedRegistryTypeUnion
     fail = False
     for param in conf_params:
         if not param.init:  # field has constant value, don't set
+            continue
+        if param.name == 'group':
+            # Set group field
+            out[param.name] = config_group
             continue
 
         dtype = _get_dtype(param.type)  # type: ignore[arg-type]
@@ -177,7 +181,7 @@ def config_from_registry(
     kv.batch_end()
     if fail:
         return None
-    return config_type(**out, group=config_group)
+    return config_type(**out)  # type:ignore[arg-type]
 
 
 def _exists(kv: KeyValueStore, pname: str, ptype: type[Any]) -> bool:

@@ -14,6 +14,7 @@ from pntos_python_datasets import EXAMPLE_LCM_LOG, EXAMPLE_ROS_LOG
 
 OUTPUT_LOG_PREFIX = 'pntos_output'
 OUTPUT_LOG = Path(f'{OUTPUT_LOG_PREFIX}.log')
+OUTPUT_HDF5_FILE = Path('OUTPUT.hdf5')
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
@@ -42,9 +43,13 @@ if __name__ == '__main__':
 
     # Tutorial apps include UI plugin which automatically plots upon shutdown, so no need to plot again
     if 'tutorial' not in app_to_run.as_posix():
-        if OUTPUT_LOG.exists():
-            plot_results(OUTPUT_LOG, '/solution/pntos/pva', '/sensor/ins-d/pva')
-        else:
+        if not OUTPUT_LOG.exists():
             print(
                 f'Cannot plot results. pntOS failed to generate output log "{OUTPUT_LOG}"'
             )
+            sys.exit(1)
+
+        state_file = None
+        if 'record_states' in app_to_run.as_posix():
+            state_file = OUTPUT_HDF5_FILE
+        plot_results(OUTPUT_LOG, '/solution/pntos/pva', '/sensor/ins-d/pva', state_file)

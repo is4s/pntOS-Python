@@ -24,6 +24,7 @@ from pntos.cobra.config import (
     ControllerConfig,
     FogmConfig,
     FogmStateBlockConfig,
+    FusionEngineConfig,
     ImuConfig,
     ImuRotatorConfig,
     InertialConfig,
@@ -57,6 +58,7 @@ imu_model = ImuConfig(
 my_config = [
     LcmTransportConfig(output_version=AspnVersion.V23, group='config/lcm_transport'),
     ControllerConfig(group='controller'),
+    FusionEngineConfig(),
     StandardOrchestrationConfig(
         best_sol_channel='/solution/pntos/pva',
         imu_sol_channel='/solution/pntos-imu/pva',

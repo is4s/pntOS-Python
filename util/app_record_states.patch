@@ -1,0 +1,66 @@
+diff --git a/apps/standard/pos_ins.py b/apps/standard/pos_ins_record_states.py
+index 11f25a0b..1fe02743 100755
+--- a/apps/standard/pos_ins.py
++++ b/apps/standard/pos_ins_record_states.py
+@@ -1,5 +1,18 @@
+ #!/usr/bin/env python3
+ 
++"""This app is nearly identical to the apps/standard/pos_ins.py, with 2 key differences:
++
++1. The filter states are recorded after each propagation and update step and saved to an
++   HDF5 file. After running this app, these states can be plotted along with the filter
++   solution via:
++
++    ./postprocessing/plot_results.py pntos_output.log --hdf5-file=OUTPUT.hdf5
++
++2. The inertial error states modeled by the Pinson15NedBlock are reset only after one or
++   more of the position error states reaches 100 m. This differs from the base app,
++   which resets these states after every measurement update.
++"""
++
+ import sys
+ 
+ import numpy as np
+@@ -9,6 +22,7 @@ from pntos.api import EstimateWithCovariance, EstimateWithCovarianceType, Loggin
+ 
+ # Import Cobra plugins and config structs
+ from pntos.cobra import (
++    DiagnosticLogPlugin,
+     EkfFusionStrategyPlugin,
+     LcmLogTransportPlugin,
+     ManualHeadingAlignInitializationPlugin,
+@@ -24,6 +38,7 @@ from pntos.cobra import (
+ from pntos.cobra.config import (
+     AspnVersion,
+     ControllerConfig,
++    FeedbackConfig,
+     FogmConfig,
+     FogmStateBlockConfig,
+     FusionEngineConfig,
+@@ -72,7 +87,7 @@ my_config = [
+         ),
+     ),
+     ControllerConfig(group='controller'),
+-    FusionEngineConfig(),
++    FusionEngineConfig(save_x_and_p_after_prop=True, save_x_and_p_after_update=True),
+     StandardOrchestrationConfig(
+         best_sol_channel='/solution/pntos/pva',
+         imu_sol_channel='/solution/pntos-imu/pva',
+@@ -121,6 +136,9 @@ my_config = [
+             C_imu_to_platform=C_imu_to_platform,
+             inertial_buffer_length=10.0,
+         ),
++        feedback_config=FeedbackConfig(
++            'config/inertial_feedback', pos_error_threshold=100.0
++        ),
+         alignment_config=ManualHeadingAlignmentConfig(
+             group='config/default/alignment',
+             static_time=10.0,
+@@ -168,6 +186,7 @@ plugins = [
+     StandardRegistryPlugin('Cobra Standard Registry Plugin', config=my_config),
+     StandardPreprocessorPlugin('Cobra Standard Preprocessor Plugin'),
+     StandardOrchestrationPlugin('Cobra Standard Orchestration Plugin'),
++    DiagnosticLogPlugin('Cobra HDF5 Diagnostic Log Plugin'),
+ ]
+ 
+ # Start the controller, and pass it all of the other plugins to use

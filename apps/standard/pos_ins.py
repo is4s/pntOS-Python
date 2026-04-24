@@ -26,6 +26,7 @@ from pntos.cobra.config import (
     ControllerConfig,
     FogmConfig,
     FogmStateBlockConfig,
+    FusionEngineConfig,
     ImuConfig,
     ImuRotatorConfig,
     InertialConfig,
@@ -71,6 +72,7 @@ my_config = [
         ),
     ),
     ControllerConfig(group='controller'),
+    FusionEngineConfig(),
     StandardOrchestrationConfig(
         best_sol_channel='/solution/pntos/pva',
         imu_sol_channel='/solution/pntos-imu/pva',
