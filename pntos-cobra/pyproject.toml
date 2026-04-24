@@ -32,7 +32,7 @@ dependencies = [
     "lcm>=1.5.1,<2",
     "matplotlib",
     # Generated from commit 2d65da3693e7087a0e9ae56db6eba900c9e7ea91 on 8 May 2025
-    "navtk==2.1.post3.dev0",
+    "navtk==2.1.post6.dev0",
     # numpy 2.2 type errors with Cobra (#148).
     "numpy!=2.2",
     "pntos-api==0.1.dev0",

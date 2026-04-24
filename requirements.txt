@@ -119,7 +119,7 @@ mypy==1.18.2
 mypy-extensions==1.1.0
     # via mypy
 myst-parser==4.0.1
-navtk==2.1.0.post3.dev0
+navtk==2.1.0.post6.dev0
     # via pntos-cobra
 numpy==2.1.3
     # via
