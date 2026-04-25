@@ -3,6 +3,7 @@ from aspn23 import (
     MeasurementAltitude,
     MeasurementAltitudeReference,
     MeasurementPosition,
+    MeasurementPositionReferenceFrame,
     MeasurementPositionVelocityAttitude,
     MeasurementPositionVelocityAttitudeReferenceFrame,
 )
@@ -26,8 +27,8 @@ class AltitudeMeasurementProcessor(StandardMeasurementProcessor):
 
     This measurement processor handles all of the following ASPN message types:
      - MeasurementAltitude
-     - MeasurementPosition
-     - MeasurementPositionVelocityAttitude
+     - MeasurementPosition (Geodetic)
+     - MeasurementPositionVelocityAttitude (Geodetic)
     """
 
     _mediator: Mediator
@@ -47,8 +48,8 @@ class AltitudeMeasurementProcessor(StandardMeasurementProcessor):
             label (str): Name of processor.
             state_block_labels (list[str]): A 2-element list of labels of state blocks this
                 processor can update. The first entry should refer to a Pinson-style
-                state block of at least size 3, with NED position errors in meters as
-                the first three states. The second entry should refer to a 1-state FOGM
+                state block of at least size 3, with a Down position error in meters as
+                the third state. The second entry should refer to a 1-state FOGM
                 state block estimating time-correlated altitude bias.
             mediator (Mediator): A :class:`pntos.api.Mediator` instance.
         """
@@ -127,18 +128,27 @@ class AltitudeMeasurementProcessor(StandardMeasurementProcessor):
             # Convert altitude from MSL to HAE if necessary
             if meas.reference is MeasurementAltitudeReference.MSL:
                 alt = msl_to_hae(alt, self._inertial_pos[0], self._inertial_pos[1])[1]
-        elif isinstance(meas, MeasurementPosition):
+        elif (
+            isinstance(meas, MeasurementPosition)
+            and meas.reference_frame is MeasurementPositionReferenceFrame.GEODETIC
+        ):
             time = meas.time_of_validity
             alt = meas.term3
             variance = meas.covariance[2, 2]
-        elif isinstance(meas, MeasurementPositionVelocityAttitude):
+        elif (
+            isinstance(meas, MeasurementPositionVelocityAttitude)
+            and meas.reference_frame
+            is MeasurementPositionVelocityAttitudeReferenceFrame.GEODETIC
+        ):
             time = meas.time_of_validity
             alt = meas.p3
             variance = meas.covariance[2, 2]
         else:
             self._mediator.log_message(
                 LoggingLevel.ERROR,
-                f'AltitudeMeasurementProcessor expected message of type MeasurementAltitude, MeasurementPosition, or MeasurementPositionVelocityAttitude, but got message of type {type(meas)}. Cannot process message.',
+                f'AltitudeMeasurementProcessor expected message of type MeasurementAltitude, or a MeasurementPosition/ \
+                MeasurementPositionVelocityAttitude with a GEODETIC reference frame. Message of type \
+                {type(meas)} does not qualify. Cannot process message.',
             )
             return None
 
@@ -166,7 +176,7 @@ class AltitudeMeasurementProcessor(StandardMeasurementProcessor):
         z = np.array([[alt - inertial_alt]])
         H = np.zeros((1, num_states))
         H[0, 2] = -1
-        H[0, 15] = 1
+        H[0, -1] = 1
 
         def h(x: NDArray[float64]) -> NDArray[float64]:
             return H @ x

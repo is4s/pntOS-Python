@@ -45,7 +45,10 @@ class PositionMeasurementProcessor(StandardMeasurementProcessor):
 
         Args:
             label (str): Name of processor.
-            state_block_labels (list[str]): The list of state blocks this measurement processor can update.
+            state_block_labels (list[str]): A 2-element list of labels of state blocks this
+                processor can update. The first entry should refer to a Pinson-style
+                state block of at least size 9, with NED position errors in meters as
+                the first three states and NED tilt errors, in radians, as states 6:9.
             mediator (Mediator): a Mediator instance.
         """
         if len(state_block_labels) != 2:  # noqa: PLR2004
@@ -78,8 +81,8 @@ class PositionMeasurementProcessor(StandardMeasurementProcessor):
             gen_x_and_p_func: Callback to get the current joint state estimate and covariance for both the PinsonErrorToStandard
                 virtual state block and sensor measurement error blocks this processor is updating. LLA position in
                 rad, rad, meters respectively are expected at indices [0:3] and RPY tilt in radians are
-                expected at indices [6:9]. Sensor measurement error states in the NED frame are expected to
-                be the last 3 states.
+                expected at indices [6:9]. Sensor measurement error states in units matching
+                indices [0:3] are expected to be the last 3 states.
         Returns:
             StandardMeasurementModel if all restrictions on `message` and `gen_x_and_p_func` are met and
             proper aux data is available, None otherwise.

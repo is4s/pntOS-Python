@@ -103,7 +103,9 @@ class StandardStateBlock(ABC):
     """
 
     label: str
+    """The unique name for this state block."""
     num_states: int
+    """The number of states represented by this state block."""
 
     @abstractmethod
     def receive_aux_data(self, aux: list[Message | None]) -> None:
@@ -278,7 +280,16 @@ class StandardMeasurementProcessor(ABC):
     """
 
     label: str
+    """A unique name for this measurement processor. This value will be used to
+            select a measurement processor to handle new measurements that the strategy
+            receives"""
     state_block_labels: list[str]
+    """A list of unique state block labels associated with
+            measurements received by this processor. The estimate and covariance matrices passed
+            into :meth:`generate_model` will be composed of the states associated with these state
+            blocks, and the returned StandardMeasurementModel.h and StandardMeasurementModel.H must
+            respect these states. Note: ``state_block_labels[i]`` is the identifier for the ``i`` th
+            state block this processor relates to"""
 
     @abstractmethod
     def receive_aux_data(self, aux: list[Message | None]) -> None:

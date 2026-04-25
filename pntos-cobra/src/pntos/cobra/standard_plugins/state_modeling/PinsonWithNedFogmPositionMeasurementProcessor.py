@@ -162,7 +162,7 @@ class PinsonWithNedFogmPositionMeasurementProcessor(StandardMeasurementProcessor
         if not isinstance(message.wrapped_message, MeasurementPosition):
             self._mediator.log_message(
                 LoggingLevel.ERROR,
-                f'PinsonWithNedFogmPositionMeasurementProcessorexpected message of type\
+                f'PinsonWithNedFogmPositionMeasurementProcessor expected message of type\
                 MeasurementPosition, but got message of type \
                 {type(message.wrapped_message)}. Cannot process message.',
             )
