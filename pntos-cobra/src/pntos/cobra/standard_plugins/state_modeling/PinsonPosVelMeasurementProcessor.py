@@ -94,6 +94,15 @@ class PinsonPosVelMeasurementProcessor(StandardMeasurementProcessor):
 
         pva = aux[0].wrapped_message
 
+        if pva.reference_frame is not MeasurementPVAReferenceFrame.GEODETIC:
+            self._mediator.log_message(
+                LoggingLevel.ERROR,
+                f'PinsonPosVelMeasurementProcessor expected MeasurementPositionVelocityAttitude with a\
+                reference frame of f{MeasurementPVAReferenceFrame.GEODETIC}, but got measurement with a\
+                reference frame of {pva.reference_frame}. Cannot process message.',
+            )
+            return
+
         if pva.quaternion is None:
             self._mediator.log_message(
                 LoggingLevel.ERROR,

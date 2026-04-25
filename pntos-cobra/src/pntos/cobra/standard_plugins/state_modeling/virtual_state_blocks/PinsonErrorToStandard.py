@@ -42,13 +42,21 @@ class PinsonErrorToStandard(VirtualStateBlock):
 
     Output Transformation States in Order:
         0 - Latitude        (rad)
+
         1 - Longitude       (rad)
+
         2 - Altitude HAE    (m)
+
         3 - North Velocity  (m/s)
+
         4 - East Velocity   (m/s)
+
         5 - Down Velocity   (m/s)
+
         6 - Roll            (rad)
+
         7 - Pitch           (rad)
+
         8 - Yaw             (rad)
 
     Additional trailing states are retained and unmodified.

@@ -122,8 +122,11 @@ class PinsonVelocityMeasurementProcessor(StandardMeasurementProcessor):
         )
 
         # z = measured NED inertial velocity error
+        ewc = gen_x_and_p_func(self.state_block_labels)
+        if ewc is None:
+            return None
         z = np.reshape(meas_vel - inertial_vel, (3, 1))
-        H = np.zeros((3, 15))
+        H = np.zeros((3, ewc.estimate.shape[0]))
         H[:, 3:6] = np.eye(3)
 
         def h(x: NDArray[float64]) -> NDArray[float64]:

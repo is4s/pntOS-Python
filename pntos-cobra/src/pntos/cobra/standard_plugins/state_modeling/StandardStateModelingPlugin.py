@@ -325,10 +325,10 @@ class StandardStateModelProvider(api.StandardStateModelProvider):
         Args:
             block_index (int): Index into self.block_identifiers used to select the desired type of state block.
 
-                - Index 0 corresponds to a Pinson15NedBlock.
-                - Index 1 corresponds to a FogmBlock.
-                - Index 2 corresponds to a ClockBiasStateBlock.
-                - Index 3 corresponds to a ConstantStateBlock.
+                - Index 0 corresponds to a :class:`Pinson15NedBlock`.
+                - Index 1 corresponds to a :class:`FogmBlock`.
+                - Index 2 corresponds to a :class:`ClockBiasStateBlock`.
+                - Index 3 corresponds to a :class:`ConstantStateBlock`.
                 - All other indices will result in a return value of None.
             engine (StandardFusionEngine | None): An optional parameter that may be provided to the
                 new block, such that the block may interact with the fusion engine it
@@ -466,8 +466,8 @@ class StandardStateModelProvider(api.StandardStateModelProvider):
         Args:
             virtual_block_index (int): Index into self.virtual_block_identifiers used to select the desired type of state block.
 
-                - Index 0 corresponds to a PinsonErrorToStandard VSB.
-                - Index 1 corresponds to a StateExtractor VSB.
+                - Index 0 corresponds to a :class:`PinsonErrorToStandard` VSB.
+                - Index 1 corresponds to a :class:`StateExtractor` VSB.
                 - All other indices will result in a return value of None.
             source_label (str): A string which will be used to populate the ``source`` field
                 of the newly created virtual state block. This ``source_label`` should correspond
