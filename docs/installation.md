@@ -28,8 +28,7 @@ open a new shell.
 
 ## Environment Setup
 
-Setting up your environment is done in two steps: installing native dependencies and then setting up your Python
-environment.
+Setting up your environment is done in three steps: installing native dependencies, cloning the {term}`pntOS-Python` project, and setting up your Python environment.
 
 ### Install Native Dependencies
 
@@ -52,12 +51,20 @@ sudo apt update && sudo apt install python3 python3-venv git libglib2.0-dev defa
 Users of other operating systems will need to install the above packages using
 their operating system's package manager.
 
+### Cloning pntOS-Python
+
+Next, download the {term}`pntOS-Python` project onto your machine. While there are several approaches to do so, we suggest
+you clone the [`pntos-python Git repository`](https://git.aspn.us/pntos/pntos-python) using:
+
 ```{note}
-While Cobra has been tested and is known to work on many different operating systems, currently only Ubuntu 22.04
-and 24.04 are officially supported. We anticipate adding support for many more operating systems before our 1.0 release.
+The following command requires that you have successfully created an SSH key and added it to [your git.aspn.us profile](https://git.aspn.us/-/user_settings/ssh_keys) as described in the [Authentication](#authentication) section.
 ```
 
-You are now ready to set up your Python environment in the next section.
+```shell
+git clone git@git.aspn.us:pntos/pntos-python.git
+```
+
+Finally, you are now ready to set up your Python environment in the next section.
 
 ### Python Environment Setup
 
