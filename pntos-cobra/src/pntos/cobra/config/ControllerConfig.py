@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from .BaseConfig import BaseConfig
 
@@ -17,7 +17,7 @@ class ControllerConfig(BaseConfig):
     """
 
     # INHERITED FIELDS
-    group: str
+    group: str = field(default='config/controller', init=False)
 
     # UNIQUE FIELDS
     buffer_length_sec: float = 2.0
@@ -34,8 +34,7 @@ class BuscatConfig(BaseConfig):
     """
 
     # INHERITED FIELDS
-    group: str
-    """Inherited from BaseConfig. Registry group in which to store this config."""
+    group: str = field(default='config/buscat', init=False)
 
     # UNIQUE FIELDS
     output_transports: tuple[str, ...]

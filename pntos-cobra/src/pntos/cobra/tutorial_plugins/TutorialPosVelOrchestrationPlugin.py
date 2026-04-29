@@ -86,7 +86,7 @@ class TutorialPosVelOrchestrationPlugin(OrchestrationPlugin):
         orch_config = config_from_registry(
             TutorialOrchestrationConfig,
             self.mediator,
-            'config/orchestration',
+            TutorialOrchestrationConfig.group,
         )
 
         # Associate incoming channels with measurement processor labels

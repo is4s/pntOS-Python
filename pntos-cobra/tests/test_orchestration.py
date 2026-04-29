@@ -147,7 +147,6 @@ tutorial_config = [
     ),
     TutorialOrchestrationConfig(
         position_channel=POS_CHANNEL,
-        group='config/orchestration',
     ),
     TimeAdjusterConfig(
         group='config/time_adjuster',
@@ -171,7 +170,7 @@ tutorial_config = [
 ]
 
 standard_config = [
-    ControllerConfig(group='controller'),
+    ControllerConfig(),
     FusionEngineConfig(),
     StandardOrchestrationConfig(
         best_sol_channel=BEST_SOL_CHANNEL,
@@ -238,7 +237,6 @@ standard_config = [
                 C_imu_to_platform=C_imu_to_platform,
             ),
         ),
-        group='config/orchestration',
     ),
 ]
 

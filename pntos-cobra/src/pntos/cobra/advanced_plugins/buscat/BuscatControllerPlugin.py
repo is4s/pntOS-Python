@@ -178,7 +178,7 @@ class BuscatControllerPlugin(ControllerPlugin):
 
         # Set the mediators' output transport
         temp_mediator = BuscatMediator(self.identifier, ControllerPlugin)
-        config = config_from_registry(BuscatConfig, temp_mediator, 'buscat')
+        config = config_from_registry(BuscatConfig, temp_mediator, BuscatConfig.group)
         if config is None:
             self._log(
                 LoggingLevel.ERROR,

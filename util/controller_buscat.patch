@@ -1,5 +1,5 @@
 diff --git a/pntos-cobra/src/pntos/cobra/standard_plugins//controller/StandardControllerPlugin.py b/pntos-cobra/src/pntos/cobra/advanced_plugins//buscat/BuscatControllerPlugin.py
-index 2fdc67aa..e1a55e77 100644
+index 0236a214..621de1f7 100644
 --- a/pntos-cobra/src/pntos/cobra/standard_plugins//controller/StandardControllerPlugin.py
 +++ b/pntos-cobra/src/pntos/cobra/advanced_plugins//buscat/BuscatControllerPlugin.py
 @@ -6,12 +6,11 @@ from pntos.api import (
@@ -121,25 +121,27 @@ index 2fdc67aa..e1a55e77 100644
  
          # call init_plugin() on all the other plugins
          for i, plugin in enumerate(self._plugins):
-@@ -179,40 +174,25 @@ class StandardControllerPlugin(ControllerPlugin):
+@@ -179,42 +174,25 @@ class StandardControllerPlugin(ControllerPlugin):
              )
  
          # Give the mediators other needed plugins
 -        StandardMediator._transport_plugins = self._transport_plugins
 -        StandardMediator._orchestration_plugin = orchestration_plugin
-+        BuscatMediator._transport_plugins = self._transport_plugins
- 
+-
 -        # Give the orchestration the plugins it needs
 -        orchestration_plugin.init_orchestration_plugin(
 -            plugins_for_orchestration, stream_config
 -        )
--
++        BuscatMediator._transport_plugins = self._transport_plugins
+ 
 -        # Extract controller-specific config
 -        temp_mediator = StandardMediator(self.identifier, ControllerPlugin)
--        config = config_from_registry(ControllerConfig, temp_mediator, 'controller')
+-        config = config_from_registry(
+-            ControllerConfig, temp_mediator, ControllerConfig.group
+-        )
 +        # Set the mediators' output transport
 +        temp_mediator = BuscatMediator(self.identifier, ControllerPlugin)
-+        config = config_from_registry(BuscatConfig, temp_mediator, 'buscat')
++        config = config_from_registry(BuscatConfig, temp_mediator, BuscatConfig.group)
          if config is None:
              self._log(
                  LoggingLevel.ERROR,
@@ -169,7 +171,7 @@ index 2fdc67aa..e1a55e77 100644
          """
          Utility function to ensure ``plugins`` contains enough plugins to run pntOS
          Cobra. Then assigns and dispatches them to the relevant fields on the
-@@ -220,34 +200,21 @@ class StandardControllerPlugin(ControllerPlugin):
+@@ -222,34 +200,21 @@ class StandardControllerPlugin(ControllerPlugin):
          not as expected.
          """
          sorted_plugins: SortedPlugins = sort_plugins_dataclass(plugins)
@@ -204,7 +206,7 @@ index 2fdc67aa..e1a55e77 100644
          )
  
      def _log(self, level: LoggingLevel, message: str) -> None:
-@@ -285,10 +252,10 @@ class StandardControllerPlugin(ControllerPlugin):
+@@ -287,10 +252,10 @@ class StandardControllerPlugin(ControllerPlugin):
                  'Press Ctrl + C at any time to shut down pntOS...',
              )
              try:

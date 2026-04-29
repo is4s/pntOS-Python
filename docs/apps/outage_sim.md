@@ -10,10 +10,10 @@ This tutorial will iteratively walk through these features and the effects they 
 
 ## The Outage
 
-Thanks to the handy {py:obj}`OutagePreprocessor<pntos.cobra.internal.OutagePreprocessor>` we are able to simulate an outage of 
-any channel we choose. In this app we have chosen to deprive the filter of GPS position measurements for 600 seconds 
-(seconds 1000 to 1600). Inducing this outage on the Standard POS INS App creates an IMU-only environment where the 
-filter's error grows without any constraints. 
+Thanks to the handy {py:obj}`OutagePreprocessor<pntos.cobra.internal.OutagePreprocessor>` we are able to simulate an outage of
+any channel we choose. In this app we have chosen to deprive the filter of GPS position measurements for 600 seconds
+(seconds 1000 to 1600). Inducing this outage on the Standard POS INS App creates an IMU-only environment where the
+filter's error grows without any constraints.
 
 ![](../images/outage_ne_traj.png)
 
@@ -25,9 +25,9 @@ Cobra Solution.
 
 While the trajectory plot is great for visualization, it does not provide much information on what is going on behind
 the scenes. The NED Position Error plot, however, gives us numerical insight into how the filter handled the GPS
-position outage. One thing we quickly notice is that the down error grew significantly, something the trajectory did not reveal. 
+position outage. One thing we quickly notice is that the down error grew significantly, something the trajectory did not reveal.
 IMUs are typically very sensitive to vertical position errors because even the smallest gyro misalignment can open the door for
-gravity to cause quadratic error growth. 
+gravity to cause quadratic error growth.
 
 In both plots, we can clearly see the outage has a significant, adverse effect on the accuracy of the Cobra solution.
 So how can we improve our filter's response to an outage? Data - the answer to most problems. If we can provide our
@@ -47,7 +47,6 @@ LcmLogTransportConfig(
     input_file=EXAMPLE_LCM_LOG,
     output_file=OUTPUT_LOG,
     output_version=AspnVersion.V23,
-    group='config/lcm_log_transport',
     channels_to_process=(
         '/sensor/vn-100/imu',
         '/sensor/ublox-ZED-F9T/position',
@@ -92,7 +91,6 @@ LcmLogTransportConfig(
     input_file=EXAMPLE_LCM_LOG,
     output_file=OUTPUT_LOG,
     output_version=AspnVersion.V23,
-    group='config/lcm_log_transport',
     channels_to_process=(
         '/sensor/vn-100/imu',
         '/sensor/ublox-ZED-F9T/position',
@@ -131,8 +129,8 @@ has an associated percent change statistic with it (compared with the previous c
 :header-rows: 1
 :class: centered-table
 
-*   - Metric      
-    - IMU Only  
+*   - Metric
+    - IMU Only
     - +Barometer
     - +Barometer and Velocity
 *   - North RMSE (m)

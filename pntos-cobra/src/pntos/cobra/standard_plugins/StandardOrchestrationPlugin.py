@@ -152,7 +152,9 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
 
         # Grab orchestration and controller configs
         orch_config = config_from_registry(
-            StandardOrchestrationConfig, self.mediator, 'config/orchestration'
+            StandardOrchestrationConfig,
+            self.mediator,
+            StandardOrchestrationConfig.group,
         )
         if orch_config is None:
             self._log(
@@ -161,7 +163,7 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
             )
             return
         controller_config = config_from_registry(
-            ControllerConfig, self.mediator, 'controller'
+            ControllerConfig, self.mediator, ControllerConfig.group
         )
         if controller_config is None:
             self._log(

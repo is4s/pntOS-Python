@@ -54,7 +54,7 @@ imu_model = ImuConfig(
     gyro_bias_initial_sigma=(0.003, 0.003, 0.003),
 )
 my_config = [
-    ControllerConfig(group='controller'),
+    ControllerConfig(),
     FusionEngineConfig(),
     StandardOrchestrationConfig(
         best_sol_channel='/solution/pntos/pva',
@@ -128,7 +128,6 @@ my_config = [
                 time_bias=int(0.15 * 1e9),
             ),
         ),
-        group='config/orchestration',
     ),
 ]
 # End Config

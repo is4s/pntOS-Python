@@ -5,10 +5,7 @@ from time import time
 from lcm import LCM, Event, EventLog
 from pntos.api import LoggingLevel, Mediator, Message, TransportPlugin
 from pntos.cobra.config import LcmLogTransportConfig, config_from_registry
-from pntos.cobra.utils import (
-    create_lcm_message,
-    process_lcm_message,
-)
+from pntos.cobra.utils import create_lcm_message, process_lcm_message
 from tqdm import tqdm
 
 
@@ -43,9 +40,8 @@ class TutorialLcmTransportPlugin(TransportPlugin):
         if mediator is not None:
             self.mediator = mediator
 
-        config_group = 'config/lcm_log_transport'
         config = config_from_registry(
-            LcmLogTransportConfig, self.mediator, config_group
+            LcmLogTransportConfig, self.mediator, LcmLogTransportConfig.group
         )
 
         self._output_version = config.output_version

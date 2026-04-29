@@ -1,5 +1,5 @@
 diff --git a/apps/tutorial/pos_ins.py b/apps/standard/pos_ins.py
-index c156813c..11f25a0b 100755
+index 49e9a082..701f7e6b 100755
 --- a/apps/tutorial/pos_ins.py
 +++ b/apps/standard/pos_ins.py
 @@ -2,39 +2,42 @@
@@ -53,7 +53,7 @@ index c156813c..11f25a0b 100755
  )
  from pntos_python_datasets import EXAMPLE_LCM_LOG
  
-@@ -46,85 +49,104 @@ C_imu_to_platform = (
+@@ -46,81 +49,101 @@ C_imu_to_platform = (
      (-0.01742059, 0.99983262, -0.00559042),
      (-0.0603517, 0.00452957, 0.9981669),
  )
@@ -73,13 +73,12 @@ index c156813c..11f25a0b 100755
          input_file=EXAMPLE_LCM_LOG,
          output_file=OUTPUT_LOG,
          output_version=AspnVersion.V23,
-         group='config/lcm_log_transport',
 +        channels_to_process=(
 +            '/sensor/vn-100/imu',
 +            '/sensor/ublox-ZED-F9T/position',
 +        ),
      ),
-     ControllerConfig(group='controller'),
+     ControllerConfig(),
      FusionEngineConfig(),
 -    ImuConfig(
 -        group='config/inertial_state',
@@ -128,6 +127,26 @@ index c156813c..11f25a0b 100755
 -    ),
 -    TutorialOrchestrationConfig(
 -        position_channel='/sensor/ublox-ZED-F9T/position',
+-    ),
+-    TimeAdjusterConfig(
+-        group='config/time_adjuster',
+-        channel_to_correct='/sensor/vn-100/imu',
+-        expected_dt_nsec=int(0.01 * 1e9),
+-    ),
+-    UiLogPlottingConfig(
+-        logfile=OUTPUT_LOG,
+-        solution_channel='/solution/pntos/pva',
+-        truth_channel='/sensor/ins-d/pva',
+-    ),
+-    ImuRotatorConfig(
+-        group='config/imu_rotator',
+-        C_imu_to_platform=C_imu_to_platform,
+-        channel='/sensor/vn-100/imu',
+-    ),
+-    TimeBiasConfig(
+-        group='config/time_bias',
+-        channels_to_correct=('/sensor/ublox-ZED-F9T/position',),
+-        time_bias=int(0.15 * 1e9),
 +    StandardOrchestrationConfig(
 +        best_sol_channel='/solution/pntos/pva',
 +        imu_sol_channel='/solution/pntos-imu/pva',
@@ -200,33 +219,10 @@ index c156813c..11f25a0b 100755
 +                time_bias=int(0.15 * 1e9),
 +            ),
 +        ),
-         group='config/orchestration',
      ),
--    TimeAdjusterConfig(
--        group='config/time_adjuster',
--        channel_to_correct='/sensor/vn-100/imu',
--        expected_dt_nsec=int(0.01 * 1e9),
--    ),
--    UiLogPlottingConfig(
--        group='config/ui_logfile_plotting',
--        logfile=OUTPUT_LOG,
--        solution_channel='/solution/pntos/pva',
--        truth_channel='/sensor/ins-d/pva',
--    ),
--    ImuRotatorConfig(
--        group='config/imu_rotator',
--        C_imu_to_platform=C_imu_to_platform,
--        channel='/sensor/vn-100/imu',
--    ),
--    TimeBiasConfig(
--        group='config/time_bias',
--        channels_to_correct=('/sensor/ublox-ZED-F9T/position',),
--        time_bias=int(0.15 * 1e9),
--    ),
  ]
  # End Config
- 
-@@ -134,17 +156,18 @@ plugins = [
+@@ -131,17 +154,18 @@ plugins = [
      LcmLogTransportPlugin('Cobra LCM Log Transport Plugin'),
      EkfFusionStrategyPlugin('Cobra EKF Fusion Strategy Plugin'),
      StandardFusionPlugin('Cobra Standard Fusion Plugin'),

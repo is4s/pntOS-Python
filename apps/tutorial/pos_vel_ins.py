@@ -51,9 +51,8 @@ my_config = [
         input_file=EXAMPLE_LCM_LOG,
         output_file=OUTPUT_LOG,
         output_version=AspnVersion.V23,
-        group='config/lcm_log_transport',
     ),
-    ControllerConfig(group='controller'),
+    ControllerConfig(),
     FusionEngineConfig(),
     ImuConfig(
         group='config/inertial_state',
@@ -102,7 +101,6 @@ my_config = [
     ),
     TutorialOrchestrationConfig(
         position_channel='/sensor/ublox-ZED-F9T/position',
-        group='config/orchestration',
         velocity_channel='/sensor/ublox-ZED-F9T/velocity',
     ),
     TimeAdjusterConfig(
@@ -111,7 +109,6 @@ my_config = [
         expected_dt_nsec=int(0.01 * 1e9),
     ),
     UiLogPlottingConfig(
-        group='config/ui_logfile_plotting',
         logfile=OUTPUT_LOG,
         solution_channel='/solution/pntos/pva',
         truth_channel='/sensor/ins-d/pva',

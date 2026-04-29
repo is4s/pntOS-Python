@@ -1,5 +1,5 @@
 diff --git a/apps/standard/pos_ins.py b/apps/standard/outage_sim.py
-index 11f25a0b..675873aa 100755
+index 701f7e6b..03c9c7ee 100755
 --- a/apps/standard/pos_ins.py
 +++ b/apps/standard/outage_sim.py
 @@ -23,6 +23,7 @@ from pntos.cobra import (
@@ -19,7 +19,7 @@ index 11f25a0b..675873aa 100755
      PinsonStateBlockConfig,
      SensorConfig,
      SensorMeasurementProcessorConfig,
-@@ -69,6 +72,8 @@ my_config = [
+@@ -68,6 +71,8 @@ my_config = [
          channels_to_process=(
              '/sensor/vn-100/imu',
              '/sensor/ublox-ZED-F9T/position',
@@ -27,8 +27,8 @@ index 11f25a0b..675873aa 100755
 +            # '/sensor/ublox-ZED-F9T/velocity', # uncomment me to use a velocity update
          ),
      ),
-     ControllerConfig(group='controller'),
-@@ -97,6 +102,20 @@ my_config = [
+     ControllerConfig(),
+@@ -96,6 +101,20 @@ my_config = [
                      tau=(300.0, 300.0, 200.0),
                  ),
              ),
@@ -49,7 +49,7 @@ index 11f25a0b..675873aa 100755
          ),
          mp_configs=(
              SensorMeasurementProcessorConfig(
-@@ -113,6 +132,28 @@ my_config = [
+@@ -112,6 +131,28 @@ my_config = [
                      sensor_name='position',
                  ),
              ),
@@ -78,7 +78,7 @@ index 11f25a0b..675873aa 100755
          ),
          inertial_config=InertialConfig(
              group='config/inertial',
-@@ -141,10 +182,25 @@ my_config = [
+@@ -140,10 +181,25 @@ my_config = [
              ),
              TimeBiasConfig(
                  group='config/time_bias',
@@ -102,6 +102,6 @@ index 11f25a0b..675873aa 100755
 +            ),
          ),
 +        max_prop_interval=1.0,
-         group='config/orchestration',
      ),
  ]
+ # End Config

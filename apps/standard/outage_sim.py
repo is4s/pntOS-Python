@@ -68,7 +68,6 @@ my_config = [
         input_file=EXAMPLE_LCM_LOG,
         output_file=OUTPUT_LOG,
         output_version=AspnVersion.V23,
-        group='config/lcm_log_transport',
         channels_to_process=(
             '/sensor/vn-100/imu',
             '/sensor/ublox-ZED-F9T/position',
@@ -76,7 +75,7 @@ my_config = [
             # '/sensor/ublox-ZED-F9T/velocity', # uncomment me to use a velocity update
         ),
     ),
-    ControllerConfig(group='controller'),
+    ControllerConfig(),
     FusionEngineConfig(),
     StandardOrchestrationConfig(
         best_sol_channel='/solution/pntos/pva',
@@ -201,7 +200,6 @@ my_config = [
             ),
         ),
         max_prop_interval=1.0,
-        group='config/orchestration',
     ),
 ]
 # End Config

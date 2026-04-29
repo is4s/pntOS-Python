@@ -12,20 +12,15 @@ from pntos.cobra import (
     StandardLoggingPlugin,
     StandardRegistryPlugin,
 )
-from pntos.cobra.config import (
-    AspnVersion,
-    BuscatConfig,
-    LcmLogTransportConfig,
-)
+from pntos.cobra.config import AspnVersion, BuscatConfig, LcmLogTransportConfig
 from pntos_python_datasets import ASPN2_EXAMPLE_LCM_LOG
 
 OUTPUT_LOG = sys.argv[1] if len(sys.argv) > 1 else 'pntos_output.log'
 
 # Config setup
 my_config = [
-    BuscatConfig(group='buscat', output_transports=('Cobra LCM Log Transport Plugin',)),
+    BuscatConfig(output_transports=('Cobra LCM Log Transport Plugin',)),
     LcmLogTransportConfig(
-        group='config/lcm_log_transport',
         output_version=AspnVersion.V23,
         input_file=ASPN2_EXAMPLE_LCM_LOG,
         output_file=OUTPUT_LOG,

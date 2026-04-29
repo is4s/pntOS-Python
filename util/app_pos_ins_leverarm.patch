@@ -1,8 +1,8 @@
 diff --git a/apps/standard/pos_ins.py b/apps/standard/pos_ins_leverarm.py
-index 11f25a0b..345e1208 100755
+index 701f7e6b..50249f76 100755
 --- a/apps/standard/pos_ins.py
 +++ b/apps/standard/pos_ins_leverarm.py
-@@ -97,18 +97,40 @@ my_config = [
+@@ -96,18 +96,40 @@ my_config = [
                      tau=(300.0, 300.0, 200.0),
                  ),
              ),

@@ -1,5 +1,5 @@
 diff --git a/apps/standard/pos_ins.py b/apps/standard/pos_ins_record_states.py
-index 11f25a0b..1fe02743 100755
+index 701f7e6b..a8e4732e 100755
 --- a/apps/standard/pos_ins.py
 +++ b/apps/standard/pos_ins_record_states.py
 @@ -1,5 +1,18 @@
@@ -37,16 +37,16 @@ index 11f25a0b..1fe02743 100755
      FogmConfig,
      FogmStateBlockConfig,
      FusionEngineConfig,
-@@ -72,7 +87,7 @@ my_config = [
+@@ -71,7 +86,7 @@ my_config = [
          ),
      ),
-     ControllerConfig(group='controller'),
+     ControllerConfig(),
 -    FusionEngineConfig(),
 +    FusionEngineConfig(save_x_and_p_after_prop=True, save_x_and_p_after_update=True),
      StandardOrchestrationConfig(
          best_sol_channel='/solution/pntos/pva',
          imu_sol_channel='/solution/pntos-imu/pva',
-@@ -121,6 +136,9 @@ my_config = [
+@@ -120,6 +135,9 @@ my_config = [
              C_imu_to_platform=C_imu_to_platform,
              inertial_buffer_length=10.0,
          ),
@@ -56,7 +56,7 @@ index 11f25a0b..1fe02743 100755
          alignment_config=ManualHeadingAlignmentConfig(
              group='config/default/alignment',
              static_time=10.0,
-@@ -168,6 +186,7 @@ plugins = [
+@@ -166,6 +184,7 @@ plugins = [
      StandardRegistryPlugin('Cobra Standard Registry Plugin', config=my_config),
      StandardPreprocessorPlugin('Cobra Standard Preprocessor Plugin'),
      StandardOrchestrationPlugin('Cobra Standard Orchestration Plugin'),

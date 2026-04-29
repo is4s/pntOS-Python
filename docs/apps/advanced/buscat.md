@@ -59,7 +59,7 @@ designate that as the desired output transport. The second config object is for 
 read from, the output file to write to, and the ASPN version to use for the output messages (ASPN23).
 
 ```{literalinclude} ../../../apps/advanced/buscat.py
-:start-at: "from pntos.cobra.config import ("
+:start-at: "from pntos.cobra.config import "
 :end-at: "# End Config"
 :lineno-match:
 ```

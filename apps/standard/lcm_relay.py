@@ -56,8 +56,8 @@ imu_model = ImuConfig(
     gyro_bias_initial_sigma=(0.003, 0.003, 0.003),
 )
 my_config = [
-    LcmTransportConfig(output_version=AspnVersion.V23, group='config/lcm_transport'),
-    ControllerConfig(group='controller'),
+    LcmTransportConfig(output_version=AspnVersion.V23),
+    ControllerConfig(),
     FusionEngineConfig(),
     StandardOrchestrationConfig(
         best_sol_channel='/solution/pntos/pva',
@@ -131,7 +131,6 @@ my_config = [
                 time_bias=int(0.15 * 1e9),
             ),
         ),
-        group='config/orchestration',
     ),
 ]
 # End Config

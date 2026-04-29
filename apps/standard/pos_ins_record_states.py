@@ -80,13 +80,12 @@ my_config = [
         input_file=EXAMPLE_LCM_LOG,
         output_file=OUTPUT_LOG,
         output_version=AspnVersion.V23,
-        group='config/lcm_log_transport',
         channels_to_process=(
             '/sensor/vn-100/imu',
             '/sensor/ublox-ZED-F9T/position',
         ),
     ),
-    ControllerConfig(group='controller'),
+    ControllerConfig(),
     FusionEngineConfig(save_x_and_p_after_prop=True, save_x_and_p_after_update=True),
     StandardOrchestrationConfig(
         best_sol_channel='/solution/pntos/pva',
@@ -163,7 +162,6 @@ my_config = [
                 time_bias=int(0.15 * 1e9),
             ),
         ),
-        group='config/orchestration',
     ),
 ]
 # End Config

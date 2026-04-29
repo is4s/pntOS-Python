@@ -31,8 +31,6 @@ from .VirtualStateBlockManager import (
     VirtualStateBlockManager,
 )
 
-CONFIG_GROUP = 'config/fusion_engine'
-
 
 @dataclass
 class stateblock_info:
@@ -950,7 +948,7 @@ class StandardFusionPlugin(FusionPlugin):
     ) -> FusionEngineType | None:
         if self.is_fusion_type_supported(fusion_type):
             config = config_from_registry(
-                FusionEngineConfig, self._mediator, CONFIG_GROUP
+                FusionEngineConfig, self._mediator, FusionEngineConfig.group
             )
             assert config is not None
 
