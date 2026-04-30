@@ -189,7 +189,7 @@ support the following types:
 |                            | `bool`                                                             | N/A                                                                        | `enabled: bool`                         |
 | **Enums**                  | `Enum` or `IntEnum`| Any subclass of `Enum` or `IntEnum` | `mode: SensorMode`                      |
 | **EstimateWithCovariance** | {py:obj}`EstimateWithCovariance<pntos.api.EstimateWithCovariance>` | N/A                                                                        | `state: EstimateWithCovariance`         |
-| **Nested Configs**         | `BaseConfig`                                                       | Any subclass of `BaseConfig`                                               | `sensor_config: SensorConfig`           |
+| **Nested Configs**         | `BaseConfig`                                                       | Any subclass of `BaseConfig`                                               | `fogm_model: FogmConfig`                |
 | **1-D List**               | `list[T]`                                                          | `T` must be `int`, `float`, `str`, or `BaseConfig`                         | `values: list[float]`                   |
 | **1-D Tuple**              | `tuple[T, ...]`                                                    | `T` must be `int`, `float`, `str`, or `BaseConfig`; all elements same type | `coords: tuple[float, ...]`             |
 | **2-D List**               | `list[list[T]]`                                                    | `T` must be `int` or `float`; all rows same length                         | `matrix: list[list[float]]`             |

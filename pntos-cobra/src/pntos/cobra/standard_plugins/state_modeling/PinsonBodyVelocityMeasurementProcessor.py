@@ -59,8 +59,8 @@ class PinsonBodyVelocityMeasurementProcessor(StandardMeasurementProcessor):
                 platform frame origin to the velocity sensor origin, in the platform frame, in
                 units of meters.
             orientation_ps_p (NDArray[float64]): A 4-element quaternion representing the rotational
-                difference from the sensor frame to the platform frame. The corresponding DCM would
-                be C_sensor_to_platform.
+                difference from the platform frame to the sensor frame. The corresponding DCM would
+                be C_platform_to_sensor.
         """
         self.label = label
         self.state_block_labels = state_block_labels
@@ -171,8 +171,7 @@ class PinsonBodyVelocityMeasurementProcessor(StandardMeasurementProcessor):
             ]
         )
 
-        C_sensor_to_platform = quat_to_dcm(self._orientation_ps_p)
-        C_platform_to_sensor = C_sensor_to_platform.T
+        C_platform_to_sensor = quat_to_dcm(self._orientation_ps_p)
 
         # Correct inertial att
         assert self._inertial_pva.quaternion is not None

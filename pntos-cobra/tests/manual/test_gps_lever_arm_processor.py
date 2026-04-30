@@ -35,7 +35,7 @@ from pntos.cobra import (
     StandardRegistryPlugin,
     StandardStateModelingPlugin,
 )
-from pntos.cobra.config import BaseConfig, FogmConfig, ImuConfig, SensorConfig
+from pntos.cobra.config import BaseConfig, FogmConfig, ImuConfig, MountingConfig
 from pntos.cobra.internal import StandardMediator, StandardStateModelProvider
 from pntos.cobra.utils import decode_aspn_lcm_msg, marshal_from_lcm
 
@@ -118,11 +118,10 @@ my_config: list[BaseConfig] = [
     ),
     FogmConfig(group='/config/fogm1', sigma=(0.0, 0.0, 0.0), tau=(1000, 1000, 1000)),
     FogmConfig(group='/config/fogm2', sigma=(0.0, 0.0, 0.0), tau=(1e8, 1e8, 1e8)),
-    SensorConfig(
+    MountingConfig(
         group='/config/cobra/sensor',
         lever_arm=(0.0, 0.0, 0.0),
         orientation=(1.0, 0.0, 0.0, 0.0),
-        sensor_name='novatel',
     ),
 ]
 
@@ -136,7 +135,7 @@ def fusion(la_guess: NDArray[float64]) -> StandardFusionEngine:
     Returns:
     A fusion engine with pinson and 2 fogm blocks, and the Pinson/LeverArm processor.
     """
-    assert isinstance(my_config[-1], SensorConfig)
+    assert isinstance(my_config[-1], MountingConfig)
     my_config[-1].lever_arm = (la_guess[0, 0], la_guess[1, 0], la_guess[2, 0])
     registry_plugin = StandardRegistryPlugin('Standard registry', config=my_config)
     mediator = StandardMediator(

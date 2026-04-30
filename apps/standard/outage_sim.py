@@ -22,6 +22,7 @@ from pntos.cobra import (
     StandardStateModelingPlugin,
 )
 from pntos.cobra.config import (
+    AltitudeMPConfig,
     AspnVersion,
     BarometerToAltitudeConfig,
     ControllerConfig,
@@ -33,11 +34,10 @@ from pntos.cobra.config import (
     InertialConfig,
     LcmLogTransportConfig,
     ManualHeadingAlignmentConfig,
-    MeasurementProcessorConfig,
     OutageConfig,
     PinsonStateBlockConfig,
-    SensorConfig,
-    SensorMeasurementProcessorConfig,
+    PinsonVelocityMPConfig,
+    PinsonWithNedFogmPositionMPConfig,
     StandardOrchestrationConfig,
     TimeAdjusterConfig,
     TimeBiasConfig,
@@ -117,41 +117,24 @@ my_config = [
             ),
         ),
         mp_configs=(
-            SensorMeasurementProcessorConfig(
+            PinsonWithNedFogmPositionMPConfig(
                 group='config/pos_measurement_processor',
-                identifier='pinson_with_ned_fogm_position',
                 label='pos',
                 channel='/sensor/ublox-ZED-F9T/position',
                 state_block_labels=('pinson15', 'pos_sensor_error'),
-                aux_channels=('INERTIAL_PVA',),
-                sensor_config=SensorConfig(
-                    group='config/gp3d_state_modeling',
-                    lever_arm=(-0.50, 0.38, -0.05),
-                    orientation=(0.0, 0.0, 0.0, 0.0),
-                    sensor_name='position',
-                ),
+                lever_arm=(-0.50, 0.38, -0.05),
             ),
-            SensorMeasurementProcessorConfig(
+            AltitudeMPConfig(
                 group='config/alt_measurement_processor',
-                identifier='pinson_altitude',
                 label='alt',
                 channel='/sensor/bmp388/altitude',
                 state_block_labels=('pinson15', 'alt_fogm'),
-                aux_channels=('INERTIAL_PVA',),
-                sensor_config=SensorConfig(
-                    group='config/alt_state_modeling',
-                    lever_arm=(0.0, 0.0, 0.0),
-                    orientation=(0.0, 0.0, 0.0, 0.0),
-                    sensor_name='altitude',
-                ),
             ),
-            MeasurementProcessorConfig(
+            PinsonVelocityMPConfig(
                 group='config/vel_measurement_processor',
-                identifier='pinson_velocity',
                 label='vel',
                 channel='/sensor/ublox-ZED-F9T/velocity',
                 state_block_labels=('pinson15',),
-                aux_channels=('INERTIAL_PVA',),
             ),
         ),
         inertial_config=InertialConfig(

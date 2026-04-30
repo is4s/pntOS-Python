@@ -1,8 +1,16 @@
 diff --git a/apps/standard/pos_ins.py b/apps/standard/pos_ins_bodyvel.py
-index 701f7e6b..9433a9c0 100755
+index 86eea2f3..f751a0df 100755
 --- a/apps/standard/pos_ins.py
 +++ b/apps/standard/pos_ins_bodyvel.py
-@@ -68,6 +68,7 @@ my_config = [
+@@ -32,6 +32,7 @@ from pntos.cobra.config import (
+     InertialConfig,
+     LcmLogTransportConfig,
+     ManualHeadingAlignmentConfig,
++    PinsonBodyVelocityMPConfig,
+     PinsonStateBlockConfig,
+     PinsonWithNedFogmPositionMPConfig,
+     StandardOrchestrationConfig,
+@@ -67,6 +68,7 @@ my_config = [
          channels_to_process=(
              '/sensor/vn-100/imu',
              '/sensor/ublox-ZED-F9T/position',
@@ -10,23 +18,17 @@ index 701f7e6b..9433a9c0 100755
          ),
      ),
      ControllerConfig(),
-@@ -112,6 +113,20 @@ my_config = [
-                     sensor_name='position',
-                 ),
+@@ -104,6 +106,14 @@ my_config = [
+                 state_block_labels=('pinson15', 'pos_sensor_error'),
+                 lever_arm=(-0.50, 0.38, -0.05),
              ),
-+            SensorMeasurementProcessorConfig(
++            PinsonBodyVelocityMPConfig(
 +                group='config/bodyvel_measurement_processor',
-+                identifier='pinson_body_velocity',
 +                label='body_vel',
 +                channel='/sensor/simulated/velocity',
 +                state_block_labels=('pinson15',),
-+                aux_channels=('INERTIAL_PVA', 'INERTIAL_FORCES_AND_RATES'),
-+                sensor_config=SensorConfig(
-+                    group='config/bv3d_state_modeling',
-+                    lever_arm=(0.0, 0.0, 0.0),
-+                    orientation=(0.0, 0.0, 0.0, 0.0),
-+                    sensor_name='velocity',
-+                ),
++                lever_arm=(0.0, 0.0, 0.0),
++                orientation=(0.0, 0.0, 0.0, 0.0),
 +            ),
          ),
          inertial_config=InertialConfig(

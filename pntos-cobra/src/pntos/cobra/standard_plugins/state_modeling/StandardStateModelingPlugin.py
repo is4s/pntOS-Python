@@ -8,11 +8,20 @@ from pntos.api.plugins.state_modeling import (
     VirtualStateBlock,
 )
 from pntos.cobra.config import (
+    AltitudeMPConfig,
     ClockBiasStateBlockConfig,
     ConstantStateBlockConfig,
+    Direction3dToPointsMPConfig,
     FogmStateBlockConfig,
+    PinsonBodyVelocityMPConfig,
+    PinsonErrorToStandardVSBConfig,
+    PinsonPositionMPConfig,
     PinsonStateBlockConfig,
-    SensorMeasurementProcessorConfig,
+    PinsonVelocityMPConfig,
+    PinsonWithLeverArmPositionMPConfig,
+    PinsonWithNedFogmPositionMPConfig,
+    PositionMPConfig,
+    PosVelMPConfig,
     StateExtractorConfig,
     config_from_registry,
 )
@@ -58,25 +67,25 @@ class StandardStateModelProvider(api.StandardStateModelProvider):
         """
         self._mediator = mediator
         self.processor_identifiers: list[str] = [
-            'pinson_position',
-            'pinson_velocity',
-            'pinson_with_ned_fogm_position',
-            'pinson_altitude',
-            'pinson_with_lever_arm_position',
-            'pinson_body_velocity',
-            'pinson_posvel',
-            'position',
-            'direction3D_to_points',
+            PinsonPositionMPConfig.identifier,
+            PinsonVelocityMPConfig.identifier,
+            PinsonWithNedFogmPositionMPConfig.identifier,
+            AltitudeMPConfig.identifier,
+            PinsonWithLeverArmPositionMPConfig.identifier,
+            PinsonBodyVelocityMPConfig.identifier,
+            PosVelMPConfig.identifier,
+            PositionMPConfig.identifier,
+            Direction3dToPointsMPConfig.identifier,
         ]
         self.block_identifiers: list[str] = [
-            'pinson15',
-            'fogm',
-            'clock_bias',
-            'constant',
+            PinsonStateBlockConfig.identifier,
+            FogmStateBlockConfig.identifier,
+            ClockBiasStateBlockConfig.identifier,
+            ConstantStateBlockConfig.identifier,
         ]
         self.virtual_block_identifiers: list[str] = [
-            'pinson_error_to_standard',
-            'state_extractor',
+            PinsonErrorToStandardVSBConfig.identifier,
+            StateExtractorConfig.identifier,
         ]
 
     def new_processor(
@@ -144,10 +153,10 @@ class StandardStateModelProvider(api.StandardStateModelProvider):
                         f'A config group is required for processor {self.processor_identifiers[processor_index]}',
                     )
                     return None
-                sensor_mp_config = config_from_registry(
-                    SensorMeasurementProcessorConfig, self._mediator, config_group
+                pos_mp_config = config_from_registry(
+                    PinsonPositionMPConfig, self._mediator, config_group
                 )
-                if sensor_mp_config is None:
+                if pos_mp_config is None:
                     self._mediator.log_message(
                         LoggingLevel.ERROR,
                         'Could not get position sensor config from registry.',
@@ -157,7 +166,7 @@ class StandardStateModelProvider(api.StandardStateModelProvider):
                     label,
                     state_block_labels,
                     self._mediator,
-                    np.array(sensor_mp_config.sensor_config.lever_arm),
+                    np.array(pos_mp_config.lever_arm),
                 )
             case 1:
                 return PinsonVelocityMeasurementProcessor(
@@ -172,10 +181,10 @@ class StandardStateModelProvider(api.StandardStateModelProvider):
                         f'A config group is required for processor {self.processor_identifiers[processor_index]}',
                     )
                     return None
-                sensor_mp_config = config_from_registry(
-                    SensorMeasurementProcessorConfig, self._mediator, config_group
+                pos_fogm_mp_config = config_from_registry(
+                    PinsonWithNedFogmPositionMPConfig, self._mediator, config_group
                 )
-                if sensor_mp_config is None:
+                if pos_fogm_mp_config is None:
                     self._mediator.log_message(
                         LoggingLevel.ERROR,
                         'Could not get position sensor config from registry.',
@@ -185,7 +194,7 @@ class StandardStateModelProvider(api.StandardStateModelProvider):
                     label,
                     state_block_labels,
                     self._mediator,
-                    np.array(sensor_mp_config.sensor_config.lever_arm),
+                    np.array(pos_fogm_mp_config.lever_arm),
                 )
             case 3:
                 return AltitudeMeasurementProcessor(
@@ -200,10 +209,10 @@ class StandardStateModelProvider(api.StandardStateModelProvider):
                         f'A config group is required for processor type {self.processor_identifiers[processor_index]}',
                     )
                     return None
-                sensor_config = config_from_registry(
-                    SensorMeasurementProcessorConfig, self._mediator, config_group
+                pos_lever_arm_mp_config = config_from_registry(
+                    PinsonWithLeverArmPositionMPConfig, self._mediator, config_group
                 )
-                if sensor_config is None:
+                if pos_lever_arm_mp_config is None:
                     self._mediator.log_message(
                         LoggingLevel.ERROR,
                         'Could not get position sensor config from registry.',
@@ -213,7 +222,7 @@ class StandardStateModelProvider(api.StandardStateModelProvider):
                     label,
                     state_block_labels,
                     self._mediator,
-                    np.array(sensor_config.sensor_config.lever_arm),
+                    np.array(pos_lever_arm_mp_config.lever_arm),
                 )
             case 5:
                 if config_group is None:
@@ -222,10 +231,10 @@ class StandardStateModelProvider(api.StandardStateModelProvider):
                         f'A config group is required for processor {self.processor_identifiers[processor_index]}',
                     )
                     return None
-                sensor_mp_config = config_from_registry(
-                    SensorMeasurementProcessorConfig, self._mediator, config_group
+                vel_body_mp_config = config_from_registry(
+                    PinsonBodyVelocityMPConfig, self._mediator, config_group
                 )
-                if sensor_mp_config is None:
+                if vel_body_mp_config is None:
                     self._mediator.log_message(
                         LoggingLevel.ERROR,
                         'Could not get body velocity sensor config from registry.',
@@ -235,8 +244,8 @@ class StandardStateModelProvider(api.StandardStateModelProvider):
                     label,
                     state_block_labels,
                     self._mediator,
-                    np.array(sensor_mp_config.sensor_config.lever_arm),
-                    np.array(sensor_mp_config.sensor_config.orientation),
+                    np.array(vel_body_mp_config.lever_arm),
+                    np.array(vel_body_mp_config.orientation),
                 )
             case 6:
                 if config_group is None:
@@ -245,10 +254,10 @@ class StandardStateModelProvider(api.StandardStateModelProvider):
                         f'A config group is required for processor {self.processor_identifiers[processor_index]}',
                     )
                     return None
-                sensor_mp_config = config_from_registry(
-                    SensorMeasurementProcessorConfig, self._mediator, config_group
+                posvel_mp_config = config_from_registry(
+                    PosVelMPConfig, self._mediator, config_group
                 )
-                if sensor_mp_config is None:
+                if posvel_mp_config is None:
                     self._mediator.log_message(
                         LoggingLevel.ERROR,
                         'Could not get position sensor config from registry.',
@@ -258,7 +267,7 @@ class StandardStateModelProvider(api.StandardStateModelProvider):
                     label,
                     state_block_labels,
                     self._mediator,
-                    np.array(sensor_mp_config.sensor_config.lever_arm),
+                    np.array(posvel_mp_config.lever_arm),
                 )
             case 7:
                 if config_group is None:
@@ -267,10 +276,10 @@ class StandardStateModelProvider(api.StandardStateModelProvider):
                         f'A config group is required for processor {self.processor_identifiers[processor_index]}',
                     )
                     return None
-                sensor_mp_config = config_from_registry(
-                    SensorMeasurementProcessorConfig, self._mediator, config_group
+                direct_pos_mp_config = config_from_registry(
+                    PositionMPConfig, self._mediator, config_group
                 )
-                if sensor_mp_config is None:
+                if direct_pos_mp_config is None:
                     self._mediator.log_message(
                         LoggingLevel.ERROR,
                         'Could not get position sensor config from registry.',
@@ -280,7 +289,7 @@ class StandardStateModelProvider(api.StandardStateModelProvider):
                     label,
                     state_block_labels,
                     self._mediator,
-                    np.array(sensor_mp_config.sensor_config.lever_arm),
+                    np.array(direct_pos_mp_config.lever_arm),
                 )
 
             case 8:
@@ -290,10 +299,10 @@ class StandardStateModelProvider(api.StandardStateModelProvider):
                         f'A config group is required for processor {self.processor_identifiers[processor_index]}',
                     )
                     return None
-                sensor_mp_config = config_from_registry(
-                    SensorMeasurementProcessorConfig, self._mediator, config_group
+                dir3d_mp_config = config_from_registry(
+                    Direction3dToPointsMPConfig, self._mediator, config_group
                 )
-                if sensor_mp_config is None:
+                if dir3d_mp_config is None:
                     self._mediator.log_message(
                         LoggingLevel.ERROR,
                         'Could not get direction3D to points sensor config from registry.',
@@ -303,8 +312,8 @@ class StandardStateModelProvider(api.StandardStateModelProvider):
                     label,
                     state_block_labels,
                     self._mediator,
-                    np.array(sensor_mp_config.sensor_config.lever_arm),
-                    np.array(sensor_mp_config.sensor_config.orientation),
+                    np.array(dir3d_mp_config.lever_arm),
+                    np.array(dir3d_mp_config.orientation),
                 )
         self._mediator.log_message(
             LoggingLevel.ERROR,

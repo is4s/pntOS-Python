@@ -1,16 +1,25 @@
 diff --git a/apps/standard/pos_ins.py b/apps/standard/direction_to_points.py
-index 701f7e6b..ad710f60 100755
+index 86eea2f3..15873aa9 100755
 --- a/apps/standard/pos_ins.py
 +++ b/apps/standard/direction_to_points.py
-@@ -24,6 +24,7 @@ from pntos.cobra import (
+@@ -24,6 +24,8 @@ from pntos.cobra import (
  from pntos.cobra.config import (
      AspnVersion,
      ControllerConfig,
++    Direction3dToPointsMPConfig,
 +    DownsamplerConfig,
      FogmConfig,
      FogmStateBlockConfig,
      FusionEngineConfig,
-@@ -68,6 +69,7 @@ my_config = [
+@@ -33,7 +35,6 @@ from pntos.cobra.config import (
+     LcmLogTransportConfig,
+     ManualHeadingAlignmentConfig,
+     PinsonStateBlockConfig,
+-    PinsonWithNedFogmPositionMPConfig,
+     StandardOrchestrationConfig,
+     TimeAdjusterConfig,
+     TimeBiasConfig,
+@@ -67,6 +68,7 @@ my_config = [
          channels_to_process=(
              '/sensor/vn-100/imu',
              '/sensor/ublox-ZED-F9T/position',
@@ -18,34 +27,27 @@ index 701f7e6b..ad710f60 100755
          ),
      ),
      ControllerConfig(),
-@@ -99,17 +101,17 @@ my_config = [
+@@ -97,12 +99,13 @@ my_config = [
+             ),
          ),
          mp_configs=(
-             SensorMeasurementProcessorConfig(
+-            PinsonWithNedFogmPositionMPConfig(
 -                group='config/pos_measurement_processor',
--                identifier='pinson_with_ned_fogm_position',
 -                label='pos',
 -                channel='/sensor/ublox-ZED-F9T/position',
 -                state_block_labels=('pinson15', 'pos_sensor_error'),
+-                lever_arm=(-0.50, 0.38, -0.05),
++            Direction3dToPointsMPConfig(
 +                group='config/direction3D_to_points_measurement_processor',
-+                identifier='direction3D_to_points',
 +                label='dir3D_to_points',
 +                channel='/sensor/simulated/directiontoknownfeature',
 +                state_block_labels=('pinson15',),
-                 aux_channels=('INERTIAL_PVA',),
-                 sensor_config=SensorConfig(
--                    group='config/gp3d_state_modeling',
--                    lever_arm=(-0.50, 0.38, -0.05),
--                    orientation=(0.0, 0.0, 0.0, 0.0),
--                    sensor_name='position',
-+                    group='config/direction3D_to_points_sensor',
-+                    lever_arm=(0.80, 0.0, 0.05),
-+                    orientation=(0.707106781, 0.0, 0.707106781, 0.0),
-+                    sensor_name='direction3D_to_points_sensor',
-                 ),
++                lever_arm=(0.80, 0.0, 0.05),
++                orientation=(0.707106781, 0.0, 0.707106781, 0.0),
              ),
          ),
-@@ -143,6 +145,11 @@ my_config = [
+         inertial_config=InertialConfig(
+@@ -135,6 +138,11 @@ my_config = [
                  channels_to_correct=('/sensor/ublox-ZED-F9T/position',),
                  time_bias=int(0.15 * 1e9),
              ),

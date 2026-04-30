@@ -42,6 +42,23 @@ class VirtualStateBlockConfig(BaseConfig):
 
 
 @dataclass(kw_only=True)
+class PinsonErrorToStandardVSBConfig(VirtualStateBlockConfig):
+    """
+    Configuration used to generate a new PinsonErrorToStandard virtual state block.
+    """
+
+    group: str
+
+    identifier: str = field(default='pinson_error_to_standard', init=False)
+
+    source: str
+
+    target: str
+
+    aux_channels: tuple[str, ...] | None = field(default=('INERTIAL_PVA',), init=False)
+
+
+@dataclass(kw_only=True)
 class StateExtractorConfig(VirtualStateBlockConfig):
     """
     Configuration used to generate a new StateExtractor Virtual State Block.
@@ -56,7 +73,7 @@ class StateExtractorConfig(VirtualStateBlockConfig):
 
     target: str
 
-    aux_channels: tuple[str, ...] | None = None
+    aux_channels: tuple[str, ...] | None = field(default=None, init=False)
 
     # UNIQUE FIELDS
     incoming_state_size: int

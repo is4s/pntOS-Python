@@ -7,7 +7,6 @@ from .FogmConfig import FogmConfig
 from .ImuConfig import ImuConfig
 from .InertialConfig import InertialConfig
 from .PreprocessorConfig import PreprocessorConfig
-from .SensorConfig import SensorConfig
 from .VirtualStateBlockConfig import VirtualStateBlockConfig
 
 
@@ -60,7 +59,7 @@ class PinsonStateBlockConfig(StateBlockConfig):
 
     estimate_with_covariance: EstimateWithCovariance | None = None
 
-    aux_channels: tuple[str, ...] | None = None
+    aux_channels: tuple[str, ...] | None = field(default=None, init=False)
 
     # UNIQUE FIELDS
     imu_model: ImuConfig
@@ -86,7 +85,7 @@ class FogmStateBlockConfig(StateBlockConfig):
 
     estimate_with_covariance: EstimateWithCovariance  # not optional on this block
 
-    aux_channels: tuple[str, ...] | None = None
+    aux_channels: tuple[str, ...] | None = field(default=None, init=False)
 
     # UNIQUE FIELDS
     fogm_model: FogmConfig
@@ -140,15 +139,48 @@ class MeasurementProcessorConfig(BaseConfig):
 
 
 @dataclass(kw_only=True)
-class SensorMeasurementProcessorConfig(MeasurementProcessorConfig):
+class PinsonPositionMPConfig(MeasurementProcessorConfig):
     """
-    Configuration used to create a generic sensor measurement processor.
+    Configuration for a PinsonPositionMeasurementProcessor.
+
+    This MP relates 3-D position measurements to a PinsonStateBlock modeling inertial
+    error-states.
+
+    Attributes:
+        group:
+            Inherited from MeasurementProcessorConfig. The registry group in which to
+            store this config.
+        identifier (str):
+            Inherited from MeasurementProcessorConfig. The identifier associated with
+            the type of measurement processor to use. This field is set to a constant
+            value of `pinson_position`, the identifier used to select the
+            PinsonPositionMeasurementProcessor in the StandardStateModelingPlugin.
+        label:
+            Inherited from MeasurementProcessorConfig. The unique label to associate
+            with the instance of PinsonPositionMeasurementProcessor added to the fusion
+            engine.
+        channel:
+            Inherited from MeasurementProcessorConfig. The name of the channel from
+            which the position measurements originate. This corresponds to the
+            `source_identifier` field on the ``pntos.api.Message`` class.
+        state_block_labels:
+            Inherited from MeasurementProcessorConfig. The labels of the state blocks
+            this measurement processor will use. This should be a single
+            PinsonStateBlock.
+        aux_channels:
+            Inherited from MeasurementProcessorConfig. Optional channels to map to this
+            measurement processor's `receive_aux_data` method. This field is set to a
+            constant value of `('INERTIAL_PVA',)`, since this MP requires inertial PVA
+            aux data.
+        lever_arm:
+            The 3-D vector from the platform frame to the sensor frame, in the platform
+            frame (m).
     """
 
     # INHERITED FIELDS
     group: str
 
-    identifier: str
+    identifier: str = field(default='pinson_position', init=False)
 
     label: str
 
@@ -156,15 +188,465 @@ class SensorMeasurementProcessorConfig(MeasurementProcessorConfig):
 
     state_block_labels: tuple[str, ...]
 
-    aux_channels: tuple[str, ...] | None = None
+    aux_channels: tuple[str, ...] | None = field(default=('INERTIAL_PVA',), init=False)
 
     # UNIQUE FIELDS
-    sensor_config: SensorConfig
-    """
-    A nested config that contains sensor info.
+    lever_arm: tuple[float, float, float]
 
-    See SensorConfig.py for more information.
+
+@dataclass(kw_only=True)
+class PinsonWithNedFogmPositionMPConfig(MeasurementProcessorConfig):
     """
+    Configuration for a PinsonWithNedFogmPositionMeasurementProcessor.
+
+    This MP relates 3-D position measurements to a PinsonStateBlock modeling inertial
+    error-states and a 3-state FogmStateBlock modeling time-correlated NED position
+    measurement errors.
+
+    Attributes:
+        group:
+            Inherited from MeasurementProcessorConfig. The registry group in which to
+            store this config.
+        identifier (str):
+            Inherited from MeasurementProcessorConfig. The identifier associated with
+            the type of measurement processor to use. This field is set to a constant
+            value of `pinson_with_ned_fogm_position`, the identifier used to select the
+            PinsonWithNedFogmPositionMeasurementProcessor in the StandardStateModelingPlugin.
+        label:
+            Inherited from MeasurementProcessorConfig. The unique label to associate
+            with the instance of PinsonWithNedFogmPositionMeasurementProcessor added to
+            the fusion engine.
+        channel:
+            Inherited from MeasurementProcessorConfig. The name of the channel from
+            which the position measurements originate. This corresponds to the
+            `source_identifier` field on the ``pntos.api.Message`` class.
+        state_block_labels:
+            Inherited from MeasurementProcessorConfig. The labels of the state blocks
+            this measurement processor will use. The first should refer to a
+            PinsonStateBlock and the second should refer to a 3-state FogmStateBlock
+            estimating NED position measurement errors.
+        aux_channels:
+            Inherited from MeasurementProcessorConfig. Optional channels to map to this
+            measurement processor's `receive_aux_data` method. This field is set to a
+            constant value of `('INERTIAL_PVA',)`, since this MP requires inertial PVA
+            aux data.
+        lever_arm:
+            The 3-D vector from the platform frame to the sensor frame, in the platform
+            frame (m).
+    """
+
+    # INHERITED FIELDS
+    group: str
+
+    identifier: str = field(default='pinson_with_ned_fogm_position', init=False)
+
+    label: str
+
+    channel: str
+
+    state_block_labels: tuple[str, ...]
+
+    aux_channels: tuple[str, ...] | None = field(default=('INERTIAL_PVA',), init=False)
+
+    # UNIQUE FIELDS
+    lever_arm: tuple[float, float, float]
+
+
+@dataclass(kw_only=True)
+class PinsonWithLeverArmPositionMPConfig(MeasurementProcessorConfig):
+    """
+    Configuration for a PinsonWithLeverArmPositionMeasurementProcessor.
+
+    This MP relates 3-D position measurements to a PinsonStateBlock modeling inertial
+    error-states, a 3-state FogmStateBlock modeling time-correlated NED position
+    measurement errors, and an additional 3-state FogmStateBlock modeling error in the
+    nominal lever arm.
+
+    Attributes:
+        group:
+            Inherited from MeasurementProcessorConfig. The registry group in which to
+            store this config.
+        identifier (str):
+            Inherited from MeasurementProcessorConfig. The identifier associated with
+            the type of measurement processor to use. This field is set to a constant
+            value of `pinson_with_lever_arm_position`, the identifier used to select the
+            PinsonWithLeverArmPositionMeasurementProcessor in the StandardStateModelingPlugin.
+        label:
+            Inherited from MeasurementProcessorConfig. The unique label to associate
+            with the instance of PinsonPositionMeasurementProcessor added to the fusion
+            engine.
+        channel:
+            Inherited from MeasurementProcessorConfig. The name of the channel from
+            which the position measurements originate. This corresponds to the
+            `source_identifier` field on the ``pntos.api.Message`` class.
+        state_block_labels:
+            Inherited from MeasurementProcessorConfig. The labels of the state blocks
+            this measurement processor will use. The first should refer to a
+            PinsonStateBlock, the second to a 3-state FogmStateBlock estimating NED
+            position measurement errors, and the third to an additional 3-state
+            FogmStateBlock estimating error in the nominal lever arm.
+        aux_channels:
+            Inherited from MeasurementProcessorConfig. Optional channels to map to this
+            measurement processor's `receive_aux_data` method. This field is set to a
+            constant value of `('INERTIAL_PVA',)`, since this MP requires inertial PVA
+            aux data.
+        lever_arm:
+            The 3-D vector from the platform frame to the sensor frame, in the platform
+            frame (m).
+    """
+
+    # INHERITED FIELDS
+    group: str
+
+    identifier: str = field(default='pinson_with_lever_arm_position', init=False)
+
+    label: str
+
+    channel: str
+
+    state_block_labels: tuple[str, ...]
+
+    aux_channels: tuple[str, ...] | None = field(default=('INERTIAL_PVA',), init=False)
+
+    # UNIQUE FIELDS
+    lever_arm: tuple[float, float, float]
+
+
+@dataclass(kw_only=True)
+class PosVelMPConfig(MeasurementProcessorConfig):
+    """
+    Configuration for a PosVelMeasurementProcessor.
+
+    This MP relates PVA measurements containing 3-D LLH position and 3-D NED velocity to
+    a PinsonStateBlock modeling inertial error-states.
+
+    Attributes:
+        group:
+            Inherited from MeasurementProcessorConfig. The registry group in which to
+            store this config.
+        identifier (str):
+            Inherited from MeasurementProcessorConfig. The identifier associated with
+            the type of measurement processor to use. This field is set to a constant
+            value of `pinson_posvel`, the identifier used to select the
+            PosVelMeasurementProcessor in the StandardStateModelingPlugin.
+        label:
+            Inherited from MeasurementProcessorConfig. The unique label to associate
+            with the instance of PinsonPositionMeasurementProcessor added to the fusion
+            engine.
+        channel:
+            Inherited from MeasurementProcessorConfig. The name of the channel from
+            which the PVA measurements originate. This corresponds to the
+            `source_identifier` field on the ``pntos.api.Message`` class.
+        state_block_labels:
+            Inherited from MeasurementProcessorConfig. The labels of the state blocks
+            this measurement processor will use. This should be a single
+            PinsonStateBlock.
+        aux_channels:
+            Inherited from MeasurementProcessorConfig. Optional channels to map to this
+            measurement processor's `receive_aux_data` method. This field is set to a
+            constant value of `('INERTIAL_PVA',)`, since this MP requires inertial PVA
+            aux data.
+        lever_arm:
+            The 3-D vector from the platform frame to the sensor frame, in the platform
+            frame (m).
+    """
+
+    # INHERITED FIELDS
+    group: str
+
+    identifier: str = field(default='pinson_posvel', init=False)
+
+    label: str
+
+    channel: str
+
+    state_block_labels: tuple[str, ...]
+
+    aux_channels: tuple[str, ...] | None = field(default=('INERTIAL_PVA',), init=False)
+
+    # UNIQUE FIELDS
+    lever_arm: tuple[float, float, float]
+
+
+@dataclass(kw_only=True)
+class PinsonVelocityMPConfig(MeasurementProcessorConfig):
+    """
+    Configuration for a PinsonVelocityMeasurementProcessor.
+
+    This MP relates NED velocity measurements to a PinsonStateBlock modeling inertial
+    error-states.
+
+    Attributes:
+        group:
+            Inherited from MeasurementProcessorConfig. The registry group in which to
+            store this config.
+        identifier (str):
+            Inherited from MeasurementProcessorConfig. The identifier associated with
+            the type of measurement processor to use. This field is set to a constant
+            value of `pinson_velocity`, the identifier used to select the
+            PinsonVelocityMeasurementProcessor in the StandardStateModelingPlugin.
+        label:
+            Inherited from MeasurementProcessorConfig. The unique label to associate
+            with the instance of PinsonPositionMeasurementProcessor added to the fusion
+            engine.
+        channel:
+            Inherited from MeasurementProcessorConfig. The name of the channel from
+            which the velocity measurements originate. This corresponds to the
+            `source_identifier` field on the ``pntos.api.Message`` class.
+        state_block_labels:
+            Inherited from MeasurementProcessorConfig. The labels of the state blocks
+            this measurement processor will use. This should be a single
+            PinsonStateBlock.
+        aux_channels:
+            Inherited from MeasurementProcessorConfig. Optional channels to map to this
+            measurement processor's `receive_aux_data` method. This field is set to a
+            constant value of `('INERTIAL_PVA',)`, since this MP requires inertial PVA
+            aux data.
+    """
+
+    # INHERITED FIELDS
+    group: str
+
+    identifier: str = field(default='pinson_velocity', init=False)
+
+    label: str
+
+    channel: str
+
+    state_block_labels: tuple[str, ...]
+
+    aux_channels: tuple[str, ...] | None = field(default=('INERTIAL_PVA',), init=False)
+
+
+@dataclass(kw_only=True)
+class PinsonBodyVelocityMPConfig(MeasurementProcessorConfig):
+    """
+    Configuration for a PinsonBodyVelocityMeasurementProcessor.
+
+    This MP relates sensor-frame velocity measurements to a PinsonStateBlock modeling
+    inertial error-states.
+
+    Attributes:
+        group:
+            Inherited from MeasurementProcessorConfig. The registry group in which to
+            store this config.
+        label:
+            Inherited from MeasurementProcessorConfig. The unique label to associate
+            with the instance of PinsonPositionMeasurementProcessor added to the fusion
+            engine.
+        identifier (str):
+            Inherited from MeasurementProcessorConfig. The identifier associated with
+            the type of measurement processor to use. This field is set to a constant
+            value of `pinson_body_velocity`, the identifier used to select the
+            PinsonBodyVelocityMeasurementProcessor in the StandardStateModelingPlugin.
+        channel:
+            Inherited from MeasurementProcessorConfig. The name of the channel from
+            which the velocity measurements originate. This corresponds to the
+            `source_identifier` field on the ``pntos.api.Message`` class.
+        state_block_labels:
+            Inherited from MeasurementProcessorConfig. The labels of the state blocks
+            this measurement processor will use. This should be a single
+            PinsonStateBlock.
+        aux_channels:
+            Inherited from MeasurementProcessorConfig. Optional channels to map to this
+            measurement processor's `receive_aux_data` method. This field is set to a
+            constant value of `('INERTIAL_PVA', 'INERTIAL_FORCES_AND_RATES')`, since
+            this MP requires inertial PVA and rate aux data.
+        lever_arm:
+            The 3-D vector from the platform frame to the sensor frame, in the platform
+            frame (m).
+        orientation:
+            A quaternion representing the rotational difference from the platform frame
+            to the sensor frame. The corresponding DCM would be C_platform_to_sensor.
+    """
+
+    # INHERITED FIELDS
+    group: str
+
+    identifier: str = field(default='pinson_body_velocity', init=False)
+
+    label: str
+
+    channel: str
+
+    state_block_labels: tuple[str, ...]
+
+    aux_channels: tuple[str, ...] | None = field(
+        default=('INERTIAL_PVA', 'INERTIAL_FORCES_AND_RATES'), init=False
+    )
+
+    lever_arm: tuple[float, float, float]
+
+    orientation: tuple[float, float, float, float]
+
+
+@dataclass(kw_only=True)
+class AltitudeMPConfig(MeasurementProcessorConfig):
+    """
+    Configuration for a AltitudeMeasurementProcessor.
+
+    This MP relates altitude measurements to a PinsonStateBlock modeling inertial
+    error-states and a 1-state FogmStateBlock modeling time-correlated altitude
+    measurement errors.
+
+    Attributes:
+        group:
+            Inherited from MeasurementProcessorConfig. The registry group in which to
+            store this config.
+        identifier (str):
+            Inherited from MeasurementProcessorConfig. The identifier associated with
+            the type of measurement processor to use. This field is set to a constant
+            value of `pinson_altitude`, the identifier used to select the
+            AltitudeMeasurementProcessor in the StandardStateModelingPlugin.
+        label:
+            Inherited from MeasurementProcessorConfig. The unique label to associate
+            with the instance of AltitudeMeasurementProcessor added to the fusion
+            engine.
+        channel:
+            Inherited from MeasurementProcessorConfig. The name of the channel from
+            which the altitude measurements originate. This corresponds to the
+            `source_identifier` field on the ``pntos.api.Message`` class.
+        state_block_labels:
+            Inherited from MeasurementProcessorConfig. The labels of the state blocks
+            this measurement processor will use. The first should refer to a
+            PinsonStateBlock and the second should refer to a 1-state FogmStateBlock
+            estimating altitude measurement errors.
+        aux_channels:
+            Inherited from MeasurementProcessorConfig. Optional channels to map to this
+            measurement processor's `receive_aux_data` method. This field is set to a
+            constant value of `('INERTIAL_PVA',)`, since this MP requires inertial PVA
+            aux data.
+    """
+
+    # INHERITED FIELDS
+    group: str
+
+    identifier: str = field(default='pinson_altitude', init=False)
+
+    label: str
+
+    channel: str
+
+    state_block_labels: tuple[str, ...]
+
+    aux_channels: tuple[str, ...] | None = field(default=('INERTIAL_PVA',), init=False)
+
+
+@dataclass(kw_only=True)
+class Direction3dToPointsMPConfig(MeasurementProcessorConfig):
+    """
+    Configuration for a Direction3DToPointsMeasurementProcessor.
+
+    This MP relates direction3d-to-points measurements to a PinsonStateBlock modeling inertial
+    error-states.
+
+    Attributes:
+        group:
+            Inherited from MeasurementProcessorConfig. The registry group in which to
+            store this config.
+        identifier (str):
+            Inherited from MeasurementProcessorConfig. The identifier associated with
+            the type of measurement processor to use. This field is set to a constant
+            value of `direction3D_to_points`, the identifier used to select the
+            Direction3DToPointsMeasurementProcessor in the StandardStateModelingPlugin.
+        label:
+            Inherited from MeasurementProcessorConfig. The unique label to associate
+            with the instance of Direction3DToPointsMeasurementProcessor added to the fusion
+            engine.
+        channel:
+            Inherited from MeasurementProcessorConfig. The name of the channel from
+            which the direction3d-to-points measurements originate. This corresponds to the
+            `source_identifier` field on the ``pntos.api.Message`` class.
+        state_block_labels:
+            Inherited from MeasurementProcessorConfig. The labels of the state blocks
+            this measurement processor will use. This should be a single
+            PinsonStateBlock.
+        aux_channels:
+            Inherited from MeasurementProcessorConfig. Optional channels to map to this
+            measurement processor's `receive_aux_data` method. This field is set to a
+            constant value of `('INERTIAL_PVA',)`, since this MP requires inertial PVA
+            aux data.
+        lever_arm:
+            The 3-D vector from the platform frame to the sensor frame, in the platform
+            frame (m).
+        orientation:
+            A quaternion representing the rotational difference from the platform frame
+            to the sensor frame. The corresponding DCM would be C_platform_to_sensor.
+    """
+
+    # INHERITED FIELDS
+    group: str
+
+    identifier: str = field(default='direction3D_to_points', init=False)
+
+    label: str
+
+    channel: str
+
+    state_block_labels: tuple[str, ...]
+
+    aux_channels: tuple[str, ...] | None = field(default=('INERTIAL_PVA',), init=False)
+
+    lever_arm: tuple[float, float, float]
+
+    orientation: tuple[float, float, float, float]
+
+
+@dataclass(kw_only=True)
+class PositionMPConfig(MeasurementProcessorConfig):
+    """
+    Configuration for a PositionMeasurementProcessor.
+
+    This MP relates 3-D position measurements to a state block that estimates position
+    and a 3-state FogmStateBlock modeling time-correlated NED position measurement
+    errors.
+
+    Attributes:
+        group:
+            Inherited from MeasurementProcessorConfig. The registry group in which to
+            store this config.
+        identifier (str):
+            Inherited from MeasurementProcessorConfig. The identifier associated with
+            the type of measurement processor to use. This field is set to a constant
+            value of `position`, the identifier used to select the
+            PositionMeasurementProcessor in the StandardStateModelingPlugin.
+        label:
+            Inherited from MeasurementProcessorConfig. The unique label to associate
+            with the instance of PositionMeasurementProcessor added to the fusion
+            engine.
+        channel:
+            Inherited from MeasurementProcessorConfig. The name of the channel from
+            which the position measurements originate. This corresponds to the
+            `source_identifier` field on the ``pntos.api.Message`` class.
+        state_block_labels:
+            Inherited from MeasurementProcessorConfig. The labels of the state blocks
+            this measurement processor will use. The first should refer to a state block
+            where the first 3 states model LLH position and the second should refer to a
+            3-state FogmStateBlock estimating NED position measurement errors.
+        aux_channels:
+            Inherited from MeasurementProcessorConfig. Optional channels to map to this
+            measurement processor's `receive_aux_data` method. This field is set to a
+            constant value of None, since this MP requires no aux data.
+        lever_arm:
+            The 3-D vector from the platform frame to the sensor frame, in the platform
+            frame (m).
+    """
+
+    # INHERITED FIELDS
+    group: str
+
+    identifier: str = field(default='position', init=False)
+
+    label: str
+
+    channel: str
+
+    state_block_labels: tuple[str, ...]
+
+    aux_channels: tuple[str, ...] | None = field(default=None, init=False)
+
+    # UNIQUE FIELDS
+    lever_arm: tuple[float, float, float]
 
 
 @dataclass

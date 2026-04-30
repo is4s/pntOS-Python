@@ -47,12 +47,12 @@ class StandardPreprocessorPlugin(PreprocessorPlugin):
         """
         self.identifier = identifier
         self.preprocessor_identifiers = [
-            'downsampler',
-            'imu_rotator',
-            'time_adjuster',
-            'baro_converter',
-            'time_bias',
-            'outage',
+            DownsamplerConfig.identifier,
+            ImuRotatorConfig.identifier,
+            TimeAdjusterConfig.identifier,
+            BarometerToAltitudeConfig.identifier,
+            TimeBiasConfig.identifier,
+            OutageConfig.identifier,
         ]
 
     def init_plugin(

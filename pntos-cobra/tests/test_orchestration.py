@@ -70,8 +70,8 @@ from pntos.cobra.config import (
     InertialConfig,
     ManualAlignmentConfig,
     MeasurementProcessorConfig,
+    MountingConfig,
     PinsonStateBlockConfig,
-    SensorConfig,
     StandardOrchestrationConfig,
     StaticAlignmentConfig,
     TimeAdjusterConfig,
@@ -133,11 +133,10 @@ imu_config = ImuConfig(
 tutorial_config = [
     imu_config,
     align_config,
-    SensorConfig(
+    MountingConfig(
         group='config/gp3d_state_modeling',
         lever_arm=(0.0, 0.0, 0.0),
         orientation=(0.0, 0.0, 0.0, 0.0),
-        sensor_name='novatel',
     ),
     inertial_config,
     FogmConfig(
