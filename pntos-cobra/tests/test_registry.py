@@ -26,7 +26,7 @@ from pntos.cobra.config import (
     BaseConfig,
     ImuConfig,
     ManualAlignmentConfig,
-    SensorConfig,
+    MountingConfig,
     config_from_registry,
 )
 from pntos.cobra.internal import DummyMediator, StandardKeyValueStore
@@ -59,10 +59,9 @@ my_config: list[BaseConfig] = [
         initial_gyro_scale_factor_var=(4e-5, 4e-5, 5e-5),
         group='config/default/test',
     ),
-    SensorConfig(
+    MountingConfig(
         lever_arm=(0.0, 0.0, 0.0),
         orientation=(0.0, 0.0, 0.0, 0.0),
-        sensor_name='novatel',
         group='config/default/test',
     ),
 ]

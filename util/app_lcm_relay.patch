@@ -1,5 +1,5 @@
 diff --git a/apps/standard/pos_ins.py b/apps/standard/lcm_relay.py
-index 701f7e6b..618e8fb5 100755
+index 86eea2f3..329380b3 100755
 --- a/apps/standard/pos_ins.py
 +++ b/apps/standard/lcm_relay.py
 @@ -1,7 +1,5 @@
@@ -27,8 +27,8 @@ index 701f7e6b..618e8fb5 100755
 +    LcmTransportConfig,
      ManualHeadingAlignmentConfig,
      PinsonStateBlockConfig,
-     SensorConfig,
-@@ -39,9 +37,6 @@ from pntos.cobra.config import (
+     PinsonWithNedFogmPositionMPConfig,
+@@ -38,9 +36,6 @@ from pntos.cobra.config import (
      TimeAdjusterConfig,
      TimeBiasConfig,
  )
@@ -38,7 +38,7 @@ index 701f7e6b..618e8fb5 100755
  
  # Config setup
  C_imu_to_platform = (
-@@ -61,15 +56,7 @@ imu_model = ImuConfig(
+@@ -60,15 +55,7 @@ imu_model = ImuConfig(
      gyro_bias_initial_sigma=(0.003, 0.003, 0.003),
  )
  my_config = [
@@ -55,7 +55,7 @@ index 701f7e6b..618e8fb5 100755
      ControllerConfig(),
      FusionEngineConfig(),
      StandardOrchestrationConfig(
-@@ -151,7 +138,7 @@ my_config = [
+@@ -143,7 +130,7 @@ my_config = [
  # Instantiate all of our plugins
  controller = StandardControllerPlugin('Cobra Standard Controller Plugin')
  plugins = [

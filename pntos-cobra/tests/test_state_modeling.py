@@ -61,9 +61,8 @@ from pntos.cobra import (
 from pntos.cobra.config import (
     BaseConfig,
     ImuConfig,
+    PinsonBodyVelocityMPConfig,
     PinsonStateBlockConfig,
-    SensorConfig,
-    SensorMeasurementProcessorConfig,
     StateExtractorConfig,
 )
 from pntos.cobra.internal import (
@@ -110,18 +109,13 @@ my_config: list[BaseConfig] = [
             ),
         ),
     ),
-    SensorMeasurementProcessorConfig(
+    PinsonBodyVelocityMPConfig(
         group='config/test',
-        identifier='NA',
         label='NA',
         channel='NA',
         state_block_labels=('NA',),
-        sensor_config=SensorConfig(
-            group='config/gp3d_state_modeling',
-            lever_arm=_lever_arm,
-            orientation=(1.0, 0.0, 0.0, 0.0),
-            sensor_name='NA',
-        ),
+        lever_arm=_lever_arm,
+        orientation=(1.0, 0.0, 0.0, 0.0),
     ),
     StateExtractorConfig(
         group='config/extractor',

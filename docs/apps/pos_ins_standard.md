@@ -1,9 +1,8 @@
 # Standard POS INS App
 
 The `standard/pos_ins.py` app has a lot in common with its tutorial counterpart. Many plugins and config classes are
-reused between the two apps such as the `LcmLogTransportPlugin`, `StandardPreprocessorPlugin`, `FogmConfig`,
-`SensorConfig`, and many more. There are, however, some key differences that this tutorial will walk through and
-elaborate on.
+reused between the two apps such as the `LcmLogTransportPlugin`, `StandardPreprocessorPlugin`, and `FogmConfig`.
+There are, however, some key differences that this tutorial will walk through and elaborate on.
 
 ## Plugin Changes
 
@@ -11,7 +10,7 @@ There are some plugins that were swapped out for more advanced implementations.
 
 - `TutorialPosOrchestrationPlugin` was swapped for `StandardOrchestrationPlugin` so that the standard app could be more
 robust to different filter configurations. In the tutorial app, if you wanted to leverage an additional off-the-shelf
-preprocessor you would have to add the config to the app then update the Orchestration plugin to ingest that config and 
+preprocessor you would have to add the config to the app then update the Orchestration plugin to ingest that config and
 use the preprocessor when processing messages. In the standard version, this ingestion and use is handled automatically.
 Only the app config needs to be updated to use the preprocessor as compared to the app and plugin.
 This is merely one of the many features the `StandardOrchestrationPlugin` provides.
@@ -19,8 +18,8 @@ This is merely one of the many features the `StandardOrchestrationPlugin` provid
 - `TutorialPosInsStateModelingPlugin` and `StandardStateModelingPlugin` are very similar in their structure.
 Although there are no major differences from the perspective of the app, the standard version plugin does provide
 two major improvements.
-    - Config group validation which ensures Cobra appropriately logs any issue in obtaining necessary config.
-    - A larger set of State Blocks and Measurement Processors to choose from. 
+  - Config group validation which ensures Cobra appropriately logs any issue in obtaining necessary config.
+  - A larger set of State Blocks and Measurement Processors to choose from.
 
 - `TutorialInitializationPlugin` was swapped for `ManualHeadingAlignInitializationPlugin` which takes a more robust
 approach to inertial alignment than its tutorial counterpart. The tutorial uses the `ManualAlignment` algorithm which
@@ -39,7 +38,7 @@ standard app introduces nested config. Since the standard-level orchestration pl
 their config is now a field on the orchestration plugin's config.
 
 There are a lot of config values that are reused between the two apps; the standard app simply restructures where the
-classes are located. For example, the `SensorConfig` is now on the `SensorMeasurementProcessorConfig`.
+classes are located. For example, the `FogmConfig` is now on the `FogmStateBlockConfig`.
 
 There are also quite a few new config classes introduced such as the measurement processor and state block
 configurations. The new config introduces customizable options such as the channel name of the measurements

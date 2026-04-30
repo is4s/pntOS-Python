@@ -1,16 +1,19 @@
 diff --git a/apps/standard/pos_ins.py b/apps/standard/pos_ins_vsb.py
-index 701f7e6b..b202f00b 100755
+index 86eea2f3..8b2fa6c4 100755
 --- a/apps/standard/pos_ins.py
 +++ b/apps/standard/pos_ins_vsb.py
-@@ -38,6 +38,7 @@ from pntos.cobra.config import (
+@@ -32,8 +32,9 @@ from pntos.cobra.config import (
+     InertialConfig,
+     LcmLogTransportConfig,
+     ManualHeadingAlignmentConfig,
++    PinsonErrorToStandardVSBConfig,
+     PinsonStateBlockConfig,
+-    PinsonWithNedFogmPositionMPConfig,
++    PositionMPConfig,
      StandardOrchestrationConfig,
      TimeAdjusterConfig,
      TimeBiasConfig,
-+    VirtualStateBlockConfig,
- )
- from pntos_python_datasets import EXAMPLE_LCM_LOG
- 
-@@ -88,22 +89,24 @@ my_config = [
+@@ -87,24 +88,33 @@ my_config = [
                  estimate_with_covariance=EstimateWithCovariance(
                      type=EstimateWithCovarianceType.EWC_GENERIC,
                      estimate=np.zeros((3,)),
@@ -28,29 +31,22 @@ index 701f7e6b..b202f00b 100755
              ),
          ),
          mp_configs=(
-             SensorMeasurementProcessorConfig(
+-            PinsonWithNedFogmPositionMPConfig(
 -                group='config/pos_measurement_processor',
--                identifier='pinson_with_ned_fogm_position',
++            PositionMPConfig(
 +                group='config/position',
-+                identifier='position',
                  label='pos',
                  channel='/sensor/ublox-ZED-F9T/position',
 -                state_block_labels=('pinson15', 'pos_sensor_error'),
 +                state_block_labels=('platform_pva', 'pos_sensor_error'),
-                 aux_channels=('INERTIAL_PVA',),
-                 sensor_config=SensorConfig(
-                     group='config/gp3d_state_modeling',
-@@ -113,6 +116,15 @@ my_config = [
-                 ),
+                 lever_arm=(-0.50, 0.38, -0.05),
              ),
          ),
 +        vsb_configs=(
-+            VirtualStateBlockConfig(
++            PinsonErrorToStandardVSBConfig(
 +                group='config/pes',
-+                identifier='pinson_error_to_standard',
 +                source='pinson15',
 +                target='platform_pva',
-+                aux_channels=('INERTIAL_PVA',),
 +            ),
 +        ),
          inertial_config=InertialConfig(

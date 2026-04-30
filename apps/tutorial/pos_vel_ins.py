@@ -30,7 +30,7 @@ from pntos.cobra.config import (
     InertialConfig,
     LcmLogTransportConfig,
     ManualAlignmentConfig,
-    SensorConfig,
+    MountingConfig,
     TimeAdjusterConfig,
     TimeBiasConfig,
     TutorialOrchestrationConfig,
@@ -81,11 +81,10 @@ my_config = [
         initial_time=1747680879.539799718,
         initial_vel=(0.0, 0.0, 0.0),
     ),
-    SensorConfig(
+    MountingConfig(
         group='config/gp3d_state_modeling',
         lever_arm=(-0.50, 0.38, -0.05),
         orientation=(0.0, 0.0, 0.0, 0.0),
-        sensor_name='position',
     ),
     InertialConfig(
         group='config/inertial',

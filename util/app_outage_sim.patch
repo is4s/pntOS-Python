@@ -1,25 +1,28 @@
 diff --git a/apps/standard/pos_ins.py b/apps/standard/outage_sim.py
-index 701f7e6b..03c9c7ee 100755
+index 86eea2f3..9f2a67af 100755
 --- a/apps/standard/pos_ins.py
 +++ b/apps/standard/outage_sim.py
-@@ -23,6 +23,7 @@ from pntos.cobra import (
+@@ -22,7 +22,9 @@ from pntos.cobra import (
+     StandardStateModelingPlugin,
  )
  from pntos.cobra.config import (
++    AltitudeMPConfig,
      AspnVersion,
 +    BarometerToAltitudeConfig,
      ControllerConfig,
      FogmConfig,
      FogmStateBlockConfig,
-@@ -32,6 +33,8 @@ from pntos.cobra.config import (
+@@ -32,7 +34,9 @@ from pntos.cobra.config import (
      InertialConfig,
      LcmLogTransportConfig,
      ManualHeadingAlignmentConfig,
-+    MeasurementProcessorConfig,
 +    OutageConfig,
      PinsonStateBlockConfig,
-     SensorConfig,
-     SensorMeasurementProcessorConfig,
-@@ -68,6 +71,8 @@ my_config = [
++    PinsonVelocityMPConfig,
+     PinsonWithNedFogmPositionMPConfig,
+     StandardOrchestrationConfig,
+     TimeAdjusterConfig,
+@@ -67,6 +71,8 @@ my_config = [
          channels_to_process=(
              '/sensor/vn-100/imu',
              '/sensor/ublox-ZED-F9T/position',
@@ -28,7 +31,7 @@ index 701f7e6b..03c9c7ee 100755
          ),
      ),
      ControllerConfig(),
-@@ -96,6 +101,20 @@ my_config = [
+@@ -95,6 +101,20 @@ my_config = [
                      tau=(300.0, 300.0, 200.0),
                  ),
              ),
@@ -48,37 +51,27 @@ index 701f7e6b..03c9c7ee 100755
 +            ),
          ),
          mp_configs=(
-             SensorMeasurementProcessorConfig(
-@@ -112,6 +131,28 @@ my_config = [
-                     sensor_name='position',
-                 ),
+             PinsonWithNedFogmPositionMPConfig(
+@@ -104,6 +124,18 @@ my_config = [
+                 state_block_labels=('pinson15', 'pos_sensor_error'),
+                 lever_arm=(-0.50, 0.38, -0.05),
              ),
-+            SensorMeasurementProcessorConfig(
++            AltitudeMPConfig(
 +                group='config/alt_measurement_processor',
-+                identifier='pinson_altitude',
 +                label='alt',
 +                channel='/sensor/bmp388/altitude',
 +                state_block_labels=('pinson15', 'alt_fogm'),
-+                aux_channels=('INERTIAL_PVA',),
-+                sensor_config=SensorConfig(
-+                    group='config/alt_state_modeling',
-+                    lever_arm=(0.0, 0.0, 0.0),
-+                    orientation=(0.0, 0.0, 0.0, 0.0),
-+                    sensor_name='altitude',
-+                ),
 +            ),
-+            MeasurementProcessorConfig(
++            PinsonVelocityMPConfig(
 +                group='config/vel_measurement_processor',
-+                identifier='pinson_velocity',
 +                label='vel',
 +                channel='/sensor/ublox-ZED-F9T/velocity',
 +                state_block_labels=('pinson15',),
-+                aux_channels=('INERTIAL_PVA',),
 +            ),
          ),
          inertial_config=InertialConfig(
              group='config/inertial',
-@@ -140,10 +181,25 @@ my_config = [
+@@ -132,10 +164,25 @@ my_config = [
              ),
              TimeBiasConfig(
                  group='config/time_bias',

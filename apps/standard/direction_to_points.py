@@ -24,6 +24,7 @@ from pntos.cobra import (
 from pntos.cobra.config import (
     AspnVersion,
     ControllerConfig,
+    Direction3dToPointsMPConfig,
     DownsamplerConfig,
     FogmConfig,
     FogmStateBlockConfig,
@@ -34,8 +35,6 @@ from pntos.cobra.config import (
     LcmLogTransportConfig,
     ManualHeadingAlignmentConfig,
     PinsonStateBlockConfig,
-    SensorConfig,
-    SensorMeasurementProcessorConfig,
     StandardOrchestrationConfig,
     TimeAdjusterConfig,
     TimeBiasConfig,
@@ -100,19 +99,13 @@ my_config = [
             ),
         ),
         mp_configs=(
-            SensorMeasurementProcessorConfig(
+            Direction3dToPointsMPConfig(
                 group='config/direction3D_to_points_measurement_processor',
-                identifier='direction3D_to_points',
                 label='dir3D_to_points',
                 channel='/sensor/simulated/directiontoknownfeature',
                 state_block_labels=('pinson15',),
-                aux_channels=('INERTIAL_PVA',),
-                sensor_config=SensorConfig(
-                    group='config/direction3D_to_points_sensor',
-                    lever_arm=(0.80, 0.0, 0.05),
-                    orientation=(0.707106781, 0.0, 0.707106781, 0.0),
-                    sensor_name='direction3D_to_points_sensor',
-                ),
+                lever_arm=(0.80, 0.0, 0.05),
+                orientation=(0.707106781, 0.0, 0.707106781, 0.0),
             ),
         ),
         inertial_config=InertialConfig(

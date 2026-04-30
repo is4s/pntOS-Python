@@ -42,8 +42,7 @@ from pntos.cobra.config import (
     LcmLogTransportConfig,
     ManualHeadingAlignmentConfig,
     PinsonStateBlockConfig,
-    SensorConfig,
-    SensorMeasurementProcessorConfig,
+    PosVelMPConfig,
     StandardOrchestrationConfig,
     TimeAdjusterConfig,
     TimeBiasConfig,
@@ -108,19 +107,12 @@ my_config = [
             ),
         ),
         mp_configs=(
-            SensorMeasurementProcessorConfig(
+            PosVelMPConfig(
                 group='config/posvel_measurement_processor',
-                identifier='pinson_posvel',
                 label='posvel',
                 channel='/sensor/ublox-ZED-F9T/pva',
                 state_block_labels=('pinson15',),
-                aux_channels=('INERTIAL_PVA',),
-                sensor_config=SensorConfig(
-                    group='config/gp3d_state_modeling',
-                    lever_arm=(-0.50, 0.38, -0.05),
-                    orientation=(0.0, 0.0, 0.0, 0.0),
-                    sensor_name='posvel',
-                ),
+                lever_arm=(-0.50, 0.38, -0.05),
             ),
         ),
         inertial_config=InertialConfig(

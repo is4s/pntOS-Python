@@ -7,7 +7,12 @@ from pntos.api import (
     StateModelProviderType,
     VirtualStateBlock,
 )
-from pntos.cobra.config import FogmConfig, ImuConfig, SensorConfig, config_from_registry
+from pntos.cobra.config import (
+    FogmConfig,
+    ImuConfig,
+    MountingConfig,
+    config_from_registry,
+)
 
 from .TutorialFogmBlock import TutorialFogmBlock
 from .TutorialPinson15NedBlock import TutorialPinson15NedBlock
@@ -92,8 +97,8 @@ class TutorialPosInsStateModelProvider(StandardStateModelProvider):
                     self._mediator,
                 )
             case 1:
-                sensor_config: SensorConfig = config_from_registry(  # type: ignore[assignment]
-                    SensorConfig,
+                sensor_config: MountingConfig = config_from_registry(  # type: ignore[assignment]
+                    MountingConfig,
                     self._mediator,
                     config_group,  # type: ignore[arg-type]
                 )

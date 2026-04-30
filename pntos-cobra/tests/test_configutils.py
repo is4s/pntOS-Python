@@ -24,15 +24,16 @@ from pntos.cobra import StandardRegistryPlugin
 from pntos.cobra.config import (
     BaseConfig,
     DownsamplerConfig,
+    FogmConfig,
     ImuConfig,
     ImuRotatorConfig,
     InertialConfig,
     ManualAlignmentConfig,
-    MeasurementProcessorConfig,
+    MountingConfig,
     PinsonStateBlockConfig,
+    PinsonVelocityMPConfig,
+    PinsonWithNedFogmPositionMPConfig,
     PreprocessorConfig,
-    SensorConfig,
-    SensorMeasurementProcessorConfig,
     StandardOrchestrationConfig,
     StateBlockConfig,
     StaticAlignmentConfig,
@@ -142,12 +143,11 @@ class TestConfigUtils(unittest.TestCase):
 
         self._validate_conf_from_registry(test_conf, result_conf)
 
-    def test_SensorConfig_to_from_registry(self) -> None:
-        test_conf = SensorConfig(
+    def test_MountingConfig_to_from_registry(self) -> None:
+        test_conf = MountingConfig(
             CONFIG_TEST_GROUP,
             (0.7, 0.8, 0.9),
             (1.1, 2.2, 3.3, 4.4),
-            'NCC-1701',
         )
 
         # Test config_to_registry
@@ -156,7 +156,7 @@ class TestConfigUtils(unittest.TestCase):
 
         # Test config_from_registry()
         result_conf = config_from_registry(
-            SensorConfig, self.mediator, CONFIG_TEST_GROUP
+            MountingConfig, self.mediator, CONFIG_TEST_GROUP
         )
         assert result_conf is not None
 
@@ -221,22 +221,15 @@ class TestConfigUtils(unittest.TestCase):
                 ),
             ),
             mp_configs=(
-                SensorMeasurementProcessorConfig(
+                PinsonWithNedFogmPositionMPConfig(
                     group='config/pos_measurement_processor',
-                    identifier='pinson_with_ned_fogm_position',
                     label='pos',
                     channel='/sensor/ublox-ZED-F9T/position',
                     state_block_labels=('pinson15', 'pos_sensor_error'),
-                    sensor_config=SensorConfig(
-                        CONFIG_TEST_GROUP,
-                        (0.7, 0.8, 0.9),
-                        (1.1, 2.2, 3.3, 4.4),
-                        'NCC-1701',
-                    ),
+                    lever_arm=(0.7, 0.8, 0.9),
                 ),
-                MeasurementProcessorConfig(
+                PinsonVelocityMPConfig(
                     group='config/vel_measurement_processor',
-                    identifier='pinson_velocity',
                     label='vel',
                     channel='/sensor/ublox-ZED-F9T/velocity',
                     state_block_labels=('pinson15',),
@@ -317,11 +310,10 @@ class TestConfigUtils(unittest.TestCase):
         assert config == result_config
 
     def test_config_from_registry_return_none(self) -> None:
-        test_conf = SensorConfig(
+        test_conf = FogmConfig(
             CONFIG_TEST_GROUP,
             (0.1, 0.2, 0.3),
             (0.4, 0.5, 0.6, 0.7),
-            'NCC-1701',
         )
 
         # Test config_to_registry
@@ -330,13 +322,11 @@ class TestConfigUtils(unittest.TestCase):
 
         # Whoops, modified a value in the registry
         reg = self.mediator.registry.batch_start(CONFIG_TEST_GROUP)
-        reg['lever_arm'] = ['wrong type']
+        reg['sigma'] = ['wrong type']
         reg.batch_end()
 
         # Test config_from_registry()
-        result_conf = config_from_registry(
-            SensorConfig, self.mediator, CONFIG_TEST_GROUP
-        )
+        result_conf = config_from_registry(FogmConfig, self.mediator, CONFIG_TEST_GROUP)
         assert result_conf is None
 
     def test_manual_ewc_validation(self) -> None:

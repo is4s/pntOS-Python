@@ -39,10 +39,9 @@ from pntos.cobra.config import (
     InertialConfig,
     LcmLogTransportConfig,
     ManualHeadingAlignmentConfig,
-    MeasurementProcessorConfig,
+    PinsonPositionMPConfig,
     PinsonStateBlockConfig,
-    SensorConfig,
-    SensorMeasurementProcessorConfig,
+    PinsonVelocityMPConfig,
     StandardOrchestrationConfig,
     TimeAdjusterConfig,
     TimeBiasConfig,
@@ -107,27 +106,18 @@ my_config = [
             ),
         ),
         mp_configs=(
-            SensorMeasurementProcessorConfig(
+            PinsonPositionMPConfig(
                 group='config/pos_measurement_processor',
-                identifier='pinson_position',
                 label='pos',
                 channel='/sensor/ublox-ZED-F9T/position',
                 state_block_labels=('pinson15',),
-                aux_channels=('INERTIAL_PVA',),
-                sensor_config=SensorConfig(
-                    group='config/gp3d_state_modeling',
-                    lever_arm=(-0.50, 0.38, -0.05),
-                    orientation=(0.0, 0.0, 0.0, 0.0),
-                    sensor_name='position',
-                ),
+                lever_arm=(-0.50, 0.38, -0.05),
             ),
-            MeasurementProcessorConfig(
+            PinsonVelocityMPConfig(
                 group='config/vel_measurement_processor',
-                identifier='pinson_velocity',
                 label='vel',
                 channel='/sensor/ublox-ZED-F9T/velocity',
                 state_block_labels=('pinson15',),
-                aux_channels=('INERTIAL_PVA',),
             ),
         ),
         inertial_config=InertialConfig(
