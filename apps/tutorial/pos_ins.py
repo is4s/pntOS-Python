@@ -36,7 +36,7 @@ from pntos.cobra.config import (
     TutorialOrchestrationConfig,
     UiLogPlottingConfig,
 )
-from pntos_python_datasets import EXAMPLE_LCM_LOG
+from pntos_python_datasets_lcm import EXAMPLE_LCM_LOG
 
 OUTPUT_LOG = sys.argv[1] if len(sys.argv) > 1 else 'pntos_output.log'
 

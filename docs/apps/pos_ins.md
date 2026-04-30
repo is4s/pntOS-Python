@@ -95,7 +95,7 @@ for now we need the following config objects for this POS INS fusion app:
 
 #### Example Dataset
 
-The `pntos_python_datasets` package provides the example LCM log used in this app, along with a
+The `pntos_python_datasets_lcm` package provides the example LCM log used in this app, along with a
 variable, `EXAMPLE_LCM_LOG`, which specifies the path to this log file. This input log contains the
 ASPN measurements to be processed by the filter.
 
@@ -105,7 +105,7 @@ the solution. If this filename is not provided as a command-line argument, it de
 `pntos_output.log`.
 
 ```{literalinclude} ../../apps/tutorial/pos_ins.py
-:start-at: "from pntos_python_datasets"
+:start-at: "from pntos_python_datasets_lcm"
 :end-at: "OUTPUT_LOG"
 :lineno-match:
 ```

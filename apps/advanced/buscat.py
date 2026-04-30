@@ -13,7 +13,7 @@ from pntos.cobra import (
     StandardRegistryPlugin,
 )
 from pntos.cobra.config import AspnVersion, BuscatConfig, LcmLogTransportConfig
-from pntos_python_datasets import ASPN2_EXAMPLE_LCM_LOG
+from pntos_python_datasets_aspn2_lcm import ASPN2_EXAMPLE_LCM_LOG
 
 OUTPUT_LOG = sys.argv[1] if len(sys.argv) > 1 else 'pntos_output.log'
 

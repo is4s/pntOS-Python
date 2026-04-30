@@ -194,7 +194,9 @@ def open_log() -> EventLog:
     """Log opening code yoinked from the postprocessing folder"""
     log_filename = None
     for site in getsitepackages():
-        candidate = Path(f'{site}/pntos_python_datasets/cobra_gps_ins_example_data.log')
+        candidate = Path(
+            f'{site}/pntos_python_datasets_lcm/cobra_gps_ins_example_data.log'
+        )
         if candidate.exists():
             log_filename = candidate.as_posix()
             break
