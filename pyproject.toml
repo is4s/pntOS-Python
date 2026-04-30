@@ -33,8 +33,8 @@ dev = [
     "mypy==1.18.2",
     "myst-parser>=4",
     "pip>=24",
-    # navigation-data pntos-python/v0 branch -- committed 22 January 2026
-    "pntos-python-docs-data @ git+https://github.com/Open-PNT/navigation-data.git@2b9ae38ae13b9dcb0faf6ee9b5f7a0b69d91454c",
+    # navigation-data pntos-python/v1 branch -- committed 30 April 2026
+    "pntos-python-docs-data @ git+https://github.com/Open-PNT/navigation-data.git@cb308f5b4458121ba35685559b5350e29ca46338",
     "pyproject-fmt>=2.7",
     "pytest>=8.2",
     "pytest-cov>=6",

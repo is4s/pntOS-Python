@@ -157,7 +157,7 @@ pntos-python-datasets-lcm==0.1.0
     # via pntos-python
 pntos-python-datasets-ros==0.1.0
     # via pntos-python
-pntos-python-docs-data @ git+https://github.com/Open-PNT/navigation-data.git@2b9ae38ae13b9dcb0faf6ee9b5f7a0b69d91454c
+pntos-python-docs-data @ git+https://github.com/Open-PNT/navigation-data.git@cb308f5b4458121ba35685559b5350e29ca46338
 prompt-toolkit==3.0.51
     # via ipython
 ptyprocess==0.7.0 ; sys_platform != 'emscripten' and sys_platform != 'win32'

@@ -1459,7 +1459,7 @@ dev = [
     { name = "mypy", specifier = "==1.18.2" },
     { name = "myst-parser", specifier = ">=4" },
     { name = "pip", specifier = ">=24" },
-    { name = "pntos-python-docs-data", git = "https://github.com/Open-PNT/navigation-data.git?rev=2b9ae38ae13b9dcb0faf6ee9b5f7a0b69d91454c" },
+    { name = "pntos-python-docs-data", git = "https://github.com/Open-PNT/navigation-data.git?rev=cb308f5b4458121ba35685559b5350e29ca46338" },
     { name = "pyproject-fmt", specifier = ">=2.7" },
     { name = "pytest", specifier = ">=8.2" },
     { name = "pytest-cov", specifier = ">=6" },
@@ -1496,8 +1496,8 @@ wheels = [
 
 [[package]]
 name = "pntos-python-docs-data"
-version = "0.1.3"
-source = { git = "https://github.com/Open-PNT/navigation-data.git?rev=2b9ae38ae13b9dcb0faf6ee9b5f7a0b69d91454c#2b9ae38ae13b9dcb0faf6ee9b5f7a0b69d91454c" }
+version = "0.4.0"
+source = { git = "https://github.com/Open-PNT/navigation-data.git?rev=cb308f5b4458121ba35685559b5350e29ca46338#cb308f5b4458121ba35685559b5350e29ca46338" }
 
 [[package]]
 name = "prompt-toolkit"
