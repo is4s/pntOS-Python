@@ -11,8 +11,8 @@ from git import Repo
 from parse_c_headers import clang_parse_file
 from parse_python_api import parse_python_file
 
-PNTOS_URL = 'git@git.aspn.us:pntos/pntos.git'
-FIREHOSE_URL = 'git@git.aspn.us:pntos/firehose-outputs.git'
+PNTOS_URL = 'https://github.com/Open-PNT/pntOS-C.git'
+ASPN_GENERATED_URL = 'https://github.com/is4s/aspn-generated.git'
 
 
 def main(file_name: str, revision: str) -> None:
@@ -31,7 +31,7 @@ def main(file_name: str, revision: str) -> None:
             pntos.git.fetch('origin', revision)
             pntos.git.checkout(revision)
         print(f'Cloning firehose-outputs to {firehose_path}')
-        Repo.clone_from(FIREHOSE_URL, firehose_path, depth=1)
+        Repo.clone_from(ASPN_GENERATED_URL, firehose_path, depth=1)
         c_path = c_api_path / 'pntos/plugins/'
         py_path = Path('pntos-api/src/pntos/api/plugins/')
 
