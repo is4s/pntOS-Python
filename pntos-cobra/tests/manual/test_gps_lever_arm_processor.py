@@ -1,6 +1,3 @@
-from pathlib import Path
-from site import getsitepackages
-
 from aspn23 import (
     MeasurementImu,
     MeasurementImuImuType,
@@ -38,6 +35,7 @@ from pntos.cobra import (
 from pntos.cobra.config import BaseConfig, FogmConfig, ImuConfig, MountingConfig
 from pntos.cobra.internal import StandardMediator, StandardStateModelProvider
 from pntos.cobra.utils import decode_aspn_lcm_msg, marshal_from_lcm
+from pntos_python_datasets_lcm import EXAMPLE_LCM_LOG
 
 
 def gen_msg(
@@ -191,18 +189,7 @@ def fusion(la_guess: NDArray[float64]) -> StandardFusionEngine:
 
 
 def open_log() -> EventLog:
-    """Log opening code yoinked from the postprocessing folder"""
-    log_filename = None
-    for site in getsitepackages():
-        candidate = Path(
-            f'{site}/pntos_python_datasets_lcm/cobra_gps_ins_example_data.log'
-        )
-        if candidate.exists():
-            log_filename = candidate.as_posix()
-            break
-    if log_filename is None:
-        raise Exception('Could not find log file.')
-    log = EventLog(log_filename)
+    log = EventLog(EXAMPLE_LCM_LOG)
     assert log is not None
     return log
 
