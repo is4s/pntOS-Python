@@ -10,7 +10,8 @@ from pntos.cobra.utils.lcm_utils import (
     run_pntos_with_network_transport,
 )
 from pntos.cobra.utils.ros import get_ros_bag_file, run_pntos_with_ros_transport
-from pntos_python_datasets import EXAMPLE_LCM_LOG, EXAMPLE_ROS_LOG
+from pntos_python_datasets_lcm import EXAMPLE_LCM_LOG
+from pntos_python_datasets_ros import EXAMPLE_ROS_LOG
 
 OUTPUT_LOG_PREFIX = 'pntos_output'
 OUTPUT_LOG = Path(f'{OUTPUT_LOG_PREFIX}.log')
