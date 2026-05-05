@@ -8,12 +8,12 @@
     # via pntos-python
 alabaster==1.0.0
     # via sphinx
-analysis-lcm @ git+ssh://git@git.aspn.us/pntos/analysis-scripts.git@a8ff606e4a509ac2fd1c20de6f2aef25fa5f1fb5#subdirectory=analysis-lcm
+analysis-lcm @ git+https://github.com/Open-PNT/analysis-scripts.git@92ee7b01d89a4b06abb07a37c3a990e3933d9ef6#subdirectory=analysis-lcm
     # via
     #   analysis-ros
     #   pntos-cobra
     #   pntos-python
-analysis-ros @ git+ssh://git@git.aspn.us/pntos/analysis-scripts.git@a8ff606e4a509ac2fd1c20de6f2aef25fa5f1fb5#subdirectory=analysis-ros
+analysis-ros @ git+https://github.com/Open-PNT/analysis-scripts.git@92ee7b01d89a4b06abb07a37c3a990e3933d9ef6#subdirectory=analysis-ros
     # via
     #   pntos-cobra
     #   pntos-python
@@ -21,14 +21,14 @@ aspn2-lcm @ git+ssh://git@git.aspn.us/pntos/lcm-generated.git@831a7727bffab217b3
     # via
     #   aspn2-translations
     #   pntos-cobra
-aspn2-translations @ git+ssh://git@git.aspn.us/pntos/firehose-outputs.git@1cd02aa9bd7f9cd33a5ee7842c2f7ff2f31a3415#subdirectory=aspn2_to_aspn_py_translations
+aspn2-translations @ git+ssh://git@git.aspn.us/pntos/firehose-outputs.git@5581f825c6936be56b1822bf0d948ede6a9736cb#subdirectory=aspn2_to_aspn_py_translations
     # via pntos-cobra
-aspn23 @ git+ssh://git@git.aspn.us/pntos/firehose-outputs.git@b8a34d86cf501fff795ea1953b076c92abca2465#subdirectory=aspn-py
+aspn23 @ git+https://github.com/is4s/aspn-generated.git@7e1f35bc84b90c6d361e690601448f8087e1a626#subdirectory=aspn-py
     # via
     #   aspn2-translations
     #   pntos-api
     #   pntos-cobra
-aspn23-lcm @ git+ssh://git@git.aspn.us/pntos/firehose-outputs.git@b8a34d86cf501fff795ea1953b076c92abca2465#subdirectory=lcm/python
+aspn23-lcm @ git+https://github.com/is4s/aspn-generated.git@7e1f35bc84b90c6d361e690601448f8087e1a626#subdirectory=lcm/python
     # via pntos-cobra
 asttokens==3.0.0
     # via stack-data
@@ -157,7 +157,7 @@ pntos-python-datasets-lcm==0.1.0
     # via pntos-python
 pntos-python-datasets-ros==0.1.0
     # via pntos-python
-pntos-python-docs-data==0.4.0
+pntos-python-docs-data @ git+https://github.com/Open-PNT/navigation-data.git@cb308f5b4458121ba35685559b5350e29ca46338
 prompt-toolkit==3.0.51
     # via ipython
 ptyprocess==0.7.0 ; sys_platform != 'emscripten' and sys_platform != 'win32'

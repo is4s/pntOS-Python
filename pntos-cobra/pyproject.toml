@@ -18,20 +18,20 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
 ]
 dependencies = [
-    "analysis-lcm @ git+ssh://git@git.aspn.us/pntos/analysis-scripts.git@a8ff606e4a509ac2fd1c20de6f2aef25fa5f1fb5#subdirectory=analysis-lcm",
-    "analysis-ros @ git+ssh://git@git.aspn.us/pntos/analysis-scripts.git@a8ff606e4a509ac2fd1c20de6f2aef25fa5f1fb5#subdirectory=analysis-ros",
+    # analysis-scripts main branch - committed 1 May 2026
+    "analysis-lcm @ git+https://git@github.com/Open-PNT/analysis-scripts.git@92ee7b01d89a4b06abb07a37c3a990e3933d9ef6#subdirectory=analysis-lcm",
+    "analysis-ros @ git+https://git@github.com/Open-PNT/analysis-scripts.git@92ee7b01d89a4b06abb07a37c3a990e3933d9ef6#subdirectory=analysis-ros",
     # lcm-generated aspn-2.2 branch - committed 10 November 2025
     "aspn2-lcm @ git+ssh://git@git.aspn.us/pntos/lcm-generated.git@831a7727bffab217b3de60491dc12b96b50887a1#subdirectory=python",
-    # firehose-outputs main branch - committed 10 November 2025
-    "aspn2-translations @ git+ssh://git@git.aspn.us/pntos/firehose-outputs.git@1cd02aa9bd7f9cd33a5ee7842c2f7ff2f31a3415#subdirectory=aspn2_to_aspn_py_translations",
-    # firehose-outputs main branch - committed 06 November 2025
-    "aspn23 @ git+ssh://git@git.aspn.us/pntos/firehose-outputs.git@b8a34d86cf501fff795ea1953b076c92abca2465#subdirectory=aspn-py",
-    # firehose-outputs main branch - committed 06 November 2025
-    "aspn23-lcm @ git+ssh://git@git.aspn.us/pntos/firehose-outputs.git@b8a34d86cf501fff795ea1953b076c92abca2465#subdirectory=lcm/python",
+    # firehose-outputs main branch - committed 4 May 2026
+    "aspn2-translations @ git+ssh://git@git.aspn.us/pntos/firehose-outputs.git@5581f825c6936be56b1822bf0d948ede6a9736cb#subdirectory=aspn2_to_aspn_py_translations",
+    # aspn-generated main branch - committed 21 April 2026
+    "aspn23 @ git+https://github.com/is4s/aspn-generated.git@7e1f35bc84b90c6d361e690601448f8087e1a626#subdirectory=aspn-py",
+    # aspn-generated main branch - committed 21 April 2026
+    "aspn23-lcm @ git+https://github.com/is4s/aspn-generated.git@7e1f35bc84b90c6d361e690601448f8087e1a626#subdirectory=lcm/python",
     "h5py>1",
     "lcm>=1.5.1,<2",
     "matplotlib",
-    # Generated from commit 2d65da3693e7087a0e9ae56db6eba900c9e7ea91 on 8 May 2025
     "navtk==2.1.post6.dev0",
     # numpy 2.2 type errors with Cobra (#148).
     "numpy!=2.2",
@@ -47,4 +47,8 @@ allow-direct-references = true
 packages = [ "src/pntos" ]
 
 [[tool.uv.index]]
-url = "https://git.aspn.us/api/v4/projects/94/packages/pypi/simple"
+name = "pypi"
+url = "https://pypi.org/simple/"
+
+[tool.uv.sources]
+navtk = { index = "pypi" }
