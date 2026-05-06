@@ -120,15 +120,10 @@ nitpick_ignore = [
     ('py:class', 'Event'),
 ]
 
-# Linkcheck builder options.
 linkcheck_allowed_redirects = {
-    # All redirections to the sign-in page will be counted as "working".
-    r'.*git.aspn.us.*': r'https://git.aspn.us/users/sign_in',
-    r'.*pages\.aspn\.us(?!/pntos-python/).*': r'https://git.aspn.us/users/sign_in',
-    'https://www.pntOS.com': 'https://www.pntos.com/',
+    'https://git.aspn.us/aspn/smartcables/': 'https://git.aspn.us/users/sign_in',
+    'https://git.aspn.us/pntos/pntos-python/-/blob/main/apps/advanced/buscat.py': 'https://git.aspn.us/users/sign_in',
 }
-# Ignore line number anchors (e.g. #L12), since linkcheck gives false positives for these.
-linkcheck_anchors_ignore = [r'L\d*']
 
 
 def setup(app: Sphinx) -> None:
