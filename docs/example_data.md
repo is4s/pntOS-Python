@@ -1,13 +1,32 @@
 # Example Data
 
-One of the dependencies installed as part of the [Installation Guide](installation.md) is
-`pntos-python-datasets`. This Python module contains:
+Some of the dependencies installed as part of the [Installation Guide](installation.md) are various
+`pntos-python-datasets-*` packages. These Python modules each provide one dataset, a script to play
+the data, and a variable in the Python module which provides the path on the disk to the file.
 
-- ASPN23-LCM data: `cobra_gps_ins_example_data.log`
-- ASPN2-LCM data: `cobra_aspn2_example_data.log`
-- ASPN23-ROS data: `cobra_gps_ins_example_data_0.db3`
-- A script (`play_dataset`) which can be used to play back the above data, or return the path to the
-  installed file
+```{list-table} Example Data Package Info
+:header-rows: 1
+
+* - Package
+  - Dataset
+  - Script
+  - Variable
+
+* - `pntos-python-datasets-lcm`
+  - `cobra_gps_ins_example_data.log`
+  - `play-lcm-dataset`
+  - `EXAMPLE_LCM_LOG`
+
+* - `pntos-python-datasets-ros`
+  - `cobra_gps_ins_example_data_0.db3`
+  - `play-ros-dataset`
+  - `EXAMPLE_ROS_LOG`
+
+* - `pntos-python-datasets-aspn2-lcm`
+  - `cobra_aspn2_example_data.log`
+  - `play-aspn2-lcm-dataset`
+  - `ASPN2_EXAMPLE_LCM_LOG`
+```
 
 :::{tip}
 The above datasets are provided for convenience, but pntOS-Python is in no way limited to the above
