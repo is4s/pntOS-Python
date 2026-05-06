@@ -68,20 +68,6 @@ or read the [introduction](./introduction.md).
 
 ```
 
-```{dropdown} How is Cobra different from Viper?
-
-{term}`Cobra` and {term}`Viper` are both sets of plugins,
-but Cobra is written in Python using {term}`pntOS-Python`, whereas Viper is written in
-C/C++ using the {term}`C pntOS API`.
-
-```
-
-```{dropdown} Can I use a combination of Viper and Cobra plugins together?
-
-While this is not yet supported, we hope to support interoperability soon.
-
-```
-
 # NavToolKit FAQ
 
 ```{dropdown} What is NavToolKit?

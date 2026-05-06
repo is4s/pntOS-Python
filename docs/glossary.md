@@ -48,10 +48,7 @@ pntOS-Python
     information, see the [Introduction](./introduction.md).
 
 C pntOS API
-    An {term}`API` written in C that defines a Position, Navigation, and Timing Operating System ({term}`pntOS`). The C pntOS API consists of abstract plugin definition header files. {term}`Viper` is an example implementation of the C pntOS API. For more information, see [pntos.com](https://www.pntos.com/) or the [pntOS/Viper docs](https://pntos.pages.aspn.us/pntos/).
-
-Viper
-    Viper (sometimes referred to as Viper reference plugins) is the name of a government-owned reference implementation of a set of plugins that implement the {term}`C pntOS API` specification. For more information, see [the pntOS/Viper docs](https://pntos.pages.aspn.us/pntos/).
+    An {term}`API` written in C that defines a Position, Navigation, and Timing Operating System ({term}`pntOS`). The C pntOS API consists of abstract plugin definition header files. For more information, see [pntos.com](https://www.pntos.com/) or the [pntOS docs](https://pntos.pages.aspn.us/pntos/).
 
 API
     Application Programming Interface
@@ -88,7 +85,7 @@ GNSS
     Global Navigation Satellite System
 
 pntOS
-    pntOS stands for Position, Navigation, and Timing Operating System. It consists of an {term}`API` which defines a plugin architecture for implementing {term}`PNT` solutions. Since it is only an architecture, any solution created using pntOS is going to be unique from pntOS itself and may be unique from other pntOS solutions. For more information, see [the FAQ](./faq.md#pntos-faq). {term}`Cobra` and {term}`Viper` are examples of pntOS solutions.
+    pntOS stands for Position, Navigation, and Timing Operating System. It consists of an {term}`API` which defines a plugin architecture for implementing {term}`PNT` solutions. Since it is only an architecture, any solution created using pntOS is going to be unique from pntOS itself and may be unique from other pntOS solutions. For more information, see [the FAQ](./faq.md#pntos-faq).
 
 NavToolKit
     NavToolKit (navtk) is a modular navigation software library, designed to assist users in the creation of navigation filters in an efficient, pluggable, agile manner. It is written in C++ but also contains Python bindings for use in projects like {term}`Cobra`. For more information, see [the NavToolKit FAQ](./faq.md#navtoolkit-faq) or the [NavToolKit docs](https://pntos.pages.aspn.us/navtk/tutorial/introduction.html).
