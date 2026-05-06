@@ -151,7 +151,7 @@ pluggy==1.6.0
     # via
     #   pytest
     #   pytest-cov
-pntos-python-datasets-aspn2-lcm==0.1.0
+pntos-python-datasets-aspn2-lcm==0.1.1
     # via pntos-python
 pntos-python-datasets-lcm==0.1.0
     # via pntos-python
