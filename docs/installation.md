@@ -31,10 +31,10 @@ their operating system's package manager.
 ### Cloning pntOS-Python
 
 Next, download the {term}`pntOS-Python` project onto your machine. While there are several approaches to do so, we suggest
-you clone the [`pntos-python Git repository`](https://git.aspn.us/pntos/pntos-python) using:
+you clone the [`pntos-python Git repository`](https://github.com/is4s/pntOS-Python) using:
 
 ```shell
-git clone git@git.aspn.us:pntos/pntos-python.git
+git clone https://github.com/is4s/pntOS-Python.git
 ```
 
 Finally, you are now ready to set up your Python environment in the next section.
