@@ -122,7 +122,6 @@ nitpick_ignore = [
 
 linkcheck_allowed_redirects = {
     'https://git.aspn.us/aspn/smartcables/': 'https://git.aspn.us/users/sign_in',
-    'https://git.aspn.us/pntos/pntos-python/-/blob/main/apps/advanced/buscat.py': 'https://git.aspn.us/users/sign_in',
 }
 
 
