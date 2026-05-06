@@ -219,46 +219,6 @@ Both packages specify `src/pntos` as the build directory, placing them in the `p
 UV can use custom package indexes in addition to PyPI for private or
 organization-specific packages such as a self-hosted package index on a github instance.
 
-### Configuration
-
-To add custom package indexes to UV for a given project, simply add something like this
-to the `pyproject.toml`:
-
-```toml
-[[tool.uv.index]]  # Note: double brackets = array of tables
-url = "https://git.aspn.us/api/v4/projects/94/packages/pypi/simple"
-cache-control = { api = "max-age=600", files = "max-age=365000000, immutable" }
-```
-
-| Option                | Purpose                                     | Example                        |
-| --------------------- | ------------------------------------------- | ------------------------------ |
-| `url`                 | Package index URL (must end with `/simple`) | `https://...pypi/simple`       |
-| `cache-control.api`   | Cache index responses                       | `max-age=600` (10 min)         |
-| `cache-control.files` | Cache packages                              | `max-age=365000000, immutable` |
-
-```{note}
-Indexes must be PyPI-compatible (Simple Repository API). Most package registries (GitLab, Artifactory, Nexus) support this.
-```
-
-### Authentication
-
-Most custom indexes require authentication. Set the `UV_INDEX` environment variable for
-authenticated access. Here is an example for the `pntos-python` repo (see [Installation
-Guide](installation.md#authentication) for more info):
-
-```shell
-export UV_INDEX=https://:<TOKEN>@git.aspn.us/api/v4/projects/94/packages/pypi/simple
-```
-
-### Index Search Order
-
-UV searches indexes in this order:
-
-1. Custom indexes from `[[tool.uv.index]]`
-2. Default PyPI (unless disabled)
-
-This allows private packages to override public ones while falling back to PyPI for standard packages.
-
 ## Lock File Management
 
 The `uv.lock` file ensures reproducible, deterministic builds by recording exact versions, sources, and hashes for all dependencies.
@@ -322,8 +282,7 @@ git commit
 | Problem                   | Symptoms                                               | Solutions                                                                                                                                                                                                           |
 | ------------------------- | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Dependency conflicts**  | `error: No solution found when resolving dependencies` | • Use less restrictive version constraints (`>=` instead of `==`)<br>• Run `uv lock --upgrade` to try newer versions<br>• Check for conflicting package sources                                                     |
-| **Python version issues** | Can't find Python version, compatibility errors        | • Specify version: `uv sync --python 3.12`<br>• Check installation: `which python3.10 python3.12`<br>• Loosen `requires-python` constraint in `pyproject.toml`                                                      |
-| **Authentication errors** | `401 Unauthorized` or `403 Forbidden`                  | • Set `UV_INDEX` environment variable (see [Authentication](installation.md#authentication))<br>• Verify Personal Access Token hasn't expired<br>• Check SSH keys: `ssh -T git@git.aspn.us`                         |
+| **Python version issues** | Can't find Python version, compatibility errors        | • Specify version: `uv sync --python 3.12`<br>• Check installation: `which python3.10 python3.12`<br>• Loosen `requires-python` constraint in `pyproject.toml`                                                      |                      |
 | **Cache issues**          | Stale packages, corruption suspected                   | • `uv cache clean`<br>• Delete and recreate: `rm -rf .venv && uv sync`<br>• `uv sync --reinstall`                                                                                                                   |
 | **Stale lock file**       | CI fails with "lock file out of sync"                  | • Regenerate: `uv lock`<br>• Sync and commit: `uv sync && git add uv.lock requirements*.txt`                                                                                                                        |
 | **Build failures**        | `uv build` errors, missing dependencies                | • Verify `[build-system]` in `pyproject.toml`<br>• Check `[tool.hatch.build.targets.wheel]` points to correct package<br>• Enable `allow-direct-references = true` for Git deps<br>• Run `uv sync` first            |

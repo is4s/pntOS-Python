@@ -3,29 +3,6 @@
 This guide will walk you through setting up a Python virtual environment for running
 the example {term}`apps <App>` which utilize {term}`Cobra` plugins.
 
-## Authentication
-
-To download the necessary dependencies, you will need two types of authentication set up:
-
-- An SSH key
-- A Personal Access Token (PAT)
-
-To set up an SSH key, use `ssh-keygen` and add the public portion of your key to
-[your git.aspn.us profile](https://git.aspn.us/-/user_settings/ssh_keys).
-
-To set up a PAT, go to [your git.aspn.us
-profile](https://git.aspn.us/-/user_settings/personal_access_tokens) and add a new token with `read_api` privileges.
-
-To use the PAT, set the following environment variable, replacing `<TOKEN_VALUE>` with the value of your token:
-
-```shell
-export UV_INDEX=https://:<TOKEN_VALUE>@git.aspn.us/api/v4/projects/94/packages/pypi/simple
-```
-
-You may wish to permanently set the above `UV_INDEX` variable. For example, bash users can add the above `export` line
-to their `~/.bashrc` script. If this is not done, the user will need to re-run the above `export` line each time they
-open a new shell.
-
 ## Environment Setup
 
 Setting up your environment is done in three steps: installing native dependencies, cloning the {term}`pntOS-Python` project, and setting up your Python environment.
@@ -55,10 +32,6 @@ their operating system's package manager.
 
 Next, download the {term}`pntOS-Python` project onto your machine. While there are several approaches to do so, we suggest
 you clone the [`pntos-python Git repository`](https://git.aspn.us/pntos/pntos-python) using:
-
-```{note}
-The following command requires that you have successfully created an SSH key and added it to [your git.aspn.us profile](https://git.aspn.us/-/user_settings/ssh_keys) as described in the [Authentication](#authentication) section.
-```
 
 ```shell
 git clone git@git.aspn.us:pntos/pntos-python.git
@@ -166,37 +139,6 @@ Cobra works first, head over to the [introduction to Cobra](introduction.md).
 ## Errata & Troubleshooting
 
 This section lists some potential failures you may encounter and how to resolve them.
-
-### Unauthorized Error
-
-An error like:
-
-```
-HTTP status client error (401 Unauthorized) for url
-```
-
-is caused by the `UV_INDEX` environment variable not being set as expected. You can run:
-
-```shell
-echo $UV_INDEX
-```
-
-and you should get output of the form
-`https://:<TOKEN_VALUE>@git.aspn.us/api/v4/projects/94/packages/pypi/simple`. If that is
-not the case, please see [Authentication](#authentication) for instructions on setting that
-environment variable.
-
-### Could Not Find Package
-
-An error like:
-
-```
-ERROR: Could not find a version that satisfies the requirement <package name>
-```
-
-is caused by not passing `--extra-index-url=$UV_INDEX` into `pip install`, or the variable
-`UV_INDEX` not being set. Please see [Authentication](#authentication) for instructions on setting that
-environment variable.
 
 ### Errors When Building NavToolkit From Source
 
