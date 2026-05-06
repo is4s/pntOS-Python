@@ -19,7 +19,7 @@ navigation systems with {term}`pntOS-Python` and {term}`Cobra`.
 ## App Walkthrough
 
 Let's walk through this first app piece by piece. You can find the first app file at
-[`pntos-python/apps/tutorial/pos_ins.py`](https://git.aspn.us/pntos/pntos-python/-/blob/main/apps/tutorial/pos_ins.py?ref_type=heads)
+[`pntos-python/apps/tutorial/pos_ins.py`](https://github.com/is4s/pntOS-Python/blob/main/apps/tutorial/pos_ins.py)
 to follow along. Let's get started by examining how you import elements from the `pntos` module.
 
 ### Imports

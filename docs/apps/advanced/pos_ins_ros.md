@@ -27,7 +27,7 @@ ROS in a Docker container, you may want to copy the result into it so you can
 source it from within the container.
 
 For more information on using the dev packages or manually building ASPN-ROS,
-see [Firehose](https://git.aspn.us/pntos/firehose/-/tree/main).
+see [Firehose](https://github.com/is4s/firehose).
 
 ### Specifying Python version
 
@@ -102,7 +102,7 @@ playback rate.
 
 Existing LCM logfiles can be converted to ROS bagfiles using the
 `convert_log_to_ros.py` script in the [`analysis-scripts`
-repo](https://git.aspn.us/pntos/analysis-scripts/-/tree/main). This is how the
+repo](https://github.com/is4s/analysis-scripts). This is how the
 example bagfile used above was generated.
 
 Whether converted from a LCM logfile or recorded from live ROS data, ROS

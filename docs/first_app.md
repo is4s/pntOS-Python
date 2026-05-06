@@ -28,7 +28,7 @@ These instructions assume an active virtual environment as outlined in the
 [](#select-and-run-an-app).
 
 If you have not yet created a Python virtual environment for the [`pntos-python`
-repository](https://git.aspn.us/pntos/pntos-python), follow the instructions in [](./installation.md) then go
+repository](https://github.com/is4s/pntOS-Python), follow the instructions in [](./installation.md) then go
 to [](#select-and-run-an-app).
 
 If you have created the virtual environment but it is not currently activated, run the below command

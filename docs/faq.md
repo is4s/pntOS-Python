@@ -63,7 +63,7 @@ capabilities are developed, {term}`PNT` systems must quickly adapt. {term}`pntOS
 real-time pluggability which enables rapid modification of both the sensor types and the
 integration strategies used to bring sensor data into the sensor fusion engine.
 
-For more information on the benefits of pntOS, visit [pntOS.com](https://www.pntOS.com)
+For more information on the benefits of pntOS, visit [pntos.com](https://www.pntos.com)
 or read the [introduction](./introduction.md).
 
 ```
@@ -77,7 +77,7 @@ users in the creation of navigation filters in an efficient, pluggable, agile ma
 is used heavily in {term}`Cobra` - as well as in many other navigation-related projects
 - to provide many of the mathematical algorithms related to sensor fusion. For more
 information, see [the NavToolKit
-docs](https://pntos.pages.aspn.us/navtk/tutorial/introduction.html).
+docs](https://is4s.github.io/NavToolkit/tutorial/introduction.html).
 
 ```
 

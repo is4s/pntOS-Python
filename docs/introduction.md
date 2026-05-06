@@ -14,7 +14,7 @@ The pntOS application programming interface (API) is designed to address this
 situation. It has broken up the concept of a {term}`PNT` sensor fusion system into its
 component pieces (called plugins) and defined an API to standardize their interactions,
 allowing for plugins to be individually swappable. In order to aid development of new
-plugins, the [`pntos-python`](https://git.aspn.us/pntos/pntos-python) repository provides not only a
+plugins, the [`pntos-python`](https://github.com/is4s/pntOS-Python) repository provides not only a
 [full Python API](./autodocs/api.rst), but also a set of plugins and
 {term}`Apps<App>` to serve as a reference implementation (called {term}`Cobra`).
 
@@ -132,7 +132,7 @@ wired up to talk to each other, told to start listening and processing data, and
 Most apps will look very similar to each other, with the only changes being which plugins the {term}`App` has
 decided to use and what config stanzas it needs. You can find an example of a full-fledged {term}`App` that performs
 POS/INS sensor fusion from sensor data it receives from an LCM network bus
-[here](https://git.aspn.us/pntos/pntos-python/-/blob/main/apps/tutorial/pos_ins.py).
+[here](https://github.com/is4s/pntOS-Python/blob/main/apps/tutorial/pos_ins.py).
 For instructions on how to run this example app, see [Running Your First App](first_app.md).
 
 ### A Very Simple App
@@ -385,7 +385,7 @@ The {py:obj}`DummyTransportPlugin<pntos.cobra.DummyTransportPlugin>` is designed
 implementation of a {py:obj}`Transport Plugin<pntos.api.TransportPlugin>` possible to demonstrate the concepts
 above, which is why it was chosen as the transport for our [simple app example](#a-very-simple-app).
 The source code of the {py:obj}`DummyTransportPlugin<pntos.cobra.DummyTransportPlugin>` can be
-[found here](https://git.aspn.us/pntos/pntos-python/-/blob/main/pntos-cobra/src/pntos/cobra/dummy_plugins/DummyTransportPlugin.py).
+[found here](https://github.com/is4s/pntOS-Python/blob/main/pntos-cobra/src/pntos/cobra/dummy_plugins/DummyTransportPlugin.py).
 We can see from the source that it is very similar to the simple approach we've described above, namely it:
 
 - Saves off its {py:obj}`Mediator<pntos.api.Mediator>` in its
@@ -465,9 +465,9 @@ The {py:obj}`DummyControllerPlugin<pntos.cobra.DummyControllerPlugin>` is design
 of a {py:obj}`Controller Plugin<pntos.api.ControllerPlugin>` to demonstrate the concepts
 above, which is why it was chosen as the controller for our [simple app example](#a-very-simple-app).
 The source code of the {py:obj}`DummyControllerPlugin<pntos.cobra.DummyControllerPlugin>` can be
-[found here](https://git.aspn.us/pntos/pntos-python/-/blob/main/pntos-cobra/src/pntos/cobra/dummy_plugins/DummyControllerPlugin.py),
+[found here](https://github.com/is4s/pntOS-Python/blob/main/pntos-cobra/src/pntos/cobra/dummy_plugins/DummyControllerPlugin.py),
 along with its {py:obj}`DummyMediator<pntos.cobra.internal.DummyMediator>`
-[here](https://git.aspn.us/pntos/pntos-python/-/blob/main/pntos-cobra/src/pntos/cobra/dummy_plugins/DummyMediator.py).
+[here](https://github.com/is4s/pntOS-Python/blob/main/pntos-cobra/src/pntos/cobra/dummy_plugins/DummyMediator.py).
 
 We can see from the source code that the {py:obj}`DummyMediator<pntos.cobra.internal.DummyMediator>`
 is similar to the approach we've described above, namely:
@@ -629,7 +629,7 @@ In our {term}`App`, we used
 {py:obj}`DummyOrchestrationPlugin<pntos.cobra.DummyOrchestrationPlugin>`, which is designed to be a
 simple implementation of a {py:obj}`Orchestration plugin<pntos.api.OrchestrationPlugin>`. The source
 code of `DummyOrchestrationPlugin` can be [found
-here](https://git.aspn.us/pntos/pntos-python/-/blob/main/pntos-cobra/src/pntos/cobra/dummy_plugins/DummyOrchestrationPlugin.py)
+here](https://github.com/is4s/pntOS-Python/blob/main/pntos-cobra/src/pntos/cobra/dummy_plugins/DummyOrchestrationPlugin.py)
 
 Let's walk through this example step-by-step. We'll skip the imports, which are just bringing in symbols from the
 pntOS-Python APIs. The constructor:
@@ -748,7 +748,7 @@ Orchestration plugin.
 ```{note}
 If you're interested in seeing a simple implementation of an Orchestration plugin that actually
 performs sensor fusion to produce a navigation solution, check out the
-[`DummyOrchestrationPlugin`](https://git.aspn.us/pntos/pntos-python/-/blob/main/pntos-cobra/src/pntos/cobra/dummy_plugins/DummyOrchestrationPlugin.py).
+[`DummyOrchestrationPlugin`](https://github.com/is4s/pntOS-Python/blob/main/pntos-cobra/src/pntos/cobra/dummy_plugins/DummyOrchestrationPlugin.py).
 ```
 
 ### Running The Very Simple App

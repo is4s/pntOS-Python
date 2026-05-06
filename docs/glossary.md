@@ -7,7 +7,7 @@ Cobra
     of Python plugin implementations along with a set of tutorial {term}`Apps<App>` to demonstrate the
     process of developing a navigation system with {term}`pntOS-Python`.
 
-    You can find Cobra components in various places around the [`pntos-python`](https://git.aspn.us/pntos/pntos-python) repository:
+    You can find Cobra components in various places around the [`pntos-python`](https://github.com/is4s/pntOS-Python) repository:
 
     ```{table} Cobra Components Breakdown
     | Component name                                        | Location within the repository        | Module import location | Description                                                                                                                                                                                                                            |
@@ -42,13 +42,13 @@ pntOS-Python
     An {term}`API` written in Python that defines a Position,
     Navigation, and Timing Operating System ({term}`pntOS`). pntOS-Python consists of abstract
     plugin definitions which can be found in the
-    [pntos-api/src/pntos/api/plugins](https://git.aspn.us/pntos/pntos-python/-/tree/main/pntos-api/src/pntos/api/plugins?ref_type=heads)
-    directory in the [`pntos-python`](https://git.aspn.us/pntos/pntos-python/-/tree/main?ref_type=heads)
+    [pntos-api/src/pntos/api/plugins](https://github.com/is4s/pntOS-Python/tree/main/pntos-api/src/pntos/api/plugins)
+    directory in the [`pntos-python`](https://github.com/is4s/pntOS-Python)
     repository. {term}`Cobra` is an example implementation of pntOS-Python. For more
     information, see the [Introduction](./introduction.md).
 
 C pntOS API
-    An {term}`API` written in C that defines a Position, Navigation, and Timing Operating System ({term}`pntOS`). The C pntOS API consists of abstract plugin definition header files. For more information, see [pntos.com](https://www.pntos.com/) or the [pntOS docs](https://pntos.pages.aspn.us/pntos/).
+    An {term}`API` written in C that defines a Position, Navigation, and Timing Operating System ({term}`pntOS`). The C pntOS API consists of abstract plugin definition header files. For more information, see [pntos.com](https://www.pntos.com/) or the [pntOS docs](https://open-pnt.github.io/pntOS-C/).
 
 API
     Application Programming Interface
@@ -88,7 +88,7 @@ pntOS
     pntOS stands for Position, Navigation, and Timing Operating System. It consists of an {term}`API` which defines a plugin architecture for implementing {term}`PNT` solutions. Since it is only an architecture, any solution created using pntOS is going to be unique from pntOS itself and may be unique from other pntOS solutions. For more information, see [the FAQ](./faq.md#pntos-faq).
 
 NavToolKit
-    NavToolKit (navtk) is a modular navigation software library, designed to assist users in the creation of navigation filters in an efficient, pluggable, agile manner. It is written in C++ but also contains Python bindings for use in projects like {term}`Cobra`. For more information, see [the NavToolKit FAQ](./faq.md#navtoolkit-faq) or the [NavToolKit docs](https://pntos.pages.aspn.us/navtk/tutorial/introduction.html).
+    NavToolKit (navtk) is a modular navigation software library, designed to assist users in the creation of navigation filters in an efficient, pluggable, agile manner. It is written in C++ but also contains Python bindings for use in projects like {term}`Cobra`. For more information, see [the NavToolKit FAQ](./faq.md#navtoolkit-faq) or the [NavToolKit docs](https://is4s.github.io/NavToolkit/tutorial/introduction.html).
 
 GPS
     Global Positioning System. A constellation of 24 satellites launched by the USA which provide geolocation and timing data to a GPS receiver.

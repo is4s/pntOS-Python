@@ -10,7 +10,7 @@ try:
 except ModuleNotFoundError:
     print(f'{RED}ERROR: Installation failed!\033[0m')
     print(
-        f"See '{BLUE}https://pntos.pages.aspn.us/pntos-python/installation.html#errata-troubleshooting\033[0m' for troubleshooting steps."
+        f"See '{BLUE}https://is4s.github.io/pntOS-Python/installation.html#errata-troubleshooting\033[0m' for troubleshooting steps."
     )
     sys.exit(1)
 

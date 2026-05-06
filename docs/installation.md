@@ -207,5 +207,5 @@ system will not have coverage. If that's the case, your system will instead atte
 NavToolkit module from source.
 
 If you encounter any errors during this process, please see [NavToolkit's
-documentation](https://git.aspn.us/pntos/navtk) for instructions on building the NavToolkit module
+documentation](https://github.com/is4s/NavToolkit) for instructions on building the NavToolkit module
 from source and installing it.
