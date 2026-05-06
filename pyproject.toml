@@ -160,11 +160,6 @@ name = "pypi"
 url = "https://pypi.org/simple/"
 default = true
 
-[[tool.uv.index]]
-name = "wheelhouse"
-url = "https://git.aspn.us/api/v4/projects/94/packages/pypi/simple"
-cache-control = { api = "max-age=600", files = "max-age=365000000, immutable" }
-
 [tool.uv.sources]
 pntos-api = { workspace = true }
 pntos-cobra = { workspace = true }
