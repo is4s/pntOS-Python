@@ -37,5 +37,5 @@ class BuscatConfig(BaseConfig):
     group: str = field(default='config/buscat', init=False)
 
     # UNIQUE FIELDS
-    output_transports: tuple[str, ...]
+    output_transports: tuple[str, ...] | None = None
     """Identifiers of transport plugins through which to route output messages."""

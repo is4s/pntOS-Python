@@ -1,5 +1,5 @@
 diff --git a/pntos-cobra/src/pntos/cobra/standard_plugins//controller/StandardControllerPlugin.py b/pntos-cobra/src/pntos/cobra/advanced_plugins//buscat/BuscatControllerPlugin.py
-index f097a6aa..621de1f7 100644
+index e3972543e..71aa800d1 100644
 --- a/pntos-cobra/src/pntos/cobra/standard_plugins//controller/StandardControllerPlugin.py
 +++ b/pntos-cobra/src/pntos/cobra/advanced_plugins//buscat/BuscatControllerPlugin.py
 @@ -6,59 +6,59 @@ from pntos.api import (
@@ -128,14 +128,14 @@ index f097a6aa..621de1f7 100644
              )
  
          # Give the mediators other needed plugins
--        StandardMediator._transport_plugins = self._transport_plugins
+-        StandardMediator._transport_plugins.extend(self._transport_plugins)
 -        StandardMediator._orchestration_plugin = orchestration_plugin
 -
 -        # Give the orchestration the plugins it needs
 -        orchestration_plugin.init_orchestration_plugin(
 -            plugins_for_orchestration, stream_config
 -        )
-+        BuscatMediator._transport_plugins = self._transport_plugins
++        BuscatMediator._transport_plugins.extend(self._transport_plugins)
  
 -        # Extract controller-specific config
 -        temp_mediator = StandardMediator(self.identifier, ControllerPlugin)
@@ -155,7 +155,7 @@ index f097a6aa..621de1f7 100644
 -        StandardMediator._buffer_time_nsec = int(config.buffer_length_sec * 1e9)
 -        if config.publish_interval is not None:
 -            StandardMediator._publish_interval_ns = int(config.publish_interval * 1e9)
-+        BuscatMediator._output_transports = config.output_transports
++        BuscatMediator._output_transports.extend(config.output_transports or ())
  
          # Pass off to main control loop
          self._main()

@@ -174,7 +174,7 @@ class BuscatControllerPlugin(ControllerPlugin):
             )
 
         # Give the mediators other needed plugins
-        BuscatMediator._transport_plugins = self._transport_plugins
+        BuscatMediator._transport_plugins.extend(self._transport_plugins)
 
         # Set the mediators' output transport
         temp_mediator = BuscatMediator(self.identifier, ControllerPlugin)
@@ -185,7 +185,7 @@ class BuscatControllerPlugin(ControllerPlugin):
                 'Could not extract BuscatConfig from group "buscat". Cannot initialize Buscat controller plugin.',
             )
             return
-        BuscatMediator._output_transports = config.output_transports
+        BuscatMediator._output_transports.extend(config.output_transports or ())
 
         # Pass off to main control loop
         self._main()

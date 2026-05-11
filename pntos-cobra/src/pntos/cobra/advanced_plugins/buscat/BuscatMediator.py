@@ -23,11 +23,11 @@ class BuscatMediator(Mediator):
     """
 
     _logging_plugin: LoggingPlugin | None = None
+    _output_transports: ClassVar[list[str]] = []
     _transport_plugins: ClassVar[list[TransportPlugin]] = []
     _controller_plugin: ControllerPlugin | None = None
     _logging_error_event: Event = Event()
     registry: Registry
-    _output_transports: tuple[str, ...]
 
     def __init__(
         self,

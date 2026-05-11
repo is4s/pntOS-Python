@@ -181,7 +181,7 @@ class StandardControllerPlugin(ControllerPlugin):
             )
 
         # Give the mediators other needed plugins
-        StandardMediator._transport_plugins = self._transport_plugins
+        StandardMediator._transport_plugins.extend(self._transport_plugins)
         StandardMediator._orchestration_plugin = orchestration_plugin
 
         # Give the orchestration the plugins it needs
