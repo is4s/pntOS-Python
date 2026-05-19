@@ -85,7 +85,10 @@ class ExperimentalCobraUiPlugin(UiPlugin):
             self.static_folder = Path(config.static_folder)
         else:
             self.static_folder = files('pntos.cobra').joinpath(
-                'advanced_plugins', 'ui', '_static', 'dist'
+                'advanced_plugins',
+                'ui',  # ty:ignore[too-many-positional-arguments]
+                '_static',
+                'dist',
             )
 
         werkz_logger = getLogger('werkzeug')
