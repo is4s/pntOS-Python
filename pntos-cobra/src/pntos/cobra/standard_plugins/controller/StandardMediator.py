@@ -84,7 +84,9 @@ class StandardMediator(Mediator):
         assert self._orchestration_plugin is not None, (
             'Orchestration plugin used before initialized and passed to mediator.'
         )
-        if self._stream_config._is_sequenced(type(message.wrapped_message)):
+        if self._stream_config._is_sequenced(
+            type(message.wrapped_message), message.source_identifier
+        ):
             bisect.insort(self._messages, message, key=_get_time)
         else:
             self._orchestration_plugin.process_pntos_message(message, False)

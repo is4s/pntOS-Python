@@ -1,7 +1,13 @@
+from enum import IntEnum
 from typing import ClassVar
 
 from aspn23 import AspnBase
 from pntos.api import MessageStreamConfig
+
+
+class BufferMode(IntEnum):
+    IMMEDIATE = 0
+    SEQUENCED = 1
 
 
 class StandardMessageStreamConfig(MessageStreamConfig):
@@ -12,10 +18,9 @@ class StandardMessageStreamConfig(MessageStreamConfig):
     compliant functions.
     """
 
-    # _message_lookup[type(AspnMessage)][source_identifier] -> is_sequenced?
-    _override_to_immediate: ClassVar[set[type[AspnBase]]] = set()
-    _override_to_sequenced: ClassVar[set[type[AspnBase]]] = set()
-    _default_is_sequenced: bool = False  # True -> sequenced, False -> immediate
+    # Map message type and optional source identifier to buffer mode
+    _buffer_mode: ClassVar[dict[tuple[type[AspnBase], str | None], BufferMode]] = {}
+    _default_mode: BufferMode = BufferMode.IMMEDIATE
 
     def __init__(self) -> None:
         """
@@ -24,59 +29,39 @@ class StandardMessageStreamConfig(MessageStreamConfig):
         By default, all messages are immediately streamed.
         """
 
-    def _handle_source_identifier(self, source_identifier: str | None) -> None:
-        if source_identifier is not None:
-            print(
-                '[MessageStreamConfig] ERROR: Filtering on source '
-                + 'identifier is unimplemented.'
-            )
-
     def sequenced_stream_add(
         self, message_type: type[AspnBase], source_identifier: str | None = None
     ) -> None:
-        # TODO: implement source identifier filtering
-        self._handle_source_identifier(source_identifier)
-        if message_type in self._override_to_immediate:
-            self._override_to_immediate.remove(message_type)
-        self._override_to_sequenced.add(message_type)
+        key = (message_type, source_identifier)
+        self._buffer_mode[key] = BufferMode.SEQUENCED
 
     def sequenced_stream_remove(
         self, message_type: type[AspnBase], source_identifier: str | None = None
     ) -> None:
-        # TODO: implement source identifier filtering
-        self._handle_source_identifier(source_identifier)
-        if message_type in self._override_to_sequenced:
-            self._override_to_sequenced.remove(message_type)
+        key = (message_type, source_identifier)
+        self._buffer_mode.pop(key, None)
 
     def sequenced_stream_all(self, enable: bool) -> None:
         # TODO: Implement `enable` parameter - currently ambiguous (#66)
-        StandardMessageStreamConfig._override_to_sequenced = set()
-        StandardMessageStreamConfig._override_to_immediate = set()
-        self._default_is_sequenced = True
+        self._buffer_mode.clear()
+        self._default_mode = BufferMode.SEQUENCED
 
     def immediate_stream_add(
         self, message_type: type[AspnBase], source_identifier: str | None = None
     ) -> None:
-        # TODO: implement source identifier filtering
-        self._handle_source_identifier(source_identifier)
-        if message_type in self._override_to_sequenced:
-            self._override_to_sequenced.remove(message_type)
-        self._override_to_immediate.add(message_type)
+        key = (message_type, source_identifier)
+        self._buffer_mode[key] = BufferMode.IMMEDIATE
 
     def immediate_stream_remove(
         self, message_type: type[AspnBase], source_identifier: str | None = None
     ) -> None:
-        # TODO: implement source identifier filtering
-        self._handle_source_identifier(source_identifier)
-        if message_type in self._override_to_immediate:
-            self._override_to_immediate.remove(message_type)
+        key = (message_type, source_identifier)
+        self._buffer_mode.pop(key, None)
 
     def immediate_stream_all(self, enable: bool) -> None:
         # TODO: Implement `enable` parameter - currently ambiguous (#66)
-        StandardMessageStreamConfig._override_to_sequenced = set()
-        StandardMessageStreamConfig._override_to_immediate = set()
-
-        self._default_is_sequenced = False
+        self._buffer_mode.clear()
+        self._default_mode = BufferMode.IMMEDIATE
 
     def _is_sequenced(
         self, message_type: type[AspnBase], source_identifier: str | None = None
@@ -85,10 +70,12 @@ class StandardMessageStreamConfig(MessageStreamConfig):
         Returns true if the requested type will be streamed sequentially, and
         False if the requested type will be immediately streamed.
         """
-        self._handle_source_identifier(source_identifier)
-        if message_type in self._override_to_immediate:
-            return False
-        if message_type in self._override_to_sequenced:
-            return True
-        # If type is not in either list, return the default
-        return self._default_is_sequenced
+        key = (message_type, source_identifier)
+        if key in self._buffer_mode:
+            return self._buffer_mode[key] == BufferMode.SEQUENCED
+
+        key = (message_type, None)
+        if key in self._buffer_mode:
+            return self._buffer_mode[key] == BufferMode.SEQUENCED
+
+        return self._default_mode == BufferMode.SEQUENCED
