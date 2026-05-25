@@ -17,7 +17,9 @@ from .LcmTransportConfig import (
     LcmLogTransportConfig as LcmLogTransportConfig,
     LcmTransportConfig as LcmTransportConfig,
 )
-from .ManualAlignmentConfig import ManualAlignmentConfig as ManualAlignmentConfig
+from .ManualAlignmentConfig import (
+    ManualAlignmentConfig as ManualAlignmentConfig,
+)
 from .ManualHeadingAlignmentConfig import (
     ManualHeadingAlignmentConfig as ManualHeadingAlignmentConfig,
 )
@@ -48,6 +50,9 @@ from .PreprocessorConfig import (
     PreprocessorConfig as PreprocessorConfig,
     TimeAdjusterConfig as TimeAdjusterConfig,
     TimeBiasConfig as TimeBiasConfig,
+)
+from .PvaMessageInitializationConfig import (
+    PvaMessageInitializationConfig as PvaMessageInitializationConfig,
 )
 from .StaticAlignmentConfig import (
     StaticAlignmentConfig as StaticAlignmentConfig,
