@@ -2,8 +2,7 @@
 
 ## Generating Documentation
 
-This section assumes you have a Python environment with the necessary dependencies installed. Please
-see [Environment Setup](https://is4s.github.io/pntOS-Python/installation.html#environment-setup) for more information on how to do so.
+This section assumes you have a Python environment with the necessary dependencies installed.
 
 From the project directory, you can build the docs with:
 
