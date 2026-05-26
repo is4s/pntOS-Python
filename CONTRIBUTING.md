@@ -1,5 +1,19 @@
 # Contributing
 
+## Generating Documentation
+
+This section assumes you have a Python environment with the necessary dependencies installed. Please
+see [Environment Setup](https://is4s.github.io/pntOS-Python/installation.html#environment-setup) for more information on how to do so.
+
+From the project directory, you can build the docs with:
+
+```shell
+util/build_docs.sh
+```
+
+Then, in a web browser, open the outputted `docs/build/index.html` file to view the documentation
+you just generated.
+
 ## Checking Contributions
 
 New contributions to this repo should pass the checks contained in `all_checks.sh`. Using an
