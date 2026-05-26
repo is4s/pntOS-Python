@@ -34,7 +34,7 @@ see [Environment Setup](https://is4s.github.io/pntOS-Python/installation.html#en
 From the project directory, you can build the docs with:
 
 ```shell
-sphinx-build --exception-on-warning docs/ docs/build/
+util/build_docs.sh
 ```
 
 Then, in a web browser, open the outputted `docs/build/index.html` file to view the documentation

@@ -174,7 +174,7 @@ jobs:
           uses: ./.github/actions/setup
 
         - name: Build docs
-          run: docker exec -e TZ=UTC pntos-python sphinx-build --exception-on-warning docs/ docs/build/
+          run: docker exec -e TZ=UTC pntos-python util/build_docs.sh
 
         # On non-main pushes, archive the docs.
         - name: Archive Docs
