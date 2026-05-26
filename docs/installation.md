@@ -74,7 +74,7 @@ pip install --upgrade pip
 Now we're ready to install {term}`pntOS-Python`. In the project root directory, run:
 
 ```shell
-pip install -v -r requirements.txt --extra-index-url=$UV_INDEX
+pip install -v -r requirements.txt
 ```
 
 ```{note}
