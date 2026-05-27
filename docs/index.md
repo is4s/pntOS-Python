@@ -18,6 +18,7 @@ Some good places to get started:
 :caption: Getting Started
 installation
 first_app
+exercises
 ```
 
 ```{toctree}
