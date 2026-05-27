@@ -3,9 +3,11 @@ name = "pntos-python"
 version = "0.1.0.dev0"
 description = "A meta package for pntOS that contains the components of pntOS."
 readme = "README.md"
+license = 'Apache-2.0'
+license-files = [ 'LICENSE' ]
+
 authors = [ { name = "IS4S", email = "pntos@is4s.com" } ]
 requires-python = ">=3.10"
-
 classifiers = [
     "Programming Language :: Python :: 3 :: Only",
     "Programming Language :: Python :: 3.10",
