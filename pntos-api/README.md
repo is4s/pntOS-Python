@@ -1,3 +1,3 @@
-# pntos-api
+# pntOS-Python API
 
-The API specification for pntOS, ported into pure Python.
+The Python API specification for pntOS.

@@ -1,3 +1,3 @@
-# pntos-cobra
+# Cobra
 
-A Python implementation of a set of pntOS example plugins.
+A set of pntOS-Python plugins.
