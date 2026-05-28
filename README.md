@@ -1,9 +1,6 @@
-# pntos-python
+# pntOS-Python
 
-This project contains pntOS-Python and an example implementation called Cobra.
+This project contains pntOS-Python (a pure-Python pntOS API), Cobra (a set of plugins), and various
+apps (pntOS implementations) which use the above.
 
-## Documentation
-
-For a full set of documentation, visit the hosted,
-pre-generated documentation here: [pntOS-Python
-Documentation](https://is4s.github.io/pntOS-Python/).
+To get started, see the [pntOS-Python Documentation](https://is4s.github.io/pntOS-Python/).
