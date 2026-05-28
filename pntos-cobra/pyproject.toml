@@ -1,6 +1,10 @@
 [build-system]
 build-backend = "setuptools.build_meta"
-requires = [ "setuptools>=68", "wheel" ]
+requires = [
+    "pntos-python-docs-data @ git+https://github.com/Open-PNT/navigation-data.git@20f7be74318f3f29bfdc1ae3f04dee1b6c9714b7",
+    "setuptools>=68",
+    "wheel",
+]
 
 [project]
 name = "pntos-cobra"

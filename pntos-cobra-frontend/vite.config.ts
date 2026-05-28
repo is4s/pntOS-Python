@@ -18,7 +18,6 @@ export default defineConfig({
     },
   },
   build: {
-    outDir: "../pntos-cobra/src/pntos/cobra/advanced_plugins/ui/_static/dist/",
     emptyOutDir: true,
   },
 })

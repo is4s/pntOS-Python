@@ -2,7 +2,7 @@ import os
 import time
 from pathlib import Path
 from signal import SIGINT
-from subprocess import PIPE, Popen
+from subprocess import PIPE, STDOUT, Popen
 from threading import Thread
 from typing import IO, Any
 
@@ -66,7 +66,9 @@ def run_app(
         cmd.extend(args)
 
     # Set unbuffered flag so the subprocess standard output can be read in real time
-    app_process = Popen(cmd, stdout=PIPE, text=True, bufsize=1, start_new_session=True)
+    app_process = Popen(
+        cmd, stdout=PIPE, stderr=STDOUT, text=True, bufsize=1, start_new_session=True
+    )
     if monitor:
         assert app_process.stdout is not None
         monitor_app_output(app_process.stdout, validate=validate, separate_thread=True)

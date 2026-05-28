@@ -161,6 +161,7 @@ def process_lcm_message(
 
 def run_tcp_relay() -> Popen[str]:  # pragma: no cover
     sitepackages_dir = Path(getsitepackages()[0])
+    print('Starting LCM relay...', flush=True)
     process = Popen(
         [
             'java',
@@ -183,6 +184,7 @@ def run_logger(output_file: Path) -> Popen[str]:  # pragma: no cover
         output_file.unlink()
     current_dir = Path(__file__).parent
     logger_path = current_dir / 'logger.py'
+    print('Starting logger...', flush=True)
     return run_app(
         logger_path,
         [output_file.as_posix(), '2584', '/solution/pntos/pva'],
@@ -191,6 +193,7 @@ def run_logger(output_file: Path) -> Popen[str]:  # pragma: no cover
 
 
 def run_lcm_logplayer(logfile: Path) -> Popen[bytes]:  # pragma: no cover
+    print('Starting Logplayer...', flush=True)
     return Popen(
         ['lcm-logplayer', '--lcm-url=tcpq://', '--speed=1000', logfile.as_posix()],
         start_new_session=True,
@@ -260,15 +263,23 @@ def run_pntos_with_network_transport(
     logger_process = None
     logplayer_process = None
     app_process = None
+    max_relay_wait_iterations = 10
 
     try:
         relay_process = run_tcp_relay()
         logger_process = run_logger(output_log)
+        print('Starting app...', flush=True)
         app_process = run_app(app, args, monitor=True, validate=validate)
 
         # wait for cobra to connect to TCP relay
-        for line in relay_process.stdout:  # type: ignore[union-attr]
+        for i, line in enumerate(relay_process.stdout):  # type: ignore[arg-type]
             # wait for at least 2 clients to be connected (cobra and LCM logger)
+            if i > max_relay_wait_iterations:
+                print(
+                    'Timed out waiting for clients to connect to the TCP relay.',
+                    flush=True,
+                )
+                raise TimeoutError
             if re.search(r'[2-9] clients', line):
                 break
 

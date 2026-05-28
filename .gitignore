@@ -31,3 +31,4 @@ branding/
 # Build artifacts
 node_modules
 pntos-cobra/src/pntos/cobra/advanced_plugins/ui/_static/dist/*
+pntos-cobra-frontend/dist
