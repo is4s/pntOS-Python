@@ -70,8 +70,8 @@ See [](../apps/pos_ins.md) for a walkthrough of an app that uses this plugin.
 ````{tab-item} LCM Network Transport Plugin
 
 Like the LCM log-based transport plugin, the
-{py:obj}`LcmTransportPlugin<pntos.cobra.LcmTransportPlugin>` uses LCM to decode ASPN2 and ASPN23
-input messages and to output messages in either version. However, instead of reading from and
+{py:obj}`LcmTransportPlugin<pntos.cobra.LcmTransportPlugin>` uses LCM to decode ASPN
+input messages and to encode output messages. However, instead of reading from and
 writing to a log, this plugin listens and publishes messages over the network, via either TCP or
 UDP.
 
