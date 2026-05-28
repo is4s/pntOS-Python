@@ -6,12 +6,12 @@
     #   pntos-python
 -e ./pntos-cobra
     # via pntos-python
-analysis-lcm @ git+https://github.com/Open-PNT/analysis-scripts.git@92ee7b01d89a4b06abb07a37c3a990e3933d9ef6#subdirectory=analysis-lcm
+analysis-lcm==0.1.3
     # via
     #   analysis-ros
     #   pntos-cobra
     #   pntos-python
-analysis-ros @ git+https://github.com/Open-PNT/analysis-scripts.git@92ee7b01d89a4b06abb07a37c3a990e3933d9ef6#subdirectory=analysis-ros
+analysis-ros==0.1.1
     # via
     #   pntos-cobra
     #   pntos-python
@@ -19,10 +19,13 @@ annotated-types==0.7.0
     # via pydantic
 aspn23 @ git+https://github.com/is4s/aspn-generated.git@7e1f35bc84b90c6d361e690601448f8087e1a626#subdirectory=aspn-py
     # via
+    #   analysis-lcm
     #   pntos-api
     #   pntos-cobra
 aspn23-lcm @ git+https://github.com/is4s/aspn-generated.git@7e1f35bc84b90c6d361e690601448f8087e1a626#subdirectory=lcm/python
-    # via pntos-cobra
+    # via
+    #   analysis-lcm
+    #   pntos-cobra
 bidict==0.23.1
     # via python-socketio
 blinker==1.9.0
@@ -67,6 +70,7 @@ kiwisolver==1.4.8
     # via matplotlib
 lcm==1.5.1
     # via
+    #   analysis-lcm
     #   aspn23-lcm
     #   pntos-cobra
 markupsafe==3.0.2
@@ -76,12 +80,16 @@ markupsafe==3.0.2
     #   werkzeug
 matplotlib==3.10.5
     # via
+    #   analysis-lcm
     #   pntos-cobra
     #   pntos-python
 navtk==2.1.0.post6.dev0
-    # via pntos-cobra
-numpy==2.1.3
     # via
+    #   analysis-lcm
+    #   pntos-cobra
+numpy==1.26.4
+    # via
+    #   analysis-lcm
     #   aspn23
     #   contourpy
     #   h5py
@@ -111,12 +119,16 @@ python-engineio==4.13.2
     # via python-socketio
 python-socketio==5.16.2
     # via flask-socketio
+pyyaml==6.0.2
+    # via analysis-lcm
 scipy==1.15.3 ; python_full_version < '3.11'
     # via
+    #   analysis-lcm
     #   inu
     #   pntos-cobra
 scipy==1.16.1 ; python_full_version >= '3.11'
     # via
+    #   analysis-lcm
     #   inu
     #   pntos-cobra
 simple-websocket==1.1.0

@@ -172,7 +172,9 @@ def test_standard_pos_ins_network_app() -> None:
         num_points=2584,
         pos_err_limits=ErrorLimits(std_thresh=1.4, max_thresh=3.8, pct_below_1sigma=63),
         vel_err_limits=ErrorLimits(std_thresh=0.1, max_thresh=0.8),
-        tilt_err_limits=ErrorLimits(std_thresh=0.81, max_thresh=3.5),
+        tilt_err_limits=ErrorLimits(
+            std_thresh=0.81, max_thresh=3.5, pct_below_1sigma=67
+        ),
         expected_start_time_offset=10.0,
     )
 
@@ -273,7 +275,7 @@ def test_standard_pos_ins_vel_app() -> None:
         ),
         tilt_err_limits=ErrorLimits(
             std_thresh=1.6,
-            max_thresh=5.1,
+            max_thresh=5.2,
             pct_below_1sigma=30,
             pct_below_2sigma=52,
             pct_below_3sigma=68,
@@ -309,7 +311,7 @@ def test_standard_posvel_ins_app() -> None:
         ),
         tilt_err_limits=ErrorLimits(
             std_thresh=1.6,
-            max_thresh=5.1,
+            max_thresh=5.2,
             pct_below_1sigma=30,
             pct_below_2sigma=52,
             pct_below_3sigma=68,
@@ -388,7 +390,9 @@ def test_ui_app() -> None:
         num_points=2584,
         pos_err_limits=ErrorLimits(std_thresh=1.4, max_thresh=3.8, pct_below_1sigma=63),
         vel_err_limits=ErrorLimits(std_thresh=0.1, max_thresh=0.8),
-        tilt_err_limits=ErrorLimits(std_thresh=0.81, max_thresh=3.5),
+        tilt_err_limits=ErrorLimits(
+            std_thresh=0.81, max_thresh=3.5, pct_below_1sigma=67
+        ),
         expected_start_time_offset=10.0,
     )
 

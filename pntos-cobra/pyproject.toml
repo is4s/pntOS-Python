@@ -24,9 +24,8 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
 ]
 dependencies = [
-    # analysis-scripts main branch - committed 1 May 2026
-    "analysis-lcm @ git+https://git@github.com/Open-PNT/analysis-scripts.git@92ee7b01d89a4b06abb07a37c3a990e3933d9ef6#subdirectory=analysis-lcm",
-    "analysis-ros @ git+https://git@github.com/Open-PNT/analysis-scripts.git@92ee7b01d89a4b06abb07a37c3a990e3933d9ef6#subdirectory=analysis-ros",
+    "analysis-lcm>=0.1.3",
+    "analysis-ros>=0.1.1",
     # aspn-generated main branch - committed 21 April 2026
     "aspn23 @ git+https://github.com/is4s/aspn-generated.git@7e1f35bc84b90c6d361e690601448f8087e1a626#subdirectory=aspn-py",
     # aspn-generated main branch - committed 21 April 2026
