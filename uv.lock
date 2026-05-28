@@ -70,17 +70,23 @@ wheels = [
 [[package]]
 name = "aspn23"
 version = "0.1.0"
-source = { git = "https://github.com/is4s/aspn-generated.git?subdirectory=aspn-py&rev=7e1f35bc84b90c6d361e690601448f8087e1a626#7e1f35bc84b90c6d361e690601448f8087e1a626" }
+source = { registry = "https://pypi.org/simple/" }
 dependencies = [
     { name = "numpy" },
+]
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/d3/5b/e3be529d59f33a8d4065bbb49f397605a0b0c0c5dbea3914a3193a3f6e55/aspn23-0.1.0-py3-none-any.whl", hash = "sha256:b5031337057a187831da72c392c64f8b62cab497e0c265504b949452b0a5dfa4", size = 86127, upload-time = "2026-05-27T20:49:03.497Z" },
 ]
 
 [[package]]
 name = "aspn23-lcm"
 version = "0.1.0"
-source = { git = "https://github.com/is4s/aspn-generated.git?subdirectory=lcm%2Fpython&rev=7e1f35bc84b90c6d361e690601448f8087e1a626#7e1f35bc84b90c6d361e690601448f8087e1a626" }
+source = { registry = "https://pypi.org/simple/" }
 dependencies = [
     { name = "lcm" },
+]
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/29/f5/e8a1abf91e6c7d25582ca0d467cc287c1000f8ed61ce81161c93214d85de/aspn23_lcm-0.1.0-py3-none-any.whl", hash = "sha256:ddaef5ce110c077b36b85c5c964d55db967a535a47756a845bdc81b08055a11a", size = 154328, upload-time = "2026-05-27T20:50:21.292Z" },
 ]
 
 [[package]]
@@ -1418,7 +1424,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "aspn23", git = "https://github.com/is4s/aspn-generated.git?subdirectory=aspn-py&rev=7e1f35bc84b90c6d361e690601448f8087e1a626" },
+    { name = "aspn23" },
     { name = "numpy" },
 ]
 
@@ -1449,8 +1455,8 @@ dependencies = [
 requires-dist = [
     { name = "analysis-lcm", specifier = ">=0.1.3" },
     { name = "analysis-ros", specifier = ">=0.1.1" },
-    { name = "aspn23", git = "https://github.com/is4s/aspn-generated.git?subdirectory=aspn-py&rev=7e1f35bc84b90c6d361e690601448f8087e1a626" },
-    { name = "aspn23-lcm", git = "https://github.com/is4s/aspn-generated.git?subdirectory=lcm%2Fpython&rev=7e1f35bc84b90c6d361e690601448f8087e1a626" },
+    { name = "aspn23" },
+    { name = "aspn23-lcm" },
     { name = "flask" },
     { name = "flask-socketio" },
     { name = "h5py", specifier = ">1" },
@@ -1519,7 +1525,7 @@ dev = [
     { name = "mypy", specifier = "==1.18.2" },
     { name = "myst-parser", specifier = ">=4" },
     { name = "pip", specifier = ">=24" },
-    { name = "pntos-python-docs-data", git = "https://github.com/Open-PNT/navigation-data.git?rev=20f7be74318f3f29bfdc1ae3f04dee1b6c9714b7" },
+    { name = "pntos-python-docs-data" },
     { name = "pyproject-fmt", specifier = ">=2.7" },
     { name = "pytest", specifier = ">=8.2" },
     { name = "pytest-cov", specifier = ">=6" },
@@ -1550,7 +1556,10 @@ wheels = [
 [[package]]
 name = "pntos-python-docs-data"
 version = "0.5.0"
-source = { git = "https://github.com/Open-PNT/navigation-data.git?rev=20f7be74318f3f29bfdc1ae3f04dee1b6c9714b7#20f7be74318f3f29bfdc1ae3f04dee1b6c9714b7" }
+source = { registry = "https://pypi.org/simple/" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/f1/14/01f9e8d9179190bea80228a7a1b7f7f8e2cdf0975a426ddfb6023766414d/pntos_python_docs_data-0.5.0-py2.py3-none-any.whl", hash = "sha256:f4dbb6a7dbb11fe49034d52bc16429e2a9536a0cd1ac10dcae3bb7c495cbcd93", size = 5389981, upload-time = "2026-05-27T21:09:02.169Z" },
+]
 
 [[package]]
 name = "prompt-toolkit"

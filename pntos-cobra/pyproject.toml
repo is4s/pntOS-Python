@@ -1,7 +1,7 @@
 [build-system]
 build-backend = "setuptools.build_meta"
 requires = [
-    "pntos-python-docs-data @ git+https://github.com/Open-PNT/navigation-data.git@20f7be74318f3f29bfdc1ae3f04dee1b6c9714b7",
+    "pntos-python-docs-data",
     "setuptools>=68",
     "wheel",
 ]
@@ -26,10 +26,8 @@ classifiers = [
 dependencies = [
     "analysis-lcm>=0.1.3",
     "analysis-ros>=0.1.1",
-    # aspn-generated main branch - committed 21 April 2026
-    "aspn23 @ git+https://github.com/is4s/aspn-generated.git@7e1f35bc84b90c6d361e690601448f8087e1a626#subdirectory=aspn-py",
-    # aspn-generated main branch - committed 21 April 2026
-    "aspn23-lcm @ git+https://github.com/is4s/aspn-generated.git@7e1f35bc84b90c6d361e690601448f8087e1a626#subdirectory=lcm/python",
+    "aspn23",
+    "aspn23-lcm",
     "flask",
     "flask-socketio",
     "h5py>1",

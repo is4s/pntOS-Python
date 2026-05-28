@@ -17,12 +17,12 @@ analysis-ros==0.1.1
     #   pntos-python
 annotated-types==0.7.0
     # via pydantic
-aspn23 @ git+https://github.com/is4s/aspn-generated.git@7e1f35bc84b90c6d361e690601448f8087e1a626#subdirectory=aspn-py
+aspn23==0.1.0
     # via
     #   analysis-lcm
     #   pntos-api
     #   pntos-cobra
-aspn23-lcm @ git+https://github.com/is4s/aspn-generated.git@7e1f35bc84b90c6d361e690601448f8087e1a626#subdirectory=lcm/python
+aspn23-lcm==0.1.0
     # via
     #   analysis-lcm
     #   pntos-cobra
