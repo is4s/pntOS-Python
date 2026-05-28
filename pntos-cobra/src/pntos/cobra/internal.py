@@ -1,4 +1,12 @@
 from .advanced_plugins.buscat.BuscatMediator import BuscatMediator as BuscatMediator
+from .advanced_plugins.ui.models import (
+    BatchUpdate as BatchUpdate,
+    ChunkUpdate as ChunkUpdate,
+    KeyUpdate as KeyUpdate,
+    Snapshot as Snapshot,
+    Subscription as Subscription,
+    Write as Write,
+)
 from .dummy_plugins.DummyMediator import (
     DummyMediator as DummyMediator,
 )

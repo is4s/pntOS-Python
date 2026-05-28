@@ -20,3 +20,4 @@ git diff --no-index apps/standard/pos_ins.py apps/standard/pos_ins_vsb.py > util
 git diff --no-index $standard_plugins_folder/controller/StandardControllerPlugin.py $advanced_plugins_folder/buscat/BuscatControllerPlugin.py > util/controller_buscat.patch
 git diff --no-index apps/standard/pos_ins.py apps/standard/direction_to_points.py > util/app_direction_to_points.patch
 git diff --no-index apps/standard/pos_ins.py apps/standard/pos_ins_record_states.py > util/app_record_states.patch
+git diff --no-index apps/standard/lcm_relay.py apps/advanced/ui.py > util/app_ui.patch

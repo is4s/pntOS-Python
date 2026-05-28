@@ -52,7 +52,10 @@ from .PreprocessorConfig import (
 from .StaticAlignmentConfig import (
     StaticAlignmentConfig as StaticAlignmentConfig,
 )
-from .UiConfig import UiLogPlottingConfig as UiLogPlottingConfig
+from .ui_config import (
+    ExperimentalCobraUiConfig as ExperimentalCobraUiConfig,
+    UiLogPlottingConfig as UiLogPlottingConfig,
+)
 from .utils import (
     config_from_registry as config_from_registry,
     config_to_registry as config_to_registry,

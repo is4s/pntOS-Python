@@ -19,6 +19,9 @@ RUN apt update && apt install -y \
 # Install uv
 RUN curl -LsSf https://astral.sh/uv/install.sh | UV_UNMANAGED_INSTALL="/usr/local/bin" bash
 
+# Install NodeJs Dependency for UI
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && apt-get update && apt-get install -y nodejs
+
 WORKDIR /work
 ENTRYPOINT ["/bin/bash", "-c"]
 CMD ["/bin/bash"]

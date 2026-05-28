@@ -253,6 +253,21 @@ jobs:
             docker exec pntos-python bash -c ". firehose-outputs/ros_devel/jazzy/setup.bash &&
                                             pytest apps -k test_advanced_pos_ins_ros_app -s"
 
+    Advanced-UI-App:
+        name: Advanced UI App
+        runs-on: ubuntu-24.04
+        steps:
+        - uses: actions/checkout@v4
+
+        - name: Set up
+          uses: ./.github/actions/setup
+
+        - name: Run app
+          run: |
+            set -xe
+            docker exec pntos-python ./util/build_ui.sh
+            docker exec pntos-python pytest apps -k test_ui_app -s
+
     pip-workflow:
         name: Test ${{ matrix.requirements }} pip workflow
         runs-on: ubuntu-24.04

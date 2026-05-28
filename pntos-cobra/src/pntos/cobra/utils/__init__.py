@@ -73,6 +73,14 @@ from .plugins import (
     sort_plugins_dataclass as sort_plugins_dataclass,
     validate_plugins as validate_plugins,
 )
+from .registry import (
+    BufferedMutableValueView as BufferedMutableValueView,
+    BufferedValueView as BufferedValueView,
+    GroupsView as GroupsView,
+    MutableValueView as MutableValueView,
+    ValueType as ValueType,
+    ValueView as ValueView,
+)
 from .ros import (
     get_ros_bag_file as get_ros_bag_file,
     run_pntos_with_ros_transport as run_pntos_with_ros_transport,

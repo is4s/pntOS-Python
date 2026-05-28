@@ -7,6 +7,12 @@ with contextlib.suppress(ImportError):
 from .advanced_plugins.buscat.BuscatControllerPlugin import (
     BuscatControllerPlugin as BuscatControllerPlugin,
 )
+from .advanced_plugins.ui.CobraUiLogPlayerPlugin import (
+    CobraUiLogPlayerPlugin as CobraUiLogPlayerPlugin,
+)
+from .advanced_plugins.ui.ExperimentalCobraUiPlugin import (
+    ExperimentalCobraUiPlugin as ExperimentalCobraUiPlugin,
+)
 from .dummy_plugins.DummyControllerPlugin import (
     DummyControllerPlugin as DummyControllerPlugin,
 )

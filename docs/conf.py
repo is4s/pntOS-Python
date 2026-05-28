@@ -88,7 +88,7 @@ html_theme_options = {
     'logo_only': True,
     'collapse_navigation': True,
 }
-html_favicon = f'{branding_dir}/favicon.ico'
+html_favicon = f'{branding_dir}/blue-pntos-icon.ico'
 
 nitpicky = True
 nitpick_ignore = [
@@ -118,11 +118,17 @@ nitpick_ignore = [
     ('py:class', 'AlignBase.AlignmentStatus'),
     ('py:class', 'pathlib.Path'),
     ('py:class', 'Event'),
+    ('py:class', 'pydantic.main.BaseModel'),
+    ('py:class', 'pntos.cobra.utils.registry.ValueType'),
+    ('py:obj', 'pntos.cobra.utils.registry.ValueType'),
+    ('py:class', 'ValueType'),
 ]
 
 linkcheck_allowed_redirects = {
     'https://git.aspn.us/aspn/smartcables/': 'https://git.aspn.us/users/sign_in',
 }
+# Ignore localhost URLs since they're used in examples and won't be reachable during CI.
+linkcheck_ignore = [r'http://localhost:\d+']
 
 
 def setup(app: Sphinx) -> None:

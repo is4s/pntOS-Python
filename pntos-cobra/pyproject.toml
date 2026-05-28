@@ -1,6 +1,6 @@
 [build-system]
-build-backend = "hatchling.build"
-requires = [ "hatchling" ]
+build-backend = "setuptools.build_meta"
+requires = [ "setuptools>=68", "wheel" ]
 
 [project]
 name = "pntos-cobra"
@@ -25,6 +25,8 @@ dependencies = [
     "aspn23 @ git+https://github.com/is4s/aspn-generated.git@7e1f35bc84b90c6d361e690601448f8087e1a626#subdirectory=aspn-py",
     # aspn-generated main branch - committed 21 April 2026
     "aspn23-lcm @ git+https://github.com/is4s/aspn-generated.git@7e1f35bc84b90c6d361e690601448f8087e1a626#subdirectory=lcm/python",
+    "flask",
+    "flask-socketio",
     "h5py>1",
     "lcm>=1.5.1,<2",
     "matplotlib",
@@ -32,15 +34,18 @@ dependencies = [
     # numpy 2.2 type errors with Cobra (#148).
     "numpy!=2.2",
     "pntos-api==0.1.dev0",
+    "pydantic>=2.0.0",
     "scipy>=1.15.2",
     "tqdm",
 ]
 
-[tool.hatch.metadata]
-allow-direct-references = true
+[tool.setuptools]
+include-package-data = true
 
-[tool.hatch.build.targets.wheel]
-packages = [ "src/pntos" ]
+[tool.setuptools.package-data]
+pntos-cobra = [
+    "advanced_plugins/ui/_static/dist/**/*",
+]
 
 [[tool.uv.index]]
 name = "pypi"

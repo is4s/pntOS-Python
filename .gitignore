@@ -1,7 +1,6 @@
 __pycache__/
 *.py[oc]
 build/
-dist/
 wheels/
 *.egg-info
 .venv
@@ -24,3 +23,11 @@ metadata.yaml
 
 # Artifacts from building the docs
 docs/images/
+
+### Cobra GUI Frontend
+# Site packages assets
+branding/
+*.ico
+# Build artifacts
+node_modules
+pntos-cobra/src/pntos/cobra/advanced_plugins/ui/_static/dist/*

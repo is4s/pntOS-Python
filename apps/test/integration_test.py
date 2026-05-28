@@ -374,6 +374,25 @@ def test_advanced_pos_ins_ros_app() -> None:
     )
 
 
+def test_ui_app() -> None:
+    run_pntos_with_network_transport(
+        Path('apps/advanced/ui.py'),
+        Path(EXAMPLE_LCM_LOG),
+        OUTPUT_LOG,
+        validate=True,
+    )
+    log_data = read_pva(OUTPUT_LOG.as_posix(), read_all=True)
+    validate_results(
+        log_data.data[SOLUTION_CHANNEL],
+        log_data.data[TRUTH_CHANNEL],
+        num_points=2584,
+        pos_err_limits=ErrorLimits(std_thresh=1.4, max_thresh=3.8, pct_below_1sigma=63),
+        vel_err_limits=ErrorLimits(std_thresh=0.1, max_thresh=0.8),
+        tilt_err_limits=ErrorLimits(std_thresh=0.81, max_thresh=3.5),
+        expected_start_time_offset=10.0,
+    )
+
+
 def test_standard_direction_to_points_app() -> None:
     run_pntos_with_log_transport(
         Path('apps/standard/direction_to_points.py'),
