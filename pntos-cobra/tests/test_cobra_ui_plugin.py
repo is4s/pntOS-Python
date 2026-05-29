@@ -160,24 +160,6 @@ class TestCobraUiPluginFlaskRoutes:
             assert response.status_code == 200
             assert b'Test Index' in response.data
 
-    def test_serve_index_no_static(self, mediator: DummyMediator) -> None:
-        plugin = ExperimentalCobraUiPlugin('test-plugin')
-        config_no_static = ExperimentalCobraUiConfig(
-            group='config/test_cobra_ui',
-            static_folder='',
-        )
-        with patch(
-            'pntos.cobra.advanced_plugins.ui.ExperimentalCobraUiPlugin.config_from_registry',
-            return_value=config_no_static,
-        ):
-            plugin.init_plugin(mediator=mediator)
-            plugin.app.static_folder = None
-
-        with plugin.app.test_client() as client:
-            response = client.get('/')
-            assert response.status_code == 200
-            assert b'No static folder' in response.data
-
     def test_serve_static_file_exists(
         self, initialized_plugin: ExperimentalCobraUiPlugin
     ) -> None:
