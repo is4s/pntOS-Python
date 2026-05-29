@@ -6,6 +6,7 @@ for real-time registry updates and subscriptions.
 """
 
 import shutil
+from importlib.resources import files
 from logging import ERROR, getLogger
 from pathlib import Path
 from threading import Event, Thread
@@ -49,6 +50,7 @@ class ExperimentalCobraUiPlugin(UiPlugin):
     config_group: str
     write_buffer: SequenceBuffer[Write]
     _metadata_manager: UiMetadataInterface
+    static_folder: Path
 
     def __init__(
         self,
@@ -79,17 +81,22 @@ class ExperimentalCobraUiPlugin(UiPlugin):
             self._error('Config from registry failed.')
             return
         self.config = config
-        static_folder = Path(self.config.static_folder)
+        if config.static_folder:
+            self.static_folder = Path(config.static_folder)
+        else:
+            self.static_folder = files('pntos.cobra').joinpath(  # type: ignore[call-arg, assignment]
+                'advanced_plugins', 'ui', '_static', 'dist'
+            )
 
         werkz_logger = getLogger('werkzeug')
         werkz_logger.setLevel(ERROR)
-        if not self._runtime_assets_exist(static_folder):
+        if not self._runtime_assets_exist(self.static_folder):
             self._error(
-                f'Cannot find front-end runtime assets at {static_folder.resolve().as_posix()}. '
+                f'Cannot find front-end runtime assets at {self.static_folder.resolve().as_posix()}. '
                 'Runtime assets must be built prior to using the ExperimentalCobraUiPlugin.'
             )
             return
-        self.app = Flask(__name__, static_folder=static_folder.resolve())
+        self.app = Flask(__name__, static_folder=self.static_folder.resolve())
         self._route_app()
         self.socket = SocketIO(
             self.app,
@@ -182,7 +189,7 @@ class ExperimentalCobraUiPlugin(UiPlugin):
                 if not file or not file.filename:
                     return jsonify(error='Invalid file'), 400
 
-                uploads_dir = Path(self.config.static_folder) / 'uploads'
+                uploads_dir = Path(self.static_folder) / 'uploads'
                 uploads_dir.mkdir(parents=True, exist_ok=True)
 
                 filename = secure_filename(file.filename)
