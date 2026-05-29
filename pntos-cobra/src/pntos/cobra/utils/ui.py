@@ -4,10 +4,10 @@ from time import time
 from typing import Protocol, TypeGuard, runtime_checkable
 
 import numpy as np
-from aspn23 import AspnBase, MeasurementPositionVelocityAttitude, TypeTimestamp
-from navtk.navutils import quat_to_rpy
-from numpy import float64
-from numpy.typing import NDArray
+from aspn23 import (
+    AspnBase,
+    TypeTimestamp,
+)
 
 from pntos.api import Message, Registry
 
@@ -70,34 +70,6 @@ def has_tov(measurement: AspnBase) -> TypeGuard[AspnBaseWithTOV]:
     return isinstance(measurement, AspnBaseWithTOV)
 
 
-def is_pva(measurement: AspnBase) -> TypeGuard[MeasurementPositionVelocityAttitude]:
-    return isinstance(measurement, MeasurementPositionVelocityAttitude)
-
-
-def get_pva_arrays(
-    m: MeasurementPositionVelocityAttitude,
-) -> tuple[NDArray[float64], NDArray[float64]]:
-    """
-    Extracts an ``aspn23.MeasurementPositionVelocityAttitude`` into arrays.
-
-    Returns:
-        tuple[NDArray[float64], NDArray[float64]]: The first array is a 10-element array
-            where the elements are as follows:
-            [   t, px, py, pz,  vx,  vy,  vz,   r,   p,   y]
-            with units of:
-            [nsec,  m,  m,  m, m/s, m/s, m/s, rad, rad, rad]
-            The second array is the covariance matrix from the solution, who's diagonal
-            corresponds to the last nine elements in the first array.
-    """
-    arr = [m.time_of_validity.elapsed_nsec, m.p1, m.p2, m.p3, m.v1, m.v2, m.v3]
-    arr.extend(
-        quat_to_rpy(m.quaternion)
-        if m.quaternion is not None
-        else [np.nan for _ in range(3)]
-    )
-    return np.array(arr, dtype=float64), m.covariance
-
-
 class ChannelView:
     """
     Utility object to track all registry <-> UI interactions for a single channel.
@@ -158,6 +130,9 @@ class ChannelView:
         )
         self._bandwidth: MutableValueView[float] = MutableValueView(
             self._registry, self._group, UI_GROUP_CHANNEL_KEY_BANDWIDTH_FLOAT, float
+        )
+        self._message: MutableValueView[Message] = MutableValueView(
+            self._registry, self._group, 'message', Message
         )
 
         # Buffer/update variables
@@ -232,6 +207,7 @@ class ChannelView:
             self._tov_last_message.set_value(tov_last_message, kv)
             self._type.set_value(type_str, kv)
             self._jitter.set_value(jitter, kv)
+            self._message.set_value(last_message, kv)
 
     @property
     def channel(self) -> str:
@@ -286,77 +262,12 @@ class ChannelView:
         return self._bandwidth.value or 0.0
 
 
-class FilterView:
-    """
-    A utility object to track registry <-> UI interactions for a filter.
-    """
-
-    def __init__(self, registry: Registry, filter_description: str) -> None:
-        self._registry: Registry = registry
-        self._filter_description: str = filter_description
-        self._group: str = UI_GROUP_SOLUTION_PREFIX + filter_description
-        self._solution: MutableValueView[NDArray[float64]] = MutableValueView(
-            self._registry, self._group, UI_GROUP_SOLUTION_KEY_SOLUTION, np.ndarray
-        )
-        self._solution_covariance: MutableValueView[NDArray[float64]] = (
-            MutableValueView(
-                self._registry,
-                self._group,
-                UI_GROUP_SOLUTION_KEY_SOLUTION_COVARIANCE,
-                np.ndarray,
-            )
-        )
-        self._requested_time: MutableValueView[int] = MutableValueView(
-            self._registry, self._group, UI_GROUP_SOLUTION_KEY_REQUESTED_TIME, int
-        )
-
-    def update_solution(
-        self, requested_time: TypeTimestamp, solution: Message | None
-    ) -> None:
-        """Updates the solution keys for this filter given PVA ``solution``."""
-        with self._registry.batch_start(self._group) as kv:
-            self._requested_time.set_value(requested_time.elapsed_nsec, kv)
-            if solution is None or not is_pva(solution.wrapped_message):
-                self._solution.clear_value(kv)
-                self._solution_covariance.clear_value(kv)
-                return
-            sol, cov = get_pva_arrays(solution.wrapped_message)
-            self._solution.set_value(sol, kv)
-            self._solution_covariance.set_value(cov, kv)
-
-    @property
-    def filter_description(self) -> str:
-        """The filter description of the filter for which this object is a view."""
-        return self._filter_description
-
-    @property
-    def group(self) -> str:
-        """The group in the registry that contains the metadata for this filter."""
-        return self._group
-
-    @property
-    def requested_time(self) -> int | None:
-        """Most recent requested filter solution time or None if no requests yet."""
-        return self._requested_time.value
-
-    @property
-    def solution(self) -> NDArray[float64] | None:
-        """Most recent solution array if this filter or None if it does not exist."""
-        return self._solution.value
-
-    @property
-    def solution_covariance(self) -> NDArray[float64] | None:
-        """Most recent solution covariance matrix if a solution channel."""
-        return self._solution_covariance.value
-
-
 class UiMediatorInterface:
     """
     Interface between a ``pntos.api.Mediator`` and the UI via the registry.
     """
 
     _channels: dict[str, ChannelView]
-    _filters: dict[str, FilterView]
 
     def __init__(self, registry: Registry, update_interval: float = 0.5) -> None:
         """
@@ -369,7 +280,6 @@ class UiMediatorInterface:
         self._registry: Registry = registry
         self._update_interval = update_interval
         self._channels = {}
-        self._filters = {}
 
     def _ensure_channel_view(self, channel: str) -> ChannelView:
         """Gets the ``ChannelView`` for a given channel, creating one if necessary."""
@@ -378,14 +288,6 @@ class UiMediatorInterface:
                 self._registry, channel, self._update_interval
             )
         return self._channels[channel]
-
-    def _ensure_filter_view(self, filter_description: str) -> FilterView:
-        """Gets the ``FilterView`` for given description, creating one if necessary."""
-        if filter_description not in self._filters:
-            self._filters[filter_description] = FilterView(
-                self._registry, filter_description
-            )
-        return self._filters[filter_description]
 
     def new_mediator_message(self, message: Message) -> bool:
         """
@@ -406,28 +308,6 @@ class UiMediatorInterface:
         cv = self._ensure_channel_view(message.source_identifier)
         cv.update_channel_info(message)
         return cv.mediator_enabled
-
-    def new_solution(
-        self,
-        times: list[TypeTimestamp],
-        messages: list[Message | None],
-        filter_description: str | None = None,
-    ) -> None:
-        """
-        Updates the UI with a new filter solution.
-
-        This is intended to be called anytime that the mediator's
-        ``request_solutions()`` function is called
-
-        Args:
-            times (list[TypeTimestamp]): The requested filter times.
-            messages (list[Message | None]): The resulting filter solutions for each
-                time.
-            filter_description (str | None): The filter description for this request.
-        """
-        fv = self._ensure_filter_view(filter_description or 'BEST')
-        for requested_time, message in zip(times, messages, strict=True):
-            fv.update_solution(requested_time, message)
 
 
 class SourceChannelView:

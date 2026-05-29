@@ -19,8 +19,8 @@
   }
 
   .navbar-logo {
-    width: 418px;
-    height: 131px;
+    width: 255px;
+    height: 80px;
     padding-right: 30px;
     margin-left: 30px;
   }

@@ -1,6 +1,5 @@
 <script setup lang="ts">
   import SideBarHoverIcon from '@/assets/branding/svgs/pages/dashboard/sidebar_open_icon.svg';
-  import LandAirButton from '@/components/common/LandAirButton.vue';
   import WidgetGrid from '@/components/WidgetGrid.vue';
   import WidgetSideBar, { useDashboardSidebar } from '@/components/WidgetSideBar.vue';
 
@@ -19,7 +18,6 @@
         <div class="dashboard-buttons-left"> <img :src="SideBarHoverIcon" class="sidebar-hover"
                @mouseenter="toggleSidebar()" /></div>
         <div class="dashboard-buttons-right">
-          <LandAirButton :direction="'row'" :style="'wide'"></LandAirButton>
         </div>
 
       </div>

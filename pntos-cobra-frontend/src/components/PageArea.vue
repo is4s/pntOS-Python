@@ -19,7 +19,7 @@
   export const pages: Array<Page> = [
     { to: "/dashboard", label: "Dashboard", componentId: "DashboardView" },
     { to: "/registry_inspector", label: "Registry Inspector", componentId: "RegistryInspectorView" },
-    { to: "/visualizer", label: "3D Visualizer", componentId: "VisualizerView" }
+    { to: "/visualizer", label: "Map View", componentId: "VisualizerView" }
   ]
 
   export const pageMetadata = defineStore('pageMetadata', {

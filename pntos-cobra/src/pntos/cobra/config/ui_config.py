@@ -39,8 +39,8 @@ class ExperimentalCobraUiConfig(BaseConfig):
     available to the web interface - do not put sensitive data here.
     """
     cors_allowed_origins: tuple[str, ...] = (
-        'http://localhost:5000',
-        'http://127.0.0.1:5000',
+        'http://localhost:5001',
+        'http://127.0.0.1:5001',
     )
     """
     CORS allowed origins for WebSocket connections.
@@ -48,7 +48,7 @@ class ExperimentalCobraUiConfig(BaseConfig):
     """
     host: str = 'localhost'
     """Host address to bind the web server to."""
-    port: int = 5000
+    port: int = 5001
     """Port to run the web server on."""
     send_throttle: int = 30
     """Maximum number of registry updates to send to the front-end every second."""

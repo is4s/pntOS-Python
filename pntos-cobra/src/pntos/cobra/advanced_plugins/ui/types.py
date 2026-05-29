@@ -1,8 +1,9 @@
 from dataclasses import fields, is_dataclass
+from enum import Enum
 from typing import Annotated, Any
 
 import numpy as np
-from pntos.api import RegistryValueTypeUnion
+from pntos.api import Message, RegistryValueTypeUnion
 from pydantic import PlainSerializer, PlainValidator
 
 
@@ -12,6 +13,9 @@ def _serialize_registry_value(value: Any) -> Any:  # noqa: ANN401
     """
     if isinstance(value, np.ndarray):
         return value.tolist()
+
+    if isinstance(value, Enum):
+        return value.value
 
     # Handle dataclasses (including Message) - will need a cleaner thing at some point
     if is_dataclass(value) and not isinstance(value, type):
@@ -49,7 +53,7 @@ def _validate_registry_value(value: Any) -> Any:  # noqa: ANN401
         if list_of_nums := _validate_list_of_numbers(value):
             return np.array(list_of_nums, dtype=np.float64)
 
-    if isinstance(value, (int, str, bool, float)):
+    if isinstance(value, (int, str, bool, float, np.ndarray, Message)):
         return value
     raise RuntimeError(f'Invalid type: {type(value)}')
 
