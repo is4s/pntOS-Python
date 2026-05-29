@@ -32,12 +32,6 @@ class ExperimentalCobraUiConfig(BaseConfig):
     """Configuration for CobraUiPlugin."""
 
     group: str  # Inherited field
-    static_folder: str = 'pntos-cobra/src/pntos/cobra/standard_plugins/ui/_static/dist'
-    """
-    Path to static folder to serve. Any uploaded files will be saved in
-    ``{static_folder}/uploads/``. Additionally, any files in this directory will be
-    available to the web interface - do not put sensitive data here.
-    """
     cors_allowed_origins: tuple[str, ...] = (
         'http://localhost:5001',
         'http://127.0.0.1:5001',
@@ -52,3 +46,11 @@ class ExperimentalCobraUiConfig(BaseConfig):
     """Port to run the web server on."""
     send_throttle: int = 30
     """Maximum number of registry updates to send to the front-end every second."""
+    static_folder: str | None = None
+    """
+    Path to static folder to serve. Any uploaded files will be saved in
+    ``{static_folder}/uploads/``. Additionally, any files in this directory will be
+    available to the web interface - do not put sensitive data here. This field is
+    optional because the UI plugin has a default path it checks for the assets.
+    Providing this path will overload the default path.
+    """

@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 
-from importlib.resources import files
-
 import numpy as np
 
 # API imports
@@ -39,12 +37,6 @@ from pntos.cobra.config import (
     StandardOrchestrationConfig,
     TimeAdjusterConfig,
     TimeBiasConfig,
-)
-
-static_assets_path: str = (
-    files('pntos.cobra')  # type: ignore[call-arg, attr-defined]
-    .joinpath('advanced_plugins', 'ui', '_static', 'dist')
-    .as_posix()
 )
 
 # Config setup
@@ -135,7 +127,7 @@ my_config = [
         ),
     ),
     ExperimentalCobraUiConfig(
-        group='config/cobra_ui', static_folder=static_assets_path
+        group='config/cobra_ui',
     ),
 ]
 # End Config
