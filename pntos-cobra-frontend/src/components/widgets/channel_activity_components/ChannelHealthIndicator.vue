@@ -1,55 +1,89 @@
+<script lang="ts">
+  export const HEALTHY_COLOR = 0x44A842
+  export const SICKLY_COLOR = 0xCCA629
+  export const DEADLY_COLOR = 0xC33436
+</script>
+
 <script setup lang="ts">
+  import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
+  import { useChannelTimers } from './DefaultChannelActivityCard.vue';
+
   interface ChannelHealthIndicatorProps {
-    tSinceLastMessage: number
+    value?: unknown
+    staticColor?: number
+    channel?: string
   }
 
-  defineProps<ChannelHealthIndicatorProps>()
+  const props = defineProps<ChannelHealthIndicatorProps>()
 
-  const HEALTHY_COLOR = 0x44A842
-  const SICKLY_COLOR = 0xCCA629
-  const DEADLY_COLOR = 0xC33436
-  const HEALTH_THRESHOLD = 0 // sec
-  const SICKLY_THRESHOLD = 5 // sec
-  const DEADLY_THRESHOLD = 60 // sec
-
-  function updateColor(tSinceLastMessage: number) {
-    if (tSinceLastMessage >= DEADLY_THRESHOLD) {
-      return `#${DEADLY_COLOR.toString(16).padStart(6, '0')}`
-    }
-
-    let color1, color2, t
-
-    if (tSinceLastMessage <= SICKLY_THRESHOLD) {
-      color1 = HEALTHY_COLOR
-      color2 = SICKLY_COLOR
-      t = (tSinceLastMessage - HEALTH_THRESHOLD) / (SICKLY_THRESHOLD - HEALTH_THRESHOLD)
-    } else {
-      color1 = SICKLY_COLOR
-      color2 = DEADLY_COLOR
-      t = (tSinceLastMessage - SICKLY_THRESHOLD) / (DEADLY_THRESHOLD - SICKLY_THRESHOLD)
-    }
-
-    t = Math.max(0, Math.min(1, t))
-
-    const r1 = (color1 >> 16) & 0xFF
-    const g1 = (color1 >> 8) & 0xFF
-    const b1 = color1 & 0xFF
-
-    const r2 = (color2 >> 16) & 0xFF
-    const g2 = (color2 >> 8) & 0xFF
-    const b2 = color2 & 0xFF
-
-    const r = Math.round(r1 + (r2 - r1) * t)
-    const g = Math.round(g1 + (g2 - g1) * t)
-    const b = Math.round(b1 + (b2 - b1) * t)
-
-    const out = (r << 16) | (g << 8) | b
-    return `#${out.toString(16).padStart(6, '0')}`
+  if (!props.staticColor && !props.channel) {
+    throw new Error('ChannelHealthIndicator requires either channel or staticColor prop')
   }
+
+  const SICKLY_THRESHOLD = 5
+  const DEADLY_THRESHOLD = 60
+
+  const color = ref<number>(props.staticColor ?? HEALTHY_COLOR)
+
+  if (props.staticColor !== undefined) {
+    watch(
+      () => props.staticColor,
+      (newColor) => {
+        if (newColor !== undefined) {
+          color.value = newColor
+        }
+      }
+    )
+  }
+
+  if (props.channel) {
+    const timerStore = useChannelTimers()
+    let intervalId: number | null = null
+
+    const state = timerStore.getCountdown(props.channel)
+    color.value = state.color
+
+    onMounted(() => {
+      intervalId = window.setInterval(() => {
+        if (!props.channel) return
+        const state = timerStore.getCountdown(props.channel)
+        const newRemaining = state.remaining - 0.1
+
+        if (newRemaining <= 0) {
+          if (state.color === HEALTHY_COLOR) {
+            timerStore.setCountdown(props.channel, DEADLY_THRESHOLD - SICKLY_THRESHOLD, SICKLY_COLOR)
+          } else if (state.color === SICKLY_COLOR) {
+            timerStore.setCountdown(props.channel, 0, DEADLY_COLOR)
+          }
+        } else {
+          timerStore.setCountdown(props.channel, newRemaining, state.color)
+        }
+        color.value = timerStore.getCountdown(props.channel).color
+      }, 100)
+    })
+
+    onUnmounted(() => {
+      if (intervalId !== null) {
+        window.clearInterval(intervalId)
+      }
+    })
+
+    watch(
+      () => props.value,
+      () => {
+        if (props.channel) {
+          timerStore.resetCountdown(props.channel)
+          color.value = HEALTHY_COLOR
+        }
+      }
+    )
+  }
+
+  const colorRender = computed(() => `#${color.value.toString(16).padStart(6, '0')}`)
 </script>
 
 <template>
-  <div class="health-indicator" :style="`background: ${updateColor(tSinceLastMessage)}`"></div>
+  <div class="health-indicator" :style="`background: ${colorRender}`"></div>
 </template>
 
 <style lang="css" scoped>

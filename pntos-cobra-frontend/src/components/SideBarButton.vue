@@ -1,27 +1,20 @@
 <script setup lang="ts">
   import { useWidgets } from '@/components/WidgetGrid.vue';
-  import { DEFAULT_WIDGET_HEIGHT, type WidgetMetadata } from './WidgetGrid.vue';
+  import type { WidgetMetadata } from './WidgetGrid.vue';
+  import { useWidgetActions } from '@/utils/useWidgetActions';
 
   const props = defineProps<WidgetMetadata>()
 
   const store = useWidgets()
+  const { addWidget } = useWidgetActions()
 
   function maxWidgetInstances() {
-    // TODO: make max number configurable (e.g. 3 max)
     return props.single && store.numOfType(props.type) > 0
   }
 
   function add() {
     if (maxWidgetInstances()) return
-    const id = "widget-" + String(Math.round(Math.random() * 1000000))
-    store.set({
-      id: id,
-      bannerStyle: props.bannerStyle,
-      layout: props.initialLayout || { h: DEFAULT_WIDGET_HEIGHT },
-      minimized: false,
-      title: props.title,
-      type: props.type, darkIcon: props.darkIcon, lightIcon: props.lightIcon, single: props.single, initialLayout: props.initialLayout
-    })
+    addWidget({ type: props.type })
   }
 </script>
 

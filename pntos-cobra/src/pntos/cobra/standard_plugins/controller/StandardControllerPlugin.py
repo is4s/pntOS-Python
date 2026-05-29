@@ -14,6 +14,7 @@ from pntos.api import (
 from pntos.cobra.config import ControllerConfig, config_from_registry
 from pntos.cobra.utils import (
     SortedPlugins,
+    UiMediatorInterface,
     find_base_plugin_type,
     print_message,
     sort_plugins_dataclass,
@@ -153,6 +154,7 @@ class StandardControllerPlugin(ControllerPlugin):
 
         # Give mediators a registry
         StandardMediator.registry = self._registry_plugin.new_registry(initial_config)
+        StandardMediator._ui_interface = UiMediatorInterface(StandardMediator.registry)
 
         # Initialize logger second
         assert self._logging_plugin is not None

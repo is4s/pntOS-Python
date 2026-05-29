@@ -12,16 +12,21 @@ from threading import Event, Thread
 from time import sleep, time  # noqa: F401
 from typing import Literal
 
+from engineio.payload import Payload
 from flask import Flask, Response, jsonify, request, send_from_directory
 from flask_socketio import SocketIO, emit
 from pntos.api import LoggingLevel, Mediator, UiPlugin
 from pntos.cobra.config import ExperimentalCobraUiConfig, config_from_registry
+from pntos.cobra.utils import UiMetadataInterface
 from typing_extensions import Unpack
 from werkzeug.exceptions import NotFound
 from werkzeug.utils import secure_filename
 
-from .models import Snapshot, Subscription, Write
+from .models import ChunkUpdate, Snapshot, Subscription, Write
 from .utils import RegistryManager, SequenceBuffer
+
+# Resolves #361 for now
+Payload.max_decode_packets = 500
 
 
 class ExperimentalCobraUiPlugin(UiPlugin):
@@ -43,6 +48,7 @@ class ExperimentalCobraUiPlugin(UiPlugin):
     config: ExperimentalCobraUiConfig
     config_group: str
     write_buffer: SequenceBuffer[Write]
+    _metadata_manager: UiMetadataInterface
 
     def __init__(
         self,
@@ -63,6 +69,7 @@ class ExperimentalCobraUiPlugin(UiPlugin):
     ) -> None:
         assert mediator is not None
         self.mediator = mediator
+        self._metadata_manager = UiMetadataInterface(self.mediator.registry)
         self.registry_manager = RegistryManager(self.mediator)
 
         config = config_from_registry(
@@ -128,7 +135,6 @@ class ExperimentalCobraUiPlugin(UiPlugin):
             if update is None:
                 continue
             self.socket.emit('chunkUpdate', update.model_dump())
-            self._info(f'Added to send queue: {update}')
 
     def _run_server_thread(self) -> None:
         """Run the Flask-SocketIO server in a background thread."""
@@ -204,6 +210,17 @@ class ExperimentalCobraUiPlugin(UiPlugin):
         def subscribe(subscription_json: Unpack[Subscription]) -> None:  # type: ignore[valid-type]
             subscription = Subscription.model_validate(subscription_json)
             self.registry_manager.subscribe(subscription)
+            initial_value = self.registry_manager.get_current_value(
+                subscription.group, subscription.key
+            )
+            if initial_value is not None:
+                emit(
+                    'chunkUpdate',
+                    ChunkUpdate(
+                        ordered_updates=[],
+                        unordered_updates={subscription.group: initial_value},
+                    ).model_dump(),
+                )
 
         @self.socket.event  # type: ignore[misc]
         def unsubscribe(subscription_json: Unpack[Subscription]) -> None:  # type: ignore[valid-type]
@@ -212,7 +229,6 @@ class ExperimentalCobraUiPlugin(UiPlugin):
 
         @self.socket.event  # type: ignore[misc]
         def write(write_request_dict: Unpack[Write]) -> None:  # type: ignore[valid-type]
-            self._info(f'Write: {write_request_dict}')
             write_request = Write.model_validate(write_request_dict)
             for write in self.write_buffer.add(write_request):
                 self.registry_manager.write(write)
@@ -236,6 +252,3 @@ class ExperimentalCobraUiPlugin(UiPlugin):
     def _error(self, message: str) -> None:
         """Log error message."""
         self.mediator.log_message(LoggingLevel.ERROR, message)
-
-
-__all__ = ['ExperimentalCobraUiPlugin']

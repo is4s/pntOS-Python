@@ -14,7 +14,7 @@ from pntos.api import (
     Registry,
     TransportPlugin,
 )
-from pntos.cobra.utils import print_message
+from pntos.cobra.utils import UiMediatorInterface, print_message
 
 from .StandardMessageStreamConfig import StandardMessageStreamConfig
 
@@ -42,6 +42,7 @@ class StandardMediator(Mediator):
     _buffer_time_nsec: int
     _last_solution_time: TypeTimestamp | None
     _publish_interval_ns: int | None = None
+    _ui_interface: UiMediatorInterface
 
     def __init__(
         self,
@@ -84,6 +85,8 @@ class StandardMediator(Mediator):
         assert self._orchestration_plugin is not None, (
             'Orchestration plugin used before initialized and passed to mediator.'
         )
+        if not self._ui_interface.new_mediator_message(message):
+            return
         if self._stream_config._is_sequenced(
             type(message.wrapped_message), message.source_identifier
         ):
@@ -99,6 +102,7 @@ class StandardMediator(Mediator):
         )
         for m in self._messages[:process_until_index]:
             self._orchestration_plugin.process_pntos_message(m, True)
+
         StandardMediator._messages = self._messages[process_until_index:]
 
         # Need to make sure the orchestration has received some messages before we
@@ -113,8 +117,10 @@ class StandardMediator(Mediator):
             and cur_time.elapsed_nsec - self._last_solution_time.elapsed_nsec
             > self._publish_interval_ns
         ):
-            solution = self.request_solutions([cur_time])
+            times = [cur_time]
+            solution = self.request_solutions(times)
             if solution is not None and solution[0] is not None:
+                self._ui_interface.new_solution(times, solution)
                 self._log_message(LoggingLevel.DEBUG, f'Got a solution! {solution}')
                 for transport in self._transport_plugins:
                     self.broadcast_aspn_message(

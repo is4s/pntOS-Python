@@ -484,22 +484,6 @@ class TestCallbackRegistrar:
 
         assert registrar._dict['test_group']['test_key'] is key_info
 
-    def test_register_change_raises_error_for_different_instances(
-        self, registry: Registry
-    ) -> None:
-        registrar = CallbackRegistrar()
-        key_info1: KeyInfo[RegistryValueTypeUnion] = KeyInfo(
-            registry, 'test_group', 'test_key', registrar
-        )
-        key_info2: KeyInfo[RegistryValueTypeUnion] = KeyInfo(
-            registry, 'test_group', 'test_key', registrar
-        )
-
-        registrar.register_change(key_info1)
-
-        with pytest.raises(RuntimeError, match='Multiple KeyInfo objects'):
-            registrar.register_change(key_info2)
-
     def test_pop_returns_all_registered_changes(self, registry: Registry) -> None:
         registrar = CallbackRegistrar()
         key_info1: KeyInfo[RegistryValueTypeUnion] = KeyInfo(

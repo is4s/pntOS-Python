@@ -204,11 +204,8 @@ class StandardKeyValueStore(KeyValueStore):
                 LoggingLevel.ERROR,
                 f'Key {key} does not exist in store. Unable to delete.',
             )
-        if key in self._modified_keys:
-            self._modified_keys.remove(key)
-        if key in self._callbacks:
-            del self._callbacks[key]
-        if key in self._permanent_keys:
+        self._modified_keys.add(key)
+        if key in self._permanent_keys and self._set_permanent:
             self._permanent_keys.remove(key)
 
     def __len__(self) -> int:
@@ -381,12 +378,8 @@ class StandardKeyValueStore(KeyValueStore):
             Callable[[str, list[str], KeyValueStore], None], list[str]
         ] = {}
         for k in self._modified_keys:
-            if k in self._callbacks:
-                for callback in self._callbacks[k]:
-                    if callback in keys_per_callback:
-                        keys_per_callback[callback].append(k)
-                    else:
-                        keys_per_callback[callback] = [k]
+            for callback in self._callbacks.get(k, []):
+                keys_per_callback.setdefault(callback, []).append(k)
 
         for callback, keys in keys_per_callback.items():
             callback(self._group, keys, self)
@@ -524,7 +517,7 @@ class StandardRegistry(Registry):
             for callback in self.callbacks:
                 callback(group)
         if self.groups[group]._batch_live:
-            self._log(LoggingLevel.ERROR, 'Batch already live.')
+            self._log(LoggingLevel.ERROR, f'Batch "{group}" already live.')
         self.groups[group]._batch_live = True
         return self.groups[group]
 

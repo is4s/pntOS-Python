@@ -6,7 +6,11 @@ from threading import Thread
 from lcm import LCM, LCMSubscription
 from pntos.api import LoggingLevel, Mediator, Message, TransportPlugin
 from pntos.cobra.config import LcmTransportConfig, config_from_registry
-from pntos.cobra.utils import marshal_to_aspn23_lcm, process_lcm_message
+from pntos.cobra.utils import (
+    UiSourceInterface,
+    marshal_to_aspn23_lcm,
+    process_lcm_message,
+)
 
 
 class LcmTransportPlugin(TransportPlugin):
@@ -25,6 +29,7 @@ class LcmTransportPlugin(TransportPlugin):
     _shutdown_threads: threading.Event
     _channels: set[str]
     _output_queue: Queue[Message | None]
+    _ui: UiSourceInterface
 
     def __init__(self, identifier: str) -> None:
         """
@@ -54,6 +59,8 @@ class LcmTransportPlugin(TransportPlugin):
         """
         if mediator is not None:
             self.mediator = mediator
+
+        self._ui = UiSourceInterface(self.mediator.registry)
 
         config = config_from_registry(
             LcmTransportConfig, self.mediator, LcmTransportConfig.group
@@ -114,7 +121,8 @@ class LcmTransportPlugin(TransportPlugin):
                 )
 
     def _general_handler(self, channel: str, data: bytes) -> None:
-        process_lcm_message(self.mediator, channel, data, self._channels)
+        if self._ui.new_message(channel):
+            process_lcm_message(self.mediator, channel, data, self._channels)
 
     def _handler_thread(self) -> None:
         """Call LCM.handle in a loop."""

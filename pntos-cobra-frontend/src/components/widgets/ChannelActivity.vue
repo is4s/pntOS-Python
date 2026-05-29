@@ -2,8 +2,10 @@
   import DarkIcon from '@/assets/branding/svgs/widgets/channel_activity/channel_activity_dark.svg';
   import LightIcon from '@/assets/branding/svgs/widgets/channel_activity/channel_activity_light.svg';
   import { type WidgetMetadata } from '@/components/WidgetGrid.vue';
-  import { useGroupsWithRegex } from '@/utils/useRegistry';
-  import ChannelHealthIndicator from './channel_activity_components/ChannelHealthIndicator.vue';
+  import { useChannels } from '@/utils/useRegistry';
+  import { defineStore } from 'pinia';
+  import { computed } from 'vue';
+  import ChannelHealthIndicator, { DEADLY_COLOR, HEALTHY_COLOR, SICKLY_COLOR } from './channel_activity_components/ChannelHealthIndicator.vue';
   import DefaultChannelActivityCard from './channel_activity_components/DefaultChannelActivityCard.vue';
 
   export const metadata: WidgetMetadata = {
@@ -15,48 +17,91 @@
     type: 'ChannelActivity',
     initialLayout: { h: 10, maxW: 1 }
   };
+
+  export const useChannelActivityStore = defineStore('channel-activity-widget', {
+    state: () => ({
+      pinnedChannels: [] as string[],
+    }),
+
+    actions: {
+      isPinned(channel: string): boolean {
+        return this.pinnedChannels.includes(channel)
+      },
+      addToPinned(channel: string): void {
+        if (!this.isPinned(channel)) {
+          this.pinnedChannels.push(channel)
+        }
+      },
+      removeFromPinned(channel: string): void {
+        this.pinnedChannels = this.pinnedChannels.filter((c) => c !== channel)
+      },
+    },
+    persist: true,
+  })
+
 </script>
 
 <script setup lang="ts">
-  import { channelFromGroup, UI_CHANNELS_PREFIX } from '@/utils/useRegistry';
   import type { BaseWidgetData } from './BaseWidget.vue';
   import BaseWidget from './BaseWidget.vue';
 
   const props = defineProps<BaseWidgetData>();
 
-  const groups = useGroupsWithRegex(`${UI_CHANNELS_PREFIX}.*`)
+  const channels = useChannels()
+
+  const store = useChannelActivityStore()
+
+  const pinnedChannels = computed(() => channels.value.filter((c) => store.isPinned(c)))
+  const notPinnedChannels = computed(() => channels.value.filter((c) => !store.isPinned(c)))
 
 
 </script>
 
 <template>
   <BaseWidget v-bind="props">
-    <div class="top-bar-blue">
-      <div class="top-bar-white"></div>
-      <div class="color-code-bar">
-        <div class="container">
-          <ChannelHealthIndicator :t-since-last-message="0" />0-5 Seconds
+    <div class="content-container">
+      <div class="top-bar-blue">
+        <div class="top-bar-white"></div>
+        <div class="color-code-bar">
+          <div class="container">
+            <ChannelHealthIndicator :static-color="HEALTHY_COLOR" />0-5 Seconds
+          </div>
+          <div class="container">
+            <ChannelHealthIndicator :static-color="SICKLY_COLOR" />5-60 Seconds
+          </div>
+          <div class="container">
+            <ChannelHealthIndicator :static-color="DEADLY_COLOR" /> 60+ Seconds
+          </div>
         </div>
-        <div class="container">
-          <ChannelHealthIndicator :t-since-last-message="5" />5-60 Seconds
+      </div>
+      <div class="card-area">
+        <div v-if="!channels.length">
+          <div class="no-channels-message">No channels discovered yet.</div>
         </div>
-        <div class="container">
-          <ChannelHealthIndicator :t-since-last-message="60" /> 60+ Seconds
+        <div v-for="channel of pinnedChannels" :key="channel" class="card">
+          <DefaultChannelActivityCard :channel="channel" />
+        </div>
+        <div v-for="channel of notPinnedChannels" :key="channel" class="card">
+          <DefaultChannelActivityCard :channel="channel" />
         </div>
       </div>
     </div>
-    <div v-if="!groups.length">
-      <div class="no-channels-message">No channels discovered yet.</div>
-    </div>
-    <div v-for="group of groups" :key="group" class="cards">
-      <DefaultChannelActivityCard :channel="channelFromGroup(group)" />
-    </div>
-
   </BaseWidget>
 </template>
 
 <style lang="css" scoped>
+  .content-container {
+    position: absolute;
+    top: 27px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
   .top-bar-blue {
+    flex: 0 0 auto;
     height: 20px;
     width: 100%;
     background: var(--federal-blue);
@@ -95,7 +140,9 @@
     color: #686868;
   }
 
-  .cards {
+  .card-area {
+    flex: 1 1 0;
+    min-height: 0;
     overflow-y: auto;
   }
 

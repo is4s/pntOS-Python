@@ -122,6 +122,7 @@ nitpick_ignore = [
     ('py:class', 'pntos.cobra.utils.registry.ValueType'),
     ('py:obj', 'pntos.cobra.utils.registry.ValueType'),
     ('py:class', 'ValueType'),
+    ('py:class', 'aspn23.aspn_base.AspnBase'),
 ]
 
 linkcheck_allowed_redirects = {

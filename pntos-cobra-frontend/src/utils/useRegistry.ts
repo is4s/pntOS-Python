@@ -13,6 +13,7 @@ import { io } from 'socket.io-client'
 import { v4 as newUUID } from 'uuid'
 import {
   computed,
+  effectScope,
   nextTick,
   onMounted,
   onUnmounted,
@@ -75,6 +76,8 @@ function ensureGroup(group: string): Map<string, ShadowRegistryEntry> {
   return shadowRegistry.get(group)!
 }
 
+const globalEffectScope = effectScope(true)
+
 function ensureValue<T = RegistryValueType>(
   group: string,
   key: string,
@@ -86,15 +89,17 @@ function ensureValue<T = RegistryValueType>(
       val: newRef,
       subscriptions: new Map(),
     }
-    watchEffect(() => {
-      // Only add to write batch if this is a user-initiated change, not a backend
-      // update
-      if (entry.val.value !== null && !isApplyingBackendUpdate) {
-        if (!writeBatch.has(group)) {
-          writeBatch.set(group, new Map())
+    globalEffectScope.run(() => {
+      watchEffect(() => {
+        // Only add to write batch if this is a user-initiated change, not a backend
+        // update
+        if (entry.val.value !== null && !isApplyingBackendUpdate) {
+          if (!writeBatch.has(group)) {
+            writeBatch.set(group, new Map())
+          }
+          writeBatch.get(group)!.set(key, entry.val.value)
         }
-        writeBatch.get(group)!.set(key, entry.val.value)
-      }
+      })
     })
     g.set(key, entry)
   }
@@ -263,28 +268,33 @@ socket.on('chunkUpdate', (chunk: ChunkUpdate) => {
   chunkUpdate(chunk)
 })
 
+export function useGroups(): Ref<string[] | null> {
+  const groups = useRegistry<string[]>('ui/metadata', 'groups', SubscriptionMode.LAST)
+  return groups
+}
+
 export function useGroupsWithRegex(regex: string): ComputedRef<string[]> {
   const pattern = new RegExp(regex)
+  const groups = useGroups()
+
   return computed(() => {
-    return Array.from(shadowRegistry.keys()).filter((group) => pattern.test(group))
+    if (!groups.value) return []
+    return groups.value.filter((val) => pattern.test(val))
   })
 }
 
-export function useKeysWithRegex(group: string, regex: string): ComputedRef<string[]> {
-  const pattern = new RegExp(regex)
-  return computed(() => {
-    const groupMap = shadowRegistry.get(group)
-    if (!groupMap) return []
-    return Array.from(groupMap.keys()).filter((key) => pattern.test(key))
-  })
-}
+export const UI_CHANNELS_PREFIX = 'ui/channel/'
 
-export function useCurrentTime() {
-  return useRegistry<number>('ui/utils', 'cur_time', SubscriptionMode.LAST)
-}
-export const UI_CHANNELS_PREFIX = 'ui/channels/'
 export function channelFromGroup(group: string) {
   return group.replace(UI_CHANNELS_PREFIX, '')
+}
+
+export function useChannels(): ComputedRef<string[]> {
+  const channel_groups = useGroupsWithRegex(UI_CHANNELS_PREFIX + '.*')
+
+  return computed(() => {
+    return channel_groups.value.map((group) => channelFromGroup(group))
+  })
 }
 
 export function useConnectionState() {

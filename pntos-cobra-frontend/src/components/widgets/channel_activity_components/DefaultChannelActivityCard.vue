@@ -1,39 +1,107 @@
+<script lang="ts">
+  import { defineStore } from 'pinia';
+  import { ref } from 'vue';
+  import { HEALTHY_COLOR } from './ChannelHealthIndicator.vue';
+
+  export const useChannelTimers = defineStore('channelTimers', () => {
+    const timers = ref<Record<string, number>>({})
+    const countdowns = ref<Record<string, { remaining: number, color: number }>>({})
+
+    function getTime(channel: string): number {
+      return timers.value[channel] ?? 0
+    }
+
+    function setTime(channel: string, time: number) {
+      timers.value[channel] = time
+    }
+
+    function reset(channel: string) {
+      timers.value[channel] = 0
+    }
+
+    function getCountdown(channel: string) {
+      return countdowns.value[channel] ?? { remaining: 5, color: HEALTHY_COLOR }
+    }
+
+    function setCountdown(channel: string, remaining: number, color: number) {
+      countdowns.value[channel] = { remaining, color }
+    }
+
+    function resetCountdown(channel: string) {
+      countdowns.value[channel] = { remaining: 5, color: HEALTHY_COLOR }
+    }
+
+    return {
+      timers,
+      countdowns,
+      getTime,
+      setTime,
+      reset,
+      getCountdown,
+      setCountdown,
+      resetCountdown
+    }
+  }, { persist: true })
+</script>
+
 <script setup lang="ts">
   import InfoIcon from '@/assets/branding/svgs/info.svg';
   import RadioSwitch from '@/components/common/RadioSwitch.vue';
-  import { SubscriptionMode } from '@/types';
-  import { UI_CHANNELS_PREFIX, useCurrentTime, useRegistry } from '@/utils/useRegistry';
-  import { computed } from 'vue';
-  import type { BaseChannelActivityCardProps } from './BaseChannelActivityCard.vue';
+  import { useRegistryMessageType } from '@/utils/messages';
+  import { useRegistryWithUnits, useUnits } from '@/utils/units';
+  import { UI_CHANNELS_PREFIX, useRegistry } from '@/utils/useRegistry';
+  import { computed, onMounted, onUnmounted, watch } from 'vue';
   import BaseChannelActivityCard from './BaseChannelActivityCard.vue';
 
-  const props = defineProps<BaseChannelActivityCardProps>();
+  interface Props {
+    channel: string
+  }
 
-  const registryGroup = UI_CHANNELS_PREFIX + props.channel;
+  const props = defineProps<Props>()
 
-  const enableMediator = useRegistry<boolean>(registryGroup, 'enabled_mediator', SubscriptionMode.LAST);
-  const enableSource = useRegistry<boolean>(registryGroup, 'enabled_source', SubscriptionMode.LAST);
-  const messageCount = useRegistry<number>(registryGroup, 'message_count', SubscriptionMode.LAST);
-  const rate = useRegistry<number>(registryGroup, 'rate', SubscriptionMode.LAST);
-  const type = useRegistry<string>(registryGroup, 'type', SubscriptionMode.LAST);
-  const jitter = useRegistry<number>(registryGroup, 'jitter', SubscriptionMode.LAST);
-  const tLastMessage = useRegistry<number>(registryGroup, 't_last_message', SubscriptionMode.LAST);
-  const tNow = useCurrentTime();
-  const tSinceLastMessage = computed(() => ((tNow.value ?? 0) - (tLastMessage.value ?? 0)) / 1e9);
-  const bandwidth = useRegistry<number>(registryGroup, 'bandwidth', SubscriptionMode.LAST);
+  const registryGroup = UI_CHANNELS_PREFIX + props.channel
+
+  const enableMediator = useRegistry<boolean>(registryGroup, 'enabled_mediator')
+  const enableSource = useRegistry<boolean>(registryGroup, 'enabled_source')
+  const messageCount = useRegistry<number>(registryGroup, 'message_count')
+  const { number: hzValue, rawNumber: rawHz, renderedUnit: hzUnit } = useRegistryWithUnits(registryGroup, 'rate', "Hz")
+  const type = useRegistryMessageType(registryGroup, 'type')
+  const { number: jitter, renderedUnit: jitterUnit } = useRegistryWithUnits(registryGroup, 'jitter', 's')
+  const { number: bandwidth, renderedUnit: bandwidthUnit } = useRegistryWithUnits(registryGroup, 'bandwidth', 'Bps')
+  const rateRaw = computed(() => (1 / rawHz.value))
+  const { number: rateValue, renderedUnit: rateUnit } = useUnits(rateRaw, 's')
+
+  const timerStore = useChannelTimers()
+  const time = computed(() => timerStore.getTime(props.channel))
+
+  let intervalId: number | null = null
+
+  onMounted(() => {
+    intervalId = window.setInterval(() => {
+      timerStore.setTime(props.channel, time.value + 0.1)
+    }, 100)
+  })
+
+  onUnmounted(() => {
+    if (intervalId !== null) {
+      window.clearInterval(intervalId)
+    }
+  })
+
+  watch(messageCount, () => timerStore.reset(props.channel))
 
   function toggleMediator() {
-    enableMediator.value = !enableMediator.value;
+    enableMediator.value = !enableMediator.value
   }
 
   function toggleSource() {
-    enableSource.value = !enableSource.value;
+    enableSource.value = !enableSource.value
   }
 
 </script>
 
 <template>
-  <BaseChannelActivityCard v-bind="props">
+  <BaseChannelActivityCard :channel="channel">
     <div class="grid-container">
       <div class="count misc-info">
         <div class="field-label">Message Count:</div>
@@ -41,7 +109,7 @@
       </div>
       <div class="period misc-info">
         <div class="field-label">1/Hz:</div>
-        <div class="field-data">{{ ((rate ?? 0) > 0 ? 1000 / rate! : 0).toPrecision(2) }} ms</div>
+        <div class="field-data">{{ rateValue.toFixed(1) }} {{ rateUnit }}</div>
       </div>
       <div class="type misc-info">
         <div class="field-label">Type:</div>
@@ -49,11 +117,11 @@
       </div>
       <div class="rate misc-info">
         <div class="field-label">Message Rate:</div>
-        <div class="field-data">{{ (rate ?? 0.0).toString() }} Hz</div>
+        <div class="field-data">{{ hzValue.toFixed(1) }} {{ hzUnit }}</div>
       </div>
       <div class="jitter misc-info">
         <div class="field-label">Jitter:</div>
-        <div class="field-data">{{ ((jitter ?? 0) * 1e9).toString() }} ns</div>
+        <div class="field-data">{{ jitter.toFixed(1) }} {{ jitterUnit }}</div>
       </div>
       <div class="disables"><img :src="InfoIcon" class="info-icon" />
         <div class="toggle">
@@ -66,12 +134,12 @@
       <div class="received misc-info">
         <div class="field-label">Message Received:</div>
         <div class="field-data">{{
-          tSinceLastMessage < 1 ? '<1' : tSinceLastMessage.toFixed(1) }} s</div>
+          time < 1 ? '<1' : time.toFixed(1) }} s</div>
       </div>
 
       <div class="bandwidth misc-info">
         <div class="field-label">Bandwidth:</div>
-        <div class="field-data">{{ ((bandwidth ?? 0) / 1000).toFixed(2) }} kbps</div>
+        <div class="field-data">{{ bandwidth.toFixed(1) }} {{ bandwidthUnit }}</div>
       </div>
 
 
@@ -105,7 +173,7 @@
     display: flex;
     height: 14px;
     gap: 3px;
-    overflow-x: auto;
+    overflow: hidden;
   }
 
   .field-label {

@@ -1,26 +1,41 @@
-<script lang="ts">
-  export interface BaseChannelActivityCardProps {
-    channel: string;
-  }
-</script>
-
 <script setup lang="ts">
+
   import LCMDetailsIcon from '@/assets/branding/svgs/widgets/channel_activity/lcm_details.svg';
   import PinToTopDarkIcon from '@/assets/branding/svgs/widgets/channel_activity/pin_to_top_dark.svg';
   import PinToTopLightIcon from '@/assets/branding/svgs/widgets/channel_activity/pin_to_top_light.svg';
+  import HoverButton from '@/components/common/HoverButton.vue';
   import { SubscriptionMode } from '@/types';
-  import { UI_CHANNELS_PREFIX, useCurrentTime, useRegistry } from '@/utils/useRegistry';
-  import { computed } from 'vue';
+  import { UI_CHANNELS_PREFIX, useRegistry } from '@/utils/useRegistry';
+  import { useWidgetActions } from '@/utils/useWidgetActions';
+  import { useChannelActivityStore } from '../ChannelActivity.vue';
   import ChannelHealthIndicator from './ChannelHealthIndicator.vue';
 
-  const props = defineProps<BaseChannelActivityCardProps>();
+  interface Props {
+    channel: string
+  }
 
-  const registryGroup = UI_CHANNELS_PREFIX + props.channel;
-  const tLastMessage = useRegistry<number>(registryGroup, 't_last_message', SubscriptionMode.LAST);
-  const tNow = useCurrentTime();
-  const tSinceLastMessage = computed(() => ((tNow.value ?? 0) - (tLastMessage.value ?? 0)) / 1e9);
+  const props = defineProps<Props>()
+
+  const pinnedStore = useChannelActivityStore()
+
+  const registryGroup = UI_CHANNELS_PREFIX + props.channel
   const pinned = useRegistry<boolean>(registryGroup, 'pinned', SubscriptionMode.LAST)
+  const messageCount = useRegistry<number>(registryGroup, 'message_count', SubscriptionMode.LAST)
+  const { addWidget } = useWidgetActions()
 
+  function onPinClick() {
+    console.log("Pinned! ", props.channel)
+    pinned.value = !pinned.value
+    if (pinned.value) {
+      pinnedStore.addToPinned(props.channel)
+    } else {
+      pinnedStore.removeFromPinned(props.channel)
+    }
+  }
+
+  function onLcmClick() {
+    addWidget({ type: "LcmSpy" })
+  }
 
 </script>
 
@@ -28,16 +43,24 @@
   <div class="container">
     <div class="top-row">
       <div class="top-left">
-        <ChannelHealthIndicator :t-since-last-message="tSinceLastMessage" />
+        <ChannelHealthIndicator :channel="channel" :value="messageCount" />
         {{ channel }}
       </div>
       <div class="top-right">
-        <img :src="LCMDetailsIcon" class="lcm-details" />
-        LCM Relay Details
+        <HoverButton @click=onLcmClick>
+          <div class="top-right">
+            <img :src="LCMDetailsIcon" class="lcm-details" />
+            LCM Relay Details
+          </div>
+        </HoverButton>
         <div class="separator"></div>
-        <div v-if="pinned"><img :src="PinToTopDarkIcon"></div>
-        <div v-else><img :src="PinToTopLightIcon" /></div>
-        Pin to Top
+        <HoverButton @click=onPinClick>
+          <div class="top-right">
+            <div v-if="pinned"><img :src="PinToTopDarkIcon"></div>
+            <div v-else><img :src="PinToTopLightIcon" /></div>
+            Pin to Top
+          </div>
+        </HoverButton>
       </div>
     </div>
     <slot></slot>
@@ -48,7 +71,10 @@
   .container {
     display: flex;
     padding: 5px;
-    margin: 9px;
+    margin-left: 9px;
+    margin-right: 9px;
+    margin-top: 9px;
+    margin-bottom: 0;
     background: var(--white-smoke);
     font-size: 9px;
     gap: 5px;
@@ -79,6 +105,8 @@
   .separator {
     height: 12px;
     width: 1px;
+    margin-left: 3px;
+    margin-right: 3px;
     background: #DDDDDD;
   }
 
@@ -91,6 +119,12 @@
     color: #686868;
     align-items: center;
     align-content: center;
+  }
+
+  .lcm-button-container {
+    display: flex;
+    height: 13px;
+    flex-direction: row;
   }
 
   .content {

@@ -6,6 +6,7 @@ from lcm import LCM, Event, EventLog
 from pntos.api import LoggingLevel, Mediator, Message, TransportPlugin
 from pntos.cobra.config import LcmLogTransportConfig, config_from_registry
 from pntos.cobra.utils import (
+    UiSourceInterface,
     marshal_to_aspn23_lcm,
     process_lcm_message,
 )
@@ -24,6 +25,7 @@ class LcmLogTransportPlugin(TransportPlugin):
     _lcm: LCM
     _channels_found: set[str]
     _channels_to_process: set[str] | None
+    _ui: UiSourceInterface
 
     def __init__(self, identifier: str) -> None:
         """
@@ -46,6 +48,7 @@ class LcmLogTransportPlugin(TransportPlugin):
         if mediator is not None:
             self.mediator = mediator
 
+        self._ui = UiSourceInterface(self.mediator.registry)
         config = config_from_registry(
             LcmLogTransportConfig, self.mediator, LcmLogTransportConfig.group
         )
@@ -111,9 +114,10 @@ class LcmLogTransportPlugin(TransportPlugin):
             fpos = new_fpos
 
             # process message
-            process_lcm_message(
-                self.mediator, msg.channel, msg.data, self._channels_found
-            )
+            if self._ui.new_message(msg.channel):
+                process_lcm_message(
+                    self.mediator, msg.channel, msg.data, self._channels_found
+                )
 
             msg = self._input_log.read_next_event()
 

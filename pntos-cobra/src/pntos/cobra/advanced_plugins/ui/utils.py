@@ -159,13 +159,8 @@ class CallbackRegistrar:
         """
         with self._lock:
             self.data.set()
-            if group := self._dict.get(key_info.group):
-                current = group.setdefault(key_info.key, key_info)
-                if current is not key_info:
-                    raise RuntimeError(
-                        f'Multiple KeyInfo objects at group, key: {key_info.group}, {key_info.key}'
-                    )
-                return
+            # Locking guarantees that if there was a KeyInfo at this key, it must be an
+            # old one so it's safe to over-write
             self._dict.setdefault(key_info.group, {})[key_info.key] = key_info
 
     def pop(self) -> dict[str, dict[str, KeyInfo[RegistryValueTypeUnion]]]:
@@ -195,6 +190,7 @@ class RegistryManager:
     key_info_map: dict[tuple[str, str], KeyInfo[RegistryValueTypeUnion]]
     _seq_id: LockedSequenceGenerator
     _callback_registrar: CallbackRegistrar
+    _lock: Lock
 
     def __init__(self, mediator: Mediator) -> None:
         self.mediator = mediator
@@ -202,49 +198,70 @@ class RegistryManager:
         self.subscriptions_map = {}
         self.key_info_map = {}
         self._callback_registrar = CallbackRegistrar()
+        self._lock = Lock()
 
     def shutdown(self) -> None:
         pass  # Might be useful later
 
     def subscribe(self, sub: Subscription) -> None:
         """Subscribe to a registry key."""
-        self.subscriptions_map[sub.id] = sub
-        group_key = (sub.group, sub.key)
-        if key_info := self.key_info_map.get(group_key):
-            key_info.add(sub)
-            return
-        new_key_info: KeyInfo[RegistryValueTypeUnion] = KeyInfo(
-            self.mediator.registry,
-            sub.group,
-            sub.key,
-            self._callback_registrar,
-        )
-        self.key_info_map[group_key] = new_key_info
-        new_key_info.add(sub)
+        with self._lock:
+            self.subscriptions_map[sub.id] = sub
+            group_key = (sub.group, sub.key)
+            if key_info := self.key_info_map.get(group_key):
+                key_info.add(sub)
+                return
+            new_key_info: KeyInfo[RegistryValueTypeUnion] = KeyInfo(
+                self.mediator.registry,
+                sub.group,
+                sub.key,
+                self._callback_registrar,
+            )
+            self.key_info_map[group_key] = new_key_info
+            new_key_info.add(sub)
+
+    def get_current_value(self, group: str, key: str) -> dict[str, KeyUpdate] | None:
+        """Get the current value for a subscribed key, if it exists."""
+        with self._lock:
+            group_key = (group, key)
+            if key_info := self.key_info_map.get(group_key):
+                value = key_info.value
+                if value is not None:
+                    return {
+                        key: KeyUpdate(
+                            val=value,
+                            subscription_ids=[
+                                str(id) for id in key_info.subscription_ids
+                            ],
+                            sequence_id=self._seq_id.next,
+                        )
+                    }
+            return None
 
     def unsubscribe(self, sub: Subscription) -> None:
         """Unsubscribe from a registry key."""
-        if sub.id not in self.subscriptions_map:
-            return
-        del self.subscriptions_map[sub.id]
-        group_key = (sub.group, sub.key)
-        if key_info := self.key_info_map.get(group_key):
-            key_info.remove(sub.id)
-            if not key_info.subscription_ids:
-                del self.key_info_map[group_key]
+        with self._lock:
+            if sub.id not in self.subscriptions_map:
+                return
+            del self.subscriptions_map[sub.id]
+            group_key = (sub.group, sub.key)
+            if key_info := self.key_info_map.get(group_key):
+                key_info.remove(sub.id)
+                if not key_info.subscription_ids:
+                    del self.key_info_map[group_key]
 
     def snapshot(self) -> Snapshot:
-        out = Snapshot(data={})
-        for (group, key), key_info in self.key_info_map.items():
-            value = key_info.value
-            if value is None:
-                continue
-            out.data.setdefault(group, {})[key] = value
-        return out
+        with self._lock:
+            out = Snapshot(data={})
+            for (group, key), key_info in self.key_info_map.items():
+                value = key_info.value
+                if value is None:
+                    continue
+                out.data.setdefault(group, {})[key] = value
+            return out
 
     def write(self, request: Write) -> None:
         """Write a set of values to the registry."""
-        print(f'Writing {request.sequence_id}: {request.data}')
         for group, key_val_map in request.data.items():
             kv = self.mediator.registry.batch_start(group)
             for key, value in key_val_map.items():

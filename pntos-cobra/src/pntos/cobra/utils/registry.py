@@ -18,6 +18,8 @@ that union.
 
 
 class GroupsView:
+    """Utility object to give a passive view of all groups in the registry."""
+
     def __init__(self, registry: Registry) -> None:
         self._groups: list[str] | None = registry.group_array
         registry.request_notify_new_group(self._callback)
@@ -254,6 +256,19 @@ class MutableValueView(ValueView[ValueType], Generic[ValueType]):
         kv[self._key] = new_value
         self._batch_end(kv)
 
+    def clear_value(self, kv: KeyValueStore | None = None) -> None:
+        """
+        Removes the key from the registry if it exists.
+
+        Args:
+            kv (KeyValueStore | None): If provided, value will be removed from ``kv``.
+                Otherwise, performs a full batch operation. Default: None
+        """
+        kv = self._batch_start(kv)
+        if self._key in kv:
+            del kv[self._key]
+        self._batch_end(kv)
+
 
 class BufferedMutableValueView(
     MutableValueView[ValueType],
@@ -264,8 +279,8 @@ class BufferedMutableValueView(
     A write-enabled ``ValueView`` with buffering for a key in the registry.
 
     This class inherits both the buffered behavior from ``BufferedValueView`` (e.g.
-    ``buffer`` property and ``pop()``) as well as ``set_value()`` from
-    ``MutableValueView``.
+    ``buffer`` property and ``pop()``) as well as ``set_value()`` and ``clear_value()``
+    from ``MutableValueView``.
 
     Note that the buffer will catch all ``set_value()`` calls.
     """

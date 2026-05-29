@@ -1,8 +1,8 @@
 diff --git a/pntos-cobra/src/pntos/cobra/standard_plugins//controller/StandardControllerPlugin.py b/pntos-cobra/src/pntos/cobra/advanced_plugins//buscat/BuscatControllerPlugin.py
-index 0236a214..621de1f7 100644
+index f097a6aa..621de1f7 100644
 --- a/pntos-cobra/src/pntos/cobra/standard_plugins//controller/StandardControllerPlugin.py
 +++ b/pntos-cobra/src/pntos/cobra/advanced_plugins//buscat/BuscatControllerPlugin.py
-@@ -6,12 +6,11 @@ from pntos.api import (
+@@ -6,59 +6,59 @@ from pntos.api import (
      LoggingLevel,
      LoggingPlugin,
      Mediator,
@@ -15,8 +15,10 @@ index 0236a214..621de1f7 100644
 +from pntos.cobra.config import BuscatConfig, config_from_registry
  from pntos.cobra.utils import (
      SortedPlugins,
+-    UiMediatorInterface,
      find_base_plugin_type,
-@@ -20,44 +19,46 @@ from pntos.cobra.utils import (
+     print_message,
+     sort_plugins_dataclass,
      validate_plugins,
  )
  
@@ -78,7 +80,7 @@ index 0236a214..621de1f7 100644
  
          Args:
              identifier (str): The plugin identifier passed to the
-@@ -110,22 +111,16 @@ class StandardControllerPlugin(ControllerPlugin):
+@@ -111,22 +111,16 @@ class StandardControllerPlugin(ControllerPlugin):
              self._registry_plugin,
              self._logging_plugin,
              self._transport_plugins,
@@ -103,16 +105,17 @@ index 0236a214..621de1f7 100644
              for p in self._plugins
          ]
  
-@@ -152,7 +147,7 @@ class StandardControllerPlugin(ControllerPlugin):
+@@ -153,8 +147,7 @@ class StandardControllerPlugin(ControllerPlugin):
          )
  
          # Give mediators a registry
 -        StandardMediator.registry = self._registry_plugin.new_registry(initial_config)
+-        StandardMediator._ui_interface = UiMediatorInterface(StandardMediator.registry)
 +        BuscatMediator.registry = self._registry_plugin.new_registry(initial_config)
  
          # Initialize logger second
          assert self._logging_plugin is not None
-@@ -165,7 +160,7 @@ class StandardControllerPlugin(ControllerPlugin):
+@@ -167,7 +160,7 @@ class StandardControllerPlugin(ControllerPlugin):
          )
  
          # Give mediators a logging plugin
@@ -121,7 +124,7 @@ index 0236a214..621de1f7 100644
  
          # call init_plugin() on all the other plugins
          for i, plugin in enumerate(self._plugins):
-@@ -179,42 +174,25 @@ class StandardControllerPlugin(ControllerPlugin):
+@@ -181,42 +174,25 @@ class StandardControllerPlugin(ControllerPlugin):
              )
  
          # Give the mediators other needed plugins
@@ -171,7 +174,7 @@ index 0236a214..621de1f7 100644
          """
          Utility function to ensure ``plugins`` contains enough plugins to run pntOS
          Cobra. Then assigns and dispatches them to the relevant fields on the
-@@ -222,34 +200,21 @@ class StandardControllerPlugin(ControllerPlugin):
+@@ -224,34 +200,21 @@ class StandardControllerPlugin(ControllerPlugin):
          not as expected.
          """
          sorted_plugins: SortedPlugins = sort_plugins_dataclass(plugins)
@@ -206,7 +209,7 @@ index 0236a214..621de1f7 100644
          )
  
      def _log(self, level: LoggingLevel, message: str) -> None:
-@@ -287,10 +252,10 @@ class StandardControllerPlugin(ControllerPlugin):
+@@ -289,10 +252,10 @@ class StandardControllerPlugin(ControllerPlugin):
                  'Press Ctrl + C at any time to shut down pntOS...',
              )
              try:
