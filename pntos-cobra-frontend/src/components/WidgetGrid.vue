@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { defineStore } from "pinia"
-  import type { Component } from 'vue'
-  import { markRaw } from "vue"
+  import { defineStore } from "pinia";
+  import type { Component } from 'vue';
+  import { markRaw } from "vue";
 
   export const useGrid = defineStore('grid', {
     persist: {
@@ -147,7 +147,7 @@
   export const widgetRegistry: WidgetRegistryType = {}
   export const activeWidgetTypes: Array<WidgetMetadata> = []
 
-  const excludePatterns = ['BaseWidget']
+  const excludePatterns = ['BaseWidget', 'Velocity', 'Route2d', 'RollAndPitch', 'LcmSpy', 'LatLonErr', 'Heading', 'GroundSpeed']
 
   for (const [path, module] of Object.entries(widgetModules)) {
     const componentName = getComponentName(path)
@@ -179,11 +179,11 @@
 </script>
 
 <script setup lang="ts">
-  import { GridStack, type Breakpoint, type GridStackNode, type GridStackOptions, type GridStackWidget } from 'gridstack'
-  import 'gridstack/dist/gridstack.css'
-  import { onBeforeUnmount, onMounted, ref, type ComponentPublicInstance } from 'vue'
+  import { GridStack, type Breakpoint, type GridStackNode, type GridStackOptions, type GridStackWidget } from 'gridstack';
+  import 'gridstack/dist/gridstack.css';
+  import { onBeforeUnmount, onMounted, ref, type ComponentPublicInstance } from 'vue';
 
-  import { type BaseWidgetData } from '@/components/widgets/BaseWidget.vue'
+  import { type BaseWidgetData } from '@/components/widgets/BaseWidget.vue';
 
   const gridStore = useGrid()
   const widgetStore = useWidgets()

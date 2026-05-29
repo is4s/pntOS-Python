@@ -1,6 +1,5 @@
 <script setup lang="ts">
 
-  import LCMDetailsIcon from '@/assets/branding/svgs/widgets/channel_activity/lcm_details.svg';
   import PinToTopDarkIcon from '@/assets/branding/svgs/widgets/channel_activity/pin_to_top_dark.svg';
   import PinToTopLightIcon from '@/assets/branding/svgs/widgets/channel_activity/pin_to_top_light.svg';
   import HoverButton from '@/components/common/HoverButton.vue';
@@ -24,7 +23,6 @@
   const { addWidget } = useWidgetActions()
 
   function onPinClick() {
-    console.log("Pinned! ", props.channel)
     pinned.value = !pinned.value
     if (pinned.value) {
       pinnedStore.addToPinned(props.channel)
@@ -47,13 +45,13 @@
         {{ channel }}
       </div>
       <div class="top-right">
-        <HoverButton @click=onLcmClick>
+        <!-- <HoverButton @click=onLcmClick>
           <div class="top-right">
             <img :src="LCMDetailsIcon" class="lcm-details" />
             LCM Relay Details
           </div>
         </HoverButton>
-        <div class="separator"></div>
+        <div class="separator"></div> -->
         <HoverButton @click=onPinClick>
           <div class="top-right">
             <div v-if="pinned"><img :src="PinToTopDarkIcon"></div>
