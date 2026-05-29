@@ -37,7 +37,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    min-width: 350px;
+    min-width: 225px;
     margin-left: 30px;
     height: 100%;
   }
