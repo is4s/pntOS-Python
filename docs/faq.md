@@ -1,4 +1,6 @@
-# pntOS FAQ
+# Frequently Asked Questions
+
+## pntOS
 
 ```{dropdown} Who can benefit from pntOS?
 
@@ -32,7 +34,7 @@ to {term}`ROS`.
 
 ```
 
-# Cobra FAQ
+## Cobra
 
 ```{dropdown} Why does the S&T community need Cobra?
 
@@ -68,7 +70,7 @@ or read the [introduction](./introduction.md).
 
 ```
 
-# NavToolKit FAQ
+## NavToolKit
 
 ```{dropdown} What is NavToolKit?
 
@@ -135,7 +137,7 @@ to modify the `Pinson15NedBlock` to add an additional state. Then you could:
 
 ```
 
-# ASPN FAQ
+## ASPN
 
 ```{dropdown} What is ASPN?
 

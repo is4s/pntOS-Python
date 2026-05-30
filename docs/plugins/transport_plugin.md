@@ -12,7 +12,7 @@ incoming messages need to be converted to ASPN before they can be processed. If 
 are already in an ASPN format, then the data only needs to be marshalled into the proper ASPN Python
 class.
 
-For more information about ASPN, see [](../faq.md#aspn-faq).
+For more information about ASPN, see [](../faq.md#aspn).
 
 ## Transport Plugin API
 

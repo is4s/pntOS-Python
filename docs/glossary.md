@@ -36,7 +36,7 @@ ASPN
     usage and interoperability of {term}`PNT` estimators across different systems, sources, and
     users. For the purposes of {term}`pntOS-Python`, ASPN is the data standard used for
     passing navigation information between plugins. For more information, see the
-    [ASPN FAQ](./faq.md#aspn-faq).
+    [ASPN FAQ](./faq.md#aspn).
 
 pntOS-Python
     An {term}`API` written in Python that defines a Position,
@@ -85,10 +85,10 @@ GNSS
     Global Navigation Satellite System
 
 pntOS
-    pntOS stands for Position, Navigation, and Timing Operating System. It consists of an {term}`API` which defines a plugin architecture for implementing {term}`PNT` solutions. Since it is only an architecture, any solution created using pntOS is going to be unique from pntOS itself and may be unique from other pntOS solutions. For more information, see [the FAQ](./faq.md#pntos-faq).
+    pntOS stands for Position, Navigation, and Timing Operating System. It consists of an {term}`API` which defines a plugin architecture for implementing {term}`PNT` solutions. Since it is only an architecture, any solution created using pntOS is going to be unique from pntOS itself and may be unique from other pntOS solutions. For more information, see [the FAQ](./faq.md#pntos).
 
 NavToolKit
-    NavToolKit (navtk) is a modular navigation software library, designed to assist users in the creation of navigation filters in an efficient, pluggable, agile manner. It is written in C++ but also contains Python bindings for use in projects like {term}`Cobra`. For more information, see [the NavToolKit FAQ](./faq.md#navtoolkit-faq) or the [NavToolKit docs](https://is4s.github.io/NavToolkit/tutorial/introduction.html).
+    NavToolKit (navtk) is a modular navigation software library, designed to assist users in the creation of navigation filters in an efficient, pluggable, agile manner. It is written in C++ but also contains Python bindings for use in projects like {term}`Cobra`. For more information, see [the NavToolKit FAQ](./faq.md#navtoolkit) or the [NavToolKit docs](https://is4s.github.io/NavToolkit/tutorial/introduction.html).
 
 GPS
     Global Positioning System. A constellation of 24 satellites launched by the USA which provide geolocation and timing data to a GPS receiver.
