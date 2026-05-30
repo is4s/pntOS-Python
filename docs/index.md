@@ -16,6 +16,7 @@ Some good places to get started:
 
 ```{toctree}
 :caption: Getting Started
+:maxdepth: 1
 installation
 first_app
 exercises
@@ -23,6 +24,7 @@ exercises
 
 ```{toctree}
 :caption: What is pntOS?
+:maxdepth: 1
 introduction
 plugins
 add_processor
@@ -30,6 +32,7 @@ add_processor
 
 ```{toctree}
 :caption: Tutorial Apps
+:maxdepth: 1
 :name: tutorial-apps
 apps/pos_ins
 apps/pos_vel_ins
@@ -37,6 +40,7 @@ apps/pos_vel_ins
 
 ```{toctree}
 :caption: Standard Apps
+:maxdepth: 1
 :name: standard-apps
 apps/pos_ins_standard
 apps/outage_sim
@@ -44,12 +48,14 @@ apps/outage_sim
 
 ```{toctree}
 :caption: Advanced Apps
+:maxdepth: 1
 :name: advanced-apps
 apps/advanced/pos_ins_ros
 ```
 
 ```{toctree}
 :caption: Reference
+:maxdepth: 1
 config
 auxiliary_data
 factory_pattern
@@ -63,6 +69,7 @@ uv
 
 ```{toctree}
 :caption: Other
+:maxdepth: 1
 contributing
 genindex
 glossary
