@@ -50,6 +50,7 @@ apps/advanced/pos_ins_ros
 
 ```{toctree}
 :caption: Reference
+config
 auxiliary_data
 factory_pattern
 example_data
@@ -62,10 +63,9 @@ uv
 
 ```{toctree}
 :caption: Other
+contributing
 genindex
 glossary
-contributing
-config
 ```
 
 ```{toctree}
