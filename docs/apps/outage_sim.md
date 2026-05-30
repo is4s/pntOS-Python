@@ -1,5 +1,11 @@
 # Outage Simulation App
 
+:::{caution}
+This section is only relevant to users who are working within the pntOS-Python repository.
+Downstream users will need to write their own apps to run. For help on building your own apps, see
+[The Exercises](../exercises.md)
+:::
+
 The `standard/outage_sim.py` app demonstrates the capabilities of both Cobra and sensor fusion as a whole. It is a
 derivation of `standard/pos_ins.py` that adds three key features:
 - a simulated GPS position outage

@@ -1,5 +1,11 @@
 # POS Velocity INS App
 
+:::{caution}
+This section is only relevant to users who are working within the pntOS-Python repository.
+Downstream users will need to write their own apps to run. For help on building your own apps, see
+[The Exercises](../exercises.md)
+:::
+
 The `tutorial/pos_vel_ins.py` app is very similar to the `tutorial/pos_ins.py` app. It's essentially a clone with one
 significant difference: the addition of a velocity update. This tutorial will demonstrate how to fit a Cobra app to your needs by transforming the `tutorial/pos_ins.py` app into the `tutorial/pos_vel_ins.py` app.
 

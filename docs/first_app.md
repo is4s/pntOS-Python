@@ -1,6 +1,12 @@
 # Running Your First App
 
-In the `{workspace-root}/apps` directory, there are several off-the-shelf {term}`apps
+:::{caution}
+This section is only relevant to users who are working within the pntOS-Python repository.
+Downstream users will need to write their own apps to run. For help on building your own apps, see
+[The Exercises](./exercises.md)
+:::
+
+In the `apps/` directory, there are several off-the-shelf {term}`apps
 <App>` of increasing complexity assembled from off-the-shelf {term}`Cobra` plugins that
 serve to demonstrate {term}`pntOS-Python` and the development process for you to
 build your own {term}`apps <App>`. This page serves as an introduction to running an

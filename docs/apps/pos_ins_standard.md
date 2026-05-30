@@ -1,5 +1,11 @@
 # Standard POS INS App
 
+:::{caution}
+This section is only relevant to users who are working within the pntOS-Python repository.
+Downstream users will need to write their own apps to run. For help on building your own apps, see
+[The Exercises](../exercises.md)
+:::
+
 The `standard/pos_ins.py` app has a lot in common with its tutorial counterpart. Many plugins and config classes are
 reused between the two apps such as the `LcmLogTransportPlugin`, `StandardPreprocessorPlugin`, and `FogmConfig`.
 There are, however, some key differences that this tutorial will walk through and elaborate on.

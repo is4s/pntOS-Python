@@ -1,5 +1,11 @@
 # POS INS App
 
+:::{caution}
+This section is only relevant to users who are working within the pntOS-Python repository.
+Downstream users will need to write their own apps to run. For help on building your own apps, see
+[The Exercises](../exercises.md)
+:::
+
 Welcome to the first of the {term}`Cobra` tutorial {term}`apps <App>`!
 
 ## Overview

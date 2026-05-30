@@ -1,5 +1,11 @@
 # ROS Transport App
 
+:::{caution}
+This section is only relevant to users who are working within the pntOS-Python repository.
+Downstream users will need to write their own apps to run. For help on building your own apps, see
+[The Exercises](../../exercises.md)
+:::
+
 ROS2 Humble or Jazzy can be used as a transport mechanism instead of LCM.
 Here's how to do that.
 
