@@ -345,7 +345,7 @@ produce a PVA solution from the example LCM or ROS logs.
 
 To use it, simply run:
 
-    python3 postprocessing/run_app_and_record_data.py <path/to/app.py>
+    postprocessing/run_app_and_record_data.py <path/to/app.py>
 
-Where `<path/to/app.py>` is the app you want to run.
+Where `<path/to/app.py>` should be replaced with the path to the app you want to run.
 ```
