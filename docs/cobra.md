@@ -1,7 +1,7 @@
-Cobra Documentation
-===================
+Cobra Generated Documentation
+=============================
 
-This is automatically generated documentation for the ``pntos.cobra`` module. 
+This is automatically generated documentation for the ``pntos.cobra`` module.
 
 This consists of the top-level plugin exports (see {ref}`cobra-plugins-doc`), along with
 three sub-namespaces:
@@ -15,23 +15,22 @@ has the same docstring as its API counterpart, you should assume it is simply
 implementing the API and has nothing notable besides.
 ```
 
-```{toctree} 
+```{toctree}
 :hidden:
 autodocs/cobra_plugins
 ```
 
-```{toctree} 
+```{toctree}
 :hidden:
 autodocs/cobra_config
 ```
 
-```{toctree} 
+```{toctree}
 :hidden:
 autodocs/cobra_utils
 ```
 
-```{toctree} 
+```{toctree}
 :hidden:
 autodocs/cobra_internal
 ```
-
