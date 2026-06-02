@@ -39,7 +39,7 @@ def plot_results(
     truth = log_data.data[truth_channel]
     truth.label = 'Truth'
 
-    print('Plotting results...')
+    print('Plotting results. This may take a while...')
     plt.rcParams['figure.figsize'] = (10, 6)
     plt.rcParams['figure.max_open_warning'] = 0
 

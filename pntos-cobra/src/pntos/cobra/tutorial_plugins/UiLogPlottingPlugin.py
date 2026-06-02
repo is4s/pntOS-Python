@@ -102,11 +102,14 @@ class UiLogPlottingPlugin(UiPlugin):
         save_dir = self.logfile.parent / self.logfile.stem
         self.mediator.log_message(
             LoggingLevel.INFO,
-            'Plotting results. Close all windows to continue shutdown.',
+            'Plotting results. This may take a while...',
         )
         try:
             plot_pva(solution, truth, log_data.t0, save_dir=save_dir)
-            self.mediator.log_message(LoggingLevel.INFO, f'Plots saved to {save_dir}.')
+            self.mediator.log_message(
+                LoggingLevel.INFO,
+                f'Plots saved to {save_dir}. Close all windows to continue shutdown.',
+            )
             plt.show()
         except KeyboardInterrupt:
             plt.close('all')
