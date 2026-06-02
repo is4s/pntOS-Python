@@ -95,13 +95,13 @@ Once the entire input log has been processed, you should see something like the 
 For tutorial apps, a UI plugin for LCM log plotting is initiated on shutdown. Pressing `Ctrl + C` after running the tutorial app will start the shutdown process and display something like the following:
 
 ```text
-[17/02/2026 14:51:41] [ControllerPlugin] [INFO] Keyboard Interrupt Detected.
-[17/02/2026 14:51:41] [ControllerPlugin] [INFO] Shutting down all plugins...
-[17/02/2026 14:51:41] [TransportPlugin] [INFO] Shutdown plugin for Cobra LCM Log Transport Plugin.
+[02/06/2026 15:12:30] [ControllerPlugin] [INFO] Keyboard Interrupt Detected.
+[02/06/2026 15:12:30] [ControllerPlugin] [INFO] Shutting down all plugins...
+[02/06/2026 15:12:30] [TransportPlugin] [INFO] Shutdown plugin for Cobra LCM Log Transport Plugin.
 Reading measurements from log...
-100%|█████████████████████████████████████████████████████████████████████████████████████████████████| 475M/475M [00:13<00:00, 34.0MB/s]
-[17/02/2026 14:51:57] [UiPlugin] [INFO] Plotting results. Close all windows to continue shutdown.
-[17/02/2026 14:52:10] [UiPlugin] [INFO] Plots saved to pntos_output.
+100%|████████████████████████████████████████| 476M/476M [00:11<00:00, 42.8MB/s]
+[02/06/2026 15:12:44] [UiPlugin] [INFO] Plotting results. This may take a while...
+[02/06/2026 15:12:57] [UiPlugin] [INFO] Plots saved to pntos_output. Close all windows to continue shutdown.
 ```
 
 The results from the tutorial app will be displayed in separate windows. To continue with the shutdown, simply close all the plotting windows.
@@ -151,13 +151,13 @@ Once the entire input log has been processed, you should see something like the 
 For tutorial apps, a UI plugin for LCM log plotting is initiated on shutdown. Pressing `Ctrl + C` after running the tutorial app will start the shutdown process and display something like the following:
 
 ```text
-[17/02/2026 14:51:41] [ControllerPlugin] [INFO] Keyboard Interrupt Detected.
-[17/02/2026 14:51:41] [ControllerPlugin] [INFO] Shutting down all plugins...
-[17/02/2026 14:51:41] [TransportPlugin] [INFO] Shutdown plugin for Cobra LCM Log Transport Plugin.
+[02/06/2026 15:12:30] [ControllerPlugin] [INFO] Keyboard Interrupt Detected.
+[02/06/2026 15:12:30] [ControllerPlugin] [INFO] Shutting down all plugins...
+[02/06/2026 15:12:30] [TransportPlugin] [INFO] Shutdown plugin for Cobra LCM Log Transport Plugin.
 Reading measurements from log...
-100%|█████████████████████████████████████████████████████████████████████████████████████████████████| 475M/475M [00:13<00:00, 34.0MB/s]
-[17/02/2026 14:51:57] [UiPlugin] [INFO] Plotting results. Close all windows to continue shutdown.
-[17/02/2026 14:52:10] [UiPlugin] [INFO] Plots saved to pntos_output.
+100%|████████████████████████████████████████| 476M/476M [00:11<00:00, 42.8MB/s]
+[02/06/2026 15:12:44] [UiPlugin] [INFO] Plotting results. This may take a while...
+[02/06/2026 15:12:57] [UiPlugin] [INFO] Plots saved to pntos_output. Close all windows to continue shutdown.
 ```
 
 The results from the tutorial app will be displayed in separate windows. To continue with the shutdown, simply close all the plotting windows.
