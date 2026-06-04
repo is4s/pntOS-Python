@@ -1,12 +1,54 @@
 <template>
-<div ref="mapEl" class="map"></div>
+  <div class="map-wrapper">
+    <div ref="mapEl" class="map"></div>
+
+    <div class="legend">
+      <div
+        v-for="[sourceName, source] in sourceEntries"
+        :key="sourceName"
+        class="legend-row"
+      >
+        <span class="legend-source">
+          <span
+            class="legend-dot"
+            :style="{ background: source.color }"
+          />
+
+          <span class="legend-name">
+            {{ sourceName }}
+          </span>
+        </span>
+
+        <span class="legend-controls">
+          <label>
+            <input
+              type="checkbox"
+              :checked="map && map.hasLayer(source.layer)"
+              @change="toggleSource(sourceName, $event)"
+            >
+            Show
+          </label>
+
+          <label>
+            <input
+              type="radio"
+              name="active-source"
+              :checked="centerSource === sourceName"
+              @change="centerOnSource(sourceName)"
+            >
+            Center
+          </label>
+        </span>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
 import { useRegistry } from '@/utils/useRegistry';
 import { SubscriptionMode } from '@/types';
 
-import { onMounted, ref, watch } from "vue"
+import { computed, onMounted, reactive, ref, watch } from "vue"
 import * as L from "leaflet"
 import "leaflet/dist/leaflet.css"
 
@@ -87,10 +129,9 @@ const props = withDefaults(
 
 const mapEl = ref<HTMLDivElement | null>(null)
 let map: L.Map
-let sources: Record<string, Source> = {}
-let legend: L.Control | null = null
-let legendDiv: HTMLDivElement | null = null
-let centerSource: string | null = null
+const sources = reactive<Record<string, Source>>({})
+const sourceEntries = computed(() => Object.entries(sources))
+const centerSource = ref<string | null>(null)
 
 const SOL_GROUP = "ui/channel//solution/pntos/pva"
 const TRUTH_GROUP = "ui/channel//sensor/ins-d/pva"
@@ -160,77 +201,33 @@ onMounted(() => {
 
     map.setZoom(newZoom, { animate: true })
   }, { passive: false })
-  buildLegend()
 })
 
 const MAX_POINTS_PER_SOURCE = 50;
 
-function renderLegend() {
-  if (!legendDiv) return
+function toggleSource(sourceName: string, event: Event) {
+  const checked = (event.target as HTMLInputElement).checked
 
-  legendDiv.innerHTML = ""
+  const source = sources[sourceName]
+  if (!source) return
 
-  Object.entries(sources).forEach(([source_name, source]) => {
-    const shown = map.hasLayer(source.layer)? "checked" : ""
-    const centered = centerSource && centerSource === source_name ? "checked" : ""
-    legendDiv!.innerHTML += `
-      <div class="legend-row">
-        <span class="legend-source">
-          <span class="legend-dot" style="background:${source.color}"></span>
-          <span class="legend-name">${source_name}</span>
-        </span>
-        <span class="legend-controls">
-          <label>
-            <input type="checkbox" data-source="${source_name}" ${shown}>
-            Show
-          </label>
-
-          <label>
-            <input type="radio" name="active-source" data-center="${source_name}" ${centered}>
-            Center
-          </label>
-        </span
-      </div>
-      `
-  })
-
-
-  // checkbox toggle
-  legendDiv.querySelectorAll("input[type='checkbox']").forEach(el=>{
-    el.addEventListener("change", e=>{
-      const src = (e.target as HTMLInputElement).dataset.source!
-      const layer = sources[src]!.layer
-      if ((e.target as HTMLInputElement).checked) layer?.addTo(map)
-      else layer?.remove()
-    })
-  })
-
-  // center button
-  legendDiv.querySelectorAll("input[type='radio']").forEach(btn=>{
-    btn.addEventListener("change", e=>{
-      centerSource=(e.target as HTMLInputElement).dataset.center!
-      const src_markers = sources[centerSource]!.markers
-      const last_point = src_markers[src_markers.length - 1]!.getLatLng()
-      map.panTo([last_point.lat, last_point.lng]);
-    })
-  })
+  if (checked) {
+    source.layer.addTo(map)
+  } else {
+    source.layer.remove()
+  }
 }
 
-function buildLegend() {
-  if (!map) return
-  if (legend) return  // already exists
+function centerOnSource(sourceName: string) {
+  centerSource.value = sourceName
 
-  legend = (L as any).control({ position: "topright" })
+  const markers = sources[sourceName]?.markers
 
-  legend!.onAdd = () => {
-    legendDiv = L.DomUtil.create("div","legend")
-    L.DomEvent.disableClickPropagation(legendDiv)
+  if (!markers?.length) return
 
-    renderLegend()  // initial render
-    return legendDiv
-  }
+  const lastPoint = markers[markers.length - 1]!.getLatLng()
 
-  legend!.addTo(map)
+  map.panTo(lastPoint)
 }
 
 function getNewColor() {
@@ -289,9 +286,8 @@ function addPoint(p: Point) {
     sources[p.source] = {'color': getNewColor()!, 'markers': [], 'layer': L.layerGroup().addTo(map), ellipse: null}
     if (Object.keys(sources).length == 1){
       // center on first source that shows up
-      centerSource = p.source
+      centerSource.value = p.source
     }
-    renderLegend()
   }
 
   let source = sources[p.source]!
@@ -308,7 +304,7 @@ function addPoint(p: Point) {
     fillOpacity:0.9
   }).addTo(source.layer)
 
-  if (p.source == centerSource){
+  if (p.source == centerSource.value){
     map.panTo([p.lat, p.lon]);
   }
 
@@ -342,6 +338,10 @@ function addPoint(p: Point) {
         width: 100vw;
     }
 
+    .map-wrapper {
+      position: relative;
+    }
+
     #controls {
         position: absolute;
         top: 10px;
@@ -357,6 +357,10 @@ function addPoint(p: Point) {
     }
 
     .legend {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      z-index: 1000;
       background: white;
       padding: 10px;
       border-radius: 6px;
