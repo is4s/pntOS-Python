@@ -1429,7 +1429,7 @@ requires-dist = [
 
 [[package]]
 name = "pntos-cobra"
-version = "2.1.0.post0.dev1"
+version = "2.1.0.post0.dev2"
 source = { editable = "pntos-cobra" }
 dependencies = [
     { name = "analysis-lcm" },
