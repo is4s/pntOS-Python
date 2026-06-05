@@ -24,7 +24,7 @@ wheels = [
 
 [[package]]
 name = "analysis-lcm"
-version = "0.1.3"
+version = "0.1.4"
 source = { registry = "https://pypi.org/simple/" }
 dependencies = [
     { name = "aspn23" },
@@ -41,9 +41,8 @@ dependencies = [
     { name = "tomlkit" },
     { name = "tqdm" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/d2/d8/c554f64af28b99325bac8564d3bf68cb312b5d2cd3083e16c96fd6ded0de/analysis_lcm-0.1.3.tar.gz", hash = "sha256:b16a66c4a0cac95055a43c29b22c301962d15ad81b5d171af6474d5d10ea2c10", size = 41428, upload-time = "2026-05-28T13:56:02.178Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/50/c0/2142857a39875575a62455a5462e972284a4e4baa1104ca7999a36c6ae1b/analysis_lcm-0.1.3-py3-none-any.whl", hash = "sha256:474f0d2fe9de714bc70005be3b502fa976b33cdce1cec5d8416cd2df554404e9", size = 68526, upload-time = "2026-05-28T13:56:00.959Z" },
+    { url = "https://files.pythonhosted.org/packages/57/b0/67f0f7f9435706ab74022dbbe72ec8a0a0a133b3805ab16e3a3355fe59cd/analysis_lcm-0.1.4-py3-none-any.whl", hash = "sha256:993ec6f0fb494d7ae683d42ab2cc15990b20ee8aab0046c1ce4dc3a32b21caf2", size = 68520, upload-time = "2026-06-05T18:43:14.582Z" },
 ]
 
 [[package]]
@@ -1453,7 +1452,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "analysis-lcm", specifier = ">=0.1.3" },
+    { name = "analysis-lcm", specifier = ">=0.1.4" },
     { name = "analysis-ros", specifier = ">=0.1.1" },
     { name = "aspn23" },
     { name = "aspn23-lcm" },
@@ -1508,7 +1507,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "analysis-lcm", specifier = ">=0.1.3" },
+    { name = "analysis-lcm", specifier = ">=0.1.4" },
     { name = "analysis-ros", specifier = ">=0.1.1" },
     { name = "matplotlib" },
     { name = "pntos-api", editable = "pntos-api" },
