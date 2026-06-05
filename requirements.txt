@@ -8,7 +8,7 @@
     # via pntos-python
 alabaster==1.0.0
     # via sphinx
-analysis-lcm==0.1.3
+analysis-lcm==0.1.4
     # via
     #   analysis-ros
     #   pntos-cobra
