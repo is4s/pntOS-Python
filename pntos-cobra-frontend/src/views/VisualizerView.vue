@@ -251,7 +251,7 @@ function get_ellipse_params(sx2: number, sy2: number, sxy: number): [number,numb
   return [semi_major, semi_minor, theta]
 }
 
-function createEllipse(lat:number,lng: number, ellipse_params: [number, number, number], options: L.PolylineOptions) {
+function createEllipsePoints(lat:number,lng: number, ellipse_params: [number, number, number]) {
     let semiMajor = ellipse_params[0]
     let semiMinor = ellipse_params[1]
     let rotation = ellipse_params[2]
@@ -276,7 +276,7 @@ function createEllipse(lat:number,lng: number, ellipse_params: [number, number, 
 
         points.push(L.latLng(lat + rotatedLat, lng + rotatedLng));
     }
-    return L.polygon(points, options);
+    return points;
 }
 
 function addPoint(p: Point) {
@@ -315,17 +315,17 @@ function addPoint(p: Point) {
   }
 
   if (p.cov) {
-    if (source.ellipse) {
-        source.ellipse.remove();
-    }
-
     let ellipse_params = get_ellipse_params(p.cov[0],p.cov[1],p.cov[2])
-    const ellipse = createEllipse(p.lat, p.lon, ellipse_params, {
-        color: color,
-        fill: false,
-    }).addTo(map);
-
-    source.ellipse = ellipse;
+    const points: L.LatLng[] = createEllipsePoints(p.lat, p.lon, ellipse_params)
+    if (source.ellipse) {
+        source.ellipse.setLatLngs(points);
+    } else {
+      const ellipse = L.polygon(points, {
+          color: color,
+          fill: false,
+      }).addTo(map);
+      source.ellipse = ellipse;
+    }
   }
 }
 </script>
