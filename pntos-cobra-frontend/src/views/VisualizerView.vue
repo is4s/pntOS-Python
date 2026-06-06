@@ -1,5 +1,4 @@
 <template>
-  <div class="map-wrapper">
     <div ref="mapEl" class="map"></div>
 
     <div class="legend">
@@ -41,7 +40,6 @@
         </span>
       </div>
     </div>
-  </div>
 </template>
 
 <script setup lang="ts">
