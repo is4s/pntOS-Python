@@ -179,26 +179,17 @@ watch(ublox_pos, (new_pos) => {
 onMounted(() => {
   map = L.map(mapEl.value!, {
     preferCanvas: true,
-    zoomControl: false // Hides the +/- symbols
+    zoomControl: false, // Hides the +/- symbols
+    scrollWheelZoom: 'center',
+    wheelPxPerZoomLevel: 120,
+    zoomSnap: 1,
+    zoomDelta: 1,
   }).setView([40.0, -82.0], 13);
 
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     maxZoom: 20,
     attribution: "&copy; OpenStreetMap contributors",
   }).addTo(map)
-
-  map.scrollWheelZoom.disable()
-
-  const container = map.getContainer()
-
-  container.addEventListener("wheel", (e: WheelEvent) => {
-    e.preventDefault()
-
-    const delta = e.deltaY > 0 ? -1 : 1
-    const newZoom = map.getZoom() + delta
-
-    map.setZoom(newZoom, { animate: true })
-  }, { passive: false })
 })
 
 const MAX_POINTS_PER_SOURCE = 50;
