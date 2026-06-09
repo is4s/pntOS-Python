@@ -13,7 +13,7 @@ class LcmTransportConfig(BaseConfig):
         subscribe_to (str): A regex string indicating which channels to which the transport should subscribe.
     """
 
-    group: str = field(default='config/lcm_transport', init=False)
+    group: str = field(default='config/lcm_transport', kw_only=True, init=True)
     url: str = 'tcpq://'
     subscribe_to: str = '^((?!pntos).)*$'
 
@@ -24,7 +24,7 @@ class LcmLogTransportConfig(BaseConfig):
     Configuration for LcmLogTransportPlugin, which processes messages from an LCM log.
     """
 
-    group: str = field(default='config/lcm_log_transport', init=False)
+    group: str = field(default='config/lcm_log_transport', kw_only=True, init=True)
 
     input_file: str
     """

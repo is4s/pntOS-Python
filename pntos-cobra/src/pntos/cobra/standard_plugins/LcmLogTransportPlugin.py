@@ -27,7 +27,9 @@ class LcmLogTransportPlugin(TransportPlugin):
     _channels_to_process: set[str] | None
     _ui: UiSourceInterface
 
-    def __init__(self, identifier: str) -> None:
+    def __init__(
+        self, identifier: str, config_group: str = LcmLogTransportConfig.group
+    ) -> None:
         """
         LCM Log Transport Plugin
 
@@ -36,6 +38,7 @@ class LcmLogTransportPlugin(TransportPlugin):
                 :meth:`pntos.api.CommonPlugin.identifier` field.
         """
         self.identifier = identifier
+        self._config_group = config_group
         self._shutdown_threads = threading.Event()
         self.handler = None
         self._channels_found = set()
@@ -50,7 +53,7 @@ class LcmLogTransportPlugin(TransportPlugin):
 
         self._ui = UiSourceInterface(self.mediator.registry)
         config = config_from_registry(
-            LcmLogTransportConfig, self.mediator, LcmLogTransportConfig.group
+            LcmLogTransportConfig, self.mediator, self._config_group
         )
         if config is None:
             self.mediator.log_message(

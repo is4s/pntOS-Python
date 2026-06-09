@@ -31,7 +31,9 @@ class LcmTransportPlugin(TransportPlugin):
     _output_queue: Queue[Message | None]
     _ui: UiSourceInterface
 
-    def __init__(self, identifier: str) -> None:
+    def __init__(
+        self, identifier: str, config_group: str = LcmTransportConfig.group
+    ) -> None:
         """
         ASPN-LCM Transport Plugin
 
@@ -40,6 +42,7 @@ class LcmTransportPlugin(TransportPlugin):
                 :meth:`pntos.api.CommonPlugin.identifier` field.
         """
         self.identifier = identifier
+        self._config_group = config_group
         self._shutdown_threads = threading.Event()
         self.lcm = None
         self.handler = None
@@ -63,7 +66,7 @@ class LcmTransportPlugin(TransportPlugin):
         self._ui = UiSourceInterface(self.mediator.registry)
 
         config = config_from_registry(
-            LcmTransportConfig, self.mediator, LcmTransportConfig.group
+            LcmTransportConfig, self.mediator, self._config_group
         )
         if config is None:
             self.mediator.log_message(
