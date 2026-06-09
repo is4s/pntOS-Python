@@ -22,7 +22,7 @@
           <label>
             <input
               type="checkbox"
-              :checked="map && map.hasLayer(source.layer)"
+              :checked="mapStore.visibleSources[sourceName] ?? true"
               @change="toggleSource(sourceName, $event)"
             >
             Show
@@ -32,7 +32,7 @@
             <input
               type="radio"
               name="active-source"
-              :checked="centerSource === sourceName"
+              :checked="mapStore.centerSource === sourceName"
               @change="centerOnSource(sourceName)"
             >
             Center
@@ -49,6 +49,7 @@ import { SubscriptionMode } from '@/types';
 import { computed, onMounted, reactive, ref, watch } from "vue"
 import * as L from "leaflet"
 import "leaflet/dist/leaflet.css"
+import { defineStore } from 'pinia';
 
 interface Point {
   lat: number
@@ -125,11 +126,19 @@ const props = withDefaults(
   }
 )
 
+const useMapStore = defineStore('map', {
+  state: () => ({
+    visibleSources: {} as Record<string, boolean>,
+    centerSource: null as string | null,
+    centerInitialized: false,
+  })
+})
+
 const mapEl = ref<HTMLDivElement | null>(null)
 let map: L.Map
 const sources = reactive<Record<string, Source>>({})
 const sourceEntries = computed(() => Object.entries(sources))
-const centerSource = ref<string | null>(null)
+const mapStore = useMapStore()
 
 const SOL_GROUP = "ui/channel//solution/pntos/pva"
 const TRUTH_GROUP = "ui/channel//sensor/ins-d/pva"
@@ -197,6 +206,8 @@ const MAX_POINTS_PER_SOURCE = 50;
 function toggleSource(sourceName: string, event: Event) {
   const checked = (event.target as HTMLInputElement).checked
 
+  mapStore.visibleSources[sourceName] = checked
+
   const source = sources[sourceName]
   if (!source) return
 
@@ -208,7 +219,7 @@ function toggleSource(sourceName: string, event: Event) {
 }
 
 function centerOnSource(sourceName: string) {
-  centerSource.value = sourceName
+  mapStore.centerSource = sourceName
 
   const markers = sources[sourceName]?.markers
 
@@ -272,10 +283,18 @@ function createEllipsePoints(lat:number,lng: number, ellipse_params: [number, nu
 
 function addPoint(p: Point) {
   if (!(p.source in sources)){
-    sources[p.source] = {'color': getNewColor()!, 'markers': [], 'layer': L.layerGroup().addTo(map), ellipse: null}
-    if (Object.keys(sources).length == 1){
-      // center on first source that shows up
-      centerSource.value = p.source
+    if (!(p.source in mapStore.visibleSources)) {
+      mapStore.visibleSources[p.source] = true
+    }
+    sources[p.source] = {'color': getNewColor()!, 'markers': [], 'layer': L.layerGroup(), ellipse: null}
+
+    if (mapStore.visibleSources[p.source]) {
+      sources[p.source]!.layer.addTo(map)
+    }
+
+    if (!mapStore.centerInitialized) {
+      mapStore.centerSource = p.source
+      mapStore.centerInitialized = true
     }
   }
 
@@ -293,7 +312,7 @@ function addPoint(p: Point) {
     fillOpacity:0.9
   }).addTo(source.layer)
 
-  if (p.source == centerSource.value){
+  if (p.source == mapStore.centerSource){
     map.panTo([p.lat, p.lon]);
   }
 
