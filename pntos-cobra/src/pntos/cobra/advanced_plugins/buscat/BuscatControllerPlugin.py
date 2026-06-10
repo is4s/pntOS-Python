@@ -3,6 +3,7 @@ import sys
 from pntos.api import (
     CommonPlugin,
     ControllerPlugin,
+    KeyValueStore,
     LoggingLevel,
     LoggingPlugin,
     Mediator,
@@ -187,6 +188,9 @@ class BuscatControllerPlugin(ControllerPlugin):
             return
         BuscatMediator._output_transports.extend(config.output_transports or ())
 
+        with temp_mediator.registry.batch_start('controller/flags') as kvs:
+            kvs.request_notify('ready_to_shutdown', self._ready_to_shutdown_callback)
+
         # Pass off to main control loop
         self._main()
 
@@ -216,6 +220,15 @@ class BuscatControllerPlugin(ControllerPlugin):
             sorted_plugins.transport_plugins,
             sorted_plugins.ui_plugins,
         )
+
+    def _ready_to_shutdown_callback(
+        self, group: str, modified_keys: list[str], kvs: KeyValueStore
+    ) -> None:
+        if 'ready_to_shutdown' in modified_keys and kvs['ready_to_shutdown']:
+            self._log(
+                LoggingLevel.INFO,
+                'Press Ctrl + C at any time to shut down pntOS...',
+            )
 
     def _log(self, level: LoggingLevel, message: str) -> None:
         """

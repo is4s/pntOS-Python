@@ -88,7 +88,8 @@ Once the entire input log has been processed, you should see something like the 
 [18/02/2026 15:10:01] [TransportPlugin] [INFO] Found new channel /sensor/ublox-ZED-F9T/pva       with a timestamp of 1747680880.300589800s
 [18/02/2026 15:10:01] [TransportPlugin] [INFO] Found new channel /sensor/bmp388/baro_pressure    with a timestamp of 1747680880.328312635s
 100%|██████████████████████████████████████████████████████████████████████████████████████████████| 472M/472M [00:37<00:00, 12.7MB/s]
-[18/02/2026 15:10:38] [TransportPlugin] [INFO] Done processing LCM log. Press Ctrl + C to shut down pntOS.
+[18/02/2026 15:10:38] [TransportPlugin] [INFO] Done processing LCM log.
+[17/02/2026 14:47:19] [ControllerPlugin] [INFO] Press Ctrl + C at any time to shut down pntOS...
 ```
 
 
@@ -145,7 +146,8 @@ Once the entire input log has been processed, you should see something like the 
 [18/02/2026 15:10:01] [TransportPlugin] [INFO] Found new channel /sensor/ublox-ZED-F9T/pva       with a timestamp of 1747680880.300589800s
 [18/02/2026 15:10:01] [TransportPlugin] [INFO] Found new channel /sensor/bmp388/baro_pressure    with a timestamp of 1747680880.328312635s
 100%|██████████████████████████████████████████████████████████████████████████████████████████████| 472M/472M [00:37<00:00, 12.7MB/s]
-[18/02/2026 15:10:38] [TransportPlugin] [INFO] Done processing LCM log. Press Ctrl + C to shut down pntOS.
+[18/02/2026 15:10:38] [TransportPlugin] [INFO] Done processing LCM log.
+[17/02/2026 14:47:19] [ControllerPlugin] [INFO] Press Ctrl + C at any time to shut down pntOS...
 ```
 
 For tutorial apps, a UI plugin for LCM log plotting is initiated on shutdown. Pressing `Ctrl + C` after running the tutorial app will start the shutdown process and display something like the following:
@@ -196,7 +198,8 @@ Once the entire input log has been processed, you should see something like the 
 [18/02/2026 15:47:50] [TransportPlugin] [INFO] Found new channel /sensor/ublox-ZED-F9T/position  with a timestamp of 1747680880.300589800s
 [18/02/2026 15:47:50] [OrchestrationPlugin] [INFO] Aligned filter at 1747680889.549539804s
 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████▉| 472M/472M [00:26<00:00, 18.0MB/s]
-[18/02/2026 15:48:16] [TransportPlugin] [INFO] Done processing LCM log. Press Ctrl + C to shut down pntOS.
+[18/02/2026 15:10:38] [TransportPlugin] [INFO] Done processing LCM log.
+[17/02/2026 14:47:19] [ControllerPlugin] [INFO] Press Ctrl + C at any time to shut down pntOS...
 ```
 
 The pntOS solution will be recorded to `pntos_output.log` and you can press `Ctrl + C` to shut down pntOS.

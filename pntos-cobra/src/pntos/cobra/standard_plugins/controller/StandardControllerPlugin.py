@@ -3,6 +3,7 @@ import sys
 from pntos.api import (
     CommonPlugin,
     ControllerPlugin,
+    KeyValueStore,
     LoggingLevel,
     LoggingPlugin,
     Mediator,
@@ -200,6 +201,10 @@ class StandardControllerPlugin(ControllerPlugin):
                 'Could not extract ControllerConfig from group "controller". Cannot initialize controller plugin.',
             )
             return
+
+        with temp_mediator.registry.batch_start('controller/flags') as kvs:
+            kvs.request_notify('ready_to_shutdown', self._ready_to_shutdown_callback)
+
         StandardMediator._buffer_time_nsec = int(config.buffer_length_sec * 1e9)
         if config.publish_interval is not None:
             StandardMediator._publish_interval_ns = int(config.publish_interval * 1e9)
@@ -253,6 +258,15 @@ class StandardControllerPlugin(ControllerPlugin):
             sorted_plugins.ui_plugins,
             plugins_for_orchestration,
         )
+
+    def _ready_to_shutdown_callback(
+        self, group: str, modified_keys: list[str], kvs: KeyValueStore
+    ) -> None:
+        if 'ready_to_shutdown' in modified_keys and kvs['ready_to_shutdown']:
+            self._log(
+                LoggingLevel.INFO,
+                'Press Ctrl + C at any time to shut down pntOS...',
+            )
 
     def _log(self, level: LoggingLevel, message: str) -> None:
         """

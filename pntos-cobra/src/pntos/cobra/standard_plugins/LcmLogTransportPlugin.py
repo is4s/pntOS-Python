@@ -130,10 +130,9 @@ class LcmLogTransportPlugin(TransportPlugin):
 
         if msg is None:
             # Reached end of log and pntOS has not been shut down yet
-            self.mediator.log_message(
-                LoggingLevel.INFO,
-                'Done processing LCM log. Press Ctrl + C to shut down pntOS.',
-            )
+            self.mediator.log_message(LoggingLevel.INFO, 'Done processing LCM log.')
+            with self.mediator.registry.batch_start('controller/flags') as kvs:
+                kvs['ready_to_shutdown'] = True
 
     def start_listening(self) -> None:
         self._log_reader_thread = Thread(target=self.read_log, args=[])

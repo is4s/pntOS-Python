@@ -223,7 +223,7 @@ def run_pntos_with_log_transport(
         app_process = run_app(app, args, validate=validate)
 
         # Wait until pntOS is done processing the LCM log
-        done_msg = 'Done processing LCM log. Press Ctrl + C to shut down pntOS.'
+        done_msg = 'Done processing LCM log.'
         assert app_process.stdout is not None
         monitor_app_output(app_process.stdout, validate=validate, wait_for_msg=done_msg)
 
