@@ -7,7 +7,7 @@ from aspn23 import (
     MeasurementPositionVelocityAttitude,
     MeasurementPositionVelocityAttitudeReferenceFrame,
 )
-from navtk.navutils import msl_to_hae
+from navtk.navutils import msl_to_hae, quat_to_dcm, skew
 from numpy import float64
 from numpy.typing import NDArray
 from pntos.api import (
@@ -34,12 +34,14 @@ class AltitudeMeasurementProcessor(StandardMeasurementProcessor):
     _mediator: Mediator
     _inertial_solution_time_nsec: int | None
     _inertial_pos: NDArray[float64]
+    _l_ps_p: NDArray[float64]
 
     def __init__(
         self,
         label: str,
         state_block_labels: list[str],
         mediator: Mediator,
+        l_ps_p: NDArray[float64],
     ) -> None:
         """
         An Altitude Measurement Processor.
@@ -48,16 +50,21 @@ class AltitudeMeasurementProcessor(StandardMeasurementProcessor):
             label (str): Name of processor.
             state_block_labels (list[str]): A 2-element list of labels of state blocks this
                 processor can update. The first entry should refer to a Pinson-style
-                state block of at least size 3, with a Down position error in meters as
-                the third state. The second entry should refer to a 1-state FOGM
-                state block estimating time-correlated altitude bias.
+                state block of at least size 9, with down position error in meters as
+                the third state and NED tilt errors, in radians, as states 6:9. The
+                second entry should refer to a 1-state FOGM state block estimating
+                time-correlated altitude bias.
             mediator (Mediator): A :class:`pntos.api.Mediator` instance.
+            l_ps_p (NDArray[float64]): A 3-element array representing the lever arm from the
+                platform frame origin to the position sensor origin, in the platform frame, in
+                units of meters.
         """
         self.label = label
         self.state_block_labels = state_block_labels
         self._mediator = mediator
         self._inertial_solution_time_nsec = None
         self._inertial_pos = np.zeros(3)
+        self._l_ps_p = l_ps_p
 
     def receive_aux_data(self, aux: list[Message | None]) -> None:
         # Receive and store estimated inertial solution
@@ -89,6 +96,12 @@ class AltitudeMeasurementProcessor(StandardMeasurementProcessor):
                 f'AltitudeMeasurementProcessor received PVA aux data with no position at time {pva.time_of_validity.elapsed_nsec / 1e9:.9f}s.',
             )
             return
+        if pva.quaternion is None:
+            self._mediator.log_message(
+                LoggingLevel.ERROR,
+                f'AltitudeMeasurementProcessor received PVA aux data with no quaternion at time {pva.time_of_validity.elapsed_nsec / 1e9:.9f}s.',
+            )
+            return
 
         if (
             pva.reference_frame
@@ -104,6 +117,8 @@ class AltitudeMeasurementProcessor(StandardMeasurementProcessor):
         self._inertial_pos[0] = pva.p1
         self._inertial_pos[1] = pva.p2
         self._inertial_pos[2] = pva.p3
+
+        self._C_platform_to_nav = quat_to_dcm(pva.quaternion)
 
     def generate_model(
         self, message: Message, gen_x_and_p_func: GenXandP
@@ -177,9 +192,13 @@ class AltitudeMeasurementProcessor(StandardMeasurementProcessor):
         H = np.zeros((1, num_states))
         H[0, 2] = -1
         H[0, -1] = 1
+        H[0, 6:9] = skew(self._C_platform_to_nav @ self._l_ps_p)[2]
 
         def h(x: NDArray[float64]) -> NDArray[float64]:
-            return H @ x
+            lever_arm_diff = (
+                (np.eye(3) - skew(x[6:9, 0])) @ self._C_platform_to_nav @ self._l_ps_p
+            )
+            return -x[2:3] + x[-1:] + lever_arm_diff[2]  # type: ignore[no-any-return]
 
         R = np.array([[variance]])
 

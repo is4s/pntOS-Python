@@ -516,6 +516,9 @@ class AltitudeMPConfig(MeasurementProcessorConfig):
             measurement processor's `receive_aux_data` method. This field is set to a
             constant value of `('INERTIAL_PVA',)`, since this MP requires inertial PVA
             aux data.
+        lever_arm:
+            The 3-D vector from the platform frame to the sensor frame, in the platform
+            frame (m).
     """
 
     # INHERITED FIELDS
@@ -530,6 +533,8 @@ class AltitudeMPConfig(MeasurementProcessorConfig):
     state_block_labels: tuple[str, ...]
 
     aux_channels: tuple[str, ...] | None = field(default=('INERTIAL_PVA',), init=False)
+
+    lever_arm: tuple[float, float, float]
 
 
 @dataclass(kw_only=True)

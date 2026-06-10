@@ -260,7 +260,7 @@ def altitude_mp(
     state_model_provider: StateModelProviderType,
 ) -> StandardMeasurementProcessor:
     out = state_model_provider.new_processor(
-        3, None, 'altitude', ['pinson', 'fogm'], '/config/cobra/sensor'
+        3, None, 'altitude', ['pinson', 'fogm'], 'config/test'
     )
     assert isinstance(out, StandardMeasurementProcessor)
     assert isinstance(out, AltitudeMeasurementProcessor)
@@ -1010,11 +1010,14 @@ def test_generate_model_alt(
     exp_H = np.zeros((1, 16))
     exp_H[0, 2] = -1
     exp_H[0, 15] = 1
+    assert inertial_pva.quaternion is not None
+    C = quat_to_dcm(inertial_pva.quaternion)
+    exp_H[0, 6:9] = skew(C @ _lever_arm)[2]
     exp_R = np.array([[alt.variance]])
     exp_z = alt.altitude - inertial_pva.p3
     assert np.array_equal(mm.H, exp_H)
     assert np.array_equal(mm.R, exp_R)
-    assert np.array_equal(mm.h(x_and_p.estimate).flatten(), np.zeros(1))
+    assert np.array_equal(mm.h(x_and_p.estimate).flatten(), np.array([_lever_arm[2]]))
     assert np.allclose(mm.z, exp_z)
 
 
@@ -1053,11 +1056,14 @@ def test_generate_model_alt_msl(
     exp_H = np.zeros((1, 16))
     exp_H[0, 2] = -1
     exp_H[0, 15] = 1
+    assert inertial_pva.quaternion is not None
+    C = quat_to_dcm(inertial_pva.quaternion)
+    exp_H[0, 6:9] = skew(C @ _lever_arm)[2]
     exp_R = np.array([[alt.variance]])
     exp_z = hae_alt - inertial_pva.p3
     assert np.array_equal(mm.H, exp_H)
     assert np.array_equal(mm.R, exp_R)
-    assert np.array_equal(mm.h(x_and_p.estimate).flatten(), np.zeros(1))
+    assert np.array_equal(mm.h(x_and_p.estimate).flatten(), np.array([_lever_arm[2]]))
     assert np.allclose(mm.z, exp_z)
 
 
@@ -1089,11 +1095,14 @@ def test_generate_model_pos_alt(
     exp_H = np.zeros((1, 16))
     exp_H[0, 2] = -1
     exp_H[0, 15] = 1
+    assert inertial_pva.quaternion is not None
+    C = quat_to_dcm(inertial_pva.quaternion)
+    exp_H[0, 6:9] = skew(C @ _lever_arm)[2]
     exp_R = np.array([[pos.covariance[2, 2]]])
     exp_z = pos.term3 - inertial_pva.p3
     assert np.array_equal(mm.H, exp_H)
     assert np.array_equal(mm.R, exp_R)
-    assert np.array_equal(mm.h(x_and_p.estimate).flatten(), np.zeros(1))
+    assert np.array_equal(mm.h(x_and_p.estimate).flatten(), np.array([_lever_arm[2]]))
     assert np.allclose(mm.z, exp_z)
 
 

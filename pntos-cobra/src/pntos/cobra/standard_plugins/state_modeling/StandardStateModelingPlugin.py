@@ -88,7 +88,7 @@ class StandardStateModelProvider(api.StandardStateModelProvider):
             StateExtractorConfig.identifier,
         ]
 
-    def new_processor(
+    def new_processor(  # noqa: PLR0915
         self,
         processor_index: int,
         engine: StandardFusionEngine | None,
@@ -197,10 +197,27 @@ class StandardStateModelProvider(api.StandardStateModelProvider):
                     np.array(pos_fogm_mp_config.lever_arm),
                 )
             case 3:
+                if config_group is None:
+                    self._mediator.log_message(
+                        LoggingLevel.ERROR,
+                        f'A config group is required for processor {self.processor_identifiers[processor_index]}',
+                    )
+                    return None
+                alt_mp_config = config_from_registry(
+                    AltitudeMPConfig, self._mediator, config_group
+                )
+                if alt_mp_config is None:
+                    self._mediator.log_message(
+                        LoggingLevel.ERROR,
+                        'Could not get altitude MP config from registry.',
+                    )
+                    return None
+
                 return AltitudeMeasurementProcessor(
                     label,
                     state_block_labels,
                     self._mediator,
+                    np.array(alt_mp_config.lever_arm),
                 )
             case 4:
                 if config_group is None:

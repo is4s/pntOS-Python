@@ -1,5 +1,5 @@
 diff --git a/apps/standard/pos_ins.py b/apps/standard/outage_sim.py
-index eb98e009..c2f31637 100755
+index eb98e009..1887995e 100755
 --- a/apps/standard/pos_ins.py
 +++ b/apps/standard/outage_sim.py
 @@ -22,6 +22,8 @@ from pntos.cobra import (
@@ -51,7 +51,7 @@ index eb98e009..c2f31637 100755
          ),
          mp_configs=(
              PinsonWithNedFogmPositionMPConfig(
-@@ -102,6 +122,18 @@ my_config = [
+@@ -102,6 +122,19 @@ my_config = [
                  state_block_labels=('pinson15', 'pos_sensor_error'),
                  lever_arm=(-0.50, 0.38, -0.05),
              ),
@@ -60,6 +60,7 @@ index eb98e009..c2f31637 100755
 +                label='alt',
 +                channel='/sensor/bmp388/altitude',
 +                state_block_labels=('pinson15', 'alt_fogm'),
++                lever_arm=(0.0, 0.0, 1.0),
 +            ),
 +            PinsonVelocityMPConfig(
 +                group='config/vel_measurement_processor',
@@ -70,7 +71,7 @@ index eb98e009..c2f31637 100755
          ),
          inertial_config=InertialConfig(
              group='config/inertial',
-@@ -130,10 +162,25 @@ my_config = [
+@@ -130,10 +163,25 @@ my_config = [
              ),
              TimeBiasConfig(
                  group='config/time_bias',
