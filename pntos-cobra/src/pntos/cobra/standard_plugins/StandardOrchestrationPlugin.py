@@ -29,7 +29,6 @@ from pntos.api import (
     StateModelingPlugin,
 )
 from pntos.cobra.config import (
-    ControllerConfig,
     FeedbackConfig,
     MeasurementProcessorConfig,
     PinsonStateBlockConfig,
@@ -162,17 +161,8 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
                 'Unable to grab the orchestration config from the registry. Filter cannot be implemented.',
             )
             return
-        controller_config = config_from_registry(
-            ControllerConfig, self.mediator, ControllerConfig.group
-        )
-        if controller_config is None:
-            self._log(
-                LoggingLevel.ERROR,
-                'Unable to grab the controller config from the registry. Filter cannot be implemented.',
-            )
-            return
         # Store orchestration config fields
-        self._store_config_data(orch_config, controller_config)
+        self._store_config_data(orch_config)
 
         sorted_plugins = sort_plugins_dataclass(plugins)
         if not validate_plugins(
@@ -255,15 +245,12 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
     def _store_config_data(
         self,
         orch_config: StandardOrchestrationConfig,
-        controller_config: ControllerConfig,
     ) -> None:
         """
         Utility function to store the orchestration config fields in easily accessible data structures.
 
         Args:
             orch_config (StandardOrchestrationConfig): The ``StandardOrchestrationConfig`` containing the data
-                to be stored.
-            controller_config (ControllerConfig): The ``ControllerConfig`` containing additional data
                 to be stored.
         """
         # Pinson state block
@@ -279,7 +266,7 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
         self.inertial_channels = orch_config.inertial_config.channels
         self.inertial_group = orch_config.inertial_config.group
         self.max_prop_dt_ns = int(orch_config.max_prop_interval * 1e9)
-        self.buffer_time_ns = int(controller_config.buffer_length_sec * 1e9)
+        self.buffer_time_ns = int(orch_config.max_filter_lag * 1e9)
         self.feedback_config = orch_config.feedback_config
 
     def _initialize_filter(self) -> None:

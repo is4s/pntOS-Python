@@ -2,6 +2,8 @@ from dataclasses import dataclass, field
 
 from .BaseConfig import BaseConfig
 
+CONTROLLER_BUFFER_LENGTH_SEC = 2.0
+
 
 @dataclass
 class ControllerConfig(BaseConfig):
@@ -20,7 +22,7 @@ class ControllerConfig(BaseConfig):
     group: str = field(default='config/controller', init=False)
 
     # UNIQUE FIELDS
-    buffer_length_sec: float = 2.0
+    buffer_length_sec: float = CONTROLLER_BUFFER_LENGTH_SEC
     publish_interval: float | None = 1.0
 
 

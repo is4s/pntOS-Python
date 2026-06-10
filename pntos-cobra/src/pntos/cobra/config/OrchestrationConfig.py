@@ -3,6 +3,7 @@ from dataclasses import dataclass, field
 from pntos.api import EstimateWithCovariance
 
 from .BaseConfig import BaseConfig
+from .ControllerConfig import CONTROLLER_BUFFER_LENGTH_SEC
 from .FogmConfig import FogmConfig
 from .ImuConfig import ImuConfig
 from .InertialConfig import InertialConfig
@@ -792,4 +793,11 @@ class StandardOrchestrationConfig(BaseConfig):
     NOTE: It is recommended when enabling this feature that you disable
     `publish_interval` in ControllerConfig, otherwise filter solutions may be published
     out of order.
+    """
+
+    max_filter_lag: float = CONTROLLER_BUFFER_LENGTH_SEC
+    """
+    Maximum difference (in seconds) between current filter time and latest measurement
+    time. Filter will propagate forward to remain within this window of the latest
+    measurement time.
     """
