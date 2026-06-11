@@ -141,7 +141,6 @@ class StandardMediator(Mediator):
             solution = self.request_solutions(times)
             if solution is not None and solution[0] is not None:
                 self._ui_interface.new_mediator_message(solution[0])
-                self._log_message(LoggingLevel.DEBUG, f'Got a solution! {solution}')
                 for transport in self._transport_plugins:
                     self.broadcast_aspn_message(
                         solution[0],

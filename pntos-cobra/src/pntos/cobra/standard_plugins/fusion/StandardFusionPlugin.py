@@ -646,10 +646,6 @@ class StandardFusionEngine(api.StandardFusionEngine):
             message=message, gen_x_and_p_func=self.generate_x_and_p
         )
         if measurement_model is None:
-            self._mediator.log_message(
-                LoggingLevel.DEBUG,
-                'Unable to generate measurement model during update.',
-            )
             return
 
         # Make full size H matrix
