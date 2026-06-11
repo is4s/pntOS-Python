@@ -534,7 +534,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
         if processor.label in self._mp:
             self._mediator.log_message(
                 LoggingLevel.WARN,
-                f'Stateblock to be added ({processor.label}) already exists.  No action taken.',
+                f'Measurement processor to be added ({processor.label}) already exists.  No action taken.',
             )
             return
 
