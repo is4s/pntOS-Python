@@ -18,7 +18,7 @@ class LcmTransportConfig(BaseConfig):
     subscribe_to: str = '^((?!pntos).)*$'
 
 
-@dataclass
+@dataclass(kw_only=True)
 class LcmLogTransportConfig(BaseConfig):
     """
     Configuration for LcmLogTransportPlugin, which processes messages from an LCM log.
@@ -26,9 +26,9 @@ class LcmLogTransportConfig(BaseConfig):
 
     group: str = field(default='config/lcm_log_transport', kw_only=True, init=True)
 
-    input_file: str
+    input_file: str | None = None
     """
-    The path of the LCM log to be processed.
+    Optional path of an LCM log to be processed.
     """
 
     output_file: str

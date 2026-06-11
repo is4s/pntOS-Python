@@ -61,7 +61,7 @@ class LcmLogTransportPlugin(TransportPlugin):
             )
             return
 
-        self._input_log = EventLog(config.input_file)
+        self._input_log = EventLog(config.input_file) if config.input_file else None
         if config.output_file == config.input_file:
             self.mediator.log_message(
                 LoggingLevel.ERROR,
@@ -84,12 +84,16 @@ class LcmLogTransportPlugin(TransportPlugin):
         This is called by the pntOS system when it is done with the plugin.
         """
         self.stop_listening()
+        self._output_log.close()
         self.mediator.log_message(
             LoggingLevel.INFO, f'Shutdown plugin for {self.identifier}.'
         )
 
     def read_log(self) -> None:
         """Process messages from LCM log"""
+        if self._input_log is None:
+            return
+
         log_size = self._input_log.size()
         progressbar = tqdm(total=log_size, unit='B', unit_scale=True)
         fpos = self._input_log.tell()
@@ -126,7 +130,6 @@ class LcmLogTransportPlugin(TransportPlugin):
 
         progressbar.close()
         self._input_log.close()
-        self._output_log.close()
 
         if msg is None:
             # Reached end of log and pntOS has not been shut down yet
@@ -135,9 +138,10 @@ class LcmLogTransportPlugin(TransportPlugin):
                 kvs['ready_to_shutdown'] = True
 
     def start_listening(self) -> None:
-        self._log_reader_thread = Thread(target=self.read_log, args=[])
-        self._log_reader_thread.start()
-        self.mediator.log_message(LoggingLevel.INFO, 'LCM log reader is running.')
+        if self._input_log:
+            self._log_reader_thread = Thread(target=self.read_log, args=[])
+            self._log_reader_thread.start()
+            self.mediator.log_message(LoggingLevel.INFO, 'LCM log reader is running.')
 
     def stop_listening(self) -> None:
         self._shutdown_threads.set()
