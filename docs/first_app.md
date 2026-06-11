@@ -73,7 +73,9 @@ apps/tutorial/pos_ins.py
 
 Once the app is started, it will immediately start processing messages from the input log,
 with a progress bar tracking the percentage of messages that have been processed.
-Once the entire input log has been processed, you should see something like the following:
+Once the entire input log has been processed, the app will automatically shut down. For tutorial
+apps, a UI plugin for LCM log plotting is initiated on shutdown. You should see something like the
+following terminal output, followed by a set of plots displaying the results:
 
 ```text
 [17/02/2026 14:47:19] [LoggingPlugin] [INFO] using hard-coded global logging level INFO
@@ -89,14 +91,6 @@ Once the entire input log has been processed, you should see something like the 
 [18/02/2026 15:10:01] [TransportPlugin] [INFO] Found new channel /sensor/bmp388/baro_pressure    with a timestamp of 1747680880.328312635s
 100%|██████████████████████████████████████████████████████████████████████████████████████████████| 472M/472M [00:37<00:00, 12.7MB/s]
 [18/02/2026 15:10:38] [TransportPlugin] [INFO] Done processing LCM log.
-[17/02/2026 14:47:19] [ControllerPlugin] [INFO] Press Ctrl + C at any time to shut down pntOS...
-```
-
-
-For tutorial apps, a UI plugin for LCM log plotting is initiated on shutdown. Pressing `Ctrl + C` after running the tutorial app will start the shutdown process and display something like the following:
-
-```text
-[02/06/2026 15:12:30] [ControllerPlugin] [INFO] Keyboard Interrupt Detected.
 [02/06/2026 15:12:30] [ControllerPlugin] [INFO] Shutting down all plugins...
 [02/06/2026 15:12:30] [TransportPlugin] [INFO] Shutdown plugin for Cobra LCM Log Transport Plugin.
 Reading measurements from log...
@@ -131,7 +125,9 @@ apps/tutorial/pos_vel_ins.py
 
 Once the app is started, it will immediately start processing messages from the input log,
 with a progress bar tracking the percentage of messages that have been processed.
-Once the entire input log has been processed, you should see something like the following:
+Once the entire input log has been processed, the app will automatically shut down. For tutorial
+apps, a UI plugin for LCM log plotting is initiated on shutdown. You should see something like the
+following terminal output, followed by a set of plots displaying the results:
 
 ```text
 [17/02/2026 14:47:19] [LoggingPlugin] [INFO] using hard-coded global logging level INFO
@@ -147,13 +143,6 @@ Once the entire input log has been processed, you should see something like the 
 [18/02/2026 15:10:01] [TransportPlugin] [INFO] Found new channel /sensor/bmp388/baro_pressure    with a timestamp of 1747680880.328312635s
 100%|██████████████████████████████████████████████████████████████████████████████████████████████| 472M/472M [00:37<00:00, 12.7MB/s]
 [18/02/2026 15:10:38] [TransportPlugin] [INFO] Done processing LCM log.
-[17/02/2026 14:47:19] [ControllerPlugin] [INFO] Press Ctrl + C at any time to shut down pntOS...
-```
-
-For tutorial apps, a UI plugin for LCM log plotting is initiated on shutdown. Pressing `Ctrl + C` after running the tutorial app will start the shutdown process and display something like the following:
-
-```text
-[02/06/2026 15:12:30] [ControllerPlugin] [INFO] Keyboard Interrupt Detected.
 [02/06/2026 15:12:30] [ControllerPlugin] [INFO] Shutting down all plugins...
 [02/06/2026 15:12:30] [TransportPlugin] [INFO] Shutdown plugin for Cobra LCM Log Transport Plugin.
 Reading measurements from log...
@@ -188,7 +177,8 @@ apps/standard/pos_ins.py
 
 Once the app is started, it will immediately start processing messages from the input log,
 with a progress bar tracking the percentage of messages that have been processed.
-Once the entire input log has been processed, you should see something like the following:
+Once the entire input log has been processed, the app will automatically shutdown and you should see
+something like the following in the terminal:
 
 ```text
 [18/02/2026 15:47:50] [LoggingPlugin] [INFO] using hard-coded global logging level INFO
@@ -199,11 +189,13 @@ Once the entire input log has been processed, you should see something like the 
 [18/02/2026 15:47:50] [OrchestrationPlugin] [INFO] Aligned filter at 1747680889.549539804s
 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████▉| 472M/472M [00:26<00:00, 18.0MB/s]
 [18/02/2026 15:10:38] [TransportPlugin] [INFO] Done processing LCM log.
-[17/02/2026 14:47:19] [ControllerPlugin] [INFO] Press Ctrl + C at any time to shut down pntOS...
+[18/02/2026 15:10:38] [ControllerPlugin] [INFO] Shutting down all plugins...
+[18/02/2026 15:10:38] [TransportPlugin] [INFO] Shutdown plugin for Cobra LCM Log Transport Plugin.
+[18/02/2026 15:10:38] [LoggingPlugin] [INFO]  Logging plugin shut down correctly.
 ```
 
-The pntOS solution will be recorded to `pntos_output.log` and you can press `Ctrl + C` to shut down pntOS.
-For information on how to plot the pntOS solution from a log file, see [](#view-results-from-a-log-file).
+The pntOS solution will be recorded to `pntos_output.log`. For information on how to plot the pntOS
+solution from a log file, see [](#view-results-from-a-log-file).
 ````
 
 ````{tab-item} LCM Relay App

@@ -1,8 +1,8 @@
 diff --git a/pntos-cobra/src/pntos/cobra/standard_plugins//controller/StandardControllerPlugin.py b/pntos-cobra/src/pntos/cobra/advanced_plugins//buscat/BuscatControllerPlugin.py
-index f2a2d9204..b2a841155 100644
+index 4beee48e0..44cb190d8 100644
 --- a/pntos-cobra/src/pntos/cobra/standard_plugins//controller/StandardControllerPlugin.py
 +++ b/pntos-cobra/src/pntos/cobra/advanced_plugins//buscat/BuscatControllerPlugin.py
-@@ -7,59 +7,59 @@ from pntos.api import (
+@@ -7,59 +7,60 @@ from pntos.api import (
      LoggingLevel,
      LoggingPlugin,
      Mediator,
@@ -13,6 +13,7 @@ index f2a2d9204..b2a841155 100644
  )
 -from pntos.cobra.config import ControllerConfig, config_from_registry
 +from pntos.cobra.config import BuscatConfig, config_from_registry
++from pntos.cobra.standard_plugins.controller.StandardMediator import ExitCode
  from pntos.cobra.utils import (
      SortedPlugins,
 -    UiMediatorInterface,
@@ -22,7 +23,7 @@ index f2a2d9204..b2a841155 100644
      validate_plugins,
  )
  
--from .StandardMediator import StandardMediator
+-from .StandardMediator import ExitCode, StandardMediator
 -from .StandardMessageStreamConfig import StandardMessageStreamConfig
 +from .BuscatMediator import BuscatMediator
  
@@ -80,7 +81,7 @@ index f2a2d9204..b2a841155 100644
  
          Args:
              identifier (str): The plugin identifier passed to the
-@@ -112,22 +112,16 @@ class StandardControllerPlugin(ControllerPlugin):
+@@ -112,22 +113,16 @@ class StandardControllerPlugin(ControllerPlugin):
              self._registry_plugin,
              self._logging_plugin,
              self._transport_plugins,
@@ -105,7 +106,7 @@ index f2a2d9204..b2a841155 100644
              for p in self._plugins
          ]
  
-@@ -154,8 +148,7 @@ class StandardControllerPlugin(ControllerPlugin):
+@@ -154,8 +149,7 @@ class StandardControllerPlugin(ControllerPlugin):
          )
  
          # Give mediators a registry
@@ -115,7 +116,7 @@ index f2a2d9204..b2a841155 100644
  
          # Initialize logger second
          assert self._logging_plugin is not None
-@@ -168,7 +161,7 @@ class StandardControllerPlugin(ControllerPlugin):
+@@ -168,7 +162,7 @@ class StandardControllerPlugin(ControllerPlugin):
          )
  
          # Give mediators a logging plugin
@@ -124,7 +125,7 @@ index f2a2d9204..b2a841155 100644
  
          # call init_plugin() on all the other plugins
          for i, plugin in enumerate(self._plugins):
-@@ -182,46 +175,28 @@ class StandardControllerPlugin(ControllerPlugin):
+@@ -182,47 +176,29 @@ class StandardControllerPlugin(ControllerPlugin):
              )
  
          # Give the mediators other needed plugins
@@ -161,6 +162,7 @@ index f2a2d9204..b2a841155 100644
 -        if config.publish_interval is not None:
 -            StandardMediator._publish_interval_ns = int(config.publish_interval * 1e9)
 -
+         self._auto_shutdown = config.auto_shutdown
          # Pass off to main control loop
          self._main()
  
@@ -178,7 +180,7 @@ index f2a2d9204..b2a841155 100644
          """
          Utility function to ensure ``plugins`` contains enough plugins to run pntOS
          Cobra. Then assigns and dispatches them to the relevant fields on the
-@@ -229,34 +204,21 @@ class StandardControllerPlugin(ControllerPlugin):
+@@ -230,34 +206,21 @@ class StandardControllerPlugin(ControllerPlugin):
          not as expected.
          """
          sorted_plugins: SortedPlugins = sort_plugins_dataclass(plugins)
@@ -213,16 +215,25 @@ index f2a2d9204..b2a841155 100644
          )
  
      def _ready_to_shutdown_callback(
-@@ -303,10 +265,10 @@ class StandardControllerPlugin(ControllerPlugin):
+@@ -265,7 +228,7 @@ class StandardControllerPlugin(ControllerPlugin):
+     ) -> None:
+         if 'ready_to_shutdown' in modified_keys and kvs['ready_to_shutdown']:
+             if self._auto_shutdown:
+-                StandardMediator._exit_event.set(ExitCode.SUCCESS)
++                BuscatMediator._exit_event.set(ExitCode.SUCCESS)
+             else:
+                 self._log(
+                     LoggingLevel.INFO,
+@@ -307,10 +270,10 @@ class StandardControllerPlugin(ControllerPlugin):
                  'Press Ctrl + C at any time to shut down pntOS...',
              )
              try:
--                StandardMediator._logging_error_event.wait()
-+                BuscatMediator._logging_error_event.wait()
+-                StandardMediator._exit_event.wait()
++                BuscatMediator._exit_event.wait()
              except KeyboardInterrupt:
                  self._log(LoggingLevel.INFO, 'Keyboard Interrupt Detected.')
  
          self.shutdown_plugin()
--        if StandardMediator._logging_error_event.is_set():
-+        if BuscatMediator._logging_error_event.is_set():
+-        if StandardMediator._exit_event.exit_code == ExitCode.ERROR:
++        if BuscatMediator._exit_event.exit_code == ExitCode.ERROR:
              sys.exit(1)

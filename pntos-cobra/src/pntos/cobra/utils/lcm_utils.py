@@ -207,6 +207,9 @@ def run_pntos_with_log_transport(
 ) -> int:  # pragma: no cover
     """Spin up app, process log, then shut down.
 
+    NOTE: Assumes controller plugin is configured to automatically shutdown when
+    processing is complete.
+
     Args:
         app (pathlib.Path): Path to app to run.
         args (list[str] | None): Optional command-line arguments to pass to app (e.g. output log).
@@ -216,25 +219,12 @@ def run_pntos_with_log_transport(
     Returns:
         Return code of app. Will be 0 if app ran and terminated successfully.
     """
-    # initialize process variables to avoid possibly unbound errors
-    app_process = None
+    app_process = run_app(app, args)
 
-    try:
-        app_process = run_app(app, args, validate=validate)
+    assert app_process.stdout is not None
+    monitor_app_output(app_process.stdout, validate=validate)
 
-        # Wait until pntOS is done processing the LCM log
-        done_msg = 'Done processing LCM log.'
-        assert app_process.stdout is not None
-        monitor_app_output(app_process.stdout, validate=validate, wait_for_msg=done_msg)
-
-        # Continue to forward app output to stdout
-        monitor_app_output(app_process.stdout, separate_thread=True)
-
-    finally:
-        if app_process is not None:
-            kill(app_process)
-
-    return app_process.returncode if app_process else -1
+    return app_process.wait()
 
 
 def run_pntos_with_network_transport(

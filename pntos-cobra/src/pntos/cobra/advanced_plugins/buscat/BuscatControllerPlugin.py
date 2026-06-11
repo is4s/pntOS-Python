@@ -12,6 +12,7 @@ from pntos.api import (
     UiPlugin,
 )
 from pntos.cobra.config import BuscatConfig, config_from_registry
+from pntos.cobra.standard_plugins.controller.StandardMediator import ExitCode
 from pntos.cobra.utils import (
     SortedPlugins,
     find_base_plugin_type,
@@ -191,6 +192,7 @@ class BuscatControllerPlugin(ControllerPlugin):
         with temp_mediator.registry.batch_start('controller/flags') as kvs:
             kvs.request_notify('ready_to_shutdown', self._ready_to_shutdown_callback)
 
+        self._auto_shutdown = config.auto_shutdown
         # Pass off to main control loop
         self._main()
 
@@ -225,10 +227,13 @@ class BuscatControllerPlugin(ControllerPlugin):
         self, group: str, modified_keys: list[str], kvs: KeyValueStore
     ) -> None:
         if 'ready_to_shutdown' in modified_keys and kvs['ready_to_shutdown']:
-            self._log(
-                LoggingLevel.INFO,
-                'Press Ctrl + C at any time to shut down pntOS...',
-            )
+            if self._auto_shutdown:
+                BuscatMediator._exit_event.set(ExitCode.SUCCESS)
+            else:
+                self._log(
+                    LoggingLevel.INFO,
+                    'Press Ctrl + C at any time to shut down pntOS...',
+                )
 
     def _log(self, level: LoggingLevel, message: str) -> None:
         """
@@ -265,10 +270,10 @@ class BuscatControllerPlugin(ControllerPlugin):
                 'Press Ctrl + C at any time to shut down pntOS...',
             )
             try:
-                BuscatMediator._logging_error_event.wait()
+                BuscatMediator._exit_event.wait()
             except KeyboardInterrupt:
                 self._log(LoggingLevel.INFO, 'Keyboard Interrupt Detected.')
 
         self.shutdown_plugin()
-        if BuscatMediator._logging_error_event.is_set():
+        if BuscatMediator._exit_event.exit_code == ExitCode.ERROR:
             sys.exit(1)

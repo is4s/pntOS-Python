@@ -1,4 +1,3 @@
-from threading import Event
 from typing import ClassVar
 
 from aspn23 import TypeTimestamp
@@ -12,6 +11,7 @@ from pntos.api import (
     Registry,
     TransportPlugin,
 )
+from pntos.cobra.standard_plugins.controller.StandardMediator import ExitCode, ExitEvent
 from pntos.cobra.utils import print_message
 
 
@@ -26,7 +26,7 @@ class BuscatMediator(Mediator):
     _output_transports: ClassVar[list[str]] = []
     _transport_plugins: ClassVar[list[TransportPlugin]] = []
     _controller_plugin: ControllerPlugin | None = None
-    _logging_error_event: Event = Event()
+    _exit_event: ExitEvent = ExitEvent()
     registry: Registry
 
     def __init__(
@@ -110,4 +110,4 @@ class BuscatMediator(Mediator):
                 message,
             )
         if level is LoggingLevel.ERROR and self._controller_plugin is not None:
-            self._logging_error_event.set()
+            self._exit_event.set(ExitCode.ERROR)

@@ -1,4 +1,5 @@
 import bisect
+from enum import IntEnum
 from threading import Event
 from typing import ClassVar
 
@@ -19,6 +20,25 @@ from pntos.cobra.utils import UiMediatorInterface, print_message
 from .StandardMessageStreamConfig import StandardMessageStreamConfig
 
 
+class ExitCode(IntEnum):
+    SUCCESS = 0
+    ERROR = 1
+
+
+class ExitEvent(Event):
+    def __init__(self) -> None:
+        super().__init__()
+        self.exit_code: ExitCode = ExitCode.SUCCESS
+
+    def set(self, exit_code: ExitCode = ExitCode.SUCCESS) -> None:
+        self.exit_code = exit_code
+        super().set()
+
+    def clear(self) -> None:
+        self.exit_code = ExitCode.SUCCESS
+        super().clear()
+
+
 def _get_time(msg: Message) -> int:
     """Returns the time of the message in nanoseconds."""
     return int(msg.wrapped_message.time_of_validity.elapsed_nsec)  # type: ignore[attr-defined]
@@ -36,7 +56,7 @@ class StandardMediator(Mediator):
     _orchestration_plugin: OrchestrationPlugin | None = None
     _controller_plugin: ControllerPlugin | None = None
     _stream_config: StandardMessageStreamConfig
-    _logging_error_event: Event = Event()
+    _exit_event: ExitEvent = ExitEvent()
     registry: Registry
     _messages: ClassVar[list[Message]] = []
     _buffer_time_nsec: int
@@ -174,4 +194,4 @@ class StandardMediator(Mediator):
                 message,
             )
         if level is LoggingLevel.ERROR and self._controller_plugin is not None:
-            self._logging_error_event.set()
+            self._exit_event.set(ExitCode.ERROR)

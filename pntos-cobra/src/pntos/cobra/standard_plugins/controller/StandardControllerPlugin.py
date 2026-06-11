@@ -22,7 +22,7 @@ from pntos.cobra.utils import (
     validate_plugins,
 )
 
-from .StandardMediator import StandardMediator
+from .StandardMediator import ExitCode, StandardMediator
 from .StandardMessageStreamConfig import StandardMessageStreamConfig
 
 
@@ -209,6 +209,7 @@ class StandardControllerPlugin(ControllerPlugin):
         if config.publish_interval is not None:
             StandardMediator._publish_interval_ns = int(config.publish_interval * 1e9)
 
+        self._auto_shutdown = config.auto_shutdown
         # Pass off to main control loop
         self._main()
 
@@ -263,10 +264,13 @@ class StandardControllerPlugin(ControllerPlugin):
         self, group: str, modified_keys: list[str], kvs: KeyValueStore
     ) -> None:
         if 'ready_to_shutdown' in modified_keys and kvs['ready_to_shutdown']:
-            self._log(
-                LoggingLevel.INFO,
-                'Press Ctrl + C at any time to shut down pntOS...',
-            )
+            if self._auto_shutdown:
+                StandardMediator._exit_event.set(ExitCode.SUCCESS)
+            else:
+                self._log(
+                    LoggingLevel.INFO,
+                    'Press Ctrl + C at any time to shut down pntOS...',
+                )
 
     def _log(self, level: LoggingLevel, message: str) -> None:
         """
@@ -303,10 +307,10 @@ class StandardControllerPlugin(ControllerPlugin):
                 'Press Ctrl + C at any time to shut down pntOS...',
             )
             try:
-                StandardMediator._logging_error_event.wait()
+                StandardMediator._exit_event.wait()
             except KeyboardInterrupt:
                 self._log(LoggingLevel.INFO, 'Keyboard Interrupt Detected.')
 
         self.shutdown_plugin()
-        if StandardMediator._logging_error_event.is_set():
+        if StandardMediator._exit_event.exit_code == ExitCode.ERROR:
             sys.exit(1)
