@@ -57,6 +57,7 @@ class Direction3DToPointsMeasurementProcessor(StandardMeasurementProcessor):
             l_ps_p (NDArray[float64]): A 3-element array representing the lever arm from the
                 platform frame origin to the position sensor origin, in the platform frame, in
                 units of meters.
+            orientation (NDArray[float64]): A 4 element quaternion array representing the sensor frame angle offset from the platform frame.
         """
         self.label = label
         self.state_block_labels = state_block_labels
@@ -103,7 +104,7 @@ class Direction3DToPointsMeasurementProcessor(StandardMeasurementProcessor):
 
         self._inertial_pva = pva
 
-    def generate_model(  # noqa: PLR0915
+    def generate_model(
         self, message: Message, gen_x_and_p_func: GenXandP
     ) -> StandardMeasurementModel | None:
         """
@@ -122,8 +123,94 @@ class Direction3DToPointsMeasurementProcessor(StandardMeasurementProcessor):
 
         **Model Description and Derivation**
 
-        TODO: Add model description and derivation
+        Measurements accepted by this processor are modeled as
 
+        :math:`U_{s \\Rightarrow f}^s = \\frac{C_p^s C_g^p (P_f^g - (P_p^g + C_p^g l_{p \\Rightarrow s}^p))}{|| C_p^s C_g^p (P_f^g - (P_p^g + C_p^g l_{p \\Rightarrow s}^p)) ||} + \\eta(0,\\sigma_z)`
+
+        .. _note-label:
+
+        .. note:: The Direction3DToPointsMeasurement for this processor is a sine-space measurement type, meaning the received measurements are 2-element arrays represented by the y and z components of the unit vector above.
+
+        where
+
+        :math:`U_{s \\Rightarrow f}^s` is the measured unit vector describing the direction to the position of some feature :math:`P_f^g` along the vector from :math:`s` sensor to :math:`f` feature.
+
+        :math:`C_p^s` is the true rotation from the :math:`p` platform frame to the :math:`s` sensor frame.
+
+        :math:`C_g^p` is the true rotation from some global Cartesian frame :math:`g` to the :math:`p` platform frame.
+
+        :math:`P_f^g` is the true position of the :math:`f` feature in the :math:`g` frame.
+
+        :math:`P_p^g` is the true position of the :math:`p` platform frame origin in the :math:`g` frame.
+
+        :math:`C_p^g` is the true rotation from the :math:`p` platform frame to the :math:`g` frame.
+
+        :math:`l_{p \\Rightarrow s}^p` is the lever arm, a vector from the :math:`p` frame origin to the :math:`s` frame origin, expressed in the :math:`p` frame.
+
+        :math:`\\eta(0, \\sigma_z)` is 0-mean Gaussian white noise.
+
+        :math:`||` is the magnitude of the vector inside these symbols.
+
+        In other words, the measurement is modeled as perfect aside from white noise, offset from the
+        platform frame by a known lever arm.
+
+        The measurement is used to update the estimates of the error in the nominal trajectory of the
+        platform frame, provided through a `MeasurementPositionVelocityAttitude` (PVA) via the
+        :meth:`receive_aux_data` function. This PVA provides the following values of interest:
+
+        :math:`\\hat{P}_p^g`: The estimated position of the platform frame origin in the g frame.
+
+        :math:`\\hat{C}^{ned}_p`: The estimated orientation of the platform frame with respect to the North-East-Down (NED) frame.
+
+        We wish to use this measurement to update estimates of the following states contained in the
+        'Pinson' state block:
+
+        :math:`\\delta P_p^{ned}`: The estimate of the error in the current nominal position of the
+        platform frame, expressed in the NED frame. The relationship between the true
+        position, the nominal position, and the error state estimates is :math:`P = \\hat{P} + \\delta P`
+
+        :math:`\\delta \\psi^{ned}`: The NED frame tilt error estimates. The relationship between the true
+        and estimated rotations is :math:`C^{ned}_p = C^{ned}_{\\hat{ned}}C^{\\hat{ned}}_p \\approx [I - \\delta \\psi^{ned} \\times ]C^{\\hat{ned}}_p`
+        (where :math:`\\times` is the skew/cross operator).
+
+        The measurement vector provided to the filter :math:`z` is the difference between the
+        measurement and the predicted unit vector to the feature using nominal platform position and orientation (white noise terms dropped, and :math:`ned` frame used as `g` frame):
+
+        :math:`z = U_{s \\Rightarrow f}^s  - \\hat{U}_{s \\Rightarrow f}^s`
+
+        The measurement model :math:`h(x)` is found by expanding :math:`z` in terms of the states :math:`x` (i.e. :math:`\\delta P_p^{ned}` and :math:`\\delta \\psi^{ned}`):
+
+        :math:`z = U_{s \\Rightarrow f}^s  - \\hat{U}_{s \\Rightarrow f}^s = \\frac{\\vec{v}_{s \\Rightarrow f}^s}{||\\vec{v}_{s \\Rightarrow f}^s||} - \\frac{\\hat{\\vec{v}}_{s \\Rightarrow f}^s}{||\\hat{\\vec{v}}_{s \\Rightarrow f}^s||}`
+
+        where we can expand the true numerator :math:`\\vec{v}_{s \\Rightarrow f}^s` using the error state definitions above:
+
+        :math:`\\vec{v}_{s \\Rightarrow f}^s = C_p^s C_{ned}^p (P_f^{ned} - (P_p^{ned} + C_p^{ned} l_{p \\Rightarrow s}^p))`
+
+        :math:`= C_p^s \\hat{C}_{ned}^p [I + \\delta\\psi^{ned} \\times](P_f^{ned} - ((\\hat{P}_p^{ned} + \\delta P_p^{ned}) + [I - \\delta\\psi^{ned} \\times] \\hat{C}_p^{ned} l_{p \\Rightarrow s}^p)`
+
+        After expanding the solution above, the higher-order error products (:math:`2^{nd}` order or higher) can be dropped, giving us the following :
+
+        :math:`= C_p^s \\hat{C}_{ned}^p (P_f^{ned} - \\hat{P}_p^{ned} - \\hat{C}_p^{ned} l_{p \\Rightarrow s}^p) + C_p^s \\hat{C}_{ned}^p [\\delta\\psi^{ned} \\times] (P_f^{ned} - \\hat{P}_p^{ned} - \\hat{C}_p^{ned} l_{p \\Rightarrow s}^p) - C_p^s \\hat{C}_{ned}^p \\delta P_p^{ned} + C_p^s \\hat{C}_{ned}^p [\\delta\\psi^{ned} \\times]\\hat{C}_p^{ned} l_{p \\Rightarrow s}^p`
+
+        :math:`= C_p^s \\hat{C}_{ned}^p (P_f^{ned} - \\hat{P}_p^{ned} - \\hat{C}_p^{ned} l_{p \\Rightarrow s}^p) - C_p^s \\hat{C}_{ned}^p [(P_f^{ned} - \\hat{P}_p^{ned}) \\times] \\delta\\psi - C_p^s \\hat{C}_{ned}^p \\delta P_p^{ned}`
+
+        :math:`= \\hat{\\vec{v}}_{s \\Rightarrow f}^s - C_p^s \\hat{C}_{ned}^p [(P_f^{ned} - \\hat{P}_p^{ned}) \\times] \\delta\\psi - C_p^s \\hat{C}_{ned}^p \\delta P_p^{ned}`
+
+        The numerator estimate :math:`\\hat{\\vec{v}}_{s \\Rightarrow f}^s` can now be subtracted to satisfy the :math:`\\delta \\vec{v}_{s \\Rightarrow f}^s = \\vec{v}_{s \\Rightarrow f}^s - \\hat{\\vec{v}}_{s \\Rightarrow f}^s` definition:
+
+        :math:`\\delta \\vec{v}_{s \\Rightarrow f}^s = -C_p^s \\hat{C}_{ned}^p [(P_f^{ned} - \\hat{P}_p^{ned}) \\times] \\delta\\psi - C_p^s \\hat{C}_{ned}^p \\delta P_p^{ned}`
+
+        Using the identity :math:`\\delta U \\approx A \\delta v` where :math:`A = \\frac{I - \\hat{U} \\hat{U}^T}{||\\hat{v}||}` (bottom 2x3 is used for this processor by dropping the first row, see :ref:`Note <note-label>` above), the measurement model :math:`h(x)` for the whole unit vector can be found:
+
+        :math:`h(x) \\approx A (-C_p^s \\hat{C}_{ned}^p [(P_f^{ned} - \\hat{P}_p^{ned}) \\times] \\delta\\psi) - A (C_p^s \\hat{C}_{ned}^p \\delta P_p^{ned})`
+
+        where :math:`h(x)` is a 2x1 array, matching the size of the measurements.
+
+        Finally, to generate the measurement Jacobian :math:`H` we take derivatives of :math:`h(x)`:
+
+        :math:`\\frac{\\delta h(x)}{d \\delta P_p^{ned}} = -A C_p^s \\hat{C}_{ned}^p`
+
+        :math:`\\frac{\\delta h(x)}{d \\delta \\psi^{ned}} = -A C_p^s \\hat{C}_{ned}^p [(P_f^{ned} - \\hat{P}_p^{ned}) \\times]`
         """
         if len(self.state_block_labels) != self._num_required_blocks:
             self._mediator.log_message(
@@ -251,24 +338,12 @@ class Direction3DToPointsMeasurementProcessor(StandardMeasurementProcessor):
         # Measurement Function
         def h(x: NDArray[np.float64]) -> NDArray[np.float64]:
             dpos_ned = x[0:3, 0].reshape(3, 1)
-            dtheta_ned = x[6:9, 0]
+            dtheta_ned = x[6:9, 0].reshape(3, 1)
 
-            # Predict perturbed unit vector
-            delta_pos_sensor_p = (
-                C_nav_to_sensor
-                @ ((I3x3 + skew(dtheta_ned)) @ (delta_pos[:, :, None] - dpos_ned))
-                - C_platform_to_sensor @ l_s
+            out: NDArray[np.float64] = (
+                -temp @ C_nav_to_sensor @ dpos_ned[None, :, :]
+                - temp @ C_nav_to_sensor @ skew(delta_pos) @ dtheta_ned[None, :, :]
             )
-            norm_p = np.linalg.norm(delta_pos_sensor_p, axis=1)[:, None, :]
-            u_p = delta_pos_sensor_p / norm_p
-
-            # Predict nominal unit vector (no error)
-            delta_pos_sensor_n = (
-                C_nav_to_sensor @ delta_pos[:, :, None] - C_platform_to_sensor @ l_s
-            )
-            norm_n = np.linalg.norm(delta_pos_sensor_n, axis=1)[:, None, :]
-
-            out: NDArray[float64] = u_p[:, 1:3] - (delta_pos_sensor_n / norm_n)[:, 1:3]
 
             return out.reshape(-1, 1)
 
