@@ -49,6 +49,9 @@ from .standard_plugins.preprocessor.TimeAdjusterPreprocessor import (
 from .standard_plugins.preprocessor.TimeBiasPreprocessor import (
     TimeBiasPreprocessor as TimeBiasPreprocessor,
 )
+from .standard_plugins.PvaMessageInitializationPlugin import (
+    PvaMessageInitialization as PvaMessageInitialization,
+)
 from .standard_plugins.StandardInertialPlugin import (
     StandardInertial as StandardInertial,
 )

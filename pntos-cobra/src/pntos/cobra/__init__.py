@@ -46,6 +46,9 @@ from .standard_plugins.ManualHeadingAlignInitializationPlugin import (
 from .standard_plugins.preprocessor.StandardPreprocessorPlugin import (
     StandardPreprocessorPlugin as StandardPreprocessorPlugin,
 )
+from .standard_plugins.PvaMessageInitializationPlugin import (
+    PvaMessageInitializationPlugin as PvaMessageInitializationPlugin,
+)
 from .standard_plugins.StandardInertialPlugin import (
     StandardInertialPlugin as StandardInertialPlugin,
 )

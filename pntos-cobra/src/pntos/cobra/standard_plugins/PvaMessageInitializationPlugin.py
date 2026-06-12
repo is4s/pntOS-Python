@@ -42,7 +42,7 @@ class PvaMessageInitialization(InertialInitializationStrategy):
         Constructor.
 
         Args:
-            config_group (str): A :class:`~pntos.cobra.config.PvaMessageAlignmentWithDataConfig` config group.
+            config_group (str): A :class:`~pntos.cobra.config.PvaMessageInitializationConfig` config group.
             mediator (Mediator): A :class:`~pntos.api.Mediator` instance.
         """
         self.mediator = mediator
@@ -101,7 +101,7 @@ class PvaMessageInitialization(InertialInitializationStrategy):
 
         # Initialize from current PVA
         initial_pva = deepcopy(message.wrapped_message)
-        if self._initial_pva_cov:
+        if self._initial_pva_cov is not None:
             # Override PVA covariance
             initial_pva.covariance = self._initial_pva_cov
 
