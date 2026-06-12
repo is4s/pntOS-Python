@@ -21,6 +21,7 @@ mypy apps/tutorial/ --no-implicit-reexport
 mypy apps/dummy/ --no-implicit-reexport
 source util/check_sync.sh
 ret_val=$?  # this must be set after check_sync to observe if it passed or not
+source util/build_docs.sh
 pytest pntos-cobra --cov --cov-fail-under=75 --cov-report={term,html} --cov-config=.coveragerc
 
 # don't print the following commands
