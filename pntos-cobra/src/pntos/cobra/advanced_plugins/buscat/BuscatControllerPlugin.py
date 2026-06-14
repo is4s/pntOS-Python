@@ -188,6 +188,7 @@ class BuscatControllerPlugin(ControllerPlugin):
             )
             return
         BuscatMediator._output_transports.extend(config.output_transports or ())
+        BuscatMediator._output_channel_prefix = config.output_channel_prefix
 
         with temp_mediator.registry.batch_start('controller/flags') as kvs:
             kvs.request_notify('ready_to_shutdown', self._ready_to_shutdown_callback)

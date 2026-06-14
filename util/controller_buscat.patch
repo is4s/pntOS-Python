@@ -1,5 +1,5 @@
 diff --git a/pntos-cobra/src/pntos/cobra/standard_plugins//controller/StandardControllerPlugin.py b/pntos-cobra/src/pntos/cobra/advanced_plugins//buscat/BuscatControllerPlugin.py
-index 4beee48e0..44cb190d8 100644
+index 4beee48e0..f5966f6f7 100644
 --- a/pntos-cobra/src/pntos/cobra/standard_plugins//controller/StandardControllerPlugin.py
 +++ b/pntos-cobra/src/pntos/cobra/advanced_plugins//buscat/BuscatControllerPlugin.py
 @@ -7,59 +7,60 @@ from pntos.api import (
@@ -125,7 +125,7 @@ index 4beee48e0..44cb190d8 100644
  
          # call init_plugin() on all the other plugins
          for i, plugin in enumerate(self._plugins):
-@@ -182,47 +176,29 @@ class StandardControllerPlugin(ControllerPlugin):
+@@ -182,47 +176,30 @@ class StandardControllerPlugin(ControllerPlugin):
              )
  
          # Give the mediators other needed plugins
@@ -154,6 +154,7 @@ index 4beee48e0..44cb190d8 100644
              )
              return
 +        BuscatMediator._output_transports.extend(config.output_transports or ())
++        BuscatMediator._output_channel_prefix = config.output_channel_prefix
  
          with temp_mediator.registry.batch_start('controller/flags') as kvs:
              kvs.request_notify('ready_to_shutdown', self._ready_to_shutdown_callback)
@@ -180,7 +181,7 @@ index 4beee48e0..44cb190d8 100644
          """
          Utility function to ensure ``plugins`` contains enough plugins to run pntOS
          Cobra. Then assigns and dispatches them to the relevant fields on the
-@@ -230,34 +206,21 @@ class StandardControllerPlugin(ControllerPlugin):
+@@ -230,34 +207,21 @@ class StandardControllerPlugin(ControllerPlugin):
          not as expected.
          """
          sorted_plugins: SortedPlugins = sort_plugins_dataclass(plugins)
@@ -215,7 +216,7 @@ index 4beee48e0..44cb190d8 100644
          )
  
      def _ready_to_shutdown_callback(
-@@ -265,7 +228,7 @@ class StandardControllerPlugin(ControllerPlugin):
+@@ -265,7 +229,7 @@ class StandardControllerPlugin(ControllerPlugin):
      ) -> None:
          if 'ready_to_shutdown' in modified_keys and kvs['ready_to_shutdown']:
              if self._auto_shutdown:
@@ -224,7 +225,7 @@ index 4beee48e0..44cb190d8 100644
              else:
                  self._log(
                      LoggingLevel.INFO,
-@@ -307,10 +270,10 @@ class StandardControllerPlugin(ControllerPlugin):
+@@ -307,10 +271,10 @@ class StandardControllerPlugin(ControllerPlugin):
                  'Press Ctrl + C at any time to shut down pntOS...',
              )
              try:

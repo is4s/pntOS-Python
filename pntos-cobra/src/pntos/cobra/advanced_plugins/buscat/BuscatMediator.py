@@ -27,6 +27,8 @@ class BuscatMediator(Mediator):
     _transport_plugins: ClassVar[list[TransportPlugin]] = []
     _controller_plugin: ControllerPlugin | None = None
     _exit_event: ExitEvent = ExitEvent()
+    _output_channel_prefix: str = ''
+
     registry: Registry
 
     def __init__(
@@ -59,10 +61,10 @@ class BuscatMediator(Mediator):
 
     def process_pntos_message(self, message: Message) -> None:
         # pass to designated transport plugin for broadcast
-        if message.source_identifier.startswith('/buscat/pntos'):
+        if message.source_identifier.startswith(self._output_channel_prefix):
             channel = message.source_identifier
         else:
-            channel = '/buscat/pntos' + message.source_identifier
+            channel = self._output_channel_prefix + message.source_identifier
 
         for output_transport in self._output_transports:
             self.broadcast_aspn_message(
