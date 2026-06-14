@@ -106,14 +106,6 @@ def process_lcm_message(
         data (bytes): A message represented in binary.
         channels (set[str]): Set of channels found so far.
     """
-    # Do not process messages sent from pntos.
-    if 'pntos' in channel:
-        mediator.log_message(
-            LoggingLevel.DEBUG,
-            'pntOS channel message, not processing in ASPN handler.',
-        )
-        return
-
     try:
         lcm_aspn_msg = decode_aspn_lcm_msg(data)
     except ValueError as e:
