@@ -68,7 +68,11 @@ class LcmLogTransportPlugin(TransportPlugin):
                 f'Output file of {config.output_file} cannot be the same as input file.',
             )
             return
-        self._output_log = EventLog(config.output_file, 'w', overwrite=True)
+        self._output_log = (
+            EventLog(config.output_file, 'w', overwrite=True)
+            if config.output_file
+            else None
+        )
 
         self._channels_to_process = (
             set(config.channels_to_process)
@@ -84,7 +88,8 @@ class LcmLogTransportPlugin(TransportPlugin):
         This is called by the pntOS system when it is done with the plugin.
         """
         self.stop_listening()
-        self._output_log.close()
+        if self._output_log:
+            self._output_log.close()
         self.mediator.log_message(
             LoggingLevel.INFO, f'Shutdown plugin for {self.identifier}.'
         )
@@ -101,7 +106,7 @@ class LcmLogTransportPlugin(TransportPlugin):
         # Read until end of log or until pntOS is shut down
         msg: Event | None = self._input_log.read_next_event()
         while msg is not None and not self._shutdown_threads.is_set():
-            if self._record_input_channels:
+            if self._output_log and self._record_input_channels:
                 # write input messages to output log so that they can be analyzed along with
                 # any messages that are output via broadcast_message
                 time_microsec = int(time() * 1e6)
@@ -150,6 +155,13 @@ class LcmLogTransportPlugin(TransportPlugin):
         self, message: Message, channel_name: str | None = None
     ) -> None:
         """Record LCM message to output file"""
+        if not self._output_log:
+            self.mediator.log_message(
+                LoggingLevel.ERROR,
+                'Cannot output message via LcmLogTransportPlugin. Output file has not been set in LcmLogTransportConfig.',
+            )
+            return
+
         if channel_name is None:
             self.mediator.log_message(
                 LoggingLevel.WARN,

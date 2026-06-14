@@ -31,9 +31,9 @@ class LcmLogTransportConfig(BaseConfig):
     Optional path of an LCM log to be processed.
     """
 
-    output_file: str
+    output_file: str | None = None
     """
-    The path of the LCM log to which the transport should record messages.
+    Optional path of the LCM log to which the transport should record messages.
 
     NOTE: If output_file already exists, it will be overwritten. Thus, it must be different from input_file.
     """
