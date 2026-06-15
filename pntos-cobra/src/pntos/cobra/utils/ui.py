@@ -67,7 +67,7 @@ class AspnBaseWithTOV(AspnBase, Protocol):
 
 
 def has_tov(measurement: AspnBase) -> TypeGuard[AspnBaseWithTOV]:
-    return isinstance(measurement, AspnBaseWithTOV)
+    return hasattr(measurement, 'time_of_validity')
 
 
 class ChannelView:
