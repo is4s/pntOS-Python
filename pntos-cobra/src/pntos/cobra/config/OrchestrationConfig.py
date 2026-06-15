@@ -1,3 +1,4 @@
+from copy import deepcopy
 from dataclasses import dataclass, field
 
 from pntos.api import EstimateWithCovariance
@@ -8,6 +9,7 @@ from .FogmConfig import FogmConfig
 from .ImuConfig import ImuConfig
 from .InertialConfig import InertialConfig
 from .PreprocessorConfig import PreprocessorConfig
+from .StreamConfig import DEFAULT_STREAM_CONFIG, StreamConfig
 from .VirtualStateBlockConfig import VirtualStateBlockConfig
 
 
@@ -801,3 +803,10 @@ class StandardOrchestrationConfig(BaseConfig):
     time. Filter will propagate forward to remain within this window of the latest
     measurement time.
     """
+
+    stream_config: StreamConfig = field(
+        default_factory=lambda: deepcopy(DEFAULT_STREAM_CONFIG)
+    )
+    """Stream configuration specifying which message types and channels to buffer.
+
+    Default stream config buffers all message types except IMU."""

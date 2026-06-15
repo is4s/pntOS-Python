@@ -1,13 +1,8 @@
-from enum import IntEnum
 from typing import ClassVar
 
 from aspn23 import AspnBase
 from pntos.api import MessageStreamConfig
-
-
-class BufferMode(IntEnum):
-    IMMEDIATE = 0
-    SEQUENCED = 1
+from pntos.cobra.config import BufferMode
 
 
 class StandardMessageStreamConfig(MessageStreamConfig):

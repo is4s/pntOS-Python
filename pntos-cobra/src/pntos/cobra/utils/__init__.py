@@ -6,6 +6,7 @@ from .arrays import (
     validate_array as validate_array,
     validate_manual_ewc as validate_manual_ewc,
 )
+from .aspn import ASPN_MESSAGE_TYPE_MAP as ASPN_MESSAGE_TYPE_MAP
 from .conversions import (
     convert_alignment as convert_alignment,
     convert_header_from_cpp as convert_header_from_cpp,

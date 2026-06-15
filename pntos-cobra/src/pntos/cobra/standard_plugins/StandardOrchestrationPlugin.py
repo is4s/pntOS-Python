@@ -1,6 +1,5 @@
 import numpy as np
 from aspn23 import (
-    MeasurementImu,
     TypeTimestamp,
 )
 from numpy import float64
@@ -29,16 +28,19 @@ from pntos.api import (
     StateModelingPlugin,
 )
 from pntos.cobra.config import (
+    BufferMode,
     FeedbackConfig,
     MeasurementProcessorConfig,
     PinsonStateBlockConfig,
     PreprocessorConfig,
     StandardOrchestrationConfig,
     StateBlockConfig,
+    StreamConfig,
     VirtualStateBlockConfig,
 )
 from pntos.cobra.config.utils import config_from_registry
 from pntos.cobra.utils import (
+    ASPN_MESSAGE_TYPE_MAP,
     Cache,
     EstimateWithCovarianceEntry,
     FilterSolutionEntry,
@@ -136,12 +138,32 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
         else:
             print_message(level, OrchestrationPlugin.__name__, message)  # type: ignore[unreachable]
 
+    def _set_stream_config(
+        self,
+        registry_stream_config: StreamConfig,
+        controller_stream_config: MessageStreamConfig,
+    ) -> None:
+        """Use stream config from registry to set stream config for controller."""
+        if registry_stream_config.default_buffer_mode == BufferMode.SEQUENCED:
+            controller_stream_config.sequenced_stream_all(True)
+            override_stream_func = controller_stream_config.immediate_stream_add
+        else:
+            controller_stream_config.immediate_stream_all(True)
+            override_stream_func = controller_stream_config.sequenced_stream_add
+
+        # After setting default stream, add any message-type or channel-specific overrides
+        override_streams = registry_stream_config.override_streams
+        if override_streams is None:
+            return
+        for stream in override_streams:
+            message_type = ASPN_MESSAGE_TYPE_MAP[stream.message_type]
+            override_stream_func(
+                message_type=message_type, source_identifier=stream.source_identifier
+            )
+
     def init_orchestration_plugin(
         self, plugins: list[CommonPlugin] | None, stream_config: MessageStreamConfig
     ) -> None:
-        stream_config.sequenced_stream_all(True)
-        stream_config.immediate_stream_add(MeasurementImu)
-
         if plugins is None:
             self._log(
                 LoggingLevel.ERROR,
@@ -161,6 +183,9 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
                 'Unable to grab the orchestration config from the registry. Filter cannot be implemented.',
             )
             return
+
+        self._set_stream_config(orch_config.stream_config, stream_config)
+
         # Store orchestration config fields
         self._store_config_data(orch_config)
 

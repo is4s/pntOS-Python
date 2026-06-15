@@ -95,6 +95,7 @@ nitpick_ignore = [
     # Core Python classes which automodule automatically tries to link to.
     ('py:class', 'abc.ABC'),
     ('py:class', 'optional'),
+    ('py:class', 'enum.Enum'),
     ('py:class', 'enum.IntEnum'),
     ('py:class', 'contextlib.AbstractContextManager'),
     # numpy classes which automodule automatically tries to link to.
