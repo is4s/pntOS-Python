@@ -11,6 +11,7 @@ from pntos.api import (
 from pntos.cobra.config import (
     TimeAdjusterConfig,
 )
+from pntos.cobra.utils import has_tov
 
 
 class TimeAdjusterPreprocessor(Preprocessor):
@@ -36,7 +37,7 @@ class TimeAdjusterPreprocessor(Preprocessor):
             return [message]
 
         msg: AspnBase = message.wrapped_message
-        if not hasattr(msg, 'time_of_validity'):
+        if not has_tov(msg):
             self._mediator.log_message(
                 LoggingLevel.WARN,
                 f'TimeAdjusterPreprocessor received a message from channel {message.source_identifier} with no time of validity. Ignoring message.',

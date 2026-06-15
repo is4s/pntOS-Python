@@ -32,6 +32,8 @@ from pntos.api import (
     StandardInertialMechanization,
 )
 
+from .ui import has_tov
+
 
 def set_up_initializer(
     initialization_plugin: InitializationPlugin,
@@ -84,7 +86,7 @@ def has_valid_time(
 
     measurement = message.wrapped_message
     # get time - check for old messages
-    if hasattr(measurement, 'time_of_validity'):
+    if has_tov(measurement):
         message_time = measurement.time_of_validity.elapsed_nsec
         if fusion_engine.time.elapsed_nsec <= message_time:
             return True

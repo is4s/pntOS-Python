@@ -1,5 +1,6 @@
 from pntos.api import LoggingLevel, Mediator, Message, Preprocessor
 from pntos.cobra.config import OutageConfig
+from pntos.cobra.utils import has_tov
 
 
 class Outage:
@@ -48,7 +49,7 @@ class OutagePreprocessor(Preprocessor):
             return [message]
 
         aspn_msg = message.wrapped_message
-        if not hasattr(aspn_msg, 'time_of_validity'):
+        if not has_tov(aspn_msg):
             self.mediator.log_message(
                 LoggingLevel.WARN,
                 f'OutagePreprocessor received a message from channel {message.source_identifier} with no time of validity. Ignoring message.',

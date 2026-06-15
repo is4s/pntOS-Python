@@ -25,7 +25,7 @@ from pntos.api import (
     VirtualStateBlock,
 )
 from pntos.cobra.config import FusionEngineConfig, config_from_registry
-from pntos.cobra.utils import validate_array
+from pntos.cobra.utils import has_tov, validate_array
 
 from .VirtualStateBlockManager import (
     VirtualStateBlockManager,
@@ -639,7 +639,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
 
         # Call propagate, which handles the error handling and figures out if
         # propagation is needed
-        assert hasattr(message.wrapped_message, 'time_of_validity')
+        assert has_tov(message.wrapped_message)
         self.propagate(message.wrapped_message.time_of_validity)
 
         measurement_model = self._mp[processor_label].generate_model(

@@ -10,6 +10,7 @@ from pntos.api import (
 from pntos.cobra.config import (
     TimeBiasConfig,
 )
+from pntos.cobra.utils import has_tov
 
 
 class TimeBiasPreprocessor(Preprocessor):
@@ -44,7 +45,7 @@ class TimeBiasPreprocessor(Preprocessor):
             return [message]
 
         aspn_message: AspnBase = message.wrapped_message
-        if not hasattr(aspn_message, 'time_of_validity'):
+        if not has_tov(aspn_message):
             self._mediator.log_message(
                 LoggingLevel.WARN,
                 f'TimeBiasPreprocessor received a message from channel {message.source_identifier} with no time of validity. Ignoring message.',
