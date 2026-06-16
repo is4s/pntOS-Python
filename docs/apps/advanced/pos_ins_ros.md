@@ -102,8 +102,8 @@ enough for the fastest topics to be published at full speed. This can be
 confirmed with `ros2 topic hz`.
 :::
 
-Running `play-dataset -t ros` will play a ROS2 sqlite3 bagfile with the same
-data as the LCM logfile used by `play-dataset`. Use `-r` to specify the
+Running `play-ros-dataset` will play a ROS2 sqlite3 bagfile with the same
+data as the LCM logfile used by `play-lcm-dataset`. Use `-r` to specify the
 playback rate.
 
 Existing LCM logfiles can be converted to ROS bagfiles using the
