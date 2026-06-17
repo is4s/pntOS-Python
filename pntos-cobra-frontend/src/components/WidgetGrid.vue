@@ -147,7 +147,7 @@
   export const widgetRegistry: WidgetRegistryType = {}
   export const activeWidgetTypes: Array<WidgetMetadata> = []
 
-  const excludePatterns = ['BaseWidget', 'Velocity', 'Route2d', 'RollAndPitch', 'LcmSpy', 'LatLonErr', 'Heading', 'GroundSpeed']
+  const excludePatterns = ['BaseWidget', 'Velocity', 'Route2d', 'RollAndPitch', 'LcmSpy', 'Heading', 'GroundSpeed']
 
   for (const [path, module] of Object.entries(widgetModules)) {
     const componentName = getComponentName(path)
