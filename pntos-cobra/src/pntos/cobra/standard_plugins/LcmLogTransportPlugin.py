@@ -88,6 +88,8 @@ class LcmLogTransportPlugin(TransportPlugin):
         This is called by the pntOS system when it is done with the plugin.
         """
         self.stop_listening()
+        if self._log_reader_thread is not None:
+            self._log_reader_thread.join()
         if self._output_log:
             self._output_log.close()
         self.mediator.log_message(
