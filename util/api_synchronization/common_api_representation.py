@@ -85,6 +85,7 @@ class CtoPyApiComparator:
             'double': 'float64',
             'double*': 'NDArray[float64]',
             'int': 'int',  # size_t
+            'int64_t': 'int',
             '_Nullable**': ' | None]',
             '_Nullable*': ' | None',
             'struct': '',
@@ -118,6 +119,8 @@ class CtoPyApiComparator:
         self.attribute_exceptions = {
             'memory': '',
             'length': '',
+            'base': '',
+            'data_len': '',
             'plugin_type': '',
             'inertial_type': '',
             'type': '',
@@ -260,7 +263,7 @@ class CtoPyApiComparator:
         temp = c_class.name.removeprefix('Pntos')
         if temp != py_class.name:
             print(
-                f'WARNING: The C struct name {c_class.name} does not match the Python class name '
+                f'{colored("WARNING:", YELLOW)} The C struct name {c_class.name} does not match the Python class name '
                 f'{py_class.name} after removing the "Pntos" prefix. Comparison will continue, '
                 'but ensure these classes should be compared.'
             )
@@ -398,6 +401,7 @@ class CtoPyApiComparator:
         py_classes: dict[str, ApiClass] = {}
         for cls in py_module.classes:
             py_classes['Pntos' + cls.name] = cls
+            py_classes['AspnExtended' + cls.name] = cls
         for c_class in c_module.classes:
             if c_class.name in self.class_exceptions:
                 print(f'C Struct {c_class.name} found in exceptions list. Skipping...')

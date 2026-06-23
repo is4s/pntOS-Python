@@ -14,8 +14,66 @@ from parse_python_api import parse_python_file
 PNTOS_URL = 'https://github.com/Open-PNT/pntOS-C.git'
 ASPN_GENERATED_URL = 'https://github.com/is4s/aspn-generated.git'
 
+C_ONLY_FILES = {
+    'annotations',
+    'aspn',
+    'loader',
+    'memory',
+    'plugins',
+    'stdbool',
+    'stdint',
+    'type_enum',
+}
 
-def main(file_name: str, revision: str) -> None:
+
+def compare_file(
+    c_full_path: Path, py_full_path: Path, c_api_path: str, aspn_path: str, fn: str
+) -> bool:
+    if not Path.is_file(py_full_path):
+        if py_full_path.stem not in C_ONLY_FILES:
+            print(
+                f'{colored("ERROR:", RED)} Python file ({py_full_path}) does not exist.'
+            )
+            return True
+        print(
+            f'Python file ({py_full_path}) does not exist but was found in exceptions list. Skipping...'
+        )
+        return False
+
+    comparator = CtoPyApiComparator()
+    c_module = clang_parse_file(c_full_path, c_api_path, aspn_path)
+    py_module = parse_python_file(py_full_path)
+
+    print(f'\n{colored(f"COMPARING {fn.upper()} MODULES...", BLUE)}')
+    return comparator.compare_modules(c_module, py_module)
+
+
+def compare_dir(
+    c_path: Path, py_path: Path, c_api_path: str, aspn_path: str, bad_mods: list[str]
+) -> bool:
+    exit_val = False
+    for c_fn in c_path.iterdir():
+        fn = c_fn.name.split('.')[0]
+        py_fn = fn + '.py'
+        c_full_path = c_path / c_fn
+        py_full_path = py_path / py_fn
+
+        if c_full_path.exists() and not c_full_path.is_file():
+            py_full_path = py_full_path.with_suffix('')
+            ret_val = compare_dir(
+                c_full_path, py_full_path, c_api_path, aspn_path, bad_mods
+            )
+            if ret_val:
+                exit_val = ret_val
+        elif c_full_path.is_file():
+            ret_val = compare_file(c_full_path, py_full_path, c_api_path, aspn_path, fn)
+            if ret_val:
+                bad_mods.append(fn)
+                exit_val = ret_val
+    return exit_val
+
+
+def main(revision: str) -> None:
     """Main script."""
     exit_val = False
     bad_mods = []
@@ -32,41 +90,11 @@ def main(file_name: str, revision: str) -> None:
             pntos.git.checkout(revision)
         print(f'Cloning firehose-outputs to {firehose_path}')
         Repo.clone_from(ASPN_GENERATED_URL, firehose_path, depth=1)
-        c_path = c_api_path / 'pntos/plugins/'
-        py_path = Path('pntos-api/src/pntos/api/plugins/')
+        c_path = c_api_path / 'pntos/'
+        py_path = Path('pntos-api/src/pntos/api/')
 
-        if file_name:
-            c_full_path = c_path / (file_name + '.h')
-            py_full_path = py_path / (file_name + '.py')
+        exit_val = compare_dir(c_path, py_path, c_api_path, aspn_path, bad_mods)
 
-            comparator = CtoPyApiComparator()
-            c_module = clang_parse_file(c_full_path, c_api_path, aspn_path)
-            py_module = parse_python_file(py_full_path)
-
-            print(f'\n{colored(f"COMPARING {file_name.upper()} MODULES...", BLUE)}')
-            exit_val = comparator.compare_modules(c_module, py_module)
-            bad_mods.append(file_name)
-        else:
-            for c_fn in c_path.iterdir():
-                fn = c_fn.name.split('.')[0]
-                py_fn = fn + '.py'
-
-                c_full_path = c_path / c_fn
-                py_full_path = py_path / py_fn
-
-                comparator = CtoPyApiComparator()
-                c_module = clang_parse_file(c_full_path, c_api_path, aspn_path)
-                py_module = parse_python_file(py_full_path)
-
-                comparator = CtoPyApiComparator()
-                c_module = clang_parse_file(c_full_path, c_api_path, aspn_path)
-                py_module = parse_python_file(py_full_path)
-
-                print(f'\n{colored(f"COMPARING {fn.upper()} MODULES...", BLUE)}')
-                ret_val = comparator.compare_modules(c_module, py_module)
-                if ret_val:
-                    bad_mods.append(fn)
-                    exit_val = ret_val
     print(f'\n{colored("Overall Result:", BLUE)}')
     if exit_val:
         print(
@@ -86,12 +114,5 @@ if __name__ == '__main__':
         required=False,
         help='An optional argument to specify a C-API revision to compare to.',
     )
-    parser.add_argument(
-        '-f',
-        '--file',
-        type=str,
-        required=False,
-        help='An optional argument to specify a single API file to compare.',
-    )
     args = parser.parse_args()
-    main(args.file, args.revision)
+    main(args.revision)

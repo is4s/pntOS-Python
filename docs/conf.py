@@ -103,6 +103,7 @@ nitpick_ignore = [
     ('py:class', 'NDArray'),
     # A ASPN-Python classes which automodule automatically tries to link to.
     ('py:class', 'AspnBase'),
+    ('py:class', 'aspn23.aspn_base.AspnBase'),
     ('py:class', 'MeasurementImu'),
     ('py:class', 'MeasurementImuImuType'),
     ('py:class', 'MeasurementPositionVelocityAttitude'),
