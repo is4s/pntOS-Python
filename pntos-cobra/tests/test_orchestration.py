@@ -240,8 +240,10 @@ standard_config = [
 ]
 
 manual_fogm_config = deepcopy(standard_config)
-orch_config: StandardOrchestrationConfig = manual_fogm_config[2]  # ty:ignore[invalid-assignment]
-orch_config.additional_sb_configs[0].estimate_with_covariance = EstimateWithCovariance(  # ty:ignore[not-subscriptable]
+orch_config = manual_fogm_config[2]
+assert isinstance(orch_config, StandardOrchestrationConfig)
+assert orch_config.additional_sb_configs is not None
+orch_config.additional_sb_configs[0].estimate_with_covariance = EstimateWithCovariance(
     type=EstimateWithCovarianceType.EWC_GENERIC,
     estimate=np.zeros((3,)),
     covariance=np.eye(3),
@@ -694,9 +696,10 @@ class Test_Orchestration(unittest.TestCase):
                 False,
             )
 
+        assert isinstance(self.orchestration_plugin, StandardOrchestrationPlugin)
         assert (
             self.orchestration_plugin.fusion_engine.time.elapsed_nsec
-            == self.orchestration_plugin.inertial_drift_prop_dt  # ty:ignore[unresolved-attribute]
+            == self.orchestration_plugin.inertial_drift_prop_dt
         )
 
     def test_process_pntos_message_alignment_tutorial(self) -> None:
@@ -872,7 +875,8 @@ class Test_Orchestration(unittest.TestCase):
             imu_model=imu_config,
         )
         temp_config = deepcopy(standard_config)
-        orch_config: StandardOrchestrationConfig = temp_config[2]  # ty:ignore[invalid-assignment]
+        orch_config = temp_config[2]
+        assert isinstance(orch_config, StandardOrchestrationConfig)
         orch_config.alignment_config = align_config
         static_alignment_plugin = StaticAlignInitializationPlugin(
             'Static Alignment Initialization Plugin'

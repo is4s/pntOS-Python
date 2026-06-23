@@ -99,16 +99,16 @@ class ValueView(Generic[ValueType]):
         registry: Registry,
         group: str,
         key: str,
-        type: type[ValueType],
+        type: type[ValueType] | None = None,
         post_callback: Callable[[str, list[str], KeyValueStore], None] | None = None,
     ) -> None: ...
 
     def __init__(
         self,
-        registry: Registry,
-        group: str,
-        key: str,
-        type: type[ValueType] | None = None,
+        registry,
+        group,
+        key,
+        type=None,
         post_callback: Callable[[str, list[str], KeyValueStore], None] | None = None,
     ) -> None:
         """
@@ -203,19 +203,19 @@ class BufferedValueView(ValueView[ValueType], Generic[ValueType]):
         registry: Registry,
         group: str,
         key: str,
-        type: type[ValueType],
+        type: type[ValueType] | None = None,
     ) -> None: ...
 
     def __init__(
         self,
-        registry: Registry,
-        group: str,
-        key: str,
-        type: type[ValueType] | None = None,
+        registry,
+        group,
+        key,
+        type=None,
     ) -> None:
         self._buffer: list[ValueType | None] = []
         self._buffer_lock: RLock = RLock()
-        super().__init__(registry, group, key, type)  # ty:ignore[no-matching-overload]
+        super().__init__(registry, group, key, type)
 
     def _callback(self, group: str, keys: list[str], kv: KeyValueStore) -> None:
         with self._value_lock:
@@ -263,17 +263,17 @@ class MutableValueView(ValueView[ValueType], Generic[ValueType]):
         registry: Registry,
         group: str,
         key: str,
-        type: type[ValueType],
+        type: type[ValueType] | None = None,
     ) -> None: ...
 
     def __init__(
         self,
-        registry: Registry,
-        group: str,
-        key: str,
-        type: type[ValueType] | None = None,
+        registry,
+        group,
+        key,
+        type=None,
     ) -> None:
-        super().__init__(registry, group, key, type)  # ty:ignore[no-matching-overload]
+        super().__init__(registry, group, key, type)
         self._started_batch = False
 
     def _batch_start(self, kv: KeyValueStore | None = None) -> KeyValueStore:

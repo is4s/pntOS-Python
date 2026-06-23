@@ -112,7 +112,9 @@ class StandardInertial(StandardInertialMechanization):
                 == InertialSolutionRangeType.INERTIAL_NO_UPDATES_WITHIN_RANGE
             ):
                 pva = self.inertial.calc_pva_no_reset_since(cpp_time, first_time)
-            solutions.append(Message(convert_pva_from_cpp(pva), self.identifier))  # ty:ignore[possibly-unresolved-reference]
+            else:
+                return None
+            solutions.append(Message(convert_pva_from_cpp(pva), self.identifier))
         return solutions
 
     def is_time_in_range(self, time: TypeTimestamp) -> bool:

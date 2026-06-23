@@ -108,8 +108,9 @@ class StandardFusionEngine(api.StandardFusionEngine):
             i_next = i_next + self._sb[this_key].num_states
 
     def _save_x_and_p_to_registry(self) -> None:
-        estimate = self._strategy.estimate  # ty:ignore[unresolved-attribute]
-        covariance = self._strategy.covariance  # ty:ignore[unresolved-attribute]
+        assert self._strategy is not None
+        estimate = self._strategy.estimate
+        covariance = self._strategy.covariance
 
         if estimate is None or covariance is None:
             return

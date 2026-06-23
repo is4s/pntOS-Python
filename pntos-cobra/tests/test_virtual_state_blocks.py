@@ -391,7 +391,11 @@ def test_give_aux_data(mediator: StandardMediator, pva: Message) -> None:
     aux: list[Message | None] = [pva]
     vsbm.give_virtual_state_block_aux_data('give_data', aux)
     node = vsbm._node_map['give_data']
-    assert node.block._pva.p1 == pva.wrapped_message.p1  # ty:ignore[unresolved-attribute]
+    assert hasattr(pva.wrapped_message, 'p1')
+    assert node.block is not None
+    assert hasattr(node.block, '_pva')
+    assert hasattr(node.block._pva, 'p1')
+    assert node.block._pva.p1 == pva.wrapped_message.p1
 
 
 def test_invalid_vsb_manager_ops(

@@ -6,7 +6,7 @@ for real-time registry updates and subscriptions.
 """
 
 import shutil
-from importlib.resources import files
+from importlib.resources import as_file, files
 from logging import ERROR, getLogger
 from pathlib import Path
 from threading import Event, Thread
@@ -50,7 +50,6 @@ class ExperimentalCobraUiPlugin(UiPlugin):
     config_group: str
     write_buffer: SequenceBuffer[Write]
     _metadata_manager: UiMetadataInterface
-    static_folder: Path
 
     def __init__(
         self,
@@ -84,16 +83,20 @@ class ExperimentalCobraUiPlugin(UiPlugin):
         if config.static_folder:
             self.static_folder = Path(config.static_folder)
         else:
-            self.static_folder = files('pntos.cobra').joinpath(  # ty:ignore[invalid-assignment]
-                'advanced_plugins',
-                'ui',  # ty:ignore[too-many-positional-arguments]
-                '_static',
-                'dist',
-            )
+            with as_file(
+                files('pntos.cobra')
+                .joinpath('advanced_plugins')
+                .joinpath('ui')
+                .joinpath('_static')
+                .joinpath(
+                    'dist',
+                )
+            ) as path:
+                self.static_folder = path
 
         werkz_logger = getLogger('werkzeug')
         werkz_logger.setLevel(ERROR)
-        if not self._runtime_assets_exist(self.static_folder):
+        if not self._runtime_assets_exist(Path(self.static_folder)):
             self._error(
                 f'Cannot find front-end runtime assets at {self.static_folder.resolve().as_posix()}. '
                 'Runtime assets must be built prior to using the ExperimentalCobraUiPlugin.'

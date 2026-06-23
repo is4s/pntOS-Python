@@ -130,7 +130,7 @@ class TestRegistry(unittest.TestCase):
             ),
             'Genesis planet',
         )
-        self._test_types = [
+        self._test_types: list[type[RegistryValueTypeUnion]] = [
             str,
             list[str],
             int,
@@ -163,7 +163,7 @@ class TestRegistry(unittest.TestCase):
 
     @property
     def test_types(self) -> list[type[RegistryValueTypeUnion]]:
-        return self._test_types  # ty:ignore[invalid-return-type]
+        return self._test_types
 
     @property
     def test_keys(self) -> list[str]:

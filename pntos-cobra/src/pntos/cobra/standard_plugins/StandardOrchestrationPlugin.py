@@ -521,11 +521,18 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
             )
             return
 
-        # Give the fusion engine a strategy
-        fusion_engine.strategy = self.fusion_strategy_plugin.new_fusion_strategy(  # ty:ignore[invalid-assignment]
+        fusion_strategy = self.fusion_strategy_plugin.new_fusion_strategy(
             StandardFusionStrategy
         )
+        if fusion_strategy is None:
+            self._log(
+                LoggingLevel.ERROR,
+                'Unable to make new fusion strategy - cannot continue.',
+            )
+            return
 
+        # Give the fusion engine a strategy
+        fusion_engine.strategy = fusion_strategy
         # Store fusion engine
         self.fusion_engine = fusion_engine
 
@@ -729,12 +736,14 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
 
         if self.feedback_config.pos_error_threshold:
             pinson_x_and_p: EstimateWithCovariance = self.cache.get('pinson')
-            surpassed_error_threshold = np.any(
-                np.abs(pinson_x_and_p.estimate[:3])
-                >= self.feedback_config.pos_error_threshold
+            surpassed_error_threshold = bool(
+                np.any(
+                    np.abs(pinson_x_and_p.estimate[:3])
+                    >= self.feedback_config.pos_error_threshold
+                )
             )
 
-        return surpassed_time_threshold and surpassed_error_threshold  # ty:ignore[invalid-return-type]
+        return surpassed_time_threshold and surpassed_error_threshold
 
     def _apply_inertial_feedback(self) -> None:
         """Correct inertial solution with pinson error states and reset states."""

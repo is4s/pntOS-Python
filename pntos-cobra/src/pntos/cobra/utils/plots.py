@@ -25,13 +25,26 @@ def plot_pva(
     if save_dir:
         Path(save_dir).mkdir(parents=True, exist_ok=True)
 
+    assert not isinstance(pva.vel, list)
+    assert not isinstance(pva.rpy, list)
+    assert not isinstance(pva.llh, list)
+    assert not isinstance(pva.time, list)
+    assert not isinstance(pva.vel_sig, list)
+    assert not isinstance(pva.ned_sig, list)
+    assert not isinstance(pva.llh_sig, list)
+    assert not isinstance(pva.tilt_sig, list)
+    assert not isinstance(truth_pva.llh, list)
+    assert not isinstance(truth_pva.vel, list)
+    assert not isinstance(truth_pva.rpy, list)
+    assert not isinstance(truth_pva.time, list)
+
     leg = [pva.label, truth_pva.label]
     leg_w_sigma = [pva.label, truth_pva.label, '+/- 1 sigma']
 
     # Interpolate truth onto solution times so that we can calculate the solution error
-    interp_truth_pva = interpolate_pva(pva.time, truth_pva)  # ty:ignore[invalid-argument-type]
+    interp_truth_pva = interpolate_pva(pva.time, truth_pva)
     ned_err = pva.ned - interp_truth_pva.ned
-    vel_err = pva.vel - interp_truth_pva.vel  # ty:ignore[unsupported-operator]
+    vel_err = pva.vel - interp_truth_pva.vel
     rpy_rad = np.deg2rad(pva.rpy)
     truth_rpy_rad = np.deg2rad(interp_truth_pva.rpy)
     tilt_err = np.rad2deg(calc_tilts(truth_rpy_rad, rpy_rad))
@@ -42,19 +55,19 @@ def plot_pva(
     plot_trajectory(
         pva.ned,
         truth_pva.ned,
-        pva.time,  # ty:ignore[invalid-argument-type]
-        truth_pva.time,  # ty:ignore[invalid-argument-type]
+        pva.time,
+        truth_pva.time,
         leg,
         drms_str,
         save_dir,
     )
 
     plot_llh(
-        pva.llh,  # ty:ignore[invalid-argument-type]
-        truth_pva.llh,  # ty:ignore[invalid-argument-type]
-        pva.llh_sig,  # ty:ignore[invalid-argument-type]
-        pva.time,  # ty:ignore[invalid-argument-type]
-        truth_pva.time,  # ty:ignore[invalid-argument-type]
+        pva.llh,
+        truth_pva.llh,
+        pva.llh_sig,
+        pva.time,
+        truth_pva.time,
         t0,
         leg_w_sigma,
         save_dir,
@@ -62,38 +75,38 @@ def plot_pva(
     plot_ned(
         pva.ned,
         truth_pva.ned,
-        pva.ned_sig,  # ty:ignore[invalid-argument-type]
-        pva.time,  # ty:ignore[invalid-argument-type]
-        truth_pva.time,  # ty:ignore[invalid-argument-type]
+        pva.ned_sig,
+        pva.time,
+        truth_pva.time,
         t0,
         leg_w_sigma,
         save_dir,
     )
-    plot_ned_err(ned_err, pva.ned_sig, pva.time, t0, pva.label, save_dir)  # ty:ignore[invalid-argument-type]
+    plot_ned_err(ned_err, pva.ned_sig, pva.time, t0, pva.label, save_dir)
 
     plot_vel(
-        pva.vel,  # ty:ignore[invalid-argument-type]
-        truth_pva.vel,  # ty:ignore[invalid-argument-type]
-        pva.vel_sig,  # ty:ignore[invalid-argument-type]
-        pva.time,  # ty:ignore[invalid-argument-type]
-        truth_pva.time,  # ty:ignore[invalid-argument-type]
+        pva.vel,
+        truth_pva.vel,
+        pva.vel_sig,
+        pva.time,
+        truth_pva.time,
         t0,
         leg_w_sigma,
         save_dir,
     )
-    plot_vel_err(vel_err, pva.vel_sig, pva.time, t0, pva.label, save_dir)  # ty:ignore[invalid-argument-type]
+    plot_vel_err(vel_err, pva.vel_sig, pva.time, t0, pva.label, save_dir)
 
     plot_rpy(
-        pva.rpy,  # ty:ignore[invalid-argument-type]
-        truth_pva.rpy,  # ty:ignore[invalid-argument-type]
-        pva.tilt_sig,  # ty:ignore[invalid-argument-type]
-        pva.time,  # ty:ignore[invalid-argument-type]
-        truth_pva.time,  # ty:ignore[invalid-argument-type]
+        pva.rpy,
+        truth_pva.rpy,
+        pva.tilt_sig,
+        pva.time,
+        truth_pva.time,
         t0,
         leg_w_sigma,
         save_dir,
     )
-    plot_tilt_err(tilt_err, pva.tilt_sig, pva.time, t0, pva.label, save_dir)  # ty:ignore[invalid-argument-type]
+    plot_tilt_err(tilt_err, pva.tilt_sig, pva.time, t0, pva.label, save_dir)
 
 
 def plot_x_and_p(

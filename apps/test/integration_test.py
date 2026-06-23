@@ -65,11 +65,18 @@ def validate_results(
     tilt_err_limits: ErrorLimits,
     expected_start_time_offset: float = 0.0,
 ) -> None:
+    assert not isinstance(pva.time, list)
+    assert not isinstance(truth.time, list)
+    assert not isinstance(pva.vel, list)
+    assert not isinstance(pva.ned_sig, list)
+    assert not isinstance(pva.vel_sig, list)
+    assert not isinstance(pva.tilt_sig, list)
+
     filter_time = pva.time
     truth_time = truth.time
 
     # ensure solution has enough points
-    assert filter_time.size == num_points  # ty:ignore[unresolved-attribute]
+    assert filter_time.size == num_points
 
     # ensure solution has no NANs
     assert not np.isnan(pva.ned).any()
@@ -84,17 +91,17 @@ def validate_results(
     assert abs(filter_time[-1] - truth_time[-1]) < 3  # noqa: PLR2004
 
     # Interpolate truth onto solution times so that we can calculate the solution error
-    interp_truth_pva = interpolate_pva(pva.time, truth)  # ty:ignore[invalid-argument-type]
+    interp_truth_pva = interpolate_pva(pva.time, truth)
     ned_err = pva.ned - interp_truth_pva.ned
-    vel_err = pva.vel - interp_truth_pva.vel  # ty:ignore[unsupported-operator]
+    vel_err = pva.vel - interp_truth_pva.vel
     rpy_rad = np.deg2rad(pva.rpy)
     truth_rpy_rad = np.deg2rad(interp_truth_pva.rpy)
     tilt_err = np.rad2deg(calc_tilts(truth_rpy_rad, rpy_rad))
 
     # ensure PVA errors are within expected limits
-    validate_error(ned_err, pva.ned_sig, limits=pos_err_limits)  # ty:ignore[invalid-argument-type]
-    validate_error(vel_err, pva.vel_sig, limits=vel_err_limits)  # ty:ignore[invalid-argument-type]
-    validate_error(tilt_err, pva.tilt_sig, limits=tilt_err_limits)  # ty:ignore[invalid-argument-type]
+    validate_error(ned_err, pva.ned_sig, limits=pos_err_limits)
+    validate_error(vel_err, pva.vel_sig, limits=vel_err_limits)
+    validate_error(tilt_err, pva.tilt_sig, limits=tilt_err_limits)
 
 
 def test_dummy_app() -> None:

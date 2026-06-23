@@ -150,7 +150,8 @@ def fusion(la_guess: NDArray[float64]) -> StandardFusionEngine:
     fusion_strategy_plugin = EkfFusionStrategyPlugin(identifier='test_strategy_plugin')
     fusion_strategy_plugin.init_plugin('test_strategy', mediator=mediator)
     fusion_strategy = fusion_strategy_plugin.new_fusion_strategy(StandardFusionStrategy)
-    fusion_engine.strategy = fusion_strategy  # ty:ignore[invalid-assignment]
+    assert fusion_strategy is not None
+    fusion_engine.strategy = fusion_strategy
 
     pos_model_plug = StandardStateModelingPlugin('pos_ins_state_modeling')
     pos_model_plug.init_plugin(mediator=mediator)
@@ -162,7 +163,8 @@ def fusion(la_guess: NDArray[float64]) -> StandardFusionEngine:
     assert pins is not None
     assert sb1 is not None
     assert sb2 is not None
-    proc_index = mod_prov.processor_identifiers.index('pinson_with_lever_arm_position')  # ty:ignore[unresolved-attribute]
+    assert mod_prov.processor_identifiers is not None
+    proc_index = mod_prov.processor_identifiers.index('pinson_with_lever_arm_position')
     mp = mod_prov.new_processor(
         proc_index, None, 'proc', ['pinson', 'fogm1', 'fogm2'], '/config/cobra/sensor'
     )
