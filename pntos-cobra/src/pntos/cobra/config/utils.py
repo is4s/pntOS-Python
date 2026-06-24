@@ -119,6 +119,13 @@ def config_from_registry(
     Returns:
         ConfigType | None
     """
+    if not mediator.registry.has_group(config_group):
+        mediator.log_message(
+            LoggingLevel.ERROR,
+            f'config_from_registry: group {config_group} does not exist in the registry.',
+        )
+        return None
+
     conf_params = fields(config_type)
     kv = mediator.registry.batch_start(config_group)
     out: dict[str, SupportedRegistryTypeUnion] = {}
