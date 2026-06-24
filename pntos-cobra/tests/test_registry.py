@@ -668,7 +668,20 @@ class TestRegistry(unittest.TestCase):
             else:  # If not implemented, should return None
                 assert kv_type is None, self.test_err[i]
 
-    def test___contains__(self) -> None:
+    def test___contains__group(self) -> None:
+        self.set_up_store_with_all_types('group')
+
+        assert 'group' in self.reg
+        assert self.reg.has_group('group')
+
+        for group in self.reg.group_array or []:
+            assert self.reg.has_group('group')
+            assert group in self.reg
+
+        assert 'nonexistent_group' not in self.reg
+        assert not self.reg.has_group('nonexistent-group')
+
+    def test___contains__key(self) -> None:
         test_kv = self.set_up_store_with_all_types()
 
         # Make sure all keys are in there
