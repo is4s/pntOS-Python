@@ -805,6 +805,29 @@ class Registry(ABC):
         """
         pass
 
+    ############# BEGIN FINAL METHODS - THESE SHOULD NOT BE OVERRIDDEN #################
+
+    @final
+    def __contains__(self, group: str) -> bool:
+        """
+        Check whether or not a given group has had any values added to it (for any key).
+
+        This function is equivalent to calling :meth:`has_group`, but allows the
+        user to use python "if in" statements. For example:
+
+            if group in registry:
+                ...
+
+        Args:
+            group (str)
+
+        Returns:
+            bool
+        """
+        return self.has_group(group)
+
+    ################################ END FINAL METHODS #################################
+
 
 class Mediator(ABC):
     """
