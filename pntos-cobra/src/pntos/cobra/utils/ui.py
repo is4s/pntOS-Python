@@ -1,5 +1,5 @@
 import pickle
-from threading import Lock, Thread, Timer
+from threading import Lock, Timer
 from time import time
 from typing import Protocol, TypeGuard, runtime_checkable
 
@@ -9,9 +9,9 @@ from aspn23 import (
     TypeTimestamp,
 )
 
-from pntos.api import Message, Registry
+from pntos.api import KeyValueStore, Message, Registry
 
-from .registry import GroupsView, MutableValueView, ValueView
+from .registry import GroupsView, KeysView, MutableValueView, ValueView
 
 # Channels each have their own group of format: `UI_CHANNEL_GROUP_PREFIX/{channel}`
 UI_GROUP_CHANNEL_PREFIX = 'ui/channel/'
@@ -40,25 +40,72 @@ UI_GROUP_METADATA = 'ui/metadata'
 # Keys in `UI_GROUP_METADATA` group:
 UI_GROUP_METADATA_KEY_GROUPS_LIST = 'groups'
 
+# Group for frontend to pass information to backend. Backend should not write to this group
+UI_GROUP_FRONTEND = 'ui/frontend'
+UI_GROUP_FRONTEND_KEY_REQUESTED_GROUPS = 'requested_groups'
 
-class UiMetadataInterface(GroupsView):
+
+class UiMetadataInterface:
     """Utility object to populate the keys in the ``UI_GROUP_METADATA`` group."""
 
     def __init__(self, registry: Registry) -> None:
+        self._registry = registry
         self._groups_view = MutableValueView(
             registry, UI_GROUP_METADATA, UI_GROUP_METADATA_KEY_GROUPS_LIST, list
         )
-        super().__init__(registry)
-        if self._groups is not None:
-            self._groups_view.set_value(self._groups)
+        self._groups_reader = GroupsView(registry, self._new_group_created)
+        if self._groups_reader.groups is not None:
+            self._groups_view.set_value(list(self._groups_reader.groups))
 
-    def _callback(self, new_group: str) -> None:
-        super()._callback(new_group)
-        if self._groups is None:
+        self._requested_groups_view = ValueView(
+            registry,
+            UI_GROUP_FRONTEND,
+            UI_GROUP_FRONTEND_KEY_REQUESTED_GROUPS,
+            list,
+            self._new_group_requested,
+        )
+        self._key_readers: dict[str, KeysView] = {}
+        self._keys_writers: dict[str, MutableValueView[list[str]]] = {}
+
+    def _new_group_created(self, new_group: str) -> None:
+        groups = self._groups_reader.groups
+        if groups is None:
             return
-        Thread(
-            target=self._groups_view.set_value, args=(list(self._groups),), daemon=True
-        ).start()
+
+        self._groups_view.set_value(list(groups))
+
+    def _new_group_requested(self, _: str, __: list[str], ___: KeyValueStore) -> None:
+        for group in self._requested_groups_view.value:  # type: ignore[union-attr]
+            if group in self._keys_writers:
+                continue
+            # Create KeysView to spy on keys in group, and MutableValueView to update list of keys in group
+            key_reader = KeysView(self._registry, group, self._key_change_callback)
+
+            keys_writer = MutableValueView(
+                self._registry, UI_GROUP_METADATA, group, list
+            )
+            keys_writer.set_value(key_reader.keys)
+
+            numerical_keys_key = f'numbers/{group}'
+            numerical_keys_writer = MutableValueView(
+                self._registry, UI_GROUP_METADATA, numerical_keys_key, list
+            )
+            numerical_keys_writer.set_value(key_reader.numerical_keys)
+
+            self._key_readers[group] = key_reader
+            self._keys_writers[group] = keys_writer
+            self._keys_writers[numerical_keys_key] = numerical_keys_writer
+
+    def _key_change_callback(
+        self, group: str, modified_keys: list[str], kvs: KeyValueStore
+    ) -> None:
+        key_reader = self._key_readers[group]
+
+        keys_writer = self._keys_writers[group]
+        keys_writer.set_value(key_reader.keys)
+
+        numerical_keys_writer = self._keys_writers[f'numbers/{group}']
+        numerical_keys_writer.set_value(key_reader.numerical_keys)
 
 
 @runtime_checkable

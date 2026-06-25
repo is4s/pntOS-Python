@@ -106,14 +106,21 @@ function ensureValue<T = RegistryValueType>(
 export function useRegistry<T = RegistryValueType>(
   group: string,
   key: string,
+  force_subscribe: boolean = false,
 ): Ref<T | null> {
   const entry = ensureValue<T>(group, key)
   const subscription = { group: group, key: key, id: newUUID() }
 
-  onMounted(() => {
+  if (force_subscribe) {
     entry.subscriptions.set(subscription.id, subscription)
     socket.emit('subscribe', subscription)
-  })
+  } else {
+    onMounted(() => {
+      entry.subscriptions.set(subscription.id, subscription)
+      socket.emit('subscribe', subscription)
+    })
+  }
+
   onUnmounted(() => {
     entry.subscriptions.delete(subscription.id)
     socket.emit('unsubscribe', subscription)
@@ -269,6 +276,25 @@ export function useGroupsWithRegex(regex: string): ComputedRef<string[]> {
     if (!groups.value) return []
     return groups.value.filter((val) => pattern.test(val))
   })
+}
+
+let requested_groups: string[] = []
+function requestGroup(group: string) {
+  if (!requested_groups.includes(group)) {
+    requested_groups.push(group)
+    const requested = useRegistry<string[]>('ui/frontend', 'requested_groups', true)
+    requested.value = requested_groups
+  }
+}
+
+export function useKeysFromGroup(group: string): Ref<string[] | null> {
+  requestGroup(group)
+  return useRegistry<string[]>('ui/metadata', group, true)
+}
+
+export function useNumericalKeysFromGroup(group: string): Ref<string[] | null> {
+  requestGroup(group)
+  return useRegistry<string[]>('ui/metadata', 'numbers/' + group, true)
 }
 
 export const UI_CHANNELS_PREFIX = 'ui/channel/'

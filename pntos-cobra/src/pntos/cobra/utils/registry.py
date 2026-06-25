@@ -1,5 +1,5 @@
 import builtins
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from threading import RLock
 from typing import Generic, TypeVar, overload
 
@@ -20,8 +20,11 @@ that union.
 class GroupsView:
     """Utility object to give a passive view of all groups in the registry."""
 
-    def __init__(self, registry: Registry) -> None:
+    def __init__(
+        self, registry: Registry, post_callback: Callable[[str], None] | None = None
+    ) -> None:
         self._groups: list[str] | None = registry.group_array
+        self._post_callback = post_callback
         registry.request_notify_new_group(self._callback)
 
     def _callback(self, new_group: str) -> None:
@@ -29,9 +32,54 @@ class GroupsView:
             self._groups = []
         self._groups.append(new_group)
 
+        if self._post_callback:
+            self._post_callback(new_group)
+
     @property
     def groups(self) -> Sequence[str] | None:
         return self._groups
+
+
+class KeysView:
+    """Utility object to give a passive view of all keys in a group."""
+
+    def __init__(
+        self,
+        registry: Registry,
+        group: str,
+        post_callback: Callable[[str, list[str], KeyValueStore], None] | None = None,
+    ) -> None:
+        self._kvs = registry.batch_start(group)
+        self._keys = set(self._kvs.keys() or [])
+        self._numerical_keys = {
+            k for k in self._keys if self._kvs.get_type(k) in (int, float)
+        }
+        self._kvs.request_notify(None, self._callback)
+        self._kvs.batch_end()
+        self._post_callback = post_callback
+
+    def _callback(
+        self, group: str, modified_keys: list[str], kvs: KeyValueStore
+    ) -> None:
+        for key in modified_keys:
+            if key not in kvs:
+                self._keys.discard(key)
+                self._numerical_keys.discard(key)
+            elif key not in self._keys:
+                self._keys.add(key)
+                if kvs.get_type(key) in (int, float):
+                    self._numerical_keys.add(key)
+
+        if self._post_callback is not None:
+            self._post_callback(group, modified_keys, kvs)
+
+    @property
+    def keys(self) -> list[str]:
+        return list(self._keys)
+
+    @property
+    def numerical_keys(self) -> list[str]:
+        return list(self._numerical_keys)
 
 
 class ValueView(Generic[ValueType]):
@@ -42,6 +90,7 @@ class ValueView(Generic[ValueType]):
         group: str,
         key: str,
         type: None = None,
+        post_callback: Callable[[str, list[str], KeyValueStore], None] | None = None,
     ) -> None: ...
 
     @overload
@@ -51,6 +100,7 @@ class ValueView(Generic[ValueType]):
         group: str,
         key: str,
         type: type[ValueType],
+        post_callback: Callable[[str, list[str], KeyValueStore], None] | None = None,
     ) -> None: ...
 
     def __init__(
@@ -59,6 +109,7 @@ class ValueView(Generic[ValueType]):
         group: str,
         key: str,
         type: type[ValueType] | None = None,
+        post_callback: Callable[[str, list[str], KeyValueStore], None] | None = None,
     ) -> None:
         """
         Utility object to expose an automatically-updating registry value.
@@ -95,13 +146,17 @@ class ValueView(Generic[ValueType]):
             else:
                 self._value = kv.get_value(self._key, self._type)  # type: ignore[type-var]
         kv.batch_end()
+        self._post_callback = post_callback
 
     def _callback(self, group: str, keys: list[str], kv: KeyValueStore) -> None:
         with self._value_lock:
             if self._type is not None:
                 self._value = kv.get_value(self._key, self._type)  # type: ignore[type-var]
-                return
-            self._value = kv[self._key]  # type: ignore[assignment]
+            else:
+                self._value = kv[self._key]  # type: ignore[assignment]
+
+        if self._post_callback is not None:
+            self._post_callback(group, keys, kv)
 
     @property
     def group(self) -> str:
