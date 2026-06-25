@@ -51,6 +51,7 @@ apps/outage_sim
 :maxdepth: 1
 :name: advanced-apps
 apps/advanced/pos_ins_ros
+apps/advanced/ui
 ```
 
 ```{toctree}
