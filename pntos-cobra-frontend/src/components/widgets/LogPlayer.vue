@@ -20,7 +20,6 @@
   import { CELL_GAP, MINIMIZED_WIDGET_HEIGHT } from '@/components/WidgetGrid.vue';
   import type { BaseWidgetData } from '@/components/widgets/BaseWidget.vue';
   import BaseWidget from '@/components/widgets/BaseWidget.vue';
-  import { SubscriptionMode } from '@/types';
   import { useRegistry } from '@/utils/useRegistry';
   import type { Ref } from 'vue';
   import { computed, ref } from 'vue';
@@ -28,29 +27,18 @@
   const props = defineProps<BaseWidgetData>();
   const GROUP = "ui/logplayer";
 
-  // const requestedSpeed = useRegistry<number>(GROUP, "requested_speed", SubscriptionMode.LAST, 1);
-  // const nMessages = useRegistry<number>(GROUP, "n_messages", SubscriptionMode.LAST, 0);
-  // const playing = useRegistry<boolean>(GROUP, "playing", SubscriptionMode.LAST, false);
-  // const collapsed = useRegistry<boolean>(GROUP, 'channels_collapsed', SubscriptionMode.LAST, false);
-  // const file = useRegistry<string>(GROUP, "file", SubscriptionMode.LAST, "Choose a file.");
-  // const fractionThroughFile = useRegistry<number>(GROUP, "fraction_through_file", SubscriptionMode.LAST, 0);
-  // const requestedFractionThroughFile = useRegistry<number>(GROUP, "requested_fraction_through_file", SubscriptionMode.LAST, 0);
-  // const time = useRegistry<number>(GROUP, "time", SubscriptionMode.LAST, 0.0);
-  // const actualSpeed = useRegistry<number>(GROUP, "actual_speed", SubscriptionMode.LAST, 0.0);
-  // const channels = useRegistry<Array<string>>(GROUP, "channels", SubscriptionMode.LAST, []);
-  // const step = useRegistry<boolean>(GROUP, 'step', SubscriptionMode.LAST, false);
 
-  const requestedSpeed = useRegistry<number>(GROUP, "requested_speed", SubscriptionMode.LAST);
-  const nMessages = useRegistry<number>(GROUP, "n_messages", SubscriptionMode.LAST);
-  const playing = useRegistry<boolean>(GROUP, "playing", SubscriptionMode.LAST);
-  const collapsed = useRegistry<boolean>(GROUP, 'channels_collapsed', SubscriptionMode.LAST);
-  const file = useRegistry<string>(GROUP, "file", SubscriptionMode.LAST);
-  const fractionThroughFile = useRegistry<number>(GROUP, "fraction_through_file", SubscriptionMode.LAST);
-  const requestedFractionThroughFile = useRegistry<number>(GROUP, "requested_fraction_through_file", SubscriptionMode.LAST);
-  const time = useRegistry<number>(GROUP, "time", SubscriptionMode.LAST);
-  const actualSpeed = useRegistry<number>(GROUP, "actual_speed", SubscriptionMode.LAST);
-  const channels = useRegistry<Array<string>>(GROUP, "channels", SubscriptionMode.LAST);
-  const step = useRegistry<boolean>(GROUP, 'step', SubscriptionMode.LAST);
+  const requestedSpeed = useRegistry<number>(GROUP, "requested_speed");
+  const nMessages = useRegistry<number>(GROUP, "n_messages");
+  const playing = useRegistry<boolean>(GROUP, "playing");
+  const collapsed = useRegistry<boolean>(GROUP, 'channels_collapsed');
+  const file = useRegistry<string>(GROUP, "file");
+  const fractionThroughFile = useRegistry<number>(GROUP, "fraction_through_file");
+  const requestedFractionThroughFile = useRegistry<number>(GROUP, "requested_fraction_through_file");
+  const time = useRegistry<number>(GROUP, "time");
+  const actualSpeed = useRegistry<number>(GROUP, "actual_speed");
+  const channels = useRegistry<Array<string>>(GROUP, "channels");
+  const step = useRegistry<boolean>(GROUP, 'step');
 
   const icon = computed(() => playing.value ? PauseButtonIcon : PlayButtonIcon);
 
@@ -144,8 +132,8 @@
   function stopAndClose(remove: () => void) {
     playing.value = false
     setTimeout(() => {
-    remove()
-  }, 100)
+      remove()
+    }, 100)
   }
 
 </script>

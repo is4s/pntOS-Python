@@ -7,7 +7,6 @@ from pntos.api import Registry, RegistryValueTypeUnion
 from pntos.cobra.advanced_plugins.ui.models import (
     Snapshot,
     Subscription,
-    SubscriptionMode,
     Write,
 )
 from pntos.cobra.advanced_plugins.ui.utils import (
@@ -53,7 +52,6 @@ def test_subscription() -> Subscription:
         id=uuid4(),
         group='test_group',
         key='test_key',
-        mode=SubscriptionMode.LAST,
     )
 
 
@@ -375,8 +373,8 @@ class TestKeyInfo:
             registry, 'test_group', 'test_key', callback_registrar
         )
 
-        sub1 = Subscription(id=uuid4(), group='g', key='k', mode=SubscriptionMode.LAST)
-        sub2 = Subscription(id=uuid4(), group='g', key='k', mode=SubscriptionMode.LAST)
+        sub1 = Subscription(id=uuid4(), group='g', key='k')
+        sub2 = Subscription(id=uuid4(), group='g', key='k')
 
         key_info.add(sub1)
         key_info.add(sub2)
@@ -425,7 +423,6 @@ class TestKeyInfo:
                 id=uuid4(),
                 group='test_group',
                 key='test_key',
-                mode=SubscriptionMode.LAST,
             )
             for _ in range(5)
         ]
@@ -618,12 +615,8 @@ class TestRegistryManager:
     def test_subscribe_to_existing_key_reuses_key_info(
         self, registry_manager: RegistryManager
     ) -> None:
-        sub1 = Subscription(
-            id=uuid4(), group='test_group', key='test_key', mode=SubscriptionMode.LAST
-        )
-        sub2 = Subscription(
-            id=uuid4(), group='test_group', key='test_key', mode=SubscriptionMode.LAST
-        )
+        sub1 = Subscription(id=uuid4(), group='test_group', key='test_key')
+        sub2 = Subscription(id=uuid4(), group='test_group', key='test_key')
 
         registry_manager.subscribe(sub1)
         registry_manager.subscribe(sub2)
@@ -656,9 +649,7 @@ class TestRegistryManager:
     def test_unsubscribe_nonexistent_subscription_does_nothing(
         self, registry_manager: RegistryManager
     ) -> None:
-        nonexistent_sub = Subscription(
-            id=uuid4(), group='fake', key='fake', mode=SubscriptionMode.LAST
-        )
+        nonexistent_sub = Subscription(id=uuid4(), group='fake', key='fake')
 
         registry_manager.unsubscribe(nonexistent_sub)
 
@@ -672,12 +663,8 @@ class TestRegistryManager:
         kv['key2'] = 'hello'
         kv.batch_end()
 
-        sub1 = Subscription(
-            id=uuid4(), group='test_group', key='key1', mode=SubscriptionMode.LAST
-        )
-        sub2 = Subscription(
-            id=uuid4(), group='test_group', key='key2', mode=SubscriptionMode.LAST
-        )
+        sub1 = Subscription(id=uuid4(), group='test_group', key='key1')
+        sub2 = Subscription(id=uuid4(), group='test_group', key='key2')
         registry_manager.subscribe(sub1)
         registry_manager.subscribe(sub2)
 
@@ -695,7 +682,6 @@ class TestRegistryManager:
             id=uuid4(),
             group='test_group',
             key='nonexistent',
-            mode=SubscriptionMode.LAST,
         )
         registry_manager.subscribe(sub)
 
@@ -709,9 +695,7 @@ class TestRegistryManager:
     def test_write_updates_registry_values(
         self, registry_manager: RegistryManager, registry: Registry
     ) -> None:
-        sub = Subscription(
-            id=uuid4(), group='test_group', key='test_key', mode=SubscriptionMode.LAST
-        )
+        sub = Subscription(id=uuid4(), group='test_group', key='test_key')
         registry_manager.subscribe(sub)
 
         write_request = Write(
@@ -728,12 +712,8 @@ class TestRegistryManager:
     def test_write_uses_batch_operations(
         self, registry_manager: RegistryManager, registry: Registry
     ) -> None:
-        sub1 = Subscription(
-            id=uuid4(), group='test_group', key='key1', mode=SubscriptionMode.LAST
-        )
-        sub2 = Subscription(
-            id=uuid4(), group='test_group', key='key2', mode=SubscriptionMode.LAST
-        )
+        sub1 = Subscription(id=uuid4(), group='test_group', key='key1')
+        sub2 = Subscription(id=uuid4(), group='test_group', key='key2')
         registry_manager.subscribe(sub1)
         registry_manager.subscribe(sub2)
 
@@ -752,9 +732,7 @@ class TestRegistryManager:
     def test_pop_waits_for_callback_data(
         self, registry_manager: RegistryManager, registry: Registry
     ) -> None:
-        sub = Subscription(
-            id=uuid4(), group='test_group', key='test_key', mode=SubscriptionMode.LAST
-        )
+        sub = Subscription(id=uuid4(), group='test_group', key='test_key')
         registry_manager.subscribe(sub)
 
         def trigger_update() -> None:
@@ -771,7 +749,7 @@ class TestRegistryManager:
         thread.join()
 
         assert chunk_update is not None
-        assert 'test_group' in chunk_update.unordered_updates
+        assert 'test_group' in chunk_update.updates
 
     def test_pop_with_timeout_returns_none_when_no_data(
         self, registry_manager: RegistryManager
@@ -783,9 +761,7 @@ class TestRegistryManager:
     def test_pop_returns_chunk_update_with_sequence_ids(
         self, registry_manager: RegistryManager, registry: Registry
     ) -> None:
-        sub = Subscription(
-            id=uuid4(), group='test_group', key='test_key', mode=SubscriptionMode.LAST
-        )
+        sub = Subscription(id=uuid4(), group='test_group', key='test_key')
         registry_manager.subscribe(sub)
 
         kv = registry.batch_start('test_group')
@@ -795,17 +771,15 @@ class TestRegistryManager:
         chunk_update = registry_manager.pop(timeout=0.5)
 
         assert chunk_update is not None
-        assert 'test_group' in chunk_update.unordered_updates
-        key_update = chunk_update.unordered_updates['test_group']['test_key']
+        assert 'test_group' in chunk_update.updates
+        key_update = chunk_update.updates['test_group']['test_key']
         assert key_update.val == 100
         assert key_update.sequence_id == 0
 
     def test_pop_includes_subscription_ids(
         self, registry_manager: RegistryManager, registry: Registry
     ) -> None:
-        sub = Subscription(
-            id=uuid4(), group='test_group', key='test_key', mode=SubscriptionMode.LAST
-        )
+        sub = Subscription(id=uuid4(), group='test_group', key='test_key')
         registry_manager.subscribe(sub)
 
         kv = registry.batch_start('test_group')
@@ -815,18 +789,14 @@ class TestRegistryManager:
         chunk_update = registry_manager.pop(timeout=0.5)
 
         assert chunk_update is not None
-        key_update = chunk_update.unordered_updates['test_group']['test_key']
+        key_update = chunk_update.updates['test_group']['test_key']
         assert str(sub.id) in key_update.subscription_ids
 
     def test_multiple_subscriptions_to_different_keys(
         self, registry_manager: RegistryManager, registry: Registry
     ) -> None:
-        sub1 = Subscription(
-            id=uuid4(), group='group1', key='key1', mode=SubscriptionMode.LAST
-        )
-        sub2 = Subscription(
-            id=uuid4(), group='group2', key='key2', mode=SubscriptionMode.LAST
-        )
+        sub1 = Subscription(id=uuid4(), group='group1', key='key1')
+        sub2 = Subscription(id=uuid4(), group='group2', key='key2')
 
         registry_manager.subscribe(sub1)
         registry_manager.subscribe(sub2)
@@ -842,9 +812,7 @@ class TestRegistryManagerIntegration:
     def test_subscribe_write_pop_cycle(
         self, registry_manager: RegistryManager, registry: Registry
     ) -> None:
-        sub = Subscription(
-            id=uuid4(), group='test_group', key='test_key', mode=SubscriptionMode.LAST
-        )
+        sub = Subscription(id=uuid4(), group='test_group', key='test_key')
         registry_manager.subscribe(sub)
 
         write_request = Write(
@@ -859,12 +827,8 @@ class TestRegistryManagerIntegration:
     def test_multiple_clients_subscribing_to_same_key(
         self, registry_manager: RegistryManager, registry: Registry
     ) -> None:
-        sub1 = Subscription(
-            id=uuid4(), group='test_group', key='shared_key', mode=SubscriptionMode.LAST
-        )
-        sub2 = Subscription(
-            id=uuid4(), group='test_group', key='shared_key', mode=SubscriptionMode.LAST
-        )
+        sub1 = Subscription(id=uuid4(), group='test_group', key='shared_key')
+        sub2 = Subscription(id=uuid4(), group='test_group', key='shared_key')
 
         registry_manager.subscribe(sub1)
         registry_manager.subscribe(sub2)
@@ -876,7 +840,7 @@ class TestRegistryManagerIntegration:
         chunk_update = registry_manager.pop(timeout=0.5)
 
         assert chunk_update is not None
-        key_update = chunk_update.unordered_updates['test_group']['shared_key']
+        key_update = chunk_update.updates['test_group']['shared_key']
         assert str(sub1.id) in key_update.subscription_ids
         assert str(sub2.id) in key_update.subscription_ids
 
@@ -892,7 +856,6 @@ class TestRegistryManagerIntegration:
                         id=uuid4(),
                         group=f'group_{thread_id}',
                         key=f'key_{i}',
-                        mode=SubscriptionMode.LAST,
                     )
                     registry_manager.subscribe(sub)
                     time.sleep(0.001)
@@ -915,9 +878,7 @@ class TestRegistryManagerIntegration:
     def test_registry_updates_trigger_callbacks_and_appear_in_pop(
         self, registry_manager: RegistryManager, registry: Registry
     ) -> None:
-        sub = Subscription(
-            id=uuid4(), group='test_group', key='test_key', mode=SubscriptionMode.LAST
-        )
+        sub = Subscription(id=uuid4(), group='test_group', key='test_key')
         registry_manager.subscribe(sub)
 
         kv = registry.batch_start('test_group')
@@ -926,7 +887,7 @@ class TestRegistryManagerIntegration:
 
         chunk_update = registry_manager.pop(timeout=0.5)
         assert chunk_update is not None
-        assert chunk_update.unordered_updates['test_group']['test_key'].val == 'initial'
+        assert chunk_update.updates['test_group']['test_key'].val == 'initial'
 
         kv = registry.batch_start('test_group')
         kv['test_key'] = 'updated'
@@ -934,14 +895,12 @@ class TestRegistryManagerIntegration:
 
         chunk_update = registry_manager.pop(timeout=0.5)
         assert chunk_update is not None
-        assert chunk_update.unordered_updates['test_group']['test_key'].val == 'updated'
+        assert chunk_update.updates['test_group']['test_key'].val == 'updated'
 
     def test_sequence_id_ordering_in_updates(
         self, registry_manager: RegistryManager, registry: Registry
     ) -> None:
-        sub = Subscription(
-            id=uuid4(), group='test_group', key='test_key', mode=SubscriptionMode.LAST
-        )
+        sub = Subscription(id=uuid4(), group='test_group', key='test_key')
         registry_manager.subscribe(sub)
 
         kv = registry.batch_start('test_group')
@@ -950,7 +909,7 @@ class TestRegistryManagerIntegration:
 
         chunk1 = registry_manager.pop(timeout=0.5)
         assert chunk1 is not None
-        seq1 = chunk1.unordered_updates['test_group']['test_key'].sequence_id
+        seq1 = chunk1.updates['test_group']['test_key'].sequence_id
 
         kv = registry.batch_start('test_group')
         kv['test_key'] = 2
@@ -958,16 +917,14 @@ class TestRegistryManagerIntegration:
 
         chunk2 = registry_manager.pop(timeout=0.5)
         assert chunk2 is not None
-        seq2 = chunk2.unordered_updates['test_group']['test_key'].sequence_id
+        seq2 = chunk2.updates['test_group']['test_key'].sequence_id
 
         assert seq2 > seq1
 
     def test_external_registry_writes_appear_in_pop(
         self, registry_manager: RegistryManager, registry: Registry
     ) -> None:
-        sub = Subscription(
-            id=uuid4(), group='test_group', key='test_key', mode=SubscriptionMode.LAST
-        )
+        sub = Subscription(id=uuid4(), group='test_group', key='test_key')
         registry_manager.subscribe(sub)
 
         kv = registry.batch_start('test_group')
@@ -977,7 +934,4 @@ class TestRegistryManagerIntegration:
         chunk_update = registry_manager.pop(timeout=0.5)
 
         assert chunk_update is not None
-        assert (
-            chunk_update.unordered_updates['test_group']['test_key'].val
-            == 'external_write'
-        )
+        assert chunk_update.updates['test_group']['test_key'].val == 'external_write'

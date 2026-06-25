@@ -12,7 +12,7 @@ from pntos.api import Registry
 from pntos.cobra.advanced_plugins.ui.ExperimentalCobraUiPlugin import (
     ExperimentalCobraUiPlugin,
 )
-from pntos.cobra.advanced_plugins.ui.models import Subscription, SubscriptionMode
+from pntos.cobra.advanced_plugins.ui.models import Subscription
 from pntos.cobra.config import ExperimentalCobraUiConfig
 from pntos.cobra.dummy_plugins.DummyMediator import DummyMediator
 from pntos.cobra.standard_plugins.StandardRegistryPlugin import StandardRegistryPlugin
@@ -261,7 +261,6 @@ class TestCobraUiPluginSocketRoutes:
             id=uuid4(),
             group='test_group',
             key='test_key',
-            mode=SubscriptionMode.LAST,
         )
         initialized_plugin.registry_manager.subscribe(sub)
 
@@ -311,7 +310,6 @@ class TestCobraUiPluginSocketRoutes:
             id=sub_id,
             group='test_group',
             key='test_key',
-            mode=SubscriptionMode.LAST,
         )
         initialized_plugin.registry_manager.subscribe(sub)
         assert sub_id in initialized_plugin.registry_manager.subscriptions_map
@@ -338,7 +336,6 @@ class TestCobraUiPluginSocketRoutes:
             id=uuid4(),
             group='test_group',
             key='test_key',
-            mode=SubscriptionMode.LAST,
         )
         initialized_plugin.registry_manager.subscribe(sub)
 
@@ -370,13 +367,11 @@ class TestCobraUiPluginSocketRoutes:
             id=uuid4(),
             group='test_group',
             key='key1',
-            mode=SubscriptionMode.LAST,
         )
         sub2 = Subscription(
             id=uuid4(),
             group='test_group',
             key='key2',
-            mode=SubscriptionMode.LAST,
         )
         initialized_plugin.registry_manager.subscribe(sub1)
         initialized_plugin.registry_manager.subscribe(sub2)
@@ -410,7 +405,6 @@ class TestCobraUiPluginSocketRoutes:
             id=uuid4(),
             group='test_group',
             key='test_key',
-            mode=SubscriptionMode.LAST,
         )
         initialized_plugin.registry_manager.subscribe(sub)
 

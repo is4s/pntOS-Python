@@ -79,7 +79,7 @@ class Emit:
 
 class KeyInfo(MutableValueView[ValueType], Generic[ValueType]):
     _subscriptions: dict[UUID4, Subscription]
-    """All subscriptions for this key with ``SubscriptionMode.LAST``"""
+    """All subscriptions for this key"""
     _do_not_update_front_end: Event
     """
     If set, the next callback will be assumed to be a write from the front-end or some
@@ -109,7 +109,6 @@ class KeyInfo(MutableValueView[ValueType], Generic[ValueType]):
 
     def add(self, subscription: Subscription) -> None:
         """Adds subscription to this key."""
-        # TODO: Implement SubscriptionMode.ALL
         if subscription.id in self._subscriptions:
             return  # Duplicate
         self._subscriptions[subscription.id] = subscription
@@ -281,12 +280,11 @@ class RegistryManager:
         if not self._callback_registrar.data.is_set():
             return None
         out = ChunkUpdate(
-            ordered_updates=[],
-            unordered_updates={},
+            updates={},
         )
         changed_keys = self._callback_registrar.pop()
         for group, key_map in changed_keys.items():
-            out_group = out.unordered_updates.setdefault(group, {})
+            out_group = out.updates.setdefault(group, {})
             for key, key_info in key_map.items():
                 value = key_info.value
                 if value is None:

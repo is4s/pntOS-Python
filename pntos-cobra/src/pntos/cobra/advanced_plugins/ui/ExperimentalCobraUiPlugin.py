@@ -224,8 +224,7 @@ class ExperimentalCobraUiPlugin(UiPlugin):
                 emit(
                     'chunkUpdate',
                     ChunkUpdate(
-                        ordered_updates=[],
-                        unordered_updates={subscription.group: initial_value},
+                        updates={subscription.group: initial_value},
                     ).model_dump(),
                 )
 

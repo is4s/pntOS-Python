@@ -113,7 +113,7 @@
   export type BannerStyle = "blue" | "none"
 
   export const MINIMIZED_WIDGET_HEIGHT = 28
-  export const CELL_GAP = 19
+  export const CELL_GAP = 10
   export const DEFAULT_WIDGET_HEIGHT = 5
 
   export interface WidgetMetadata {
@@ -316,7 +316,8 @@
 <style lang="css" scoped>
   .widget-grid {
     height: 100%;
-    width: 100%;
+    width: calc(100% - 24px);
+    margin: 0 auto;
   }
 
   .grid-stack-item-content {

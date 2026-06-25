@@ -1,6 +1,5 @@
 from .advanced_plugins.buscat.BuscatMediator import BuscatMediator as BuscatMediator
 from .advanced_plugins.ui.models import (
-    BatchUpdate as BatchUpdate,
     ChunkUpdate as ChunkUpdate,
     KeyUpdate as KeyUpdate,
     Snapshot as Snapshot,

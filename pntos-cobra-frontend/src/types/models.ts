@@ -3,11 +3,6 @@ import type { Ref } from 'vue'
 
 type UUID4 = string
 
-export enum SubscriptionMode {
-  ALL = 'all',
-  LAST = 'last',
-}
-
 /**
  * Registry value types that can be deserialized from frontend
  */
@@ -17,7 +12,6 @@ export interface Subscription {
   id: UUID4
   group: string
   key: string
-  mode: SubscriptionMode
 }
 export interface KeyUpdate {
   val: RegistryValueType
@@ -25,15 +19,8 @@ export interface KeyUpdate {
   sequence_id: number
 }
 
-export interface BatchUpdate {
-  sequence_id: number
-  group: string
-  keys: Record<string, KeyUpdate>
-}
-
 export interface ChunkUpdate {
-  ordered_updates: BatchUpdate[]
-  unordered_updates: Record<string, Record<string, KeyUpdate>>
+  updates: Record<string, Record<string, KeyUpdate>>
 }
 
 export interface Snapshot {

@@ -1,5 +1,4 @@
 import type {
-  BatchUpdate,
   ChunkUpdate,
   CobraUiSocketInterface,
   RegistryValueType,
@@ -8,7 +7,6 @@ import type {
   Snapshot,
   Write,
 } from '@/types'
-import { SubscriptionMode } from '@/types'
 import { io } from 'socket.io-client'
 import { v4 as newUUID } from 'uuid'
 import {
@@ -24,7 +22,6 @@ import {
   type ComputedRef,
   type Ref,
 } from 'vue'
-import { SequenceBuffer } from './SequenceBuffer'
 
 const socket: CobraUiSocketInterface = io()
 
@@ -109,10 +106,9 @@ function ensureValue<T = RegistryValueType>(
 export function useRegistry<T = RegistryValueType>(
   group: string,
   key: string,
-  mode: SubscriptionMode = SubscriptionMode.LAST,
 ): Ref<T | null> {
   const entry = ensureValue<T>(group, key)
-  const subscription = { group: group, key: key, id: newUUID(), mode: mode }
+  const subscription = { group: group, key: key, id: newUUID() }
 
   onMounted(() => {
     entry.subscriptions.set(subscription.id, subscription)
@@ -205,18 +201,10 @@ socket.on('disconnect', (reason: string) => {
   sendTimer = null
 })
 
-const batchBuffer = new SequenceBuffer<BatchUpdate>((batch: BatchUpdate) => batch.sequence_id)
-
 function chunkUpdate(updates: ChunkUpdate): void {
   isApplyingBackendUpdate = true
   try {
-    batchBuffer.addMultiple(updates.ordered_updates).forEach((update) => {
-      Object.entries(update.keys).forEach(([key, value]) => {
-        const entry = ensureValue(update.group, key)
-        entry.val.value = value.val // TODO: use value metadata?
-      })
-    })
-    Object.entries(updates.unordered_updates).forEach(([group, keyVal]) => {
+    Object.entries(updates.updates).forEach(([group, keyVal]) => {
       Object.entries(keyVal).forEach(([key, value]) => {
         const entry = ensureValue(group, key)
         entry.val.value = value.val // TODO: use value metadata?
@@ -269,7 +257,7 @@ socket.on('chunkUpdate', (chunk: ChunkUpdate) => {
 })
 
 export function useGroups(): Ref<string[] | null> {
-  const groups = useRegistry<string[]>('ui/metadata', 'groups', SubscriptionMode.LAST)
+  const groups = useRegistry<string[]>('ui/metadata', 'groups')
   return groups
 }
 

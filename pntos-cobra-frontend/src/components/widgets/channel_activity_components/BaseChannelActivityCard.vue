@@ -3,7 +3,6 @@
   import PinToTopDarkIcon from '@/assets/branding/svgs/widgets/channel_activity/pin_to_top_dark.svg';
   import PinToTopLightIcon from '@/assets/branding/svgs/widgets/channel_activity/pin_to_top_light.svg';
   import HoverButton from '@/components/common/HoverButton.vue';
-  import { SubscriptionMode } from '@/types';
   import { UI_CHANNELS_PREFIX, useRegistry } from '@/utils/useRegistry';
   import { useWidgetActions } from '@/utils/useWidgetActions';
   import { useChannelActivityStore } from '../ChannelActivity.vue';
@@ -18,8 +17,8 @@
   const pinnedStore = useChannelActivityStore()
 
   const registryGroup = UI_CHANNELS_PREFIX + props.channel
-  const pinned = useRegistry<boolean>(registryGroup, 'pinned', SubscriptionMode.LAST)
-  const messageCount = useRegistry<number>(registryGroup, 'message_count', SubscriptionMode.LAST)
+  const pinned = useRegistry<boolean>(registryGroup, 'pinned')
+  const messageCount = useRegistry<number>(registryGroup, 'message_count')
   const { addWidget } = useWidgetActions()
 
   function onPinClick() {

@@ -1,4 +1,3 @@
-import { SubscriptionMode } from '@/types'
 import { computed, type ComputedRef, ref, type Ref, watch } from 'vue'
 import { useRegistry } from './useRegistry'
 
@@ -165,6 +164,6 @@ export function useRegistryWithUnits(
   unitSuffix: string = '',
   defaultVal: number = 0,
 ): NumberWithUnitRef<number> {
-  const value = useRegistry<number>(group, key, SubscriptionMode.LAST)
+  const value = useRegistry<number>(group, key)
   return useUnits(value, unitSuffix, defaultVal)
 }
