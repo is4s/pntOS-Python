@@ -53,20 +53,23 @@
     top: 0;
     left: 0;
     min-height: calc(100vh - var(--header-height) - var(--footer-height));
-    width: 199px;
+    width: 260px;
     box-shadow: 4px 0px 4px 4px rgba(0, 0, 0, 0.05);
     transition: 300ms ease-out;
     display: flex;
     flex-direction: column;
+    border-top-right-radius: 15px;
     overflow-x: hidden;
     position: absolute;
     z-index: 10;
-    background-color: var(--white-smoke);
-    padding: 14px;
+    background-color: var(--white);
+    padding-top: 14px;
+    padding-left: 18px;
+    padding-right: 18px;
   }
 
   .collapsed {
-    left: -199px;
+    left: -260px;
     box-shadow: none;
   }
 

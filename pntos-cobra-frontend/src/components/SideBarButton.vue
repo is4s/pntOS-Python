@@ -47,7 +47,7 @@
   }
 
   .container-not-maxed {
-    background: var(--platinum);
+    background: var(--white-smoke);
     color: var(--black);
   }
 
