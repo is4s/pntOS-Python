@@ -148,7 +148,10 @@
     padding-left: 9px;
     display: flex;
     align-items: center;
+  }
 
+  .widget-title-blue:hover {
+    cursor: default
   }
   .min {
     transition: transform 0.2s ease;

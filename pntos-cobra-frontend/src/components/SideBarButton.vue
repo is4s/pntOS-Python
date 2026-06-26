@@ -46,6 +46,10 @@
     transition: background 0.2s ease, color 0.2s ease;
   }
 
+  .container:hover {
+    cursor: default
+  }
+
   .container-not-maxed {
     background: var(--white-smoke);
     color: var(--black);

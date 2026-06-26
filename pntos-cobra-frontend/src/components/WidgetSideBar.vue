@@ -80,6 +80,10 @@
     margin-left: 2px;
   }
 
+  .sidebar-label:hover {
+    cursor:default
+  }
+
   .sidebar-grid {
     display: flex;
     flex-direction: column;
