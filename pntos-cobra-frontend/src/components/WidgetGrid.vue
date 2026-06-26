@@ -62,8 +62,10 @@ export const useWidgets = defineStore('main-widget-grid', {
       if (widget.minimized) {
         widget.nonMinimizedHeight = widget.layout.h
         widget.layout.h = 1
+        widget.layout.maxH = 1
       } else {
         widget.layout.h = widget.nonMinimizedHeight
+        widget.layout.maxH = undefined
       }
     },
     getNewWidgets() {
