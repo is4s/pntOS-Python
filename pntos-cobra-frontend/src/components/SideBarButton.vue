@@ -21,10 +21,10 @@
 <template>
   <div class="container" :class="maxWidgetInstances() ? '' : 'container-not-maxed'" @click="add">
     <div v-if="!maxWidgetInstances()">
-      <img :src="props.darkIcon" />
+      <img class="icon" :src="props.darkIcon" />
     </div>
     <div v-else>
-      <img :src="props.lightIcon" />
+      <img class="icon" :src="props.lightIcon" />
     </div>
     {{ props.title }}
   </div>
@@ -34,7 +34,8 @@
 <style lang="css" scoped>
   .container {
     width: 100%;
-    border-radius: 4px;
+    height: 30px;
+    border-radius: 3px;
     display: flex;
     align-content: center;
     align-items: center;
@@ -56,6 +57,8 @@
   }
 
   .icon {
-    fill: var(--federal-blue)
+    fill: var(--federal-blue);
+    display: flex;
+    margin: 2px;
   }
 </style>
