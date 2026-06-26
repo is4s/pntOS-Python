@@ -18,8 +18,6 @@
   import ExitLightBackgroundIcon from "@/assets/branding/svgs/widgets/ExitLightBackground.svg";
   import MaximizeDarkBackgroundIcon from "@/assets/branding/svgs/widgets/MaximizeDarkBackground.svg";
   import MaximizeLightBackgroundIcon from "@/assets/branding/svgs/widgets/MaximizeLightBackground.svg";
-  import MinimizeDarkBackgroundIcon from "@/assets/branding/svgs/widgets/MinimizeDarkBackground.svg";
-  import MinimizeLightBackgroundIcon from "@/assets/branding/svgs/widgets/MinimizeLightBackground.svg";
   import { useGrid, useWidgets } from "@/components/WidgetGrid.vue";
   import { onMounted } from "vue";
 
@@ -27,7 +25,6 @@
   const props = defineProps<BaseWidgetData>()
 
   const style = {
-    minimizeButton: props.bannerStyle === 'none' ? MinimizeLightBackgroundIcon : MinimizeDarkBackgroundIcon,
     maximizeButton: props.bannerStyle === 'none' ? MaximizeLightBackgroundIcon : MaximizeDarkBackgroundIcon,
     exitButton: props.bannerStyle === 'none' ? ExitLightBackgroundIcon : ExitDarkBackgroundIcon,
   }
@@ -71,7 +68,7 @@
   <div class="widget-container" :class="minimized ? 'no-overflow' : ''">
     <div class="widget-buttons-container" :class="minimized ? 'widget-buttons-minimized-hover' : ''">
       <div class="widget-button" @click="toggleMinimize">
-        <img :src="minimized ? style['minimizeButton'] : style['maximizeButton']" />
+        <img :src="style['maximizeButton']" :class="minimized ? 'min' : 'max'" />
       </div>
       <div class="widget-button" @click="handleExit">
         <img :src="style['exitButton']" />
@@ -152,5 +149,14 @@
     display: flex;
     align-items: center;
 
+  }
+  .min {
+    transition: transform 0.2s ease;
+    transform: rotate(180deg);
+  }
+
+  .max {
+    transition: transform 0.2s ease;
+    transform: rotate(0deg);
   }
 </style>

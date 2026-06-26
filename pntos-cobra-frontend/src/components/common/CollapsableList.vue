@@ -1,5 +1,4 @@
 <script setup lang="ts">
-  import CollapsedIcon from '@/assets/branding/svgs/collapsed-list.svg';
   import ExpandedIcon from '@/assets/branding/svgs/expanded-list.svg';
   import { computed, type ComponentPublicInstance } from 'vue';
 
@@ -12,8 +11,6 @@
     maxH?: number,
   }
   const props = defineProps<ListInfo>()
-
-  const icon = computed(() => props.collapsed ? CollapsedIcon : ExpandedIcon)
 
   function setItemRef(el: Element | ComponentPublicInstance | null) {
     if (!el || !(el instanceof Element)) return
@@ -29,7 +26,7 @@
       <li class="cobra-ui-list-title-item">
         <div class="cobra-ui-list-title">{{ listTitle }}</div>
         <div class="cobra-ui-list-collapse-button clickable-button centered" @click="toggleCollapseCallback()">
-          <img :src="icon" />
+          <img :src="ExpandedIcon" :class="collapsed ? 'icon-collapsed' : 'icon-expanded'"/>
         </div>
       </li>
       <div v-if="!collapsed">
@@ -116,5 +113,14 @@
     top: 2px;
   }
 
+  .icon-collapsed {
+    transition: transform 0.2s ease;
+    transform: rotate(180deg)
+  }
+
+  .icon-expanded {
+    transition: transform 0.2s ease;
+    transform: rotate(0deg)
+  }
 
 </style>
