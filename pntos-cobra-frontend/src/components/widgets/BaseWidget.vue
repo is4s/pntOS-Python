@@ -139,7 +139,7 @@
   }
 
   .widget-title-blue {
-    height: 27px;
+    height: 28px;
     width: 100%;
     background: var(--federal-blue);
     color: var(--white);
