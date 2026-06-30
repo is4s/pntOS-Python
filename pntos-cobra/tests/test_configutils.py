@@ -309,6 +309,33 @@ class TestConfigUtils(unittest.TestCase):
         assert result_config.imu_model == config.imu_model
         assert config == result_config
 
+    def test_get_correct_type_to_from_registry(self) -> None:
+        imu_model = ImuConfig(
+            CONFIG_TEST_GROUP,
+            (1.23, 2.34, 3.45),
+            (12.3, 23.4, 34.5),
+            (123.0, 234.0, 345.0),
+            (1e-1, 1e-2, 1e-3),
+            (2e-2, 3e-3, 4e-4),
+            (1.23e-10, 2.34e-10, 3.45e-10),
+        )
+        config = StaticAlignmentConfig(CONFIG_TEST_GROUP, 1.23, imu_model)
+
+        # Write config to registry
+        config_to_registry(config, self.mediator)
+
+        # Overwrite the float field with a string representation
+        with self.mediator.registry.batch_start(CONFIG_TEST_GROUP) as kv:
+            kv['static_time'] = '2.46'  # Registry supports str -> float conversion
+
+        # Read back - should convert string to float automatically via get_value
+        result_config = config_from_registry(
+            StaticAlignmentConfig, self.mediator, CONFIG_TEST_GROUP
+        )
+        assert result_config is not None
+        assert result_config.static_time == 2.46  # Should be converted to float
+        assert result_config.imu_model == config.imu_model
+
     def test_config_from_registry_return_none(self) -> None:
         test_conf = FogmConfig(
             CONFIG_TEST_GROUP,

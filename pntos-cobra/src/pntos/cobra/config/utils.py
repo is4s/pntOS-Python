@@ -145,15 +145,15 @@ def config_from_registry(
             continue
         if issubclass(dtype, EstimateWithCovariance):
             val = EstimateWithCovariance(
-                type=EstimateWithCovarianceType(kv['_ewc_type']),
-                estimate=kv['_estimate'],  # ty:ignore[invalid-argument-type]
-                covariance=kv['_covariance'],  # ty:ignore[invalid-argument-type]
+                type=EstimateWithCovarianceType(kv.get_value('_ewc_type', int)),
+                estimate=kv.get_value('_estimate', np.ndarray),  # ty:ignore[invalid-argument-type]
+                covariance=kv.get_value('_covariance', np.ndarray),  # ty:ignore[invalid-argument-type]
             )
         # Special case: nested config or a series of nested configs
         elif issubclass(dtype, BaseConfig):
             val = _nested_config_from_registry(kv, mediator, param)
         else:
-            val = kv[param.name]
+            val = _typed_get_value(kv, param, dtype)
 
         if val is None:
             mediator.log_message(
@@ -231,6 +231,84 @@ def _get_dtype(param_type: type[Any]) -> type[Any]:
     return dtype
 
 
+def _typed_get_value(kv: KeyValueStore, param: Field[Any], dtype: type[Any]) -> Any:  # noqa: ANN401
+    """
+    Read ``kv[param.name]`` via the typed ``KeyValueStore.get_value(key, T)`` accessor,
+    with ``T`` derived from the dataclass field annotation.
+
+    Replaces the previous untyped ``kv[param.name]`` indexing so values stored as strings
+    on text-backed registries (e.g. GKeyFile, used by the C/pntOS bridge) come back as
+    their declared Python type — matching the annotation that ``_get_dtype`` and
+    ``_confirm_types`` already consult. Behavior is unchanged for in-process registries
+    that already type values correctly.
+
+    Args:
+        kv (KeyValueStore): The KeyValueStore to read from.
+        param (Field[Any]): The dataclass field describing the destination type.
+        dtype (type[Any]): The innermost dataclass type (as returned by ``_get_dtype``).
+
+    Returns:
+        The value at ``param.name``, in the type derived from the annotation.
+    """
+    annotation = param.type
+    if _is_type_optional(annotation):
+        annotation = get_args(annotation)[0]
+    origin = get_origin(annotation)
+    if origin in (tuple, list):
+        # String series come back as Python lists; numeric series as numpy arrays.
+        if dtype is str:
+            return kv.get_value(param.name, list)
+        return kv.get_value(param.name, np.ndarray)
+    if origin is np.ndarray:
+        return kv.get_value(param.name, np.ndarray)
+    if isclass(dtype) and issubclass(dtype, Enum):
+        # Enum could be an int, str, etc... - need to determine the enum type via the
+        # type of the first enum value
+        value_type = type(next(iter(dtype)).value)
+        return kv.get_value(param.name, value_type)
+    if dtype is bool:
+        # Some bridges return int 0/1 for bool reads; coerce so _confirm_types accepts it.
+        v = kv.get_value(param.name, bool)
+        return bool(v) if v is not None else None
+    if dtype is int:
+        return kv.get_value(param.name, int)
+    if dtype is float:
+        return kv.get_value(param.name, float)
+    return kv.get_value(param.name, str)
+
+
+def _get_groups(kv: KeyValueStore, param: Field[Any]) -> list[str] | str | None:
+    """
+    Retrieves nested config group names from the registry, inferring return shape from
+    the field annotation.
+
+    Args:
+        kv (KeyValueStore): The KeyValueStore to read from.
+        param (Field[Any]): The dataclass field describing the nested config or config
+            series.
+
+    Returns:
+        list[str] | str | None: A list of group names if the field expects a series of
+        configs, a single group name string if the field expects a single nested config,
+        or None if the group key does not exist.
+    """
+    group_key = '_' + param.name + '_groups'
+    if group_key not in kv:
+        return None
+    # Use typed get_value so the source-of-truth annotation (tuple/list of configs vs single
+    # config) picks the right return shape. An untyped kv[group_key] read can collapse a
+    # one-element series to a bare str on text-backed registries, breaking the isinstance
+    # branch below.
+    _ann = param.type
+    if _is_type_optional(_ann):
+        _ann = get_args(_ann)[0]
+    if get_origin(_ann) in (tuple, list):
+        groups = kv.get_value(group_key, list) or []
+    else:
+        groups = kv.get_value(group_key, str)
+    return groups
+
+
 def _nested_config_from_registry(
     kv: KeyValueStore,
     mediator: Mediator,
@@ -248,10 +326,7 @@ def _nested_config_from_registry(
     Returns:
         ConfigType | list[ConfigType] | None
     """
-    group_key = '_' + param.name + '_groups'
-    if group_key not in kv:
-        return None
-    groups = kv[group_key]
+    groups = _get_groups(kv, param)
     val = None
     kv.batch_end()
     if isinstance(groups, str):
@@ -266,7 +341,7 @@ def _nested_config_from_registry(
             conf_type = get_args(conf_type)[0]
         val = []
         for group in groups:
-            conf = config_from_registry(conf_type, mediator, group)  # ty:ignore[invalid-argument-type]
+            conf = config_from_registry(conf_type, mediator, group)
             if conf is None:
                 val = None
                 break
