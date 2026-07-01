@@ -31,8 +31,8 @@ dependencies = [
     "h5py>1",
     "lcm>=1.5.1,<2",
     "matplotlib",
-    "navanalysis-lcm>=0.1.5",
-    "navanalysis-ros>=0.1.2",
+    "navanalysis-lcm==0.1.5",
+    "navanalysis-ros==0.1.2",
     "navtk==2.1.post6.dev0",
     # numpy 2.2 type errors with Cobra (#148).
     "numpy!=2.2",
