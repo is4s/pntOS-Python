@@ -1359,7 +1359,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "aspn23" },
+    { name = "aspn23", specifier = "==0.1.0" },
     { name = "numpy" },
 ]
 
@@ -1388,8 +1388,8 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "aspn23" },
-    { name = "aspn23-lcm" },
+    { name = "aspn23", specifier = "==0.1.0" },
+    { name = "aspn23-lcm", specifier = "==0.1.0" },
     { name = "flask" },
     { name = "flask-socketio" },
     { name = "h5py", specifier = ">1" },

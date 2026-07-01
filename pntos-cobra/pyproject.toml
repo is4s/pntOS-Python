@@ -24,8 +24,8 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
 ]
 dependencies = [
-    "aspn23",
-    "aspn23-lcm",
+    "aspn23==0.1.0",
+    "aspn23-lcm==0.1.0",
     "flask",
     "flask-socketio",
     "h5py>1",
