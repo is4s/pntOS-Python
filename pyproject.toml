@@ -16,9 +16,9 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
 ]
 dependencies = [
-    "analysis-lcm>=0.1.4",
-    "analysis-ros>=0.1.1",
     "matplotlib",
+    "navanalysis-lcm>=0.1.5",
+    "navanalysis-ros>=0.1.2",
     "pntos-api",
     "pntos-cobra",
     "pntos-python-datasets-lcm==0.1.0",

@@ -23,41 +23,6 @@ wheels = [
 ]
 
 [[package]]
-name = "analysis-lcm"
-version = "0.1.4"
-source = { registry = "https://pypi.org/simple/" }
-dependencies = [
-    { name = "aspn23" },
-    { name = "aspn23-lcm" },
-    { name = "inu" },
-    { name = "lcm" },
-    { name = "matplotlib" },
-    { name = "navtk" },
-    { name = "numpy" },
-    { name = "pyyaml" },
-    { name = "scipy", version = "1.15.3", source = { registry = "https://pypi.org/simple/" }, marker = "python_full_version < '3.11'" },
-    { name = "scipy", version = "1.16.1", source = { registry = "https://pypi.org/simple/" }, marker = "python_full_version >= '3.11'" },
-    { name = "tabulate" },
-    { name = "tomlkit" },
-    { name = "tqdm" },
-]
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/57/b0/67f0f7f9435706ab74022dbbe72ec8a0a0a133b3805ab16e3a3355fe59cd/analysis_lcm-0.1.4-py3-none-any.whl", hash = "sha256:993ec6f0fb494d7ae683d42ab2cc15990b20ee8aab0046c1ce4dc3a32b21caf2", size = 68520, upload-time = "2026-06-05T18:43:14.582Z" },
-]
-
-[[package]]
-name = "analysis-ros"
-version = "0.1.1"
-source = { registry = "https://pypi.org/simple/" }
-dependencies = [
-    { name = "analysis-lcm" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/ea/20/311c1ffbaf5c1215600cf72f6bf408baefcc58203a5b01f4da78ec661352/analysis_ros-0.1.1.tar.gz", hash = "sha256:56202a0592c23d46e9a9979eb551dc4c8ab1dafb4639b0c82686486b7fcc0b2b", size = 6512, upload-time = "2026-05-28T13:56:00.076Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/72/1e/031088d18c192d390d9692bc72c9e5b6491825487590d2ba813740b09220/analysis_ros-0.1.1-py3-none-any.whl", hash = "sha256:0e8d5a77dde3efc2fb4b6586047f4163b74f9d99121ef89c3a2866337795b240", size = 8426, upload-time = "2026-05-28T13:56:03.217Z" },
-]
-
-[[package]]
 name = "annotated-types"
 version = "0.7.0"
 source = { registry = "https://pypi.org/simple/" }
@@ -1191,6 +1156,40 @@ wheels = [
 ]
 
 [[package]]
+name = "navanalysis-lcm"
+version = "0.1.5"
+source = { registry = "https://pypi.org/simple/" }
+dependencies = [
+    { name = "aspn23" },
+    { name = "aspn23-lcm" },
+    { name = "inu" },
+    { name = "lcm" },
+    { name = "matplotlib" },
+    { name = "navtk" },
+    { name = "numpy" },
+    { name = "pyyaml" },
+    { name = "scipy", version = "1.15.3", source = { registry = "https://pypi.org/simple/" }, marker = "python_full_version < '3.11'" },
+    { name = "scipy", version = "1.16.1", source = { registry = "https://pypi.org/simple/" }, marker = "python_full_version >= '3.11'" },
+    { name = "tabulate" },
+    { name = "tomlkit" },
+    { name = "tqdm" },
+]
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/c3/9a/acd1efd3e6c782edb0e1eb2f1ac0d5f07696a1ee6a94c504cfdb2a890041/navanalysis_lcm-0.1.5-py3-none-any.whl", hash = "sha256:cd921b5ea5766bff0894905387510f594810d70659ff4407f0bde4b77cc0f4b7", size = 69065, upload-time = "2026-06-26T01:42:05.426Z" },
+]
+
+[[package]]
+name = "navanalysis-ros"
+version = "0.1.2"
+source = { registry = "https://pypi.org/simple/" }
+dependencies = [
+    { name = "navanalysis-lcm" },
+]
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/5d/ba/a87b8c68c2ccd162cecb7c3b99fa90dfaf0f53a33ac374ace256ecb4a9dd/navanalysis_ros-0.1.2-py3-none-any.whl", hash = "sha256:bb9def43e996384f122822adcf967108102222d9a68414001c266a2ccef76036", size = 8505, upload-time = "2026-06-26T01:42:06.768Z" },
+]
+
+[[package]]
 name = "navtk"
 version = "2.1.0.post6.dev0"
 source = { registry = "https://pypi.org/simple/" }
@@ -1432,8 +1431,6 @@ name = "pntos-cobra"
 version = "2.1.0.post0.dev2"
 source = { editable = "pntos-cobra" }
 dependencies = [
-    { name = "analysis-lcm" },
-    { name = "analysis-ros" },
     { name = "aspn23" },
     { name = "aspn23-lcm" },
     { name = "flask" },
@@ -1441,6 +1438,8 @@ dependencies = [
     { name = "h5py" },
     { name = "lcm" },
     { name = "matplotlib" },
+    { name = "navanalysis-lcm" },
+    { name = "navanalysis-ros" },
     { name = "navtk" },
     { name = "numpy" },
     { name = "pntos-api" },
@@ -1452,8 +1451,6 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "analysis-lcm", specifier = ">=0.1.4" },
-    { name = "analysis-ros", specifier = ">=0.1.1" },
     { name = "aspn23" },
     { name = "aspn23-lcm" },
     { name = "flask" },
@@ -1461,6 +1458,8 @@ requires-dist = [
     { name = "h5py", specifier = ">1" },
     { name = "lcm", specifier = ">=1.5.1,<2" },
     { name = "matplotlib" },
+    { name = "navanalysis-lcm", specifier = ">=0.1.5" },
+    { name = "navanalysis-ros", specifier = ">=0.1.2" },
     { name = "navtk", specifier = "==2.1.post6.dev0", index = "https://pypi.org/simple/" },
     { name = "numpy", specifier = "!=2.2" },
     { name = "pntos-api", editable = "pntos-api" },
@@ -1474,9 +1473,9 @@ name = "pntos-python"
 version = "2.1.0.post0.dev0"
 source = { virtual = "." }
 dependencies = [
-    { name = "analysis-lcm" },
-    { name = "analysis-ros" },
     { name = "matplotlib" },
+    { name = "navanalysis-lcm" },
+    { name = "navanalysis-ros" },
     { name = "pntos-api" },
     { name = "pntos-cobra" },
     { name = "pntos-python-datasets-lcm" },
@@ -1507,9 +1506,9 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "analysis-lcm", specifier = ">=0.1.4" },
-    { name = "analysis-ros", specifier = ">=0.1.1" },
     { name = "matplotlib" },
+    { name = "navanalysis-lcm", specifier = ">=0.1.5" },
+    { name = "navanalysis-ros", specifier = ">=0.1.2" },
     { name = "pntos-api", editable = "pntos-api" },
     { name = "pntos-cobra", editable = "pntos-cobra" },
     { name = "pntos-python-datasets-lcm", specifier = "==0.1.0", index = "https://pypi.org/simple/" },

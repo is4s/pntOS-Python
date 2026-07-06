@@ -1,10 +1,10 @@
-from analysis.lcm.conversions import pressure_to_alt
 from aspn23 import (
     MeasurementAltitude,
     MeasurementAltitudeErrorModel,
     MeasurementAltitudeReference,
     MeasurementBarometer,
 )
+from navanalysis.lcm.conversions import pressure_to_alt
 from pntos.api import (
     LoggingLevel,
     Mediator,

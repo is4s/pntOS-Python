@@ -5,10 +5,10 @@ from dataclasses import dataclass
 from pathlib import Path
 
 import numpy as np
-from analysis.lcm.data import PvaData
-from analysis.lcm.error import calc_tilts
-from analysis.lcm.interpolation import interpolate_pva
-from analysis.lcm.log_readers import read_pva
+from navanalysis.lcm.data import PvaData
+from navanalysis.lcm.error import calc_tilts
+from navanalysis.lcm.interpolation import interpolate_pva
+from navanalysis.lcm.log_readers import read_pva
 from numpy.typing import NDArray
 from pntos.cobra.utils import (
     run_pntos_with_log_transport,

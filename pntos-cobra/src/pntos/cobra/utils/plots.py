@@ -2,11 +2,11 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
-from analysis.lcm.data import PvaData
-from analysis.lcm.error import calc_drms, calc_tilts
-from analysis.lcm.interpolation import interpolate_pva
-from analysis.lcm.plots.utils import show_stats
 from matplotlib.colors import LinearSegmentedColormap
+from navanalysis.lcm.data import PvaData
+from navanalysis.lcm.error import calc_drms, calc_tilts
+from navanalysis.lcm.interpolation import interpolate_pva
+from navanalysis.lcm.plots.utils import show_stats
 from numpy import float64
 from numpy.typing import NDArray
 

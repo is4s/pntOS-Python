@@ -5,8 +5,8 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
-from analysis.lcm.data import LogData, PvaData
-from analysis.lcm.log_readers import read_pva
+from navanalysis.lcm.data import LogData, PvaData
+from navanalysis.lcm.log_readers import read_pva
 from pntos.api import LoggingLevel
 from pntos.cobra.utils import load_from_hdf5_file, plot_pva, plot_x_and_p, print_message
 
@@ -16,7 +16,7 @@ def harvest_data(
 ) -> LogData[PvaData]:
     # ROS bagfile
     if logfile.suffix in {'.db3', '.mcap'}:
-        from analysis.ros import RosBagReader  # noqa: PLC0415
+        from navanalysis.ros import RosBagReader  # noqa: PLC0415
 
         return RosBagReader(logfile).harvest_topics(channels)
 

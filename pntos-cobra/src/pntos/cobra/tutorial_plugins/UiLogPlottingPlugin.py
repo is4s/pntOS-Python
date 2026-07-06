@@ -1,8 +1,8 @@
 from pathlib import Path
 
 import matplotlib.pyplot as plt
-from analysis.lcm.data import LogData, PvaData
-from analysis.lcm.log_readers import read_pva
+from navanalysis.lcm.data import LogData, PvaData
+from navanalysis.lcm.log_readers import read_pva
 from pntos.api import LoggingLevel, Mediator, UiPlugin
 from pntos.cobra.config import UiLogPlottingConfig, config_from_registry
 from pntos.cobra.utils import plot_pva
@@ -77,7 +77,7 @@ class UiLogPlottingPlugin(UiPlugin):
     ) -> LogData[PvaData]:
         # ROS bagfile
         if self.logfile.suffix in {'.db3', '.mcap'}:
-            from analysis.ros import RosBagReader  # noqa: PLC0415
+            from navanalysis.ros import RosBagReader  # noqa: PLC0415
 
             return RosBagReader(self.logfile.as_posix()).harvest_topics(channels)
 

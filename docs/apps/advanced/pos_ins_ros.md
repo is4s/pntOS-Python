@@ -107,8 +107,8 @@ data as the LCM logfile used by `play-lcm-dataset`. Use `-r` to specify the
 playback rate.
 
 Existing LCM logfiles can be converted to ROS bagfiles using the
-`convert_log_to_ros.py` script in the [`analysis-scripts`
-repo](https://github.com/is4s/analysis-scripts). This is how the
+`convert_log_to_ros.py` script in the [`nav-analysis`
+repo](https://github.com/is4s/nav-analysis). This is how the
 example bagfile used above was generated.
 
 Whether converted from a LCM logfile or recorded from live ROS data, ROS

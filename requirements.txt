@@ -8,25 +8,16 @@
     # via pntos-python
 alabaster==1.0.0
     # via sphinx
-analysis-lcm==0.1.4
-    # via
-    #   analysis-ros
-    #   pntos-cobra
-    #   pntos-python
-analysis-ros==0.1.1
-    # via
-    #   pntos-cobra
-    #   pntos-python
 annotated-types==0.7.0
     # via pydantic
 aspn23==0.1.0
     # via
-    #   analysis-lcm
+    #   navanalysis-lcm
     #   pntos-api
     #   pntos-cobra
 aspn23-lcm==0.1.0
     # via
-    #   analysis-lcm
+    #   navanalysis-lcm
     #   pntos-cobra
 asttokens==3.0.0
     # via stack-data
@@ -96,7 +87,7 @@ imagesize==1.4.1
 iniconfig==2.1.0
     # via pytest
 inu==1.1.0
-    # via analysis-lcm
+    # via navanalysis-lcm
 ipython==8.37.0 ; python_full_version < '3.11'
 ipython==9.4.0 ; python_full_version >= '3.11'
 ipython-pygments-lexers==1.1.1 ; python_full_version >= '3.11'
@@ -115,8 +106,8 @@ kiwisolver==1.4.8
     # via matplotlib
 lcm==1.5.1
     # via
-    #   analysis-lcm
     #   aspn23-lcm
+    #   navanalysis-lcm
     #   pntos-cobra
 libclang==18.1.1
 markdown-it-py==3.0.0
@@ -130,7 +121,7 @@ markupsafe==3.0.2
     #   werkzeug
 matplotlib==3.10.5
     # via
-    #   analysis-lcm
+    #   navanalysis-lcm
     #   pntos-cobra
     #   pntos-python
 matplotlib-inline==0.1.7
@@ -143,18 +134,27 @@ mypy==1.18.2
 mypy-extensions==1.1.0
     # via mypy
 myst-parser==4.0.1
+navanalysis-lcm==0.1.5
+    # via
+    #   navanalysis-ros
+    #   pntos-cobra
+    #   pntos-python
+navanalysis-ros==0.1.2
+    # via
+    #   pntos-cobra
+    #   pntos-python
 navtk==2.1.0.post6.dev0
     # via
-    #   analysis-lcm
+    #   navanalysis-lcm
     #   pntos-cobra
 numpy==1.26.4
     # via
-    #   analysis-lcm
     #   aspn23
     #   contourpy
     #   h5py
     #   inu
     #   matplotlib
+    #   navanalysis-lcm
     #   navtk
     #   pntos-api
     #   pntos-cobra
@@ -212,8 +212,8 @@ python-socketio==5.16.2
     # via flask-socketio
 pyyaml==6.0.2
     # via
-    #   analysis-lcm
     #   myst-parser
+    #   navanalysis-lcm
 requests==2.32.4
     # via sphinx
 roman-numerals-py==3.1.0 ; python_full_version >= '3.11'
@@ -221,13 +221,13 @@ roman-numerals-py==3.1.0 ; python_full_version >= '3.11'
 ruff==0.13.2
 scipy==1.15.3 ; python_full_version < '3.11'
     # via
-    #   analysis-lcm
     #   inu
+    #   navanalysis-lcm
     #   pntos-cobra
 scipy==1.16.1 ; python_full_version >= '3.11'
     # via
-    #   analysis-lcm
     #   inu
+    #   navanalysis-lcm
     #   pntos-cobra
 setuptools==82.0.1
 simple-websocket==1.1.0
@@ -272,7 +272,7 @@ sphinxcontrib-serializinghtml==2.0.0
 stack-data==0.6.3
     # via ipython
 tabulate==0.9.0
-    # via analysis-lcm
+    # via navanalysis-lcm
 toml-fmt-common==1.0.1
     # via pyproject-fmt
 tomli==2.2.1 ; python_full_version <= '3.11'
@@ -283,10 +283,10 @@ tomli==2.2.1 ; python_full_version <= '3.11'
     #   sphinx
     #   toml-fmt-common
 tomlkit==0.13.3
-    # via analysis-lcm
+    # via navanalysis-lcm
 tqdm==4.67.1
     # via
-    #   analysis-lcm
+    #   navanalysis-lcm
     #   pntos-cobra
 traitlets==5.14.3
     # via
