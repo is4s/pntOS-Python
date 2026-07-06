@@ -147,7 +147,7 @@ jobs:
             docker exec pntos-python bash -c ". firehose-outputs/ros_devel/jazzy/setup.bash &&
                                             pytest pntos-cobra/tests/test_aspn_ros.py"
 
-    mypy:
+    ty:
         runs-on: ubuntu-24.04
         steps:
         - uses: actions/checkout@v4
@@ -158,11 +158,7 @@ jobs:
         - name: Run tests
           run: |
             set -xe
-            docker exec pntos-python mypy pntos-api --no-implicit-reexport
-            docker exec pntos-python mypy pntos-cobra --no-implicit-reexport
-            docker exec pntos-python mypy apps/advanced/ --no-implicit-reexport
-            docker exec pntos-python mypy apps/standard/ --no-implicit-reexport
-            docker exec pntos-python mypy apps/tutorial/ --no-implicit-reexport
+            docker exec pntos-python ty check
 
     documentation-check:
         name: Documentation check
