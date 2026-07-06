@@ -5,6 +5,14 @@ from aspn23 import (
     MeasurementVelocity,
     MeasurementVelocityReferenceFrame,
 )
+from navtk.navutils import (
+    ROTATION_RATE as OMEGA_E,
+    meridian_radius,
+    north_to_delta_lat,
+    quat_to_dcm,
+    skew,
+    transverse_radius,
+)
 from numpy import float64
 from numpy.typing import NDArray
 from pntos.api import (
@@ -14,14 +22,6 @@ from pntos.api import (
     Message,
     StandardMeasurementModel,
     StandardMeasurementProcessor,
-)
-from pntos.cobra.utils import (
-    OMEGA_E,
-    meridian_radius,
-    north_to_delta_lat,
-    quat_to_dcm,
-    skew,
-    transverse_radius,
 )
 
 NUM_PINSON_STATES = 15
@@ -209,7 +209,7 @@ class PinsonBodyVelocityMeasurementProcessor(StandardMeasurementProcessor):
 
             if np.any(z):
                 tan_vel_sensor = self._calc_tan_vel(
-                    lat,  # ty:ignore[invalid-argument-type]
+                    lat,
                     alt,
                     corr_inertial_vel_ned,
                     rotation_rate,

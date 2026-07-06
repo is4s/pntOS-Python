@@ -33,7 +33,7 @@ dependencies = [
     "matplotlib",
     "navanalysis-lcm==0.1.5",
     "navanalysis-ros==0.1.2",
-    "navtk==2.1.post6.dev0",
+    "navtk==2.1.post7.dev0",
     # numpy 2.2 type errors with Cobra (#148).
     "numpy!=2.2",
     "pntos-api>=2.0.0,<3.0.0",

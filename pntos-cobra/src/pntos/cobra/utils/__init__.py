@@ -23,6 +23,7 @@ from .conversions import (
     convert_status as convert_status,
     convert_timestamp_from_cpp as convert_timestamp_from_cpp,
     convert_timestamp_to_cpp as convert_timestamp_to_cpp,
+    extract_pos_and_vel as extract_pos_and_vel,
 )
 from .hdf5 import (
     load_from_hdf5_file as load_from_hdf5_file,
@@ -40,7 +41,6 @@ from .lcm_utils import (
     run_tcp_relay as run_tcp_relay,
 )
 from .logging import print_message as print_message
-from .navigation import *  # noqa: F403
 from .orchestration_utils import (
     Cache as Cache,
     CacheEntry as CacheEntry,

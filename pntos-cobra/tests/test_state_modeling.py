@@ -29,6 +29,7 @@ from aspn23 import (
 )
 from conftest import gxp
 from navtk.navutils import (
+    ROTATION_RATE as OMEGA_E,
     d_rpy_to_dcm_wrt_p,
     d_rpy_to_dcm_wrt_r,
     d_rpy_to_dcm_wrt_y,
@@ -80,7 +81,6 @@ from pntos.cobra.internal import (
     StandardMediator,
     StateExtractor,
 )
-from pntos.cobra.utils import OMEGA_E
 
 _lever_arm = (-2.0, 3.0, 5.0)
 # _orientation = (0.707106781, 0.0, 0.707106781, 0.0)

@@ -3,6 +3,12 @@ from aspn23 import (
     MeasurementPosition,
     MeasurementPositionVelocityAttitude as MeasurementPVA,
 )
+from navtk.navutils import (
+    delta_lat_to_north,
+    delta_lon_to_east,
+    quat_to_dcm,
+    skew,
+)
 from numpy import float64
 from numpy.typing import NDArray
 from pntos.api import (
@@ -11,12 +17,6 @@ from pntos.api import (
     Message,
     StandardMeasurementModel,
     StandardMeasurementProcessor,
-)
-from pntos.cobra.utils import (
-    delta_lat_to_north,
-    delta_lon_to_east,
-    quat_to_dcm,
-    skew,
 )
 
 

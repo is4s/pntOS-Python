@@ -83,7 +83,7 @@ navanalysis-ros==0.1.2
     # via
     #   pntos-cobra
     #   pntos-python
-navtk==2.1.0.post6.dev0
+navtk==2.1.0.post7.dev0
     # via
     #   navanalysis-lcm
     #   pntos-cobra

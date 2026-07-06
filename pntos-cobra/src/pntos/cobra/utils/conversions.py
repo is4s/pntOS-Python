@@ -430,3 +430,18 @@ def convert_ndarray_to_list(
     if target_type is int:
         return arr.astype(int).tolist()
     return arr.tolist()
+
+
+def extract_pos_and_vel(
+    pva: MeasurementPositionVelocityAttitude,
+) -> tuple[tuple[float, float, float], tuple[float, float, float]] | None:
+    if (
+        pva.p1 is None
+        or pva.p2 is None
+        or pva.p3 is None
+        or pva.v1 is None
+        or pva.v2 is None
+        or pva.v3 is None
+    ):
+        return None
+    return ((pva.p1, pva.p2, pva.p3), (pva.v1, pva.v2, pva.v3))
