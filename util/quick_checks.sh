@@ -13,11 +13,12 @@ ruff format
 pyproject-fmt pyproject.toml --column-width 88 --indent 4 --keep-full-version
 pyproject-fmt pntos-api/pyproject.toml --column-width 88 --indent 4 --keep-full-version
 pyproject-fmt pntos-cobra/pyproject.toml --column-width 88 --indent 4 --keep-full-version
+pyproject-fmt pntos-extras/pyproject.toml --column-width 88 --indent 4 --keep-full-version
 ty check
 util/check_sync.sh
 ret_val=$?  # this must be set after check_sync to observe if it passed or not
 util/build_docs.sh
-pytest pntos-cobra --cov --cov-fail-under=75 --cov-report={term,html} --cov-config=.coveragerc
+pytest pntos-cobra pntos-extras --cov --cov-fail-under=75 --cov-report={term,html} --cov-config=.coveragerc
 
 # don't print the following commands
 set +x

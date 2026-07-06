@@ -3,8 +3,13 @@
 -e ./pntos-api
     # via
     #   pntos-cobra
+    #   pntos-extras
     #   pntos-python
 -e ./pntos-cobra
+    # via
+    #   pntos-extras
+    #   pntos-python
+-e ./pntos-extras
     # via pntos-python
 alabaster==1.0.0
     # via sphinx
@@ -15,6 +20,7 @@ aspn23==0.1.0
     #   navanalysis-lcm
     #   pntos-api
     #   pntos-cobra
+    #   pntos-extras
 aspn23-lcm==0.1.0
     # via
     #   navanalysis-lcm
@@ -144,6 +150,7 @@ navtk==2.1.0.post7.dev0
     # via
     #   navanalysis-lcm
     #   pntos-cobra
+    #   pntos-extras
 numpy==1.26.4
     # via
     #   aspn23
@@ -155,6 +162,7 @@ numpy==1.26.4
     #   navtk
     #   pntos-api
     #   pntos-cobra
+    #   pntos-extras
     #   scipy
 packaging==25.0
     # via

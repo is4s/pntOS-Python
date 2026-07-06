@@ -10,6 +10,7 @@ resolution-markers = [
 members = [
     "pntos-api",
     "pntos-cobra",
+    "pntos-extras",
     "pntos-python",
 ]
 
@@ -1406,6 +1407,27 @@ requires-dist = [
 ]
 
 [[package]]
+name = "pntos-extras"
+version = "2.1.0.post0.dev3"
+source = { editable = "pntos-extras" }
+dependencies = [
+    { name = "aspn23" },
+    { name = "navtk" },
+    { name = "numpy" },
+    { name = "pntos-api" },
+    { name = "pntos-cobra" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "aspn23", specifier = "==0.1.0" },
+    { name = "navtk", specifier = "==2.1.post7.dev0", index = "https://pypi.org/simple/" },
+    { name = "numpy", specifier = "!=2.2" },
+    { name = "pntos-api", editable = "pntos-api" },
+    { name = "pntos-cobra", editable = "pntos-cobra" },
+]
+
+[[package]]
 name = "pntos-python"
 version = "2.1.0.post0.dev0"
 source = { virtual = "." }
@@ -1415,6 +1437,7 @@ dependencies = [
     { name = "navanalysis-ros" },
     { name = "pntos-api" },
     { name = "pntos-cobra" },
+    { name = "pntos-extras" },
     { name = "pntos-python-datasets-lcm" },
     { name = "pntos-python-datasets-ros" },
 ]
@@ -1448,6 +1471,7 @@ requires-dist = [
     { name = "navanalysis-ros", specifier = ">=0.1.2" },
     { name = "pntos-api", editable = "pntos-api" },
     { name = "pntos-cobra", editable = "pntos-cobra" },
+    { name = "pntos-extras", editable = "pntos-extras" },
     { name = "pntos-python-datasets-lcm", specifier = "==0.1.0" },
     { name = "pntos-python-datasets-ros", specifier = "==0.1.0" },
 ]
