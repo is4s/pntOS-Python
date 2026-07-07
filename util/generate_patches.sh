@@ -11,6 +11,7 @@ git diff --no-index apps/tutorial/pos_ins.py apps/standard/pos_ins.py > util/app
 git diff --no-index apps/standard/pos_ins.py apps/standard/lcm_relay.py > util/app_lcm_relay.patch
 git diff --no-index apps/standard/pos_ins.py apps/standard/pos_ins_leverarm.py > util/app_pos_ins_leverarm.patch
 git diff --no-index apps/standard/pos_ins.py apps/standard/pos_ins_bodyvel.py > util/app_pos_ins_bodyvel.patch
+git diff --no-index apps/standard/pos_ins_bodyvel.py apps/extras/pos_ins_zerovel2d.py > util/app_pos_ins_zerovel2d.patch
 git diff --no-index apps/standard/pos_ins.py apps/advanced/pos_ins_ros.py > util/app_pos_ros.patch
 git diff --no-index $tutorial_plugins_folder"TutorialPosOrchestrationPlugin.py" $tutorial_plugins_folder"TutorialPosVelOrchestrationPlugin.py" > util/orch_pos_vel.patch
 git diff --no-index apps/standard/pos_ins.py apps/standard/pos_vel_ins.py > util/app_pos_vel_standard.patch

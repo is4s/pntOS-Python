@@ -81,6 +81,8 @@ check_sync $orig_dir"/util/app_lcm_relay.patch"
 check_sync $orig_dir"/util/app_pos_ins_leverarm.patch"
 # Apply app bodyvel patch
 check_sync $orig_dir"/util/app_pos_ins_bodyvel.patch"
+# Apply app pseudovel patch
+check_sync $orig_dir"/util/app_pos_ins_zerovel2d.patch"
 # Apply app vsb patch
 check_sync $orig_dir"/util/app_pos_ins_vsb.patch"
 # Apply app outage patch

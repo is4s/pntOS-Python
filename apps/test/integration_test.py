@@ -256,6 +256,22 @@ def test_standard_pos_bodyvel_ins_app() -> None:
     )
 
 
+def test_extras_pos_zerovel2d_ins_app() -> None:
+    run_pntos_with_log_transport(
+        Path('apps/extras/pos_ins_zerovel2d.py'), [OUTPUT_LOG.as_posix()], validate=True
+    )
+    log_data = read_pva(OUTPUT_LOG.as_posix(), read_all=True)
+    validate_results(
+        log_data.data[SOLUTION_CHANNEL],
+        log_data.data[TRUTH_CHANNEL],
+        num_points=2570,
+        pos_err_limits=ErrorLimits(std_thresh=1.4, max_thresh=3.8),
+        vel_err_limits=ErrorLimits(std_thresh=0.1, max_thresh=0.8),
+        tilt_err_limits=ErrorLimits(std_thresh=0.8, max_thresh=3.5),
+        expected_start_time_offset=10.0,
+    )
+
+
 def test_standard_pos_ins_vel_app() -> None:
     run_pntos_with_log_transport(
         Path('apps/standard/pos_vel_ins.py'), [OUTPUT_LOG.as_posix()], validate=True

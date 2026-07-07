@@ -220,6 +220,7 @@ jobs:
               - test_standard_outage_sim_app
               - test_standard_pos_ins_vsb_app
               - test_standard_pos_ins_record_states
+              - test_extras_pos_zerovel2d_ins_app
         steps:
         - uses: actions/checkout@v4
 
