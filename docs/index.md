@@ -82,4 +82,5 @@ glossary
 :maxdepth: 1
 autodocs/api
 cobra
+extras
 ```
