@@ -127,7 +127,6 @@ ini_options.addopts = [
     "--cov-fail-under=75",
     "--cov-report=term",
     "--cov-report=html",
-    "--cov-config=.coveragerc",
 ]
 
 [tool.coverage]
