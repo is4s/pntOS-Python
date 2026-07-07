@@ -449,10 +449,14 @@ def _validate_config_value(
     mismatch_type_msg = f'config_to_registry: Field {param.name} in {config_type.__name__} has the wrong type.\n\tExpected: {param.type}\n\tReceived: {_get_verbose_type(val)}'
     converting_msg = f'{mismatch_type_msg}\nConverting to expected type.'
     # internally convert int to float if type is supposed to be float
-    if isinstance(val, int) and param.type is float:
-        mediator.log_message(LoggingLevel.WARN, converting_msg)
-        val = float(val)
-        return (True, val)
+    if isinstance(val, int):
+        t = param.type
+        if _is_type_optional(t):
+            t = get_args(t)[0]
+        if t is float:
+            mediator.log_message(LoggingLevel.WARN, converting_msg)
+            val = float(val)
+            return (True, val)
     if isinstance(val, (tuple, list, np.ndarray)):
         # don't need to actually convert to expected type now, as all
         # tuples/lists/ndarrays will be converted to the same internal type when storing
