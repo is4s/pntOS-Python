@@ -105,7 +105,7 @@ jobs:
           uses: ./.github/actions/setup
 
         - name: Run tests
-          run: docker exec pntos-python pytest pntos-cobra pntos-extras --cov --cov-fail-under=75 --cov-report={term,html}  --cov-config=.coveragerc
+          run: docker exec pntos-python pytest pntos-cobra pntos-extras --cov
 
         - name: Save coverage report
           uses: actions/upload-artifact@v4
@@ -125,7 +125,7 @@ jobs:
             python: 3.13
 
         - name: Run tests
-          run: docker exec pntos-python pytest pntos-cobra pntos-extras --cov --cov-fail-under=75 --cov-report={term,html}  --cov-config=.coveragerc
+          run: docker exec pntos-python pytest pntos-cobra pntos-extras --cov
 
     ROS-Test:
         name: ROS Transport Tests

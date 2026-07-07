@@ -117,8 +117,18 @@ lint.isort.combine-as-imports = true
 lint.pydocstyle.convention = "google"
 
 [tool.pytest]
-# NOTE: coverage is not enabled here by default as it doesn't work when debugging tests
-ini_options.addopts = "-p no:launch_ros -p no:launch_testing --no-cov-on-fail"
+# NOTE: while coverage flags are provided here, coverage is not enabled as it doesn't work when
+# debugging tests. To enable coverage, pass `--cov` flag when running pytest, and the flags below
+# will all be included by default.
+ini_options.addopts = [
+    "-p no:launch_ros",
+    "-p no:launch_testing",
+    "--no-cov-on-fail",
+    "--cov-fail-under=75",
+    "--cov-report=term",
+    "--cov-report=html",
+    "--cov-config=.coveragerc",
+]
 
 [tool.coverage]
 run.omit = [
