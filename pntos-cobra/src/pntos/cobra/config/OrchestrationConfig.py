@@ -426,8 +426,8 @@ class PinsonBodyVelocityMPConfig(MeasurementProcessorConfig):
     """
     Configuration for a PinsonBodyVelocityMeasurementProcessor.
 
-    This MP relates sensor-frame velocity measurements to a PinsonStateBlock modeling
-    inertial error-states.
+    This MP relates sensor-frame 1d, 2d, or 3d velocity measurements to a
+    PinsonStateBlock modeling inertial error-states.
 
     Attributes:
         group:

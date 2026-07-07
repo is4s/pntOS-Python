@@ -30,8 +30,8 @@ NUM_PINSON_STATES = 15
 
 class PinsonBodyVelocityMeasurementProcessor(StandardMeasurementProcessor):
     """
-    Generates a model that maps a velocity measurement in the body/sensor frame
-    to an inertial error states block.
+    Generates a model that maps a 1d, 2d, or 3d velocity measurement in the body/sensor
+    frame to an inertial error state block.
     """
 
     _mediator: Mediator
@@ -192,6 +192,10 @@ class PinsonBodyVelocityMeasurementProcessor(StandardMeasurementProcessor):
         C_ned_to_sensor_der = -uncorr_C_ned_to_sensor @ skew(corr_inertial_vel_ned)
 
         z = np.array([[vel.x], [vel.y], [vel.z]])
+        # Get indices of non-None velocity measurements
+        mask = (z != None).ravel()  # noqa: E711
+        z = z[mask].astype(np.float64)
+
         H = np.zeros((3, num_states))
         H[:, 3:6] = C_ned_to_sensor
         H[:, 6:9] = C_ned_to_sensor_der
@@ -227,11 +231,11 @@ class PinsonBodyVelocityMeasurementProcessor(StandardMeasurementProcessor):
                 inertial_vel_sensor + tan_vel_sensor
             ).reshape(3, 1)
 
-            return sensor_vel_sensor
+            return sensor_vel_sensor[mask]
 
         R = vel.covariance
 
-        return StandardMeasurementModel(z, h, H, R)
+        return StandardMeasurementModel(z, h, H[mask], R)
 
     def _calc_tan_vel(
         self,
