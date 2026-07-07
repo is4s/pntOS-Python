@@ -646,3 +646,15 @@ class TestConfigUtils(unittest.TestCase):
         out_bar = config_from_registry(Bar, self.mediator, 'bar')
         assert out_bar is not None
         self._validate_conf_from_registry(in_bar, out_bar)
+
+    def test_multiple_types_produces_error(self) -> None:
+        @dataclass
+        class Foo(BaseConfig):
+            foo: int | str | None
+
+        in_foo = Foo(group='foo', foo=3)
+        # Won't work because foo cannot take on multiple types
+        config_to_registry(in_foo, self.mediator)
+        # Won't work because config_to_registry failed
+        out_foo = config_from_registry(Foo, self.mediator, 'foo')
+        assert out_foo is None

@@ -1,7 +1,7 @@
 from dataclasses import Field, fields
 from enum import Enum, IntEnum
 from inspect import isclass
-from typing import Any, TypeVar, get_args, get_origin
+from typing import Any, TypeVar, Union, get_args, get_origin
 
 import numpy as np
 from navtk.filtering import ImuModel
@@ -363,7 +363,6 @@ def config_to_registry(config: BaseConfig, mediator: Mediator) -> None:
         mediator (Mediator): A :class:`pntos.api.Mediator` instance.
     """
     conf_params = [f for f in fields(config) if f.name != 'group']
-    kv = mediator.registry.batch_start(config.group)
 
     for param in conf_params:
         if not _is_type_supported(param.type):  # ty:ignore[invalid-argument-type]
@@ -371,8 +370,10 @@ def config_to_registry(config: BaseConfig, mediator: Mediator) -> None:
                 LoggingLevel.ERROR,
                 f'Support for converting {param.type} to a registry type does not exist. Support must be added or a different type must be used on the config class {type(config)}.',
             )
-            kv.batch_end()
             return
+
+    kv = mediator.registry.batch_start(config.group)
+    for param in conf_params:
         val_to_store = getattr(config, param.name)
 
         result, val_to_store = _validate_config_value(
@@ -589,8 +590,11 @@ def _is_type_supported(field_type: type[Any]) -> bool:
     """
     type_to_compare = field_type
     if _is_type_optional(type_to_compare):
-        type_to_compare = get_args(type_to_compare)[0]
+        type_to_compare = Union[get_args(type_to_compare)[:-1]]  # noqa: UP007
     origin = get_origin(type_to_compare)
+    if origin is Union:
+        # Only union type supported is Foo | None. Field cannot have one of multiple types.
+        return False
     # if type is a tuple or list, check the type of each value it contains
     if origin is list:
         return _validate_list_type(type_to_compare)
