@@ -568,6 +568,16 @@ class TestConfigUtils(unittest.TestCase):
         assert out_conf is not None
         assert conf.dynamic_field == out_conf.dynamic_field  # ty:ignore[unresolved-attribute]
 
+    def test_int_to_optional_float_conversion(self) -> None:
+        group = 'itf_opt_conv'
+        DynConf = self._make_config('dynamic_field', float, True)
+        val = 1
+        conf = DynConf(dynamic_field=val, group=group)  # ty:ignore[unknown-argument]
+        config_to_registry(conf, self.mediator)
+        out_conf = config_from_registry(DynConf, self.mediator, group)
+        assert out_conf is not None
+        assert conf.dynamic_field == out_conf.dynamic_field  # ty:ignore[unresolved-attribute]
+
     def test_list_to_tuple_conversion(self) -> None:
         group = 'md_list_to_tuple'
         DynConf = self._make_config(
