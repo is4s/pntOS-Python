@@ -117,7 +117,8 @@ lint.isort.combine-as-imports = true
 lint.pydocstyle.convention = "google"
 
 [tool.pytest]
-ini_options.addopts = "-p no:launch_ros -p no:launch_testing"
+# NOTE: coverage is not enabled here by default as it doesn't work when debugging tests
+ini_options.addopts = "-p no:launch_ros -p no:launch_testing --no-cov-on-fail"
 
 [tool.coverage]
 run.omit = [
