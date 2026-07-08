@@ -214,7 +214,7 @@ class PinsonBodyVelocityMeasurementProcessor(StandardMeasurementProcessor):
             # Get gyro bias from state vector otherwise set to zeros
             gyro_bias = x[12:15, 0] if num_states >= NUM_PINSON_STATES else np.zeros(3)
 
-            if np.any(z):
+            if np.any(z) and np.any(self._l_ps_p):
                 tan_vel_sensor = self._calc_tan_vel(
                     lat,
                     alt,
