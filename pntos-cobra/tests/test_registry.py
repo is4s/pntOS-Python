@@ -62,7 +62,7 @@ my_config: list[BaseConfig] = [
     ),
     MountingConfig(
         lever_arm=(0.0, 0.0, 0.0),
-        orientation=(0.0, 0.0, 0.0, 0.0),
+        orientation=(1.0, 0.0, 0.0, 0.0),
         group='config/default/test',
     ),
 ]

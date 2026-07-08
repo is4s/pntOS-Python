@@ -80,7 +80,7 @@ my_config: list[BaseConfig] = [
     MountingConfig(
         group='config/gp3d_state_modeling',
         lever_arm=(-0.50, 0.38, -0.05),
-        orientation=(0.0, 0.0, 0.0, 0.0),
+        orientation=(1.0, 0.0, 0.0, 0.0),
     ),
     InertialConfig(
         group='config/inertial',

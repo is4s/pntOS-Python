@@ -1,5 +1,5 @@
-diff --git a/apps/standard/pos_ins_bodyvel.py b/apps/advanced/pos_ins_zerovel2d.py
-index 7daf5360e..547225d8f 100755
+diff --git a/apps/standard/pos_ins_bodyvel.py b/apps/extras/pos_ins_zerovel2d.py
+index b2740232..bc01be84 100755
 --- a/apps/standard/pos_ins_bodyvel.py
 +++ b/apps/extras/pos_ins_zerovel2d.py
 @@ -1,5 +1,13 @@
@@ -33,7 +33,7 @@ index 7daf5360e..547225d8f 100755
          ),
      ),
      ControllerConfig(),
-@@ -111,12 +120,12 @@ my_config: list[BaseConfig] = [
+@@ -111,9 +120,9 @@ my_config: list[BaseConfig] = [
                  lever_arm=(-0.50, 0.38, -0.05),
              ),
              PinsonBodyVelocityMPConfig(
@@ -42,14 +42,10 @@ index 7daf5360e..547225d8f 100755
 -                channel='/sensor/simulated/velocity',
 +                group='config/zerovel2d_measurement_processor',
 +                label='zerovel',
-+                channel='/generated/zero/velocity',
++                channel='/generated/zero/velocity2d',
                  state_block_labels=('pinson15',),
                  lever_arm=(0.0, 0.0, 0.0),
--                orientation=(0.0, 0.0, 0.0, 0.0),
-+                orientation=(1.0, 0.0, 0.0, 0.0),
-             ),
-         ),
-         inertial_config=InertialConfig(
+                 orientation=(1.0, 0.0, 0.0, 0.0),
 @@ -149,6 +158,14 @@ my_config: list[BaseConfig] = [
                  channels_to_correct=('/sensor/ublox-ZED-F9T/position',),
                  time_bias=int(0.15 * 1e9),

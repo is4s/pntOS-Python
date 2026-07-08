@@ -116,7 +116,7 @@ my_config: list[BaseConfig] = [
                 channel='/sensor/simulated/velocity',
                 state_block_labels=('pinson15',),
                 lever_arm=(0.0, 0.0, 0.0),
-                orientation=(0.0, 0.0, 0.0, 0.0),
+                orientation=(1.0, 0.0, 0.0, 0.0),
             ),
         ),
         inertial_config=InertialConfig(

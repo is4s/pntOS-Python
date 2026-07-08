@@ -137,7 +137,7 @@ tutorial_config = [
     MountingConfig(
         group='config/gp3d_state_modeling',
         lever_arm=(0.0, 0.0, 0.0),
-        orientation=(0.0, 0.0, 0.0, 0.0),
+        orientation=(1.0, 0.0, 0.0, 0.0),
     ),
     inertial_config,
     FogmConfig(
