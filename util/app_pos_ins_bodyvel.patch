@@ -1,8 +1,16 @@
 diff --git a/apps/standard/pos_ins.py b/apps/standard/pos_ins_bodyvel.py
-index 391390a3..b2740232 100755
+index 391390a3..e4d606ce 100755
 --- a/apps/standard/pos_ins.py
 +++ b/apps/standard/pos_ins_bodyvel.py
-@@ -37,6 +37,7 @@ from pntos.cobra.config import (
+@@ -29,6 +29,7 @@ from pntos.cobra import (
+ from pntos.cobra.config import (
+     BaseConfig,
+     ControllerConfig,
++    DownsamplerConfig,
+     FogmConfig,
+     FogmStateBlockConfig,
+     FusionEngineConfig,
+@@ -37,6 +38,7 @@ from pntos.cobra.config import (
      InertialConfig,
      LcmLogTransportConfig,
      ManualHeadingAlignmentConfig,
@@ -10,7 +18,7 @@ index 391390a3..b2740232 100755
      PinsonStateBlockConfig,
      PinsonWithNedFogmPositionMPConfig,
      StandardOrchestrationConfig,
-@@ -71,6 +72,7 @@ my_config: list[BaseConfig] = [
+@@ -71,6 +73,7 @@ my_config: list[BaseConfig] = [
          channels_to_process=(
              '/sensor/vn-100/imu',
              '/sensor/ublox-ZED-F9T/position',
@@ -18,7 +26,7 @@ index 391390a3..b2740232 100755
          ),
      ),
      ControllerConfig(),
-@@ -108,6 +110,14 @@ my_config: list[BaseConfig] = [
+@@ -108,6 +111,14 @@ my_config: list[BaseConfig] = [
                  state_block_labels=('pinson15', 'pos_sensor_error'),
                  lever_arm=(-0.50, 0.38, -0.05),
              ),
@@ -33,3 +41,15 @@ index 391390a3..b2740232 100755
          ),
          inertial_config=InertialConfig(
              group='config/inertial',
+@@ -139,6 +150,11 @@ my_config: list[BaseConfig] = [
+                 channels_to_correct=('/sensor/ublox-ZED-F9T/position',),
+                 time_bias=int(0.15 * 1e9),
+             ),
++            DownsamplerConfig(
++                'config/downsampler',
++                channels_to_downsample=('/sensor/simulated/velocity',),
++                downsampling_factors=(10,),  # Downsample from 1 Hz to 0.1 Hz
++            ),
+         ),
+     ),
+ ]

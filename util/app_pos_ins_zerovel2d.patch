@@ -1,5 +1,5 @@
 diff --git a/apps/standard/pos_ins_bodyvel.py b/apps/extras/pos_ins_zerovel2d.py
-index b2740232..bc01be84 100755
+index e4d606ce..bc01be84 100755
 --- a/apps/standard/pos_ins_bodyvel.py
 +++ b/apps/extras/pos_ins_zerovel2d.py
 @@ -1,5 +1,13 @@
@@ -16,7 +16,15 @@ index b2740232..bc01be84 100755
  import sys
  
  import numpy as np
-@@ -44,6 +52,8 @@ from pntos.cobra.config import (
+@@ -29,7 +37,6 @@ from pntos.cobra import (
+ from pntos.cobra.config import (
+     BaseConfig,
+     ControllerConfig,
+-    DownsamplerConfig,
+     FogmConfig,
+     FogmStateBlockConfig,
+     FusionEngineConfig,
+@@ -45,6 +52,8 @@ from pntos.cobra.config import (
      TimeAdjusterConfig,
      TimeBiasConfig,
  )
@@ -25,7 +33,7 @@ index b2740232..bc01be84 100755
  from pntos_python_datasets_lcm import EXAMPLE_LCM_LOG
  
  OUTPUT_LOG = sys.argv[1] if len(sys.argv) > 1 else 'pntos_output.log'
-@@ -72,7 +82,6 @@ my_config: list[BaseConfig] = [
+@@ -73,7 +82,6 @@ my_config: list[BaseConfig] = [
          channels_to_process=(
              '/sensor/vn-100/imu',
              '/sensor/ublox-ZED-F9T/position',
@@ -33,7 +41,7 @@ index b2740232..bc01be84 100755
          ),
      ),
      ControllerConfig(),
-@@ -111,9 +120,9 @@ my_config: list[BaseConfig] = [
+@@ -112,9 +120,9 @@ my_config: list[BaseConfig] = [
                  lever_arm=(-0.50, 0.38, -0.05),
              ),
              PinsonBodyVelocityMPConfig(
@@ -46,10 +54,14 @@ index b2740232..bc01be84 100755
                  state_block_labels=('pinson15',),
                  lever_arm=(0.0, 0.0, 0.0),
                  orientation=(1.0, 0.0, 0.0, 0.0),
-@@ -149,6 +158,14 @@ my_config: list[BaseConfig] = [
+@@ -150,10 +158,13 @@ my_config: list[BaseConfig] = [
                  channels_to_correct=('/sensor/ublox-ZED-F9T/position',),
                  time_bias=int(0.15 * 1e9),
              ),
+-            DownsamplerConfig(
+-                'config/downsampler',
+-                channels_to_downsample=('/sensor/simulated/velocity',),
+-                downsampling_factors=(10,),  # Downsample from 1 Hz to 0.1 Hz
 +            ZeroVelocity2dGeneratorConfig(
 +                group='config/pseudovel_generator',
 +                channels=('/sensor/ublox-ZED-F9T/position',),
@@ -57,11 +69,10 @@ index b2740232..bc01be84 100755
 +                lateral_vel_sigma=0.5,
 +                vertical_vel_sigma=1.0,
 +                output_channel='/generated/zero/velocity2d',
-+            ),
+             ),
          ),
      ),
- ]
-@@ -172,6 +189,7 @@ plugins: list[CommonPlugin] = [
+@@ -178,6 +189,7 @@ plugins: list[CommonPlugin] = [
      StandardRegistryPlugin('Cobra Standard Registry Plugin', config=my_config),
      StandardPreprocessorPlugin('Cobra Standard Preprocessor Plugin'),
      StandardOrchestrationPlugin('Cobra Standard Orchestration Plugin'),

@@ -29,6 +29,7 @@ from pntos.cobra import (
 from pntos.cobra.config import (
     BaseConfig,
     ControllerConfig,
+    DownsamplerConfig,
     FogmConfig,
     FogmStateBlockConfig,
     FusionEngineConfig,
@@ -148,6 +149,11 @@ my_config: list[BaseConfig] = [
                 group='config/time_bias',
                 channels_to_correct=('/sensor/ublox-ZED-F9T/position',),
                 time_bias=int(0.15 * 1e9),
+            ),
+            DownsamplerConfig(
+                'config/downsampler',
+                channels_to_downsample=('/sensor/simulated/velocity',),
+                downsampling_factors=(10,),  # Downsample from 1 Hz to 0.1 Hz
             ),
         ),
     ),
