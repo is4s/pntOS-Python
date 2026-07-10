@@ -32,15 +32,13 @@ class CobraUiLogPlayerPlugin(UtilityPlugin):
         self._lcm_url = lcm_url
         self._group = group
         self._requested_seek_fraction: float | None = None
-        self._seek_lock: Lock = Lock()
         self._local_offset: float = 0.0
         self._log_offset: float = 0.0
         self._last_display_time: float = 0.0
         self._last_system_time: float = 0.0
         self._channels_seen: set[str] = set()
         self._log_thread = None
-        script_dir = Path(__file__).parent.resolve()
-        self._upload_dir = script_dir / upload_dir
+        self._passed_upload_dir = upload_dir
 
     def init_plugin(
         self,
@@ -50,9 +48,11 @@ class CobraUiLogPlayerPlugin(UtilityPlugin):
         assert mediator is not None
         self._mediator = mediator
         self._shutdown_thread_event = Event()
+        self._seek_lock: Lock = Lock()
         self._play = Event()
         self._step = Event()
         self._file_found = Event()
+        self._upload_dir = Path(__file__).parent.resolve() / self._passed_upload_dir
         self._lcm = LCM(self._lcm_url)
         self._initialize_keys()
         self._request_notify_new_file()

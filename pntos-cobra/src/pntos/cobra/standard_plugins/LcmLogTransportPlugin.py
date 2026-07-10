@@ -39,7 +39,6 @@ class LcmLogTransportPlugin(TransportPlugin):
         """
         self.identifier = identifier
         self._config_group = config_group
-        self._shutdown_threads = threading.Event()
         self.handler = None
         self._channels_found = set()
 
@@ -50,6 +49,8 @@ class LcmLogTransportPlugin(TransportPlugin):
     ) -> None:
         if mediator is not None:
             self.mediator = mediator
+
+        self._shutdown_threads = threading.Event()
 
         self._ui = UiSourceInterface(self.mediator.registry)
         config = config_from_registry(

@@ -43,12 +43,10 @@ class LcmTransportPlugin(TransportPlugin):
         """
         self.identifier = identifier
         self._config_group = config_group
-        self._shutdown_threads = threading.Event()
         self.lcm = None
         self.handler = None
         self._sender = None
         self._channels = set()
-        self._output_queue = Queue()
 
     def init_plugin(
         self,
@@ -62,6 +60,9 @@ class LcmTransportPlugin(TransportPlugin):
         """
         if mediator is not None:
             self.mediator = mediator
+
+        self._output_queue = Queue()
+        self._shutdown_threads = threading.Event()
 
         self._ui = UiSourceInterface(self.mediator.registry)
 

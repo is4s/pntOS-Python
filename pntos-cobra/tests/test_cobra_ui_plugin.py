@@ -76,8 +76,6 @@ class TestCobraUiPluginAPI:
         assert plugin.identifier == 'test-plugin'
         assert plugin.config_group == 'config/test'
         assert plugin.write_buffer is not None
-        assert isinstance(plugin._shutdown_event, Event)
-        assert not plugin._shutdown_event.is_set()
 
     def test_init_default_config_group(self) -> None:
         plugin = ExperimentalCobraUiPlugin('test-plugin')
@@ -96,6 +94,8 @@ class TestCobraUiPluginAPI:
             plugin.init_plugin(mediator=mediator)
 
         assert plugin.mediator is mediator
+        assert isinstance(plugin._shutdown_event, Event)
+        assert not plugin._shutdown_event.is_set()
         assert plugin.registry_manager is not None
         assert plugin.config == mock_config
         assert plugin.app is not None

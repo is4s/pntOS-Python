@@ -59,7 +59,6 @@ class ExperimentalCobraUiPlugin(UiPlugin):
         self.identifier = identifier
         self.config_group = config_group
         self.write_buffer = SequenceBuffer(key=lambda x: x.sequence_id)
-        self._shutdown_event = Event()
         self._server_thread: Thread | None = None
         self._emitter_thread: Thread | None = None
 
@@ -70,6 +69,7 @@ class ExperimentalCobraUiPlugin(UiPlugin):
     ) -> None:
         assert mediator is not None
         self.mediator = mediator
+        self._shutdown_event = Event()
         self._metadata_manager = UiMetadataInterface(self.mediator.registry)
         self.registry_manager = RegistryManager(self.mediator)
 

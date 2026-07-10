@@ -34,7 +34,6 @@ class DummyTransportPlugin(TransportPlugin):
     def __init__(self, identifier: str) -> None:
         self.identifier = identifier
         self.mediator = None
-        self._thread = Thread(target=listen_for_messages, args=(self,))
         self._listening = False
 
     def init_plugin(
@@ -43,6 +42,7 @@ class DummyTransportPlugin(TransportPlugin):
         mediator: Mediator | None = None,
     ) -> None:
         self.mediator = mediator
+        self._thread = Thread(target=listen_for_messages, args=(self,))
         self._log(message='Initialized DummyTransport')
 
     def shutdown_plugin(self) -> None:
