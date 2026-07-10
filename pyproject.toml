@@ -160,5 +160,4 @@ src.exclude = [
     "pntos-cobra/src/pntos/cobra/tutorial_plugins/*",
 ]
 rules.all = "error"
-rules.missing-override-decorator = "ignore"
 rules.missing-type-argument = "ignore"

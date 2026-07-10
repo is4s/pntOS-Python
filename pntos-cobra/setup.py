@@ -65,7 +65,7 @@ def build_frontend_assets() -> None:
 
 
 class BuildPyCommand(build_py):
-    def run(self) -> None:
+    def run(self) -> None:  # ty:ignore[missing-override-decorator]
         move_branding_assets()
         build_frontend_assets()
         super().run()

@@ -2,6 +2,7 @@ import cProfile
 import pstats
 
 from pntos.cobra import LcmLogTransportPlugin
+from typing_extensions import override
 
 
 class LcmLogTransportPluginWithProfiling(LcmLogTransportPlugin):
@@ -16,6 +17,7 @@ class LcmLogTransportPluginWithProfiling(LcmLogTransportPlugin):
     plugin has very limited usefulness.
     """
 
+    @override
     def read_log(self) -> None:
         """Process messages from LCM log, with profiling enabled."""
         profile = cProfile.Profile()
