@@ -120,6 +120,7 @@ class CobraUiLogPlayerPlugin(UtilityPlugin):
                     if self._step.is_set():
                         kv = self._mediator.registry.batch_start(self._group)
                         kv['step'] = False
+                        kv['playing'] = False
                         kv.batch_end()
                         self._step.clear()
                         self._play.clear()
@@ -171,6 +172,7 @@ class CobraUiLogPlayerPlugin(UtilityPlugin):
                 if self._step.is_set():
                     kv = self._mediator.registry.batch_start(self._group)
                     kv['step'] = False
+                    kv['playing'] = False
                     kv.batch_end()
                     self._step.clear()
                     self._play.clear()
