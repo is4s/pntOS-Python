@@ -53,6 +53,7 @@ class CobraUiLogPlayerPlugin(UtilityPlugin):
         self._seek_lock: Lock = Lock()
         self._play = Event()
         self._step = Event()
+        self._seek_event = Event()
         self._file_found = Event()
         self._upload_dir = Path(__file__).parent.resolve() / self._passed_upload_dir
         self._lcm = LCM(self._lcm_url)
@@ -78,15 +79,13 @@ class CobraUiLogPlayerPlugin(UtilityPlugin):
                 if not self._play.is_set():
                     continue
 
-                with self._seek_lock:
-                    if self._requested_seek_fraction is not None:
-                        seek_pos = int(
-                            self._requested_seek_fraction * self._event_log.size()
-                        )
+                if self._requested_seek_fraction is not None:
+                    seek_pos = int(
+                        self._requested_seek_fraction * self._event_log.size()
+                    )
+                    with self._seek_lock:
                         self._event_log.seek(seek_pos)
-                        self._requested_seek_fraction = None
-                        self._log_offset = 0.0
-                        self._local_offset = 0.0
+                    self._requested_seek_fraction = None
 
                 last_position_fraction = self._event_log.tell() / self._event_log.size()
 
@@ -101,6 +100,10 @@ class CobraUiLogPlayerPlugin(UtilityPlugin):
                     self._log_offset = event.timestamp
                     self._local_offset = time.perf_counter() * 1_000_000
                     last_speed = current_speed
+                elif self._seek_event.is_set():
+                    self._seek_event.clear()
+                    self._log_offset = event.timestamp
+                    self._local_offset = time.perf_counter() * 1_000_000
 
                 log_relative_time = event.timestamp - self._log_offset
                 clock_relative_time = (
@@ -125,14 +128,15 @@ class CobraUiLogPlayerPlugin(UtilityPlugin):
                         self._step.clear()
                         self._play.clear()
                         should_continue = False
-                    elif not self._play.is_set():
+                    elif not self._play.is_set() or self._seek_event.is_set():
                         should_continue = False
                     else:
                         should_continue = True
 
                     if not should_continue:
                         seek_pos = int(last_position_fraction * self._event_log.size())
-                        self._event_log.seek(seek_pos)
+                        with self._seek_lock:
+                            self._event_log.seek(seek_pos)
                         break
 
                     chunk = min(wait_time_ms, 50)
@@ -144,7 +148,8 @@ class CobraUiLogPlayerPlugin(UtilityPlugin):
 
                 if not (self._play.is_set() or self._step.is_set()):
                     seek_pos = int(last_position_fraction * self._event_log.size())
-                    self._event_log.seek(seek_pos)
+                    with self._seek_lock:
+                        self._event_log.seek(seek_pos)
                     continue
 
                 self._lcm.publish(event.channel, event.data)
@@ -201,12 +206,14 @@ class CobraUiLogPlayerPlugin(UtilityPlugin):
         kv = self._mediator.registry.batch_start(self._group)
         kv.request_notify('playing', self._play_pause_callback)
         kv.request_notify('step', self._step_callback)
+        kv.request_notify('requested_fraction_through_file', self._seek_pos_callback)
         kv.batch_end()
 
     def _remove_notify_run_thread(self) -> None:
         kv = self._mediator.registry.batch_start(self._group)
         kv.remove_notify('playing', self._play_pause_callback)
         kv.remove_notify('step', self._step_callback)
+        kv.remove_notify('requested_fraction_through_file', self._seek_pos_callback)
         kv.batch_end()
 
     def _play_pause_callback(
@@ -250,6 +257,14 @@ class CobraUiLogPlayerPlugin(UtilityPlugin):
             return
         self._step.set()
         self._play.set()
+
+    def _seek_pos_callback(
+        self, group: str, keys: list[str], kv: KeyValueStore
+    ) -> None:
+        self._requested_seek_fraction = kv.get_value(
+            'requested_fraction_through_file', float
+        )
+        self._seek_event.set()
 
     def _shutdown_current_thread(self) -> None:
         if self._log_thread is not None:
