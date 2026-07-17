@@ -83,12 +83,14 @@ copytree(src=branding_dir + '/figures/', dst='images')
 
 html_static_path = ['_static', branding_dir]
 
-html_logo = branding_dir + 'pntOs_Logo_Gradient_Light_Horizontal.png'
+html_logo = (
+    branding_dir + 'Cobra_Logo-Standards_Horizontal-Color-WhiteTagline_Vers1.png'
+)
 html_theme_options = {
     'logo_only': True,
     'collapse_navigation': True,
 }
-html_favicon = f'{branding_dir}/blue-pntos-icon.ico'
+html_favicon = f'{branding_dir}/purple-cobra-icon.ico'
 
 nitpicky = True
 nitpick_ignore = [

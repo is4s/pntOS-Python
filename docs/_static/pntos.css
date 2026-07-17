@@ -10,6 +10,30 @@ body, h1, h2, h3, h4, h5, h6{
     background: #040747;
 }
 
+/* Sidebar header colors */
+.wy-menu-vertical header,
+.wy-menu-vertical p.caption {
+    color: #9900CC;
+}
+
+.wy-side-nav-search > a {
+    color: #9900CC;
+}
+
+/* Replace home icon with custom purple Cobra icon */
+.fa-home:before,
+.icon-home:before {
+    content: "";
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    background-image: url("purple-cobra-icon.ico");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    vertical-align: middle;
+}
+
 footer {
     background-image: url("pntOS_Branding_Elements_HexagonGroup_Blue_1.png");
     background-position: right bottom;
