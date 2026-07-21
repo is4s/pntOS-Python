@@ -188,11 +188,11 @@ pluggy==1.6.0
     # via
     #   pytest
     #   pytest-cov
+pntos-cobra-docs-data==1.0.0
 pntos-python-datasets-lcm==0.1.0
     # via pntos-python
 pntos-python-datasets-ros==0.1.0
     # via pntos-python
-pntos-python-docs-data==0.5.1
 prompt-toolkit==3.0.51
     # via ipython
 ptyprocess==0.7.0 ; sys_platform != 'emscripten' and sys_platform != 'win32'

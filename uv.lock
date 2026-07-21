@@ -1439,6 +1439,14 @@ requires-dist = [
 ]
 
 [[package]]
+name = "pntos-cobra-docs-data"
+version = "1.0.0"
+source = { registry = "https://pypi.org/simple/" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/6b/16/020f216bc95f214c8bd95df83e2700de1ea0adf7e7dd574c53f8b09f7a8f/pntos_cobra_docs_data-1.0.0-py2.py3-none-any.whl", hash = "sha256:2ff6429ac5b052e81955fde4aea3336123a4f035ccfaafc82c803246b41748e8", size = 5466381, upload-time = "2026-07-21T13:45:57.967Z" },
+]
+
+[[package]]
 name = "pntos-extras"
 version = "2.1.0.post0.dev3"
 source = { editable = "pntos-extras" }
@@ -1483,7 +1491,7 @@ dev = [
     { name = "libclang" },
     { name = "myst-parser" },
     { name = "pip" },
-    { name = "pntos-python-docs-data" },
+    { name = "pntos-cobra-docs-data" },
     { name = "pyproject-fmt" },
     { name = "pytest" },
     { name = "pytest-cov" },
@@ -1517,7 +1525,7 @@ dev = [
     { name = "libclang", specifier = ">=18.1.1" },
     { name = "myst-parser", specifier = ">=4" },
     { name = "pip", specifier = ">=24" },
-    { name = "pntos-python-docs-data" },
+    { name = "pntos-cobra-docs-data" },
     { name = "pyproject-fmt", specifier = ">=2.7" },
     { name = "pytest", specifier = ">=8.2" },
     { name = "pytest-cov", specifier = ">=6" },
@@ -1544,14 +1552,6 @@ version = "0.1.0"
 source = { registry = "https://pypi.org/simple/" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/c4/5f/39b3d7a85cd7ffc8e32e1d4d5c8d8263d4fd56e33f3407823f6787efc087/pntos_python_datasets_ros-0.1.0-py2.py3-none-any.whl", hash = "sha256:173b505b838c27dc22c56d456a891bb3e469d673953e41d9c9539232ed55d970", size = 62131994, upload-time = "2026-04-30T20:57:43.474Z" },
-]
-
-[[package]]
-name = "pntos-python-docs-data"
-version = "0.5.1"
-source = { registry = "https://pypi.org/simple/" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/3a/dc/320fb9802285146a76a32d75ff4b57158e2c5aa23e23deb8d7c7943dd82c/pntos_python_docs_data-0.5.1-py2.py3-none-any.whl", hash = "sha256:f9c82368e23d2d2aef3a0779cb684555b718f5617830aad03618498f5277e01a", size = 5489798, upload-time = "2026-07-06T15:33:05.573Z" },
 ]
 
 [[package]]
