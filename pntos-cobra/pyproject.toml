@@ -43,7 +43,3 @@ scripts.catalog = "pntos.cobra.utils.plugins:cobra_catalog"
 [tool.setuptools]
 include-package-data = true
 package-data.pntos-cobra = [ "advanced_plugins/ui/_static/dist/**/*" ]
-
-[tool.uv]
-sources.navtk = { index = "pypi" }
-index = [ { name = "pypi", url = "https://pypi.org/simple/" } ]

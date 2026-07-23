@@ -26,7 +26,3 @@ dependencies = [
     "pntos-api>=2.0.0,<3.0.0",
     "pntos-cobra==2.1.0.post0.dev3",
 ]
-
-[tool.uv]
-sources.navtk = { index = "pypi" }
-index = [ { name = "pypi", url = "https://pypi.org/simple/" } ]
