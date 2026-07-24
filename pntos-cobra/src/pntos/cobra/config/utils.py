@@ -350,6 +350,12 @@ def _nested_config_from_registry(
     return val
 
 
+def _is_equal(v1: RegistryValueTypeUnion, v2: RegistryValueTypeUnion) -> bool:
+    if isinstance(v1, np.ndarray) and isinstance(v2, np.ndarray):
+        return np.array_equal(v1, v2)  # ty:ignore[invalid-argument-type]
+    return v1 == v2
+
+
 def config_to_registry(config: BaseConfig, mediator: Mediator) -> None:
     """
     A utility function that inserts a config into the registry.
@@ -362,6 +368,7 @@ def config_to_registry(config: BaseConfig, mediator: Mediator) -> None:
         config (BaseConfig): The config to be stored in the registry.
         mediator (Mediator): A :class:`pntos.api.Mediator` instance.
     """
+
     conf_params = [f for f in fields(config) if f.name != 'group']
 
     for param in conf_params:
@@ -373,6 +380,15 @@ def config_to_registry(config: BaseConfig, mediator: Mediator) -> None:
             return
 
     kv = mediator.registry.batch_start(config.group)
+
+    def _write_to_kv(key: str, val: RegistryValueTypeUnion) -> None:
+        if key in kv and not _is_equal(val, kv[key]):  # ty:ignore[invalid-argument-type]
+            mediator.log_message(
+                LoggingLevel.WARN,
+                f"Overwriting registry key '{key}'.\n\tPrevious value: {kv[key]}\n\tNew value: {val}",
+            )
+        kv[key] = val
+
     for param in conf_params:
         val_to_store = getattr(config, param.name)
 
@@ -399,24 +415,24 @@ def config_to_registry(config: BaseConfig, mediator: Mediator) -> None:
                         kv.batch_end()
                         config_to_registry(nested_config, mediator)
                         kv.batch_restart()
-                    kv['_' + param.name + '_groups'] = nested_groups
+                    _write_to_kv('_' + param.name + '_groups', nested_groups)
                     continue
         elif isinstance(val_to_store, Enum):
             val_to_store = val_to_store.value
         elif isinstance(val_to_store, EstimateWithCovariance):
-            kv['_estimate'] = val_to_store.estimate
-            kv['_covariance'] = val_to_store.covariance
-            kv['_ewc_type'] = val_to_store.type.value
+            _write_to_kv('_estimate', val_to_store.estimate)
+            _write_to_kv('_covariance', val_to_store.covariance)
+            _write_to_kv('_ewc_type', val_to_store.type.value)
             continue
         elif isinstance(val_to_store, BaseConfig):
             kv.batch_end()
             config_to_registry(val_to_store, mediator)
             kv.batch_restart()
-            kv['_' + param.name + '_groups'] = val_to_store.group
+            _write_to_kv('_' + param.name + '_groups', val_to_store.group)
             continue
         elif val_to_store is None:
             continue
-        kv[param.name] = val_to_store
+        _write_to_kv(param.name, val_to_store)
     kv.batch_end()
 
 
