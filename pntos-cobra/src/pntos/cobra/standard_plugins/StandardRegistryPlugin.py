@@ -642,7 +642,7 @@ class StandardRegistryPlugin(RegistryPlugin):
         return out
 
     def _log(self, level: LoggingLevel, message: str) -> None:
-        if self.mediator is not None:
+        try:
             self.mediator.log_message(level, message)
-        else:
+        except AttributeError:
             print_message(level, RegistryPlugin.__name__, message)
