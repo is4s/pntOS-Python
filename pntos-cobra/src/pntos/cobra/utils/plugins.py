@@ -383,6 +383,9 @@ class TerminalTree(CatalogTree):
 def extend_state_modeling_plugins(
     plugin_type_tree: CatalogTree, plugin: PluginType
 ) -> bool:
+    """
+    Attach to the plugin_type_tree a state modeling plugin with all its providers.
+    """
     if not issubclass(plugin, StateModelingPlugin):
         return False
 
@@ -435,8 +438,32 @@ def extend_state_modeling_plugins(
     return True
 
 
+def extend_preprocessor_plugin(
+    plugin_type_tree: CatalogTree, plugin: PluginType
+) -> bool:
+    """
+    Attach to the plugin_type_tree a preprocessor plugin with all its preprocessor options.
+    """
+    if not issubclass(plugin, PreprocessorPlugin):
+        return False
+    # preprocessor plugins have preprocessors we want to view
+    plugin_tree = plugin_type_tree.add_branch(plugin.__name__, expand=False)
+    preprocessor_added = False
+    try:
+        plugin_obj: PreprocessorPlugin = plugin(identifier='temp')  # ty:ignore[unknown-argument]
+        for p in plugin_obj.preprocessor_identifiers:
+            preprocessor_added = True
+            plugin_tree.add_leaf(p)
+        if not preprocessor_added:
+            plugin_tree.add_leaf('No Preprocessors found')
+    except AttributeError:
+        plugin_tree.add_leaf('Unable to view all Preprocessors')
+    return True
+
+
 _specific_extensions: list[Callable[[CatalogTree, PluginType], bool]] = [
     extend_state_modeling_plugins,
+    extend_preprocessor_plugin,
 ]
 """
 Instead of adding just the plugin, if it matches an extension type add the plugin *and* corresponding subtree with information.
