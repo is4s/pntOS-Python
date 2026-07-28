@@ -125,9 +125,7 @@ class StandardPreprocessorPlugin(PreprocessorPlugin):
                     return None
 
                 return ImuRotationPreprocessor(
-                    self.mediator,
-                    inert_config.channel,
-                    array(inert_config.C_imu_to_platform),
+                    self.mediator, array(inert_config.C_imu_to_platform)
                 )
 
             case 2:
@@ -149,7 +147,9 @@ class StandardPreprocessorPlugin(PreprocessorPlugin):
                     )
                     return None
 
-                return TimeAdjusterPreprocessor(time_adjuster_cfg, self.mediator)
+                return TimeAdjusterPreprocessor(
+                    time_adjuster_cfg.expected_dt_nsec, self.mediator
+                )
 
             case 3:
                 if config_group is None:
@@ -169,7 +169,7 @@ class StandardPreprocessorPlugin(PreprocessorPlugin):
                     )
                     return None
                 return BarometerToAltitudePreprocessor(
-                    bta_config.channel, self.mediator, bta_config.alt_sigma
+                    self.mediator, bta_config.alt_sigma
                 )
 
             case 4:
@@ -191,7 +191,7 @@ class StandardPreprocessorPlugin(PreprocessorPlugin):
                     )
                     return None
 
-                return TimeBiasPreprocessor(time_bias_cfg, self.mediator)
+                return TimeBiasPreprocessor(time_bias_cfg.time_bias, self.mediator)
 
             case 5:
                 preproc_id = self.preprocessor_identifiers[preprocessor_index]
@@ -208,7 +208,10 @@ class StandardPreprocessorPlugin(PreprocessorPlugin):
                         f'Failed to populate OutageConfig for preprocessor {preproc_id}.',
                     )
                     return None
-                return OutagePreprocessor(self.mediator, outage)
+
+                return OutagePreprocessor(
+                    outage.start_time, outage.end_time, self.mediator
+                )
 
             case _:
                 self.mediator.log_message(

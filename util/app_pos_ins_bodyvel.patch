@@ -1,5 +1,5 @@
 diff --git a/apps/standard/pos_ins.py b/apps/standard/pos_ins_bodyvel.py
-index 391390a3..e4d606ce 100755
+index 8cc11962..915a1b29 100755
 --- a/apps/standard/pos_ins.py
 +++ b/apps/standard/pos_ins_bodyvel.py
 @@ -29,6 +29,7 @@ from pntos.cobra import (
@@ -42,12 +42,12 @@ index 391390a3..e4d606ce 100755
          inertial_config=InertialConfig(
              group='config/inertial',
 @@ -139,6 +150,11 @@ my_config: list[BaseConfig] = [
-                 channels_to_correct=('/sensor/ublox-ZED-F9T/position',),
+                 channels=('/sensor/ublox-ZED-F9T/position',),
                  time_bias=int(0.15 * 1e9),
              ),
 +            DownsamplerConfig(
-+                'config/downsampler',
-+                channels_to_downsample=('/sensor/simulated/velocity',),
++                group='config/downsampler',
++                channels=('/sensor/simulated/velocity',),
 +                downsampling_factors=(10,),  # Downsample from 1 Hz to 0.1 Hz
 +            ),
          ),

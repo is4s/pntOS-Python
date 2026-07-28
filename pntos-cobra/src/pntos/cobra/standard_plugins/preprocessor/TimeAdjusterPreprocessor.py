@@ -8,36 +8,28 @@ from pntos.api import (
     Message,
     Preprocessor,
 )
-from pntos.cobra.config import (
-    TimeAdjusterConfig,
-)
 from pntos.cobra.utils import has_tov
 from typing_extensions import override
 
 
 class TimeAdjusterPreprocessor(Preprocessor):
     _mediator: Mediator
-    _channel_to_correct: str
     _last_nsec: int | None
     _expected_dt_nsec: int
     _tolerance_nsec: int
 
     def __init__(
         self,
-        config: TimeAdjusterConfig,
+        expected_dt_nsec: int,
         mediator: Mediator,
     ) -> None:
         self._mediator = mediator
-        self._channel_to_correct = config.channel_to_correct
         self._last_nsec = None
-        self._expected_dt_nsec = config.expected_dt_nsec
+        self._expected_dt_nsec = expected_dt_nsec
         self._tolerance_nsec = int(0.0001 * 1e9)
 
     @override
     def process_pntos_message(self, message: Message) -> list[Message] | None:
-        if message.source_identifier != self._channel_to_correct:
-            return [message]
-
         msg: AspnBase = message.wrapped_message
         if not has_tov(msg):
             self._mediator.log_message(

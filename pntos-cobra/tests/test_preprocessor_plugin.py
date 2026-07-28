@@ -35,26 +35,27 @@ from pntos.cobra.internal import (
 )
 
 downsampler_config = DownsamplerConfig(
-    channels_to_downsample=('test1', 'test2', 'test3'),
+    group='config/downsampler',
+    channels=('test1', 'test2', 'test3'),
     downsampling_factors=(2, 3, -1),
-    group='test',
 )
 inertial_config = ImuRotatorConfig(
-    group='/config/imu_rotator',
-    channel='/sensor/imu',
-    C_imu_to_platform=((0, 1, 0), (1, 0, 0), (0, 0, -1)),
+    group='config/imu_rotator',
+    channels=('/sensor/imu',),
+    C_imu_to_platform=((0.00, 1.00, 0.00), (1.00, 0.00, 0.00), (0.00, 0.00, -1.00)),
 )
 time_adjuster_config = TimeAdjusterConfig(
-    group='test',
-    channel_to_correct='/sensor/imu',
+    group='config/time_adjuster',
+    channels=('/sensor/imu',),
     expected_dt_nsec=int(0.01 * 1e9),
 )
 baro_to_alt_config = BarometerToAltitudeConfig(
-    group='baro_test', channel='/sensor/barometer'
+    group='config/baro',
+    channels=('/sensor/barometer',),
 )
 outage_config = OutageConfig(
-    group='outage',
-    channel='/sensor/imu',
+    group='config/outage',
+    channels=('/sensor/imu',),
     start_time=2.0,
     end_time=3.0,
 )
@@ -99,16 +100,16 @@ def test_plugin_constructor(
 def test_invalid_mediator() -> None:
     ds_plugin = StandardPreprocessorPlugin('preprocessor_plugin')
     ds_plugin.init_plugin()
-    assert not ds_plugin.new_preprocessor(0, 'test')
+    assert not ds_plugin.new_preprocessor(0, 'config/downsampler')
 
 
 def test_invalid_index(
     preprocessor_plugin: StandardPreprocessorPlugin,
 ) -> None:
-    assert preprocessor_plugin.new_preprocessor(-1, 'test') is None
+    assert preprocessor_plugin.new_preprocessor(-1, 'invalid') is None
     assert (
         preprocessor_plugin.new_preprocessor(
-            len(preprocessor_plugin.preprocessor_identifiers), 'test'
+            len(preprocessor_plugin.preprocessor_identifiers), 'invalid'
         )
         is None
     )
@@ -160,7 +161,7 @@ def test_no_config_group(
 def downsampler(
     preprocessor_plugin: StandardPreprocessorPlugin,
 ) -> Preprocessor:
-    ds = preprocessor_plugin.new_preprocessor(0, 'test')
+    ds = preprocessor_plugin.new_preprocessor(0, 'config/downsampler')
     assert ds is not None
     return ds
 
@@ -191,7 +192,7 @@ def assert_aspn_alt_equal(alt1: MeasurementAltitude, alt2: MeasurementAltitude) 
 def test_bad_channel(
     preprocessor_plugin: StandardPreprocessorPlugin,
 ) -> None:
-    ds = preprocessor_plugin.new_preprocessor(0, 'test')
+    ds = preprocessor_plugin.new_preprocessor(0, 'config/downsampler')
     assert ds is not None
     bad = create_aspn_altitude('bad')
     bad_alt_meas = bad.wrapped_message
@@ -290,7 +291,7 @@ def imu_rotator_preprocessor(
     preprocessor_plugin: StandardPreprocessorPlugin,
 ) -> Preprocessor:
     idx = preprocessor_plugin.preprocessor_identifiers.index('imu_rotator')
-    preprocessor = preprocessor_plugin.new_preprocessor(idx, '/config/imu_rotator')
+    preprocessor = preprocessor_plugin.new_preprocessor(idx, 'config/imu_rotator')
     assert preprocessor is not None
     assert isinstance(preprocessor, ImuRotationPreprocessor)
     return preprocessor
@@ -352,7 +353,7 @@ def time_adjuster_preprocessor(
     preprocessor_plugin: StandardPreprocessorPlugin,
 ) -> Preprocessor:
     idx = preprocessor_plugin.preprocessor_identifiers.index('time_adjuster')
-    preprocessor = preprocessor_plugin.new_preprocessor(idx, 'test')
+    preprocessor = preprocessor_plugin.new_preprocessor(idx, 'config/time_adjuster')
     assert preprocessor is not None
     assert isinstance(preprocessor, TimeAdjusterPreprocessor)
     return preprocessor
@@ -466,7 +467,7 @@ def baro_to_alt(
     preprocessor_plugin: StandardPreprocessorPlugin,
 ) -> Preprocessor:
     idx = preprocessor_plugin.preprocessor_identifiers.index('baro_converter')
-    preprocessor = preprocessor_plugin.new_preprocessor(idx, 'baro_test')
+    preprocessor = preprocessor_plugin.new_preprocessor(idx, 'config/baro')
     assert preprocessor is not None
     assert isinstance(preprocessor, BarometerToAltitudePreprocessor)
     return preprocessor
@@ -499,19 +500,10 @@ def outage_preprocessor(
     preprocessor_plugin: StandardPreprocessorPlugin,
 ) -> OutagePreprocessor:
     idx = preprocessor_plugin.preprocessor_identifiers.index('outage')
-    preprocessor = preprocessor_plugin.new_preprocessor(idx, 'outage')
+    preprocessor = preprocessor_plugin.new_preprocessor(idx, 'config/outage')
     assert preprocessor is not None
     assert isinstance(preprocessor, OutagePreprocessor)
     return preprocessor
-
-
-def test_irrelevant_channel(outage_preprocessor: OutagePreprocessor) -> None:
-    # No messages received yet on outage channel
-    assert outage_preprocessor.first_msg_time_ns is None
-    irrelevant_msg = create_aspn_altitude('irrelevant_channel')
-    outage_preprocessor.process_pntos_message(irrelevant_msg)
-    # Still no messages received on outage channel
-    assert outage_preprocessor.first_msg_time_ns is None
 
 
 def test_outage(outage_preprocessor: OutagePreprocessor) -> None:

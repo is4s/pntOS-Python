@@ -2,6 +2,7 @@ import unittest
 from contextlib import redirect_stdout
 from copy import deepcopy
 from io import StringIO
+from types import NoneType
 
 import numpy as np
 from aspn23 import (
@@ -79,7 +80,13 @@ from pntos.cobra.config import (
     TutorialOrchestrationConfig,
     VirtualStateBlockConfig,
 )
-from pntos.cobra.internal import StandardMediator, StandardMessageStreamConfig
+from pntos.cobra.internal import (
+    ImuRotationPreprocessor,
+    StandardMediator,
+    StandardMessageStreamConfig,
+    TimeAdjusterPreprocessor,
+    TimeBiasPreprocessor,
+)
 from typing_extensions import override
 
 # Test globals
@@ -150,17 +157,17 @@ tutorial_config = [
     ),
     TimeAdjusterConfig(
         group='config/time_adjuster',
-        channel_to_correct=IMU_CHANNEL,
+        channels=(IMU_CHANNEL,),
         expected_dt_nsec=int(0.01 * 1e9),
     ),
     ImuRotatorConfig(
         group='config/imu_rotator',
-        channel=IMU_CHANNEL,
+        channels=(IMU_CHANNEL,),
         C_imu_to_platform=C_imu_to_platform,
     ),
     TimeBiasConfig(
         group='config/time_bias',
-        channels_to_correct=(
+        channels=(
             '/sensor/ublox-ZED-F9T/position',
             '/sensor/ublox-ZED-F9T/velocity',
         ),
@@ -231,10 +238,23 @@ standard_config = [
         inertial_config=inertial_config,
         alignment_config=align_config,
         preprocessor_configs=(
+            TimeAdjusterConfig(
+                group='config/time_adjuster',
+                channels=(IMU_CHANNEL,),
+                expected_dt_nsec=int(0.01 * 1e9),
+            ),
             ImuRotatorConfig(
-                group='config/rotator',
-                channel=IMU_CHANNEL,
+                group='config/imu_rotator',
+                channels=(IMU_CHANNEL,),
                 C_imu_to_platform=C_imu_to_platform,
+            ),
+            TimeBiasConfig(
+                group='config/time_bias',
+                channels=(
+                    '/sensor/ublox_ZED_F9T/position',
+                    '/sensor/ublox_ZED_F9T/velocity',
+                ),
+                time_bias=int(0 * 1e9),
             ),
         ),
     ),
@@ -928,6 +948,65 @@ class Test_Orchestration(unittest.TestCase):
             self.orchestration_plugin.initializer.request_current_status()
             == InitializationStatus.INITIALIZED_GOOD
         )
+
+    def test_preprocessor_manager(self) -> None:
+        temp_config = deepcopy(standard_config)
+        orch_config = temp_config[2]
+        assert isinstance(orch_config, StandardOrchestrationConfig)
+        assert orch_config.preprocessor_configs
+
+        plugins = self.instantiate_default_plugins(temp_config)
+        self.orchestration_plugin = StandardOrchestrationPlugin(
+            'StandardOrchestrationPlugin'
+        )
+        self.state_modeling_plugin = StandardStateModelingPlugin(
+            'Cobra Standard State Modeling Plugin'
+        )
+        plugins.append(self.orchestration_plugin)
+        plugins.append(self.state_modeling_plugin)
+        self.init_all_plugins(plugins)
+
+        self.orchestration_plugin.init_orchestration_plugin(
+            plugins, StandardMessageStreamConfig()
+        )
+
+        manager = self.orchestration_plugin.preprocessor_manager
+        assert manager
+
+        all_channels: list[str] = []
+        for config in orch_config.preprocessor_configs:
+            if isinstance(config.channels, (str, NoneType)):
+                continue
+            all_channels.extend(config.channels)
+
+        for channel in all_channels:
+            self.orchestration_plugin.process_pntos_message(
+                self.generate_imu_message(source_identifier=channel), sequenced=False
+            )
+        assert manager._chains
+
+        for channel, preprocessors in manager._chains.items():
+            if channel not in all_channels or preprocessors is None:
+                raise ValueError(
+                    f'Channel `{channel}` was not stored in chain cache correctly'
+                )
+            match channel:
+                case _ if channel == IMU_CHANNEL:
+                    assert len(preprocessors) == 2
+                    assert [type(p) for p in preprocessors] == [
+                        TimeAdjusterPreprocessor,
+                        ImuRotationPreprocessor,
+                    ]
+                case '/sensor/ublox_ZED_F9T/position':
+                    assert len(preprocessors) == 1
+                    assert type(preprocessors[0]) is TimeBiasPreprocessor
+                case '/sensor/ublox_ZED_F9T/velocity':
+                    assert len(preprocessors) == 1
+                    assert type(preprocessors[0]) is TimeBiasPreprocessor
+                case _:
+                    raise ValueError(
+                        f'Unexpected channel `{channel}` found in chain cache'
+                    )
 
 
 def suite() -> unittest.TestSuite:

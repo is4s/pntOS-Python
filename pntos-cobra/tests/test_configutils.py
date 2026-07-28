@@ -164,8 +164,8 @@ class TestConfigUtils(unittest.TestCase):
 
     def test_DownsamplerConfig_to_from_registry(self) -> None:
         test_conf = DownsamplerConfig(
-            CONFIG_TEST_GROUP,
-            channels_to_downsample=('chan1', 'chan2', 'chan3'),
+            group=CONFIG_TEST_GROUP,
+            channels=('chan1', 'chan2', 'chan3'),
             downsampling_factors=(1, 2, 3),
         )
         # Test config_to_registry
@@ -179,7 +179,9 @@ class TestConfigUtils(unittest.TestCase):
         self._validate_conf_from_registry(test_conf, result_conf)
 
     def test_PreprocessorConfig_to_from_registry(self) -> None:
-        test_conf = PreprocessorConfig(CONFIG_TEST_GROUP, 'downsampler')
+        test_conf = PreprocessorConfig(
+            group=CONFIG_TEST_GROUP, identifier='downsampler', channels=('none',)
+        )
         # Test config_to_registry
         config_to_registry(test_conf, self.mediator)
         self._validate_conf_to_registry(test_conf)
@@ -267,12 +269,12 @@ class TestConfigUtils(unittest.TestCase):
             preprocessor_configs=(
                 ImuRotatorConfig(
                     group='config/imu_rotator',
-                    channel='/sensor/vn-100/imu',
+                    channels=('/sensor/vn-100/imu',),
                     C_imu_to_platform=C_imu_to_platform,
                 ),
                 TimeAdjusterConfig(
                     group='config/time_adjuster',
-                    channel_to_correct='/sensor/vn-100/imu',
+                    channels=('/sensor/vn-100/imu',),
                     expected_dt_nsec=int(0.01 * 1e9),
                 ),
             ),

@@ -99,7 +99,7 @@ my_config: list[BaseConfig] = [
     ),
     TimeAdjusterConfig(
         group='config/time_adjuster',
-        channel_to_correct='/sensor/vn-100/imu',
+        channels=('/sensor/vn-100/imu',),
         expected_dt_nsec=int(0.01 * 1e9),
     ),
     UiLogPlottingConfig(
@@ -110,11 +110,11 @@ my_config: list[BaseConfig] = [
     ImuRotatorConfig(
         group='config/imu_rotator',
         C_imu_to_platform=C_imu_to_platform,
-        channel='/sensor/vn-100/imu',
+        channels=('/sensor/vn-100/imu',),
     ),
     TimeBiasConfig(
         group='config/time_bias',
-        channels_to_correct=('/sensor/ublox-ZED-F9T/position',),
+        channels=('/sensor/ublox-ZED-F9T/position',),
         time_bias=int(0.15 * 1e9),
     ),
 ]

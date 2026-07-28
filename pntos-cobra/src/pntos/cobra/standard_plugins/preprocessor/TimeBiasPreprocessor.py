@@ -7,9 +7,6 @@ from pntos.api import (
     Message,
     Preprocessor,
 )
-from pntos.cobra.config import (
-    TimeBiasConfig,
-)
 from pntos.cobra.utils import has_tov
 from typing_extensions import override
 
@@ -18,18 +15,16 @@ class TimeBiasPreprocessor(Preprocessor):
     """Corrects timestamps for a constant bias.
 
     This preprocessor is useful when a specific sensor produces timestamps with a constant bias. It
-    is configured with a list of channels as well as a constant time bias. Any message whose source
-    identifier matches one of the configured channels will have its timestamp subtracted by the bias
-    amount.
+    is configured with a constant time bias. All incoming message will have its timestamp subtracted
+    by the bias amount.
     """
 
     _mediator: Mediator
-    _channels_to_correct: tuple[str, ...]
     _time_bias: int
 
     def __init__(
         self,
-        config: TimeBiasConfig,
+        time_bias: int,
         mediator: Mediator,
     ) -> None:
         """
@@ -38,14 +33,10 @@ class TimeBiasPreprocessor(Preprocessor):
             mediator (Mediator): Used to get config information and to perform logging.
         """
         self._mediator = mediator
-        self._channels_to_correct = config.channels_to_correct
-        self._time_bias = config.time_bias
+        self._time_bias = time_bias
 
     @override
     def process_pntos_message(self, message: Message) -> list[Message] | None:
-        if message.source_identifier not in self._channels_to_correct:
-            return [message]
-
         aspn_message: AspnBase = message.wrapped_message
         if not has_tov(aspn_message):
             self._mediator.log_message(

@@ -20,7 +20,6 @@ from pntos.api import (
     Message,
     MessageStreamConfig,
     OrchestrationPlugin,
-    Preprocessor,
     StandardFusionEngine,
     StandardFusionStrategy,
     StandardInertialMechanization,
@@ -32,20 +31,19 @@ from pntos.cobra.config import (
     FeedbackConfig,
     MeasurementProcessorConfig,
     PinsonStateBlockConfig,
-    PreprocessorConfig,
     StandardOrchestrationConfig,
     StateBlockConfig,
     StreamConfig,
     VirtualStateBlockConfig,
 )
 from pntos.cobra.config.utils import config_from_registry
+from pntos.cobra.internal import PreprocessorManager
 from pntos.cobra.utils import (
     ASPN_MESSAGE_TYPE_MAP,
     Cache,
     EstimateWithCovarianceEntry,
     FilterSolutionEntry,
     InertialSolutionEntry,
-    SortedPlugins,
     get_best_solution,
     get_dead_reckoning_solution,
     has_valid_time,
@@ -73,7 +71,7 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
     fusion_strategy_plugin: FusionStrategyPlugin
     inertial_plugin: InertialPlugin
     state_modeling_plugins: list[StateModelingPlugin]
-    preprocessors: list[Preprocessor]
+    preprocessor_manager: PreprocessorManager | None
     initialization_plugin: InitializationPlugin
     initialization_state: InitializationStatus
     initializer: InertialInitializationStrategy
@@ -97,7 +95,7 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
         self.identifier: str = identifier
         self.initialization_state = InitializationStatus.WAITING
         self.init_solution = None
-        self.preprocessors = []
+        self.preprocessor_manager = None
         self.measurement_channels = {}
         self.inertial_drift_prop_dt = int(0.1 * 1e9)
         self.cache = Cache()
@@ -210,10 +208,12 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
         self.initialization_plugin = sorted_plugins.initialization_plugins[0]
         self.state_modeling_plugins = sorted_plugins.state_modeling_plugins
 
-        # Set up preprocessors
+        # Set up preprocessor manager if defined, otherwise ignore preprocessing workflow
         if orch_config.preprocessor_configs is not None:
-            self.preprocessors = self._set_up_preprocessors(
-                sorted_plugins, orch_config.preprocessor_configs
+            self.preprocessor_manager = PreprocessorManager(
+                sorted_plugins.preprocessor_plugins,
+                orch_config.preprocessor_configs,
+                self.mediator,
             )
         self._set_up_fusion_engine(
             orch_config.additional_sb_configs,
@@ -231,31 +231,6 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
             self._generate_initial_inertial_solution()
             self._initialize_filter()
             self._send_inertial_aux_to_pinson()
-
-    def _set_up_preprocessors(
-        self,
-        sorted_plugins: SortedPlugins,
-        preprocessor_configs: tuple[PreprocessorConfig, ...],
-    ) -> list[Preprocessor]:
-        """
-        Finds and creates a list of preprocessors based on the information from ``preprocessor_configs``.
-
-        Args:
-            sorted_plugins (SortedPlugins): A `SortedPlugins` instance.
-            preprocessor_configs (tuple[PreprocessorConfig, ...]):
-
-        Returns:
-            list[Preprocessor]
-        """
-        preprocessors = []
-        for config in preprocessor_configs:
-            for plugin in sorted_plugins.preprocessor_plugins:
-                for idx in range(len(plugin.preprocessor_identifiers)):
-                    if plugin.preprocessor_identifiers[idx] == config.identifier:
-                        preprocessor = plugin.new_preprocessor(idx, config.group)
-                        if preprocessor is not None:
-                            preprocessors.append(preprocessor)
-        return preprocessors
 
     def _generate_initial_inertial_solution(self) -> None:
         """Utility function that generates the initial inertial solution."""
@@ -592,30 +567,6 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
 
         return None
 
-    def _preprocess_message(self, message: Message) -> list[Message] | None:
-        """Process the given message by the full chain of preprocessors.
-
-        Args:
-            message (Message): The message to process.
-
-        Returns:
-            list[Message] | None: The output messages, or None if one of the preprocessors dropped the input message.
-        """
-        out_list = [message]
-        for preprocessor in self.preprocessors:
-            if len(out_list) == 0:
-                return None
-            tmp_list = out_list.copy()
-            out_list = []
-            for out_message in tmp_list:
-                new_messages = preprocessor.process_pntos_message(out_message)
-                if new_messages is not None:
-                    out_list.extend(new_messages)
-
-        if len(out_list) > 0:
-            return out_list
-        return None
-
     def _propagate_to_time(self, target_time: TypeTimestamp) -> None:
         """Propagate up to target time in max steps of self.max_prop_dt_ns"""
         filter_time = self.fusion_engine.time
@@ -860,7 +811,12 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
 
     @override
     def process_pntos_message(self, message: Message, sequenced: bool) -> None:
-        preprocessed_messages = self._preprocess_message(message)
+        if self.preprocessor_manager is not None:
+            preprocessed_messages = self.preprocessor_manager.preprocess_message(
+                message
+            )
+        else:
+            preprocessed_messages = [message]
         if preprocessed_messages is None:
             # Message dropped in preprocessing
             return

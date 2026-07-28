@@ -1,5 +1,5 @@
 diff --git a/apps/standard/lcm_relay.py b/apps/advanced/ui.py
-index fdf95961..798034b5 100755
+index 31982bb4..ac5de308 100755
 --- a/apps/standard/lcm_relay.py
 +++ b/apps/advanced/ui.py
 @@ -12,7 +12,9 @@ from pntos.api import (

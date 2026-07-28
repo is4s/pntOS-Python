@@ -1,3 +1,5 @@
+from types import NoneType
+
 from numpy import array
 from pntos.api import (
     LoggingLevel,
@@ -5,9 +7,7 @@ from pntos.api import (
     Message,
     Preprocessor,
 )
-from pntos.cobra.config import (
-    DownsamplerConfig,
-)
+from pntos.cobra.config import DownsamplerConfig
 from typing_extensions import override
 
 
@@ -35,7 +35,15 @@ class DownsamplerPreprocessor(Preprocessor):
         self._update_counters = {}
         self.mediator = mediator
 
-        channels = config.channels_to_downsample
+        if isinstance(config.channels, (NoneType, str)):
+            self.mediator.log_message(
+                LoggingLevel.WARN,
+                f'Unsupported type of `{type(config.channels)}` for downsampling channels. '
+                + 'Downsampling will be disabled.',
+            )
+            return
+
+        channels: tuple[str, ...] = config.channels
         factors = array(config.downsampling_factors, dtype=int)
         chan_len = len(channels)
         fac_len = len(factors)

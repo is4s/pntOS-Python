@@ -136,17 +136,17 @@ my_config: list[BaseConfig] = [
         preprocessor_configs=(
             ImuRotatorConfig(
                 group='config/imu_rotator',
-                channel='/sensor/vn-100/imu',
+                channels=('/sensor/vn-100/imu',),
                 C_imu_to_platform=C_imu_to_platform,
             ),
             TimeAdjusterConfig(
                 group='config/time_adjuster',
-                channel_to_correct='/sensor/vn-100/imu',
+                channels=('/sensor/vn-100/imu',),
                 expected_dt_nsec=int(0.01 * 1e9),
             ),
             TimeBiasConfig(
                 group='config/time_bias',
-                channels_to_correct=('/sensor/ublox-ZED-F9T/pva',),
+                channels=('/sensor/ublox-ZED-F9T/pva',),
                 time_bias=int(0.15 * 1e9),
             ),
         ),

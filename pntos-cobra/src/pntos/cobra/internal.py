@@ -42,6 +42,9 @@ from .standard_plugins.preprocessor.ImuRotationPreprocessor import (
 from .standard_plugins.preprocessor.OutagePreprocessor import (
     OutagePreprocessor as OutagePreprocessor,
 )
+from .standard_plugins.preprocessor.PreprocessorManager import (
+    PreprocessorManager as PreprocessorManager,
+)
 from .standard_plugins.preprocessor.TimeAdjusterPreprocessor import (
     TimeAdjusterPreprocessor as TimeAdjusterPreprocessor,
 )

@@ -1,18 +1,18 @@
 from pntos.api import LoggingLevel, Mediator, Message, Preprocessor
-from pntos.cobra.config import OutageConfig
 from pntos.cobra.utils import has_tov
 from typing_extensions import override
 
 
 class Outage:
-    config: OutageConfig
     mediator: Mediator
     active: bool
 
-    def __init__(self, config: OutageConfig, mediator: Mediator) -> None:
-        self.config = config
+    def __init__(self, start_time: float, end_time: float, mediator: Mediator) -> None:
         self.mediator = mediator
         self.active = False
+
+        self._start_time: float = start_time
+        self._end_time: float = end_time
 
     def update_status(self, time: float) -> None:
         """
@@ -21,18 +21,18 @@ class Outage:
         - time: Current relative time in seconds.
         - mediator: Mediator object for logging messages.
         """
-        outage_active = self.config.start_time <= time < self.config.end_time
+        outage_active = self._start_time <= time < self._end_time
 
         if outage_active and not self.active:
             self.mediator.log_message(
                 LoggingLevel.INFO,
-                f'Beginning outage on channel {self.config.channel} from time {self.config.start_time}s to {self.config.end_time}s (cur_time={time}s).',
+                f'Beginning outage from time {self._start_time}s to {self._end_time}s (cur_time={time}s).',
             )
             self.active = True
         elif not outage_active and self.active:
             self.mediator.log_message(
                 LoggingLevel.INFO,
-                f'Ending outage on channel {self.config.channel} at time {time}s.',
+                f'Ending outage at time {time}s.',
             )
             self.active = False
 
@@ -40,16 +40,13 @@ class Outage:
 class OutagePreprocessor(Preprocessor):
     """Preprocessor used to induce an outage on a given channel."""
 
-    def __init__(self, mediator: Mediator, outage_config: OutageConfig) -> None:
+    def __init__(self, start_time: float, end_time: float, mediator: Mediator) -> None:
         self.mediator = mediator
-        self.outage = Outage(outage_config, mediator)
+        self.outage = Outage(start_time, end_time, mediator)
         self.first_msg_time_ns: int | None = None
 
     @override
     def process_pntos_message(self, message: Message) -> list[Message] | None:
-        if message.source_identifier != self.outage.config.channel:
-            return [message]
-
         aspn_msg = message.wrapped_message
         if not has_tov(aspn_msg):
             self.mediator.log_message(

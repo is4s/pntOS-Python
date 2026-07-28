@@ -1,5 +1,5 @@
 diff --git a/apps/standard/pos_vel_ins.py b/apps/standard/posvel_ins.py
-index 4e8ae351..68c626eb 100755
+index 67a4339f..4d3d83d0 100755
 --- a/apps/standard/pos_vel_ins.py
 +++ b/apps/standard/posvel_ins.py
 @@ -1,11 +1,13 @@
@@ -67,11 +67,11 @@ index 4e8ae351..68c626eb 100755
              ),
              TimeBiasConfig(
                  group='config/time_bias',
--                channels_to_correct=(
+-                channels=(
 -                    '/sensor/ublox-ZED-F9T/position',
 -                    '/sensor/ublox-ZED-F9T/velocity',
 -                ),
-+                channels_to_correct=('/sensor/ublox-ZED-F9T/pva',),
++                channels=('/sensor/ublox-ZED-F9T/pva',),
                  time_bias=int(0.15 * 1e9),
              ),
          ),

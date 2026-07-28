@@ -1,10 +1,6 @@
 [build-system]
 build-backend = "setuptools.build_meta"
-requires = [
-    "pntos-python-docs-data",
-    "setuptools>=68",
-    "wheel",
-]
+requires = [ "pntos-python-docs-data", "setuptools>=68", "wheel" ]
 
 [project]
 name = "pntos-cobra"
