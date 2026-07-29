@@ -78,25 +78,25 @@ apps, a UI plugin for LCM log plotting is initiated on shutdown. You should see 
 following terminal output, followed by a set of plots displaying the results:
 
 ```text
-[17/02/2026 14:47:19] [LoggingPlugin] [INFO] using hard-coded global logging level INFO
-[17/02/2026 14:47:19] [OrchestrationPlugin] [INFO] Aligned filter at 1747680879.539799929s
-[17/02/2026 14:47:19] [TransportPlugin] [INFO] LCM log reader is running.
-[17/02/2026 14:47:19] [ControllerPlugin] [INFO] Press Ctrl + C at any time to shut down pntOS...
-[18/02/2026 15:10:01] [TransportPlugin] [INFO] Found new channel /sensor/vn-100/imu      with a timestamp of 1747680879.539799690s
-[18/02/2026 15:10:01] [TransportPlugin] [INFO] Found new channel /sensor/ins-d/pva       with a timestamp of 1747680879.543048859s
-[18/02/2026 15:10:01] [TransportPlugin] [INFO] Found new channel /sensor/simulated/velocity      with a timestamp of 1747680879.543048859s
-[18/02/2026 15:10:01] [TransportPlugin] [INFO] Found new channel /sensor/ublox-ZED-F9T/position  with a timestamp of 1747680880.300589800s
-[18/02/2026 15:10:01] [TransportPlugin] [INFO] Found new channel /sensor/ublox-ZED-F9T/velocity  with a timestamp of 1747680880.300589800s
-[18/02/2026 15:10:01] [TransportPlugin] [INFO] Found new channel /sensor/ublox-ZED-F9T/pva       with a timestamp of 1747680880.300589800s
-[18/02/2026 15:10:01] [TransportPlugin] [INFO] Found new channel /sensor/bmp388/baro_pressure    with a timestamp of 1747680880.328312635s
-100%|██████████████████████████████████████████████████████████████████████████████████████████████| 472M/472M [00:37<00:00, 12.7MB/s]
-[18/02/2026 15:10:38] [TransportPlugin] [INFO] Done processing LCM log.
-[02/06/2026 15:12:30] [ControllerPlugin] [INFO] Shutting down all plugins...
-[02/06/2026 15:12:30] [TransportPlugin] [INFO] Shutdown plugin for Cobra LCM Log Transport Plugin.
+[17/07/2026 11:51:39] [LoggingPlugin] [INFO] using hard-coded global logging level INFO
+[17/07/2026 11:51:39] [OrchestrationPlugin] [INFO] Aligned filter at 1747680879.539799929s
+[17/07/2026 11:51:39] [ControllerPlugin] [INFO] Press Ctrl + C at any time to shut down pntOS...
+[17/07/2026 11:51:39] [TransportPlugin] [INFO] Found new channel /sensor/vn-100/imu      with a timestamp of 1747680879.539799690s
+[17/07/2026 11:51:39] [TransportPlugin] [INFO] Found new channel /sensor/ins-d/pva       with a timestamp of 1747680879.543048859s
+[17/07/2026 11:51:39] [TransportPlugin] [INFO] Found new channel /sensor/simulated/velocity      with a timestamp of 1747680879.543048859s
+[17/07/2026 11:51:39] [TransportPlugin] [INFO] Found new channel /sensor/simulated/directiontoknownfeature       with a timestamp of 1747680879.543048859s
+[17/07/2026 11:51:39] [TransportPlugin] [INFO] Found new channel /sensor/ublox-ZED-F9T/position  with a timestamp of 1747680880.300589800s
+[17/07/2026 11:51:39] [TransportPlugin] [INFO] Found new channel /sensor/ublox-ZED-F9T/velocity  with a timestamp of 1747680880.300589800s
+[17/07/2026 11:51:39] [TransportPlugin] [INFO] Found new channel /sensor/ublox-ZED-F9T/pva       with a timestamp of 1747680880.300589800s
+[17/07/2026 11:51:39] [TransportPlugin] [INFO] Found new channel /sensor/bmp388/baro_pressure    with a timestamp of 1747680880.328312635s
+100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 474M/474M [00:17<00:00, 26.7MB/s]
+[17/07/2026 11:51:57] [TransportPlugin] [INFO] Done processing LCM log.
+[17/07/2026 11:51:57] [ControllerPlugin] [INFO] Shutting down all plugins...
+[17/07/2026 11:51:57] [TransportPlugin] [INFO] Shutdown plugin for Cobra Tutorial LCM Log Transport Plugin.
 Reading measurements from log...
-100%|████████████████████████████████████████| 476M/476M [00:11<00:00, 42.8MB/s]
-[02/06/2026 15:12:44] [UiPlugin] [INFO] Plotting results. This may take a while...
-[02/06/2026 15:12:57] [UiPlugin] [INFO] Plots saved to pntos_output. Close all windows to continue shutdown.
+100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 476M/476M [00:05<00:00, 82.9MB/s]
+[17/07/2026 11:52:04] [UiPlugin] [INFO] Plotting results. This may take a while...
+[17/07/2026 11:52:11] [UiPlugin] [INFO] Plots saved to pntos_output. Close all windows to continue shutdown.
 ```
 
 The results from the tutorial app will be displayed in separate windows. To continue with the shutdown, simply close all the plotting windows.
@@ -130,25 +130,25 @@ apps, a UI plugin for LCM log plotting is initiated on shutdown. You should see 
 following terminal output, followed by a set of plots displaying the results:
 
 ```text
-[17/02/2026 14:47:19] [LoggingPlugin] [INFO] using hard-coded global logging level INFO
-[17/02/2026 14:47:19] [OrchestrationPlugin] [INFO] Aligned filter at 1747680879.539799929s
-[17/02/2026 14:47:19] [TransportPlugin] [INFO] LCM log reader is running.
-[17/02/2026 14:47:19] [ControllerPlugin] [INFO] Press Ctrl + C at any time to shut down pntOS...
-[18/02/2026 15:10:01] [TransportPlugin] [INFO] Found new channel /sensor/vn-100/imu      with a timestamp of 1747680879.539799690s
-[18/02/2026 15:10:01] [TransportPlugin] [INFO] Found new channel /sensor/ins-d/pva       with a timestamp of 1747680879.543048859s
-[18/02/2026 15:10:01] [TransportPlugin] [INFO] Found new channel /sensor/simulated/velocity      with a timestamp of 1747680879.543048859s
-[18/02/2026 15:10:01] [TransportPlugin] [INFO] Found new channel /sensor/ublox-ZED-F9T/position  with a timestamp of 1747680880.300589800s
-[18/02/2026 15:10:01] [TransportPlugin] [INFO] Found new channel /sensor/ublox-ZED-F9T/velocity  with a timestamp of 1747680880.300589800s
-[18/02/2026 15:10:01] [TransportPlugin] [INFO] Found new channel /sensor/ublox-ZED-F9T/pva       with a timestamp of 1747680880.300589800s
-[18/02/2026 15:10:01] [TransportPlugin] [INFO] Found new channel /sensor/bmp388/baro_pressure    with a timestamp of 1747680880.328312635s
-100%|██████████████████████████████████████████████████████████████████████████████████████████████| 472M/472M [00:37<00:00, 12.7MB/s]
-[18/02/2026 15:10:38] [TransportPlugin] [INFO] Done processing LCM log.
-[02/06/2026 15:12:30] [ControllerPlugin] [INFO] Shutting down all plugins...
-[02/06/2026 15:12:30] [TransportPlugin] [INFO] Shutdown plugin for Cobra LCM Log Transport Plugin.
+[17/07/2026 11:58:37] [LoggingPlugin] [INFO] using hard-coded global logging level INFO
+[17/07/2026 11:58:37] [OrchestrationPlugin] [INFO] Aligned filter at 1747680879.539799929s
+[17/07/2026 11:58:37] [ControllerPlugin] [INFO] Press Ctrl + C at any time to shut down pntOS...
+[17/07/2026 11:58:37] [TransportPlugin] [INFO] Found new channel /sensor/vn-100/imu      with a timestamp of 1747680879.539799690s
+[17/07/2026 11:58:37] [TransportPlugin] [INFO] Found new channel /sensor/ins-d/pva       with a timestamp of 1747680879.543048859s
+[17/07/2026 11:58:37] [TransportPlugin] [INFO] Found new channel /sensor/simulated/velocity      with a timestamp of 1747680879.543048859s
+[17/07/2026 11:58:37] [TransportPlugin] [INFO] Found new channel /sensor/simulated/directiontoknownfeature       with a timestamp of 1747680879.543048859s
+[17/07/2026 11:58:37] [TransportPlugin] [INFO] Found new channel /sensor/ublox-ZED-F9T/position  with a timestamp of 1747680880.300589800s
+[17/07/2026 11:58:37] [TransportPlugin] [INFO] Found new channel /sensor/ublox-ZED-F9T/velocity  with a timestamp of 1747680880.300589800s
+[17/07/2026 11:58:37] [TransportPlugin] [INFO] Found new channel /sensor/ublox-ZED-F9T/pva       with a timestamp of 1747680880.300589800s
+[17/07/2026 11:58:37] [TransportPlugin] [INFO] Found new channel /sensor/bmp388/baro_pressure    with a timestamp of 1747680880.328312635s
+100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 474M/474M [00:20<00:00, 22.8MB/s]
+[17/07/2026 11:58:58] [TransportPlugin] [INFO] Done processing LCM log.
+[17/07/2026 11:58:58] [ControllerPlugin] [INFO] Shutting down all plugins...
+[17/07/2026 11:58:58] [TransportPlugin] [INFO] Shutdown plugin for Cobra Tutorial LCM Log Transport Plugin.
 Reading measurements from log...
-100%|████████████████████████████████████████| 476M/476M [00:11<00:00, 42.8MB/s]
-[02/06/2026 15:12:44] [UiPlugin] [INFO] Plotting results. This may take a while...
-[02/06/2026 15:12:57] [UiPlugin] [INFO] Plots saved to pntos_output. Close all windows to continue shutdown.
+100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 476M/476M [00:05<00:00, 81.1MB/s]
+[17/07/2026 11:59:05] [UiPlugin] [INFO] Plotting results. This may take a while...
+[17/07/2026 11:59:12] [UiPlugin] [INFO] Plots saved to pntos_output. Close all windows to continue shutdown.
 ```
 
 The results from the tutorial app will be displayed in separate windows. To continue with the shutdown, simply close all the plotting windows.
@@ -181,17 +181,17 @@ Once the entire input log has been processed, the app will automatically shutdow
 something like the following in the terminal:
 
 ```text
-[18/02/2026 15:47:50] [LoggingPlugin] [INFO] using hard-coded global logging level INFO
-[18/02/2026 15:47:50] [TransportPlugin] [INFO] LCM log reader is running.
-[18/02/2026 15:47:50] [ControllerPlugin] [INFO] Press Ctrl + C at any time to shut down pntOS...
-[18/02/2026 15:47:50] [TransportPlugin] [INFO] Found new channel /sensor/vn-100/imu with a timestamp of 1747680879.539799690s
-[18/02/2026 15:47:50] [TransportPlugin] [INFO] Found new channel /sensor/ublox-ZED-F9T/position  with a timestamp of 1747680880.300589800s
-[18/02/2026 15:47:50] [OrchestrationPlugin] [INFO] Aligned filter at 1747680889.549539804s
-100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████▉| 472M/472M [00:26<00:00, 18.0MB/s]
-[18/02/2026 15:10:38] [TransportPlugin] [INFO] Done processing LCM log.
-[18/02/2026 15:10:38] [ControllerPlugin] [INFO] Shutting down all plugins...
-[18/02/2026 15:10:38] [TransportPlugin] [INFO] Shutdown plugin for Cobra LCM Log Transport Plugin.
-[18/02/2026 15:10:38] [LoggingPlugin] [INFO]  Logging plugin shut down correctly.
+[17/07/2026 12:08:15] [LoggingPlugin] [INFO] using hard-coded global logging level INFO
+[17/07/2026 12:08:15] [ControllerPlugin] [INFO] Press Ctrl + C at any time to shut down pntOS...
+[17/07/2026 12:08:15] [TransportPlugin] [INFO] LCM log reader is running.
+[17/07/2026 12:08:15] [TransportPlugin] [INFO] Found new channel /sensor/vn-100/imu      with a timestamp of 1747680879.539799690s
+[17/07/2026 12:08:15] [TransportPlugin] [INFO] Found new channel /sensor/ublox-ZED-F9T/position  with a timestamp of 1747680880.300589800s
+[17/07/2026 12:08:15] [OrchestrationPlugin] [INFO] Aligned filter at 1747680889.549539804s
+100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████▉| 474M/474M [00:11<00:00, 40.9MB/s]
+[17/07/2026 12:08:27] [TransportPlugin] [INFO] Done processing LCM log.
+[17/07/2026 12:08:27] [ControllerPlugin] [INFO] Shutting down all plugins...
+[17/07/2026 12:08:27] [TransportPlugin] [INFO] Shutdown plugin for Cobra LCM Log Transport Plugin.
+[17/07/2026 12:08:27] [LoggingPlugin] [INFO]  Logging plugin shut down correctly.
 ```
 
 The pntOS solution will be recorded to `pntos_output.log`. For information on how to plot the pntOS
@@ -243,6 +243,7 @@ This should open the LCM LogPlayer GUI with a play button. You should see the fo
 
 - /sensor/bmp388/baro_pressure
 - /sensor/ins-d/pva
+- /sensor/simulated/directiontoknownfeature
 - /sensor/simulated/velocity
 - /sensor/ublox-ZED-F9T/position
 - /sensor/ublox-ZED-F9T/pva
@@ -277,18 +278,19 @@ This will spin up pntOS and it is ready to start processing messages. To produce
 push the `play` button in the LogPlayer to start the datastream. You should see something similar to the following:
 
 ```text
-[20/02/2026 12:14:00] [LoggingPlugin] [INFO] using hard-coded global logging level INFO
+[17/07/2026 12:20:49] [LoggingPlugin] [INFO] using hard-coded global logging level INFO
+[17/07/2026 12:20:49] [ControllerPlugin] [INFO] Press Ctrl + C at any time to shut down pntOS...
 LCM tcpq: connecting...
-[20/02/2026 12:14:00] [TransportPlugin] [INFO] LCM message handler is running.
-[20/02/2026 12:14:00] [ControllerPlugin] [INFO] Press Ctrl + C at any time to shut down pntOS...
-[20/02/2026 12:14:03] [TransportPlugin] [INFO] Found new channel /sensor/ins-d/pva  with a timestamp of 1747680882.938483715s
-[20/02/2026 12:14:03] [TransportPlugin] [INFO] Found new channel /sensor/vn-100/imu  with a timestamp of 1747680882.940131664s
-[20/02/2026 12:14:03] [TransportPlugin] [INFO] Found new channel /sensor/ublox-ZED-F9T/position  with a timestamp of 1747680883.294163942s
-[20/02/2026 12:14:03] [TransportPlugin] [INFO] Found new channel /sensor/ublox-ZED-F9T/velocity  with a timestamp of 1747680883.294163942s
-[20/02/2026 12:14:03] [TransportPlugin] [INFO] Found new channel /sensor/ublox-ZED-F9T/pva  with a timestamp of 1747680883.294163942s
-[20/02/2026 12:14:04] [TransportPlugin] [INFO] Found new channel /sensor/simulated/velocity  with a timestamp of 1747680883.543442726s
-[20/02/2026 12:14:06] [TransportPlugin] [INFO] Found new channel /sensor/bmp388/baro_pressure  with a timestamp of 1747680885.336656809s
-[20/02/2026 12:14:13] [OrchestrationPlugin] [INFO] Aligned filter at 1747680892.949498653s
+[17/07/2026 12:20:49] [TransportPlugin] [INFO] LCM message handler is running.
+[17/07/2026 12:20:51] [TransportPlugin] [INFO] Found new channel /sensor/vn-100/imu      with a timestamp of 1747680879.539799690s
+[17/07/2026 12:20:51] [TransportPlugin] [INFO] Found new channel /sensor/ins-d/pva       with a timestamp of 1747680879.543048859s
+[17/07/2026 12:20:51] [TransportPlugin] [INFO] Found new channel /sensor/simulated/velocity      with a timestamp of 1747680879.543048859s
+[17/07/2026 12:20:51] [TransportPlugin] [INFO] Found new channel /sensor/simulated/directiontoknownfeature       with a timestamp of 1747680879.543048859s
+[17/07/2026 12:20:51] [TransportPlugin] [INFO] Found new channel /sensor/ublox-ZED-F9T/position  with a timestamp of 1747680880.300589800s
+[17/07/2026 12:20:51] [TransportPlugin] [INFO] Found new channel /sensor/ublox-ZED-F9T/velocity  with a timestamp of 1747680880.300589800s
+[17/07/2026 12:20:51] [TransportPlugin] [INFO] Found new channel /sensor/ublox-ZED-F9T/pva       with a timestamp of 1747680880.300589800s
+[17/07/2026 12:20:51] [TransportPlugin] [INFO] Found new channel /sensor/bmp388/baro_pressure    with a timestamp of 1747680880.328312635s
+[17/07/2026 12:21:01] [OrchestrationPlugin] [INFO] Aligned filter at 1747680889.549539804s
 ```
 
 Unlike the other apps, there will be no progess bar displayed in the console. The LogPlayer will have a progress bar where you can track the progress

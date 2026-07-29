@@ -1,5 +1,5 @@
 diff --git a/pntos-cobra/src/pntos/cobra/standard_plugins//controller/StandardControllerPlugin.py b/pntos-cobra/src/pntos/cobra/advanced_plugins//buscat/BuscatControllerPlugin.py
-index cf97c7ae..9a6889ba 100644
+index c4be0d3a..45034938 100644
 --- a/pntos-cobra/src/pntos/cobra/standard_plugins//controller/StandardControllerPlugin.py
 +++ b/pntos-cobra/src/pntos/cobra/advanced_plugins//buscat/BuscatControllerPlugin.py
 @@ -7,15 +7,14 @@ from pntos.api import (
@@ -126,7 +126,7 @@ index cf97c7ae..9a6889ba 100644
  
          # call init_plugin() on all the other plugins
          for i, plugin in enumerate(self._plugins):
-@@ -186,47 +180,30 @@ class StandardControllerPlugin(ControllerPlugin):
+@@ -186,33 +180,23 @@ class StandardControllerPlugin(ControllerPlugin):
              )
  
          # Give the mediators other needed plugins
@@ -165,8 +165,15 @@ index cf97c7ae..9a6889ba 100644
 -            StandardMediator._publish_interval_ns = int(config.publish_interval * 1e9)
 -
          self._auto_shutdown = config.auto_shutdown
+ 
          # Pass off to main control loop
-         self._main()
+@@ -223,19 +207,12 @@ class StandardControllerPlugin(ControllerPlugin):
+         except KeyboardInterrupt:
+             self._log(LoggingLevel.INFO, 'Keyboard Interrupt Detected.')
+         self.shutdown_plugin()
+-        if StandardMediator._exit_event.exit_code == ExitCode.ERROR:
++        if BuscatMediator._exit_event.exit_code == ExitCode.ERROR:
+             sys.exit(1)
  
      def _sort_and_validate_plugins(
          self, plugins: list[CommonPlugin]
@@ -182,7 +189,7 @@ index cf97c7ae..9a6889ba 100644
          """
          Utility function to ensure ``plugins`` contains enough plugins to run pntOS
          Cobra. Then assigns and dispatches them to the relevant fields on the
-@@ -234,34 +211,21 @@ class StandardControllerPlugin(ControllerPlugin):
+@@ -243,34 +220,21 @@ class StandardControllerPlugin(ControllerPlugin):
          not as expected.
          """
          sorted_plugins: SortedPlugins = sort_plugins_dataclass(plugins)
@@ -217,7 +224,7 @@ index cf97c7ae..9a6889ba 100644
          )
  
      def _ready_to_shutdown_callback(
-@@ -269,7 +233,7 @@ class StandardControllerPlugin(ControllerPlugin):
+@@ -278,7 +242,7 @@ class StandardControllerPlugin(ControllerPlugin):
      ) -> None:
          if 'ready_to_shutdown' in modified_keys and kvs['ready_to_shutdown']:
              if self._auto_shutdown:
@@ -226,16 +233,9 @@ index cf97c7ae..9a6889ba 100644
              else:
                  self._log(
                      LoggingLevel.INFO,
-@@ -311,10 +275,10 @@ class StandardControllerPlugin(ControllerPlugin):
-                 'Press Ctrl + C at any time to shut down pntOS...',
-             )
-             try:
--                StandardMediator._exit_event.wait()
-+                BuscatMediator._exit_event.wait()
-             except KeyboardInterrupt:
-                 self._log(LoggingLevel.INFO, 'Keyboard Interrupt Detected.')
+@@ -315,4 +279,4 @@ class StandardControllerPlugin(ControllerPlugin):
+             ui_needing_main_thrd[0].run_main_thread()
  
-         self.shutdown_plugin()
--        if StandardMediator._exit_event.exit_code == ExitCode.ERROR:
-+        if BuscatMediator._exit_event.exit_code == ExitCode.ERROR:
-             sys.exit(1)
+         else:  # wait for ctrl + c or exit event to exit
+-            StandardMediator._exit_event.wait()
++            BuscatMediator._exit_event.wait()

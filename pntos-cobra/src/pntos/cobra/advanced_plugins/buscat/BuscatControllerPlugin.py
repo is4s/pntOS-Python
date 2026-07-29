@@ -198,8 +198,17 @@ class BuscatControllerPlugin(ControllerPlugin):
             kvs.request_notify('ready_to_shutdown', self._ready_to_shutdown_callback)
 
         self._auto_shutdown = config.auto_shutdown
+
         # Pass off to main control loop
-        self._main()
+        self._log(LoggingLevel.INFO, 'Press Ctrl + C at any time to shut down pntOS...')
+        try:
+            self._main()
+        # Handle KeyboardInterrupt for graceful shutdown
+        except KeyboardInterrupt:
+            self._log(LoggingLevel.INFO, 'Keyboard Interrupt Detected.')
+        self.shutdown_plugin()
+        if BuscatMediator._exit_event.exit_code == ExitCode.ERROR:
+            sys.exit(1)
 
     def _sort_and_validate_plugins(
         self, plugins: list[CommonPlugin]
@@ -269,16 +278,5 @@ class BuscatControllerPlugin(ControllerPlugin):
         if ui_needing_main_thrd:
             ui_needing_main_thrd[0].run_main_thread()
 
-        else:  # wait for ctrl + c to exit
-            self._log(
-                LoggingLevel.INFO,
-                'Press Ctrl + C at any time to shut down pntOS...',
-            )
-            try:
-                BuscatMediator._exit_event.wait()
-            except KeyboardInterrupt:
-                self._log(LoggingLevel.INFO, 'Keyboard Interrupt Detected.')
-
-        self.shutdown_plugin()
-        if BuscatMediator._exit_event.exit_code == ExitCode.ERROR:
-            sys.exit(1)
+        else:  # wait for ctrl + c or exit event to exit
+            BuscatMediator._exit_event.wait()

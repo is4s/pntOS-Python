@@ -1,10 +1,10 @@
 diff --git a/apps/tutorial/pos_ins.py b/apps/tutorial/pos_vel_ins.py
-index 43becb5a..b8a604b4 100755
+index 4cf93d4b..e19d04bf 100755
 --- a/apps/tutorial/pos_ins.py
 +++ b/apps/tutorial/pos_vel_ins.py
 @@ -17,7 +17,7 @@ from pntos.cobra import (
-     StandardRegistryPlugin,
      TutorialInitializationPlugin,
+     TutorialLcmLogTransportPlugin,
      TutorialPosInsStateModelingPlugin,
 -    TutorialPosOrchestrationPlugin,
 +    TutorialPosVelOrchestrationPlugin,

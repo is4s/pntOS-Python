@@ -73,8 +73,8 @@ from .tutorial_plugins.state_modeling.TutorialPosInsStateModelingPlugin import (
 from .tutorial_plugins.TutorialInitializationPlugin import (
     TutorialInitializationPlugin as TutorialInitializationPlugin,
 )
-from .tutorial_plugins.TutorialLcmTransportPlugin import (
-    TutorialLcmTransportPlugin as TutorialLcmTransportPlugin,
+from .tutorial_plugins.TutorialLcmLogTransportPlugin import (
+    TutorialLcmLogTransportPlugin as TutorialLcmLogTransportPlugin,
 )
 from .tutorial_plugins.TutorialPosOrchestrationPlugin import (
     TutorialPosOrchestrationPlugin as TutorialPosOrchestrationPlugin,

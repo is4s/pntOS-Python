@@ -8,7 +8,6 @@ from pntos.api import CommonPlugin, LoggingLevel
 # Import Cobra plugins and config structs
 from pntos.cobra import (
     EkfFusionStrategyPlugin,
-    LcmLogTransportPlugin,
     StandardControllerPlugin,
     StandardFusionPlugin,
     StandardInertialPlugin,
@@ -16,6 +15,7 @@ from pntos.cobra import (
     StandardPreprocessorPlugin,
     StandardRegistryPlugin,
     TutorialInitializationPlugin,
+    TutorialLcmLogTransportPlugin,
     TutorialPosInsStateModelingPlugin,
     TutorialPosVelOrchestrationPlugin,
     UiLogPlottingPlugin,
@@ -127,7 +127,7 @@ my_config: list[BaseConfig] = [
 # Instantiate all of our plugins
 controller = StandardControllerPlugin('Cobra Standard Controller Plugin')
 plugins: list[CommonPlugin] = [
-    LcmLogTransportPlugin('Cobra LCM Log Transport Plugin'),
+    TutorialLcmLogTransportPlugin('Cobra Tutorial LCM Log Transport Plugin'),
     EkfFusionStrategyPlugin('Cobra EKF Fusion Strategy Plugin'),
     StandardFusionPlugin('Cobra Standard Fusion Plugin'),
     TutorialPosInsStateModelingPlugin('Cobra Tutorial State Modeling Plugin'),

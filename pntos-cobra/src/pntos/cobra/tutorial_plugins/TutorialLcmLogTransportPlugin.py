@@ -12,7 +12,7 @@ from pntos.cobra.utils import (
 from tqdm import tqdm
 
 
-class TutorialLcmTransportPlugin(TransportPlugin):
+class TutorialLcmLogTransportPlugin(TransportPlugin):
     """A tutorial transport plugin which process LCM messages from a log.
 
     Capable of marshalling ASPN23-LCM to ASPN23-Python."""
@@ -87,10 +87,10 @@ class TutorialLcmTransportPlugin(TransportPlugin):
         self._input_log.close()
         self._output_log.close()
 
-        self.mediator.log_message(
-            LoggingLevel.INFO,
-            'Done processing LCM log. Press Ctrl + C to shut down pntOS.',
-        )
+        # log completion and signal shutdown after end of lcm log
+        self.mediator.log_message(LoggingLevel.INFO, 'Done processing LCM log.')
+        with self.mediator.registry.batch_start('controller/flags') as kvs:
+            kvs['ready_to_shutdown'] = True
 
     def stop_listening(self) -> None:
         # Nothing to do upon shutdown, transport already processed all messages
