@@ -1,5 +1,5 @@
 diff --git a/apps/tutorial/pos_ins.py b/apps/tutorial/pos_vel_ins.py
-index 4cf93d4b..e19d04bf 100755
+index 33d14266..afb75427 100755
 --- a/apps/tutorial/pos_ins.py
 +++ b/apps/tutorial/pos_vel_ins.py
 @@ -17,7 +17,7 @@ from pntos.cobra import (
@@ -11,32 +11,41 @@ index 4cf93d4b..e19d04bf 100755
      UiLogPlottingPlugin,
  )
  from pntos.cobra.config import (
-@@ -96,6 +96,7 @@ my_config: list[BaseConfig] = [
-     ),
-     TutorialOrchestrationConfig(
-         position_channel='/sensor/ublox-ZED-F9T/position',
-+        velocity_channel='/sensor/ublox-ZED-F9T/velocity',
-     ),
-     TimeAdjusterConfig(
-         group='config/time_adjuster',
-@@ -114,7 +115,10 @@ my_config: list[BaseConfig] = [
-     ),
-     TimeBiasConfig(
-         group='config/time_bias',
--        channels=('/sensor/ublox-ZED-F9T/position',),
-+        channels=(
-+            '/sensor/ublox-ZED-F9T/position',
-+            '/sensor/ublox-ZED-F9T/velocity',
-+        ),
-         time_bias=int(0.15 * 1e9),
-     ),
- ]
-@@ -136,7 +140,7 @@ plugins: list[CommonPlugin] = [
-     StandardRegistryPlugin('Cobra Standard Registry Plugin', config=my_config),
-     StandardPreprocessorPlugin('Cobra Standard Preprocessor Plugin'),
-     UiLogPlottingPlugin('Cobra UI Logfile Plotting Plugin'),
--    TutorialPosOrchestrationPlugin('Cobra Tutorial Orchestration Plugin'),
-+    TutorialPosVelOrchestrationPlugin('Cobra Tutorial Orchestration Plugin'),
- ]
+@@ -40,7 +40,7 @@ from pntos_python_datasets_lcm import EXAMPLE_LCM_LOG
  
- # Start the controller, and pass it all of the other plugins to use
+ 
+ def main() -> None:
+-    """Run the pos_ins app."""
++    """Run the pos_vel_ins app."""
+     OUTPUT_LOG = sys.argv[1] if len(sys.argv) > 1 else 'pntos_output.log'
+ 
+     # Config setup
+@@ -103,6 +103,7 @@ def main() -> None:
+         ),
+         TutorialOrchestrationConfig(
+             position_channel='/sensor/ublox-ZED-F9T/position',
++            velocity_channel='/sensor/ublox-ZED-F9T/velocity',
+         ),
+         TimeAdjusterConfig(
+             group='config/time_adjuster',
+@@ -121,7 +122,10 @@ def main() -> None:
+         ),
+         TimeBiasConfig(
+             group='config/time_bias',
+-            channels=('/sensor/ublox-ZED-F9T/position',),
++            channels=(
++                '/sensor/ublox-ZED-F9T/position',
++                '/sensor/ublox-ZED-F9T/velocity',
++            ),
+             time_bias=int(0.15 * 1e9),
+         ),
+     ]
+@@ -143,7 +147,7 @@ def main() -> None:
+         StandardRegistryPlugin('Cobra Standard Registry Plugin', config=my_config),
+         StandardPreprocessorPlugin('Cobra Standard Preprocessor Plugin'),
+         UiLogPlottingPlugin('Cobra UI Logfile Plotting Plugin'),
+-        TutorialPosOrchestrationPlugin('Cobra Tutorial Orchestration Plugin'),
++        TutorialPosVelOrchestrationPlugin('Cobra Tutorial Orchestration Plugin'),
+     ]
+ 
+     # Start the controller, and pass it all of the other plugins to use

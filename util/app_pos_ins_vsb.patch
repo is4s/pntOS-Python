@@ -1,5 +1,5 @@
 diff --git a/apps/standard/pos_ins.py b/apps/standard/pos_ins_vsb.py
-index 8cc11962..bbd90d04 100755
+index 9903fdf3..f7780e91 100755
 --- a/apps/standard/pos_ins.py
 +++ b/apps/standard/pos_ins_vsb.py
 @@ -37,8 +37,9 @@ from pntos.cobra.config import (
@@ -13,42 +13,51 @@ index 8cc11962..bbd90d04 100755
      StandardOrchestrationConfig,
      TimeAdjusterConfig,
      TimeBiasConfig,
-@@ -91,24 +92,33 @@ my_config: list[BaseConfig] = [
-                 estimate_with_covariance=EstimateWithCovariance(
-                     type=EstimateWithCovarianceType.EWC_GENERIC,
-                     estimate=np.zeros((3,)),
--                    covariance=(np.eye(3) * 9.0),
-+                    covariance=np.diag(
-+                        [2.22e-13, 3.73e-13, 9.0]
-+                    ),  # converted to radians-squared
-                 ),
-                 fogm_model=FogmConfig(
-                     group='config/pos_sensor_error',
--                    sigma=(1.5, 1.5, 2.0),
-+                    sigma=(2.515e-7, 3.259e-7, 2.0),  # converted to radians
-                     tau=(300.0, 300.0, 200.0),
+@@ -47,7 +48,7 @@ from pntos_python_datasets_lcm import EXAMPLE_LCM_LOG
+ 
+ 
+ def main() -> None:
+-    """Run the pos_ins app."""
++    """Run the pos_ins_vsb app."""
+     OUTPUT_LOG = sys.argv[1] if len(sys.argv) > 1 else 'pntos_output.log'
+ 
+     # Config setup
+@@ -94,24 +95,33 @@ def main() -> None:
+                     estimate_with_covariance=EstimateWithCovariance(
+                         type=EstimateWithCovarianceType.EWC_GENERIC,
+                         estimate=np.zeros((3,)),
+-                        covariance=(np.eye(3) * 9.0),
++                        covariance=np.diag(
++                            [2.22e-13, 3.73e-13, 9.0]
++                        ),  # converted to radians-squared
+                     ),
+                     fogm_model=FogmConfig(
+                         group='config/pos_sensor_error',
+-                        sigma=(1.5, 1.5, 2.0),
++                        sigma=(2.515e-7, 3.259e-7, 2.0),  # converted to radians
+                         tau=(300.0, 300.0, 200.0),
+                     ),
                  ),
              ),
-         ),
-         mp_configs=(
--            PinsonWithNedFogmPositionMPConfig(
--                group='config/pos_measurement_processor',
-+            PositionMPConfig(
-+                group='config/position',
-                 label='pos',
-                 channel='/sensor/ublox-ZED-F9T/position',
--                state_block_labels=('pinson15', 'pos_sensor_error'),
-+                state_block_labels=('platform_pva', 'pos_sensor_error'),
-                 lever_arm=(-0.50, 0.38, -0.05),
+             mp_configs=(
+-                PinsonWithNedFogmPositionMPConfig(
+-                    group='config/pos_measurement_processor',
++                PositionMPConfig(
++                    group='config/position',
+                     label='pos',
+                     channel='/sensor/ublox-ZED-F9T/position',
+-                    state_block_labels=('pinson15', 'pos_sensor_error'),
++                    state_block_labels=('platform_pva', 'pos_sensor_error'),
+                     lever_arm=(-0.50, 0.38, -0.05),
+                 ),
              ),
-         ),
-+        vsb_configs=(
-+            PinsonErrorToStandardVSBConfig(
-+                group='config/pes',
-+                source='pinson15',
-+                target='platform_pva',
++            vsb_configs=(
++                PinsonErrorToStandardVSBConfig(
++                    group='config/pes',
++                    source='pinson15',
++                    target='platform_pva',
++                ),
 +            ),
-+        ),
-         inertial_config=InertialConfig(
-             group='config/inertial',
-             expected_dt=0.01,
+             inertial_config=InertialConfig(
+                 group='config/inertial',
+                 expected_dt=0.01,

@@ -1,5 +1,5 @@
 diff --git a/apps/standard/lcm_relay.py b/apps/advanced/ui.py
-index 31982bb4..ac5de308 100755
+index 3d56a14c..05744c2e 100755
 --- a/apps/standard/lcm_relay.py
 +++ b/apps/advanced/ui.py
 @@ -12,7 +12,9 @@ from pntos.api import (
@@ -20,22 +20,31 @@ index 31982bb4..ac5de308 100755
      FogmConfig,
      FogmStateBlockConfig,
      FusionEngineConfig,
-@@ -129,6 +132,9 @@ my_config: list[BaseConfig] = [
+@@ -44,7 +47,7 @@ from pntos.cobra.config import (
+ 
+ 
+ def main() -> None:
+-    """Run the lcm_relay app."""
++    """Run the ui app."""
+     # Config setup
+     C_imu_to_platform = (
+         (0.99802515, 0.01772605, 0.06026269),
+@@ -132,6 +135,9 @@ def main() -> None:
+                 ),
              ),
          ),
-     ),
-+    ExperimentalCobraUiConfig(
-+        group='config/cobra_ui',
-+    ),
- ]
- # End Config
++        ExperimentalCobraUiConfig(
++            group='config/cobra_ui',
++        ),
+     ]
+     # End Config
  
-@@ -150,6 +156,8 @@ plugins: list[CommonPlugin] = [
-     StandardRegistryPlugin('Cobra Standard Registry Plugin', config=my_config),
-     StandardPreprocessorPlugin('Cobra Standard Preprocessor Plugin'),
-     StandardOrchestrationPlugin('Cobra Standard Orchestration Plugin'),
-+    ExperimentalCobraUiPlugin('Experimental Cobra UI Plugin'),
-+    CobraUiLogPlayerPlugin('Cobra UI Log Player Plugin'),
- ]
+@@ -153,6 +159,8 @@ def main() -> None:
+         StandardRegistryPlugin('Cobra Standard Registry Plugin', config=my_config),
+         StandardPreprocessorPlugin('Cobra Standard Preprocessor Plugin'),
+         StandardOrchestrationPlugin('Cobra Standard Orchestration Plugin'),
++        ExperimentalCobraUiPlugin('Experimental Cobra UI Plugin'),
++        CobraUiLogPlayerPlugin('Cobra UI Log Player Plugin'),
+     ]
  
- # Start the controller, and pass it all of the other plugins to use
+     # Start the controller, and pass it all of the other plugins to use

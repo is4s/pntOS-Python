@@ -9,15 +9,22 @@ from pntos.cobra import (
     DummyTransportPlugin,
 )
 
-# Instantiate all of our plugins
-controller = DummyControllerPlugin('Cobra Dummy Controller Plugin')
-plugins: list[CommonPlugin] = [
-    DummyTransportPlugin('Cobra Dummy Transport Plugin'),
-    DummyOrchestrationPlugin('Cobra Dummy Orchestration Plugin'),
-]
 
-# Start the controller
-controller.init_plugin()
+def main() -> None:
+    """Run the minimal app."""
+    # Instantiate all of our plugins
+    controller = DummyControllerPlugin('Cobra Dummy Controller Plugin')
+    plugins: list[CommonPlugin] = [
+        DummyTransportPlugin('Cobra Dummy Transport Plugin'),
+        DummyOrchestrationPlugin('Cobra Dummy Orchestration Plugin'),
+    ]
 
-# Give the controller control, and pass it the list of other plugins
-controller.take_control(plugins)
+    # Start the controller
+    controller.init_plugin()
+
+    # Give the controller control, and pass it the list of other plugins
+    controller.take_control(plugins)
+
+
+if __name__ == '__main__':
+    main()

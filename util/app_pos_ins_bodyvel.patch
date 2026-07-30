@@ -1,5 +1,5 @@
 diff --git a/apps/standard/pos_ins.py b/apps/standard/pos_ins_bodyvel.py
-index 8cc11962..915a1b29 100755
+index 9903fdf3..4c6b31e6 100755
 --- a/apps/standard/pos_ins.py
 +++ b/apps/standard/pos_ins_bodyvel.py
 @@ -29,6 +29,7 @@ from pntos.cobra import (
@@ -18,38 +18,47 @@ index 8cc11962..915a1b29 100755
      PinsonStateBlockConfig,
      PinsonWithNedFogmPositionMPConfig,
      StandardOrchestrationConfig,
-@@ -71,6 +73,7 @@ my_config: list[BaseConfig] = [
-         channels_to_process=(
-             '/sensor/vn-100/imu',
-             '/sensor/ublox-ZED-F9T/position',
-+            '/sensor/simulated/velocity',
-         ),
-     ),
-     ControllerConfig(),
-@@ -108,6 +111,14 @@ my_config: list[BaseConfig] = [
-                 state_block_labels=('pinson15', 'pos_sensor_error'),
-                 lever_arm=(-0.50, 0.38, -0.05),
+@@ -47,7 +49,7 @@ from pntos_python_datasets_lcm import EXAMPLE_LCM_LOG
+ 
+ 
+ def main() -> None:
+-    """Run the pos_ins app."""
++    """Run the pos_ins_bodyvel app."""
+     OUTPUT_LOG = sys.argv[1] if len(sys.argv) > 1 else 'pntos_output.log'
+ 
+     # Config setup
+@@ -74,6 +76,7 @@ def main() -> None:
+             channels_to_process=(
+                 '/sensor/vn-100/imu',
+                 '/sensor/ublox-ZED-F9T/position',
++                '/sensor/simulated/velocity',
              ),
-+            PinsonBodyVelocityMPConfig(
-+                group='config/bodyvel_measurement_processor',
-+                label='body_vel',
-+                channel='/sensor/simulated/velocity',
-+                state_block_labels=('pinson15',),
-+                lever_arm=(0.0, 0.0, 0.0),
-+                orientation=(1.0, 0.0, 0.0, 0.0),
-+            ),
          ),
-         inertial_config=InertialConfig(
-             group='config/inertial',
-@@ -139,6 +150,11 @@ my_config: list[BaseConfig] = [
-                 channels=('/sensor/ublox-ZED-F9T/position',),
-                 time_bias=int(0.15 * 1e9),
+         ControllerConfig(),
+@@ -111,6 +114,14 @@ def main() -> None:
+                     state_block_labels=('pinson15', 'pos_sensor_error'),
+                     lever_arm=(-0.50, 0.38, -0.05),
+                 ),
++                PinsonBodyVelocityMPConfig(
++                    group='config/bodyvel_measurement_processor',
++                    label='body_vel',
++                    channel='/sensor/simulated/velocity',
++                    state_block_labels=('pinson15',),
++                    lever_arm=(0.0, 0.0, 0.0),
++                    orientation=(1.0, 0.0, 0.0, 0.0),
++                ),
              ),
-+            DownsamplerConfig(
-+                group='config/downsampler',
-+                channels=('/sensor/simulated/velocity',),
-+                downsampling_factors=(10,),  # Downsample from 1 Hz to 0.1 Hz
-+            ),
+             inertial_config=InertialConfig(
+                 group='config/inertial',
+@@ -142,6 +153,11 @@ def main() -> None:
+                     channels=('/sensor/ublox-ZED-F9T/position',),
+                     time_bias=int(0.15 * 1e9),
+                 ),
++                DownsamplerConfig(
++                    group='config/downsampler',
++                    channels=('/sensor/simulated/velocity',),
++                    downsampling_factors=(10,),  # Downsample from 1 Hz to 0.1 Hz
++                ),
+             ),
          ),
-     ),
- ]
+     ]

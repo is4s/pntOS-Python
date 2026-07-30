@@ -1,5 +1,5 @@
 diff --git a/apps/standard/pos_vel_ins.py b/apps/standard/posvel_ins.py
-index 67a4339f..4d3d83d0 100755
+index 28bbae68..b96865b9 100755
 --- a/apps/standard/pos_vel_ins.py
 +++ b/apps/standard/posvel_ins.py
 @@ -1,11 +1,13 @@
@@ -30,48 +30,57 @@ index 67a4339f..4d3d83d0 100755
      StandardOrchestrationConfig,
      TimeAdjusterConfig,
      TimeBiasConfig,
-@@ -79,7 +80,7 @@ my_config: list[BaseConfig] = [
-         channels_to_process=(
-             '/sensor/vn-100/imu',
-             '/sensor/ublox-ZED-F9T/position',
--            '/sensor/ublox-ZED-F9T/velocity',
-+            '/sensor/ublox-ZED-F9T/pva',
-         ),
-     ),
-     ControllerConfig(),
-@@ -110,19 +111,13 @@ my_config: list[BaseConfig] = [
+@@ -55,7 +56,7 @@ from pntos_python_datasets_lcm import EXAMPLE_LCM_LOG
+ 
+ 
+ def main() -> None:
+-    """Run the pos_vel_ins app."""
++    """Run the posvel_ins app."""
+     OUTPUT_LOG = sys.argv[1] if len(sys.argv) > 1 else 'pntos_output.log'
+ 
+     # Config setup
+@@ -82,7 +83,7 @@ def main() -> None:
+             channels_to_process=(
+                 '/sensor/vn-100/imu',
+                 '/sensor/ublox-ZED-F9T/position',
+-                '/sensor/ublox-ZED-F9T/velocity',
++                '/sensor/ublox-ZED-F9T/pva',
              ),
          ),
-         mp_configs=(
--            PinsonPositionMPConfig(
--                group='config/pos_measurement_processor',
--                label='pos',
--                channel='/sensor/ublox-ZED-F9T/position',
-+            PosVelMPConfig(
-+                group='config/posvel_measurement_processor',
-+                label='posvel',
-+                channel='/sensor/ublox-ZED-F9T/pva',
-                 state_block_labels=('pinson15',),
-                 lever_arm=(-0.50, 0.38, -0.05),
+         ControllerConfig(),
+@@ -113,19 +114,13 @@ def main() -> None:
+                 ),
              ),
--            PinsonVelocityMPConfig(
--                group='config/vel_measurement_processor',
--                label='vel',
--                channel='/sensor/ublox-ZED-F9T/velocity',
--                state_block_labels=('pinson15',),
--            ),
-         ),
-         inertial_config=InertialConfig(
-             group='config/inertial',
-@@ -151,10 +146,7 @@ my_config: list[BaseConfig] = [
-             ),
-             TimeBiasConfig(
-                 group='config/time_bias',
--                channels=(
--                    '/sensor/ublox-ZED-F9T/position',
--                    '/sensor/ublox-ZED-F9T/velocity',
+             mp_configs=(
+-                PinsonPositionMPConfig(
+-                    group='config/pos_measurement_processor',
+-                    label='pos',
+-                    channel='/sensor/ublox-ZED-F9T/position',
++                PosVelMPConfig(
++                    group='config/posvel_measurement_processor',
++                    label='posvel',
++                    channel='/sensor/ublox-ZED-F9T/pva',
+                     state_block_labels=('pinson15',),
+                     lever_arm=(-0.50, 0.38, -0.05),
+                 ),
+-                PinsonVelocityMPConfig(
+-                    group='config/vel_measurement_processor',
+-                    label='vel',
+-                    channel='/sensor/ublox-ZED-F9T/velocity',
+-                    state_block_labels=('pinson15',),
 -                ),
-+                channels=('/sensor/ublox-ZED-F9T/pva',),
-                 time_bias=int(0.15 * 1e9),
              ),
-         ),
+             inertial_config=InertialConfig(
+                 group='config/inertial',
+@@ -154,10 +149,7 @@ def main() -> None:
+                 ),
+                 TimeBiasConfig(
+                     group='config/time_bias',
+-                    channels=(
+-                        '/sensor/ublox-ZED-F9T/position',
+-                        '/sensor/ublox-ZED-F9T/velocity',
+-                    ),
++                    channels=('/sensor/ublox-ZED-F9T/pva',),
+                     time_bias=int(0.15 * 1e9),
+                 ),
+             ),
