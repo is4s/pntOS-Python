@@ -6,10 +6,12 @@ from subprocess import PIPE, STDOUT, Popen
 from threading import Thread
 from typing import IO, Any
 
+from pntos.api import LoggingLevel
+
 
 def monitor_app_output(
     pipe: IO[Any],
-    validate: bool = False,
+    validate: LoggingLevel | None = None,
     wait_for_msg: str = '',
     separate_thread: bool = False,
 ) -> None:
@@ -21,9 +23,12 @@ def monitor_app_output(
 
     for line in pipe:
         print(line, end='')
-        if validate:
+        if validate == LoggingLevel.WARN:
             # ensure there are no warnings or errors
             assert 'WARN' not in line
+            assert 'ERROR' not in line
+        if validate == LoggingLevel.ERROR:
+            # ensure there are no errors
             assert 'ERROR' not in line
         if wait_for_msg and wait_for_msg in line:
             break
@@ -59,7 +64,7 @@ def run_app(
     app: Path,
     args: list[str] | None = None,
     monitor: bool = False,
-    validate: bool = False,
+    validate: LoggingLevel | None = None,
 ) -> Popen[str]:
     cmd = ['python3', '-u', app.as_posix()]
     if args is not None:

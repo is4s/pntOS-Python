@@ -2,6 +2,8 @@ import shutil
 from pathlib import Path
 from subprocess import Popen
 
+from pntos.api import LoggingLevel
+
 from .apps import kill, monitor_app_output, run_app, wait_until_file_stable
 
 
@@ -36,7 +38,7 @@ def run_pntos_with_ros_transport(
     app: Path,
     input_log: Path,
     output_log: Path,
-    validate: bool = False,
+    validate: LoggingLevel | None = None,
 ) -> int:  # pragma: no cover
     """Spin up app and network tools necessary to run it, process log, then shut down.
 
@@ -44,8 +46,9 @@ def run_pntos_with_ros_transport(
         app (pathlib.Path): Path to app to run.
         input_log (pathlib.Path): ROS log containing the measurements to be processed.
         output_log (pathlib.Path): ROS log to which output should be recorded.
-        validate (bool): Whether to validate the app's output, ensuring there are no
-            warnings or errors. Defaults to False.
+        validate (LoggingLevel | None): Whether to validate the app's output. `LoggingLevel.ERROR`
+            ensures no errors,`LoggingLevel.WARN` ensures no errors or warnings, and `None`
+            disables validation. Defaults to `None`.
 
     Returns:
         Return code of app. Will be 0 if app ran and terminated successfully.

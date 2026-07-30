@@ -10,6 +10,7 @@ from navanalysis.lcm.error import calc_tilts
 from navanalysis.lcm.interpolation import interpolate_pva
 from navanalysis.lcm.log_readers import read_pva
 from numpy.typing import NDArray
+from pntos.api import LoggingLevel
 from pntos.cobra.utils import (
     run_pntos_with_log_transport,
     run_pntos_with_network_transport,
@@ -108,7 +109,9 @@ def test_dummy_app() -> None:
     app_process = None
     try:
         # Doesn't do anything fancy, just make sure it runs.
-        app_process = run_app(Path('apps/dummy/minimal.py'), args=None, validate=True)
+        app_process = run_app(
+            Path('apps/dummy/minimal.py'), args=None, validate=LoggingLevel.WARN
+        )
     finally:
         if app_process is not None:
             kill(app_process)
@@ -116,7 +119,9 @@ def test_dummy_app() -> None:
 
 def test_tutorial_pos_ins_app() -> None:
     run_pntos_with_log_transport(
-        Path('apps/tutorial/pos_ins.py'), [OUTPUT_LOG.as_posix()], validate=True
+        Path('apps/tutorial/pos_ins.py'),
+        [OUTPUT_LOG.as_posix()],
+        validate=LoggingLevel.WARN,
     )
     log_data = read_pva(OUTPUT_LOG.as_posix(), read_all=True)
     validate_results(
@@ -133,7 +138,9 @@ def test_tutorial_pos_ins_app() -> None:
 
 def test_standard_pos_ins_app() -> None:
     run_pntos_with_log_transport(
-        Path('apps/standard/pos_ins.py'), [OUTPUT_LOG.as_posix()], validate=True
+        Path('apps/standard/pos_ins.py'),
+        [OUTPUT_LOG.as_posix()],
+        validate=LoggingLevel.WARN,
     )
     log_data = read_pva(OUTPUT_LOG.as_posix(), read_all=True)
     validate_results(
@@ -151,7 +158,7 @@ def test_standard_pos_ins_record_states_app() -> None:
     run_pntos_with_log_transport(
         Path('apps/standard/pos_ins_record_states.py'),
         [OUTPUT_LOG.as_posix()],
-        validate=True,
+        validate=LoggingLevel.WARN,
     )
     log_data = read_pva(OUTPUT_LOG.as_posix(), read_all=True)
     validate_results(
@@ -170,7 +177,7 @@ def test_standard_pos_ins_network_app() -> None:
         Path('apps/standard/lcm_relay.py'),
         Path(EXAMPLE_LCM_LOG),
         OUTPUT_LOG,
-        validate=True,
+        validate=LoggingLevel.WARN,
     )
     log_data = read_pva(OUTPUT_LOG.as_posix(), read_all=True)
     validate_results(
@@ -188,7 +195,9 @@ def test_standard_pos_ins_network_app() -> None:
 
 def test_tutorial_pos_ins_vel_app() -> None:
     run_pntos_with_log_transport(
-        Path('apps/tutorial/pos_vel_ins.py'), [OUTPUT_LOG.as_posix()], validate=True
+        Path('apps/tutorial/pos_vel_ins.py'),
+        [OUTPUT_LOG.as_posix()],
+        validate=LoggingLevel.WARN,
     )
     log_data = read_pva(OUTPUT_LOG.as_posix(), read_all=True)
     validate_results(
@@ -224,7 +233,7 @@ def test_standard_pos_ins_leverarm_app() -> None:
     run_pntos_with_log_transport(
         Path('apps/standard/pos_ins_leverarm.py'),
         [OUTPUT_LOG.as_posix()],
-        validate=True,
+        validate=LoggingLevel.WARN,
     )
     log_data = read_pva(OUTPUT_LOG.as_posix(), read_all=True)
     validate_results(
@@ -242,7 +251,9 @@ def test_standard_pos_ins_leverarm_app() -> None:
 
 def test_standard_pos_bodyvel_ins_app() -> None:
     run_pntos_with_log_transport(
-        Path('apps/standard/pos_ins_bodyvel.py'), [OUTPUT_LOG.as_posix()], validate=True
+        Path('apps/standard/pos_ins_bodyvel.py'),
+        [OUTPUT_LOG.as_posix()],
+        validate=LoggingLevel.WARN,
     )
     log_data = read_pva(OUTPUT_LOG.as_posix(), read_all=True)
     validate_results(
@@ -272,7 +283,9 @@ def test_standard_pos_bodyvel_ins_app() -> None:
 
 def test_extras_pos_zerovel2d_ins_app() -> None:
     run_pntos_with_log_transport(
-        Path('apps/extras/pos_ins_zerovel2d.py'), [OUTPUT_LOG.as_posix()], validate=True
+        Path('apps/extras/pos_ins_zerovel2d.py'),
+        [OUTPUT_LOG.as_posix()],
+        validate=LoggingLevel.WARN,
     )
     log_data = read_pva(OUTPUT_LOG.as_posix(), read_all=True)
     validate_results(
@@ -288,7 +301,9 @@ def test_extras_pos_zerovel2d_ins_app() -> None:
 
 def test_standard_pos_ins_vel_app() -> None:
     run_pntos_with_log_transport(
-        Path('apps/standard/pos_vel_ins.py'), [OUTPUT_LOG.as_posix()], validate=True
+        Path('apps/standard/pos_vel_ins.py'),
+        [OUTPUT_LOG.as_posix()],
+        validate=LoggingLevel.WARN,
     )
     log_data = read_pva(OUTPUT_LOG.as_posix(), read_all=True)
     validate_results(
@@ -323,7 +338,9 @@ def test_standard_pos_ins_vel_app() -> None:
 
 def test_standard_posvel_ins_app() -> None:
     run_pntos_with_log_transport(
-        Path('apps/standard/posvel_ins.py'), [OUTPUT_LOG.as_posix()], validate=True
+        Path('apps/standard/posvel_ins.py'),
+        [OUTPUT_LOG.as_posix()],
+        validate=LoggingLevel.WARN,
     )
     log_data = read_pva(OUTPUT_LOG.as_posix(), read_all=True)
 
@@ -361,7 +378,7 @@ def test_standard_outage_sim_app() -> None:
     run_pntos_with_log_transport(
         Path('apps/standard/outage_sim.py'),
         [OUTPUT_LOG.as_posix()],
-        validate=True,
+        validate=LoggingLevel.WARN,
     )
     log_data = read_pva(OUTPUT_LOG.as_posix(), read_all=True)
     validate_results(
@@ -383,7 +400,9 @@ def test_standard_outage_sim_app() -> None:
 
 def test_standard_pos_ins_vsb_app() -> None:
     run_pntos_with_log_transport(
-        Path('apps/standard/pos_ins_vsb.py'), [OUTPUT_LOG.as_posix()], validate=True
+        Path('apps/standard/pos_ins_vsb.py'),
+        [OUTPUT_LOG.as_posix()],
+        validate=LoggingLevel.WARN,
     )
     log_data = read_pva(OUTPUT_LOG.as_posix(), read_all=True)
     validate_results(
@@ -409,7 +428,7 @@ def test_advanced_pos_ins_ros_app() -> None:
         Path('apps/advanced/pos_ins_ros.py'),
         Path(EXAMPLE_ROS_LOG),
         OUTPUT_BAG,
-        validate=True,
+        validate=LoggingLevel.WARN,
     )
 
 
@@ -418,7 +437,7 @@ def test_ui_app() -> None:
         Path('apps/advanced/ui.py'),
         Path(EXAMPLE_LCM_LOG),
         OUTPUT_LOG,
-        validate=True,
+        validate=LoggingLevel.WARN,
     )
     log_data = read_pva(OUTPUT_LOG.as_posix(), read_all=True)
     validate_results(
@@ -438,7 +457,7 @@ def test_standard_direction_to_points_app() -> None:
     run_pntos_with_log_transport(
         Path('apps/standard/direction_to_points.py'),
         [OUTPUT_LOG.as_posix()],
-        validate=True,
+        validate=LoggingLevel.WARN,
     )
     log_data = read_pva(OUTPUT_LOG.as_posix(), read_all=True)
     validate_results(

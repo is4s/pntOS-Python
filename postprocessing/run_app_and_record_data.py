@@ -5,6 +5,7 @@ import sys
 from pathlib import Path
 
 from plot_results import plot_results
+from pntos.api import LoggingLevel
 from pntos.cobra.utils.lcm_utils import (
     run_pntos_with_log_transport,
     run_pntos_with_network_transport,
@@ -28,7 +29,7 @@ if __name__ == '__main__':
     returncode = -1
     if 'lcm_relay' in app_to_run.as_posix():
         returncode = run_pntos_with_network_transport(
-            app_to_run, Path(EXAMPLE_LCM_LOG), OUTPUT_LOG, validate=True
+            app_to_run, Path(EXAMPLE_LCM_LOG), OUTPUT_LOG, validate=LoggingLevel.WARN
         )
     elif 'ros' in app_to_run.as_posix():
         returncode = run_pntos_with_ros_transport(
