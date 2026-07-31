@@ -1,13 +1,19 @@
 import argparse
+import contextlib
+import inspect
 import re
+import shlex
+import subprocess
 import typing
 from abc import ABC, abstractmethod
 from collections.abc import Callable
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Any
 
 from rich import print as rich_print
 from rich.tree import Tree as RichTree
+from textual import on
 from textual.app import App, ComposeResult
 from textual.widgets import Tree as TextualTree
 from textual.widgets.tree import TreeNode
@@ -304,7 +310,8 @@ def cobra_catalog() -> None:
         UtilityPlugin,
     ]
     parser = argparse.ArgumentParser(
-        description='Allows the user to view available plugins in a hierarchial structure.'
+        description='Allows the user to view available plugins in a hierarchial structure.',
+        epilog="controls: 'q'=quit | 'enter'=open file | 'space'=expand/shrink tree item",
     )
     parser.add_argument(
         '--match',
@@ -324,6 +331,18 @@ def cobra_catalog() -> None:
         action='store_true',
         help='If specified, will print the plugin tree directly to the terminal as opposed to launching an interactive app.',
     )
+    parser.add_argument(
+        '-e',
+        '--editor-incantation',
+        default='code',
+        help="The editor incantation for opening paths. {code, pycharm, vim, etc.} If a node is selected that is associated with a particular file, the program will call '[EXECUTABLE] [FILEPATH]'.",
+    )
+    parser.add_argument(
+        '-n',
+        '--no-open',
+        action='store_true',
+        help='If specified, the app will not support clicking or enter to open plugin files.',
+    )
     args, _ = parser.parse_known_args()
     if args.print:
         print_plugin_tree(args, plugin_types)
@@ -338,11 +357,13 @@ class CatalogTree(ABC):
     """Abstract interface for different tree options for the `catalog` command."""
 
     @abstractmethod
-    def add_branch(self, label: str, expand: bool = False) -> 'CatalogTree':
+    def add_branch(
+        self, label: str, data: Path | None = None, expand: bool = False
+    ) -> 'CatalogTree':
         """Adds a nested node that can contain further sub-nodes."""
 
     @abstractmethod
-    def add_leaf(self, label: str) -> None:
+    def add_leaf(self, label: str, data: Path | None = None) -> None:
         """Adds a terminal leaf node."""
 
 
@@ -353,13 +374,15 @@ class PrintTree(CatalogTree):
         self.root_tree = root
 
     @override
-    def add_branch(self, label: str, expand: bool = False) -> 'PrintTree':
+    def add_branch(
+        self, label: str, data: Path | None = None, expand: bool = False
+    ) -> 'PrintTree':
         # simulate the same way the newly created sub-tree is returned when .add() is called on a RichTree
         child_node = self.root_tree.add(label)
         return PrintTree(child_node)
 
     @override
-    def add_leaf(self, label: str) -> None:
+    def add_leaf(self, label: str, data: Path | None = None) -> None:
         self.root_tree.add(label)
 
 
@@ -370,14 +393,16 @@ class TerminalTree(CatalogTree):
         self.root_node = root
 
     @override
-    def add_branch(self, label: str, expand: bool = False) -> 'TerminalTree':
+    def add_branch(
+        self, label: str, data: Path | None = None, expand: bool = False
+    ) -> 'TerminalTree':
         # simulate the same way the newly created sub-tree is returned when .add() is called on a TerminalTree
-        child_node = self.root_node.add(label, expand=expand)
+        child_node = self.root_node.add(label, data, expand=expand)
         return TerminalTree(child_node)
 
     @override
-    def add_leaf(self, label: str) -> None:
-        self.root_node.add_leaf(label)
+    def add_leaf(self, label: str, data: Path | None = None) -> None:
+        self.root_node.add_leaf(label, data)
 
 
 def extend_state_modeling_plugins(
@@ -390,7 +415,9 @@ def extend_state_modeling_plugins(
         return False
 
     # state modeling plugins have providers we want to view in their sub trees
-    plugin_tree = plugin_type_tree.add_branch(plugin.__name__, expand=False)
+    plugin_tree = plugin_type_tree.add_branch(
+        plugin.__name__, Path(inspect.getfile(plugin)), expand=False
+    )
     provider_added = False
     try:
         plugin_obj: StateModelingPlugin = plugin(identifier='temp')  # ty:ignore[unknown-argument]
@@ -447,7 +474,9 @@ def extend_preprocessor_plugin(
     if not issubclass(plugin, PreprocessorPlugin):
         return False
     # preprocessor plugins have preprocessors we want to view
-    plugin_tree = plugin_type_tree.add_branch(plugin.__name__, expand=False)
+    plugin_tree = plugin_type_tree.add_branch(
+        plugin.__name__, Path(inspect.getfile(plugin)), expand=False
+    )
     preprocessor_added = False
     try:
         plugin_obj: PreprocessorPlugin = plugin(identifier='temp')  # ty:ignore[unknown-argument]
@@ -511,7 +540,9 @@ def build_plugin_tree(
                     )
                 # if it did not match any of the tree_extenders, add it as a leaf
                 if not matched_an_extender:
-                    plugin_type_tree.add_leaf(plugin.__name__)
+                    plugin_type_tree.add_leaf(
+                        plugin.__name__, Path(inspect.getfile(plugin))
+                    )
 
 
 def print_plugin_tree(args: argparse.Namespace, plugin_types: list[PluginType]) -> None:
@@ -528,7 +559,7 @@ def print_plugin_tree(args: argparse.Namespace, plugin_types: list[PluginType]) 
     rich_print(tree)
 
 
-class Catalog(App[str]):
+class Catalog(App[Path]):
     """
     The app class for the textual app "catalog"
     """
@@ -545,11 +576,20 @@ class Catalog(App[str]):
 
     @override
     def compose(self) -> ComposeResult:
-        tree: TextualTree[str] = TextualTree('All Available Plugins')
+        tree: TextualTree[Path] = TextualTree('All Available Plugins')
         build_plugin_tree(TerminalTree(tree.root), self.args, self.plugin_types)
 
         tree.root.expand()
         yield tree
+
+    @on(TextualTree.NodeSelected)
+    def on_tree_node_selected(self, event: TextualTree.NodeSelected) -> None:
+        file_path = event.node.data
+
+        if not self.args.no_open and file_path:
+            with contextlib.suppress(FileNotFoundError):
+                cmd = [*shlex.split(self.args.editor_incantation), str(file_path)]
+                subprocess.run(cmd, check=False)
 
 
 def get_subclasses(base_class: PluginType) -> set[PluginType]:
