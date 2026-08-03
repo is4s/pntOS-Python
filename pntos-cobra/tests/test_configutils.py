@@ -1,4 +1,6 @@
+import io
 import unittest
+from contextlib import redirect_stdout
 from dataclasses import dataclass, field, fields
 from enum import IntEnum
 from pathlib import Path
@@ -670,3 +672,20 @@ class TestConfigUtils(unittest.TestCase):
         # Won't work because config_to_registry failed
         out_foo = config_from_registry(Foo, self.mediator, 'foo')
         assert out_foo is None
+
+    def test_warn_on_overwrite(self) -> None:
+        @dataclass
+        class Foo(BaseConfig):
+            foo: list[str]
+
+        _in_foo_1 = Foo(group='foo', foo=['foo'])
+        _in_foo_2 = Foo(group='foo', foo=['foo', 'bar'])
+        config_to_registry(_in_foo_1, self.mediator)
+
+        buf = io.StringIO()
+        with redirect_stdout(buf):
+            # should create overwrite warning
+            config_to_registry(_in_foo_2, self.mediator)
+        output = buf.getvalue()
+        print(output)
+        self.assertIn('WARN', output)
