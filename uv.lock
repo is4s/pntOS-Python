@@ -1345,7 +1345,7 @@ requires-dist = [
     { name = "navanalysis-lcm", specifier = "==0.1.5" },
     { name = "navanalysis-ros", specifier = "==0.1.2" },
     { name = "navtk", specifier = "==2.1.post7.dev0" },
-    { name = "numpy", specifier = "!=2.2" },
+    { name = "numpy" },
     { name = "pntos-api", editable = "pntos-api" },
     { name = "pydantic", specifier = ">=2.0.0" },
     { name = "scipy", specifier = ">=1.15.2" },
@@ -1378,7 +1378,7 @@ dependencies = [
 requires-dist = [
     { name = "aspn23", specifier = "==0.1.0" },
     { name = "navtk", specifier = "==2.1.post7.dev0" },
-    { name = "numpy", specifier = "!=2.2" },
+    { name = "numpy" },
     { name = "pntos-api", editable = "pntos-api" },
     { name = "pntos-cobra", editable = "pntos-cobra" },
 ]

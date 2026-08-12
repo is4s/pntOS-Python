@@ -21,8 +21,7 @@ classifiers = [
 dependencies = [
     "aspn23==0.1.0",
     "navtk==2.1.post7.dev0",
-    # numpy 2.2 type errors with Cobra (#148).
-    "numpy!=2.2",
+    "numpy",
     "pntos-api>=2.0.0,<3.0.0",
     "pntos-cobra==2.1.0.post0.dev3",
 ]
