@@ -506,11 +506,9 @@ def _create_dummy_value(in_type: type[Any]) -> Any:  # noqa: ANN401
         val = _create_dummy_value(get_args(in_type)[0])
         return [val, val]
     if origin is np.ndarray:
-        shape, dtype = get_args(in_type)
+        _, dtype = get_args(in_type)
         val = _create_dummy_value(get_args(dtype)[0])
-        if shape is Any:
-            shape = (2,)
-        return np.full(shape, val)
+        return np.full((2,), val)
     if in_type is bool:
         return True
     # Need this to come before the int check, since IntEnum objects are also an int
