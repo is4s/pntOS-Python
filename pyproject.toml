@@ -37,7 +37,7 @@ dev = [
     "pyproject-fmt>=2.7",
     "pytest>=8.2",
     "pytest-cov>=6",
-    "ruff==0.13.2",
+    "ruff==0.16.0",
     "setuptools>=82.0.1",
     "sphinx>=7.3.7",
     "sphinx-copybutton",
@@ -90,6 +90,7 @@ lint.ignore = [
     "PLR0911",
     "PLR0912",
     "PLR0913",
+    "PLR0917",
 ]
 lint.per-file-ignores."*/tests/*" = [
     "ANN001",

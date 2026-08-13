@@ -45,13 +45,13 @@ first two parameters since it already knows the plugin's type and identifier. Fo
 example, when any plugin (e.g., a UiPlugin) calls:
 
 ```python
-mediator.log_message(LoggingLevel.INFO, "Ui initialized.")
+mediator.log_message(LoggingLevel.INFO, 'Ui initialized.')
 ```
 
 The {py:obj}`Mediator<pntos.api.Mediator>` could internally call:
 
 ```python
-logging_plugin.log(UiPlugin, "Cobra Ui Plugin", LoggingLevel.INFO, "Ui initialized.")
+logging_plugin.log(UiPlugin, 'Cobra Ui Plugin', LoggingLevel.INFO, 'Ui initialized.')
 ```
 
 ```{note}
@@ -71,7 +71,7 @@ The {py:obj}`StandardLoggingPlugin<pntos.cobra.StandardLoggingPlugin>`
 logs to the console. Given:
 
 ```python
-logging_plugin.log(UiPlugin, "Cobra Ui Plugin", LoggingLevel.INFO, "Ui initialized.")
+logging_plugin.log(UiPlugin, 'Cobra Ui Plugin', LoggingLevel.INFO, 'Ui initialized.')
 ```
 
 The terminal output is:

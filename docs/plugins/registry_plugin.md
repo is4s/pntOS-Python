@@ -34,19 +34,18 @@ this example group-key-value data structure with groups `"foo"`, `"bar"`, and `"
 
 ```python
 group_key_value_store = {
-    "foo": {
-        "key1": True,
-        "key2": 42,
+    'foo': {
+        'key1': True,
+        'key2': 42,
     },
-    "bar": {
-        "key1": "Hello World!",
+    'bar': {
+        'key1': 'Hello World!',
     },
-    "baz": {
-        "key1": 0,
-        "key2": False,
-        "key3": "test",
+    'baz': {
+        'key1': 0,
+        'key2': False,
+        'key3': 'test',
     },
-
 }
 ```
 
@@ -134,13 +133,13 @@ There are several ways to get and set keys and values in a
 Note the difference between `__getitem__` and `get_value`:
 
 ```python
-kv = registry.batch_start("foo_group")
-kv.set_value("bar_key", 42)
+kv = registry.batch_start('foo_group')
+kv.set_value('bar_key', 42)
 kv.batch_end()
 
 kv.batch_restart()
-val_ambiguous: RegistryValueTypeUnion | None = kv["bar_key"]
-val_int: int | None = kv.get_value("bar_key", int)
+val_ambiguous: RegistryValueTypeUnion | None = kv['bar_key']
+val_int: int | None = kv.get_value('bar_key', int)
 kv.batch_end()
 ```
 
@@ -179,29 +178,31 @@ The following table lists all supported types with example values of those types
 
 Below is an example of getting and setting all supported types.
 
+<!-- fmt:off -->
 ```python
 # Setting values of various types in the registry
-kvstore = registry.batch_start("my_data")
-kvstore["name"] = "MyApp"                          # str
-kvstore["sensors"] = ["GPS", "IMU", "Barometer"]   # list[str]
-kvstore["count"] = 42                              # int
-kvstore["enabled"] = True                          # bool
-kvstore["temperature"] = 23.5                      # float
-kvstore["position"] = np.array([1.0, 2.0, 3.0])    # NDArray[float64]
-kvstore["newest"] = Message(aspn_msg, "sensor_1")  # Message
+kvstore = registry.batch_start('my_data')
+kvstore['name'] = 'MyApp'                          # str
+kvstore['sensors'] = ['GPS', 'IMU', 'Barometer']   # list[str]
+kvstore['count'] = 42                              # int
+kvstore['enabled'] = True                          # bool
+kvstore['temperature'] = 23.5                      # float
+kvstore['position'] = np.array([1.0, 2.0, 3.0])    # NDArray[float64]
+kvstore['newest'] = Message(aspn_msg, 'sensor_1')  # Message
 kvstore.batch_end()
 
 # Retrieving values with type specification
 kvstore.batch_restart()
-name = kvstore.get_value("name", str)              # "MyApp"
-sensors = kvstore.get_value("sensors", list)       # ["GPS", "IMU", "Barometer"]
-count = kvstore.get_value("count", int)            # 42
-enabled = kvstore.get_value("enabled", bool)       # True
-temp = kvstore.get_value("temperature", float)     # 23.5
-pos = kvstore.get_value("position", np.ndarray)    # np.array([1.0, 2.0, 3.0])
-newest = kvstore.get_value("newest", Message)      # Message(aspn_msg, "sensor_1")
+name = kvstore.get_value('name', str)            # "MyApp"
+sensors = kvstore.get_value('sensors', list)     # ["GPS", "IMU", "Barometer"]
+count = kvstore.get_value('count', int)          # 42
+enabled = kvstore.get_value('enabled', bool)     # True
+temp = kvstore.get_value('temperature', float)   # 23.5
+pos = kvstore.get_value('position', np.ndarray)  # np.array([1.0, 2.0, 3.0])
+newest = kvstore.get_value('newest', Message)    # Message(aspn_msg, "sensor_1")
 kvstore.batch_end()
 ```
+<!-- fmt:on -->
 
 While these are the only types directly supported in the registry, some implementations
 may provide means of converting other types into types that can be stored in the
@@ -237,12 +238,12 @@ values. For example, a registry could choose to support storing a value as an in
 and retrieve it as a string:
 
 ```python
-kvstore = registry.batch_start("conversions")
-kvstore["count"] = 42  # Store as int
+kvstore = registry.batch_start('conversions')
+kvstore['count'] = 42  # Store as int
 kvstore.batch_end()
 
 kvstore.batch_restart()
-count_str = kvstore.get_value("count", str)  # Retrieve as str, returns "42"
+count_str = kvstore.get_value('count', str)  # Retrieve as str, returns "42"
 kvstore.batch_end()
 ```
 
@@ -276,7 +277,8 @@ The callback takes a single string parameter (the new group name):
 
 ```python
 def my_new_group_callback(new_group: str) -> None:
-    print(f"New group: {new_group}")
+    print(f'New group: {new_group}')
+
 
 registry.request_notify_new_group(my_new_group_callback)
 ```
@@ -288,8 +290,9 @@ changes in a group, or for changes to a specific key. Callbacks must have these
 parameters:
 
 ```python
-def my_callback(group: str, modified_keys: list[str], kvstore: KeyValueStore) -> None:
-    ...
+def my_callback(
+    group: str, modified_keys: list[str], kvstore: KeyValueStore
+) -> None: ...
 ```
 
 To register a callback, call
@@ -297,22 +300,28 @@ To register a callback, call
 
 ```python
 # Handles all modifications in a group
-def my_general_callback(group: str, modified_keys: list[str], kvstore: KeyValueStore) -> None:
+def my_general_callback(
+    group: str, modified_keys: list[str], kvstore: KeyValueStore
+) -> None:
     print(f"Modified keys in group '{group}' (key: new_value):")
     for key in modified_keys:
-        print(f"    {key}: {kvstore[key]}")
+        print(f'    {key}: {kvstore[key]}')
+
 
 # Only handles when `my_key` changes
-def my_specific_callback(group: str, modified_keys: list[str], kvstore: KeyValueStore) -> None:
+def my_specific_callback(
+    group: str, modified_keys: list[str], kvstore: KeyValueStore
+) -> None:
     print(f"Key 'my_key' was changed to {kvstore['my_key']}.")
 
-kvstore = registry.batch_start("my_group")
+
+kvstore = registry.batch_start('my_group')
 kvstore.request_notify(
-    key=None, # Registers this callback for all keys in this group
+    key=None,  # Registers this callback for all keys in this group
     callback=my_general_callback,
 )
 kvstore.request_notify(
-    key='my_key', # Callback only triggers when the value at 'my_key' changes
+    key='my_key',  # Callback only triggers when the value at 'my_key' changes
     callback=my_specific_callback,
 )
 kvstore.batch_end()
@@ -325,10 +334,10 @@ In the above scenario, if another plugin were to set the following values in the
 registry:
 
 ```python
-kvstore = registry.batch_start("my_group")
-kvstore["my_key"] = 5
-kvstore["my_other_key"] = True
-kvstore["yet_another_key"] = 0.7539
+kvstore = registry.batch_start('my_group')
+kvstore['my_key'] = 5
+kvstore['my_other_key'] = True
+kvstore['yet_another_key'] = 0.7539
 kvstore.batch_end()
 ```
 
@@ -350,7 +359,7 @@ To remove a callback, call
 {py:obj}`remove_notify()<pntos.api.KeyValueStore.remove_notify>`:
 
 ```python
-kvstore = registry.batch_start("my_group")
+kvstore = registry.batch_start('my_group')
 kvstore.remove_notify(
     key='my_key',
     callback=my_specific_callback,
@@ -406,9 +415,10 @@ The registry can be accessed by any plugin through the
 ```python
 class MyPlugin(UtilityPlugin):
     ...
+
     def init_plugin(self, plugin_resources_location, mediator) -> None:
-        kvstore = mediator.registry.batch_start("my_config_group")
-        config_val = kvstore["my_config_key"]
+        kvstore = mediator.registry.batch_start('my_config_group')
+        config_val = kvstore['my_config_key']
         kvstore.batch_end()
 ```
 
@@ -645,8 +655,8 @@ functions:
 
 ```{literalinclude} ../../pntos-cobra/src/pntos/cobra/standard_plugins/StandardRegistryPlugin.py
 :language: python
-:start-at: _callbacks: dict[None | str, list[Callable[[str, list[str], KeyValueStore], None]]]
-:end-at: _callbacks: dict[None | str, list[Callable[[str, list[str], KeyValueStore], None]]]
+:start-at: _callbacks: dict[str | None, list[Callable[[str, list[str], KeyValueStore], None]]]
+:end-at: _callbacks: dict[str | None, list[Callable[[str, list[str], KeyValueStore], None]]]
 ```
 
 When {py:obj}`batch_end()<pntos.cobra.internal.StandardKeyValueStore.batch_end>` is
@@ -724,17 +734,17 @@ types. Implementations may support type conversions when calling `get_value(key,
 with a different type than stored. For example:
 
 ```python
-kv.set_value(key, 3.14) # set as a float
-str_val = kv.get_value(key, str) # request it as a string
-print(str_val) # If the implementation supports it: "3.14"
+kv.set_value(key, 3.14)  # set as a float
+str_val = kv.get_value(key, str)  # request it as a string
+print(str_val)  # If the implementation supports it: "3.14"
 ```
 
 However, not all type conversions are likely to be supported:
 
 ```python
-kv.set_value(key, 3.14) # set as a float
-str_val = kv.get_value(key, Message) # No meaningful conversion from float to Message
-print(str_val) # None
+kv.set_value(key, 3.14)  # set as a float
+str_val = kv.get_value(key, Message)  # No meaningful conversion from float to Message
+print(str_val)  # None
 ```
 
 Click a type tab to see the supported `get_value()` request types for a value of that type

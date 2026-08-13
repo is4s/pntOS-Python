@@ -233,7 +233,7 @@ rich==15.0.0
     # via textual
 roman-numerals-py==3.1.0 ; python_full_version >= '3.11'
     # via sphinx
-ruff==0.13.2
+ruff==0.16.0
 scipy==1.15.3 ; python_full_version < '3.11'
     # via
     #   inu

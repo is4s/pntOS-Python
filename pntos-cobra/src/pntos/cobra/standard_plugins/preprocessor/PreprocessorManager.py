@@ -98,7 +98,7 @@ class PreprocessorManager:
                     break
 
         # Cache the created chain if not empty, otherwise store None
-        self._chains[new_channel] = chain_to_create if chain_to_create else None
+        self._chains[new_channel] = chain_to_create or None
 
     def preprocess_message(self, message: Message) -> list[Message] | None:
         """

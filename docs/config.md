@@ -52,16 +52,18 @@ class Foo:
     value1: int
     value2: str
 
+
 @dataclass
 class Bar(Foo):
     value3: float
 
+
 data = Bar(
-    value1=42,            # From super-type Foo
-    value2="hello world", # From super-type Foo
-    value3=3.14
+    value1=42,  # From super-type Foo
+    value2='hello world',  # From super-type Foo
+    value3=3.14,
 )
-print(data.value1) # 42
+print(data.value1)  # 42
 ```
 
 ````{note}
@@ -133,17 +135,19 @@ additional fields:
 ```python
 from pntos.cobra.config import BaseConfig
 
+
 @dataclass
 class SensorConfig(BaseConfig):
-    group: str # Inherited from BaseConfig
+    group: str  # Inherited from BaseConfig
     label: str
     frequency: float
 
+
 @dataclass
 class AltitudeSensorConfig(SensorConfig):
-    group: str       # Inherited from BaseConfig
-    label: str       # Inherited from SensorConfig
-    frequency: float # Inherited from SensorConfig
+    group: str  # Inherited from BaseConfig
+    label: str  # Inherited from SensorConfig
+    frequency: float  # Inherited from SensorConfig
     initial_height: float
 ```
 
@@ -342,7 +346,7 @@ For example:
 @dataclass
 class BarConfig(BaseConfig):
     value1: int  # Valid
-    _value2: int # Invalid!
+    _value2: int  # Invalid!
 ```
 
 {py:obj}`config_to_registry()<pntos.cobra.config.config_to_registry>` stores auxiliary

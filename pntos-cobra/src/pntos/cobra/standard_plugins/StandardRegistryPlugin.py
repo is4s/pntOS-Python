@@ -41,7 +41,7 @@ class StandardKeyValueStore(KeyValueStore):
     """
 
     _store: dict[str, RegistryValueTypeUnion]
-    _callbacks: dict[None | str, list[Callable[[str, list[str], KeyValueStore], None]]]
+    _callbacks: dict[str | None, list[Callable[[str, list[str], KeyValueStore], None]]]
     _permanent_keys: set[str]
     _set_permanent: bool
     _modified_keys: set[str]
