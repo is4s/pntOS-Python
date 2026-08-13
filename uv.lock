@@ -1448,8 +1448,8 @@ requires-dist = [
     { name = "navanalysis-ros", specifier = ">=0.1.2" },
     { name = "pntos-api", editable = "pntos-api" },
     { name = "pntos-cobra", editable = "pntos-cobra" },
-    { name = "pntos-python-datasets-lcm", specifier = "==0.1.0", index = "https://pypi.org/simple/" },
-    { name = "pntos-python-datasets-ros", specifier = "==0.1.0", index = "https://pypi.org/simple/" },
+    { name = "pntos-python-datasets-lcm", specifier = "==0.1.0" },
+    { name = "pntos-python-datasets-ros", specifier = "==0.1.0" },
 ]
 
 [package.metadata.requires-dev]
@@ -1490,10 +1490,10 @@ wheels = [
 
 [[package]]
 name = "pntos-python-docs-data"
-version = "0.5.0"
+version = "0.5.1"
 source = { registry = "https://pypi.org/simple/" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/f1/14/01f9e8d9179190bea80228a7a1b7f7f8e2cdf0975a426ddfb6023766414d/pntos_python_docs_data-0.5.0-py2.py3-none-any.whl", hash = "sha256:f4dbb6a7dbb11fe49034d52bc16429e2a9536a0cd1ac10dcae3bb7c495cbcd93", size = 5389981, upload-time = "2026-05-27T21:09:02.169Z" },
+    { url = "https://files.pythonhosted.org/packages/3a/dc/320fb9802285146a76a32d75ff4b57158e2c5aa23e23deb8d7c7943dd82c/pntos_python_docs_data-0.5.1-py2.py3-none-any.whl", hash = "sha256:f9c82368e23d2d2aef3a0779cb684555b718f5617830aad03618498f5277e01a", size = 5489798, upload-time = "2026-07-06T15:33:05.573Z" },
 ]
 
 [[package]]

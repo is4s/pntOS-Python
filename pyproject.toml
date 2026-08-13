@@ -3,9 +3,8 @@ name = "pntos-python"
 version = "2.1.0-0.dev0"
 description = "A meta package for pntOS that contains the components of pntOS."
 readme = "README.md"
-license = 'Apache-2.0'
-license-files = [ 'LICENSE' ]
-
+license = "Apache-2.0"
+license-files = [ "LICENSE" ]
 authors = [ { name = "IS4S", email = "pntos@is4s.com" } ]
 requires-python = ">=3.10"
 classifiers = [
@@ -115,44 +114,37 @@ lint.per-file-ignores."util/*" = [ "D", "F" ]
 lint.isort.combine-as-imports = true
 lint.pydocstyle.convention = "google"
 
-[tool.pytest.ini_options]
-addopts = "-p no:launch_ros -p no:launch_testing"
+[tool.pytest]
+ini_options.addopts = "-p no:launch_ros -p no:launch_testing"
 
-[tool.coverage.run]
-omit = [
-    "pntos-api/*",
-    # upstream ROS
-    "/opt/ros/*",
+[tool.coverage]
+run.omit = [
     # ASPN-ROS
     "*/ros_devel/*",
+    # upstream ROS
+    "/opt/ros/*",
+    "pntos-api/*",
     # App-running utils
     "pntos-cobra/src/pntos/cobra/utils/apps.py",
 ]
 
-[tool.ty.rules]
-all = "error"
-missing-type-argument = "ignore"
-missing-override-decorator = "ignore"
-
-[tool.ty.src]
-exclude = [
-    "pntos-cobra/src/pntos/cobra/tutorial_plugins/*",
-    "pntos-cobra/src/pntos/cobra/dummy_plugins/*",
-]
-
 [tool.uv]
+sources.pntos-api = { workspace = true }
+sources.pntos-cobra = { workspace = true }
+sources.pntos-python-datasets-aspn2-lcm = { index = "wheelhouse" }
 package = false
-
-[tool.uv.workspace]
-members = [ "pntos-api", "pntos-cobra" ]
+workspace.members = [ "pntos-api", "pntos-cobra" ]
 
 [[tool.uv.index]]
 name = "pypi"
 url = "https://pypi.org/simple/"
 default = true
 
-[tool.uv.sources]
-pntos-api = { workspace = true }
-pntos-cobra = { workspace = true }
-pntos-python-datasets-lcm = { index = "pypi" }
-pntos-python-datasets-ros = { index = "pypi" }
+[tool.ty]
+src.exclude = [
+    "pntos-cobra/src/pntos/cobra/dummy_plugins/*",
+    "pntos-cobra/src/pntos/cobra/tutorial_plugins/*",
+]
+rules.all = "error"
+rules.missing-override-decorator = "ignore"
+rules.missing-type-argument = "ignore"
