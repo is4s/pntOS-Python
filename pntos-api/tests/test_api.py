@@ -2,6 +2,7 @@ from abc import ABC
 
 from pntos import api
 from pntos.api import CommonPlugin, Registry
+from typing_extensions import override
 
 
 def assert_is_only_instance(plugin: api.CommonPlugin, expected_type: type[ABC]) -> None:
@@ -86,12 +87,15 @@ def test_type_parameters() -> None:
 class MockControllerPlugin(api.ControllerPlugin):
     identifier = ''
 
+    @override
     def init_plugin(self, plugin_resources_location=None, mediator=None) -> None:
         return
 
+    @override
     def shutdown_plugin(self) -> None:
         return
 
+    @override
     def take_control(
         self,
         plugins,
@@ -104,15 +108,19 @@ class MockControllerPlugin(api.ControllerPlugin):
 class MockFusionPlugin(api.FusionPlugin):
     identifier = ''
 
+    @override
     def init_plugin(self, plugin_resources_location=None, mediator=None) -> None:
         return
 
+    @override
     def shutdown_plugin(self) -> None:
         return
 
+    @override
     def is_fusion_type_supported(self, fusion_type: type[api.FusionEngineType]) -> bool:
         return False
 
+    @override
     def new_fusion_engine(
         self, fusion_type: type[api.FusionEngineType]
     ) -> api.FusionEngineType | None:
@@ -122,17 +130,21 @@ class MockFusionPlugin(api.FusionPlugin):
 class MockFusionStrategyPlugin(api.FusionStrategyPlugin):
     identifier = ''
 
+    @override
     def init_plugin(self, plugin_resources_location=None, mediator=None) -> None:
         return
 
+    @override
     def shutdown_plugin(self) -> None:
         return
 
+    @override
     def is_fusion_type_supported(
         self, fusion_type: type[api.FusionStrategyType]
     ) -> bool:
         return False
 
+    @override
     def new_fusion_strategy(
         self, fusion_type: type[api.FusionStrategyType]
     ) -> api.FusionStrategyType | None:
@@ -142,15 +154,19 @@ class MockFusionStrategyPlugin(api.FusionStrategyPlugin):
 class MockInertialPlugin(api.InertialPlugin):
     identifier = ''
 
+    @override
     def init_plugin(self, plugin_resources_location=None, mediator=None) -> None:
         return
 
+    @override
     def shutdown_plugin(self) -> None:
         return
 
+    @override
     def is_inertial_type_supported(self, inertial_type: type[api.InertialType]) -> bool:
         return False
 
+    @override
     def new_inertial(
         self,
         inertial_type: type[api.InertialType],
@@ -163,17 +179,21 @@ class MockInertialPlugin(api.InertialPlugin):
 class MockInitializationPlugin(api.InitializationPlugin):
     identifier = ''
 
+    @override
     def init_plugin(self, plugin_resources_location=None, mediator=None) -> None:
         return
 
+    @override
     def shutdown_plugin(self) -> None:
         return
 
+    @override
     def is_initialization_type_supported(
         self, initialization_type: type[api.InitializationType]
     ) -> bool:
         return False
 
+    @override
     def new_initialization_strategy(
         self,
         initialization_type: type[api.InitializationType],
@@ -185,12 +205,15 @@ class MockInitializationPlugin(api.InitializationPlugin):
 class MockLoggingPlugin(api.LoggingPlugin):
     identifier = ''
 
+    @override
     def init_plugin(self, plugin_resources_location=None, mediator=None) -> None:
         return
 
+    @override
     def shutdown_plugin(self) -> None:
         return
 
+    @override
     def log(
         self,
         source_plugin_type: api.PluginType,
@@ -204,21 +227,27 @@ class MockLoggingPlugin(api.LoggingPlugin):
 class MockOrchestrationPlugin(api.OrchestrationPlugin):
     identifier = ''
 
+    @override
     def init_plugin(self, plugin_resources_location=None, mediator=None) -> None:
         return
 
+    @override
     def shutdown_plugin(self) -> None:
         return
 
+    @override
     def init_orchestration_plugin(self, plugins, stream_config) -> None:
         return
 
+    @override
     def filter_description_list(self) -> None:
         return None
 
+    @override
     def process_pntos_message(self, message, sequenced) -> None:
         return
 
+    @override
     def request_solutions(self, solution_times, filter_description=None) -> None:
         return None
 
@@ -226,12 +255,15 @@ class MockOrchestrationPlugin(api.OrchestrationPlugin):
 class MockPlatformIntegrationPlugin(api.PlatformIntegrationPlugin):
     identifier = ''
 
+    @override
     def init_plugin(self, plugin_resources_location=None, mediator=None) -> None:
         return
 
+    @override
     def shutdown_plugin(self) -> None:
         return
 
+    @override
     def take_control(
         self, plugins, plugin_resources_locations=None, initial_config=None
     ) -> None:
@@ -244,12 +276,15 @@ class MockPreprocessorPlugin(api.PreprocessorPlugin):
     def __init__(self) -> None:
         self.preprocessor_identifiers = ['']
 
+    @override
     def init_plugin(self, plugin_resources_location=None, mediator=None) -> None:
         return
 
+    @override
     def shutdown_plugin(self) -> None:
         return
 
+    @override
     def new_preprocessor(self, preprocessor_index, config_group=None) -> None:
         return None
 
@@ -257,12 +292,15 @@ class MockPreprocessorPlugin(api.PreprocessorPlugin):
 class MockRegistryPlugin(api.RegistryPlugin):
     identifier = ''
 
+    @override
     def init_plugin(self, plugin_resources_location=None, mediator=None) -> None:
         return
 
+    @override
     def shutdown_plugin(self) -> None:
         return
 
+    @override
     def new_registry(self, initial_config: str | None = None) -> Registry:
         return None  # ty:ignore[invalid-return-type]
 
@@ -270,15 +308,19 @@ class MockRegistryPlugin(api.RegistryPlugin):
 class MockStateModelingPlugin(api.StateModelingPlugin):
     identifier = ''
 
+    @override
     def init_plugin(self, plugin_resources_location=None, mediator=None) -> None:
         return
 
+    @override
     def shutdown_plugin(self) -> None:
         return
 
+    @override
     def is_fusion_type_supported(self, fusion_type) -> bool:
         return False
 
+    @override
     def new_state_model_provider(self, fusion_type) -> None:
         return None
 
@@ -286,18 +328,23 @@ class MockStateModelingPlugin(api.StateModelingPlugin):
 class MockTransportPlugin(api.TransportPlugin):
     identifier = ''
 
+    @override
     def init_plugin(self, plugin_resources_location=None, mediator=None) -> None:
         return
 
+    @override
     def shutdown_plugin(self) -> None:
         return
 
+    @override
     def broadcast_message(self, message, channel_name=None) -> None:
         return
 
+    @override
     def start_listening(self) -> None:
         return
 
+    @override
     def stop_listening(self) -> None:
         return
 
@@ -305,15 +352,19 @@ class MockTransportPlugin(api.TransportPlugin):
 class MockUiPlugin(api.UiPlugin):
     identifier = ''
 
+    @override
     def init_plugin(self, plugin_resources_location=None, mediator=None) -> None:
         return
 
+    @override
     def shutdown_plugin(self) -> None:
         return
 
+    @override
     def requires_main_thread(self) -> bool:
         return False
 
+    @override
     def run_main_thread(self) -> None:
         return
 

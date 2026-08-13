@@ -1,5 +1,6 @@
 from pntos.api import CommonPlugin, LoggingLevel, LoggingPlugin, Mediator
 from pntos.cobra.utils import print_message
+from typing_extensions import override
 
 
 class StandardLoggingPlugin(LoggingPlugin):
@@ -31,6 +32,7 @@ class StandardLoggingPlugin(LoggingPlugin):
         self.global_log_level: LoggingLevel = global_log_level
         self.date_time_format: str = date_time_format
 
+    @override
     def init_plugin(
         self,
         plugin_resources_location: str | None = None,
@@ -43,6 +45,7 @@ class StandardLoggingPlugin(LoggingPlugin):
             'using hard-coded global logging level ' + self.global_log_level.name,
         )
 
+    @override
     def shutdown_plugin(self) -> None:
         self.log(
             LoggingPlugin,
@@ -51,6 +54,7 @@ class StandardLoggingPlugin(LoggingPlugin):
             ' Logging plugin shut down correctly.',
         )
 
+    @override
     def log(
         self,
         source_plugin_type: type[CommonPlugin],

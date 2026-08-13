@@ -6,6 +6,7 @@ from pntos.cobra import DummyTransportPlugin
 from pntos.cobra.internal import (
     DummyMediator,
 )
+from typing_extensions import override
 
 
 class FlagMediator(DummyMediator):
@@ -15,6 +16,7 @@ class FlagMediator(DummyMediator):
         super().__init__()
         self.got_msg = False
 
+    @override
     def process_pntos_message(self, message: Message) -> None:
         super().process_pntos_message(message)
         self.got_msg = True

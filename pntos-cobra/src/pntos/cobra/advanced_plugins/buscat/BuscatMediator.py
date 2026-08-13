@@ -13,6 +13,7 @@ from pntos.api import (
 )
 from pntos.cobra.standard_plugins.controller.StandardMediator import ExitCode, ExitEvent
 from pntos.cobra.utils import print_message
+from typing_extensions import override
 
 
 class BuscatMediator(Mediator):
@@ -49,9 +50,11 @@ class BuscatMediator(Mediator):
         self._attached_plugin_identifier: str = attached_plugin_identifier
 
     @property
+    @override
     def filter_description_list(self) -> list[str]:
         return []
 
+    @override
     def request_solutions(
         self,
         solution_times: list[TypeTimestamp],
@@ -59,6 +62,7 @@ class BuscatMediator(Mediator):
     ) -> list[Message | None] | None:
         pass
 
+    @override
     def process_pntos_message(self, message: Message) -> None:
         # pass to designated transport plugin for broadcast
         if message.source_identifier.startswith(self._output_channel_prefix):
@@ -73,6 +77,7 @@ class BuscatMediator(Mediator):
                 destination_identifier=channel,
             )
 
+    @override
     def broadcast_aspn_message(
         self,
         message: Message,
@@ -93,6 +98,7 @@ class BuscatMediator(Mediator):
                 f'Transport "{transport}" not found. Unable to broadcast message.',
             )
 
+    @override
     def log_message(self, level: LoggingLevel, message: str) -> None:
         self._log_message(level, message, self._attached_plugin_type)
 

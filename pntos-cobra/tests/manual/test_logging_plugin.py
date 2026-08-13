@@ -10,6 +10,7 @@ from pntos.api import (
 )
 from pntos.cobra import StandardLoggingPlugin
 from pntos.cobra.internal import StandardMediator, StandardRegistry
+from typing_extensions import override
 
 expected_results: dict[ll, str] = {
     ll.DEBUG: '',
@@ -68,6 +69,7 @@ class DummyPlugin(CommonPlugin):
     def __init__(self, identifier: str) -> None:
         self.identifier = identifier
 
+    @override
     def init_plugin(
         self,
         plugin_resources_location: str | None = None,
@@ -75,6 +77,7 @@ class DummyPlugin(CommonPlugin):
     ) -> None:
         pass
 
+    @override
     def shutdown_plugin(self) -> None:
         pass
 

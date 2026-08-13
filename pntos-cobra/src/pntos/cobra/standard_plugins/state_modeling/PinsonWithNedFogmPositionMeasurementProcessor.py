@@ -20,6 +20,7 @@ from pntos.api import (
     StandardMeasurementModel,
     StandardMeasurementProcessor,
 )
+from typing_extensions import override
 
 
 class PinsonWithNedFogmPositionMeasurementProcessor(StandardMeasurementProcessor):
@@ -69,6 +70,7 @@ class PinsonWithNedFogmPositionMeasurementProcessor(StandardMeasurementProcessor
                 f'PinsonWithNedFogmPositionMeasurementProcessor requires {self._num_required_blocks} state blocks, got {state_block_labels}.',
             )
 
+    @override
     def receive_aux_data(self, aux: list[Message | None]) -> None:
         if not aux or aux[0] is None:
             self._mediator.log_message(
@@ -107,6 +109,7 @@ class PinsonWithNedFogmPositionMeasurementProcessor(StandardMeasurementProcessor
 
         self._inertial_pva = pva
 
+    @override
     def generate_model(
         self, message: Message, gen_x_and_p_func: GenXandP
     ) -> StandardMeasurementModel | None:

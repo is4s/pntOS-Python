@@ -16,6 +16,7 @@ from pntos.api import (
     TransportPlugin,
 )
 from pntos.cobra.utils import UiMediatorInterface, print_message
+from typing_extensions import override
 
 from .StandardMessageStreamConfig import StandardMessageStreamConfig
 
@@ -30,10 +31,12 @@ class ExitEvent(Event):
         super().__init__()
         self.exit_code: ExitCode = ExitCode.SUCCESS
 
+    @override
     def set(self, exit_code: ExitCode = ExitCode.SUCCESS) -> None:
         self.exit_code = exit_code
         super().set()
 
+    @override
     def clear(self) -> None:
         self.exit_code = ExitCode.SUCCESS
         super().clear()
@@ -83,12 +86,14 @@ class StandardMediator(Mediator):
         self._last_solution_time = None
 
     @property
+    @override
     def filter_description_list(self) -> list[str]:
         assert self._orchestration_plugin is not None, (
             'Orchestration plugin used before initialized and passed to mediator.'
         )
         return self._orchestration_plugin.filter_description_list
 
+    @override
     def request_solutions(
         self,
         solution_times: list[TypeTimestamp],
@@ -101,6 +106,7 @@ class StandardMediator(Mediator):
             solution_times, filter_description
         )
 
+    @override
     def process_pntos_message(self, message: Message) -> None:
         assert self._orchestration_plugin is not None, (
             'Orchestration plugin used before initialized and passed to mediator.'
@@ -154,6 +160,7 @@ class StandardMediator(Mediator):
                 )
             self._last_solution_time = cur_time
 
+    @override
     def broadcast_aspn_message(
         self,
         message: Message,
@@ -174,6 +181,7 @@ class StandardMediator(Mediator):
                 f'Transport "{transport}" not found. Unable to broadcast message.',
             )
 
+    @override
     def log_message(self, level: LoggingLevel, message: str) -> None:
         self._log_message(level, message, self._attached_plugin_type)
 

@@ -15,6 +15,7 @@ from pntos.api import (
     StandardInertialErrors,
 )
 from pntos.cobra.config import PvaMessageInitializationConfig, config_from_registry
+from typing_extensions import override
 
 NSEC_PER_SEC = 1_000_000_000
 
@@ -75,12 +76,15 @@ class PvaMessageInitialization(InertialInitializationStrategy):
 
         self._status = InitializationStatus.WAITING
 
+    @override
     def request_motion_needed(self) -> InitializationMotionNeeded:
         return InitializationMotionNeeded.ANY_MOTION
 
+    @override
     def request_current_status(self) -> InitializationStatus:
         return self._status
 
+    @override
     def process_pntos_message(self, message: Message) -> None:
         """Receive PVA from which to set initial solution."""
         if message.source_identifier != self._pva_channel:
@@ -114,6 +118,7 @@ class PvaMessageInitialization(InertialInitializationStrategy):
 
         self._status = InitializationStatus.INITIALIZED_GOOD
 
+    @override
     def request_solution(self) -> InitialInertialSolution:
         """Get the initial PVA."""
         return self._initial_solution
@@ -134,6 +139,7 @@ class PvaMessageInitializationPlugin(InitializationPlugin):
         """
         self.identifier = identifier
 
+    @override
     def init_plugin(
         self,
         plugin_resources_location: str | None = None,
@@ -142,14 +148,17 @@ class PvaMessageInitializationPlugin(InitializationPlugin):
         assert mediator is not None
         self.mediator = mediator
 
+    @override
     def shutdown_plugin(self) -> None:
         return
 
+    @override
     def is_initialization_type_supported(
         self, initialization_type: InitializationType
     ) -> bool:
         return initialization_type is InertialInitializationStrategy
 
+    @override
     def new_initialization_strategy(
         self,
         initialization_type: type[InitializationType],

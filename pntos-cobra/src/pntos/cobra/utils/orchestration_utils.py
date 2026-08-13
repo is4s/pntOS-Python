@@ -18,6 +18,7 @@ from navtk.navutils import (
 )
 from numpy import array, float64
 from numpy.typing import NDArray
+from typing_extensions import override
 
 from pntos.api import (
     EstimateWithCovariance,
@@ -361,6 +362,7 @@ class InertialSolutionEntry(CacheEntry):
         self._solution_channel = solution_channel
         self._log_func = log_func
 
+    @override
     def recalculate(self, cache: 'Cache') -> None:
         """
         Calculate and store the inertial solution at the current filter time.
@@ -401,6 +403,7 @@ class EstimateWithCovarianceEntry(CacheEntry):
         super().__init__(fusion_engine)
         self._sb_label = sb_label
 
+    @override
     def recalculate(self, cache: 'Cache') -> None:
         """
         Calculate and store the state block estimate at the given time.
@@ -444,6 +447,7 @@ class FilterSolutionEntry(CacheEntry):
         self._inertial_solution_key = inertial_solution_key
         self._pinson_x_and_p_key = pinson_x_and_p_key
 
+    @override
     def recalculate(self, cache: 'Cache') -> None:
         """
         Calculate and store the filter solution at the given time.

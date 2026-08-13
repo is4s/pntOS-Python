@@ -1,6 +1,7 @@
 from pntos.api import LoggingLevel, Mediator, Message, Preprocessor
 from pntos.cobra.config import OutageConfig
 from pntos.cobra.utils import has_tov
+from typing_extensions import override
 
 
 class Outage:
@@ -44,6 +45,7 @@ class OutagePreprocessor(Preprocessor):
         self.outage = Outage(outage_config, mediator)
         self.first_msg_time_ns: int | None = None
 
+    @override
     def process_pntos_message(self, message: Message) -> list[Message] | None:
         if message.source_identifier != self.outage.config.channel:
             return [message]

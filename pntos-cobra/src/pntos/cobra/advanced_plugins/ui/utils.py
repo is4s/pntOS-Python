@@ -14,6 +14,7 @@ from pntos.api import Mediator, Registry, RegistryValueTypeUnion
 from pntos.api.plugins.common import KeyValueStore
 from pntos.cobra.utils import MutableValueView, ValueType
 from pydantic.types import UUID4
+from typing_extensions import override
 
 from .models import (
     ChunkUpdate,
@@ -99,6 +100,7 @@ class KeyInfo(MutableValueView[ValueType], Generic[ValueType]):
         self._do_not_update_front_end = Event()
         super().__init__(registry, group, key, None)
 
+    @override
     def _callback(self, group: str, keys: list[str], kv: KeyValueStore) -> None:
         super()._callback(group, keys, kv)
         if self._do_not_update_front_end.is_set():
@@ -117,6 +119,7 @@ class KeyInfo(MutableValueView[ValueType], Generic[ValueType]):
         if subscription_id in self._subscriptions:
             self._subscriptions.pop(subscription_id)
 
+    @override
     def _batch_start(self, kv: KeyValueStore | None = None) -> KeyValueStore:
         # Assume this is initiated by set_value() -> we don't want to trigger a
         # front-end update

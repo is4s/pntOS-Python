@@ -12,6 +12,7 @@ from pntos.api import (
     StandardStateBlock,
 )
 from scipy.linalg import expm
+from typing_extensions import override
 
 
 class FogmBlock(StandardStateBlock):
@@ -66,6 +67,7 @@ class FogmBlock(StandardStateBlock):
         self._Q = diagflat(2.0 * pow(sigmas, 2.0) / taus)  # ty:ignore[invalid-assignment]
         self._I = eye(self.num_states)
 
+    @override
     def receive_aux_data(self, aux: list[Message | None]) -> None:
         """Receive aux data. Unused for this class.
 
@@ -77,6 +79,7 @@ class FogmBlock(StandardStateBlock):
             LoggingLevel.WARN, 'FogmBlock does not require aux data.'
         )
 
+    @override
     def generate_dynamics(
         self,
         gen_x_and_p_func: GenXandP,

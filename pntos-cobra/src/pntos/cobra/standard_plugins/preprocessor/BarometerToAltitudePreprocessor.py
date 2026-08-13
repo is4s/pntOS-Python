@@ -11,6 +11,7 @@ from pntos.api import (
     Message,
     Preprocessor,
 )
+from typing_extensions import override
 
 
 class BarometerToAltitudePreprocessor(Preprocessor):
@@ -34,6 +35,7 @@ class BarometerToAltitudePreprocessor(Preprocessor):
         self._mediator = mediator
         self._alt_sigma = alt_sigma
 
+    @override
     def process_pntos_message(self, message: Message) -> list[Message]:
         if message.source_identifier == self._channel:
             msg = message.wrapped_message

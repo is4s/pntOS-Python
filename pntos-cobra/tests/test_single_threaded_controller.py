@@ -48,6 +48,7 @@ from pntos.cobra import (
     StandardRegistryPlugin,
 )
 from pntos.cobra.internal import DummyMediator, StandardMediator
+from typing_extensions import override
 
 FOUND_ERROR = False
 ERROR_MESSAGE = ''
@@ -57,6 +58,7 @@ class DummyInitializationPlugin(InitializationPlugin):
     def __init__(self, identifier: str) -> None:
         self.identifier = identifier
 
+    @override
     def init_plugin(
         self,
         plugin_resources_location: str | None = None,
@@ -64,14 +66,17 @@ class DummyInitializationPlugin(InitializationPlugin):
     ) -> None:
         self.mediator = mediator
 
+    @override
     def shutdown_plugin(self) -> None:
         return
 
+    @override
     def is_initialization_type_supported(
         self, initialization_type: type[InitializationType]
     ) -> bool:
         return True
 
+    @override
     def new_initialization_strategy(
         self,
         initialization_type: type[InitializationType],
@@ -86,6 +91,7 @@ class DummyInertialPlugin(InertialPlugin):
     def __init__(self, identifier: str) -> None:
         self.identifier = identifier
 
+    @override
     def init_plugin(
         self,
         plugin_resources_location: str | None = None,
@@ -93,12 +99,15 @@ class DummyInertialPlugin(InertialPlugin):
     ) -> None:
         self.mediator = mediator
 
+    @override
     def shutdown_plugin(self) -> None:
         return
 
+    @override
     def is_inertial_type_supported(self, inertial_type: type[InertialType]) -> bool:
         return True
 
+    @override
     def new_inertial(
         self,
         inertial_type: type[InertialType],
@@ -112,6 +121,7 @@ class DummyFusionPlugin(FusionPlugin):
     def __init__(self, identifier: str) -> None:
         self.identifier = identifier
 
+    @override
     def init_plugin(
         self,
         plugin_resources_location: str | None = None,
@@ -119,12 +129,15 @@ class DummyFusionPlugin(FusionPlugin):
     ) -> None:
         self.mediator = mediator
 
+    @override
     def shutdown_plugin(self) -> None:
         return
 
+    @override
     def is_fusion_type_supported(self, fusion_type: type[FusionEngineType]) -> bool:
         return True
 
+    @override
     def new_fusion_engine(
         self, fusion_type: type[FusionEngineType]
     ) -> FusionEngineType | None:
@@ -138,29 +151,36 @@ class DummyStandardFusionEngine(StandardFusionEngine):
     _time: TypeTimestamp = TypeTimestamp(0)
 
     @property
+    @override
     def time(self) -> TypeTimestamp:
         return self._time
 
     @time.setter
+    @override
     def time(self, time: TypeTimestamp) -> None:
         self._time = time
 
     @property
+    @override
     def strategy(self) -> StandardFusionStrategy | None:
         return self._strategy
 
     @strategy.setter
+    @override
     def strategy(self, strategy: StandardFusionStrategy) -> None:
         self._strategy = strategy
 
     @property
+    @override
     def num_states(self) -> int:
         return 0
 
     @property
+    @override
     def state_block_labels(self) -> list[str] | None:
         pass
 
+    @override
     def add_state_block(
         self,
         block: StandardStateBlock,
@@ -169,86 +189,107 @@ class DummyStandardFusionEngine(StandardFusionEngine):
     ) -> None:
         pass
 
+    @override
     def get_state_block_estimate(self, block_label: str) -> NDArray[float64] | None:
         pass
 
+    @override
     def get_state_block_covariance(self, block_label: str) -> NDArray[float64] | None:
         pass
 
+    @override
     def get_state_block_cross_covariance(
         self, block_label1: str, block_label2: str
     ) -> NDArray[float64] | None:
         pass
 
+    @override
     def set_state_block_estimate(
         self, block_label: str, estimate: NDArray[float64]
     ) -> None:
         pass
 
+    @override
     def set_state_block_covariance(
         self, block_label: str, covariance: NDArray[float64]
     ) -> None:
         pass
 
+    @override
     def set_state_block_cross_covariance(
         self, block_label1: str, block_label2: str, covariance: NDArray[float64]
     ) -> None:
         pass
 
+    @override
     def remove_state_block(self, block_label: str) -> None:
         pass
 
     @property
+    @override
     def virtual_state_block_target_labels(self) -> list[str] | None:
         pass
 
+    @override
     def has_virtual_state_block(self, vsb_target_label: str) -> bool:
         return False
 
+    @override
     def add_virtual_state_block(self, virtual_state_block: VirtualStateBlock) -> None:
         pass
 
+    @override
     def remove_virtual_state_block(self, vsb_target_label: str) -> None:
         pass
 
     @property
+    @override
     def measurement_processor_labels(self) -> list[str] | None:
         pass
 
+    @override
     def add_measurement_processor(
         self, processor: StandardMeasurementProcessor
     ) -> None:
         pass
 
+    @override
     def remove_measurement_processor(self, processor_label: str) -> None:
         pass
 
+    @override
     def propagate(self, time: TypeTimestamp) -> None:
         pass
 
+    @override
     def update(self, processor_label: str, message: Message) -> None:
         pass
 
+    @override
     def peek_ahead(
         self, time: TypeTimestamp, block_labels: list[str]
     ) -> EstimateWithCovariance | None:
         pass
 
+    @override
     def generate_x_and_p(
         self, block_labels: list[str]
     ) -> EstimateWithCovariance | None:
         pass
 
+    @override
     def give_state_block_aux_data(
         self, block_label: str, aux: list[Message | None]
     ) -> None:
         pass
 
+    @override
     def give_measurement_processor_aux_data(
         self, processor_label: str, aux: list[Message | None]
     ) -> None:
         pass
 
+    @override
     def give_virtual_state_block_aux_data(
         self, target_label: str, aux: list[Message | None]
     ) -> None:
@@ -262,6 +303,7 @@ class DummyFusionStrategyPlugin(FusionStrategyPlugin):
     def __init__(self, identifier: str) -> None:
         self.identifier = identifier
 
+    @override
     def init_plugin(
         self,
         plugin_resources_location: str | None = None,
@@ -269,12 +311,15 @@ class DummyFusionStrategyPlugin(FusionStrategyPlugin):
     ) -> None:
         self.mediator = mediator
 
+    @override
     def shutdown_plugin(self) -> None:
         return
 
+    @override
     def is_fusion_type_supported(self, fusion_type: type[FusionStrategyType]) -> bool:
         return True
 
+    @override
     def new_fusion_strategy(
         self, fusion_type: type[FusionStrategyType]
     ) -> FusionStrategyType | None:
@@ -285,6 +330,7 @@ class DummyStateModelingPlugin(StateModelingPlugin):
     def __init__(self, identifier: str) -> None:
         self.identifier = identifier
 
+    @override
     def init_plugin(
         self,
         plugin_resources_location: str | None = None,
@@ -292,14 +338,17 @@ class DummyStateModelingPlugin(StateModelingPlugin):
     ) -> None:
         self.mediator = mediator
 
+    @override
     def shutdown_plugin(self) -> None:
         return
 
+    @override
     def is_fusion_type_supported(
         self, fusion_type: type[StateModelProviderType]
     ) -> bool:
         return True
 
+    @override
     def new_state_model_provider(
         self, fusion_type: type[StateModelProviderType]
     ) -> StateModelProviderType | None:
@@ -312,6 +361,7 @@ class DummyStandardStateModelProvider(StandardStateModelProvider):
         self.block_identifiers = []
         self.virtual_block_identifiers = []
 
+    @override
     def new_processor(
         self,
         processor_index: int,
@@ -322,6 +372,7 @@ class DummyStandardStateModelProvider(StandardStateModelProvider):
     ) -> StandardMeasurementProcessor | None:
         return None
 
+    @override
     def new_block(
         self,
         block_index: int,
@@ -331,6 +382,7 @@ class DummyStandardStateModelProvider(StandardStateModelProvider):
     ) -> StandardStateBlock | None:
         return None
 
+    @override
     def new_virtual_block(
         self,
         virtual_block_index: int,
@@ -343,9 +395,11 @@ class DummyStandardStateModelProvider(StandardStateModelProvider):
 
 class DummyStandardFusionStrategy(StandardFusionStrategy):
     @property
+    @override
     def num_states(self) -> int:
         return 0
 
+    @override
     def add_states(
         self,
         initial_estimate: NDArray[float64],
@@ -354,22 +408,27 @@ class DummyStandardFusionStrategy(StandardFusionStrategy):
     ) -> int:
         return 0
 
+    @override
     def remove_states(self, first_index: int, count: int) -> None:
         pass
 
     @property
+    @override
     def estimate(self) -> NDArray[float64] | None:
         return None
 
+    @override
     def set_estimate_slice(
         self, new_estimate: NDArray[float64], first_index: int
     ) -> None:
         pass
 
     @property
+    @override
     def covariance(self) -> NDArray[float64] | None:
         pass
 
+    @override
     def set_covariance_slice(
         self,
         new_covariance: NDArray[float64],
@@ -378,9 +437,11 @@ class DummyStandardFusionStrategy(StandardFusionStrategy):
     ) -> None:
         pass
 
+    @override
     def propagate(self, dynamics_model: StandardDynamicsModel) -> None:
         pass
 
+    @override
     def update(self, measurement_model: StandardMeasurementModel) -> None:
         pass
 
@@ -389,17 +450,21 @@ class DummyStandardFusionStrategy(StandardFusionStrategy):
 
 
 class DummyInertialInitializationStrategy(InertialInitializationStrategy):
+    @override
     def request_solution(self) -> InitialInertialSolution:
         return InitialInertialSolution(
             None, None, None, InitializationStatus.INITIALIZED_GOOD
         )
 
+    @override
     def request_motion_needed(self) -> InitializationMotionNeeded:
         return InitializationMotionNeeded.ANY_MOTION
 
+    @override
     def request_current_status(self) -> InitializationStatus:
         return InitializationStatus.INITIALIZED_GOOD
 
+    @override
     def process_pntos_message(self, message: Message) -> None:
         pass
 
@@ -413,6 +478,7 @@ class DummyUiPlugin(UiPlugin):
         self.identifier = identifier
         self.timer = None
 
+    @override
     def init_plugin(
         self,
         plugin_resources_location: str | None = None,
@@ -420,12 +486,15 @@ class DummyUiPlugin(UiPlugin):
     ) -> None:
         self.mediator = mediator
 
+    @override
     def shutdown_plugin(self) -> None:
         return
 
+    @override
     def requires_main_thread(self) -> bool:
         return True
 
+    @override
     def run_main_thread(self) -> None:
         raise ExitThread
 

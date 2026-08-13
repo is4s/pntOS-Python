@@ -25,6 +25,7 @@ from pntos.api import (
     StandardStateBlock,
 )
 from pntos.cobra.config import ImuConfig
+from typing_extensions import override
 
 
 def extract_pos(pva: MeasurementPVA) -> NDArray[float64]:
@@ -144,6 +145,7 @@ class Pinson15NedBlock(StandardStateBlock):
         self._old_pva_aux = None
         self._force_and_rate_aux = None
 
+    @override
     def receive_aux_data(self, aux: list[Message | None]) -> None:
         """Receive inertial PVA and forces as aux data.
 
@@ -172,6 +174,7 @@ class Pinson15NedBlock(StandardStateBlock):
                     f'Pinson15NedBlock expected aux data of type MeasurementPositionVelocityAttitude or MeasurementImu, but got message of type {type(message.wrapped_message)}.',
                 )
 
+    @override
     def generate_dynamics(
         self,
         gen_x_and_p_func: GenXandP,

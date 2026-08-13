@@ -11,6 +11,7 @@ from pntos.cobra.utils import (
     marshal_to_aspn23_lcm,
     process_lcm_message,
 )
+from typing_extensions import override
 
 
 class LcmTransportPlugin(TransportPlugin):
@@ -48,6 +49,7 @@ class LcmTransportPlugin(TransportPlugin):
         self._sender = None
         self._channels = set()
 
+    @override
     def init_plugin(
         self,
         plugin_resources_location: str | None = None,
@@ -82,6 +84,7 @@ class LcmTransportPlugin(TransportPlugin):
         self._sender = threading.Thread(target=self._send_thread)
         self._sender.start()
 
+    @override
     def shutdown_plugin(self) -> None:
         """
         PntOS plugin shutdown function
@@ -137,6 +140,7 @@ class LcmTransportPlugin(TransportPlugin):
             else:
                 time.sleep(0.01)
 
+    @override
     def start_listening(self) -> None:
         try:
             self.lcm = LCM(self._url)
@@ -155,6 +159,7 @@ class LcmTransportPlugin(TransportPlugin):
         self.handler.start()
         self.mediator.log_message(LoggingLevel.INFO, 'LCM message handler is running.')
 
+    @override
     def stop_listening(self) -> None:
         # This closes the handler thread
         self._shutdown_threads.set()
@@ -169,6 +174,7 @@ class LcmTransportPlugin(TransportPlugin):
 
         self.mediator.log_message(LoggingLevel.INFO, 'LCM transport stopped.')
 
+    @override
     def broadcast_message(
         self, message: Message, channel_name: str | None = None
     ) -> None:

@@ -21,6 +21,7 @@ from pntos.cobra.utils import (
     sort_plugins_dataclass,
     validate_plugins,
 )
+from typing_extensions import override
 
 from .StandardMediator import ExitCode, StandardMediator
 from .StandardMessageStreamConfig import StandardMessageStreamConfig
@@ -72,6 +73,7 @@ class StandardControllerPlugin(ControllerPlugin):
         self._ui_plugins: list[UiPlugin] = []
         self._registry_plugin: RegistryPlugin | None = None
 
+    @override
     def init_plugin(
         self,
         plugin_resources_location: str | None = None,
@@ -83,6 +85,7 @@ class StandardControllerPlugin(ControllerPlugin):
             )
         self._plugin_resources_location = plugin_resources_location
 
+    @override
     def shutdown_plugin(self) -> None:
         self._log(LoggingLevel.INFO, 'Shutting down all plugins...')
 
@@ -99,6 +102,7 @@ class StandardControllerPlugin(ControllerPlugin):
 
     identifier: str
 
+    @override
     def take_control(
         self,
         plugins: list[CommonPlugin],

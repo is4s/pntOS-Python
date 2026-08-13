@@ -34,6 +34,7 @@ from pntos.cobra.internal import (
     StateExtractor,
 )
 from scipy.linalg import block_diag
+from typing_extensions import override
 
 config: list[BaseConfig] = [FusionEngineConfig()]
 
@@ -44,9 +45,11 @@ class _TestStateBlock(StandardStateBlock):
         self.label = label
         self.num_states = 4
 
+    @override
     def receive_aux_data(self, aux: list[Message | None]) -> None:
         pass
 
+    @override
     def generate_dynamics(
         self,
         gen_x_and_p_func: GenXandP,
@@ -70,9 +73,11 @@ class _TestMeasurementProcessor(StandardMeasurementProcessor):
         self.label = label
         self.state_block_labels = state_block_labels
 
+    @override
     def receive_aux_data(self, aux: list[Message | None]) -> None:
         pass
 
+    @override
     def generate_model(
         self, message: Message, gen_x_and_p_func: GenXandP
     ) -> StandardMeasurementModel | None:

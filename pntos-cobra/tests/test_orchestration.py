@@ -80,6 +80,7 @@ from pntos.cobra.config import (
     VirtualStateBlockConfig,
 )
 from pntos.cobra.internal import StandardMediator, StandardMessageStreamConfig
+from typing_extensions import override
 
 # Test globals
 FOUND_ERROR = False
@@ -255,9 +256,11 @@ class MockMP(StandardMeasurementProcessor):
         self.label = label
         self.state_block_labels = []
 
+    @override
     def generate_model(self, message: Message, gen_x_and_p_func: GenXandP) -> None:
         print(f'{self.label} received message')
 
+    @override
     def receive_aux_data(self, aux: list[Message | None]) -> None:
         pass
 
@@ -267,6 +270,7 @@ class MockVSB(VirtualStateBlock):
         self.source = source
         self.target = target
 
+    @override
     def convert(
         self,
         estimate_with_covariance: EstimateWithCovariance,
@@ -274,16 +278,19 @@ class MockVSB(VirtualStateBlock):
     ) -> EstimateWithCovariance:
         return estimate_with_covariance
 
+    @override
     def convert_estimate(
         self, estimate: NDArray[float64], time: TypeTimestamp
     ) -> NDArray[float64]:
         return estimate
 
+    @override
     def jacobian(
         self, estimate: NDArray[float64], time: TypeTimestamp
     ) -> NDArray[float64]:
         return np.eye(estimate.size)
 
+    @override
     def receive_aux_data(self, aux: list[Message | None]) -> None:
         print(f'{self.target} got aux')
 
@@ -294,6 +301,7 @@ class MockStateModelProvider(StandardStateModelProvider):
         self.virtual_block_identifiers = ['mock_vsb']
         self.processor_identifiers = ['mock_mp']
 
+    @override
     def new_processor(
         self,
         processor_index: int,
@@ -304,6 +312,7 @@ class MockStateModelProvider(StandardStateModelProvider):
     ) -> StandardMeasurementProcessor | None:
         return MockMP(label)
 
+    @override
     def new_block(
         self,
         block_index: int,
@@ -313,6 +322,7 @@ class MockStateModelProvider(StandardStateModelProvider):
     ) -> StandardStateBlock | None:
         return None
 
+    @override
     def new_virtual_block(
         self,
         virtual_block_index: int,
@@ -326,6 +336,7 @@ class MockStateModelProvider(StandardStateModelProvider):
 class MockStateModelingPlugin(StateModelingPlugin):
     identifier = 'Mock State Modeling Plugin'
 
+    @override
     def init_plugin(
         self,
         plugin_resources_location: str | None = None,
@@ -333,14 +344,17 @@ class MockStateModelingPlugin(StateModelingPlugin):
     ) -> None:
         return
 
+    @override
     def shutdown_plugin(self) -> None:
         return
 
+    @override
     def is_fusion_type_supported(
         self, fusion_type: type[StateModelProviderType]
     ) -> bool:
         return False
 
+    @override
     def new_state_model_provider(
         self, fusion_type: type[StateModelProviderType]
     ) -> StateModelProviderType | None:

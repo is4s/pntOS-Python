@@ -58,6 +58,7 @@ from pntos.cobra.utils import (
     validate_plugins,
 )
 from scipy.linalg import block_diag
+from typing_extensions import override
 
 
 class StandardOrchestrationPlugin(OrchestrationPlugin):
@@ -109,6 +110,7 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
         self.vsbs_needing_f_and_r: dict[str, list[str]] = {}
         self.vsb_target_to_source: dict[str, str] = {}
 
+    @override
     def init_plugin(
         self,
         plugin_resources_location: str | None = None,
@@ -123,6 +125,7 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
             return
         self.mediator = mediator
 
+    @override
     def shutdown_plugin(self) -> None:
         pass
 
@@ -161,6 +164,7 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
                 message_type=message_type, source_identifier=stream.source_identifier
             )
 
+    @override
     def init_orchestration_plugin(
         self, plugins: list[CommonPlugin] | None, stream_config: MessageStreamConfig
     ) -> None:
@@ -854,6 +858,7 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
             for label in vsb_labels:
                 self.fusion_engine.give_virtual_state_block_aux_data(label, [message])
 
+    @override
     def process_pntos_message(self, message: Message, sequenced: bool) -> None:
         preprocessed_messages = self._preprocess_message(message)
         if preprocessed_messages is None:
@@ -901,6 +906,7 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
         self._propagate_during_outage()
 
     @property
+    @override
     def filter_description_list(self) -> list[str]:
         descriptions = []
         aspn_pva = 'ASPN_MEASUREMENT_POSITION_VELOCITY_ATTITUDE_ESTIMATE'
@@ -910,6 +916,7 @@ class StandardOrchestrationPlugin(OrchestrationPlugin):
 
         return descriptions
 
+    @override
     def request_solutions(
         self,
         solution_times: list[TypeTimestamp],

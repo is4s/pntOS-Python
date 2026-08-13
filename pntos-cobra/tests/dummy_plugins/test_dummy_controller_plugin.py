@@ -11,6 +11,7 @@ from pntos.cobra import (
     DummyTransportPlugin,
 )
 from pntos.cobra.internal import DummyMediator
+from typing_extensions import override
 
 
 class DoStuffPlugin(CommonPlugin):
@@ -27,6 +28,7 @@ class DoStuffPlugin(CommonPlugin):
         self.th = None
         self.did_log = False
 
+    @override
     def init_plugin(
         self,
         plugin_resources_location: str | None = None,
@@ -60,6 +62,7 @@ class DoStuffPlugin(CommonPlugin):
                 self.do_stuff = False
             loops -= 1
 
+    @override
     def shutdown_plugin(self) -> None:
         self.do_stuff = False
         if self.th:

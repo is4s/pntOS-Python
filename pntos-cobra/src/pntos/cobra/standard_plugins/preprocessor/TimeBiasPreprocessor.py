@@ -11,6 +11,7 @@ from pntos.cobra.config import (
     TimeBiasConfig,
 )
 from pntos.cobra.utils import has_tov
+from typing_extensions import override
 
 
 class TimeBiasPreprocessor(Preprocessor):
@@ -40,6 +41,7 @@ class TimeBiasPreprocessor(Preprocessor):
         self._channels_to_correct = config.channels_to_correct
         self._time_bias = config.time_bias
 
+    @override
     def process_pntos_message(self, message: Message) -> list[Message] | None:
         if message.source_identifier not in self._channels_to_correct:
             return [message]

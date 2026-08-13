@@ -30,6 +30,7 @@ from pntos.cobra.config import (
     config_from_registry,
 )
 from pntos.cobra.internal import DummyMediator, StandardKeyValueStore
+from typing_extensions import override
 
 my_config: list[BaseConfig] = [
     ImuConfig(
@@ -79,6 +80,7 @@ def dummy_log(level: LoggingLevel, message: str) -> None:
 
 
 class LocalDummyMediator(DummyMediator):
+    @override
     def log_message(self, level: LoggingLevel, message: str) -> None:
         dummy_log(level, message)
 
@@ -89,6 +91,7 @@ class LocalDummyControllerPlugin(DummyControllerPlugin):
     def __init__(self, identifier: str) -> None:
         super().__init__(identifier)
 
+    @override
     def take_control(
         self,
         plugins: list[CommonPlugin],

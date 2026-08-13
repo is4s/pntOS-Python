@@ -9,6 +9,7 @@ from common_api_representation import (  # ty:ignore[unresolved-import]
     ApiFunction,
     ApiModule,
 )
+from typing_extensions import override
 
 PY_TO_C: dict[str, str] = {
     'type[FusionStrategyType]': 'FusionType',
@@ -37,6 +38,7 @@ class ApiVisitor(ast.NodeVisitor):
         self.module = ApiModule(name=module_name)
         self.curr_class = None
 
+    @override
     def visit_Module(self, node: ast.Module) -> None:
         """
         Customized method for visiting modules.
@@ -47,6 +49,7 @@ class ApiVisitor(ast.NodeVisitor):
             if isinstance(stmt, ast.ClassDef):
                 self.visit(stmt)
 
+    @override
     def visit_ClassDef(self, node: ast.ClassDef) -> None:
         """
         Customized method for visiting classes.
@@ -61,6 +64,7 @@ class ApiVisitor(ast.NodeVisitor):
         self.module.add_class(cls)
         self.curr_class = None
 
+    @override
     def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
         """Customized method for visiting methods and their arguments."""
         assert self.curr_class is not None
@@ -83,6 +87,7 @@ class ApiVisitor(ast.NodeVisitor):
         func = ApiFunction(name=name, return_type=return_type, parameters=params)
         self.curr_class.add_method(func)
 
+    @override
     def visit_AnnAssign(self, node: ast.AnnAssign) -> None:
         """Customized method for visiting class attributes."""
         assert self.curr_class is not None

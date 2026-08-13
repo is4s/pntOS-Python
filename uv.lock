@@ -1356,12 +1356,14 @@ source = { editable = "pntos-api" }
 dependencies = [
     { name = "aspn23" },
     { name = "numpy" },
+    { name = "typing-extensions" },
 ]
 
 [package.metadata]
 requires-dist = [
     { name = "aspn23", specifier = "==0.1.0" },
     { name = "numpy" },
+    { name = "typing-extensions", specifier = ">=4.14.1" },
 ]
 
 [[package]]
@@ -1385,6 +1387,7 @@ dependencies = [
     { name = "scipy", version = "1.15.3", source = { registry = "https://pypi.org/simple/" }, marker = "python_full_version < '3.11'" },
     { name = "scipy", version = "1.16.1", source = { registry = "https://pypi.org/simple/" }, marker = "python_full_version >= '3.11'" },
     { name = "tqdm" },
+    { name = "typing-extensions" },
 ]
 
 [package.metadata]
@@ -1404,6 +1407,7 @@ requires-dist = [
     { name = "pydantic", specifier = ">=2.0.0" },
     { name = "scipy", specifier = ">=1.15.2" },
     { name = "tqdm" },
+    { name = "typing-extensions", specifier = ">=4.14.1" },
 ]
 
 [[package]]
@@ -1440,6 +1444,7 @@ dependencies = [
     { name = "pntos-extras" },
     { name = "pntos-python-datasets-lcm" },
     { name = "pntos-python-datasets-ros" },
+    { name = "typing-extensions" },
 ]
 
 [package.dev-dependencies]
@@ -1474,6 +1479,7 @@ requires-dist = [
     { name = "pntos-extras", editable = "pntos-extras" },
     { name = "pntos-python-datasets-lcm", specifier = "==0.1.0" },
     { name = "pntos-python-datasets-ros", specifier = "==0.1.0" },
+    { name = "typing-extensions", specifier = ">=4.14.1" },
 ]
 
 [package.metadata.requires-dev]

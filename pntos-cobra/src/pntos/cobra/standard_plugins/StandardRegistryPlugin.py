@@ -23,6 +23,7 @@ from pntos.api import (
 )
 from pntos.cobra.config import BaseConfig, config_to_registry
 from pntos.cobra.utils import print_message
+from typing_extensions import override
 
 REGISTRY_DATA_FORMAT = KeyValueStoreDataFormat.UNSPECIFIED
 REGISTRY_SEPARATOR = ', '
@@ -168,6 +169,7 @@ class StandardKeyValueStore(KeyValueStore):
         else:
             self._store = {}
 
+    @override
     def keys(self) -> list[str] | None:
         self._check_batch_operation()
         keys = self._store.keys()
@@ -175,16 +177,19 @@ class StandardKeyValueStore(KeyValueStore):
             return None
         return list(keys)
 
+    @override
     def __contains__(self, key: str) -> bool:
         """Wrapper function for dictionary-like kvstore."""
         self._check_batch_operation()
         return key in self._store
 
+    @override
     def __setitem__(self, key: str, value: RegistryValueTypeUnion) -> None:
         """Wrapper function for dictionary-like kvstore."""
         self._check_batch_operation()
         self.set_value(key, value)
 
+    @override
     def __getitem__(self, key: str) -> RegistryValueTypeUnion | None:
         self._check_batch_operation()
         if key in self._store:
@@ -195,6 +200,7 @@ class StandardKeyValueStore(KeyValueStore):
         )
         return None
 
+    @override
     def __delitem__(self, key: str) -> None:
         self._check_batch_operation()
         if key in self._store:
@@ -208,9 +214,11 @@ class StandardKeyValueStore(KeyValueStore):
         if key in self._permanent_keys and self._set_permanent:
             self._permanent_keys.remove(key)
 
+    @override
     def __len__(self) -> int:
         return len(self._store)
 
+    @override
     def get_value(
         self, key: str, value_type: type[RegistryValueType]
     ) -> RegistryValueType | None:
@@ -298,6 +306,7 @@ class StandardKeyValueStore(KeyValueStore):
                 pass
         return None
 
+    @override
     def get_raw(self, key: str | None = None) -> bytes | None:
         self._check_batch_operation()
         if key is None:
@@ -321,6 +330,7 @@ class StandardKeyValueStore(KeyValueStore):
             )
         return None
 
+    @override
     def set_value(self, key: str, value: RegistryValueTypeUnion) -> None:
         self._check_batch_operation()
         if not self._check_valid_type(value):
@@ -339,6 +349,7 @@ class StandardKeyValueStore(KeyValueStore):
         self._store[key] = value
         return
 
+    @override
     def set_raw(self, key: str | None, bytes: bytes) -> None:
         self._check_batch_operation()
         if key is None:
@@ -349,11 +360,13 @@ class StandardKeyValueStore(KeyValueStore):
             return
         self[key] = bytes.decode(self._encoding)
 
+    @override
     def remove_key(self, key: str) -> bool:
         self._check_batch_operation()
         del self[key]
         return True
 
+    @override
     def batch_end(self) -> None:
         self._check_batch_operation()
 
@@ -387,6 +400,7 @@ class StandardKeyValueStore(KeyValueStore):
         self._modified_keys = set()
         self._batch_live = False
 
+    @override
     def batch_restart(self) -> None:
         if self._batch_live:
             self._log(
@@ -398,6 +412,7 @@ class StandardKeyValueStore(KeyValueStore):
         self._modified_keys = set()
         return
 
+    @override
     def request_notify(
         self,
         key: str | None,
@@ -410,6 +425,7 @@ class StandardKeyValueStore(KeyValueStore):
             self._callbacks[key].append(callback)
         return True
 
+    @override
     def remove_notify(
         self,
         key: str | None,
@@ -426,10 +442,12 @@ class StandardKeyValueStore(KeyValueStore):
             return removed_any
         return False
 
+    @override
     def __iter__(self) -> Iterator[str]:
         self._check_batch_operation()
         return iter(self._store)
 
+    @override
     def clear(self) -> None:
         self._check_batch_operation()
         self._store.clear()
@@ -437,19 +455,23 @@ class StandardKeyValueStore(KeyValueStore):
         self._modified_keys = set()
         self._permanent_keys = set()
 
+    @override
     def values(self) -> list[RegistryValueTypeUnion]:
         self._check_batch_operation()
         return list(self._store.values())
 
+    @override
     def items(self) -> list[tuple[str, RegistryValueTypeUnion]]:
         self._check_batch_operation()
         return [(k, v) for k, v in self._store.items()]
 
+    @override
     def set_permanent(self, permanent: bool) -> bool:
         self._check_batch_operation()
         self._set_permanent = permanent
         return True
 
+    @override
     def get_type(self, key: str) -> type[RegistryValueTypeUnion] | None:
         self._check_batch_operation()
         if key in self._store:
@@ -509,6 +531,7 @@ class StandardRegistry(Registry):
         self._log = log_func
         self._plugin_resources_location = plugin_resources_location
 
+    @override
     def batch_start(self, group: str) -> KeyValueStore:
         if group not in self.groups:
             self.groups[group] = StandardKeyValueStore(
@@ -522,14 +545,17 @@ class StandardRegistry(Registry):
         return self.groups[group]
 
     @property
+    @override
     def group_array(self) -> list[str] | None:
         if len(self.groups) == 0:
             return None
         return list(self.groups.keys())
 
+    @override
     def has_group(self, group: str) -> bool:
         return group in self.groups
 
+    @override
     def request_notify_new_group(self, callback: Callable[[str], None]) -> bool:
         self.callbacks.append(callback)
         return True
@@ -558,6 +584,7 @@ class StandardRegistryPlugin(RegistryPlugin):
         self.registries = []
         self.config = config if config is not None else []
 
+    @override
     def init_plugin(
         self,
         plugin_resources_location: str | None = None,
@@ -582,6 +609,7 @@ class StandardRegistryPlugin(RegistryPlugin):
 
         # Make sure to only add supported configs to registry
 
+    @override
     def shutdown_plugin(self) -> None:
         # Batch-end any open key-value stores
         for registry in self.registries:
@@ -591,6 +619,7 @@ class StandardRegistryPlugin(RegistryPlugin):
 
     identifier: str
 
+    @override
     def new_registry(self, initial_config: str | None = None) -> Registry:
         if initial_config is not None:
             self._log(

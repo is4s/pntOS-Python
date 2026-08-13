@@ -22,4 +22,5 @@ classifiers = [
 dependencies = [
     "aspn23==0.1.0",
     "numpy",
+    "typing-extensions>=4.14.1",
 ]

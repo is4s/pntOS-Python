@@ -1,5 +1,3 @@
-"""Python API of pntOS."""
-
 import copy
 from dataclasses import dataclass
 
@@ -26,6 +24,7 @@ from pntos.api import (
 )
 from pntos.cobra.config import FusionEngineConfig, config_from_registry
 from pntos.cobra.utils import has_tov, validate_array
+from typing_extensions import override
 
 from .VirtualStateBlockManager import (
     VirtualStateBlockManager,
@@ -73,19 +72,23 @@ class StandardFusionEngine(api.StandardFusionEngine):
         self._saved_state_labels: list[str] = []
 
     @property
+    @override
     def time(self) -> TypeTimestamp:
         """The current time of the filter."""
         return self._time
 
     @time.setter
+    @override
     def time(self, timestamp: TypeTimestamp) -> None:
         self._time = timestamp
 
     @property
+    @override
     def strategy(self) -> StandardFusionStrategy | None:
         return self._strategy
 
     @strategy.setter
+    @override
     def strategy(self, strategy: StandardFusionStrategy | None) -> None:
         self._strategy = strategy
 
@@ -132,16 +135,19 @@ class StandardFusionEngine(api.StandardFusionEngine):
             kv['sigma'] = np.sqrt(np.diagonal(covariance))
 
     @property
+    @override
     def num_states(self) -> int:
         return self._num_states
 
     @property
+    @override
     def state_block_labels(self) -> list[str] | None:
         if self._num_states > 0:
             return list(self._sb.keys())
         self._mediator.log_message(LoggingLevel.WARN, 'No state blocks added.')
         return None
 
+    @override
     def add_state_block(
         self,
         block: StandardStateBlock,
@@ -228,6 +234,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
             new_sb  # Adds this sb descriptor to the end of the current list of stateblocks
         )
 
+    @override
     def get_state_block_estimate(self, block_label: str) -> NDArray[float64] | None:
         assert self._strategy is not None, 'FusionStrategy has not been set'
         block_found = block_label in self._sb
@@ -264,6 +271,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
             est, real_label, block_label, self.time
         )
 
+    @override
     def get_state_block_covariance(self, block_label: str) -> NDArray[float64] | None:
         assert self._strategy is not None, 'FusionStrategy has not been set'
         block_found = block_label in self._sb
@@ -312,6 +320,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
             return None
         return (jac @ cov) @ jac.T
 
+    @override
     def get_state_block_cross_covariance(
         self, block_label1: str, block_label2: str
     ) -> NDArray[float64] | None:
@@ -381,6 +390,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
             return None
         return (jac1 @ cov) @ jac2.T
 
+    @override
     def set_state_block_estimate(
         self, block_label: str, estimate: NDArray[float64]
     ) -> None:
@@ -410,6 +420,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
         # Make the change
         self._strategy.set_estimate_slice(estimate, this_sb.start_index)
 
+    @override
     def set_state_block_covariance(
         self, block_label: str, covariance: NDArray[float64]
     ) -> None:
@@ -439,6 +450,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
             first_row=this_sb.start_index,
         )
 
+    @override
     def set_state_block_cross_covariance(
         self, block_label1: str, block_label2: str, covariance: NDArray[float64]
     ) -> None:
@@ -486,6 +498,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
             first_col=sb1.start_index,
         )
 
+    @override
     def remove_state_block(self, block_label: str) -> None:
         assert self._strategy is not None, 'FusionStrategy has not been set'
         if block_label not in self._sb:
@@ -511,24 +524,30 @@ class StandardFusionEngine(api.StandardFusionEngine):
         self._re_index_stateblocks()
 
     @property
+    @override
     def virtual_state_block_target_labels(self) -> list[str] | None:
         return self._vsb_manager.get_virtual_state_block_labels()
 
+    @override
     def has_virtual_state_block(self, vsb_target_label: str) -> bool:
         return vsb_target_label in self._vsb_manager._node_map
 
+    @override
     def add_virtual_state_block(self, virtual_state_block: VirtualStateBlock) -> None:
         self._vsb_manager.add_virtual_state_block(virtual_state_block)
 
+    @override
     def remove_virtual_state_block(self, vsb_target_label: str) -> None:
         self._vsb_manager.remove_virtual_state_block(vsb_target_label)
 
     @property
+    @override
     def measurement_processor_labels(self) -> list[str] | None:
         if not self._mp.keys():
             return None
         return list(self._mp.keys())
 
+    @override
     def add_measurement_processor(
         self, processor: StandardMeasurementProcessor
     ) -> None:
@@ -541,6 +560,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
 
         self._mp[processor.label] = processor
 
+    @override
     def remove_measurement_processor(self, processor_label: str) -> None:
         if processor_label not in self._mp:
             self._mediator.log_message(
@@ -552,6 +572,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
 
         del self._mp[processor_label]
 
+    @override
     def propagate(self, time: TypeTimestamp) -> None:
         assert self._strategy is not None, 'FusionStrategy has not been set'
         if time.elapsed_nsec < self.time.elapsed_nsec:
@@ -627,6 +648,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
         if self._save_x_and_p_after_prop:
             self._save_x_and_p_to_registry()
 
+    @override
     def update(self, processor_label: str, message: Message) -> None:
         assert self._strategy is not None, 'FusionStrategy has not been set'
         # Verify processor exists
@@ -744,6 +766,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
             real_label = self._vsb_manager.get_start_block_label(label)
         return real_label
 
+    @override
     def peek_ahead(
         self, time: TypeTimestamp, block_labels: list[str]
     ) -> EstimateWithCovariance | None:
@@ -786,6 +809,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
         # Pull out the desired states
         return peekahead_fusion.generate_x_and_p(block_labels=block_labels)
 
+    @override
     def generate_x_and_p(
         self, block_labels: list[str]
     ) -> EstimateWithCovariance | None:
@@ -877,6 +901,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
                 col0 = col1
         return cov_out
 
+    @override
     def give_state_block_aux_data(
         self, block_label: str, aux: list[Message | None]
     ) -> None:
@@ -890,6 +915,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
 
         self._sb[block_label].block.receive_aux_data(aux)
 
+    @override
     def give_measurement_processor_aux_data(
         self, processor_label: str, aux: list[Message | None]
     ) -> None:
@@ -903,6 +929,7 @@ class StandardFusionEngine(api.StandardFusionEngine):
 
         self._mp[processor_label].receive_aux_data(aux)
 
+    @override
     def give_virtual_state_block_aux_data(
         self, target_label: str, aux: list[Message | None]
     ) -> None:
@@ -926,6 +953,7 @@ class StandardFusionPlugin(FusionPlugin):
         """
         self.identifier = identifier
 
+    @override
     def init_plugin(
         self,
         plugin_resources_location: str | None = None,
@@ -934,12 +962,15 @@ class StandardFusionPlugin(FusionPlugin):
         if mediator is not None:
             self._mediator = mediator
 
+    @override
     def shutdown_plugin(self) -> None:
         pass
 
+    @override
     def is_fusion_type_supported(self, fusion_type: type[FusionEngineType]) -> bool:
         return fusion_type == api.StandardFusionEngine
 
+    @override
     def new_fusion_engine(
         self, fusion_type: type[FusionEngineType]
     ) -> FusionEngineType | None:

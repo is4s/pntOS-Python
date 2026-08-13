@@ -12,6 +12,7 @@ from pntos.cobra.config import (
     TimeAdjusterConfig,
 )
 from pntos.cobra.utils import has_tov
+from typing_extensions import override
 
 
 class TimeAdjusterPreprocessor(Preprocessor):
@@ -32,6 +33,7 @@ class TimeAdjusterPreprocessor(Preprocessor):
         self._expected_dt_nsec = config.expected_dt_nsec
         self._tolerance_nsec = int(0.0001 * 1e9)
 
+    @override
     def process_pntos_message(self, message: Message) -> list[Message] | None:
         if message.source_identifier != self._channel_to_correct:
             return [message]

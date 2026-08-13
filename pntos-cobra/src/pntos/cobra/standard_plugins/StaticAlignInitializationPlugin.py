@@ -15,6 +15,7 @@ from pntos.cobra.config.StaticAlignmentConfig import (
     StaticAlignmentConfig,
 )
 from pntos.cobra.utils import convert_alignment, convert_message, convert_status
+from typing_extensions import override
 
 
 class StaticAlign(InertialInitializationStrategy):
@@ -46,12 +47,15 @@ class StaticAlign(InertialInitializationStrategy):
         imu_model = imu_model_from_config(config.imu_model)
         self.aligner = StaticAlignment(imu_model, config.static_time)
 
+    @override
     def request_motion_needed(self) -> InitializationMotionNeeded:
         return InitializationMotionNeeded.NO_MOTION
 
+    @override
     def request_current_status(self) -> InitializationStatus:
         return convert_status(self.aligner.check_alignment_status(), self.mediator)
 
+    @override
     def process_pntos_message(self, message: Message) -> None:
         converted_message = convert_message(message.wrapped_message)
         if converted_message is not None:
@@ -59,6 +63,7 @@ class StaticAlign(InertialInitializationStrategy):
         else:
             self.mediator.log_message(LoggingLevel.ERROR, 'Could not convert message')
 
+    @override
     def request_solution(self) -> InitialInertialSolution:
         unchecked_solution = self.aligner.get_computed_alignment()
         unchecked_covariance = self.aligner.get_computed_covariance()
@@ -85,6 +90,7 @@ class StaticAlignInitializationPlugin(InitializationPlugin):
         """
         self.identifier = identifier
 
+    @override
     def init_plugin(
         self,
         plugin_resources_location: str | None = None,
@@ -95,14 +101,17 @@ class StaticAlignInitializationPlugin(InitializationPlugin):
         else:
             print(f'Error ({self.__class__.__name__}): mediator cannot be None')
 
+    @override
     def shutdown_plugin(self) -> None:
         pass
 
+    @override
     def is_initialization_type_supported(
         self, initialization_type: type[InitializationType]
     ) -> bool:
         return initialization_type == InertialInitializationStrategy
 
+    @override
     def new_initialization_strategy(
         self,
         initialization_type: type[InitializationType],

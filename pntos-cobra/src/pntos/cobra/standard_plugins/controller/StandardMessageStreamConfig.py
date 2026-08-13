@@ -3,6 +3,7 @@ from typing import ClassVar
 from aspn23 import AspnBase
 from pntos.api import MessageStreamConfig
 from pntos.cobra.config import BufferMode
+from typing_extensions import override
 
 
 class StandardMessageStreamConfig(MessageStreamConfig):
@@ -24,35 +25,41 @@ class StandardMessageStreamConfig(MessageStreamConfig):
         By default, all messages are immediately streamed.
         """
 
+    @override
     def sequenced_stream_add(
         self, message_type: type[AspnBase], source_identifier: str | None = None
     ) -> None:
         key = (message_type, source_identifier)
         self._buffer_mode[key] = BufferMode.SEQUENCED
 
+    @override
     def sequenced_stream_remove(
         self, message_type: type[AspnBase], source_identifier: str | None = None
     ) -> None:
         key = (message_type, source_identifier)
         self._buffer_mode.pop(key, None)
 
+    @override
     def sequenced_stream_all(self, enable: bool) -> None:
         # TODO: Implement `enable` parameter - currently ambiguous (#66)
         self._buffer_mode.clear()
         self._default_mode = BufferMode.SEQUENCED
 
+    @override
     def immediate_stream_add(
         self, message_type: type[AspnBase], source_identifier: str | None = None
     ) -> None:
         key = (message_type, source_identifier)
         self._buffer_mode[key] = BufferMode.IMMEDIATE
 
+    @override
     def immediate_stream_remove(
         self, message_type: type[AspnBase], source_identifier: str | None = None
     ) -> None:
         key = (message_type, source_identifier)
         self._buffer_mode.pop(key, None)
 
+    @override
     def immediate_stream_all(self, enable: bool) -> None:
         # TODO: Implement `enable` parameter - currently ambiguous (#66)
         self._buffer_mode.clear()

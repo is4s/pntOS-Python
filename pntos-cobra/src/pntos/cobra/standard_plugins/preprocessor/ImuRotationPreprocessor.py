@@ -9,6 +9,7 @@ from pntos.api import (
     Message,
     Preprocessor,
 )
+from typing_extensions import override
 
 
 class ImuRotationPreprocessor(Preprocessor):
@@ -26,6 +27,7 @@ class ImuRotationPreprocessor(Preprocessor):
         self._imu_channel = imu_channel
         self._C_imu_to_platform = C_imu_to_platform
 
+    @override
     def process_pntos_message(self, message: Message) -> list[Message]:
         if message.source_identifier == self._imu_channel:
             if isinstance(message.wrapped_message, MeasurementImu):

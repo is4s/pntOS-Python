@@ -8,6 +8,7 @@ from pntos.api import (
     Message,
     VirtualStateBlock,
 )
+from typing_extensions import override
 
 EXPECTED_COV_DIM = 2
 
@@ -73,12 +74,14 @@ class StateExtractor(VirtualStateBlock):
         for i in range(ind_count):
             self._jac[i, indices[i]] = 1.0
 
+    @override
     def receive_aux_data(self, aux: list[Message | None]) -> None:
         self._mediator.log_message(
             LoggingLevel.WARN,
             'StateExtractor does not require aux data. This method is unimplemented.',
         )
 
+    @override
     def convert(
         self,
         estimate_with_covariance: EstimateWithCovariance,
@@ -94,6 +97,7 @@ class StateExtractor(VirtualStateBlock):
         cov = (self._jac @ estimate_with_covariance.covariance) @ self._jac.T
         return EstimateWithCovariance(estimate_with_covariance.type, state, cov)
 
+    @override
     def convert_estimate(
         self, estimate: NDArray[float64], time: TypeTimestamp
     ) -> NDArray[float64]:
@@ -107,6 +111,7 @@ class StateExtractor(VirtualStateBlock):
 
         return self._jac @ estimate
 
+    @override
     def jacobian(
         self, estimate: NDArray[float64], time: TypeTimestamp
     ) -> NDArray[float64]:

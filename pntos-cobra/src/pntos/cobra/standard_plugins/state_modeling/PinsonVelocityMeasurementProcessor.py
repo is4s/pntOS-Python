@@ -14,6 +14,7 @@ from pntos.api import (
     StandardMeasurementModel,
     StandardMeasurementProcessor,
 )
+from typing_extensions import override
 
 
 class PinsonVelocityMeasurementProcessor(StandardMeasurementProcessor):
@@ -46,6 +47,7 @@ class PinsonVelocityMeasurementProcessor(StandardMeasurementProcessor):
         self._mediator = mediator
         self._inertial_pva = None
 
+    @override
     def receive_aux_data(self, aux: list[Message | None]) -> None:
         if not aux or aux[0] is None:
             self._mediator.log_message(
@@ -78,6 +80,7 @@ class PinsonVelocityMeasurementProcessor(StandardMeasurementProcessor):
 
         self._inertial_pva = pva
 
+    @override
     def generate_model(
         self, message: Message, gen_x_and_p_func: GenXandP
     ) -> StandardMeasurementModel | None:

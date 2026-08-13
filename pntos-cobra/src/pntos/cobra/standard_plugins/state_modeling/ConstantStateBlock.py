@@ -15,6 +15,7 @@ from pntos.api import (
     StandardDynamicsModel,
     StandardStateBlock,
 )
+from typing_extensions import override
 
 
 class ConstantStateBlock(StandardStateBlock):
@@ -34,9 +35,11 @@ class ConstantStateBlock(StandardStateBlock):
         self.num_states = num_states
         self._Q = Q if Q is not None else np.zeros((num_states, num_states))
 
+    @override
     def receive_aux_data(self, aux: list[Message | None]) -> None:
         pass
 
+    @override
     def generate_dynamics(
         self,
         gen_x_and_p_func: GenXandP,

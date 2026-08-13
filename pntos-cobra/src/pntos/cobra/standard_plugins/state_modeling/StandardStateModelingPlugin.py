@@ -25,6 +25,7 @@ from pntos.cobra.config import (
     StateExtractorConfig,
     config_from_registry,
 )
+from typing_extensions import override
 
 from .AltitudeMeasurementProcessor import AltitudeMeasurementProcessor
 from .ClockBiasStateBlock import ClockBiasStateBlock
@@ -88,6 +89,7 @@ class StandardStateModelProvider(api.StandardStateModelProvider):
             StateExtractorConfig.identifier,
         ]
 
+    @override
     def new_processor(  # noqa: PLR0915
         self,
         processor_index: int,
@@ -341,6 +343,7 @@ class StandardStateModelProvider(api.StandardStateModelProvider):
         )
         return None
 
+    @override
     def new_block(
         self,
         block_index: int,
@@ -485,6 +488,7 @@ class StandardStateModelProvider(api.StandardStateModelProvider):
                 )
                 return None
 
+    @override
     def new_virtual_block(
         self,
         virtual_block_index: int,
@@ -561,6 +565,7 @@ class StandardStateModelingPlugin(StateModelingPlugin):
     def __init__(self, identifier: str) -> None:
         self.identifier = identifier
 
+    @override
     def init_plugin(
         self,
         plugin_resources_location: str | None = None,
@@ -569,9 +574,11 @@ class StandardStateModelingPlugin(StateModelingPlugin):
         if mediator is not None:
             self._mediator = mediator
 
+    @override
     def shutdown_plugin(self) -> None:
         pass
 
+    @override
     def new_state_model_provider(
         self, fusion_type: type[StateModelProviderType]
     ) -> StateModelProviderType | None:
@@ -580,5 +587,6 @@ class StandardStateModelingPlugin(StateModelingPlugin):
 
         return StandardStateModelProvider(self._mediator)
 
+    @override
     def is_fusion_type_supported(self, fusion_type: StateModelProviderType) -> bool:
         return fusion_type is api.StandardStateModelProvider

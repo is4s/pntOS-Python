@@ -14,6 +14,7 @@ from pntos.cobra.config import (
     TimeBiasConfig,
     config_from_registry,
 )
+from typing_extensions import override
 
 from .BarometerToAltitudePreprocessor import BarometerToAltitudePreprocessor
 from .DownsamplerPreprocessor import DownsamplerPreprocessor
@@ -55,6 +56,7 @@ class StandardPreprocessorPlugin(PreprocessorPlugin):
             OutageConfig.identifier,
         ]
 
+    @override
     def init_plugin(
         self,
         plugin_resources_location: str | None = None,
@@ -64,9 +66,11 @@ class StandardPreprocessorPlugin(PreprocessorPlugin):
             print('Error: mediator cannot be None')
         self.mediator = mediator
 
+    @override
     def shutdown_plugin(self) -> None:
         pass
 
+    @override
     def new_preprocessor(
         self,
         preprocessor_index: int,

@@ -3,6 +3,8 @@ from collections.abc import Callable, Sequence
 from threading import RLock
 from typing import Generic, TypeVar, overload
 
+from typing_extensions import override
+
 from pntos.api import (
     KeyValueStore,
     Registry,
@@ -217,6 +219,7 @@ class BufferedValueView(ValueView[ValueType], Generic[ValueType]):
         self._buffer_lock: RLock = RLock()
         super().__init__(registry, group, key, type)
 
+    @override
     def _callback(self, group: str, keys: list[str], kv: KeyValueStore) -> None:
         with self._value_lock:
             super()._callback(group, keys, kv)

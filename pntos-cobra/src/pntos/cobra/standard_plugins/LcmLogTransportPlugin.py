@@ -11,6 +11,7 @@ from pntos.cobra.utils import (
     process_lcm_message,
 )
 from tqdm import tqdm
+from typing_extensions import override
 
 
 class LcmLogTransportPlugin(TransportPlugin):
@@ -42,6 +43,7 @@ class LcmLogTransportPlugin(TransportPlugin):
         self.handler = None
         self._channels_found = set()
 
+    @override
     def init_plugin(
         self,
         plugin_resources_location: str | None = None,
@@ -82,6 +84,7 @@ class LcmLogTransportPlugin(TransportPlugin):
         )
         self._record_input_channels = config.record_input_channels
 
+    @override
     def shutdown_plugin(self) -> None:
         """
         PntOS plugin shutdown function
@@ -145,15 +148,18 @@ class LcmLogTransportPlugin(TransportPlugin):
             with self.mediator.registry.batch_start('controller/flags') as kvs:
                 kvs['ready_to_shutdown'] = True
 
+    @override
     def start_listening(self) -> None:
         if self._input_log:
             self._log_reader_thread = Thread(target=self.read_log, args=[])
             self._log_reader_thread.start()
             self.mediator.log_message(LoggingLevel.INFO, 'LCM log reader is running.')
 
+    @override
     def stop_listening(self) -> None:
         self._shutdown_threads.set()
 
+    @override
     def broadcast_message(
         self, message: Message, channel_name: str | None = None
     ) -> None:

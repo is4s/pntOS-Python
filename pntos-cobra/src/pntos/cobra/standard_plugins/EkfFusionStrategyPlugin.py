@@ -10,6 +10,7 @@ from pntos.api import (
     StandardMeasurementModel,
 )
 from pntos.cobra.utils import is_symmetric, validate_array
+from typing_extensions import override
 
 
 class EkfFusionStrategy(StandardFusionStrategy):
@@ -36,9 +37,11 @@ class EkfFusionStrategy(StandardFusionStrategy):
         self._mediator = mediator
 
     @property
+    @override
     def num_states(self) -> int:
         return self._num_states
 
+    @override
     def add_states(
         self,
         initial_estimate: NDArray[np.float64],
@@ -98,6 +101,7 @@ class EkfFusionStrategy(StandardFusionStrategy):
 
         return index_of_first_state_added
 
+    @override
     def remove_states(self, first_index: int, count: int) -> None:
         # Make sure states exist
         if count <= 0:
@@ -122,11 +126,13 @@ class EkfFusionStrategy(StandardFusionStrategy):
         self._num_states -= count
 
     @property
+    @override
     def estimate(self) -> NDArray[np.float64] | None:
         if self._num_states == 0:
             return None
         return self._x
 
+    @override
     def set_estimate_slice(
         self, new_estimate: NDArray[np.float64], first_index: int
     ) -> None:
@@ -142,11 +148,13 @@ class EkfFusionStrategy(StandardFusionStrategy):
         self._x[first_index : first_index + n] = new_estimate
 
     @property
+    @override
     def covariance(self) -> NDArray[np.float64] | None:
         if self._num_states == 0:
             return None
         return self._P
 
+    @override
     def set_covariance_slice(
         self,
         new_covariance: NDArray[np.float64],
@@ -174,6 +182,7 @@ class EkfFusionStrategy(StandardFusionStrategy):
         if not is_symmetric(self._P, self._mediator, rtol, atol):
             self._P = 0.5 * (self._P + self._P.T)
 
+    @override
     def propagate(self, dynamics_model: StandardDynamicsModel) -> None:
         self._symmetrize_covariance()
 
@@ -201,6 +210,7 @@ class EkfFusionStrategy(StandardFusionStrategy):
             dynamics_model.Phi @ self._P @ dynamics_model.Phi.T + dynamics_model.Qd
         )
 
+    @override
     def update(self, measurement_model: StandardMeasurementModel) -> None:
         validate_array(measurement_model.z, self._mediator, 'z', dims=2, cols=1)
         num_meas = measurement_model.z.shape[0]
@@ -262,6 +272,7 @@ class EkfFusionStrategyPlugin(FusionStrategyPlugin):
         """
         self.identifier = identifier
 
+    @override
     def init_plugin(
         self,
         plugin_resources_location: str | None = None,
@@ -270,12 +281,15 @@ class EkfFusionStrategyPlugin(FusionStrategyPlugin):
         if mediator is not None:
             self._mediator = mediator
 
+    @override
     def shutdown_plugin(self) -> None:
         pass
 
+    @override
     def is_fusion_type_supported(self, fusion_type: type[FusionStrategyType]) -> bool:
         return fusion_type == StandardFusionStrategy
 
+    @override
     def new_fusion_strategy(
         self, fusion_type: type[FusionStrategyType]
     ) -> FusionStrategyType | None:

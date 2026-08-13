@@ -5,6 +5,7 @@ from threading import Event, Lock, Thread
 from lcm import LCM, EventLog
 from pntos.api import KeyValueStore, LoggingLevel, Mediator, UtilityPlugin
 from pntos.cobra.utils import MutableValueView
+from typing_extensions import override
 
 DISPLAY_UPDATE_INTERVAL_MS = 100
 FILE_KEY_DEFAULT_VALUE = 'Choose a file.'
@@ -40,6 +41,7 @@ class CobraUiLogPlayerPlugin(UtilityPlugin):
         self._log_thread = None
         self._passed_upload_dir = upload_dir
 
+    @override
     def init_plugin(
         self,
         plugin_resources_location: str | None = None,
@@ -257,6 +259,7 @@ class CobraUiLogPlayerPlugin(UtilityPlugin):
                     LoggingLevel.WARN, 'Having trouble shuting down'
                 )
 
+    @override
     def shutdown_plugin(self) -> None:
         self._remove_notify_new_file()
         self._remove_notify_run_thread()

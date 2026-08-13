@@ -153,6 +153,9 @@ tqdm==4.67.1
     #   pntos-cobra
 typing-extensions==4.14.1
     # via
+    #   pntos-api
+    #   pntos-cobra
+    #   pntos-python
     #   pydantic
     #   pydantic-core
     #   typing-inspection

@@ -32,6 +32,7 @@ from pntos.cobra.internal import (
     VirtualStateBlockManager,
 )
 from pntos.cobra.utils import convert_timestamp_to_cpp
+from typing_extensions import override
 
 VSB_SOURCE = 'test_source'
 
@@ -65,12 +66,14 @@ class PinsonErrorToStandardWrapped(VirtualStateBlock):
             ),
         )
 
+    @override
     def receive_aux_data(self, aux: list[Message | None]) -> None:
         for msg in reversed(aux):
             if msg is not None and isinstance(msg.wrapped_message, MeasurementPVA):
                 self._pva = msg.wrapped_message
                 break
 
+    @override
     def convert(
         self,
         estimate_with_covariance: EstimateWithCovariance,
@@ -84,11 +87,13 @@ class PinsonErrorToStandardWrapped(VirtualStateBlock):
             estimate_with_covariance.type, ewc.estimate, ewc.covariance
         )
 
+    @override
     def convert_estimate(
         self, estimate: NDArray[float64], time: TypeTimestamp
     ) -> NDArray[float64]:
         return self._pes.convert_estimate(estimate, convert_timestamp_to_cpp(time))
 
+    @override
     def jacobian(
         self, estimate: NDArray[float64], time: TypeTimestamp
     ) -> NDArray[float64]:

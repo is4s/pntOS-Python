@@ -23,6 +23,7 @@ from pntos.api import (
     StandardMeasurementModel,
     StandardMeasurementProcessor,
 )
+from typing_extensions import override
 
 NUM_PINSON_STATES = 15
 
@@ -68,6 +69,7 @@ class PinsonBodyVelocityMeasurementProcessor(StandardMeasurementProcessor):
         self._l_ps_p = l_ps_p
         self._orientation_ps_p = orientation_ps_p
 
+    @override
     def receive_aux_data(self, aux: list[Message | None]) -> None:
         if not aux:
             self._mediator.log_message(
@@ -123,6 +125,7 @@ class PinsonBodyVelocityMeasurementProcessor(StandardMeasurementProcessor):
 
         self._force_and_rate_aux = aux[1].wrapped_message
 
+    @override
     def generate_model(
         self, message: Message, gen_x_and_p_func: GenXandP
     ) -> StandardMeasurementModel | None:

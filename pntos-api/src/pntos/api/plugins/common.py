@@ -11,6 +11,7 @@ from typing import TypeVar, final
 from aspn23 import AspnBase, TypeTimestamp
 from numpy import float64
 from numpy.typing import NDArray
+from typing_extensions import override
 
 
 @dataclass
@@ -678,6 +679,7 @@ class KeyValueStore(AbstractContextManager['KeyValueStore']):
     ############# BEGIN FINAL METHODS - THESE SHOULD NOT BE OVERRIDDEN #################
 
     @final
+    @override
     def __enter__(self) -> 'KeyValueStore':
         """
         Allows for use of the ``Registry`` through Python ``with`` statements.
@@ -696,6 +698,7 @@ class KeyValueStore(AbstractContextManager['KeyValueStore']):
         return super().__enter__()
 
     @final
+    @override
     def __exit__(
         self,
         exc_type: type[BaseException] | None,

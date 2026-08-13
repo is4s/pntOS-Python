@@ -8,6 +8,7 @@ from pntos.api import (
 from pntos.cobra.config import (
     DownsamplerConfig,
 )
+from typing_extensions import override
 
 
 class DownsamplerPreprocessor(Preprocessor):
@@ -62,6 +63,7 @@ class DownsamplerPreprocessor(Preprocessor):
                 # Setting to -1 so the first message is always processed
                 self._update_counters[channel] = -1
 
+    @override
     def process_pntos_message(self, message: Message) -> list[Message] | None:
         identifier = message.source_identifier
         if identifier not in self._downsampling_factors:

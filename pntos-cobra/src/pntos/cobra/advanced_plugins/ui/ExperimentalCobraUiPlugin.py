@@ -19,7 +19,7 @@ from flask_socketio import SocketIO, emit
 from pntos.api import LoggingLevel, Mediator, UiPlugin
 from pntos.cobra.config import ExperimentalCobraUiConfig, config_from_registry
 from pntos.cobra.utils import UiMetadataInterface
-from typing_extensions import Unpack
+from typing_extensions import Unpack, override
 from werkzeug.exceptions import NotFound
 from werkzeug.utils import secure_filename
 
@@ -62,6 +62,7 @@ class ExperimentalCobraUiPlugin(UiPlugin):
         self._server_thread: Thread | None = None
         self._emitter_thread: Thread | None = None
 
+    @override
     def init_plugin(
         self,
         plugin_resources_location: str | None = None,
@@ -122,6 +123,7 @@ class ExperimentalCobraUiPlugin(UiPlugin):
             f'Web server starting on http://{self.config.host}:{self.config.port}'
         )
 
+    @override
     def shutdown_plugin(self) -> None:
         self._info('Shutting down web server...')
 
@@ -131,10 +133,12 @@ class ExperimentalCobraUiPlugin(UiPlugin):
 
         self._info('Web server shut down complete.')
 
+    @override
     def requires_main_thread(self) -> bool:
         # TODO: enable setting config and holding until set
         return False
 
+    @override
     def run_main_thread(self) -> None:
         pass
 

@@ -28,6 +28,7 @@ from pntos.cobra.utils import (
     convert_timestamp_from_cpp,
     convert_timestamp_to_cpp,
 )
+from typing_extensions import override
 
 
 class StandardInertial(StandardInertialMechanization):
@@ -74,9 +75,11 @@ class StandardInertial(StandardInertialMechanization):
             buffer_length=config.inertial_buffer_length,
         )
 
+    @override
     def request_solution_message_type(self) -> type[AspnBase]:
         return MeasurementPositionVelocityAttitude
 
+    @override
     def request_current_solution(self) -> Message:
         return Message(
             convert_pva_from_cpp(
@@ -87,6 +90,7 @@ class StandardInertial(StandardInertialMechanization):
             self.identifier,
         )
 
+    @override
     def request_solution(self, time: TypeTimestamp) -> Message | None:
         p_cpp = self.inertial.calc_pva(convert_timestamp_to_cpp(time))
         if p_cpp:
@@ -96,6 +100,7 @@ class StandardInertial(StandardInertialMechanization):
             )
         return None
 
+    @override
     def request_solutions(
         self, times: list[TypeTimestamp], solution_type: InertialSolutionRangeType
     ) -> list[Message | None] | None:
@@ -117,18 +122,23 @@ class StandardInertial(StandardInertialMechanization):
             solutions.append(Message(convert_pva_from_cpp(pva), self.identifier))
         return solutions
 
+    @override
     def is_time_in_range(self, time: TypeTimestamp) -> bool:
         return self.inertial.in_range(convert_timestamp_to_cpp(time))
 
+    @override
     def request_earliest_time(self) -> TypeTimestamp:
         return convert_timestamp_from_cpp(self.inertial.time_span()[0])
 
+    @override
     def request_latest_time(self) -> TypeTimestamp:
         return convert_timestamp_from_cpp(self.inertial.time_span()[1])
 
+    @override
     def request_process_pntos_message_types(self) -> list[type[AspnBase]]:
         return [MeasurementImu]
 
+    @override
     def process_pntos_message(self, message: Message) -> None:
         if isinstance(message.wrapped_message, MeasurementImu):
             imu_cpp = convert_imu_to_cpp(message.wrapped_message)
@@ -140,6 +150,7 @@ class StandardInertial(StandardInertialMechanization):
                 'request_process_pntos_message_types() for valid message types.',
             )
 
+    @override
     def request_forces_and_rates(
         self, time: TypeTimestamp
     ) -> InertialForcesRates | None:
@@ -148,6 +159,7 @@ class StandardInertial(StandardInertialMechanization):
         forces_and_rates = convert_imu_from_cpp(forces_and_rates_cpp)
         return InertialForcesRates(forces_and_rates, InertialFrame.INERTIAL_FRAME_NED)
 
+    @override
     def request_average_forces_and_rates(
         self, time1: TypeTimestamp, time2: TypeTimestamp
     ) -> InertialForcesRates | None:
@@ -163,9 +175,11 @@ class StandardInertial(StandardInertialMechanization):
         forces_and_rates = convert_imu_from_cpp(forces_and_rates_cpp)
         return InertialForcesRates(forces_and_rates, InertialFrame.INERTIAL_FRAME_NED)
 
+    @override
     def request_reset_message_types(self) -> list[type[AspnBase]] | None:
         return [MeasurementPositionVelocityAttitude]
 
+    @override
     def reset_solution(self, message: Message) -> None:
         if isinstance(message.wrapped_message, MeasurementPositionVelocityAttitude):
             pva = convert_pva_to_cpp(message.wrapped_message)
@@ -176,6 +190,7 @@ class StandardInertial(StandardInertialMechanization):
                 'Message must be of type MeasurementPositionVelocityAttitude.',
             )
 
+    @override
     def correct_sensor_errors(
         self, time: TypeTimestamp, errors: StandardInertialErrors
     ) -> None:
@@ -188,6 +203,7 @@ class StandardInertial(StandardInertialMechanization):
         )
         self.inertial.reset(imu_errs=errors_cpp)
 
+    @override
     def request_sensor_errors(
         self, time: TypeTimestamp
     ) -> StandardInertialErrors | None:
@@ -217,6 +233,7 @@ class StandardInertialPlugin(InertialPlugin):
         """
         self.identifier = identifier
 
+    @override
     def init_plugin(
         self,
         plugin_resources_location: str | None = None,
@@ -228,12 +245,15 @@ class StandardInertialPlugin(InertialPlugin):
             self.mediator = None
             print('Error: mediator cannot be None.')
 
+    @override
     def shutdown_plugin(self) -> None:
         pass
 
+    @override
     def is_inertial_type_supported(self, inertial_type: type[InertialType]) -> bool:
         return issubclass(inertial_type, StandardInertialMechanization)
 
+    @override
     def new_inertial(
         self,
         inertial_type: type[InertialType],

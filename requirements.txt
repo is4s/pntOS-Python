@@ -299,6 +299,9 @@ typing-extensions==4.14.1
     # via
     #   exceptiongroup
     #   ipython
+    #   pntos-api
+    #   pntos-cobra
+    #   pntos-python
     #   pydantic
     #   pydantic-core
     #   typing-inspection

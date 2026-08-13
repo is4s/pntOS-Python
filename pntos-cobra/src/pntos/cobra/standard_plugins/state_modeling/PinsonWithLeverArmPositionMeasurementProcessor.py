@@ -20,6 +20,7 @@ from pntos.api import (
     StandardMeasurementModel,
     StandardMeasurementProcessor,
 )
+from typing_extensions import override
 
 
 class PinsonWithLeverArmPositionMeasurementProcessor(StandardMeasurementProcessor):
@@ -73,6 +74,7 @@ class PinsonWithLeverArmPositionMeasurementProcessor(StandardMeasurementProcesso
                 f'PinsonWithLeverArmPositionMeasurementProcessor requires {self._num_required_blocks} state blocks, got {state_block_labels}.',
             )
 
+    @override
     def receive_aux_data(self, aux: list[Message | None]) -> None:
         """
         Receive aux data.
@@ -124,6 +126,7 @@ class PinsonWithLeverArmPositionMeasurementProcessor(StandardMeasurementProcesso
 
         self._inertial_pva = pva
 
+    @override
     def generate_model(
         self, message: Message, gen_x_and_p_func: GenXandP
     ) -> StandardMeasurementModel | None:

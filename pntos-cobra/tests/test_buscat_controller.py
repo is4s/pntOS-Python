@@ -16,6 +16,7 @@ from pntos.cobra import (
 )
 from pntos.cobra.config import BaseConfig, BuscatConfig
 from pntos.cobra.internal import BuscatMediator, DummyMediator
+from typing_extensions import override
 
 FOUND_ERROR = False
 ERROR_MESSAGE = ''
@@ -26,6 +27,7 @@ class DummyUtilityPlugin(UtilityPlugin):
         self.identifier = identifier
         self.timer = None
 
+    @override
     def init_plugin(
         self,
         plugin_resources_location: str | None = None,
@@ -33,6 +35,7 @@ class DummyUtilityPlugin(UtilityPlugin):
     ) -> None:
         self.mediator = mediator
 
+    @override
     def shutdown_plugin(self) -> None:
         return
 
@@ -42,6 +45,7 @@ class DummyUiPlugin(UiPlugin):
         self.identifier = identifier
         self.timer = None
 
+    @override
     def init_plugin(
         self,
         plugin_resources_location: str | None = None,
@@ -49,17 +53,21 @@ class DummyUiPlugin(UiPlugin):
     ) -> None:
         self.mediator = mediator
 
+    @override
     def shutdown_plugin(self) -> None:
         return
 
+    @override
     def requires_main_thread(self) -> bool:
         return True
 
+    @override
     def run_main_thread(self) -> None:
         pass
 
 
 class DummyTestMediator(DummyMediator):
+    @override
     def log_message(self, level: LoggingLevel, message: str) -> None:
         if level is LoggingLevel.ERROR:
             global ERROR_MESSAGE
@@ -74,6 +82,7 @@ class DummyTransportPlugin(TransportPlugin):
     def __init__(self, identifier: str) -> None:
         self.identifier = identifier
 
+    @override
     def init_plugin(
         self,
         plugin_resources_location: str | None = None,
@@ -82,17 +91,21 @@ class DummyTransportPlugin(TransportPlugin):
         assert mediator is not None
         self.mediator = mediator
 
+    @override
     def shutdown_plugin(self) -> None:
         return
 
+    @override
     def start_listening(self) -> None:
         print(f'Processing message from {self.identifier}')
         msg = Message(None, '')
         self.mediator.process_pntos_message(msg)
 
+    @override
     def stop_listening(self) -> None:
         pass
 
+    @override
     def broadcast_message(
         self, message: Message, channel_name: str | None = None
     ) -> None:

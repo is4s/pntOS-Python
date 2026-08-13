@@ -1,5 +1,7 @@
 from threading import Thread
 
+from typing_extensions import override
+
 try:
     import rclpy  # ty:ignore[unresolved-import]
 except ImportError as e:
@@ -42,6 +44,7 @@ class Aspn23RosTransportPlugin(TransportPlugin):
         self._topics: list[str] = []
         self._scan_timer: Timer
 
+    @override
     def init_plugin(
         self,
         plugin_resources_location: str | None = None,
@@ -67,6 +70,7 @@ class Aspn23RosTransportPlugin(TransportPlugin):
 
         self.thread = Thread(target=execute)
 
+    @override
     def shutdown_plugin(self) -> None:
         """
         PntOS plugin shutdown function
@@ -107,6 +111,7 @@ class Aspn23RosTransportPlugin(TransportPlugin):
                 LoggingLevel.DEBUG, f'Subscribed to ROS topic {topic}.'
             )
 
+    @override
     def start_listening(self) -> None:
         """Begin listening for ROS messages"""
 
@@ -114,6 +119,7 @@ class Aspn23RosTransportPlugin(TransportPlugin):
         self.thread.start()
         self.mediator.log_message(LoggingLevel.INFO, 'ROS transport started.')
 
+    @override
     def stop_listening(self) -> None:
         """Shut down all ROS subscriptions belonging to this plugin"""
         self._scan_timer.cancel()
@@ -122,6 +128,7 @@ class Aspn23RosTransportPlugin(TransportPlugin):
         self._subs.clear()
         self.mediator.log_message(LoggingLevel.INFO, 'ROS transport stopped.')
 
+    @override
     def broadcast_message(
         self, message: Message, channel_name: str | None = None
     ) -> None:

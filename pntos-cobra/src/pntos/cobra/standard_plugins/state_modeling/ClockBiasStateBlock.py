@@ -17,6 +17,7 @@ from pntos.api import (
     StandardDynamicsModel,
     StandardStateBlock,
 )
+from typing_extensions import override
 
 
 class ClockBiasStateBlock(StandardStateBlock):
@@ -41,9 +42,11 @@ class ClockBiasStateBlock(StandardStateBlock):
         self._h_neg2 = h_neg2
         self._q3 = q3
 
+    @override
     def receive_aux_data(self, aux: list[Message | None]) -> None:
         pass
 
+    @override
     def generate_dynamics(
         self,
         gen_x_and_p_func: GenXandP,

@@ -26,6 +26,7 @@ from pntos.api import (
     VirtualStateBlock,
 )
 from pntos.cobra.utils import extract_pos_and_vel
+from typing_extensions import override
 
 POS_START = 0
 POS_END = 3
@@ -83,6 +84,7 @@ class PinsonErrorToStandard(VirtualStateBlock):
         self._dy = array(((0, 0, 1), (0, 0, 0), (-1, 0, 0)))
         self._dz = array(((0, -1, 0), (1, 0, 0), (0, 0, 0)))
 
+    @override
     def receive_aux_data(self, aux: list[Message | None]) -> None:
         for msg in reversed(aux):
             if (
@@ -94,6 +96,7 @@ class PinsonErrorToStandard(VirtualStateBlock):
                 self._pva = msg.wrapped_message
                 break
 
+    @override
     def convert(
         self,
         estimate_with_covariance: EstimateWithCovariance,
@@ -106,6 +109,7 @@ class PinsonErrorToStandard(VirtualStateBlock):
             EstimateWithCovarianceType.EWC_GENERIC, state, cov
         )
 
+    @override
     def convert_estimate(
         self, estimate: NDArray[float64], time: TypeTimestamp
     ) -> NDArray[float64]:
@@ -161,6 +165,7 @@ class PinsonErrorToStandard(VirtualStateBlock):
         ).reshape(-1, 1)
         return out
 
+    @override
     def jacobian(
         self, estimate: NDArray[float64], time: TypeTimestamp
     ) -> NDArray[float64]:

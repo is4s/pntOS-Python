@@ -21,6 +21,7 @@ from pntos.api import (
     StandardMeasurementModel,
     StandardMeasurementProcessor,
 )
+from typing_extensions import override
 
 
 class PositionMeasurementProcessor(StandardMeasurementProcessor):
@@ -61,12 +62,14 @@ class PositionMeasurementProcessor(StandardMeasurementProcessor):
         self._mediator = mediator
         self._l_ps_p = l_ps_p
 
+    @override
     def receive_aux_data(self, aux: list[Message | None]) -> None:
         self._mediator.log_message(
             LoggingLevel.DEBUG,
             'PositionMeasurementProcessor does not require aux data.',
         )
 
+    @override
     def generate_model(
         self,
         message: Message,

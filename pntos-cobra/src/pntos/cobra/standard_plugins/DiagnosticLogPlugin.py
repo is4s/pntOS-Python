@@ -8,6 +8,7 @@ from pntos.api import (
     UtilityPlugin,
 )
 from pntos.cobra.utils import save_to_hdf5_file
+from typing_extensions import override
 
 GROUP_TO_WATCH = 'diagnostics'
 OUTPUT_FILE = Path('./OUTPUT.hdf5')
@@ -38,6 +39,7 @@ class DiagnosticLogPlugin(UtilityPlugin):
         self._output_file = output_file if output_file is not None else OUTPUT_FILE
         self._store: dict[str, list[RegistryValueTypeUnion]] = {}
 
+    @override
     def init_plugin(
         self,
         plugin_resources_location: str | None = None,
@@ -52,6 +54,7 @@ class DiagnosticLogPlugin(UtilityPlugin):
         kv.request_notify(None, self._callback)
         kv.batch_end()
 
+    @override
     def shutdown_plugin(self) -> None:
         if self._store:
             save_to_hdf5_file(self._output_file, self._store, self.mediator)

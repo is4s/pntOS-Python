@@ -18,6 +18,7 @@ from pntos.api import (
     StandardMeasurementModel,
     StandardMeasurementProcessor,
 )
+from typing_extensions import override
 
 
 class AltitudeMeasurementProcessor(StandardMeasurementProcessor):
@@ -66,6 +67,7 @@ class AltitudeMeasurementProcessor(StandardMeasurementProcessor):
         self._inertial_pos = np.zeros(3)
         self._l_ps_p = l_ps_p
 
+    @override
     def receive_aux_data(self, aux: list[Message | None]) -> None:
         # Receive and store estimated inertial solution
         if not aux or aux[0] is None:
@@ -120,6 +122,7 @@ class AltitudeMeasurementProcessor(StandardMeasurementProcessor):
 
         self._C_platform_to_nav = quat_to_dcm(pva.quaternion)
 
+    @override
     def generate_model(
         self, message: Message, gen_x_and_p_func: GenXandP
     ) -> StandardMeasurementModel | None:
