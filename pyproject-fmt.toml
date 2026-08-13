@@ -2,4 +2,4 @@ keep_full_version = true
 indent = 4
 column_width = 88
 skip_wrap_for_keys = [ "*" ]
-max_supported_python = "3.13"
+max_supported_python = "3.14"

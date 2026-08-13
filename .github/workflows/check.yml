@@ -110,8 +110,8 @@ jobs:
             name: coverage-report
             path: htmlcov/*
 
-    Python-3_13-Test:
-        name: Python 3.13 Test
+    Python-Latest-Test:
+        name: Python 3.14 Test
         runs-on: ubuntu-24.04
         steps:
         - uses: actions/checkout@v4
@@ -119,7 +119,7 @@ jobs:
         - name: Set up
           uses: ./.github/actions/setup
           with:
-            python: 3.13
+            python: 3.14
 
         - name: Run tests
           run: docker exec pntos-python pytest pntos-cobra pntos-extras --cov

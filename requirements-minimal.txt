@@ -53,7 +53,7 @@ fonttools==4.59.0
     # via matplotlib
 h11==0.16.0
     # via wsproto
-h5py==3.14.0
+h5py==3.16.0
     # via pntos-cobra
 inu==1.1.0
     # via navanalysis-lcm
@@ -65,7 +65,7 @@ jinja2==3.1.6
     #   flask-socketio
 kiwisolver==1.4.8
     # via matplotlib
-lcm==1.5.1
+lcm==1.5.2
     # via
     #   aspn23-lcm
     #   navanalysis-lcm
@@ -144,7 +144,7 @@ python-engineio==4.13.2
     # via python-socketio
 python-socketio==5.16.2
     # via flask-socketio
-pyyaml==6.0.2
+pyyaml==6.0.3
     # via navanalysis-lcm
 rich==15.0.0
     # via textual
