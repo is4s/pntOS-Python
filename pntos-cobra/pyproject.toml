@@ -1,17 +1,16 @@
 [build-system]
 build-backend = "setuptools.build_meta"
-requires = [ "pntos-python-docs-data", "setuptools>=68", "wheel" ]
+requires = [ "pntos-python-docs-data", "setuptools>=68" ]
 
 [project]
 name = "pntos-cobra"
 version = "2.1.0-0.dev3"
 description = "A Python implementation of a set of pntOS example plugins."
 readme = "README.md"
-license = 'Apache-2.0'
-license-files = [ 'LICENSE' ]
-
+license = "Apache-2.0"
+license-files = [ "LICENSE" ]
 authors = [ { name = "IS4S", email = "pntos@is4s.com" } ]
-requires-python = ">=3.10"
+requires-python = ">=3.10,<3.14"
 classifiers = [
     "Programming Language :: Python :: 3 :: Only",
     "Programming Language :: Python :: 3.10",
@@ -43,15 +42,8 @@ scripts.catalog = "pntos.cobra.utils.plugins:cobra_catalog"
 
 [tool.setuptools]
 include-package-data = true
+package-data.pntos-cobra = [ "advanced_plugins/ui/_static/dist/**/*" ]
 
-[tool.setuptools.package-data]
-pntos-cobra = [
-    "advanced_plugins/ui/_static/dist/**/*",
-]
-
-[[tool.uv.index]]
-name = "pypi"
-url = "https://pypi.org/simple/"
-
-[tool.uv.sources]
-navtk = { index = "pypi" }
+[tool.uv]
+sources.navtk = { index = "pypi" }
+index = [ { name = "pypi", url = "https://pypi.org/simple/" } ]

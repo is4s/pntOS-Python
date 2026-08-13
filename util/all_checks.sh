@@ -10,10 +10,7 @@ set -xe
 
 ruff check --fix
 ruff format
-pyproject-fmt pyproject.toml --column-width 88 --indent 4 --keep-full-version
-pyproject-fmt pntos-api/pyproject.toml --column-width 88 --indent 4 --keep-full-version
-pyproject-fmt pntos-cobra/pyproject.toml --column-width 88 --indent 4 --keep-full-version
-pyproject-fmt pntos-extras/pyproject.toml --column-width 88 --indent 4 --keep-full-version
+pyproject-fmt pyproject.toml pntos-*/pyproject.toml
 ty check
 util/check_sync.sh
 ret_val=$?  # this must be set after check_sync to observe if it passed or not

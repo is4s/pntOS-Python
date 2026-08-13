@@ -6,7 +6,7 @@ readme = "README.md"
 license = "Apache-2.0"
 license-files = [ "LICENSE" ]
 authors = [ { name = "IS4S", email = "pntos@is4s.com" } ]
-requires-python = ">=3.10"
+requires-python = ">=3.10,<3.14"
 classifiers = [
     "Programming Language :: Python :: 3 :: Only",
     "Programming Language :: Python :: 3.10",
@@ -34,7 +34,7 @@ dev = [
     "myst-parser>=4",
     "pip>=24",
     "pntos-cobra-docs-data",
-    "pyproject-fmt>=2.7",
+    "pyproject-fmt==2.25.3",
     "pytest>=8.2",
     "pytest-cov>=6",
     "ruff==0.16.0",
@@ -45,6 +45,13 @@ dev = [
     "sphinx-rtd-theme>=3.0.2",
     "ty==0.0.64",
 ]
+
+[tool.uv]
+sources.pntos-api = { workspace = true }
+sources.pntos-cobra = { workspace = true }
+sources.pntos-extras = { workspace = true }
+package = false
+workspace.members = [ "pntos-api", "pntos-cobra", "pntos-extras" ]
 
 [tool.ruff]
 format.quote-style = "single"
@@ -118,6 +125,15 @@ lint.per-file-ignores."util/*" = [ "D", "F" ]
 lint.isort.combine-as-imports = true
 lint.pydocstyle.convention = "google"
 
+[tool.ty]
+src.exclude = [
+    "pntos-cobra/src/pntos/cobra/dummy_plugins/*",
+    "pntos-cobra/src/pntos/cobra/tutorial_plugins/*",
+]
+rules.all = "error"
+rules.missing-type-argument = "ignore"
+analysis.strict-equality-semantics = false
+
 [tool.pytest]
 # NOTE: while coverage flags are provided here, coverage is not enabled as it doesn't work when
 # debugging tests. To enable coverage, pass `--cov` flag when running pytest, and the flags below
@@ -141,27 +157,3 @@ run.omit = [
     # App-running utils
     "pntos-cobra/src/pntos/cobra/utils/apps.py",
 ]
-
-[tool.uv]
-sources.pntos-api = { workspace = true }
-sources.pntos-cobra = { workspace = true }
-sources.pntos-extras = { workspace = true }
-sources.pntos-python-datasets-aspn2-lcm = { index = "wheelhouse" }
-package = false
-workspace.members = [ "pntos-api", "pntos-cobra", "pntos-extras" ]
-
-[[tool.uv.index]]
-name = "pypi"
-url = "https://pypi.org/simple/"
-default = true
-
-[tool.ty]
-src.exclude = [
-    "pntos-cobra/src/pntos/cobra/dummy_plugins/*",
-    "pntos-cobra/src/pntos/cobra/tutorial_plugins/*",
-]
-rules.all = "error"
-rules.missing-type-argument = "ignore"
-
-[tool.ty.analysis]
-strict-equality-semantics = false
