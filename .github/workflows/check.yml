@@ -124,6 +124,26 @@ jobs:
         - name: Run tests
           run: docker exec pntos-python pytest pntos-cobra pntos-extras --cov
 
+    Dependency-Upgrade-Test:
+        name: Dependency Upgrade Test
+        runs-on: ubuntu-24.04
+        steps:
+        - uses: actions/checkout@v4
+
+        - name: Set up
+          uses: ./.github/actions/setup
+          with:
+            sync: false
+
+        - name: Upgrade
+          run: docker exec pntos-python uv sync --upgrade
+
+        - name: Check
+          run: |
+            docker exec pntos-python ty check
+            docker exec pntos-python ruff check
+            docker exec pntos-python pytest pntos-cobra pntos-extras
+
     ROS-Test:
         name: ROS Transport Tests
         runs-on: ubuntu-24.04
