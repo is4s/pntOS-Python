@@ -1,6 +1,17 @@
+import argparse
 import re
+import typing
+from abc import ABC, abstractmethod
 from collections.abc import Callable
 from dataclasses import dataclass, field
+from typing import Any
+
+from rich import print as rich_print
+from rich.tree import Tree as RichTree
+from textual.app import App, ComposeResult
+from textual.widgets import Tree as TextualTree
+from textual.widgets.tree import TreeNode
+from typing_extensions import override
 
 from pntos.api import (
     CommonPlugin,
@@ -11,16 +22,21 @@ from pntos.api import (
     InitializationPlugin,
     LoggingLevel,
     LoggingPlugin,
+    Mediator,
     OrchestrationPlugin,
     PlatformIntegrationPlugin,
     PluginType,
     PreprocessorPlugin,
     RegistryPlugin,
+    StandardStateModelProvider,
     StateModelingPlugin,
+    StateModelProviderType,
     TransportPlugin,
     UiPlugin,
     UtilityPlugin,
 )
+
+from ..dummy_plugins.DummyMediator import DummyMediator  # noqa: TID252
 
 
 @dataclass
@@ -217,3 +233,314 @@ def camel_to_snake(name: str) -> str:
 
     """
     return re.sub(r'(?<!^)(?=[A-Z])', '_', name).lower()
+
+
+class _CatalogLoggingPlugin(LoggingPlugin):
+    """
+    This logger is used to catch any errors that occur when in the catalog function when attempting to introspect plugins, in order to display
+    an error message in the tree, as opposed to giving no indication that introspecting was attempted at all.
+    """
+
+    def __init__(self) -> None:
+        self.error: str | None = None
+
+    @override
+    def init_plugin(
+        self,
+        plugin_resources_location: str | None = None,
+        mediator: Mediator | None = None,
+    ) -> None:
+        pass
+
+    @override
+    def log(
+        self,
+        source_plugin_type: PluginType,
+        source_plugin_identifier: str,
+        level: LoggingLevel,
+        message: str,
+    ) -> None:
+        """
+        If the passed LoggingLevel is an error, that is saved to this plugin's internal error variable.
+        """
+        if level == LoggingLevel.ERROR:
+            self.error = message
+
+    @override
+    def shutdown_plugin(self) -> None:
+        pass
+
+
+def cobra_catalog() -> None:
+    """
+    Launches a textual app (or simply prints a tree to the terminal) that contains a tree view of all implemented
+    plugins, sorted by type. An example output could be::
+
+        All Available Plugins
+        ├── ControllerPlugins
+        │   ├── DummyControllerPlugin
+        │   ├── StandardControllerPlugin
+        │   └── BuscatControllerPlugin
+        ├── FusionPlugins
+        │   └── StandardFusionPlugin
+        └── FusionStrategyPlugins
+            └── EkfFusionStrategyPlugin
+    """
+    # A list of all Plugin Types/Categories to be queried through
+    plugin_types: list[PluginType] = [
+        ControllerPlugin,
+        FusionPlugin,
+        FusionStrategyPlugin,
+        InertialPlugin,
+        InitializationPlugin,
+        LoggingPlugin,
+        OrchestrationPlugin,
+        PlatformIntegrationPlugin,
+        PreprocessorPlugin,
+        RegistryPlugin,
+        StateModelingPlugin,
+        TransportPlugin,
+        UiPlugin,
+        UtilityPlugin,
+    ]
+    parser = argparse.ArgumentParser(
+        description='Allows the user to view available plugins in a hierarchial structure.'
+    )
+    parser.add_argument(
+        '--match',
+        '-m',
+        default='.*',
+        help='ReGex pattern for matching outputted plugins. Ex: "Tutorial*"',
+    )
+    parser.add_argument(
+        '--type',
+        '-t',
+        default=None,
+        help='Specific category you want to view all plugins within. Ex: "ControllerPlugin"',
+    )
+    parser.add_argument(
+        '-p',
+        '--print',
+        action='store_true',
+        help='If specified, will print the plugin tree directly to the terminal as opposed to launching an interactive app.',
+    )
+    args, _ = parser.parse_known_args()
+    if args.print:
+        print_plugin_tree(args, plugin_types)
+    else:
+        catalog_app = Catalog()
+        catalog_app.args = args
+        catalog_app.plugin_types = plugin_types
+        catalog_app.run()
+
+
+class CatalogTree(ABC):
+    """Abstract interface for different tree options for the `catalog` command."""
+
+    @abstractmethod
+    def add_branch(self, label: str, expand: bool = False) -> 'CatalogTree':
+        """Adds a nested node that can contain further sub-nodes."""
+
+    @abstractmethod
+    def add_leaf(self, label: str) -> None:
+        """Adds a terminal leaf node."""
+
+
+class PrintTree(CatalogTree):
+    """Wrapper for RichTree"""
+
+    def __init__(self, root: RichTree) -> None:
+        self.root_tree = root
+
+    @override
+    def add_branch(self, label: str, expand: bool = False) -> 'PrintTree':
+        # simulate the same way the newly created sub-tree is returned when .add() is called on a RichTree
+        child_node = self.root_tree.add(label)
+        return PrintTree(child_node)
+
+    @override
+    def add_leaf(self, label: str) -> None:
+        self.root_tree.add(label)
+
+
+class TerminalTree(CatalogTree):
+    """Wrapper for TextualTree."""
+
+    def __init__(self, root: TreeNode) -> None:
+        self.root_node = root
+
+    @override
+    def add_branch(self, label: str, expand: bool = False) -> 'TerminalTree':
+        # simulate the same way the newly created sub-tree is returned when .add() is called on a TerminalTree
+        child_node = self.root_node.add(label, expand=expand)
+        return TerminalTree(child_node)
+
+    @override
+    def add_leaf(self, label: str) -> None:
+        self.root_node.add_leaf(label)
+
+
+def extend_state_modeling_plugins(
+    plugin_type_tree: CatalogTree, plugin: PluginType
+) -> bool:
+    if not issubclass(plugin, StateModelingPlugin):
+        return False
+
+    # state modeling plugins have providers we want to view in their sub trees
+    plugin_tree = plugin_type_tree.add_branch(plugin.__name__, expand=False)
+    provider_added = False
+    try:
+        plugin_obj: StateModelingPlugin = plugin(identifier='temp')  # ty:ignore[unknown-argument]
+        for model_type in StateModelProviderType.__constraints__:
+            if model_type != Any:
+                logger = _CatalogLoggingPlugin()
+                plugin_obj.init_plugin(mediator=DummyMediator([logger]))
+                mod_provider = plugin_obj.new_state_model_provider(
+                    model_type  # ty:ignore[invalid-argument-type]
+                )
+
+                if logger.error is not None:
+                    plugin_tree.add_leaf('Error: ' + logger.error)
+                if mod_provider:
+                    # if it's a standard state model, there's 3 categories we want to include
+                    if issubclass(type(mod_provider), StandardStateModelProvider):
+                        provider_tree = plugin_tree.add_branch(
+                            type(mod_provider).__name__
+                        )
+
+                        mps = mod_provider.processor_identifiers
+                        if mps:
+                            mp_tree = provider_tree.add_branch('Measurement Processors')
+                            for mp in mps:
+                                mp_tree.add_leaf(mp)
+
+                        sbs = mod_provider.block_identifiers
+                        if sbs:
+                            sb_tree = provider_tree.add_branch('State Blocks')
+                            for sb in sbs:
+                                sb_tree.add_leaf(sb)
+
+                        vsbs = mod_provider.virtual_block_identifiers
+                        if vsbs:
+                            vsb_tree = provider_tree.add_branch('Virtual State Blocks')
+                            for vsb in vsbs:
+                                vsb_tree.add_leaf(vsb)
+                    else:
+                        plugin_tree.add_leaf(type(mod_provider).__name__)
+                    provider_added = True
+        if not provider_added:
+            plugin_tree.add_leaf('No Providers found')
+    except AttributeError:
+        plugin_tree.add_leaf('Unable to view all Providers')
+    return True
+
+
+_specific_extensions: list[Callable[[CatalogTree, PluginType], bool]] = [
+    extend_state_modeling_plugins,
+]
+"""
+Instead of adding just the plugin, if it matches an extension type add the plugin *and* corresponding subtree with information.
+The format of an extension function should:
+    Check if it's the wanted plugin type
+        If not, return false
+        If it is, add the subtree (including the plugin name as the root of that subtree) to the passed CatalogTree, then return true.
+
+Note that there should only be one extension function per plugin type.
+"""
+
+
+def build_plugin_tree(
+    tree: CatalogTree, args: argparse.Namespace, plugin_types: list[PluginType]
+) -> None:
+    """
+    Assembles a tree where each category (top-level plugin type) has
+    children that represent all plugins in the project that
+    inherit from that type.
+    Additionally, some plugins have additional internal properties that are displayed (collapsed if supported by the tree type)
+    """
+    for plugin_type in plugin_types:
+        # check if a type filter was provided, and use it if it was
+        if args.type and args.type != (plugin_type.__name__):
+            continue
+
+        plugins = get_subclasses(plugin_type)
+        if not plugins:
+            continue
+
+        plugin_type_tree = None
+        for plugin in plugins:
+            # use the match filter, will be '*' if not user specified so everything will match.
+            if re.match(args.match, plugin.__name__):
+                if plugin_type_tree is None:
+                    # create the category branch
+                    plugin_type_tree = tree.add_branch(
+                        plugin_type.__name__ + 's', expand=True
+                    )
+                matched_an_extender = False
+                # if the plugin matched with any of the types looked for in the extensions, it was added in that extension function as a branch
+                for extender_function in _specific_extensions:
+                    matched_an_extender = matched_an_extender or extender_function(
+                        plugin_type_tree, plugin
+                    )
+                # if it did not match any of the tree_extenders, add it as a leaf
+                if not matched_an_extender:
+                    plugin_type_tree.add_leaf(plugin.__name__)
+
+
+def print_plugin_tree(args: argparse.Namespace, plugin_types: list[PluginType]) -> None:
+    """Prints a rich tree of the available plugins, in a hierarchal structure, to the terminal. Contents can be filtered.
+
+    Args:
+        args (argparse.Namespace): Parsed command line arguments that contain filters for plugin name and type.
+        plugin_types (list[PluginType]): A list containing all base plugin types/categories to be searched through.
+    """
+
+    tree = RichTree('All Available Plugins')
+    build_plugin_tree(PrintTree(tree), args, plugin_types)
+
+    rich_print(tree)
+
+
+class Catalog(App[str]):
+    """
+    The app class for the textual app "catalog"
+    """
+
+    BINDINGS: typing.ClassVar = [
+        ('ctrl+c', 'quit', 'Quit the application'),
+        ('q', 'quit', 'Quit the application'),
+    ]
+
+    plugin_types: list[PluginType]
+    """A list containing all base plugin types/categories to be searched through."""
+    args: argparse.Namespace
+    """Parsed command line arguments that contain filters for plugin name and type."""
+
+    @override
+    def compose(self) -> ComposeResult:
+        tree: TextualTree[str] = TextualTree('All Available Plugins')
+        build_plugin_tree(TerminalTree(tree.root), self.args, self.plugin_types)
+
+        tree.root.expand()
+        yield tree
+
+
+def get_subclasses(base_class: PluginType) -> set[PluginType]:
+    """
+    Takes a class and returns a set with all subclasses (recursively)
+
+    Args:
+        base_class (type[object]): A class object, seen as `<class xyz>`. This is the "parent" object.
+
+    Returns:
+        set[type[object]]: A set containing the class of every subclass (recursive) of the original class.
+    """
+    subclasses = set()
+    work = [base_class]
+    while work:
+        parent = work.pop()
+        for child in parent.__subclasses__():
+            if child not in subclasses:
+                subclasses.add(child)
+                work.append(child)
+    return subclasses

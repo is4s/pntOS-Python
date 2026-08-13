@@ -98,6 +98,7 @@ nitpick_ignore = [
     ('py:class', 'enum.Enum'),
     ('py:class', 'enum.IntEnum'),
     ('py:class', 'contextlib.AbstractContextManager'),
+    ('py:class', 'threading.Event'),
     # numpy classes which automodule automatically tries to link to.
     ('py:class', 'float64'),
     ('py:class', 'NDArray'),

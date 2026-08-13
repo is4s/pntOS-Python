@@ -70,6 +70,7 @@ from .plots import (
 from .plugins import (
     SortedPlugins as SortedPlugins,
     camel_to_snake as camel_to_snake,
+    cobra_catalog as cobra_catalog,
     find_base_plugin_type as find_base_plugin_type,
     sort_plugins_dataclass as sort_plugins_dataclass,
     validate_plugins as validate_plugins,

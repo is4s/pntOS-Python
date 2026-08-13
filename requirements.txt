@@ -116,10 +116,14 @@ lcm==1.5.1
     #   navanalysis-lcm
     #   pntos-cobra
 libclang==18.1.1
+linkify-it-py==2.1.0
+    # via markdown-it-py
 markdown-it-py==3.0.0
     # via
     #   mdit-py-plugins
     #   myst-parser
+    #   rich
+    #   textual
 markupsafe==3.0.2
     # via
     #   flask
@@ -133,7 +137,9 @@ matplotlib==3.10.5
 matplotlib-inline==0.1.7
     # via ipython
 mdit-py-plugins==0.4.2
-    # via myst-parser
+    # via
+    #   myst-parser
+    #   textual
 mdurl==0.1.2
     # via markdown-it-py
 myst-parser==4.0.1
@@ -176,6 +182,8 @@ pexpect==4.9.0 ; sys_platform != 'emscripten' and sys_platform != 'win32'
 pillow==11.3.0
     # via matplotlib
 pip==25.2
+platformdirs==4.11.2
+    # via textual
 pluggy==1.6.0
     # via
     #   pytest
@@ -200,7 +208,9 @@ pygments==2.19.2
     #   ipython
     #   ipython-pygments-lexers
     #   pytest
+    #   rich
     #   sphinx
+    #   textual
 pyparsing==3.2.3
     # via matplotlib
 pyproject-fmt==2.7.0
@@ -219,6 +229,8 @@ pyyaml==6.0.2
     #   navanalysis-lcm
 requests==2.32.4
     # via sphinx
+rich==15.0.0
+    # via textual
 roman-numerals-py==3.1.0 ; python_full_version >= '3.11'
     # via sphinx
 ruff==0.13.2
@@ -276,6 +288,8 @@ stack-data==0.6.3
     # via ipython
 tabulate==0.9.0
     # via navanalysis-lcm
+textual==8.2.8
+    # via pntos-cobra
 toml-fmt-common==1.0.1
     # via pyproject-fmt
 tomli==2.2.1 ; python_full_version <= '3.11'
@@ -304,9 +318,12 @@ typing-extensions==4.14.1
     #   pntos-python
     #   pydantic
     #   pydantic-core
+    #   textual
     #   typing-inspection
 typing-inspection==0.4.2
     # via pydantic
+uc-micro-py==2.0.0
+    # via linkify-it-py
 urllib3==2.5.0
     # via requests
 wcwidth==0.2.13
