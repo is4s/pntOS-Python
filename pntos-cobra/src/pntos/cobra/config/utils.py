@@ -601,9 +601,9 @@ def _is_type_supported(field_type: type[Any]) -> bool:
         return False
     # if type is a tuple or list, check the type of each value it contains
     if origin is list:
-        return _validate_list_type(type_to_compare)
+        return _validate_list_type(type_to_compare)  # ty:ignore[invalid-argument-type]
     if origin is tuple:
-        return _validate_tuple_type(type_to_compare)
+        return _validate_tuple_type(type_to_compare)  # ty:ignore[invalid-argument-type]
     if origin is np.ndarray:
         shape, dtype = get_args(type_to_compare)  # noqa: RUF059
         dtype = get_args(dtype)[0]
@@ -612,7 +612,8 @@ def _is_type_supported(field_type: type[Any]) -> bool:
     if origin is not None:
         return False
     return type_to_compare in SUPPORTED_TYPES or issubclass(
-        type_to_compare, (Enum, IntEnum, BaseConfig)
+        type_to_compare,  # ty:ignore[invalid-argument-type]
+        (Enum, IntEnum, BaseConfig),
     )
 
 

@@ -308,7 +308,7 @@ traitlets==5.14.3
     # via
     #   ipython
     #   matplotlib-inline
-ty==0.0.54
+ty==0.0.64
 typing-extensions==4.14.1
     # via
     #   exceptiongroup

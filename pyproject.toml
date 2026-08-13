@@ -43,7 +43,7 @@ dev = [
     "sphinx-copybutton",
     "sphinx-design",
     "sphinx-rtd-theme>=3.0.2",
-    "ty==0.0.54",
+    "ty==0.0.64",
 ]
 
 [tool.ruff]
@@ -161,3 +161,6 @@ src.exclude = [
 ]
 rules.all = "error"
 rules.missing-type-argument = "ignore"
+
+[tool.ty.analysis]
+strict-equality-semantics = false
