@@ -4,7 +4,7 @@ requires = [ "pntos-python-docs-data", "setuptools>=68" ]
 
 [project]
 name = "pntos-cobra"
-version = "2.1.0-0.dev3"
+version = "2.1.0-0.dev4"
 description = "A Python implementation of a set of pntOS example plugins."
 readme = "README.md"
 license = "Apache-2.0"

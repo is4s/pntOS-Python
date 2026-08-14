@@ -24,5 +24,5 @@ dependencies = [
     "navtk==2.1.post7.dev0",
     "numpy",
     "pntos-api>=2.0.0,<3.0.0",
-    "pntos-cobra==2.1.0.post0.dev3",
+    "pntos-cobra>=2.1.0.post0.dev3,<=2.1.0.post0.dev4",
 ]
