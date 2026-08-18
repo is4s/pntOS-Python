@@ -1,7 +1,7 @@
-diff --git a/apps/standard/pos_ins.py b/apps/standard/pos_ins_bodyvel.py
+diff --git a/pntos-cobra-apps/src/pntos/apps/standard/pos_ins.py b/pntos-cobra-apps/src/pntos/apps/standard/pos_ins_bodyvel.py
 index 9903fdf3..4c6b31e6 100755
---- a/apps/standard/pos_ins.py
-+++ b/apps/standard/pos_ins_bodyvel.py
+--- a/pntos-cobra-apps/src/pntos/apps/standard/pos_ins.py
++++ b/pntos-cobra-apps/src/pntos/apps/standard/pos_ins_bodyvel.py
 @@ -29,6 +29,7 @@ from pntos.cobra import (
  from pntos.cobra.config import (
      BaseConfig,

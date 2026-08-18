@@ -21,6 +21,7 @@ dependencies = [
     "navanalysis-ros>=0.1.2",
     "pntos-api",
     "pntos-cobra",
+    "pntos-cobra-apps",
     "pntos-extras",
     "pntos-python-datasets-lcm==0.1.0",
     "pntos-python-datasets-ros==0.1.0",
@@ -50,9 +51,10 @@ dev = [
 [tool.uv]
 sources.pntos-api = { workspace = true }
 sources.pntos-cobra = { workspace = true }
+sources.pntos-cobra-apps = { workspace = true }
 sources.pntos-extras = { workspace = true }
 package = false
-workspace.members = [ "pntos-api", "pntos-cobra", "pntos-extras" ]
+workspace.members = [ "pntos-api", "pntos-cobra", "pntos-cobra-apps", "pntos-extras" ]
 
 [tool.ruff]
 format.quote-style = "single"
@@ -115,10 +117,10 @@ lint.per-file-ignores."*/tests/*" = [
     "PLW0602",
     "PLW0603",
 ]
-lint.per-file-ignores."apps/*" = [ "D" ]
 lint.per-file-ignores."docs/*" = [ "D" ]
 lint.per-file-ignores."internal.py" = [ "PLC0414" ]
 lint.per-file-ignores."pntos-api/*" = [ "PIE" ]
+lint.per-file-ignores."pntos-cobra-apps/*" = [ "D" ]
 lint.per-file-ignores."pntos-cobra/*" = [ "D" ]
 lint.per-file-ignores."pntos-extras/*" = [ "D" ]
 lint.per-file-ignores."postprocessing/*" = [ "D" ]

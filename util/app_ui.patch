@@ -1,7 +1,7 @@
-diff --git a/apps/standard/lcm_relay.py b/apps/advanced/ui.py
+diff --git a/pntos-cobra-apps/src/pntos/apps/standard/lcm_relay.py b/pntos-cobra-apps/src/pntos/apps/advanced/ui.py
 index 3d56a14c..05744c2e 100755
---- a/apps/standard/lcm_relay.py
-+++ b/apps/advanced/ui.py
+--- a/pntos-cobra-apps/src/pntos/apps/standard/lcm_relay.py
++++ b/pntos-cobra-apps/src/pntos/apps/advanced/ui.py
 @@ -12,7 +12,9 @@ from pntos.api import (
  
  # Import Cobra plugins and config structs

@@ -10,6 +10,7 @@ resolution-markers = [
 members = [
     "pntos-api",
     "pntos-cobra",
+    "pntos-cobra-apps",
     "pntos-extras",
     "pntos-python",
 ]
@@ -1468,6 +1469,23 @@ requires-dist = [
 ]
 
 [[package]]
+name = "pntos-cobra-apps"
+version = "0.1.0"
+source = { editable = "pntos-cobra-apps" }
+dependencies = [
+    { name = "pntos-api" },
+    { name = "pntos-cobra" },
+    { name = "pntos-python-datasets-lcm" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "pntos-api", editable = "pntos-api" },
+    { name = "pntos-cobra", editable = "pntos-cobra" },
+    { name = "pntos-python-datasets-lcm", specifier = ">=0.1.0" },
+]
+
+[[package]]
 name = "pntos-cobra-docs-data"
 version = "1.0.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1506,6 +1524,7 @@ dependencies = [
     { name = "navanalysis-ros" },
     { name = "pntos-api" },
     { name = "pntos-cobra" },
+    { name = "pntos-cobra-apps" },
     { name = "pntos-extras" },
     { name = "pntos-python-datasets-lcm" },
     { name = "pntos-python-datasets-ros" },
@@ -1541,6 +1560,7 @@ requires-dist = [
     { name = "navanalysis-ros", specifier = ">=0.1.2" },
     { name = "pntos-api", editable = "pntos-api" },
     { name = "pntos-cobra", editable = "pntos-cobra" },
+    { name = "pntos-cobra-apps", editable = "pntos-cobra-apps" },
     { name = "pntos-extras", editable = "pntos-extras" },
     { name = "pntos-python-datasets-lcm", specifier = "==0.1.0" },
     { name = "pntos-python-datasets-ros", specifier = "==0.1.0" },

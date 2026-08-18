@@ -3,12 +3,16 @@
 -e ./pntos-api
     # via
     #   pntos-cobra
+    #   pntos-cobra-apps
     #   pntos-extras
     #   pntos-python
 -e ./pntos-cobra
     # via
+    #   pntos-cobra-apps
     #   pntos-extras
     #   pntos-python
+-e ./pntos-cobra-apps
+    # via pntos-python
 -e ./pntos-extras
     # via pntos-python
 annotated-types==0.7.0
@@ -125,7 +129,9 @@ pillow==11.3.0
 platformdirs==4.11.2
     # via textual
 pntos-python-datasets-lcm==0.1.0
-    # via pntos-python
+    # via
+    #   pntos-cobra-apps
+    #   pntos-python
 pntos-python-datasets-ros==0.1.0
     # via pntos-python
 pydantic==2.13.4

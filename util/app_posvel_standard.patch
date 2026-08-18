@@ -1,7 +1,7 @@
-diff --git a/apps/standard/pos_vel_ins.py b/apps/standard/posvel_ins.py
+diff --git a/pntos-cobra-apps/src/pntos/apps/standard/pos_vel_ins.py b/pntos-cobra-apps/src/pntos/apps/standard/posvel_ins.py
 index 28bbae68..b96865b9 100755
---- a/apps/standard/pos_vel_ins.py
-+++ b/apps/standard/posvel_ins.py
+--- a/pntos-cobra-apps/src/pntos/apps/standard/pos_vel_ins.py
++++ b/pntos-cobra-apps/src/pntos/apps/standard/posvel_ins.py
 @@ -1,11 +1,13 @@
  #!/usr/bin/env python3
  

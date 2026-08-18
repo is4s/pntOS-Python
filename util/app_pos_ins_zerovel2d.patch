@@ -1,7 +1,7 @@
-diff --git a/apps/standard/pos_ins_bodyvel.py b/apps/extras/pos_ins_zerovel2d.py
+diff --git a/pntos-cobra-apps/src/pntos/apps/standard/pos_ins_bodyvel.py b/pntos-cobra-apps/src/pntos/apps/extras/pos_ins_zerovel2d.py
 index 4c6b31e6..41c26c6b 100755
---- a/apps/standard/pos_ins_bodyvel.py
-+++ b/apps/extras/pos_ins_zerovel2d.py
+--- a/pntos-cobra-apps/src/pntos/apps/standard/pos_ins_bodyvel.py
++++ b/pntos-cobra-apps/src/pntos/apps/extras/pos_ins_zerovel2d.py
 @@ -1,5 +1,13 @@
  #!/usr/bin/env python3
  

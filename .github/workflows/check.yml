@@ -245,7 +245,7 @@ jobs:
           uses: ./.github/actions/setup
 
         - name: Run app
-          run: docker exec pntos-python pytest apps -k ${{ matrix.app }} -s
+          run: docker exec pntos-python pytest pntos-cobra-apps -k ${{ matrix.app }} -s
 
     ROS-App:
         name: ROS Transport App
@@ -266,7 +266,7 @@ jobs:
                                             git fetch --depth 1 origin $FIREHOSE_OUTPUTS_VERSION &&
                                             git checkout $FIREHOSE_OUTPUTS_VERSION"
             docker exec pntos-python bash -c ". firehose-outputs/ros_devel/jazzy/setup.bash &&
-                                            pytest apps -k test_advanced_pos_ins_ros_app -s"
+                                            pytest pntos-cobra-apps -k test_advanced_pos_ins_ros_app -s"
 
     Advanced-UI-App:
         name: Advanced UI App
@@ -281,7 +281,7 @@ jobs:
           run: |
             set -xe
             docker exec pntos-python ./util/build_ui.sh
-            docker exec pntos-python pytest apps -k test_ui_app -s
+            docker exec pntos-python pytest pntos-cobra-apps -k test_ui_app -s
 
     pip-workflow:
         name: Test ${{ matrix.requirements }} pip workflow
@@ -320,7 +320,7 @@ jobs:
             key: pip-cache-${{ matrix.requirements }}-${{ hashFiles(matrix.requirements) }}
 
         - name: Run an app
-          run: docker exec pntos-python postprocessing/run_app_and_record_data.py apps/standard/pos_ins.py
+          run: docker exec pntos-python postprocessing/run_app_and_record_data.py pntos-cobra-apps/src/pntos/apps/standard/pos_ins.py
 
     Copyright:
         name: Copyright year

@@ -1,7 +1,7 @@
-diff --git a/apps/tutorial/pos_ins.py b/apps/standard/pos_ins.py
-index 940541fe..a1c36865 100755
---- a/apps/tutorial/pos_ins.py
-+++ b/apps/standard/pos_ins.py
+diff --git a/pntos-cobra-apps/src/pntos/apps/tutorial/pos_ins.py b/pntos-cobra-apps/src/pntos/apps/standard/pos_ins.py
+index 33d14266..9903fdf3 100755
+--- a/pntos-cobra-apps/src/pntos/apps/tutorial/pos_ins.py
++++ b/pntos-cobra-apps/src/pntos/apps/standard/pos_ins.py
 @@ -2,39 +2,46 @@
  
  import sys

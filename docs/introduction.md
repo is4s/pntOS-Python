@@ -27,7 +27,7 @@ This project consists of the following main parts:
 |:-------------------------------------------------------------------------------------------- |:--------------------------------- |:----------------------------------------------------------------------------------------- |
 | pntOS-Python Architecture Application Programming Interface [(API)](./autodocs/api.rst) | `pntos-api/src/pntos/api/plugins` | Defines a set of plugins and how they are to interact.                                    |
 | [Cobra Plugins](./plugins.md)                                                                | `pntos-cobra/src/pntos/cobra`     | Implementation of API - functional Python plugins and helper objects.                     |
-| [Cobra Apps](./first_app.md)                                                                 | `apps/`                           | Each app loads a set of Cobra plugins, defines any config values, and starts the plugins. |
+| [Cobra Apps](./first_app.md)                                                                 | `pntos-cobra-apps/src/pntos/apps/` | Each app loads a set of Cobra plugins, defines any config values, and starts the plugins. |
 ```
 
 While pntOS is analogous to an operating system in terms of its comprehensive scope, it is not a true
@@ -132,7 +132,7 @@ wired up to talk to each other, told to start listening and processing data, and
 Most apps will look very similar to each other, with the only changes being which plugins the {term}`App` has
 decided to use and what config stanzas it needs. You can find an example of a full-fledged {term}`App` that performs
 POS/INS sensor fusion from sensor data it receives from an LCM network bus
-[here](https://github.com/is4s/pntOS-Python/blob/main/apps/tutorial/pos_ins.py).
+[here](https://github.com/is4s/pntOS-Python/tree/main/pntos-cobra-apps/src/pntos/apps/tutorial/pos_ins.py).
 For instructions on how to run this example app, see [Running Your First App](first_app.md).
 
 ### A Very Simple App
@@ -153,7 +153,7 @@ excluded here for brevity.
 
 We might write our app like this:
 
-```{literalinclude} ../apps/dummy/minimal.py
+```{literalinclude} ../pntos-cobra-apps/src/pntos/apps/dummy/minimal.py
 ```
 
 ...and thats it! Once our {term}`App` calls
@@ -176,7 +176,7 @@ As a parameter, {py:obj}`take_control<pntos.api.ControllerPlugin.take_control>` 
 plugins that it is supposed to use to set up the {term}`pntOS-Python` system. For example, our
 {py:obj}`Controller plugin<pntos.api.ControllerPlugin>` might receive this list of plugins:
 
-```{literalinclude} ../apps/dummy/minimal.py
+```{literalinclude} ../pntos-cobra-apps/src/pntos/apps/dummy/minimal.py
 :start-at: plugins: list[CommonPlugin] =
 :end-at: ]
 ```
@@ -763,7 +763,7 @@ If you do not have Cobra installed into an active virtual environment, first see
 Now, let's run the app:
 
 ```shell
-apps/dummy/minimal.py
+pntos-cobra-apps/src/pntos/apps/dummy/minimal.py
 ```
 
 You should see something like:

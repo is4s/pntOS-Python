@@ -26,16 +26,16 @@ Run this command to set up the LCM relay:
 java -classpath $VIRTUAL_ENV/lib/python3.*/site-packages/share/java/lcm.jar lcm.lcm.TCPService
 ```
 
-Then, in a separate terminal, run the experimental UI app script with:
+Then, in a separate terminal (with the with the Python virtual environment activated), run the experimental UI app script with:
 
 ```sh
-apps/advanced/ui.py
+cobra_advanced_ui_app
 ```
 
 The terminal output should look something like this:
 
 ```
-$ apps/advanced/ui.py 
+$ cobra_advanced_ui_app
 [29/05/2026 13:53:25] [LoggingPlugin] [INFO] using hard-coded global logging level INFO
 [29/05/2026 13:53:25] [UiPlugin] [INFO] Web server starting on http://localhost:5001
 LCM tcpq: connecting...

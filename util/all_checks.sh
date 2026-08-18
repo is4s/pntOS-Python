@@ -16,7 +16,7 @@ util/check_sync.sh
 ret_val=$?  # this must be set after check_sync to observe if it passed or not
 util/build_docs.sh
 pytest pntos-cobra pntos-extras --cov
-pytest apps -s
+pytest pntos-cobra-apps -s
 python3 util/api_synchronization/compare_apis.py
 
 # don't print the following commands

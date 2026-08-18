@@ -1,7 +1,7 @@
-diff --git a/apps/standard/pos_ins.py b/apps/standard/pos_ins_vsb.py
+diff --git a/pntos-cobra-apps/src/pntos/apps/standard/pos_ins.py b/pntos-cobra-apps/src/pntos/apps/standard/pos_ins_vsb.py
 index 9903fdf3..f7780e91 100755
---- a/apps/standard/pos_ins.py
-+++ b/apps/standard/pos_ins_vsb.py
+--- a/pntos-cobra-apps/src/pntos/apps/standard/pos_ins.py
++++ b/pntos-cobra-apps/src/pntos/apps/standard/pos_ins_vsb.py
 @@ -37,8 +37,9 @@ from pntos.cobra.config import (
      InertialConfig,
      LcmLogTransportConfig,

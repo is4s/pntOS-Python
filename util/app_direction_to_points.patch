@@ -1,7 +1,7 @@
-diff --git a/apps/standard/pos_ins.py b/apps/standard/direction_to_points.py
+diff --git a/pntos-cobra-apps/src/pntos/apps/standard/pos_ins.py b/pntos-cobra-apps/src/pntos/apps/standard/direction_to_points.py
 index 9903fdf3..d6a71d9b 100755
---- a/apps/standard/pos_ins.py
-+++ b/apps/standard/direction_to_points.py
+--- a/pntos-cobra-apps/src/pntos/apps/standard/pos_ins.py
++++ b/pntos-cobra-apps/src/pntos/apps/standard/direction_to_points.py
 @@ -29,6 +29,7 @@ from pntos.cobra import (
  from pntos.cobra.config import (
      BaseConfig,

@@ -3,12 +3,16 @@
 -e ./pntos-api
     # via
     #   pntos-cobra
+    #   pntos-cobra-apps
     #   pntos-extras
     #   pntos-python
 -e ./pntos-cobra
     # via
+    #   pntos-cobra-apps
     #   pntos-extras
     #   pntos-python
+-e ./pntos-cobra-apps
+    # via pntos-python
 -e ./pntos-extras
     # via pntos-python
 alabaster==1.0.0
@@ -190,7 +194,9 @@ pluggy==1.6.0
     #   pytest-cov
 pntos-cobra-docs-data==1.0.0
 pntos-python-datasets-lcm==0.1.0
-    # via pntos-python
+    # via
+    #   pntos-cobra-apps
+    #   pntos-python
 pntos-python-datasets-ros==0.1.0
     # via pntos-python
 prompt-toolkit==3.0.51

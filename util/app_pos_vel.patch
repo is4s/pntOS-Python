@@ -1,7 +1,7 @@
-diff --git a/apps/tutorial/pos_ins.py b/apps/tutorial/pos_vel_ins.py
+diff --git a/pntos-cobra-apps/src/pntos/apps/tutorial/pos_ins.py b/pntos-cobra-apps/src/pntos/apps/tutorial/pos_vel_ins.py
 index 33d14266..afb75427 100755
---- a/apps/tutorial/pos_ins.py
-+++ b/apps/tutorial/pos_vel_ins.py
+--- a/pntos-cobra-apps/src/pntos/apps/tutorial/pos_ins.py
++++ b/pntos-cobra-apps/src/pntos/apps/tutorial/pos_vel_ins.py
 @@ -17,7 +17,7 @@ from pntos.cobra import (
      TutorialInitializationPlugin,
      TutorialLcmLogTransportPlugin,

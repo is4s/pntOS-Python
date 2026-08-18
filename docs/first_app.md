@@ -6,7 +6,7 @@ Downstream users will need to write their own apps to run. For help on building 
 [The Exercises](./exercises.md)
 :::
 
-In the `apps/` directory, there are several off-the-shelf {term}`apps
+In the `pntos-cobra-apps/src/pntos/apps/` directory, there are several off-the-shelf {term}`apps
 <App>` of increasing complexity assembled from off-the-shelf {term}`Cobra` plugins that
 serve to demonstrate {term}`pntOS-Python` and the development process for you to
 build your own {term}`apps <App>`. This page serves as an introduction to running an
@@ -46,7 +46,7 @@ from the root directory to enter the virtual environment. The command varies dep
 
 ### Select and Run an App
 
-The available apps can be found in each subfolder of the `{workspace-root}/apps`
+The available apps can be found in each subfolder of the `{workspace-root}/pntos-cobra-apps/src/pntos/apps`
 directory. If this is your first time with {term}`pntOS-Python`, it is recommended you
 start with the `pos_ins` app. If you are running your own custom app, just switch out
 the paths to the off-the-shelf apps with the path to your app in the following
@@ -68,7 +68,7 @@ To run this app, run this command from the root workspace directory (with the Py
 environment activated):
 
 ```shell
-apps/tutorial/pos_ins.py
+cobra_tutorial_pos_ins_app
 ```
 
 Once the app is started, it will immediately start processing messages from the input log,
@@ -120,7 +120,7 @@ To run this app, run this command from the root workspace directory (with the Py
 environment activated):
 
 ```shell
-apps/tutorial/pos_vel_ins.py
+cobra_tutorial_pos_vel_ins_app
 ```
 
 Once the app is started, it will immediately start processing messages from the input log,
@@ -172,7 +172,7 @@ To run this app, run this command from the root workspace directory (with the Py
 environment activated):
 
 ```shell
-apps/standard/pos_ins.py
+cobra_standard_pos_ins_app
 ```
 
 Once the app is started, it will immediately start processing messages from the input log,
@@ -271,7 +271,7 @@ to `DEBUG` when initializing the {py:obj}`pntos.cobra.StandardLoggingPlugin`.
 Finally, to start the LCM Relay App run the following command in a new terminal:
 
 ```shell
-apps/standard/lcm_relay.py
+cobra_standard_lcm_relay_app
 ```
 
 This will spin up pntOS and it is ready to start processing messages. To produce solutions, simply
@@ -316,11 +316,13 @@ type showcases certain capabilities and features of pntOS from low to high compl
 Any other apps not mentioned here may be run with the following command:
 
 ```shell
-apps/{app-type}/{app-name}.py
+cobra_{app-type}_{app-name}_app
 ```
 
-Where you would replace `{app-type}` with the app's designated type, and replace `{app-name}` with the name
-of the Python script of the actual app. This is essentially just a path to the executable Python file.
+This is the general format of the app command-line entry points, where you would replace `{app-type}` with
+the app's designated type, and replace `{app-name}` with the name of the Python script of the actual app. If
+you are running in the source project directory, you can also run the apps directly using the executable
+Python files, located in `{workspace-root}/pntos-cobra-apps/src/pntos/apps`.
 ````
 `````
 

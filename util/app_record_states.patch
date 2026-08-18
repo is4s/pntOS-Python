@@ -1,7 +1,7 @@
-diff --git a/apps/standard/pos_ins.py b/apps/standard/pos_ins_record_states.py
+diff --git a/pntos-cobra-apps/src/pntos/apps/standard/pos_ins.py b/pntos-cobra-apps/src/pntos/apps/standard/pos_ins_record_states.py
 index 9903fdf3..62fd142f 100755
---- a/apps/standard/pos_ins.py
-+++ b/apps/standard/pos_ins_record_states.py
+--- a/pntos-cobra-apps/src/pntos/apps/standard/pos_ins.py
++++ b/pntos-cobra-apps/src/pntos/apps/standard/pos_ins_record_states.py
 @@ -1,5 +1,18 @@
  #!/usr/bin/env python3
  

@@ -1,7 +1,7 @@
-diff --git a/apps/standard/pos_ins.py b/apps/standard/lcm_relay.py
+diff --git a/pntos-cobra-apps/src/pntos/apps/standard/pos_ins.py b/pntos-cobra-apps/src/pntos/apps/standard/lcm_relay.py
 index 9903fdf3..3d56a14c 100755
---- a/apps/standard/pos_ins.py
-+++ b/apps/standard/lcm_relay.py
+--- a/pntos-cobra-apps/src/pntos/apps/standard/pos_ins.py
++++ b/pntos-cobra-apps/src/pntos/apps/standard/lcm_relay.py
 @@ -1,7 +1,5 @@
  #!/usr/bin/env python3
  

@@ -25,7 +25,7 @@ navigation systems with {term}`pntOS-Python` and {term}`Cobra`.
 ## App Walkthrough
 
 Let's walk through this first app piece by piece. You can find the first app file at
-[`pntos-python/apps/tutorial/pos_ins.py`](https://github.com/is4s/pntOS-Python/blob/main/apps/tutorial/pos_ins.py)
+[`pntos-python/pntos-cobra-apps/src/pntos/apps/tutorial/pos_ins.py`](https://github.com/is4s/pntOS-Python/tree/main/pntos-cobra-apps/src/pntos/apps/tutorial/pos_ins.py)
 to follow along. Let's get started by examining how you import elements from the `pntos` module.
 
 ### Imports
@@ -53,7 +53,7 @@ a plugin in an app.
 In this case, we need to import the {py:obj}`LoggingLevel <pntos.api.LoggingLevel>` enum
 from the API:
 
-```{literalinclude} ../../apps/tutorial/pos_ins.py
+```{literalinclude} ../../pntos-cobra-apps/src/pntos/apps/tutorial/pos_ins.py
 :start-at: "from pntos.api import"
 :end-at: "from pntos.api import"
 :lineno-match:
@@ -62,7 +62,7 @@ from the API:
 This is used for initializing the global log level of the {py:obj}`StandardLoggingPlugin
 <pntos.cobra.StandardLoggingPlugin>` later in the app:
 
-```{literalinclude} ../../apps/tutorial/pos_ins.py
+```{literalinclude} ../../pntos-cobra-apps/src/pntos/apps/tutorial/pos_ins.py
 :start-at: "StandardLoggingPlugin("
 :end-at: ")"
 :lineno-match:
@@ -75,7 +75,7 @@ This is used for initializing the global log level of the {py:obj}`StandardLoggi
 You should only see plugin imports from the top-level of [`pntos.cobra`](../autodocs/cobra_plugins.rst). For instance,
 check out where the app imports the following {term}`Cobra` plugins:
 
-```{literalinclude} ../../apps/tutorial/pos_ins.py
+```{literalinclude} ../../pntos-cobra-apps/src/pntos/apps/tutorial/pos_ins.py
 :start-at: "from pntos.cobra import ("
 :end-at: ")"
 :lineno-match:
@@ -93,7 +93,7 @@ submodule contains {term}`Cobra` config objects and a few utility functions rele
 specifically to these config objects. We'll explore these more in the next section, but
 for now we need the following config objects for this POS INS fusion app:
 
-```{literalinclude} ../../apps/tutorial/pos_ins.py
+```{literalinclude} ../../pntos-cobra-apps/src/pntos/apps/tutorial/pos_ins.py
 :start-at: "from pntos.cobra.config import ("
 :end-at: ")"
 :lineno-match:
@@ -110,7 +110,7 @@ recorded, along with all input measurements. This log can then be used to analyz
 the solution. If this filename is not provided as a command-line argument, it defaults to
 `pntos_output.log`.
 
-```{literalinclude} ../../apps/tutorial/pos_ins.py
+```{literalinclude} ../../pntos-cobra-apps/src/pntos/apps/tutorial/pos_ins.py
 :start-at: "from pntos_python_datasets_lcm"
 :end-at: "OUTPUT_LOG"
 :lineno-match:
@@ -149,7 +149,7 @@ The conventions also provide information on creating your own config dataclasses
 
 So, with that background, we can now understand what is happening next in the app:
 
-```{literalinclude} ../../apps/tutorial/pos_ins.py
+```{literalinclude} ../../pntos-cobra-apps/src/pntos/apps/tutorial/pos_ins.py
 :start-at: "my_config"
 :end-at: "# End Config"
 :lineno-match:
@@ -198,7 +198,7 @@ Now we have everything we need to get our plugins running. All that's left is:
 
 We can instantiate our controller plugin like so:
 
-```{literalinclude} ../../apps/tutorial/pos_ins.py
+```{literalinclude} ../../pntos-cobra-apps/src/pntos/apps/tutorial/pos_ins.py
 :start-at: "controller = "
 :end-before: "plugins: list[CommonPlugin] = "
 :lineno-match:
@@ -208,7 +208,7 @@ We can instantiate our controller plugin like so:
 
 Next we can instantiate all the other plugins we want in this app and put them in a list:
 
-```{literalinclude} ../../apps/tutorial/pos_ins.py
+```{literalinclude} ../../pntos-cobra-apps/src/pntos/apps/tutorial/pos_ins.py
 :start-at: "plugins: list[CommonPlugin] = "
 :end-at: "]"
 :lineno-match:
@@ -233,7 +233,7 @@ start up the controller:
 
 #### 3. Call `init_plugin` on Controller
 
-```{literalinclude} ../../apps/tutorial/pos_ins.py
+```{literalinclude} ../../pntos-cobra-apps/src/pntos/apps/tutorial/pos_ins.py
 :start-at: "controller.init_plugin()"
 :end-at: ")"
 :lineno-match:

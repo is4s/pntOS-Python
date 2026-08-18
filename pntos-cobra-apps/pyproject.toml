@@ -1,0 +1,43 @@
+[build-system]
+build-backend = "setuptools.build_meta"
+requires = [ "setuptools>=68" ]
+
+[project]
+name = "pntos-cobra-apps"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+license = "Apache-2.0"
+license-files = [ "LICENSE" ]
+authors = [ { name = "IS4S", email = "pntos@is4s.com" } ]
+requires-python = ">=3.10"
+classifiers = [
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+]
+dependencies = [
+    "pntos-api>=2.0.0,<3.0.0",
+    "pntos-cobra==2.1.0.post0.dev4",
+    "pntos-python-datasets-lcm>=0.1.0",
+]
+scripts.cobra_advanced_buscat_app = "pntos.apps.advanced.buscat:main"
+scripts.cobra_advanced_pos_ins_ros_app = "pntos.apps.advanced.pos_ins_ros:main"
+scripts.cobra_advanced_ui_app = "pntos.apps.advanced.ui:main"
+scripts.cobra_dummy_minimal_app = "pntos.apps.dummy.minimal:main"
+scripts.cobra_extras_pos_ins_zerovel2d_app = "pntos.apps.extras.pos_ins_zerovel2d:main"
+scripts.cobra_standard_direction_to_points_app = "pntos.apps.standard.direction_to_points:main"
+scripts.cobra_standard_lcm_relay_app = "pntos.apps.standard.lcm_relay:main"
+scripts.cobra_standard_outage_sim_app = "pntos.apps.standard.outage_sim:main"
+scripts.cobra_standard_pos_ins_app = "pntos.apps.standard.pos_ins:main"
+scripts.cobra_standard_pos_ins_bodyvel_app = "pntos.apps.standard.pos_ins_bodyvel:main"
+scripts.cobra_standard_pos_ins_leverarm_app = "pntos.apps.standard.pos_ins_leverarm:main"
+scripts.cobra_standard_pos_ins_record_states_app = "pntos.apps.standard.pos_ins_record_states:main"
+scripts.cobra_standard_pos_ins_vsb_app = "pntos.apps.standard.pos_ins_vsb:main"
+scripts.cobra_standard_pos_vel_ins_app = "pntos.apps.standard.pos_vel_ins:main"
+scripts.cobra_standard_posvel_ins_app = "pntos.apps.standard.posvel_ins:main"
+scripts.cobra_tutorial_pos_ins_app = "pntos.apps.tutorial.pos_ins:main"
+scripts.cobra_tutorial_pos_vel_ins_app = "pntos.apps.tutorial.pos_vel_ins:main"

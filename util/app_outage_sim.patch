@@ -1,7 +1,7 @@
-diff --git a/apps/standard/pos_ins.py b/apps/standard/outage_sim.py
+diff --git a/pntos-cobra-apps/src/pntos/apps/standard/pos_ins.py b/pntos-cobra-apps/src/pntos/apps/standard/outage_sim.py
 index 9903fdf3..0a2ac03a 100755
---- a/apps/standard/pos_ins.py
-+++ b/apps/standard/outage_sim.py
+--- a/pntos-cobra-apps/src/pntos/apps/standard/pos_ins.py
++++ b/pntos-cobra-apps/src/pntos/apps/standard/outage_sim.py
 @@ -27,6 +27,8 @@ from pntos.cobra import (
      StandardStateModelingPlugin,
  )
