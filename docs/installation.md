@@ -22,13 +22,13 @@ Setting up your environment is done in three steps: installing native dependenci
 
 Please ensure you have the following packages installed and available on your system:
 
-| Package              | Reason Needed                      |
-| -------------------- | ---------------------------------- |
-| Python 3.10 or later | Needed to run Cobra                |
-| Git                  | Needed to acquire dependencies     |
-| Glib2                | Needed for LCM tools, to run Apps  |
-| Java                 | Needed for LCM tools, to run Apps  |
-| Tkinter              | Needed for plotting filter results |
+| Package              | Reason Needed                              |
+| -------------------- | ------------------------------------------ |
+| Python 3.10 or later | Needed to run Cobra                        |
+| Git                  | Needed if cloning Cobra.                   |
+| Glib2                | Needed for LCM tools, to run certain apps  |
+| Java                 | Needed for LCM tools, to run certain apps  |
+| Tkinter              | Needed for plotting filter results         |
 
 Ubuntu 22.04 users can use the following command to install the above packages:
 
