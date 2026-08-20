@@ -3,6 +3,17 @@
 This guide will walk you through setting up a Python virtual environment for running
 the example {term}`apps <App>` which utilize {term}`Cobra` plugins.
 
+Cobra is supported on unix-based (Linux and macOS) operating systems. Ubuntu (specifically 22.04) is
+the most-tested platform, but other unix-based platforms are supported as well.
+
+:::{admonition} Limitation
+:class: caution
+
+Cobra is not natively supported on Windows. It is still possible to run Cobra on windows using
+[Windows Subsystem Linux](https://learn.microsoft.com/en-us/windows/wsl/install) (WSL) or a virtual
+machine, although both are limited to experimental support in Cobra.
+:::
+
 ## Environment Setup
 
 Setting up your environment is done in three steps: installing native dependencies, cloning the {term}`pntOS-Python` project, and setting up your Python environment.
